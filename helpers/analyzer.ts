@@ -337,7 +337,7 @@ export async function logUpload(logFileName: string, testName: string) {
     const fail_lines = extractfail_lines(errorLogs);
     const shouldUploadLogs = !shouldFilterOutTest(errorLogs, fail_lines);
     console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
-    if (shouldUploadLogs) sendDatadogLog(errorLogs, testName, fail_lines);
+    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, fail_lines);
     const shouldSendNotification = fail_lines.length >= PATTERNS.min_fail_lines;
     console.log(`shouldSendNotification: ${shouldSendNotification}`);
     if (shouldSendNotification)

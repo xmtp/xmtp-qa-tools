@@ -270,11 +270,15 @@ export function flushMetrics(): Promise<void> {
 }
 
 // Datadog log sending - optimized
-export function sendDatadogLog(
+export async function sendDatadogLog(
   errorLogs: Set<string>,
   test: string,
   fail_lines: string[],
-): void {
+): Promise<void> {
+  if (!process.env.DATADOG_API_KEY) {
+    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
+    return;
+  }
   const logPayload: LogPayload = {
     metric_type: "error",
     metric_subtype: "test",
@@ -285,18 +289,16 @@ export function sendDatadogLog(
     test,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
   };
-  if (!process.env.DATADOG_API_KEY) {
-    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
-    return;
+  try {
+    await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "DD-API-KEY": process.env.DATADOG_API_KEY,
+      },
+      body: JSON.stringify(logPayload),
+    });
+  } catch (error) {
+    console.error("❌ Failed to send Datadog log:", error);
   }
-  metrics.init({ apiKey: process.env.DATADOG_API_KEY });
-  // await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //     "DD-API-KEY": process.env.DATADOG_API_KEY as string,
-  //   },
-  //   body: JSON.stringify(logPayload),
-  // });
-  sendMetric("log", fail_lines.length, logPayload);
 }
