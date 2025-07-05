@@ -36,7 +36,8 @@ export interface DeliveryMetricTags extends MetricTags {
 }
 export interface NetworkMetricTags extends MetricTags {
   metric_type: "network";
-  metric_subtype:
+  metric_subtype: "phase";
+  network_phase:
     | "dns_lookup"
     | "tcp_connection"
     | "tls_handshake"
