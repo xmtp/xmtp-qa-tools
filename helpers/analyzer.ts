@@ -8,10 +8,10 @@ import { processLogFile, stripAnsi } from "./logger";
 // Known test issues for tracking
 export const PATTERNS = {
   KNOWN_ISSUES: knownIssues,
-  minFailLines: 3,
-  minumumLineLength: 40,
-  maxLineLength: 150,
-  maxErrorLogs: 20,
+  min_fail_lines: 3,
+  min_line_length: 40,
+  max_line_length: 150,
+  max_error_logs: 20,
 
   DEDUPE: [
     "sqlcipher_mlock",
@@ -30,6 +30,25 @@ export const PATTERNS = {
   // Patterns to match error log lines
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
+
+export function hasKnownPattern(fail_lines: string[]): boolean | undefined {
+  // Check each configured filter
+  for (const filter of PATTERNS.KNOWN_ISSUES) {
+    const matchingLines = fail_lines.filter((line) =>
+      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
+    );
+
+    // If all fail lines match this filter's unique error lines, filter it out
+    if (
+      matchingLines.length > 0 &&
+      matchingLines.length === fail_lines.length
+    ) {
+      console.log(`Test filtered out (${filter.testName} test failure)`);
+      return true;
+    }
+  }
+  return false;
+}
 
 /**
  * Process error line for deduplication and cleaning
@@ -55,12 +74,12 @@ export function processErrorLine(line: string): {
 
   cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
 
-  if (cleanLine.length < PATTERNS.minumumLineLength) {
+  if (cleanLine.length < PATTERNS.min_line_length) {
     return { cleanLine, shouldSkip: true };
   }
   // Trim long lines to 200 characters max
-  if (cleanLine.length > PATTERNS.maxLineLength) {
-    cleanLine = cleanLine.substring(0, PATTERNS.maxLineLength - 3) + "...";
+  if (cleanLine.length > PATTERNS.max_line_length) {
+    cleanLine = cleanLine.substring(0, PATTERNS.max_line_length - 3) + "...";
   }
 
   return { cleanLine, shouldSkip: false };
@@ -249,7 +268,7 @@ export function extractErrorLogs(testName: string): Set<string> {
         return new Set();
       }
     }
-    const limit = PATTERNS.maxErrorLogs;
+    const limit = PATTERNS.max_error_logs;
     if (errorLines.length > 0) {
       const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
@@ -266,7 +285,7 @@ export function extractErrorLogs(testName: string): Set<string> {
 /**
  * Extract lines that contain test failures
  */
-export function extractFailLines(errorLogs: Set<string>): string[] {
+export function extractfail_lines(errorLogs: Set<string>): string[] {
   return Array.from(errorLogs).filter((log) => log.includes("FAIL  suites/"));
 }
 
@@ -282,7 +301,7 @@ export function sanitizeLogs(logs: string): string {
  */
 export function shouldFilterOutTest(
   errorLogs: Set<string>,
-  failLines: string[],
+  fail_lines: string[],
 ): boolean {
   const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
   if (jobStatus === "success") {
@@ -301,8 +320,8 @@ export function shouldFilterOutTest(
     return true;
   }
 
-  if (Array.isArray(failLines) && failLines.length === 0) {
-    console.warn("No failLines logs, skipping");
+  if (Array.isArray(fail_lines) && fail_lines.length === 0) {
+    console.warn("No fail_lines logs, skipping");
     return true;
   }
 
@@ -315,44 +334,28 @@ export async function logUpload(logFileName: string, testName: string) {
   const errorLogs = extractErrorLogs(logFileName);
 
   if (errorLogs.size > 0) {
-    const failLines = extractFailLines(errorLogs);
-    const shouldUploadLogs = !shouldFilterOutTest(errorLogs, failLines);
+    const fail_lines = extractfail_lines(errorLogs);
+    const shouldUploadLogs = !shouldFilterOutTest(errorLogs, fail_lines);
     console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
-    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, failLines);
-    const shouldSendNotification = failLines.length >= PATTERNS.minFailLines;
+    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, fail_lines);
+    const shouldSendNotification = fail_lines.length >= PATTERNS.min_fail_lines;
     console.log(`shouldSendNotification: ${shouldSendNotification}`);
     if (shouldSendNotification)
-      await sendSlackNotification(errorLogs, testName, failLines);
+      await sendSlackNotification(errorLogs, testName, fail_lines);
   }
-}
-
-export function hasKnownPattern(failLines: string[]): boolean | undefined {
-  // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = failLines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-    );
-
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
-    }
-  }
-  return false;
 }
 
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
-  failLines: string[],
+  fail_lines: string[],
 ): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
     return;
   }
-  const hasKnownPattern = hasKnownPattern(failLines);
-  if (hasKnownPattern) {
+  const hasKnownPatternCheck = hasKnownPattern(fail_lines);
+  if (hasKnownPatternCheck) {
     console.warn("Known pattern found, skipping");
     return;
   }
@@ -390,7 +393,9 @@ export async function sendSlackNotification(
   };
 
   if (data && data.ok) {
-    console.log(`✅ Slack notification sent successfully to ${targetChannel}!`);
+    console.log(
+      `✅ Slack notification sent successfully to ${process.env.SLACK_CHANNEL}!`,
+    );
   } else {
     console.error("❌ Failed to send Slack notification. Response:", data);
   }

@@ -383,7 +383,7 @@
                 "group_by": [],
                 "compute": {
                   "aggregation": "sum",
-                  "metric": "@failLines",
+                  "metric": "@fail_lines",
                   "rollup": { "type": "day" }
                 },
                 "storage": "hot"
@@ -428,7 +428,7 @@
               { "field": "env", "width": "auto" },
               { "field": "region", "width": "auto" },
               { "field": "test", "width": "auto" },
-              { "field": "failLines", "width": "auto" }
+              { "field": "fail_lines", "width": "auto" }
             ]
           }
         ],

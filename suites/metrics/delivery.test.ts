@@ -1,4 +1,4 @@
-import { sendMetric } from "@helpers/datadog";
+import { sendMetric, type DeliveryMetricTags } from "@helpers/datadog";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -46,27 +46,27 @@ describe(testName, async () => {
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
 
-      sendMetric("delivery", receptionPercentage, {
+      const deliveryMetricTags: DeliveryMetricTags = {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "delivery",
-        conversation_type: "group",
-        delivery_status: "received",
         metric_subtype: "stream",
-      });
+        conversation_type: "group",
+      };
+      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
 
-      sendMetric("order", orderPercentage, {
+      const orderMetricTags: DeliveryMetricTags = {
         sdk: workers.getCreator().sdk,
         test: testName,
-        metric_type: "delivery",
-        conversation_type: "group",
-        delivery_status: "received",
+        metric_type: "order",
         metric_subtype: "stream",
-      });
+        conversation_type: "group",
+      };
+      sendMetric("order", orderPercentage, orderMetricTags);
     }
   });
 
@@ -112,26 +112,26 @@ describe(testName, async () => {
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
 
-      sendMetric("delivery", receptionPercentage, {
+      const deliveryMetricTags: DeliveryMetricTags = {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "delivery",
-        conversation_type: "group",
-        delivery_status: "received",
         metric_subtype: "poll",
-      });
+        conversation_type: "group",
+      };
+      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
-      sendMetric("order", orderPercentage, {
+      const orderMetricTags: DeliveryMetricTags = {
         sdk: workers.getCreator().sdk,
         test: testName,
-        metric_type: "delivery",
-        conversation_type: "group",
-        delivery_status: "received",
+        metric_type: "order",
         metric_subtype: "poll",
-      });
+        conversation_type: "group",
+      };
+      sendMetric("order", orderPercentage, orderMetricTags);
     }
   });
 
@@ -200,26 +200,26 @@ describe(testName, async () => {
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
 
-      sendMetric("delivery", receptionPercentage, {
+      const deliveryMetricTags: DeliveryMetricTags = {
+        metric_subtype: "recovery",
+        metric_type: "delivery",
         sdk: offlineWorker.sdk,
         test: testName,
-        metric_type: "delivery",
         conversation_type: "group",
-        delivery_status: "received",
-        metric_subtype: "recovery",
-      });
+      };
+      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
-      sendMetric("order", orderPercentage, {
+      const orderMetricTags: DeliveryMetricTags = {
+        metric_type: "order",
+        metric_subtype: "recovery",
         sdk: offlineWorker.sdk,
         test: testName,
-        metric_type: "delivery",
         conversation_type: "group",
-        delivery_status: "received",
-        metric_subtype: "recovery",
-      });
+      };
+      sendMetric("order", orderPercentage, orderMetricTags);
     }
   });
 });

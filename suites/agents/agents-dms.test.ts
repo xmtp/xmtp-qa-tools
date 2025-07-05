@@ -1,5 +1,5 @@
 import { streamTimeout } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -53,14 +53,20 @@ describe(testName, async () => {
         3, // maxRetries
       );
 
-      sendMetric("response", result?.averageEventTiming || streamTimeout, {
+      const responseMetricTags: ResponseMetricTags = {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
-      });
+      };
+
+      sendMetric(
+        "response",
+        result?.averageEventTiming || streamTimeout,
+        responseMetricTags,
+      );
 
       expect(result?.allReceived).toBe(true);
     });

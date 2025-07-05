@@ -1,8 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import fetch from "node-fetch";
-import { getLatestSdkVersion } from "./client";
 
 // Consolidated interfaces
 interface MetricData {
@@ -20,26 +18,33 @@ interface ParsedTestName {
 }
 
 // Simplified metric tags interface - consolidates all previous metric tag types
-export interface MetricTags {
-  metric_type: "agent" | "operation" | "network" | "delivery" | "response";
-  metric_subtype?: string;
+interface MetricTags {
+  metric_type: string;
+  metric_subtype: string;
   env?: string;
   region?: string;
   sdk?: string;
   operation?: string;
   test?: string;
   country_iso_code?: string;
-  installations?: string;
   members?: string;
-  message_id?: string;
-  conversation_type?: "dm" | "group";
-  delivery_status?: "sent" | "received" | "failed";
-  network_phase?:
+}
+export interface DeliveryMetricTags extends MetricTags {
+  metric_type: "delivery" | "order";
+  metric_subtype: "stream" | "poll" | "recovery";
+  conversation_type: "dm" | "group";
+}
+export interface NetworkMetricTags extends MetricTags {
+  metric_type: "network";
+  metric_subtype:
     | "dns_lookup"
     | "tcp_connection"
     | "tls_handshake"
     | "server_call"
     | "processing";
+}
+
+export interface ResponseMetricTags extends MetricTags {
   agent?: string;
   address?: string;
 }
@@ -49,10 +54,19 @@ export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
-  installations: string;
-  members: string;
+  installations?: string;
+  members?: string;
 }
-
+interface LogPayload extends MetricTags {
+  metric_type: "error";
+  metric_subtype: "test";
+  message: string;
+  level: string;
+  error_count: number;
+  fail_lines: number;
+  test: string;
+  workflowRunUrl: string;
+}
 interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
@@ -107,12 +121,17 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
 
 // DataDog initialization
 export function initDataDog(): boolean {
-  if (!process.env.DATADOG_API_KEY) return false;
+  if (!process.env.DATADOG_API_KEY) {
+    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
+    return false;
+  }
   if (state.isInitialized) return true;
 
   try {
+    console.log("🔧 Initializing DataDog metrics...");
     metrics.init({ apiKey: process.env.DATADOG_API_KEY });
     state.isInitialized = true;
+    console.log("✅ DataDog metrics initialized successfully");
     return true;
   } catch (error) {
     console.error("❌ Failed to initialize DataDog metrics:", error);
@@ -126,8 +145,6 @@ export function sendMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
-  if (!state.isInitialized) return;
-
   try {
     const enrichedTags = enrichTags(tags);
     const fullMetricName = `xmtp.sdk.${metricName}`;
@@ -169,58 +186,6 @@ export function sendMetric(
       error instanceof Error ? error.message : String(error),
     );
   }
-}
-
-// Backward compatibility functions - simplified wrappers
-export function sendDurationMetric(
-  metricValue: number,
-  tags: DurationMetricTags,
-): void {
-  sendMetric("duration", metricValue, tags);
-}
-
-export function sendDeliveryMetric(
-  metricValue: number,
-  tags: MetricTags,
-): void {
-  sendMetric("delivery", metricValue, { ...tags, metric_type: "delivery" });
-}
-
-export function sendResponseMetric(
-  metricValue: number,
-  tags: MetricTags,
-): void {
-  sendMetric("response", metricValue, { ...tags, metric_type: "agent" });
-}
-
-// Grouping function - optimized
-export function groupMetricsByOperation(
-  metrics: [string, MetricData][],
-): Map<
-  string,
-  { operationName: string; members: string; operationData: MetricData }
-> {
-  const groups = new Map<
-    string,
-    { operationName: string; members: string; operationData: MetricData }
-  >();
-
-  for (const [operation, data] of metrics) {
-    const operationPart = operation.split(":")[0];
-    const match = operationPart.match(/^([a-zA-Z]+)-?(\d+)?$/);
-
-    const operationName = match?.[1] || operationPart;
-    const memberCount = match?.[2] || data.members || "-";
-    const groupKey = `${operationName}-${memberCount}`;
-
-    groups.set(groupKey, {
-      operationName,
-      members: memberCount,
-      operationData: data,
-    });
-  }
-
-  return groups;
 }
 
 // Test name parsing - simplified
@@ -308,33 +273,32 @@ export function flushMetrics(): Promise<void> {
 export async function sendDatadogLog(
   errorLogs: Set<string>,
   test: string,
-  failLines: string[],
+  fail_lines: string[],
 ): Promise<void> {
-  const logPayload = {
+  if (!process.env.DATADOG_API_KEY) {
+    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
+    return;
+  }
+  const logPayload: LogPayload = {
+    metric_type: "error",
+    metric_subtype: "test",
+    error_count: Array.from(errorLogs).length,
+    fail_lines: fail_lines.length,
     message: Array.from(errorLogs).join("\n"),
     level: "error",
-    service: "xmtp-qa-tools",
-    source: "xmtp-qa-tools",
     test,
-    failLines: failLines.length,
-    repository: process.env.GITHUB_REPOSITORY as string,
-    workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-    env: process.env.XMTP_ENV,
-    region: process.env.GEOLOCATION as string,
-    sdk: getLatestSdkVersion(),
   };
-
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "DD-API-KEY": process.env.DATADOG_API_KEY as string,
+        "DD-API-KEY": process.env.DATADOG_API_KEY,
       },
       body: JSON.stringify(logPayload),
     });
-  } catch (err) {
-    console.error("Failed to send log to Datadog:", err);
+  } catch (error) {
+    console.error("❌ Failed to send Datadog log:", error);
   }
 }
