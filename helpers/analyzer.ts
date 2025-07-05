@@ -341,7 +341,7 @@ export async function workflowFailed(workflowName: string): Promise<void> {
 
   const sections = [
     `*Workflow*: ${workflowName} FAILED ❌ <@fabri>`,
-    `*Timestamp*: ${new Date().toISOString()}`,
+    `*Timestamp*: \`${new Date().toISOString()}\``,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
   ];
