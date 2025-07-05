@@ -20,6 +20,7 @@ runs:
   using: "composite"
   steps:
     - name: Send Slack notification on failure
+      if: failure() || cancelled()
       run: yarn workflow-failure "${{ inputs.test-name }}"
       shell: bash
 
