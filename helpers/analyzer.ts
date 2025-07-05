@@ -337,12 +337,10 @@ export async function workflowFailed(workflowName: string): Promise<void> {
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
-  const status = process.env.GITHUB_JOB_STATUS;
   const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
   const sections = [
     `*Workflow*: ${workflowName} FAILED ❌ <@fabri>`,
-    `*Status*: ${status}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
   ];
