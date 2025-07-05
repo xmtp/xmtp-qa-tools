@@ -1,0 +1,51 @@
+name: "XMTP Test Cleanup"
+description: "Handles notifications and artifact uploads for XMTP tests"
+
+inputs:
+  test-name:
+    description: "Name of the test for notifications and artifact naming"
+    required: true
+  environment:
+    description: "Test environment (dev, production, etc.)"
+    required: true
+  enable-notifications:
+    description: "Whether to send Slack notifications on failure"
+    required: false
+    default: "true"
+  retention-days:
+    description: "Number of days to retain artifacts"
+    required: false
+    default: "90"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Send Slack notification on failure
+      if: ${{ (failure() || cancelled()) && inputs.enable-notifications == 'true' }}
+      run: yarn notify-failure "${{ inputs.test-name }}"
+      shell: bash
+
+    - name: Upload logs and environment
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: logs-env-${{ inputs.environment }}-${{ inputs.test-name }}
+        path: |
+          logs/**/*
+          .env
+        if-no-files-found: ignore
+        overwrite: true
+        include-hidden-files: true
+        retention-days: ${{ inputs.retention-days }}
+
+    - name: Upload installation databases
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: install-db-${{ inputs.environment }}-${{ inputs.test-name }}
+        path: |
+          .data/**/*
+        if-no-files-found: ignore
+        overwrite: true
+        include-hidden-files: true
+        retention-days: ${{ inputs.retention-days }}
