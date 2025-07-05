@@ -36,11 +36,9 @@ jobs:
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
-          name: logs-env-chaos-${{ matrix.test_file }}
-          path: |
-            logs/**/*
-            .env
-          if-no-files-found: ignore
-          overwrite: true
-          include-hidden-files: true
-          retention-days: 30
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "Regression"

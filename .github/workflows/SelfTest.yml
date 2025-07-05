@@ -41,13 +41,13 @@ jobs:
           cd qa-tools-test
           timeout 300s yarn dms
 
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "SelfTest"
-
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
           environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "SelfTest"
