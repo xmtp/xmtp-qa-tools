@@ -303,7 +303,7 @@ yarn test performance
 
 ```bash
 # Advanced retry mode (when retry options are present)
-yarn test functional --debug --no-fail
+yarn test functional --no-fail --debug
 ```
 
 - `--max-attempts <N>` - Number of retry attempts (default: 3)

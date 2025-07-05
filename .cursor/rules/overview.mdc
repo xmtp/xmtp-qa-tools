@@ -1,8 +1,9 @@
 ---
 description: High level descrition of the monorepo
-globs: 
+globs:
 alwaysApply: false
 ---
+
 # QA Tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
@@ -305,7 +306,7 @@ yarn test performance
 
 ```bash
 # Advanced retry mode (when retry options are present)
-yarn test functional --debug --no-fail
+yarn test functional --no-fail --debug
 ```
 
 - `--max-attempts <N>` - Number of retry attempts (default: 3)

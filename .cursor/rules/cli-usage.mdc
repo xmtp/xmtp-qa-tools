@@ -19,7 +19,7 @@ Before running any tests, you must set up a `.env` file with the following varia
 XMTP_ENV=dev                    # Options: local, dev, production
 LOGGING_LEVEL=off               # Options: off, debug, info, warn, error
 
-# Optional - for Slack notifications and monitoring  
+# Optional - for Slack notifications and monitoring
 SLACK_BOT_TOKEN=xoxb-...        # Slack bot token for notifications
 SLACK_CHANNEL=C...              # Slack channel ID for alerts
 
@@ -104,7 +104,7 @@ When you include retry options, tests run in advanced mode with logging, retries
 
 ```bash
 # Enable retry mode with debugging
-yarn test functional --debug --no-fail
+yarn test functional --no-fail --debug
 
 # Retry mode options:
 --max-attempts <N>      # Max retry attempts (default: 3)
@@ -256,7 +256,7 @@ yarn test groups                      # Quick group functionality test
 
 ```bash
 # Full functional suite with debugging
-yarn test functional --debug --no-fail
+yarn test functional --no-fail --debug
 
 # Multi-version compatibility
 yarn test functional --versions 3 --debug
@@ -266,7 +266,7 @@ yarn test functional --versions 3 --debug
 
 ```bash
 # Live production monitoring
-XMTP_ENV=production yarn test agents --debug --no-fail
+XMTP_ENV=production yarn test agents --no-fail --debug
 
 # Performance benchmarking
 XMTP_ENV=production yarn test performance --debug
@@ -280,10 +280,10 @@ XMTP_ENV=production yarn test suites/datadog --debug
 
 ```bash
 # GitHub Actions patterns (from workflows)
-yarn test functional --debug --no-fail                    # Functional testing
+yarn test functional --no-fail --debug                    # Functional testing
 yarn test functional --no-fail --debug                    # Regression testing
-yarn test large --debug --no-fail                         # Large group testing
-yarn test performance --debug --no-fail                   # Performance testing
+yarn test large --no-fail --debug                         # Large group testing
+yarn test performance --no-fail --debug                   # Performance testing
 ```
 
 ## Error Handling and Debugging
@@ -299,7 +299,7 @@ yarn test performance --debug --no-fail                   # Performance testing
 When using `--debug` flag, test failures can be analyzed through various systems:
 
 - Structured logging in the logs/ directory
-- Datadog integration for centralized log analysis  
+- Datadog integration for centralized log analysis
 - Optional Slack notifications for CI/CD alerts
 
 ### Exit Codes
@@ -320,20 +320,20 @@ When using `--debug` flag, test failures can be analyzed through various systems
 
 ```bash
 # Functional testing (every 6 hours)
-XMTP_ENV=production yarn test functional --debug --no-fail
+XMTP_ENV=production yarn test functional --no-fail --debug
 
 # Regression testing (every 6 hours)
 XMTP_ENV=production yarn script versions
 XMTP_ENV=production yarn test functional --no-fail --debug
 
 # Performance monitoring (every 30 minutes)
-XMTP_ENV=production yarn test performance --debug --no-fail
+XMTP_ENV=production yarn test performance --no-fail --debug
 
 # Large group testing (every 2 hours)
-XMTP_ENV=production yarn test large --debug --no-fail
+XMTP_ENV=production yarn test large --no-fail --debug
 
 # Agent monitoring (every 30 minutes)
-XMTP_ENV=production yarn test agents --debug --no-fail
+XMTP_ENV=production yarn test agents --no-fail --debug
 ```
 
 ## Shortcut Commands (from package.json)
