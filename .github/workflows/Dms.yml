@@ -41,55 +41,11 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn test ${{ matrix.test }} --debug --no-fail
-      - name: Send Slack notification on failure
+            - name: Send Slack notification on failure
         if: failure() || cancelled()
         run: |
-          node -e "
-          const https = require('https');
-
-          const message = {
-            channel: process.env.SLACK_CHANNEL || '#general',
-            text: \`🚨 Workflow Failed: ${{ github.workflow }}\`,
-            blocks: [
-              {
-                type: 'section',
-                text: {
-                  type: 'mrkdwn',
-                  text: \`*Workflow:* ${{ github.workflow }}\\n*Test:* ${{ matrix.test }}\\n*Environment:* ${{ matrix.environment }}\\n*Status:* \${{ job.status == 'cancelled' ? 'Timed out' : 'Failed' }}\\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>\`
-                }
-              }
-            ]
-          };
-
-          const payload = JSON.stringify(message);
-          const options = {
-            hostname: 'slack.com',
-            port: 443,
-            path: '/api/chat.postMessage',
-            method: 'POST',
-            headers: {
-              'Authorization': \`Bearer \${process.env.SLACK_BOT_TOKEN}\`,
-              'Content-Type': 'application/json',
-              'Content-Length': payload.length
-            }
-          };
-
-          if (!process.env.SLACK_BOT_TOKEN) {
-            console.log('SLACK_BOT_TOKEN not set, skipping notification');
-            process.exit(0);
-          }
-
-          const req = https.request(options, (res) => {
-            console.log(\`Slack notification sent: \${res.statusCode}\`);
-          });
-
-          req.on('error', (e) => {
-            console.error(\`Error sending Slack notification: \${e.message}\`);
-          });
-
-          req.write(payload);
-          req.end();
-          "
+          STATUS="${{ job.status == 'cancelled' && 'timed out' || 'failed' }}"
+          tsx scripts/notify-failure.ts "${{ matrix.test }}" "${{ matrix.environment }}" "${{ github.workflow }}" "$STATUS"
       - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
