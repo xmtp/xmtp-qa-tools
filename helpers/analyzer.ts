@@ -2,12 +2,18 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
-import knownIssues from "./known_issues.json";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
 export const PATTERNS = {
-  KNOWN_ISSUES: knownIssues,
+  KNOWN_ISSUES: [
+    {
+      testName: "Dms",
+      uniqueErrorLines: [
+        "FAIL  suites/functional/dms.test.ts > dms > should fail on purpose",
+      ],
+    },
+  ],
   min_fail_lines: 3,
   min_line_length: 40,
   max_line_length: 150,
