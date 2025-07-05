@@ -84,7 +84,4 @@ describe(testName, async () => {
   it("fail on purpose6", () => {
     throw new Error("fail on purpose");
   });
-  it("fail on purpose7", () => {
-    throw new Error("fail on purpose");
-  });
 });
