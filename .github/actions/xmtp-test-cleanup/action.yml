@@ -12,18 +12,10 @@ inputs:
     description: "Number of days to retain artifacts"
     required: false
     default: "90"
-  status:
-    description: "Status of the workflow"
-    required: true
 
 runs:
   using: "composite"
   steps:
-    - name: Send Slack notification on failure
-      if: failure() || cancelled()
-      run: yarn workflow-failure "${{ inputs.test-name }}"
-      shell: bash
-
     - name: Upload logs and environment
       if: always()
       uses: actions/upload-artifact@v4
