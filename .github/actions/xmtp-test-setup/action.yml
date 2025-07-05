@@ -14,7 +14,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: ${{ inputs.node-version-file }}
-        # Disable built-in cache to use shared cache below
+        # Disable built-in cache to use shared cache belows
 
     - name: Cache dependencies
       uses: actions/cache@v4
