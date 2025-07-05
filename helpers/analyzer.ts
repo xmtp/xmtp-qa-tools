@@ -337,11 +337,8 @@ export async function workflowFailed(
   const runId = process.env.GITHUB_RUN_ID;
   const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
-  const tagMessage = ""; //"<@fabri>";
-
   const sections = [
-    `*Workflow Filed*: ${test} ${tagMessage}`,
-    `*Workflow*: ${workflow}`,
+    `*Workflow*: ${workflow} FAILED ❌ <@fabri>`,
     `*env*: \`${environment}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
   ];
