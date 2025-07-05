@@ -24,6 +24,7 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
