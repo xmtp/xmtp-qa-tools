@@ -1,6 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
+import { extractErrorLogs, extractfail_lines } from "./analyzer";
 
 // Consolidated interfaces
 interface MetricData {
@@ -278,10 +279,30 @@ export function flushMetrics(): Promise<void> {
 
 // Datadog log sending - optimized
 export async function sendDatadogLog(
-  errorLogs: Set<string>,
-  test: string,
-  fail_lines: string[],
+  logFileName: string,
+  testName: string,
 ): Promise<void> {
+  const apiKey = process.env.DATADOG_API_KEY;
+  if (!apiKey) return;
+
+  const errorLogs = extractErrorLogs(logFileName);
+  const fail_lines = extractfail_lines(errorLogs);
+
+  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
+  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
+    console.warn(`Slack notification skipped (branch: ${branchName})`);
+    return;
+  }
+
+  if (!errorLogs || errorLogs.size === 0) {
+    console.warn("No error logs, skipping");
+    return;
+  }
+
+  if (Array.isArray(fail_lines) && fail_lines.length === 0) {
+    console.warn("No fail_lines logs, skipping");
+    return;
+  }
   const logPayload: LogPayload = {
     metric_type: "log",
     metric_subtype: "test",

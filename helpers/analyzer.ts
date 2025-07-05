@@ -283,42 +283,6 @@ export function sanitizeLogs(logs: string): string {
   return logs.replaceAll(/```/g, "'''");
 }
 
-export async function logUpload(logFileName: string, testName: string) {
-  const apiKey = process.env.DATADOG_API_KEY;
-  if (!apiKey) return;
-
-  const errorLogs = extractErrorLogs(logFileName);
-
-  if (errorLogs.size > 0) {
-    const fail_lines = extractfail_lines(errorLogs);
-    const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
-    if (jobStatus === "success") {
-      console.warn(`Slack notification skipped (status: ${jobStatus})`);
-      return true;
-    }
-    const branchName = (process.env.GITHUB_REF || "").replace(
-      "refs/heads/",
-      "",
-    );
-    if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
-      console.warn(`Slack notification skipped (branch: ${branchName})`);
-      return true;
-    }
-
-    if (!errorLogs || errorLogs.size === 0) {
-      console.warn("No error logs, skipping");
-      return true;
-    }
-
-    if (Array.isArray(fail_lines) && fail_lines.length === 0) {
-      console.warn("No fail_lines logs, skipping");
-      return true;
-    }
-    console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
-    await sendDatadogLog(errorLogs, testName, fail_lines);
-  }
-}
-
 export async function workflowFailed(workflowName: string): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");

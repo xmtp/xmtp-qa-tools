@@ -12,6 +12,9 @@ inputs:
     description: "Number of days to retain artifacts"
     required: false
     default: "90"
+  status:
+    description: "Status of the workflow"
+    required: true
 
 runs:
   using: "composite"
