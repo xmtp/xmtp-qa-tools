@@ -43,7 +43,7 @@ jobs:
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         run: |
-          STATUS="${{ job.status == 'cancelled' && 'timed out' || 'failed' }}"
+          STATUS="${{ job.status }}"
           yarn notify-failure "${{ matrix.test }}" "${{ matrix.environment }}" "${{ github.workflow }}" "$STATUS"
       - name: Upload logs and environment
         if: always()
