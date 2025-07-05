@@ -1,7 +1,7 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { sendDatadogLog } from "@helpers/analyzer";
+import { sendDatadogLog } from "@helpers/datadog";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
 

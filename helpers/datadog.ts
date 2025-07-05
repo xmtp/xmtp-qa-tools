@@ -312,7 +312,7 @@ export async function sendDatadogLog(
     error_count: Array.from(errorLogs).length,
     fail_lines: fail_lines.length,
     message: Array.from(errorLogs).join("\n"),
-    test,
+    test: testName,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
     environment: process.env.XMTP_ENV || "unknown",
     env: process.env.XMTP_ENV || "unknown",

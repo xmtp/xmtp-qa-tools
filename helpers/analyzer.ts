@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
-import { sendDatadogLog } from "./datadog";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
