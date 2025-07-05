@@ -2,6 +2,9 @@ name: Agents
 description: "should verify performance of the library in the production network"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "*/15 * * * *" # Runs every 15 minutes
   workflow_dispatch:
@@ -30,10 +33,13 @@ jobs:
       - name: Run tests
         run: yarn test ${{ matrix.test }} --debug --no-fail
 
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "${{ matrix.test }}"
+
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
-          status: ${{ job.status }}
           test-name: ${{ matrix.test }}
           environment: ${{ matrix.environment }}
