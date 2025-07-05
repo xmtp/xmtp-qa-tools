@@ -323,28 +323,29 @@ export async function logUpload(logFileName: string, testName: string) {
 }
 
 export async function sendSlackNotification(
-  errorLogs: Set<string>,
   test: string,
+  environment: string,
+  workflow: string,
+  status: string,
 ): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
     return;
   }
-  let workflowRunUrl = "";
-  if (process.env.GITHUB_ACTIONS) {
-    const serverUrl = process.env.GITHUB_SERVER_URL;
-    const repository = process.env.GITHUB_REPOSITORY;
-    const runId = process.env.GITHUB_RUN_ID;
-    workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
-  }
+
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
   const tagMessage = "<@fabri>";
 
   const sections = [
     `*Test*: ${test} ${tagMessage}`,
-    `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
+    `*Workflow*: ${workflow}`,
+    `*Status*: ${status}`,
+    `*env*: \`${environment}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
-    `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
   const message = sections.filter(Boolean).join("\n");
