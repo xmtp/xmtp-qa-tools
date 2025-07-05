@@ -54,6 +54,11 @@ export const setupTestLifecycle = ({
       members,
     };
 
+    sendMetric("log", duration, {
+      metric_type: "log",
+      metric_subtype: "test",
+      test: testName,
+    });
     if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
       sendMetric("duration", duration, values);
     }

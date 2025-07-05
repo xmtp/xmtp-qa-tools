@@ -121,12 +121,17 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
 
 // DataDog initialization
 export function initDataDog(): boolean {
-  if (!process.env.DATADOG_API_KEY) return false;
+  if (!process.env.DATADOG_API_KEY) {
+    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
+    return false;
+  }
   if (state.isInitialized) return true;
 
   try {
+    console.log("🔧 Initializing DataDog metrics...");
     metrics.init({ apiKey: process.env.DATADOG_API_KEY });
     state.isInitialized = true;
+    console.log("✅ DataDog metrics initialized successfully");
     return true;
   } catch (error) {
     console.error("❌ Failed to initialize DataDog metrics:", error);
@@ -268,19 +273,23 @@ export function flushMetrics(): Promise<void> {
 export function sendDatadogLog(
   errorLogs: Set<string>,
   test: string,
-  failLines: string[],
+  fail_lines: string[],
 ): void {
   const logPayload: LogPayload = {
     metric_type: "error",
     metric_subtype: "test",
     error_count: Array.from(errorLogs).length,
-    fail_lines: failLines.length,
+    fail_lines: fail_lines.length,
     message: Array.from(errorLogs).join("\n"),
     level: "error",
     test,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
   };
-
+  if (!process.env.DATADOG_API_KEY) {
+    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
+    return;
+  }
+  metrics.init({ apiKey: process.env.DATADOG_API_KEY });
   // await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
   //   method: "POST",
   //   headers: {
@@ -289,5 +298,5 @@ export function sendDatadogLog(
   //   },
   //   body: JSON.stringify(logPayload),
   // });
-  sendMetric("log", failLines.length, logPayload);
+  sendMetric("log", fail_lines.length, logPayload);
 }

@@ -100,7 +100,7 @@ const errorLogs = extractErrorLogs(testName, 50);
 const shouldFilter = shouldFilterOutTest(errorLogs);
 
 // Extract test failure lines specifically
-const failLines = extractFailLines(errorLogs);
+const fail_lines = extractfail_lines(errorLogs);
 
 // Process and clean error lines
 const { cleanLine, shouldSkip } = processErrorLine(rawLogLine);
