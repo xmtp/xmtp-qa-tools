@@ -25,14 +25,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
-
-      - name: Run tests
         run: yarn test ${{ matrix.test }} --debug --no-fail
-
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -40,3 +33,7 @@ jobs:
         with:
           test-name: ${{ matrix.test }}
           environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "${{ matrix.test }}"

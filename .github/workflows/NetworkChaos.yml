@@ -69,16 +69,16 @@ jobs:
             npx vitest run $FILE
           fi
 
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "NetworkChaos"
-
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
           environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "NetworkChaos"
 
       - name: Tear Down Docker
         if: always()
