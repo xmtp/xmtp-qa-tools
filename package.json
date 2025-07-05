@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
-    "notify-failure": "tsx -e \"import { workflowFailed } from './helpers/analyzer'; (async () => { await workflowFailed(process.argv[0] || 'Unknown'); })();\"",
+    "notify-failure": "tsx -e \"import { workflowFailed } from './helpers/analyzer'; (async () => { await workflowFailed(process.argv[1] || 'Unknown'); })();\"",
     "prod-update": "./inboxes/gen.sh --envs dev,production --installations 15,20,25,30 --count 500",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn test suites/functional --versions 3 ",
