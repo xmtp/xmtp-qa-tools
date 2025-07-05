@@ -38,6 +38,10 @@ jobs:
       - name: Create .env file
         run: echo "XMTP_ENV=local" > .env
 
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn notify-failure "AgentExamplesRepo"
+
       - name: Run agent
         run: |
           cd xmtp-agent-examples

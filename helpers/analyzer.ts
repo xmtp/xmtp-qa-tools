@@ -2,12 +2,18 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
-import knownIssues from "./known_issues.json";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
 export const PATTERNS = {
-  KNOWN_ISSUES: knownIssues,
+  KNOWN_ISSUES: [
+    {
+      testName: "Dms",
+      uniqueErrorLines: [
+        "FAIL  suites/functional/dms.test.ts > dms > should fail on purpose",
+      ],
+    },
+  ],
   min_fail_lines: 3,
   min_line_length: 40,
   max_line_length: 150,
@@ -30,25 +36,6 @@ export const PATTERNS = {
   // Patterns to match error log lines
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
-
-export function hasKnownPattern(fail_lines: string[]): boolean | undefined {
-  // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = fail_lines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-    );
-
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (
-      matchingLines.length > 0 &&
-      matchingLines.length === fail_lines.length
-    ) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
-    }
-  }
-  return false;
-}
 
 /**
  * Process error line for deduplication and cleaning
@@ -338,40 +325,24 @@ export async function logUpload(logFileName: string, testName: string) {
     const shouldUploadLogs = !shouldFilterOutTest(errorLogs, fail_lines);
     console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
     if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, fail_lines);
-
-    // const shouldSendNotification = fail_lines.length >= PATTERNS.min_fail_lines;
-    // console.log(`shouldSendNotification: ${shouldSendNotification}`);
-    // if (shouldSendNotification)
-    //   await sendSlackNotification(errorLogs, testName, fail_lines);
   }
 }
 
-export async function sendSlackNotification(
-  errorLogs: Set<string>,
-  test: string,
-  fail_lines: string[],
-): Promise<void> {
+export async function workflowFailed(workflowName: string): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
     return;
   }
-  const hasKnownPatternCheck = hasKnownPattern(fail_lines);
-  if (hasKnownPatternCheck) {
-    console.warn("Known pattern found, skipping");
-    return;
-  }
+
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
   const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
-  const tagMessage = "<@fabri>";
-
   const sections = [
-    `*Test*: ${test} ${tagMessage}`,
+    `*Workflow*: ${workflowName} FAILED ❌ <@fabri>`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
-    `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
   const message = sections.filter(Boolean).join("\n");

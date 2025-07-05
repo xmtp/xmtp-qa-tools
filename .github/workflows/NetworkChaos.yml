@@ -69,6 +69,9 @@ jobs:
             npx vitest run $FILE
           fi
 
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn notify-failure "NetworkChaos"
       - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4

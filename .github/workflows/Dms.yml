@@ -1,26 +1,24 @@
-name: Large
-description: "should verify performance of the group streams"
+name: Dms
+description: "dms"
 
 on:
-  schedule:
-    - cron: "0 */2 * * *" # Runs every 2 hours
+  # pull_request:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 jobs:
   test:
-    timeout-minutes: 20
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [large]
-        environment: [dev, production]
+        test: [dms]
+        environment: [dev]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      WORKER_COUNT: 5
-      BATCH_SIZE: 50
-      MAX_GROUP_SIZE: 200
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -41,10 +39,10 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn notify-failure "Large"
+        run: yarn notify-failure "${{ matrix.test }}"
       - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
