@@ -72,29 +72,13 @@ jobs:
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         run: yarn workflow-failure "NetworkChaos"
-      - name: Upload logs and environment
+
+      - name: Cleanup and upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/xmtp-test-cleanup
         with:
-          name: logs-env-chaos-${{ matrix.test_file }}
-          path: |
-            logs/**/*
-            .env
-          if-no-files-found: ignore
-          overwrite: true
-          include-hidden-files: true
-          retention-days: 30
-      - name: Upload installation databases
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: install-db-chaos-${{ matrix.test_file }}
-          path: |
-            .data/**/*
-          if-no-files-found: ignore
-          overwrite: true
-          include-hidden-files: true
-          retention-days: 30
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
 
       - name: Tear Down Docker
         if: always()

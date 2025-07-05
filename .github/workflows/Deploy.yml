@@ -103,6 +103,7 @@ jobs:
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         run: yarn workflow-failure "Deploy"
+
       - name: Auto-merge PR
         uses: actions/github-script@v6
         with:
