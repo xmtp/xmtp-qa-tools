@@ -20,7 +20,7 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: logs-env-${{ inputs.environment }}-${{ inputs.test-name }}
+        name: ${{ inputs.environment }}-${{ inputs.test-name }}-logs
         path: |
           logs/**/*
           .env
@@ -33,7 +33,7 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: install-db-${{ inputs.environment }}-${{ inputs.test-name }}
+        name: ${{ inputs.environment }}-${{ inputs.test-name }}-dbs
         path: |
           .data/**/*
         if-no-files-found: ignore
