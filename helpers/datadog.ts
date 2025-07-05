@@ -57,15 +57,20 @@ export interface DurationMetricTags extends MetricTags {
   installations?: string;
   members?: string;
 }
-interface LogPayload extends MetricTags {
-  metric_type: "error";
+interface LogPayload {
+  metric_type: "log";
   metric_subtype: "test";
+  level: "error";
+  service: string;
+  source: string;
   message: string;
-  level: string;
   error_count: number;
   fail_lines: number;
   test: string;
   workflowRunUrl: string;
+  env: string;
+  region: string;
+  country_iso_code: string;
 }
 interface NetworkStats {
   "DNS Lookup": number;
@@ -275,26 +280,31 @@ export async function sendDatadogLog(
   test: string,
   fail_lines: string[],
 ): Promise<void> {
-  if (!process.env.DATADOG_API_KEY) {
-    console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
-    return;
-  }
   const logPayload: LogPayload = {
-    metric_type: "error",
+    metric_type: "log",
     metric_subtype: "test",
+    level: "error",
+    service: "xmtp-qa-tools",
+    source: "xmtp-qa-tools",
     error_count: Array.from(errorLogs).length,
     fail_lines: fail_lines.length,
     message: Array.from(errorLogs).join("\n"),
-    level: "error",
     test,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+    env: process.env.XMTP_ENV || "unknown",
+    region: process.env.GEOLOCATION || "unknown",
+    country_iso_code:
+      GEO_TO_COUNTRY_CODE[
+        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+      ],
   };
+  console.debug(logPayload);
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "DD-API-KEY": process.env.DATADOG_API_KEY,
+        "DD-API-KEY": process.env.DATADOG_API_KEY || "",
       },
       body: JSON.stringify(logPayload),
     });
