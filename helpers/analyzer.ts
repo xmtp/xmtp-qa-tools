@@ -31,25 +31,6 @@ export const PATTERNS = {
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
 
-export function hasKnownPattern(fail_lines: string[]): boolean | undefined {
-  // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = fail_lines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-    );
-
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (
-      matchingLines.length > 0 &&
-      matchingLines.length === fail_lines.length
-    ) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
-    }
-  }
-  return false;
-}
-
 /**
  * Process error line for deduplication and cleaning
  */
@@ -338,32 +319,24 @@ export async function logUpload(logFileName: string, testName: string) {
     const shouldUploadLogs = !shouldFilterOutTest(errorLogs, fail_lines);
     console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
     if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, fail_lines);
-
-    // const shouldSendNotification = fail_lines.length >= PATTERNS.min_fail_lines;
-    // console.log(`shouldSendNotification: ${shouldSendNotification}`);
-    // if (shouldSendNotification)
-    //   await sendSlackNotification(errorLogs, testName, fail_lines);
   }
 }
 
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
-  fail_lines: string[],
 ): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
     return;
   }
-  const hasKnownPatternCheck = hasKnownPattern(fail_lines);
-  if (hasKnownPatternCheck) {
-    console.warn("Known pattern found, skipping");
-    return;
+  let workflowRunUrl = "";
+  if (process.env.GITHUB_ACTIONS) {
+    const serverUrl = process.env.GITHUB_SERVER_URL;
+    const repository = process.env.GITHUB_REPOSITORY;
+    const runId = process.env.GITHUB_RUN_ID;
+    workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
   }
-  const serverUrl = process.env.GITHUB_SERVER_URL;
-  const repository = process.env.GITHUB_REPOSITORY;
-  const runId = process.env.GITHUB_RUN_ID;
-  const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
   const tagMessage = "<@fabri>";
 
