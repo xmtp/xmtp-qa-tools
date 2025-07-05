@@ -41,6 +41,7 @@ describe(testName, async () => {
     if (!randomAddress) {
       throw new Error("Random client not found");
     }
+    const start = Date.now();
     const canMessage = await Client.canMessage(
       [
         {
@@ -50,8 +51,10 @@ describe(testName, async () => {
       ],
       client.get("randomclient")!.env,
     );
+    setCustomDuration(Date.now() - start);
     expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
   });
+
   it("inboxState: should measure inboxState", async () => {
     const inboxState = await creatorClient.preferences.inboxState(true);
     expect(inboxState.installations.length).toBeGreaterThan(0);
