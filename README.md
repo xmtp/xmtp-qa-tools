@@ -205,6 +205,15 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
+### Large Inbox Sync Performance Summary
+
+| Inbox Size | Sync Time (s) | DB Size (MB) | Query Count |
+| ---------- | ------------- | ------------ | ----------- |
+| Small      | 0.452         | 13           | 19          |
+| Medium     | 0.47          | 100          | 139         |
+| Large      | 0.505         | 201          | 279         |
+| XL         | 0.505         | 404          | 559         |
+
 ## Success criteria summary
 
 | Metric                  | Current Performance         | Target                 | Performance  |

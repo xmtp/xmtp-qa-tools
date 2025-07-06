@@ -345,7 +345,13 @@ export class WorkerClient extends Worker {
   get currentFolder(): string {
     return this.folder;
   }
-  async getSQLiteFileSizes() {
+  async getSQLiteFileSizes(): Promise<{
+    dbFile: number;
+    walFile: number;
+    shmFile: number;
+    total: number;
+    conversations: number;
+  }> {
     const dbPath = this.dbPath;
     // Get the directory containing the database file
     const dbDir = path.dirname(dbPath);
@@ -380,19 +386,21 @@ export class WorkerClient extends Worker {
       }
       sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
     }
-
-    // const formattedSizes = {
-    //   dbFile: formatBytes(sizes.dbFile),
-    //   walFile: formatBytes(sizes.walFile),
-    //   shmFile: formatBytes(sizes.shmFile),
-    //   conversations: sizes.conversations,
-    //   total: formatBytes(sizes.total),
-    // };
+    const formatBytes = (bytes: number) => {
+      return Math.round(bytes / (1024 * 1024));
+    };
+    const formattedSizes = {
+      dbFile: formatBytes(sizes.dbFile),
+      walFile: formatBytes(sizes.walFile),
+      shmFile: formatBytes(sizes.shmFile),
+      conversations: sizes.conversations,
+      total: formatBytes(sizes.total),
+    };
 
     // console.debug(
     //   `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
     // );
-    return sizes;
+    return formattedSizes;
   }
 
   /**
