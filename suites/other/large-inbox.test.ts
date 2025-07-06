@@ -4,7 +4,7 @@ import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, beforeAll, describe, it } from "vitest";
 
-const testName = "m_large_installations";
+const testName = "large_inbox";
 describe(testName, async () => {
   // 100 members per group
   let memberPerGroup = 1;
@@ -34,7 +34,7 @@ describe(testName, async () => {
     while (currentDbSizeMB < targetSizeMB) {
       const group = await worker.client.conversations.newGroup(getInboxIds(10));
       for (let i = 0; i < 5; i++) {
-        const message = getMessageByMb(0.2);
+        const message = getMessageByMb(1);
         await group.send(message);
       }
 
@@ -52,11 +52,6 @@ describe(testName, async () => {
     largeInbox = workers.get("large")!;
     xlInbox = workers.get("xl")!;
 
-    // Initial sync for all inboxes
-    await Promise.all(
-      workers.getAll().map((worker) => worker.client.conversations.syncAll()),
-    );
-
     // Populate inboxes to target sizes
     await populateInboxToSize(smallInbox, 0); // Fresh inbox
     await populateInboxToSize(mediumInbox, 20); // 20MB
@@ -64,12 +59,12 @@ describe(testName, async () => {
     await populateInboxToSize(xlInbox, 200); // 200MB
 
     console.log("Performing final sync on all inboxes...");
-    await Promise.all([
-      smallInbox.client.conversations.syncAll(),
-      mediumInbox.client.conversations.syncAll(),
-      largeInbox.client.conversations.syncAll(),
-      xlInbox.client.conversations.syncAll(),
-    ]);
+
+    // Initial sync for all inboxes
+    await Promise.all(
+      workers.getAll().map((worker) => worker.client.conversations.syncAll()),
+    );
+
     console.log("Initial setup completed");
   });
 
@@ -80,8 +75,8 @@ describe(testName, async () => {
       const batch = inboxIds.slice(i, i + 20);
       await group.addMembers(batch);
     }
-    for (let msgNum = 0; msgNum < 100; msgNum++) {
-      const message = getMessageByMb(0.1);
+    for (let msgNum = 0; msgNum < 10; msgNum++) {
+      const message = getMessageByMb(0.5);
       await group.send(message);
     }
   });

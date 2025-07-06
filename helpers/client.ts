@@ -673,7 +673,9 @@ export const logAndSend = async (
     await conversation.send(message);
   }
 };
-
 export const getMessageByMb = (mb: number) => {
-  return "A".repeat(mb * 1024 * 1024);
+  const message = "A".repeat(1024 * 1024 * mb);
+  //const message = "A";
+  console.log(`Message size: ${formatBytes(message.length)}`);
+  return message;
 };
