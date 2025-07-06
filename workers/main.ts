@@ -4,7 +4,6 @@ import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
   Dm,
-  Group,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
