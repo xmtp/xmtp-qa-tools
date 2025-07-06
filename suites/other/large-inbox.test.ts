@@ -1,7 +1,6 @@
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, it } from "vitest";
-import { m_large_BATCH_SIZE, m_large_TOTAL } from "../metrics/large/helpers";
 
 const testName = "m_large_installations";
 describe(testName, async () => {
