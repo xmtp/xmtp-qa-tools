@@ -82,6 +82,24 @@ describe(testName, async () => {
       await group.send(message);
     }
   });
+  it(`syncSmall: should perform syncAll on small (fresh) inbox`, async () => {
+    const syncStart = performance.now();
+    await smallInbox.client.conversations.syncAll();
+    const syncTimeMs = performance.now() - syncStart;
+    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+
+    const dbSizes = await smallInbox.worker.getSQLiteFileSizes();
+    const stats = await smallInbox.client.debugInformation?.apiStatistics();
+
+    // Store measurements
+    measurements.small.syncTime = syncTimeSeconds;
+    measurements.small.dbSize = dbSizes.total;
+    measurements.small.queryCount = Number(stats?.queryGroupMessages || 0);
+
+    console.log(`Small inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
+    console.log(`Small inbox sync time: ${syncTimeSeconds}s`);
+    console.log(`Small inbox db size: ${dbSizes.total}MB`);
+  });
 
   it(`syncMedium: should perform syncAll on medium (fresh) inbox`, async () => {
     const syncStart = performance.now();
@@ -139,25 +157,6 @@ describe(testName, async () => {
     console.log(`XL inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
     console.log(`XL inbox sync time: ${syncTimeSeconds}s`);
     console.log(`XL inbox db size: ${dbSizes.total}MB`);
-  });
-
-  it(`syncSmall: should perform syncAll on small (fresh) inbox`, async () => {
-    const syncStart = performance.now();
-    await smallInbox.client.conversations.syncAll();
-    const syncTimeMs = performance.now() - syncStart;
-    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
-
-    const dbSizes = await smallInbox.worker.getSQLiteFileSizes();
-    const stats = await smallInbox.client.debugInformation?.apiStatistics();
-
-    // Store measurements
-    measurements.small.syncTime = syncTimeSeconds;
-    measurements.small.dbSize = dbSizes.total;
-    measurements.small.queryCount = Number(stats?.queryGroupMessages || 0);
-
-    console.log(`Small inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
-    console.log(`Small inbox sync time: ${syncTimeSeconds}s`);
-    console.log(`Small inbox db size: ${dbSizes.total}MB`);
   });
 
   afterAll(async () => {
