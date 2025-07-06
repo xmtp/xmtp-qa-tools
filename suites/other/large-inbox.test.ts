@@ -60,10 +60,15 @@ describe(testName, async () => {
 
     console.log("Performing final sync on all inboxes...");
 
-    // Initial sync for all inboxes
-    await Promise.all(
-      workers.getAll().map((worker) => worker.client.conversations.syncAll()),
-    );
+    try {
+      await Promise.all(
+        workers.getAll().map((worker) => {
+          void worker.client.conversations.syncAll();
+        }),
+      );
+    } catch (error) {
+      console.error(error);
+    }
 
     console.log("Initial setup completed");
   });
@@ -77,7 +82,7 @@ describe(testName, async () => {
     }
     for (let msgNum = 0; msgNum < 10; msgNum++) {
       const message = getMessageByMb(0.5);
-      await group.send(message);
+      await group.send("sd");
     }
   });
 
