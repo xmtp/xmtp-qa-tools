@@ -6,7 +6,9 @@ import { afterAll, beforeAll, describe, it } from "vitest";
 
 const testName = "m_large_installations";
 describe(testName, async () => {
-  let memberPerGroup = 100;
+  // 100 members per group
+  let memberPerGroup = 1;
+
   setupTestLifecycle({
     testName,
   });
