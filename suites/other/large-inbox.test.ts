@@ -33,7 +33,7 @@ describe(testName, async () => {
     while (currentDbSizes.total < targetSizeMB) {
       const group = await worker.client.conversations.newGroup(getInboxIds(10));
       for (let i = 0; i < 5; i++) {
-        const message = getMessageByMb(0.4);
+        const message = getMessageByMb(0.7);
         await group.send(message);
       }
 
