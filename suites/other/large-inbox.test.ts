@@ -33,7 +33,7 @@ describe(testName, async () => {
     while (currentDbSizes.total < targetSizeMB) {
       const group = await worker.client.conversations.newGroup(getInboxIds(10));
       for (let i = 0; i < 5; i++) {
-        const message = getMessageByMb(0.1);
+        const message = getMessageByMb(0.4);
         await group.send(message);
       }
 
@@ -85,11 +85,10 @@ describe(testName, async () => {
   it(`syncSmall: should perform syncAll on small (fresh) inbox`, async () => {
     const syncStart = performance.now();
     await smallInbox.client.conversations.syncAll();
-    const syncTimeMs = performance.now() - syncStart;
-    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
 
     const dbSizes = await smallInbox.worker.getSQLiteFileSizes();
-    const stats = await smallInbox.client.debugInformation?.apiStatistics();
+    const stats = smallInbox.client.debugInformation?.apiStatistics();
 
     // Store measurements
     measurements.small.syncTime = syncTimeSeconds;
@@ -104,11 +103,10 @@ describe(testName, async () => {
   it(`syncMedium: should perform syncAll on medium (fresh) inbox`, async () => {
     const syncStart = performance.now();
     await mediumInbox.client.conversations.syncAll();
-    const syncTimeMs = performance.now() - syncStart;
-    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
 
     const dbSizes = await mediumInbox.worker.getSQLiteFileSizes();
-    const stats = await mediumInbox.client.debugInformation?.apiStatistics();
+    const stats = mediumInbox.client.debugInformation?.apiStatistics();
 
     // Store measurements
     measurements.medium.syncTime = syncTimeSeconds;
@@ -124,11 +122,10 @@ describe(testName, async () => {
   it(`syncLarge: should perform syncAll on large (fresh) inbox`, async () => {
     const syncStart = performance.now();
     await largeInbox.client.conversations.syncAll();
-    const syncTimeMs = performance.now() - syncStart;
-    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
 
     const dbSizes = await largeInbox.worker.getSQLiteFileSizes();
-    const stats = await largeInbox.client.debugInformation?.apiStatistics();
+    const stats = largeInbox.client.debugInformation?.apiStatistics();
 
     // Store measurements
     measurements.large.syncTime = syncTimeSeconds;
@@ -143,11 +140,10 @@ describe(testName, async () => {
   it(`syncXL: should perform syncAll on xl (fresh) inbox`, async () => {
     const syncStart = performance.now();
     await xlInbox.client.conversations.syncAll();
-    const syncTimeMs = performance.now() - syncStart;
-    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
 
     const dbSizes = await xlInbox.worker.getSQLiteFileSizes();
-    const stats = await xlInbox.client.debugInformation?.apiStatistics();
+    const stats = xlInbox.client.debugInformation?.apiStatistics();
 
     // Store measurements
     measurements.xl.syncTime = syncTimeSeconds;
