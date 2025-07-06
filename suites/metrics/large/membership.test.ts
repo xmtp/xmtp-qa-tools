@@ -9,14 +9,13 @@ import {
   m_large_TOTAL,
   m_large_WORKER_COUNT,
   saveLog,
-  type SummaryEntry,
 } from "./helpers";
 
 const testName = "m_large_membership";
 describe(testName, async () => {
   let newGroup: Group;
 
-  const summaryMap: Record<number, SummaryEntry> = {};
+  const summaryMap: Record<number, any> = {};
 
   let workers = await getWorkers(m_large_WORKER_COUNT);
 

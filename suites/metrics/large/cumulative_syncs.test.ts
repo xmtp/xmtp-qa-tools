@@ -2,35 +2,22 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
-import {
-  m_large_BATCH_SIZE,
-  m_large_TOTAL,
-  saveLog,
-  type SummaryEntry,
-} from "./helpers";
+import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
 
 const testName = "m_large_cumulative_syncs";
 describe(testName, async () => {
+  setupTestLifecycle({
+    testName,
+  });
   let workers: WorkerManager;
 
-  const summaryMap: Record<number, SummaryEntry> = {};
+  const summaryMap: Record<number, any> = {};
 
   workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1);
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];
   // Use different workers for each measurement
   allWorkers = workers.getAllButCreator();
-
-  let customDuration: number | undefined = undefined;
-  const setCustomDuration = (duration: number | undefined) => {
-    customDuration = duration;
-  };
-
-  setupTestLifecycle({
-    testName,
-    getCustomDuration: () => customDuration,
-    setCustomDuration,
-  });
 
   let run = 0;
   for (
