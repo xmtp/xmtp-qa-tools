@@ -11,9 +11,7 @@ describe(testName, async () => {
     testName,
   });
 
-  let workers = await getWorkers(["bob", "alice"], {
-    randomNames: false,
-  });
+  let workers = await getWorkers(["bob", "alice"]);
 
   let freshInbox: Worker;
   let populatedInbox: Worker;
@@ -31,6 +29,7 @@ describe(testName, async () => {
 
     // Create new groups and populate with messages (no timing here)
     for (let groupNum = 0; groupNum < groupCount; groupNum++) {
+      console.debug(`Creating group ${groupNum + 1} of ${groupCount}`);
       const group = await populatedInbox.client.conversations.newGroup(
         getInboxIds(10),
       );
@@ -39,6 +38,7 @@ describe(testName, async () => {
         const message = `Message ${msgNum + 1} in ${group.name}`;
         await group.send(message);
       }
+      console.debug(`Group ${groupNum + 1} created and synced`);
     }
 
     console.log(`Setup completed - ${groupCount} groups created and synced`);
