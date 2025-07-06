@@ -1,50 +1,74 @@
+import { getMessageByMb } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { beforeAll, describe, it } from "vitest";
+import { afterAll, beforeAll, describe, it } from "vitest";
 
 const testName = "m_large_installations";
 describe(testName, async () => {
-  let groupCount = 100;
   let memberPerGroup = 100;
-  let MBAmount = 20;
   setupTestLifecycle({
     testName,
   });
 
-  let workers = await getWorkers(["bob", "alice"]);
+  let workers = await getWorkers(["small", "medium", "large", "xl"]);
 
-  let freshInbox: Worker;
-  let populatedInbox: Worker;
+  let smallInbox: Worker;
+  let mediumInbox: Worker;
+  let largeInbox: Worker;
+  let xlInbox: Worker;
 
-  beforeAll(async () => {
-    freshInbox = workers.get("bob")!;
-    populatedInbox = workers.get("alice")!;
-    await freshInbox.client.conversations.syncAll();
-    await populatedInbox.client.conversations.syncAll();
+  // Helper function to populate inbox to target size
+  async function populateInboxToSize(worker: Worker, targetSizeMB: number) {
+    if (targetSizeMB === 0) return; // Skip for fresh inbox
 
-    // Get database size for populated inbox
-    const populatedDbSizes = await populatedInbox.worker.getSQLiteFileSizes();
-    let populatedDbSizeMB = Math.round(populatedDbSizes.total / (1024 * 1024));
+    let currentDbSizes = await worker.worker.getSQLiteFileSizes();
+    let currentDbSizeMB = Math.round(currentDbSizes.total / (1024 * 1024));
 
-    while (populatedDbSizeMB < MBAmount) {
-      const group = await populatedInbox.client.conversations.newGroup(
-        getInboxIds(10),
-      );
-      for (let i = 0; i < 100; i++) {
-        await group.send("Hello");
+    console.log(
+      `Populating ${worker.name} inbox to ${targetSizeMB}MB (current: ${currentDbSizeMB}MB)`,
+    );
+
+    while (currentDbSizeMB < targetSizeMB) {
+      const group = await worker.client.conversations.newGroup(getInboxIds(10));
+      for (let i = 0; i < 5; i++) {
+        const message = getMessageByMb(0.2);
+        await group.send(message);
       }
-      const populatedDbSizes = await populatedInbox.worker.getSQLiteFileSizes();
-      populatedDbSizeMB = Math.round(populatedDbSizes.total / (1024 * 1024));
-      console.log(`Populated inbox db size: ${populatedDbSizeMB}MB`);
+
+      currentDbSizes = await worker.worker.getSQLiteFileSizes();
+      currentDbSizeMB = Math.round(currentDbSizes.total / (1024 * 1024));
+      console.log(`${worker.name} inbox db size: ${currentDbSizeMB}MB`);
     }
 
-    console.log(`Setup completed - ${groupCount} groups created and synced`);
-    // Initial sync to establish baseline
-    console.log("Performing initial sync on both inboxes...");
-    await freshInbox.client.conversations.syncAll();
-    await populatedInbox.client.conversations.syncAll();
-    console.log("Initial sync completed");
+    console.log(`${worker.name} inbox populated to ${currentDbSizeMB}MB`);
+  }
+
+  beforeAll(async () => {
+    smallInbox = workers.get("small")!;
+    mediumInbox = workers.get("medium")!;
+    largeInbox = workers.get("large")!;
+    xlInbox = workers.get("xl")!;
+
+    // Initial sync for all inboxes
+    await Promise.all(
+      workers.getAll().map((worker) => worker.client.conversations.syncAll()),
+    );
+
+    // Populate inboxes to target sizes
+    await populateInboxToSize(smallInbox, 0); // Fresh inbox
+    await populateInboxToSize(mediumInbox, 20); // 20MB
+    await populateInboxToSize(largeInbox, 100); // 100MB
+    await populateInboxToSize(xlInbox, 200); // 200MB
+
+    console.log("Performing final sync on all inboxes...");
+    await Promise.all([
+      smallInbox.client.conversations.syncAll(),
+      mediumInbox.client.conversations.syncAll(),
+      largeInbox.client.conversations.syncAll(),
+      xlInbox.client.conversations.syncAll(),
+    ]);
+    console.log("Initial setup completed");
   });
 
   it(`create group with ${memberPerGroup} members`, async () => {
@@ -55,41 +79,64 @@ describe(testName, async () => {
       await group.addMembers(batch);
     }
     for (let msgNum = 0; msgNum < 100; msgNum++) {
-      const message = `Message ${msgNum + 1} in ${group.name}`;
+      const message = getMessageByMb(0.1);
       await group.send(message);
     }
   });
 
-  it(`syncFresh: should perform syncAll on fresh inbox`, async () => {
-    const syncFreshStart = performance.now();
-    await freshInbox.client.conversations.syncAll();
-    const freshSyncTimeMs = performance.now() - syncFreshStart;
-    const freshSyncTimeSeconds = Math.round(freshSyncTimeMs / 1000);
+  it(`syncSmall: should perform syncAll on small (fresh) inbox`, async () => {
+    const syncStart = performance.now();
+    await smallInbox.client.conversations.syncAll();
+    const syncTimeMs = performance.now() - syncStart;
+    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
 
-    // Get database size for fresh inbox
-    const freshDbSizes = await freshInbox.worker.getSQLiteFileSizes();
-    const freshStats = freshInbox.client.debugInformation?.apiStatistics();
-    console.log(JSON.stringify(freshStats, null, 2));
-    const freshDbSizeMB = Math.round(freshDbSizes.total / (1024 * 1024));
-    console.log(`Fresh inbox sync time: ${freshSyncTimeSeconds}s`);
-    console.log(`Fresh inbox db size: ${freshDbSizeMB}MB`);
+    const dbSizes = await smallInbox.worker.getSQLiteFileSizes();
+    const dbSizeMB = Math.round(dbSizes.total / (1024 * 1024));
+    console.log(`Small inbox sync time: ${syncTimeSeconds}s`);
+    console.log(`Small inbox db size: ${dbSizeMB}MB`);
   });
 
-  it(`syncPopulated: should perform syncAll on populated inbox with ${groupCount} groups`, async () => {
-    const syncPopulatedStart = performance.now();
-    await populatedInbox.client.conversations.syncAll();
-    const populatedSyncTimeMs = performance.now() - syncPopulatedStart;
-    const populatedSyncTimeSeconds = Math.round(populatedSyncTimeMs / 1000);
+  it(`syncMedium: should perform syncAll on medium (20MB) inbox`, async () => {
+    const syncStart = performance.now();
+    await mediumInbox.client.conversations.syncAll();
+    const syncTimeMs = performance.now() - syncStart;
+    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
 
-    // Get database size for populated inbox
-    const populatedDbSizes = await populatedInbox.worker.getSQLiteFileSizes();
-    const populatedStats =
-      populatedInbox.client.debugInformation?.apiStatistics();
-    console.log(JSON.stringify(populatedStats, null, 2));
-    const populatedDbSizeMB = Math.round(
-      populatedDbSizes.total / (1024 * 1024),
-    );
-    console.log(`Populated inbox sync time: ${populatedSyncTimeSeconds}s`);
-    console.log(`Populated inbox db size: ${populatedDbSizeMB}MB`);
+    const dbSizes = await mediumInbox.worker.getSQLiteFileSizes();
+    const dbSizeMB = Math.round(dbSizes.total / (1024 * 1024));
+    console.log(`Medium inbox sync time: ${syncTimeSeconds}s`);
+    console.log(`Medium inbox db size: ${dbSizeMB}MB`);
+  });
+
+  it(`syncLarge: should perform syncAll on large (100MB) inbox`, async () => {
+    const syncStart = performance.now();
+    await largeInbox.client.conversations.syncAll();
+    const syncTimeMs = performance.now() - syncStart;
+    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+
+    const dbSizes = await largeInbox.worker.getSQLiteFileSizes();
+    const dbSizeMB = Math.round(dbSizes.total / (1024 * 1024));
+    const stats = await largeInbox.client.debugInformation?.apiStatistics();
+    console.log(`queryGroupMessages: ${stats?.queryGroupMessages}`);
+    console.log(`Large inbox sync time: ${syncTimeSeconds}s`);
+    console.log(`Large inbox db size: ${dbSizeMB}MB`);
+  });
+
+  it(`syncXL: should perform syncAll on xl (200MB) inbox`, async () => {
+    const syncStart = performance.now();
+    await xlInbox.client.conversations.syncAll();
+    const syncTimeMs = performance.now() - syncStart;
+    const syncTimeSeconds = Math.round(syncTimeMs / 1000);
+
+    const dbSizes = await xlInbox.worker.getSQLiteFileSizes();
+    const dbSizeMB = Math.round(dbSizes.total / (1024 * 1024));
+    const stats = await xlInbox.client.debugInformation?.apiStatistics();
+    console.log(`queryGroupMessages: ${stats?.queryGroupMessages}`);
+    console.log(`XL inbox sync time: ${syncTimeSeconds}s`);
+    console.log(`XL inbox db size: ${dbSizeMB}MB`);
+  });
+
+  afterAll(async () => {
+    await workers.checkStatistics();
   });
 });

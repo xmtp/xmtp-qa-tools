@@ -153,15 +153,9 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
-  public checkStatistics(): void {
+  public async checkStatistics(): Promise<void> {
     for (const worker of this.getAll()) {
-      console.debug(
-        JSON.stringify(
-          worker.client?.debugInformation?.apiStatistics(),
-          null,
-          2,
-        ),
-      );
+      await worker.worker.getStats();
     }
   }
   public async checkForks(): Promise<void> {

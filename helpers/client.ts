@@ -673,3 +673,7 @@ export const logAndSend = async (
     await conversation.send(message);
   }
 };
+
+export const getMessageByMb = (mb: number) => {
+  return "A".repeat(mb * 1024 * 1024);
+};

@@ -4,6 +4,7 @@ import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
   Dm,
+  Group,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
@@ -182,7 +183,21 @@ export class WorkerClient extends Worker {
     // Then terminate the worker thread
     return super.terminate();
   }
-
+  async getStats() {
+    const stats = await this.client.debugInformation?.apiStatistics();
+    let object = {
+      "Query Group Messages": stats?.queryGroupMessages.toString(),
+      "Query Welcome Messages": stats?.queryWelcomeMessages.toString(),
+      "Send Group Messages": stats?.sendGroupMessages.toString(),
+      "Send Welcome Messages": stats?.sendWelcomeMessages.toString(),
+      "Upload Key Package": stats?.uploadKeyPackage.toString(),
+      "Fetch Key Package": stats?.fetchKeyPackage.toString(),
+      "Subscribe Messages": stats?.subscribeMessages.toString(),
+      "Subscribe Welcomes": stats?.subscribeWelcomes.toString(),
+    };
+    console.debug(JSON.stringify(object, null, 2));
+    this.client.debugInformation.clearAllStatistics();
+  }
   /**
    * Stops all active streams without terminating the worker
    */
