@@ -1,7 +1,11 @@
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker } from "@workers/manager";
-import { afterAll, describe, it } from "vitest";
-import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
+import { afterAll, beforeAll, describe, it } from "vitest";
+import {
+  m_large_BATCH_SIZE,
+  m_large_TOTAL,
+  saveLog,
+} from "../metrics/large/helpers";
 
 const testName = "m_large_installations";
 describe(testName, async () => {
@@ -17,30 +21,31 @@ describe(testName, async () => {
   let freshInbox: Worker;
   let populatedInbox: Worker;
 
+  beforeAll(async () => {
+    freshInbox = workers.get("bob")!;
+    populatedInbox = workers.get("alice")!;
+
+    console.log(
+      `Setup: Fresh inbox: ${freshInbox.name}, Populated inbox: ${populatedInbox.name}`,
+    );
+
+    // Initial sync to establish baseline
+    console.log("Performing initial sync on both inboxes...");
+    await freshInbox.client.conversations.syncAll();
+    await populatedInbox.client.conversations.syncAll();
+    console.log("Initial sync completed");
+  });
+
   for (
     let i = m_large_BATCH_SIZE;
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`setup-${i}: should create ${i} groups with 100 messages each`, async () => {
+    it(`setup-${i}: should create ${i} new groups with 100 messages each`, async () => {
+      console.log(`Creating ${i} new groups with 100 messages each...`);
       const setupTime = performance.now();
-      freshInbox = workers.get("bob")!;
-      populatedInbox = workers.get("alice")!;
 
-      console.log(
-        JSON.stringify(
-          {
-            freshInbox: freshInbox.name,
-            populatedInbox: populatedInbox.name,
-            groupsToCreate: i,
-          },
-          null,
-          2,
-        ),
-      );
-
-      // Create groups and populate with messages in the populated inbox
-      const groups = [];
+      // Create new groups and populate with messages
       for (let groupNum = 0; groupNum < i; groupNum++) {
         const group = await populatedInbox.client.conversations.newGroup([]);
         const groupName = `Group-${groupNum + 1}-${Date.now()}`;
@@ -51,8 +56,6 @@ describe(testName, async () => {
           const message = `Message ${msgNum + 1} in ${groupName}`;
           await group.send(message);
         }
-
-        groups.push(group);
 
         // Log progress every 10 groups
         if ((groupNum + 1) % 10 === 0) {
@@ -102,51 +105,23 @@ describe(testName, async () => {
       };
     });
 
-    it(`syncDifference-${i}: should calculate sync time difference`, () => {
+    it(`results-${i}: should show final sync times and db sizes`, () => {
       const entry = summaryMap[i];
       if (entry?.freshSyncTimeSeconds && entry?.populatedSyncTimeSeconds) {
-        const syncDifferenceSeconds =
-          entry.populatedSyncTimeSeconds - entry.freshSyncTimeSeconds;
-        const syncRatio =
-          entry.populatedSyncTimeSeconds / entry.freshSyncTimeSeconds;
-
-        // Calculate database size differences
-        const dbSizeDifferenceMB =
-          (entry.populatedDbSizeMB || 0) - (entry.freshDbSizeMB || 0);
-        const dbSizeRatio = entry.freshDbSizeMB
-          ? (entry.populatedDbSizeMB || 0) / entry.freshDbSizeMB
-          : 0;
-
-        summaryMap[i] = {
-          ...entry,
-          syncDifferenceSeconds,
-          syncRatio,
-          dbSizeDifferenceMB,
-          dbSizeRatio,
-        };
-
+        console.log(`\n=== ${i} Groups Results ===`);
         console.log(
-          JSON.stringify(
-            {
-              groups: i,
-              freshSyncSeconds: entry.freshSyncTimeSeconds,
-              populatedSyncSeconds: entry.populatedSyncTimeSeconds,
-              differenceSeconds: syncDifferenceSeconds,
-              ratio: syncRatio,
-              freshDbMB: entry.freshDbSizeMB,
-              populatedDbMB: entry.populatedDbSizeMB,
-              dbDifferenceMB: dbSizeDifferenceMB,
-              dbRatio: dbSizeRatio,
-            },
-            null,
-            2,
-          ),
+          `Fresh Inbox    - Sync: ${entry.freshSyncTimeSeconds.toFixed(3)}s, DB: ${entry.freshDbSizeMB.toFixed(1)}MB`,
+        );
+        console.log(
+          `Populated Inbox - Sync: ${entry.populatedSyncTimeSeconds.toFixed(3)}s, DB: ${entry.populatedDbSizeMB.toFixed(1)}MB`,
+        );
+        console.log(
+          `Difference     - Sync: ${(entry.populatedSyncTimeSeconds - entry.freshSyncTimeSeconds).toFixed(3)}s, DB: ${(entry.populatedDbSizeMB - entry.freshDbSizeMB).toFixed(1)}MB`,
+        );
+        console.log(
+          `Ratio          - Sync: ${(entry.populatedSyncTimeSeconds / entry.freshSyncTimeSeconds).toFixed(1)}x, DB: ${(entry.populatedDbSizeMB / entry.freshDbSizeMB).toFixed(1)}x`,
         );
       }
     });
   }
-
-  afterAll(() => {
-    saveLog(summaryMap);
-  });
 });
