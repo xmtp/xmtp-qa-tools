@@ -14,10 +14,10 @@ describe(testName, async () => {
 
   // Measurement data collection
   const measurements = {
-    small: { syncTime: 0, dbSize: 0, queryCount: 0 },
-    medium: { syncTime: 0, dbSize: 0, queryCount: 0 },
-    large: { syncTime: 0, dbSize: 0, queryCount: 0 },
-    xl: { syncTime: 0, dbSize: 0, queryCount: 0 },
+    small: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 10 },
+    medium: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 100 },
+    large: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 200 },
+    xl: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 400 },
   };
 
   // Helper function to populate inbox to target size
@@ -53,10 +53,12 @@ describe(testName, async () => {
     await Promise.all([
       workers.getAll().map((worker) => worker.client.conversations.syncAll()),
     ]);
-    await populateInboxToSize(smallInbox, 0);
-    await populateInboxToSize(mediumInbox, 50);
-    await populateInboxToSize(largeInbox, 100);
-    await populateInboxToSize(xlInbox, 200);
+
+    console.log("Populating inboxes to target size...");
+    await populateInboxToSize(smallInbox, measurements.small.targetSizeMB);
+    await populateInboxToSize(mediumInbox, measurements.medium.targetSizeMB);
+    await populateInboxToSize(largeInbox, measurements.large.targetSizeMB);
+    await populateInboxToSize(xlInbox, measurements.xl.targetSizeMB);
 
     console.log("Performing initial sync on both inboxes...");
     await Promise.all([
@@ -82,77 +84,35 @@ describe(testName, async () => {
       await group.send(message);
     }
   });
-  it(`syncSmall: should perform syncAll on small (fresh) inbox`, async () => {
-    const syncStart = performance.now();
-    await smallInbox.client.conversations.syncAll();
-    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
+  it(`should perform syncAll on all inbox sizes`, async () => {
+    const inboxes = [
+      { worker: smallInbox, name: "small", key: "small" as const },
+      { worker: mediumInbox, name: "medium", key: "medium" as const },
+      { worker: largeInbox, name: "large", key: "large" as const },
+      { worker: xlInbox, name: "xl", key: "xl" as const },
+    ];
 
-    const dbSizes = await smallInbox.worker.getSQLiteFileSizes();
-    const stats = smallInbox.client.debugInformation?.apiStatistics();
+    for (const inbox of inboxes) {
+      const syncStart = performance.now();
+      await inbox.worker.client.conversations.syncAll();
+      const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
 
-    // Store measurements
-    measurements.small.syncTime = syncTimeSeconds;
-    measurements.small.dbSize = dbSizes.total;
-    measurements.small.queryCount = Number(stats?.queryGroupMessages || 0);
+      const dbSizes = await inbox.worker.worker.getSQLiteFileSizes();
+      const stats = inbox.worker.client.debugInformation?.apiStatistics();
 
-    console.log(`Small inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
-    console.log(`Small inbox sync time: ${syncTimeSeconds}s`);
-    console.log(`Small inbox db size: ${dbSizes.total}MB`);
-  });
+      // Store measurements
+      measurements[inbox.key].syncTime = syncTimeSeconds;
+      measurements[inbox.key].dbSize = dbSizes.total;
+      measurements[inbox.key].queryCount = Number(
+        stats?.queryGroupMessages || 0,
+      );
 
-  it(`syncMedium: should perform syncAll on medium (fresh) inbox`, async () => {
-    const syncStart = performance.now();
-    await mediumInbox.client.conversations.syncAll();
-    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
-
-    const dbSizes = await mediumInbox.worker.getSQLiteFileSizes();
-    const stats = mediumInbox.client.debugInformation?.apiStatistics();
-
-    // Store measurements
-    measurements.medium.syncTime = syncTimeSeconds;
-    measurements.medium.dbSize = dbSizes.total;
-    measurements.medium.queryCount = Number(stats?.queryGroupMessages || 0);
-
-    console.log(
-      `Medium inbox queryGroupMessages: ${stats?.queryGroupMessages}`,
-    );
-    console.log(`Medium inbox sync time: ${syncTimeSeconds}s`);
-    console.log(`Medium inbox db size: ${dbSizes.total}MB`);
-  });
-  it(`syncLarge: should perform syncAll on large (fresh) inbox`, async () => {
-    const syncStart = performance.now();
-    await largeInbox.client.conversations.syncAll();
-    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
-
-    const dbSizes = await largeInbox.worker.getSQLiteFileSizes();
-    const stats = largeInbox.client.debugInformation?.apiStatistics();
-
-    // Store measurements
-    measurements.large.syncTime = syncTimeSeconds;
-    measurements.large.dbSize = dbSizes.total;
-    measurements.large.queryCount = Number(stats?.queryGroupMessages || 0);
-
-    console.log(`Large inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
-    console.log(`Large inbox sync time: ${syncTimeSeconds}s`);
-    console.log(`Large inbox db size: ${dbSizes.total}MB`);
-  });
-
-  it(`syncXL: should perform syncAll on xl (fresh) inbox`, async () => {
-    const syncStart = performance.now();
-    await xlInbox.client.conversations.syncAll();
-    const syncTimeSeconds = Math.round(performance.now() - syncStart) / 1000;
-
-    const dbSizes = await xlInbox.worker.getSQLiteFileSizes();
-    const stats = xlInbox.client.debugInformation?.apiStatistics();
-
-    // Store measurements
-    measurements.xl.syncTime = syncTimeSeconds;
-    measurements.xl.dbSize = dbSizes.total;
-    measurements.xl.queryCount = Number(stats?.queryGroupMessages || 0);
-
-    console.log(`XL inbox queryGroupMessages: ${stats?.queryGroupMessages}`);
-    console.log(`XL inbox sync time: ${syncTimeSeconds}s`);
-    console.log(`XL inbox db size: ${dbSizes.total}MB`);
+      console.log(
+        `${inbox.name} inbox queryGroupMessages: ${stats?.queryGroupMessages}`,
+      );
+      console.log(`${inbox.name} inbox sync time: ${syncTimeSeconds}s`);
+      console.log(`${inbox.name} inbox db size: ${dbSizes.total}MB`);
+    }
   });
 
   afterAll(async () => {
