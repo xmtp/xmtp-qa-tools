@@ -2,16 +2,14 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
-import {
-  m_large_BATCH_SIZE,
-  m_large_TOTAL,
-  saveLog,
-  type SummaryEntry,
-} from "./helpers";
+import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
 
 const testName = "m_large_syncs";
 describe(testName, async () => {
-  const summaryMap: Record<number, SummaryEntry> = {};
+  setupTestLifecycle({
+    testName,
+  });
+  const summaryMap: Record<number, any> = {};
 
   let workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1, {
     randomNames: false,
@@ -21,16 +19,6 @@ describe(testName, async () => {
   // Use different workers for each measurement
   allWorkers = workers.getAllButCreator();
 
-  let customDuration: number | undefined = undefined;
-  const setCustomDuration = (duration: number | undefined) => {
-    customDuration = duration;
-  };
-
-  setupTestLifecycle({
-    testName,
-    getCustomDuration: () => customDuration,
-    setCustomDuration,
-  });
   let workerA: Worker;
   let workerB: Worker;
   let run = 0;

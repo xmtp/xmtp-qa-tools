@@ -136,10 +136,9 @@ export function initDataDog(): boolean {
   if (state.isInitialized) return true;
 
   try {
-    console.log("🔧 Initializing DataDog metrics...");
     metrics.init({ apiKey: process.env.DATADOG_API_KEY });
     state.isInitialized = true;
-    console.log("✅ DataDog metrics initialized successfully");
+    console.debug("✅ DataDog metrics initialized successfully");
     return true;
   } catch (error) {
     console.error("❌ Failed to initialize DataDog metrics:", error);

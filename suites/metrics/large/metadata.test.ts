@@ -9,7 +9,6 @@ import {
   m_large_TOTAL,
   m_large_WORKER_COUNT,
   saveLog,
-  type SummaryEntry,
 } from "./helpers";
 
 const testName = "m_large_metadata";
@@ -18,7 +17,7 @@ describe(testName, async () => {
 
   let newGroup: Group;
 
-  const summaryMap: Record<number, SummaryEntry> = {};
+  const summaryMap: Record<number, any> = {};
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {

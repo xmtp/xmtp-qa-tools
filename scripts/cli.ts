@@ -374,8 +374,7 @@ async function runVitestTest(
       if (exitCode === 0) {
         console.debug("Tests passed successfully!");
         logger.close();
-
-        return; // Exit the function on success
+        return;
       } else {
         console.debug("Tests failed!");
       }

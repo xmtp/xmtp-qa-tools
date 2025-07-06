@@ -128,8 +128,8 @@ describe(testName, () => {
 
         console.debug(`Group ${groupId} - Completed: ${feature}`);
       }
-      workers.checkStatistics();
       await workers.checkForks();
+      await workers.checkStatistics();
     }
   });
 });
