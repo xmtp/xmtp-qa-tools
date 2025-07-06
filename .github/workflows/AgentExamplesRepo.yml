@@ -49,7 +49,3 @@ jobs:
             echo "Error: Agent did not reach 'Waiting for messages...' state"
             exit 1
           fi
-
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "AgentExamplesRepo"
