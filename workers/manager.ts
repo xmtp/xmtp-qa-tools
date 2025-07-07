@@ -480,7 +480,7 @@ export async function getWorkers(
       : useVersions
         ? getWorkersWithVersions(names)
         : names;
-    console.log("descriptors", descriptors);
+
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
