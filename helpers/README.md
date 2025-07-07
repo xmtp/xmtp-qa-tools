@@ -19,11 +19,14 @@ This directory contains utility modules that power the XMTP testing framework. T
 The helper modules are designed to be imported and used in test suites:
 
 ```typescript
-import { extractErrorLogs, shouldFilterOutTest } from "@helpers/analyzer";
+import {
+  extractErrorLogs,
+  shouldFilterOutTest,
+  workflowFailed,
+} from "@helpers/analyzer";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
 import { setupPrettyLogs } from "@helpers/logger";
-import { sendSlackNotification } from "@helpers/notifications";
 import {
   verifyConversationStream,
   verifyMessageStream,

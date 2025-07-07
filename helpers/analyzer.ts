@@ -195,14 +195,11 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
-export function checkForCriticalErrors(failLines: string[]): void {
-  console.log(
-    `DEBUG: checkForCriticalErrors called with ${failLines.length} fail lines`,
-  );
-
+export async function checkForCriticalErrors(
+  failLines: string[],
+): Promise<void> {
   if (failLines.length === 1) {
     const failLine = failLines[0];
-    console.log(`DEBUG: Processing fail line: "${failLine}"`);
 
     const match = failLine.match(
       /FAIL\s+(suites\/[^[]+)\s+\[\s+(suites\/[^\]]+)\s+\]/,
@@ -222,10 +219,7 @@ export function checkForCriticalErrors(failLines: string[]): void {
         console.error(
           `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
         );
-        console.error(
-          "Test suite failed to execute properly. Infrastructure or setup issue.",
-        );
-        process.exit(1); // Exit code 2 for infrastructure failure
+        await workflowFailed("Critical test suite failure detected");
       }
     }
   }
