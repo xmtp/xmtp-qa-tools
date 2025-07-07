@@ -62,31 +62,6 @@ await logAgentDetails(client);
 - **Environment configuration**: Loading and validating environment variables
 - **Key generation**: Private key and encryption key utilities
 
-**SDK Version Mappings:**
-
-```typescript
-export const VersionList = [
-  ...,
-  {
-    Client: Client220,
-    Conversation: Conversation220,
-    Dm: Dm220,
-    Group: Group220,
-    nodeVersion: "2.2.1",
-    bindingsPackage: "1.2.2",
-  },
-  {
-    Client: Client300,
-    Conversation: Conversation300,
-    Dm: Dm300,
-    Group: Group300,
-    nodeVersion: "3.0.1",
-    bindingsPackage: "1.2.5",
-  },
-  ...
-];
-```
-
 ## 🔍 Analyzer Module (`analyzer.ts`)
 
 The `analyzer.ts` module provides log analysis and error detection capabilities for identifying test failures and patterns.
