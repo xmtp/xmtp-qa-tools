@@ -453,11 +453,12 @@ export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
+    nodeVersion?: string;
     useVersions?: boolean;
     randomNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = true, randomNames = true } = options;
+  const { useVersions = true, randomNames = true, nodeVersion } = options;
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
@@ -476,8 +477,12 @@ export async function getWorkers(
     }
 
     // Apply versioning if requested
-    const descriptors = useVersions ? getWorkersWithVersions(names) : names;
-
+    let descriptors = useVersions ? getWorkersWithVersions(names) : names;
+    if (nodeVersion) {
+      descriptors = descriptors.map((descriptor) =>
+        descriptor.replace(/-[a-z]$/, `-${nodeVersion}`),
+      );
+    }
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );

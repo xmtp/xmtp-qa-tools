@@ -71,7 +71,9 @@ import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 export function nodeVersionOptions() {
-  return VersionList.map((v) => v.nodeVersion).reverse();
+  return VersionList.filter((v) => v.auto)
+    .map((v) => v.nodeVersion)
+    .reverse();
 }
 
 // SDK version mappings
@@ -84,6 +86,7 @@ export const VersionList = [
     nodeVersion: "0.0.13",
     bindingsPackage: "0.0.9",
     libXmtpVersion: "0.0.9",
+    auto: true,
   },
   {
     Client: Client47,
@@ -93,6 +96,7 @@ export const VersionList = [
     nodeVersion: "0.0.47",
     bindingsPackage: "0.4.1",
     libXmtpVersion: "6bd613d",
+    auto: true,
   },
   {
     Client: Client105,
@@ -102,6 +106,7 @@ export const VersionList = [
     nodeVersion: "1.0.5",
     bindingsPackage: "1.1.3",
     libXmtpVersion: "6eb1ce4",
+    auto: true,
   },
   {
     Client: Client209,
@@ -111,6 +116,7 @@ export const VersionList = [
     nodeVersion: "2.0.9",
     bindingsPackage: "1.1.8",
     libXmtpVersion: "bfadb76",
+    auto: true,
   },
   {
     Client: Client210,
@@ -120,6 +126,7 @@ export const VersionList = [
     nodeVersion: "2.1.0",
     bindingsPackage: "1.2.0",
     libXmtpVersion: "7b9b4d0",
+    auto: true,
   },
   {
     Client: Client220,
@@ -129,6 +136,7 @@ export const VersionList = [
     nodeVersion: "2.2.1",
     bindingsPackage: "1.2.2",
     libXmtpVersion: "d0f0b67",
+    auto: true,
   },
   {
     Client: Client300,
@@ -138,16 +146,18 @@ export const VersionList = [
     nodeVersion: "3.0.1",
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
+    auto: true,
   },
-  // {
-  //   Client: Client310,
-  //   Conversation: Conversation310,
-  //   Dm: Dm310,
-  //   Group: Group310,
-  //   nodeVersion: "3.1.0",
-  //   bindingsPackage: "1.2.6",
-  //   libXmtpVersion: "bfeba9f",
-  // },
+  {
+    Client: Client310,
+    Conversation: Conversation310,
+    Dm: Dm310,
+    Group: Group310,
+    nodeVersion: "3.1.0",
+    bindingsPackage: "1.2.6",
+    libXmtpVersion: "bfeba9f",
+    auto: false,
+  },
 ];
 
 export type GroupMetadataContent = {
