@@ -345,7 +345,6 @@ export const regressionClient = async (
   }
 
   const versionConfig = VersionList.find((v) => v.nodeVersion === sdk);
-  console.log(versionConfig, sdk);
   if (!versionConfig) {
     throw new Error(`SDK version ${sdk} not found in VersionList`);
   }
