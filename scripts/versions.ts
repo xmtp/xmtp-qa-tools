@@ -87,6 +87,7 @@ function discoverPackages(): VersionConfig[] {
         bindingsPackage: matchingBindings,
         nodeVersion,
         libXmtpVersion,
+        auto: false,
       });
 
       console.log(`${nodeVersion} -> ${matchingBindings}`);
