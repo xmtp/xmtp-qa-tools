@@ -10,8 +10,8 @@ describe("regression", () => {
   const receiverInboxId = getInboxIds(1)[0];
 
   for (const version of versions) {
-    it(`downgrade to ${version}`, async () => {
-      workers = await getWorkers(["bob-" + "a" + "-" + version], {
+    it(`downgrade to ${version.nodeVersion}`, async () => {
+      workers = await getWorkers(["bob-" + "a" + "-" + version.nodeVersion], {
         useVersions: false,
       });
 
@@ -23,8 +23,8 @@ describe("regression", () => {
     });
   }
   for (const version of versions.reverse()) {
-    it(`upgrade to ${version}`, async () => {
-      workers = await getWorkers(["alice-" + "a" + "-" + version], {
+    it(`upgrade to ${version.nodeVersion}`, async () => {
+      workers = await getWorkers(["alice-" + "a" + "-" + version.nodeVersion], {
         useVersions: false,
       });
 

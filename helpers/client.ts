@@ -71,9 +71,7 @@ import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 export function nodeVersionOptions() {
-  return VersionList.filter((v) => v.auto)
-    .map((v) => v.nodeVersion)
-    .reverse();
+  return VersionList.filter((v) => v.auto).reverse();
 }
 
 // SDK version mappings
@@ -467,15 +465,7 @@ export function getEnvPath(): string {
   }
   return envPath;
 }
-export function getLatestSdkVersion(): string {
-  const sdkVersion = nodeVersionOptions()[0];
-  // Find the version config by nodeVersion
-  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
-  if (!config) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
-  return config.nodeVersion + "-" + config.libXmtpVersion;
-}
+
 /**
  * Loads environment variables from the specified test's .env file if it exists
  */

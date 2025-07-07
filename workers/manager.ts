@@ -4,9 +4,9 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  getLatestSdkVersion,
   nodeVersionOptions,
   sleep,
+  VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -41,9 +41,9 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
 
     // If workerName already contains installation ID (has dash), don't add another "-a"
     if (workerName.includes("-")) {
-      descriptors.push(`${workerName}-${randomVersion}`);
+      descriptors.push(`${workerName}-${randomVersion.nodeVersion}`);
     } else {
-      descriptors.push(`${workerName}-a-${randomVersion}`);
+      descriptors.push(`${workerName}-a-${randomVersion.nodeVersion}`);
     }
   }
 
@@ -380,12 +380,16 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let sdk = getLatestSdkVersion();
+    let defaultSdk =
+      nodeVersionOptions()[0].nodeVersion +
+      "-" +
+      nodeVersionOptions()[0].libXmtpVersion;
+
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && nodeVersionOptions().includes(lastPart)) {
-        sdk = lastPart;
+      if (lastPart && VersionList.some((v) => v.nodeVersion === lastPart)) {
+        defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
           providedInstallId = parts.slice(1, -1).join("-");
@@ -411,7 +415,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: getLatestSdkVersion(),
+      sdk: defaultSdk,
       folder,
       walletKey,
       encryptionKey,
@@ -425,7 +429,7 @@ export class WorkerManager {
     // Create the complete worker
     const worker: Worker = {
       ...workerData,
-      sdk: sdk,
+      sdk: defaultSdk,
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
@@ -472,10 +476,10 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    let descriptors = useVersions
-      ? getWorkersWithVersions(names)
-      : nodeVersion
-        ? names.map((name) => `${name}-${nodeVersion}`)
+    let descriptors = nodeVersion
+      ? names.map((name) => `${name}-${nodeVersion}`)
+      : useVersions
+        ? getWorkersWithVersions(names)
         : names;
 
     console.log(descriptors);
