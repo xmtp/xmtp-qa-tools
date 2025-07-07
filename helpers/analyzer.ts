@@ -205,8 +205,6 @@ export async function checkForCriticalErrors(
       /FAIL\s+(suites\/[^[]+)\s+\[\s+(suites\/[^\]]+)\s+\]/,
     );
 
-    console.log(`DEBUG: Regex match result:`, match);
-
     if (match) {
       const outsidePath = match[1]?.trim();
       const insidePath = match[2]?.trim();
