@@ -1,9 +1,3 @@
----
-description:
-globs:
-alwaysApply: true
----
-
 # XMTP Testing Worker Framework Rules
 
 ## Core Testing Pattern
@@ -433,4 +427,80 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
+```
+
+## Quick Snippets
+
+### Basic Test Setup
+
+```typescript
+// Simple DM test
+const workers = await getWorkers(["alice", "bob"]);
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+```
+
+### Group Test Setup
+
+```typescript
+// 3-person group test
+const workers = await getWorkers(3);
+const group = await workers.createGroupBetweenAll("Test Group");
+```
+
+### Message Verification
+
+```typescript
+// Simple message test
+const result = await verifyMessageStream(dm, [bob], 1, "test-{i}");
+expect(result.allReceived).toBe(true);
+```
+
+### Large Group Creation
+
+```typescript
+// Large group with external members
+const workers = await getWorkers(1);
+const memberInboxIds = getInboxIds(100);
+const group = await workers
+  .getCreator()
+  .client.conversations.newGroup(memberInboxIds);
+```
+
+### Version-Specific Testing
+
+```typescript
+// Test with specific SDK version
+const workers = await getWorkers(1, { nodeVersion: "3.1.0" });
+
+// Multi-version testing
+const workers = await getWorkers(3, { useVersions: true });
+
+// Regression testing pattern
+const versions = getAutoVersions().slice(0, 3);
+for (const version of versions) {
+  const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
+    useVersions: false,
+  });
+}
+
+// Version comparison
+const workers = await getWorkers(["alice", "bob"], { useVersions: true });
+// Creates: alice-a-3.1.0, bob-a-2.2.1 (random versions)
+```
+
+### Stream Setup
+
+```typescript
+// Start message streaming
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+
+```
+
 ```
