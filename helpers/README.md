@@ -85,6 +85,7 @@ export const VersionList = [
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
   },
+  ...
 ];
 ```
 
