@@ -1,5 +1,4 @@
 import { getMessageByMb } from "@helpers/client";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, it } from "vitest";
@@ -8,10 +7,6 @@ const testName = "large_inbox";
 describe(testName, async () => {
   // 100 members per group
   let memberPerGroup = 1;
-
-  setupTestLifecycle({
-    testName,
-  });
 
   let workers = await getWorkers(["bob", "alice"]);
 

@@ -1,4 +1,3 @@
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -7,8 +6,6 @@ import { describe, it } from "vitest";
 const testName = "failtowait";
 
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
-
   const workers = await getWorkers(1, {
     nodeVersion: "3.1.0",
   });

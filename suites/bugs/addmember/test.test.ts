@@ -1,5 +1,4 @@
 import { getManualUsers } from "@helpers/client";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -7,7 +6,6 @@ import { describe, expect, it } from "vitest";
 
 const testName = "bug_addmember";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
   const workers = await getWorkers(["bob"]);
   const receiverWorkers = await getWorkers(["alice"]);
 

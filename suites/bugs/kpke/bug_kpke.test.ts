@@ -1,12 +1,10 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, it } from "vitest";
 
 const testName = "bug_kpke";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
   let workers: WorkerManager;
   let conversation: Dm;
 
