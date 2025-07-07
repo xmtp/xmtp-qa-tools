@@ -15,7 +15,7 @@ for ((x=1; x<=tranche_parts; x++)); do
   echo "Starting test cycle at $(date)"
   for ((i=1; i<=tranche; i++)); do
       echo "Restarting singlehost docker env..."
-      ./dev/down && ./dev/up && sleep 10
+      cd multinode && docker compose down && ./ci.sh && cd ..
       sleep 10
       tid=$(date +%s)
       echo "Running test iteration $i of $num_runs in tranche $tranche_parts"
