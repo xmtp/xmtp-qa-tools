@@ -4,7 +4,6 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  sdkVersionList,
   sleep,
   VersionList,
 } from "@helpers/client";
@@ -31,7 +30,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = sdkVersionList().slice(0, testVersions);
+  const availableVersions = VersionList.slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
@@ -381,7 +380,7 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = sdkVersionList()[0].nodeVersion;
+    let defaultSdk = VersionList[0].nodeVersion;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
