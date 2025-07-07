@@ -140,8 +140,6 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private folder: string;
-  private sdkVersion: string;
-  private libXmtpVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
@@ -164,13 +162,11 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
     this.name = worker.name;
-    this.sdkVersion = worker.sdkVersion;
-    this.libXmtpVersion = worker.libXmtpVersion;
-    this.sdk = worker.sdkVersion + "-" + worker.libXmtpVersion;
+    this.sdk = worker.sdk;
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
-    this.nameId = worker.name + "-" + worker.sdkVersion;
+    this.nameId = worker.name + "-" + worker.sdk.split("-")[0];
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
     this.setupEventHandlers();
@@ -451,14 +447,13 @@ export class WorkerClient extends Worker {
       data: {
         name: this.name,
         folder: this.folder,
-        sdkVersion: this.sdkVersion,
-        libXmtpVersion: this.libXmtpVersion,
+        sdk: this.sdk,
       },
     });
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      this.sdkVersion,
+      this.sdk,
       this.name,
       this.folder,
       this.env,
@@ -671,7 +666,7 @@ export class WorkerClient extends Worker {
         // );
         return;
       }
-      let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      let response = `${this.nameId} says: gm from sdk ${this.sdk}`;
       if (conversation && conversation.debugInfo !== undefined) {
         const debugInfo = await conversation.debugInfo();
         response += ` and epoch ${debugInfo?.epoch}`;
@@ -1185,7 +1180,7 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      this.sdkVersion,
+      this.sdk,
       this.name,
       newFolder,
       this.env,

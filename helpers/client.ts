@@ -297,10 +297,6 @@ export async function createClient(
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-  // Map SDK version to VersionList entry
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
-
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
   const dbPath = getDbPathOfInstallation(name, address, folder, env);
@@ -308,7 +304,6 @@ export async function createClient(
   // Use type assertion to handle the client creation
   const client = await regressionClient(
     sdkVersion,
-    libXmtpVersion,
     walletKey,
     encryptionKey,
     dbPath,
@@ -320,8 +315,7 @@ export async function createClient(
     client,
     dbPath,
     address,
-    sdkVersion: String(sdkVersion),
-    libXmtpVersion,
+    sdk: String(sdkVersion),
   };
 }
 export const regressionClient = async (
