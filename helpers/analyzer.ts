@@ -1,45 +1,22 @@
 import fs from "fs";
 import path from "path";
+import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
 export const PATTERNS = {
   KNOWN_ISSUES: [
     {
-      testName: "Browser",
-      uniqueErrorLines: [
-        "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
-      ],
-    },
-    {
       testName: "Dms",
       uniqueErrorLines: [
-        "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
-        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
-      ],
-    },
-    {
-      testName: "Agents",
-      uniqueErrorLines: [
-        "FAIL  suites/agents/agents.test.ts > agents > production: tokenbot : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+        "FAIL  suites/functional/dms.test.ts > dms > should fail on purpose",
       ],
     },
   ],
-  minFailLines: 3,
-  minumumLineLength: 40,
-  maxLineLength: 150,
+  min_fail_lines: 3,
+  min_line_length: 40,
+  max_line_length: 150,
+  max_error_logs: 20,
 
   DEDUPE: [
     "sqlcipher_mlock",
@@ -83,12 +60,12 @@ export function processErrorLine(line: string): {
 
   cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
 
-  if (cleanLine.length < PATTERNS.minumumLineLength) {
+  if (cleanLine.length < PATTERNS.min_line_length) {
     return { cleanLine, shouldSkip: true };
   }
   // Trim long lines to 200 characters max
-  if (cleanLine.length > PATTERNS.maxLineLength) {
-    cleanLine = cleanLine.substring(0, PATTERNS.maxLineLength - 3) + "...";
+  if (cleanLine.length > PATTERNS.max_line_length) {
+    cleanLine = cleanLine.substring(0, PATTERNS.max_line_length - 3) + "...";
   }
 
   return { cleanLine, shouldSkip: false };
@@ -220,30 +197,25 @@ export async function cleanAllRawLogs(): Promise<void> {
 }
 
 /**
- * Process a single log file line by line using streaming to avoid memory issues
+ * Extract error logs from log files with deduplication
  */
-async function processLogFileStream(
-  logPath: string,
-  errorLines: string[],
-  seenPatterns: Set<string>,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(logPath, {
-      encoding: "utf8",
-      highWaterMark: 64 * 1024, // 64KB chunks
-    });
+export function extractErrorLogs(testName: string): Set<string> {
+  if (!fs.existsSync("logs")) {
+    return new Set();
+  }
 
-    let buffer = "";
+  try {
+    const logFiles = fs
+      .readdirSync("logs")
+      .filter((file) => file.endsWith(".log") && file.includes(testName));
 
-    stream.on("data", (chunk: string | Buffer) => {
-      const chunkStr =
-        typeof chunk === "string" ? chunk : chunk.toString("utf8");
-      buffer += chunkStr;
+    const errorLines: string[] = [];
+    const seenPatterns = new Set<string>();
 
-      // Process complete lines from buffer
-      const lines = buffer.split("\n");
-      // Keep the last incomplete line in buffer
-      buffer = lines.pop() || "";
+    for (const logFile of logFiles) {
+      const logPath = path.join("logs", logFile);
+      const content = fs.readFileSync(logPath, "utf-8");
+      const lines = content.split("\n");
 
       for (const line of lines) {
         if (!PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
@@ -268,93 +240,9 @@ async function processLogFileStream(
           errorLines.push(cleanLine);
         }
       }
-    });
-
-    stream.on("end", () => {
-      // Process any remaining content in buffer
-      if (buffer.trim()) {
-        if (PATTERNS.MATCH.some((pattern) => pattern.test(buffer))) {
-          const { cleanLine, shouldSkip } = processErrorLine(buffer);
-          if (!shouldSkip) {
-            const isDuplicate = PATTERNS.DEDUPE.some((pattern) => {
-              if (cleanLine.includes(pattern)) {
-                if (seenPatterns.has(pattern)) {
-                  return true;
-                }
-                seenPatterns.add(pattern);
-              }
-              return false;
-            });
-
-            if (!isDuplicate) {
-              errorLines.push(cleanLine);
-            }
-          }
-        }
-      }
-      resolve();
-    });
-
-    stream.on("error", (error) => {
-      reject(error);
-    });
-  });
-}
-
-/**
- * Extract error logs from log files with deduplication
- */
-export async function extractErrorLogs(
-  testName: string,
-  limit?: number,
-): Promise<Set<string>> {
-  if (!fs.existsSync("logs")) {
-    return new Set();
-  }
-
-  try {
-    const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log") && file.includes(testName));
-
-    const errorLines: string[] = [];
-    const seenPatterns = new Set<string>();
-
-    // Check file sizes and skip files that are too large
-    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit per file
-    const processableFiles: string[] = [];
-
-    for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
-      try {
-        const stats = fs.statSync(logPath);
-        if (stats.size > MAX_FILE_SIZE) {
-          console.warn(
-            `Skipping large log file ${logFile} (${Math.round(stats.size / 1024 / 1024)}MB > ${MAX_FILE_SIZE / 1024 / 1024}MB)`,
-          );
-          continue;
-        }
-        processableFiles.push(logFile);
-      } catch (error) {
-        console.warn(`Could not check size of ${logFile}:`, error);
-        continue;
-      }
     }
 
-    // Process files using streaming
-    for (const logFile of processableFiles) {
-      const logPath = path.join("logs", logFile);
-      try {
-        await processLogFileStream(logPath, errorLines, seenPatterns);
-      } catch (error) {
-        console.error(`Error processing log file ${logFile}:`, error);
-        // Continue with other files instead of failing completely
-      }
-    }
-
-    console.log(
-      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
-    );
+    console.log(`Found ${errorLines.length} error lines`);
 
     // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
@@ -366,9 +254,9 @@ export async function extractErrorLogs(
         return new Set();
       }
     }
-
+    const limit = PATTERNS.max_error_logs;
     if (errorLines.length > 0) {
-      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
+      const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
       console.log(resultSet);
       return resultSet;
@@ -383,7 +271,7 @@ export async function extractErrorLogs(
 /**
  * Extract lines that contain test failures
  */
-export function extractFailLines(errorLogs: Set<string>): string[] {
+export function extractfail_lines(errorLogs: Set<string>): string[] {
   return Array.from(errorLogs).filter((log) => log.includes("FAIL  suites/"));
 }
 
@@ -394,32 +282,53 @@ export function sanitizeLogs(logs: string): string {
   return logs.replaceAll(/```/g, "'''");
 }
 
-/**
- * Check if test should be filtered out based on known issues
- */
-export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
-  if (!errorLogs || errorLogs.size === 0) {
-    return false;
+export async function workflowFailed(workflowName: string): Promise<void> {
+  if (!process.env.SLACK_CHANNEL) {
+    console.warn("No Slack channel found, skipping");
+    return;
+  }
+  const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
+  if (jobStatus === "success") {
+    console.warn(`Slack notification skipped (status: ${jobStatus})`);
+    return;
   }
 
-  const failLines = extractFailLines(errorLogs);
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
-  if (failLines.length === 0) {
-    return true; // Don't show if tests don't fail
-  }
+  const sections = [
+    `*Workflow*: ${workflowName} FAILED ❌ <@fabri>`,
+    `*Timestamp*: \`${new Date().toISOString()}\``,
+    `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
+    workflowRunUrl,
+  ];
 
-  // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = failLines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
+  const message = sections.filter(Boolean).join("\n");
+  const response = await fetch("https://slack.com/api/chat.postMessage", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      channel: process.env.SLACK_CHANNEL,
+      text: message,
+      mrkdwn: true,
+    }),
+  });
+
+  const data = (await response.json()) as {
+    ok: boolean;
+    [key: string]: unknown;
+  };
+
+  if (data && data.ok) {
+    console.log(
+      `✅ Slack notification sent successfully to ${process.env.SLACK_CHANNEL}!`,
     );
-
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
-    }
+  } else {
+    console.error("❌ Failed to send Slack notification. Response:", data);
   }
-
-  return false;
 }
