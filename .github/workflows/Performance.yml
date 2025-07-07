@@ -2,6 +2,9 @@ name: Performance
 description: "should verify performance "
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
