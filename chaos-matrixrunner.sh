@@ -1,0 +1,68 @@
+#!/bin/bash
+
+XMTP_ENV="local"
+
+# Matrix params
+DURATION_MS_LIST=(100000)
+CHAOS_LATENCY_MS_LIST=(0 100)
+CHAOS_JITTER_MS_LIST=(0 50)
+CHAOS_PACKET_LOSS_PCT_LIST=(0 5)
+CHAOS_EGRESS_LATENCY_MS_LIST=(100)
+CHAOS_EGRESS_JITTER_MS_LIST=(0)
+CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0)
+WORKER_COUNTS=(10 20)
+
+# Ops can be customized; default set includes all commit-inducing ops
+ENABLED_OPS="rotateKey,sendMessage,verify,updateName,addMember,removeMember,promoteAdmin,demoteAdmin"
+
+i=1
+
+for DURATION_MS in "${DURATION_MS_LIST[@]}"; do
+for CHAOS_LATENCY_MS in "${CHAOS_LATENCY_MS_LIST[@]}"; do
+for CHAOS_JITTER_MS in "${CHAOS_JITTER_MS_LIST[@]}"; do
+for CHAOS_PACKET_LOSS_PCT in "${CHAOS_PACKET_LOSS_PCT_LIST[@]}"; do
+for CHAOS_EGRESS_LATENCY_MS in "${CHAOS_EGRESS_LATENCY_MS_LIST[@]}"; do
+for CHAOS_EGRESS_JITTER_MS in "${CHAOS_EGRESS_JITTER_MS_LIST[@]}"; do
+for CHAOS_EGRESS_PACKET_LOSS_PCT in "${CHAOS_EGRESS_PACKET_LOSS_PCT_LIST[@]}"; do
+for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
+
+  echo ""
+  echo "========================================================="
+  echo "Running matrix config:"
+  echo "DURATION_MS=$DURATION_MS"
+  echo "CHAOS_LATENCY_MS=$CHAOS_LATENCY_MS"
+  echo "CHAOS_JITTER_MS=$CHAOS_JITTER_MS"
+  echo "CHAOS_PACKET_LOSS_PCT=$CHAOS_PACKET_LOSS_PCT"
+  echo "CHAOS_EGRESS_LATENCY_MS=$CHAOS_EGRESS_LATENCY_MS"
+  echo "CHAOS_EGRESS_JITTER_MS=$CHAOS_EGRESS_JITTER_MS"
+  echo "CHAOS_EGRESS_PACKET_LOSS_PCT=$CHAOS_EGRESS_PACKET_LOSS_PCT"
+  echo "WORKER_COUNT=$WORKER_COUNT"
+  echo "ENABLED_OPS=$ENABLED_OPS"
+  echo "XMTP_ENV=$XMTP_ENV"
+  echo "========================================================="
+
+  export DURATION_MS
+  export CHAOS_LATENCY_MS
+  export CHAOS_JITTER_MS
+  export CHAOS_PACKET_LOSS_PCT
+  export CHAOS_EGRESS_LATENCY_MS
+  export CHAOS_EGRESS_JITTER_MS
+  export CHAOS_EGRESS_PACKET_LOSS_PCT
+  export WORKER_COUNT
+  export ENABLED_OPS
+  export XMTP_ENV
+
+  echo "Starting with configuration $i..."
+  # Replace this line with your test runner script or loop
+  # Example:
+  # ./scripts/run-keyrotation-matrix.sh --runs=10
+  ((i++))
+
+done
+done
+done
+done
+done
+done
+done
+done
