@@ -196,15 +196,27 @@ export async function cleanAllRawLogs(): Promise<void> {
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
 function checkForCriticalErrors(failLines: string[]): void {
+  console.log(
+    `DEBUG: checkForCriticalErrors called with ${failLines.length} fail lines`,
+  );
+
   if (failLines.length === 1) {
     const failLine = failLines[0];
+    console.log(`DEBUG: Processing fail line: "${failLine}"`);
+
     const match = failLine.match(
       /FAIL\s+(suites\/[^[]+)\s+\[\s+(suites\/[^\]]+)\s+\]/,
     );
 
+    console.log(`DEBUG: Regex match result:`, match);
+
     if (match) {
       const outsidePath = match[1]?.trim();
       const insidePath = match[2]?.trim();
+
+      console.log(`DEBUG: outsidePath: "${outsidePath}"`);
+      console.log(`DEBUG: insidePath: "${insidePath}"`);
+      console.log(`DEBUG: Are paths equal? ${outsidePath === insidePath}`);
 
       if (outsidePath === insidePath) {
         console.error(
@@ -239,12 +251,6 @@ export function extractErrorLogs(testName: string): Set<string> {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
       const lines = content.split("\n");
-
-      // Extract fail lines first for critical error checking
-      const failLines = lines.filter((line) => line.includes("FAIL  suites/"));
-
-      // Check for critical transport errors first
-      checkForCriticalErrors(failLines);
 
       for (const line of lines) {
         if (!PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
