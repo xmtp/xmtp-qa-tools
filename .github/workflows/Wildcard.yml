@@ -1,5 +1,5 @@
-name: Dms
-description: "dms"
+name: Wildcard
+description: "wildcard pull request"
 
 on:
   pull_request:
