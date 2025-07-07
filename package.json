@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -27,7 +27,7 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs dev,production --installations 15,20,25,30 --count 500",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "regression": "yarn test suites/functional --versions 3 ",
+    "regression": "yarn test suites/functional --versions 3",
     "run:agent": "./suites/agents/run.sh",
     "run:commits": "./suites/commits/run.sh",
     "script": "yarn cli script",
@@ -39,7 +39,7 @@
     "@anthropic-ai/sdk": "^0.54.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
-    "@xmtp/node-bindings": "1.2.5",
+    "@xmtp/node-bindings": "1.2.6",
     "@xmtp/node-bindings-0.0.9": "npm:@xmtp/mls-client-bindings-node@0.0.9",
     "@xmtp/node-bindings-0.4.1": "npm:@xmtp/node-bindings@0.0.41",
     "@xmtp/node-bindings-1.0.0": "npm:@xmtp/node-bindings@1.0.0",
@@ -48,7 +48,8 @@
     "@xmtp/node-bindings-1.2.0": "npm:@xmtp/node-bindings@1.2.0",
     "@xmtp/node-bindings-1.2.2": "npm:@xmtp/node-bindings@1.2.2",
     "@xmtp/node-bindings-1.2.5": "npm:@xmtp/node-bindings@1.2.5",
-    "@xmtp/node-sdk": "3.0.1",
+    "@xmtp/node-bindings-1.2.6": "npm:@xmtp/node-bindings@1.2.6",
+    "@xmtp/node-sdk": "3.1.0",
     "@xmtp/node-sdk-0.0.13": "npm:@xmtp/mls-client@0.0.13",
     "@xmtp/node-sdk-0.0.47": "npm:@xmtp/node-sdk@0.0.47",
     "@xmtp/node-sdk-1.0.5": "npm:@xmtp/node-sdk@1.0.5",
@@ -56,6 +57,7 @@
     "@xmtp/node-sdk-2.1.0": "npm:@xmtp/node-sdk@2.1.0",
     "@xmtp/node-sdk-2.2.1": "npm:@xmtp/node-sdk@2.2.1",
     "@xmtp/node-sdk-3.0.1": "npm:@xmtp/node-sdk@3.0.1",
+    "@xmtp/node-sdk-3.1.0": "npm:@xmtp/node-sdk@3.1.0",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",
@@ -129,6 +131,11 @@
     "@xmtp/node-sdk@3.0.1": {
       "dependencies": {
         "@xmtp/node-bindings": "1.2.5"
+      }
+    },
+    "@xmtp/node-sdk@3.1.0": {
+      "dependencies": {
+        "@xmtp/node-bindings": "1.2.6"
       }
     }
   }
