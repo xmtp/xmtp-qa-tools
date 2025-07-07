@@ -478,6 +478,7 @@ export async function getWorkers(
         ? names.map((name) => `${name}-${nodeVersion}`)
         : names;
 
+    console.log(descriptors);
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
