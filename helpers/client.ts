@@ -329,7 +329,7 @@ export async function createClient(
   };
 }
 export const regressionClient = async (
-  sdk: string,
+  nodeVersion: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -340,13 +340,13 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.log(
-      `Creating API client with: SDK version: ${sdk} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${nodeVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
-  const versionConfig = VersionList.find((v) => v.nodeVersion === sdk);
+  const versionConfig = VersionList.find((v) => v.nodeVersion === nodeVersion);
   if (!versionConfig) {
-    throw new Error(`SDK version ${sdk} not found in VersionList`);
+    throw new Error(`SDK version ${nodeVersion} not found in VersionList`);
   }
   const ClientClass = versionConfig.Client;
   let client = null;
@@ -386,26 +386,12 @@ export const regressionClient = async (
   }
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${sdk}`);
+    throw new Error(`Failed to create client for SDK version ${nodeVersion}`);
   }
 
   return client;
 };
 
-export const getLibXmtpVersion = (client: any) => {
-  try {
-    const version = client.version;
-    if (!version || typeof version !== "string") return "unknown";
-
-    const parts = version.split("-");
-    if (parts.length <= 1) return "unknown";
-
-    const spaceParts = parts[1].split(" ");
-    return spaceParts[0] || "unknown";
-  } catch {
-    return "unknown";
-  }
-};
 export const createSigner47 = (privateKey: `0x${string}`) => {
   const account = privateKeyToAccount(privateKey);
   return {
