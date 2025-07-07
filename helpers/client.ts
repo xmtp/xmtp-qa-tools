@@ -53,6 +53,12 @@ import {
   Dm as Dm300,
   Group as Group300,
 } from "@xmtp/node-sdk-3.0.1";
+import {
+  Client as Client310,
+  Conversation as Conversation310,
+  Dm as Dm310,
+  Group as Group310,
+} from "@xmtp/node-sdk-3.1.0";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -133,17 +139,16 @@ export const VersionList = [
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
   },
+  {
+    Client: Client310,
+    Conversation: Conversation310,
+    Dm: Dm310,
+    Group: Group310,
+    nodeVersion: "3.1.0",
+    bindingsPackage: "1.2.6",
+    libXmtpVersion: "bfeba9f",
+  },
 ];
-
-// Helper function to get version config from VersionList
-export function getVersionConfig(sdkVersion: string) {
-  // Find the version config by nodeVersion
-  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
-  if (!config) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
-  return config;
-}
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -283,7 +288,7 @@ export const getDbPath = (description: string = "xmtp") => {
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
-  sdkVersion: string,
+  sdk: string,
   name: string,
   folder: string,
   env: XmtpEnv,
@@ -291,15 +296,9 @@ export async function createClient(
 ): Promise<{
   client: unknown;
   dbPath: string;
-  sdkVersion: string;
-  libXmtpVersion: string;
   address: `0x${string}`;
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
-
-  // Map SDK version to VersionList entry
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
@@ -307,8 +306,7 @@ export async function createClient(
 
   // Use type assertion to handle the client creation
   const client = await regressionClient(
-    sdkVersion,
-    libXmtpVersion,
+    sdk,
     walletKey,
     encryptionKey,
     dbPath,
@@ -320,13 +318,10 @@ export async function createClient(
     client,
     dbPath,
     address,
-    sdkVersion: String(sdkVersion),
-    libXmtpVersion,
   };
 }
 export const regressionClient = async (
-  sdkVersion: string,
-  libXmtpVersion: string,
+  sdk: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -337,17 +332,24 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.log(
-      `Creating API client with: SDK version: ${sdkVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${sdk} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
-  const versionConfig = getVersionConfig(sdkVersion);
+  const versionConfig = VersionList.find(
+    (v) =>
+      v.nodeVersion === sdk.split("-")[0] &&
+      v.libXmtpVersion === sdk.split("-")[1],
+  );
+  if (!versionConfig) {
+    throw new Error(`SDK version ${sdk} not found in VersionList`);
+  }
   const ClientClass = versionConfig.Client;
   let client = null;
 
-  if (sdkVersion === "0.0.13") {
+  if (versionConfig.nodeVersion === "0.0.13") {
     throw new Error("Invalid version");
-  } else if (sdkVersion === "0.0.47") {
+  } else if (versionConfig.nodeVersion === "0.0.47") {
     const signer = createSigner47(walletKey);
 
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
@@ -357,7 +359,7 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-  } else if (sdkVersion === "1.0.5") {
+  } else if (versionConfig.nodeVersion === "1.0.5") {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
@@ -380,7 +382,7 @@ export const regressionClient = async (
   }
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${sdkVersion}`);
+    throw new Error(`Failed to create client for SDK version ${sdk}`);
   }
 
   return client;
@@ -457,9 +459,12 @@ export function getEnvPath(): string {
 }
 export function getLatestSdkVersion(): string {
   const sdkVersion = nodeVersionOptions()[0];
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
-  return sdkVersion + "-" + libXmtpVersion;
+  // Find the version config by nodeVersion
+  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
+  if (!config) {
+    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
+  }
+  return config.nodeVersion + "-" + config.libXmtpVersion;
 }
 /**
  * Loads environment variables from the specified test's .env file if it exists

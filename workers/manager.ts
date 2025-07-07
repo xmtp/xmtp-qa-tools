@@ -4,10 +4,9 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  getVersionConfig,
+  getLatestSdkVersion,
   nodeVersionOptions,
   sleep,
-  VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -56,8 +55,6 @@ export interface WorkerBase {
   folder: string;
   walletKey: string;
   encryptionKey: string;
-  sdkVersion: string;
-  libXmtpVersion: string;
 }
 
 export interface Worker extends WorkerBase {
@@ -140,19 +137,6 @@ export class WorkerManager {
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
   }
 
-  /**
-   * Gets the version of the first worker (as a representative version)
-   */
-  public getVersion(): string {
-    const firstBaseName = Object.keys(this.workers)[0];
-    if (!firstBaseName) return "unknown";
-
-    const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
-    if (!firstInstallId) return "unknown";
-
-    return this.workers[firstBaseName][firstInstallId].sdkVersion;
-  }
-
   public async checkStatistics(): Promise<void> {
     for (const worker of this.getAll()) {
       await worker.worker.getStats();
@@ -222,7 +206,7 @@ export class WorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk} ${installationCount.installations.length} - ${formatBytes(
               (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
             )}`,
           );
@@ -395,15 +379,13 @@ export class WorkerManager {
     const parts = descriptor.split("-");
     const baseName = parts[0];
 
-    // Handle version parsing - version is always the last part if it's a number
-    let sdkVersion = getLatestVersion();
     let providedInstallId: string | undefined;
-
+    let sdk = getLatestSdkVersion();
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
       if (lastPart && nodeVersionOptions().includes(lastPart)) {
-        sdkVersion = lastPart;
+        sdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
           providedInstallId = parts.slice(1, -1).join("-");
@@ -422,7 +404,6 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
-    const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -430,12 +411,10 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: sdkVersion + "-" + libXmtpVersion,
+      sdk: getLatestSdkVersion(),
       folder,
       walletKey,
       encryptionKey,
-      sdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
     };
 
     // Create and initialize the worker
@@ -446,11 +425,10 @@ export class WorkerManager {
     // Create the complete worker
     const worker: Worker = {
       ...workerData,
+      sdk: sdk,
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
-      sdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
       installationId: initializedWorker.client.installationId,
       env: this.env,
@@ -629,30 +607,4 @@ function getNextFolderName(): string {
 export function getDataSubFolderCount() {
   const preBasePath = process.cwd();
   return fs.readdirSync(`${preBasePath}/.data`).length;
-}
-export function getLatestVersion(): string {
-  if (VersionList.length === 0) {
-    // Fallback to a known good version if VersionList is somehow empty
-    return "3.0.1";
-  }
-  // Return the latest version (last in array)
-  return "3.0.1";
-}
-
-export function getNodeSdkVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.nodeVersion;
-  } catch {
-    return "unknown";
-  }
-}
-
-export function getLibxmtpVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.libXmtpVersion;
-  } catch {
-    return "unknown";
-  }
 }
