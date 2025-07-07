@@ -87,6 +87,9 @@ function showUsageAndExit(): never {
     "      --versions count   Number of SDK versions to use (e.g., 3)",
   );
   console.error(
+    "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.0)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -109,6 +112,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
+  );
+  console.error(
+    "  yarn cli test functional --nodeVersion 3.1.0 # Uses workers with SDK version 3.1.0",
   );
   process.exit(1);
 }
@@ -191,6 +197,17 @@ function parseTestArgs(args: string[]): {
           i++;
         } else {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
+        }
+        break;
+      case "--nodeVersion":
+        if (nextArg) {
+          // Store node version in vitestArgs to be passed as environment variable
+          options.vitestArgs.push(`--nodeVersion=${nextArg}`);
+          i++;
+        } else {
+          console.warn(
+            "--nodeVersion flag requires a value (e.g., --nodeVersion 3.1.0)",
+          );
         }
         break;
       case "--debug":
@@ -353,6 +370,23 @@ async function runVitestTest(
     );
   }
 
+  // Extract --nodeVersion parameter and set as environment variable
+  const nodeVersionArg = options.vitestArgs.find((arg) =>
+    arg.startsWith("--nodeVersion="),
+  );
+  if (nodeVersionArg) {
+    const nodeVersion = nodeVersionArg.split("=")[1];
+    env.NODE_VERSION = nodeVersion;
+    console.debug(
+      `Setting NODE_VERSION environment variable to: ${nodeVersion}`,
+    );
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--nodeVersion="),
+    );
+  }
+
   // Only set debug logging if --debug was explicitly passed
   if (options.explicitLogFlag) {
     env.LOGGING_LEVEL = "debug";
@@ -475,6 +509,23 @@ async function main(): Promise<void> {
             // Remove from vitestArgs since it's not a vitest parameter
             options.vitestArgs = options.vitestArgs.filter(
               (arg) => !arg.startsWith("--versions="),
+            );
+          }
+
+          // Extract --nodeVersion parameter and set as environment variable
+          const nodeVersionArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--nodeVersion="),
+          );
+          if (nodeVersionArg) {
+            const nodeVersion = nodeVersionArg.split("=")[1];
+            env.NODE_VERSION = nodeVersion;
+            console.debug(
+              `Setting NODE_VERSION environment variable to: ${nodeVersion}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--nodeVersion="),
             );
           }
 

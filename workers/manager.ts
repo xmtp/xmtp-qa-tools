@@ -454,7 +454,11 @@ export async function getWorkers(
     randomNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = false, randomNames = true, nodeVersion } = options;
+  const {
+    useVersions = false,
+    randomNames = true,
+    nodeVersion = process.env.NODE_VERSION,
+  } = options;
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
