@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { VersionList } from "@helpers/client";
+import { VersionList } from "@workers/versions";
 
 type VersionConfig = (typeof VersionList)[number];
 const staticConfigs = VersionList;
