@@ -8,7 +8,7 @@ import { describe, it } from "vitest";
 // Count of groups to create
 const groupCount = 5;
 const parallelOperations = 1; // How many operations to perform in parallel
-
+const NODE_VERSION = "3.1.0"; // --nodeVersion=3.1.0
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
 const workerNames = [
@@ -83,6 +83,7 @@ describe(testName, () => {
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
+      nodeVersion: NODE_VERSION,
     });
     // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
     // Create groups
