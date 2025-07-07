@@ -455,6 +455,14 @@ export async function getWorkers(
   } = {},
 ): Promise<WorkerManager> {
   const { useVersions = false, randomNames = true, nodeVersion } = options;
+
+  // Only use NODE_VERSION from environment if nodeVersion wasn't explicitly provided
+  // and NODE_VERSION is explicitly set (by CLI)
+  const finalNodeVersion =
+    nodeVersion ||
+    (process.env.NODE_VERSION && process.env.NODE_VERSION.trim() !== ""
+      ? process.env.NODE_VERSION
+      : undefined);
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
@@ -468,8 +476,8 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    let descriptors = nodeVersion
-      ? names.map((name) => `${name}-${nodeVersion}`)
+    let descriptors = finalNodeVersion
+      ? names.map((name) => `${name}-${finalNodeVersion}`)
       : useVersions
         ? getWorkersWithVersions(names)
         : names;
