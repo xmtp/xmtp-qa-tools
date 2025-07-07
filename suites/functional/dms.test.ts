@@ -7,21 +7,18 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
-  const workers = await getWorkers(
-    [
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "randomguy2",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ],
-    { useVersions: true },
-  );
+  const workers = await getWorkers([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "randomguy2",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
 
   let convo: Dm;
 

@@ -1604,19 +1604,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:2.0.8":
-  version: 2.0.8
-  resolution: "@xmtp/node-sdk@npm:2.0.8"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.1.8"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/cc76d8eab8094ba9f67d08244b2f2ee2a9b790631d696f7c688c830193ff4a51a177290dd23a2e483711d1933a1fe97f14c194cc1b65726a6935790ed05c3956
-  languageName: node
-  linkType: hard
-
 "@xmtp/proto@npm:^3.62.1, @xmtp/proto@npm:^3.72.0, @xmtp/proto@npm:^3.72.3, @xmtp/proto@npm:^3.78.0":
   version: 3.82.1
   resolution: "@xmtp/proto@npm:3.82.1"
@@ -2785,7 +2772,6 @@ __metadata:
   resolution: "gm-bot@workspace:bots/gm-bot"
   dependencies:
     "@types/node": "npm:^20.14.2"
-    "@xmtp/node-sdk": "npm:2.0.8"
     dotenv: "npm:^16.4.5"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.8.3"

@@ -15,6 +15,11 @@ import {
   type SkillOptions,
 } from "../helpers/xmtp-skills";
 
+// Retry configuration constants
+const MAX_RETRIES = 5;
+// wait 5 seconds before each retry
+const RETRY_INTERVAL = 5000;
+
 /**
  * Core options for XMTP client initialization that includes skill options
  */
@@ -42,6 +47,68 @@ export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * Handle message streaming with retry logic following the new async iterator approach
+ */
+const handleStream = async (
+  client: Client,
+  callBack: MessageHandler,
+  skillOpts: SkillOptions,
+): Promise<void> => {
+  const env = client.options?.env;
+  let retries = MAX_RETRIES;
+
+  const retry = () => {
+    console.log(
+      `[${env}] Retrying in ${RETRY_INTERVAL / 1000}s, ${retries} retries left`,
+    );
+    if (retries > 0) {
+      retries--;
+      setTimeout(() => {
+        void handleStream(client, callBack, skillOpts);
+      }, RETRY_INTERVAL);
+    } else {
+      console.log(`[${env}] Max retries reached, ending process`);
+      process.exit(1);
+    }
+  };
+
+  const onFail = () => {
+    console.log(`[${env}] Stream failed`);
+    retry();
+  };
+
+  try {
+    console.log(`[${env}] Syncing conversations...`);
+    await client.conversations.sync();
+
+    const stream = await client.conversations.streamAllMessages();
+
+    console.log(`[${env}] Waiting for messages...`);
+
+    for await (const message of stream) {
+      if (message) {
+        void (async () => {
+          try {
+            await processMessage(
+              client,
+              message,
+              callBack,
+              skillOpts,
+              env || "unknown",
+            );
+          } catch (err: unknown) {
+            console.error(`[${env}] Error processing message:`, err);
+          }
+        })();
+      }
+    }
+  } catch (error) {
+    console.error(`[${env}] Error in handleStream:`, error);
+    onFail();
+  }
+};
+
+/**
  * Initialize XMTP clients with robust error handling
  */
 export const initializeClient = async (
@@ -53,37 +120,6 @@ export const initializeClient = async (
     ...DEFAULT_CORE_OPTIONS,
     ...opt,
   }));
-
-  /**
-   * Core message streaming function with robust error handling
-   */
-  const streamMessages = async (
-    client: Client,
-    callBack: MessageHandler,
-    skillOpts: SkillOptions,
-  ): Promise<void> => {
-    const env = client.options?.env;
-
-    await client.conversations.sync();
-    console.debug(`[${env}] Waiting for messages...`);
-    void client.conversations.streamAllMessages((error, message) => {
-      if (error) {
-        console.error(`[${env}] Error in streamMessages:`, error);
-        return;
-      }
-      if (message) {
-        void processMessage(
-          client,
-          message,
-          callBack,
-          skillOpts,
-          env || "unknown",
-        ).catch((err: unknown) => {
-          console.error(`[${env}] Error processing message:`, err);
-        });
-      }
-    });
-  };
 
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
@@ -121,7 +157,7 @@ export const initializeClient = async (
         // @ts-expect-error - TODO: fix this
         clients.push(client);
 
-        const streamPromise = streamMessages(
+        const streamPromise = handleStream(
           // @ts-expect-error - TODO: fix this
           client,
           messageHandler,

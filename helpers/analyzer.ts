@@ -72,10 +72,6 @@ export function processErrorLine(line: string): {
 }
 
 /**
- * Clean raw-*.log files by checking corresponding non-raw log files for "fork" content
- * If a non-raw file contains "fork", clean the corresponding raw file
- */
-/**
  * Check if a large file contains a target string using streaming
  */
 async function fileContainsString(
@@ -197,6 +193,61 @@ export async function cleanAllRawLogs(): Promise<void> {
 }
 
 /**
+ * Check for critical transport/infrastructure errors that should cause immediate process exit
+ */
+function checkForCriticalErrors(content: string): void {
+  const criticalErrors = [
+    "transport error",
+    "Error: api client error",
+    "Connection refused",
+    "Network timeout",
+    "Service unavailable",
+  ];
+
+  for (const errorPattern of criticalErrors) {
+    if (content.includes(errorPattern)) {
+      console.error(
+        `❌ CRITICAL INFRASTRUCTURE ERROR DETECTED: ${errorPattern}`,
+      );
+      console.error(
+        "Network/transport failure prevents tests from running. Exiting immediately.",
+      );
+      process.exit(2); // Exit code 2 for infrastructure failure
+    }
+  }
+
+  // Check for test suite execution failure pattern
+  // Pattern: "FAIL  suites/path/test.ts [ suites/path/test.ts ]"
+  // where the same path appears both outside and inside brackets
+  const lines = content.split("\n");
+  const failLines = lines.filter(
+    (line) => line.includes("FAIL  suites/") && line.includes("[ suites/"),
+  );
+
+  if (failLines.length === 1) {
+    const failLine = failLines[0];
+    const match = failLine.match(
+      /FAIL\s+(suites\/[^[]+)\s+\[\s+(suites\/[^\]]+)\s+\]/,
+    );
+
+    if (match) {
+      const outsidePath = match[1]?.trim();
+      const insidePath = match[2]?.trim();
+
+      if (outsidePath === insidePath) {
+        console.error(
+          `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
+        );
+        console.error(
+          "Test suite failed to execute properly. Infrastructure or setup issue.",
+        );
+        process.exit(2); // Exit code 2 for infrastructure failure
+      }
+    }
+  }
+}
+
+/**
  * Extract error logs from log files with deduplication
  */
 export function extractErrorLogs(testName: string): Set<string> {
@@ -215,6 +266,10 @@ export function extractErrorLogs(testName: string): Set<string> {
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
+
+      // Check for critical transport errors first
+      checkForCriticalErrors(content);
+
       const lines = content.split("\n");
 
       for (const line of lines) {
