@@ -20,7 +20,7 @@ for ((x=1; x<=tranche_parts; x++)); do
       tid=$(date +%s)
       echo "Running test iteration $i of $num_runs in tranche $tranche_parts"
 
-      LOGGING_LEVEL=debug timeout 300 npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
+      LOGGING_LEVEL=debug timeout $DURATION_MS npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
       exit_code=$?
 
       echo "Test iteration $i completed with exit code $exit_code"

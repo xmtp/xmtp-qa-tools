@@ -126,7 +126,7 @@ describe(testName, async () => {
           }
 
           if (enabledOps.includes("updateName")) {
-            await group.updateName("Rotation Test " + Date.now());
+            await group.updateName("Update Group Name Test " + Date.now());
           }
 
           if (enabledOps.includes("modifyMembership")) {

@@ -3,7 +3,7 @@
 XMTP_ENV="local"
 
 # Matrix params
-DURATION_MS_LIST=(100000)
+DURATION_MS_LIST=(300)
 CHAOS_LATENCY_MS_LIST=(0 100)
 CHAOS_JITTER_MS_LIST=(0 50)
 CHAOS_PACKET_LOSS_PCT_LIST=(0 5)
@@ -13,7 +13,7 @@ CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0)
 WORKER_COUNTS=(10 20)
 
 # Ops can be customized; default set includes all commit-inducing ops
-ENABLED_OPS="rotateKey,sendMessage,verify,updateName,addMember,removeMember,promoteAdmin,demoteAdmin"
+ENABLED_OPS="rotateKey,sendMessage,verify,updateName,modifyMembership,promoteAdmin,demoteAdmin"
 
 i=1
 
@@ -53,9 +53,7 @@ for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
   export XMTP_ENV
 
   echo "Starting with configuration $i..."
-  # Replace this line with your test runner script or loop
-  # Example:
-  # ./scripts/run-keyrotation-matrix.sh --runs=10
+  ./chaossuite-batchrunner.sh
   ((i++))
 
 done
