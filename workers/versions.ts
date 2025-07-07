@@ -62,7 +62,7 @@ export const VersionList = [
     Group: Group310,
     nodeVersion: "3.1.0",
     bindingsPackage: "1.2.6",
-    auto: true,
+    auto: false,
   },
   {
     Client: Client300,
