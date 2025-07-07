@@ -5,7 +5,6 @@ import {
   formatBytes,
   generateEncryptionKeyHex,
   getLatestSdkVersion,
-  getVersionConfig,
   nodeVersionOptions,
   sleep,
 } from "@helpers/client";
@@ -608,22 +607,4 @@ function getNextFolderName(): string {
 export function getDataSubFolderCount() {
   const preBasePath = process.cwd();
   return fs.readdirSync(`${preBasePath}/.data`).length;
-}
-
-export function getNodeSdkVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.nodeVersion;
-  } catch {
-    return "unknown";
-  }
-}
-
-export function getLibxmtpVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.libXmtpVersion;
-  } catch {
-    return "unknown";
-  }
 }

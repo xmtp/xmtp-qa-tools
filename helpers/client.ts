@@ -135,16 +135,6 @@ export const VersionList = [
   },
 ];
 
-// Helper function to get version config from VersionList
-export function getVersionConfig(sdkVersion: string) {
-  // Find the version config by nodeVersion
-  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
-  if (!config) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
-  return config;
-}
-
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
     fieldName: string;
@@ -319,8 +309,7 @@ export async function createClient(
   };
 }
 export const regressionClient = async (
-  sdkVersion: string,
-  libXmtpVersion: string,
+  sdk: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -331,17 +320,24 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.log(
-      `Creating API client with: SDK version: ${sdkVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${sdk} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
-  const versionConfig = getVersionConfig(sdkVersion);
+  const versionConfig = VersionList.find(
+    (v) =>
+      v.nodeVersion === sdk.split("-")[0] &&
+      v.libXmtpVersion === sdk.split("-")[1],
+  );
+  if (!versionConfig) {
+    throw new Error(`SDK version ${sdk} not found in VersionList`);
+  }
   const ClientClass = versionConfig.Client;
   let client = null;
 
-  if (sdkVersion === "0.0.13") {
+  if (versionConfig.nodeVersion === "0.0.13") {
     throw new Error("Invalid version");
-  } else if (sdkVersion === "0.0.47") {
+  } else if (versionConfig.nodeVersion === "0.0.47") {
     const signer = createSigner47(walletKey);
 
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
@@ -351,7 +347,7 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-  } else if (sdkVersion === "1.0.5") {
+  } else if (versionConfig.nodeVersion === "1.0.5") {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
@@ -374,7 +370,7 @@ export const regressionClient = async (
   }
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${sdkVersion}`);
+    throw new Error(`Failed to create client for SDK version ${sdk}`);
   }
 
   return client;
@@ -451,9 +447,12 @@ export function getEnvPath(): string {
 }
 export function getLatestSdkVersion(): string {
   const sdkVersion = nodeVersionOptions()[0];
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
-  return sdkVersion + "-" + libXmtpVersion;
+  // Find the version config by nodeVersion
+  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
+  if (!config) {
+    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
+  }
+  return config.nodeVersion + "-" + config.libXmtpVersion;
 }
 /**
  * Loads environment variables from the specified test's .env file if it exists
