@@ -22,10 +22,9 @@ const enabledOps = process.env.ENABLED_OPS
     "sendMessage",
     "verify",
     "updateName",
-    "addMember",
-    "removeMember",
+    "modifyMembership",
     "promoteAdmin",
-    "demoteAdmin",
+    "demoteAdmin"
   ];
 
 console.log("=== Key Rotation Test Configuration ===");
@@ -37,7 +36,7 @@ console.table({
   CHAOS_EGRESS_LATENCY_MS: chaosEgressLatencyMs,
   CHAOS_EGRESS_JITTER_MS: chaosEgressJitterMs,
   CHAOS_EGRESS_PACKET_LOSS_PCT: chaosEgressLossPct,
-  ENABLED_OPS: enabledOps.join(", "),
+  ENABLED_OPS: enabledOps.join(", ")
 });
 console.log("=======================================");
 
@@ -49,7 +48,7 @@ describe(testName, async () => {
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),
     new DockerContainer("multinode-node3-1"),
-    new DockerContainer("multinode-node4-1"),
+    new DockerContainer("multinode-node4-1")
   ];
 
   const userDescriptors: Record<string, string> = {};
@@ -130,35 +129,17 @@ describe(testName, async () => {
             await group.updateName("Rotation Test " + Date.now());
           }
 
-          if (enabledOps.includes("addMember")) {
-            const members = await group.members();
-            const currentMembers = members.map((m) => m.identityKey);
-            const available = workers
-              .getAll()
-              .map((w) => w.client.inboxId)
-              .filter((id) => !currentMembers.includes(id));
-
-            if (available.length > 0) {
-              const rand = available[Math.floor(Math.random() * available.length)];
-              await group.addMembers([rand]);
-            } else {
-              console.log("[addMember] No available non-members to add");
-            }
-          }
-
-          if (enabledOps.includes("removeMember")) {
-            const rand = workers.getRandomWorker().client.inboxId;
-            await group.removeMembers([rand]);
+          if (enabledOps.includes("modifyMembership")) {
+            await group.removeMembers([inboxId]);
+            await group.addMembers([inboxId]);
           }
 
           if (enabledOps.includes("promoteAdmin")) {
-            const rand = workers.getRandomWorker().client.inboxId;
-            await group.addSuperAdmin(rand);
+            await group.addSuperAdmin(inboxId);
           }
 
           if (enabledOps.includes("demoteAdmin")) {
-            const rand = workers.getRandomWorker().client.inboxId;
-            await group.removeSuperAdmin(rand);
+            await group.removeSuperAdmin(inboxId);
           }
         })();
       }, 10000);
