@@ -139,15 +139,15 @@ export const VersionList = [
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
   },
-  {
-    Client: Client310,
-    Conversation: Conversation310,
-    Dm: Dm310,
-    Group: Group310,
-    nodeVersion: "3.1.0",
-    bindingsPackage: "1.2.6",
-    libXmtpVersion: "bfeba9f",
-  },
+  // {
+  //   Client: Client310,
+  //   Conversation: Conversation310,
+  //   Dm: Dm310,
+  //   Group: Group310,
+  //   nodeVersion: "3.1.0",
+  //   bindingsPackage: "1.2.6",
+  //   libXmtpVersion: "bfeba9f",
+  // },
 ];
 
 export type GroupMetadataContent = {

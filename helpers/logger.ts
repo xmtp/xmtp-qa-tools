@@ -148,18 +148,6 @@ export const createLogger = () => {
   return logger;
 };
 
-/**
- * Log error with consistent formatting
- */
-export const logError = (e: unknown, testName: string | undefined): boolean => {
-  if (e instanceof Error) {
-    console.warn(`${testName}`, e.message);
-  } else {
-    console.warn(`Unknown error type:`, typeof e);
-  }
-  return true;
-};
-
 // Global logger instance
 const logger = createLogger();
 

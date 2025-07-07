@@ -1,0 +1,53 @@
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
+import { getWorkers } from "@workers/manager";
+import { type Group } from "@xmtp/node-sdk";
+import { describe, expect, it } from "vitest";
+
+const testName = "failtowait";
+
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
+
+  const workers = await getWorkers(["creator"]);
+  const creator = workers.get("creator")!;
+
+  it("should create a group with 25 members", async () => {
+    // Get 100 inbox IDs for group members
+    const memberInboxIds = getInboxIds(25);
+    console.log(`Creating group with ${memberInboxIds.length} members`);
+
+    // Create the group
+    const group = (await creator.client.conversations.newGroup(
+      memberInboxIds,
+    )) as Group;
+
+    console.log(`Group created with ID: ${group.id}`);
+  });
+
+  it("should create a group with 50 members", async () => {
+    // Get 100 inbox IDs for group members
+    const memberInboxIds = getInboxIds(50);
+    console.log(`Creating group with ${memberInboxIds.length} members`);
+
+    // Create the group
+    const group = (await creator.client.conversations.newGroup(
+      memberInboxIds,
+    )) as Group;
+
+    console.log(`Group created with ID: ${group.id}`);
+  });
+
+  it("should create a group with 100 members", async () => {
+    // Get 100 inbox IDs for group members
+    const memberInboxIds = getInboxIds(100);
+    console.log(`Creating group with ${memberInboxIds.length} members`);
+
+    // Create the group
+    const group = (await creator.client.conversations.newGroup(
+      memberInboxIds,
+    )) as Group;
+
+    console.log(`Group created with ID: ${group.id}`);
+  });
+});

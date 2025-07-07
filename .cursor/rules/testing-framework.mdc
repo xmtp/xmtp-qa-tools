@@ -1,18 +1,17 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
+
 # XMTP Testing Worker Framework Rules
 
 ## Core Testing Pattern
 
 ```typescript
-
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-
-import { getWorkers, getWorkerNames } from "@workers/manager";
+import { getWorkerNames, getWorkers } from "@workers/manager";
 import { describe, it } from "vitest";
 
 const testName = "my-test";
@@ -21,12 +20,10 @@ describe(testName, async () => {
   // Simplified API - versioning enabled by default
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({testName});
+  setupTestLifecycle({ testName });
 
   it("should do something", async () => {
-
-      // Test logic here
-    
+    // Test logic here
   });
 });
 ```
@@ -46,8 +43,8 @@ const workers = await getWorkers(["alice", "bob", "charlie"]);
 
 // 3. Record for API URL mapping (for distributed testing)
 const workers = await getWorkers({
-  "alice": "https://api1.example.com",
-  "bob": "https://api2.example.com"
+  alice: "https://api1.example.com",
+  bob: "https://api2.example.com",
 });
 ```
 
@@ -55,17 +52,17 @@ const workers = await getWorkers({
 
 ```typescript
 type GetWorkersOptions = {
-  env?: XmtpEnv;              // XMTP environment (default: from XMTP_ENV)
-  useVersions?: boolean;      // Apply version descriptors (default: true)
-  randomNames?: boolean;      // Use random names for number input (default: true)
-}
+  env?: XmtpEnv; // XMTP environment (default: from XMTP_ENV)
+  useVersions?: boolean; // Apply version descriptors (default: true)
+  randomNames?: boolean; // Use random names for number input (default: true)
+};
 
 // Examples:
-await getWorkers(3);                                    // 3 workers with random names, versioned
-await getWorkers(3, { randomNames: false });            // 3 workers with fixed names (bob, alice, fabri)
-await getWorkers(["alice", "bob"]);                     // Specific names, versioned
+await getWorkers(3); // 3 workers with random names, versioned
+await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
+await getWorkers(["alice", "bob"]); // Specific names, versioned
 await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
-await getWorkers(5, { env: "production" });            // 5 random workers on production
+await getWorkers(5, { env: "production" }); // 5 random workers on production
 ```
 
 ## Worker Access Patterns
@@ -96,20 +93,23 @@ const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
 ## Common Usage Patterns
 
 ### Simple Testing
+
 ```typescript
 // Most common patterns
-const workers = await getWorkers(5);                    // 5 random workers
-const workers = await getWorkers(["alice", "bob"]);     // Specific workers
+const workers = await getWorkers(5); // 5 random workers
+const workers = await getWorkers(["alice", "bob"]); // Specific workers
 ```
 
 ### Version Testing
+
 ```typescript
 // Versioning is enabled by default
-const workers = await getWorkers(3);                    // Uses random SDK versions
+const workers = await getWorkers(3); // Uses random SDK versions
 const workers = await getWorkers(3, { useVersions: false }); // All latest version
 ```
 
 ### Environment-Specific Testing
+
 ```typescript
 const workers = await getWorkers(5, { env: "production" });
 const workers = await getWorkers(["alice"], { env: "local" });
@@ -170,11 +170,11 @@ const admins = group.admins;
 import { typeofStream } from "@workers/main";
 
 // Available stream types
-typeofStream.Message;           // Message delivery streams
+typeofStream.Message; // Message delivery streams
 typeofStream.MessageandResponse; // Message streams with automatic responses
-typeofStream.GroupUpdated;      // Group metadata and membership updates
-typeofStream.Conversation;      // New conversation creation events
-typeofStream.Consent;           // Consent state changes
+typeofStream.GroupUpdated; // Group metadata and membership updates
+typeofStream.Conversation; // New conversation creation events
+typeofStream.Consent; // Consent state changes
 ```
 
 ### Manual Stream Control
@@ -188,7 +188,7 @@ workers.getReceiver().worker.startStream(typeofStream.GroupUpdated);
 workers.getReceiver().worker.startStream(typeofStream.Conversation);
 
 // Start streams for multiple workers
-workers.getAllButCreator().forEach(worker => {
+workers.getAllButCreator().forEach((worker) => {
   worker.worker.startStream(typeofStream.Message);
 });
 
@@ -283,14 +283,14 @@ All stream verification functions return a `VerifyStreamResult` object:
 
 ```typescript
 type VerifyStreamResult = {
-  allReceived: boolean;           // True if all expected events received
-  almostAllReceived: boolean;     // True if ≤2 events missing
-  receiverCount: number;          // Number of receiving workers
-  messages: string;               // Comma-separated received messages
-  eventTimings: string;           // Timing data per receiver
-  averageEventTiming: number;     // Average delivery time in ms
-  receptionPercentage: number;    // Percentage of successfully received events
-  orderPercentage: number;        // Percentage of receivers with correct order
+  allReceived: boolean; // True if all expected events received
+  almostAllReceived: boolean; // True if ≤2 events missing
+  receiverCount: number; // Number of receiving workers
+  messages: string; // Comma-separated received messages
+  eventTimings: string; // Timing data per receiver
+  averageEventTiming: number; // Average delivery time in ms
+  receptionPercentage: number; // Percentage of successfully received events
+  orderPercentage: number; // Percentage of receivers with correct order
 };
 
 // Example usage
@@ -315,7 +315,7 @@ expect(result.averageEventTiming).toBeLessThan(2000);
 workers.getReceiver().worker.startStream(typeofStream.Message);
 await conversation.send("Hello");
 
-// ❌ Bad: Start streams after triggering events  
+// ❌ Bad: Start streams after triggering events
 await conversation.send("Hello");
 workers.getReceiver().worker.startStream(typeofStream.Message);
 ```
@@ -342,7 +342,7 @@ worker.worker.startStream(typeofStream.Consent);
 // Streams are automatically cleaned up by setupTestLifecycle
 // Manual cleanup if needed:
 afterEach(() => {
-  workers.getAll().forEach(worker => {
+  workers.getAll().forEach((worker) => {
     worker.worker.endStream();
   });
 });
@@ -370,25 +370,20 @@ expect(result.orderPercentage).toBeGreaterThan(90);
 
 ```typescript
 it("should deliver messages in real-time", async () => {
-  try {
-    // Start message streams
-    workers.getReceiver().worker.startStream(typeofStream.Message);
-    
-    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
-    
-    const verifyResult = await verifyMessageStream(
-      dm,
-      [workers.get("bob")],
-      5,
-      "realtime-{i}-{randomSuffix}"
-    );
-    
-    expect(verifyResult.allReceived).toBe(true);
-    expect(verifyResult.averageEventTiming).toBeLessThan(500);
-  } catch (e) {
-    logError(e, expect.getState().currentTestName);
-    throw e;
-  }
+  // Start message streams
+  workers.getReceiver().worker.startStream(typeofStream.Message);
+
+  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+  const verifyResult = await verifyMessageStream(
+    dm,
+    [workers.get("bob")],
+    5,
+    "realtime-{i}-{randomSuffix}",
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
+  expect(verifyResult.averageEventTiming).toBeLessThan(500);
 });
 ```
 
@@ -396,25 +391,20 @@ it("should deliver messages in real-time", async () => {
 
 ```typescript
 it("should notify all members of group updates", async () => {
-  try {
-    // Start group update streams
-    workers.getAllButCreator().forEach(worker => {
-      worker.worker.startStream(typeofStream.GroupUpdated);
-    });
-    
-    const group = await workers.createGroupBetweenAll();
-    
-    const verifyResult = await verifyMetadataStream(
-      group,
-      workers.getAllButCreator(),
-      3
-    );
-    
-    expect(verifyResult.allReceived).toBe(true);
-  } catch (e) {
-    logError(e, expect.getState().currentTestName);
-    throw e;
-  }
+  // Start group update streams
+  workers.getAllButCreator().forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
+
+  const group = await workers.createGroupBetweenAll();
+
+  const verifyResult = await verifyMetadataStream(
+    group,
+    workers.getAllButCreator(),
+    3,
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
 });
 ```
 
@@ -429,19 +419,6 @@ Use predefined names from the 61 available:
  "victor", "wendy", "xavier", "yolanda", "zack", ...]
 ```
 
-## Error Handling
-
-Always wrap test logic in try-catch:
-
-```typescript
-try {
-  // Test operations
-} catch (e) {
-  logError(e, expect.getState().currentTestName);
-  throw e;
-}
-```
-
 ## Test Organization
 
 - Use `useVersions: true` option for version testing
@@ -452,10 +429,8 @@ try {
 ## Key Imports
 
 ```typescript
-
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-
-import { getWorkers, getWorkerNames } from "@workers/manager";
+import { getWorkerNames, getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 ```

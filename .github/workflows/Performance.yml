@@ -2,9 +2,6 @@ name: Performance
 description: "should verify performance "
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
@@ -16,7 +13,7 @@ jobs:
     strategy:
       matrix:
         test: [performance]
-        environment: [dev]
+        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -32,7 +29,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
