@@ -74,7 +74,7 @@ export const setupTestLifecycle = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || sdkVersionList()[0].nodeVersion,
+          sdk: sdk || sdkVersionList()[0]..,
           operation: operationName,
           test: testNameExtracted,
         };

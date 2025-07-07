@@ -74,7 +74,6 @@ export const VersionList = [
     Group: Group220,
     nodeVersion: "2.2.1",
     bindingsPackage: "1.2.2",
-    libXmtpVersion: "d0f0b67",
   },
   {
     Client: Client300,
@@ -83,7 +82,6 @@ export const VersionList = [
     Group: Group300,
     nodeVersion: "3.0.1",
     bindingsPackage: "1.2.5",
-    libXmtpVersion: "dc3e8c8",
   },
   ...
 ];

@@ -83,7 +83,6 @@ export const VersionList = [
     Group: Conversation13,
     nodeVersion: "0.0.13",
     bindingsPackage: "0.0.9",
-    libXmtpVersion: "0.0.9",
     auto: true,
   },
   {
@@ -93,7 +92,6 @@ export const VersionList = [
     Group: Group47,
     nodeVersion: "0.0.47",
     bindingsPackage: "0.4.1",
-    libXmtpVersion: "6bd613d",
     auto: true,
   },
   {
@@ -103,7 +101,6 @@ export const VersionList = [
     Group: Group105,
     nodeVersion: "1.0.5",
     bindingsPackage: "1.1.3",
-    libXmtpVersion: "6eb1ce4",
     auto: true,
   },
   {
@@ -113,7 +110,6 @@ export const VersionList = [
     Group: Group209,
     nodeVersion: "2.0.9",
     bindingsPackage: "1.1.8",
-    libXmtpVersion: "bfadb76",
     auto: true,
   },
   {
@@ -123,7 +119,6 @@ export const VersionList = [
     Group: Group210,
     nodeVersion: "2.1.0",
     bindingsPackage: "1.2.0",
-    libXmtpVersion: "7b9b4d0",
     auto: true,
   },
   {
@@ -133,7 +128,6 @@ export const VersionList = [
     Group: Group220,
     nodeVersion: "2.2.1",
     bindingsPackage: "1.2.2",
-    libXmtpVersion: "d0f0b67",
     auto: true,
   },
   {
@@ -143,7 +137,6 @@ export const VersionList = [
     Group: Group300,
     nodeVersion: "3.0.1",
     bindingsPackage: "1.2.5",
-    libXmtpVersion: "dc3e8c8",
     auto: true,
   },
   {
@@ -153,7 +146,6 @@ export const VersionList = [
     Group: Group310,
     nodeVersion: "3.1.0",
     bindingsPackage: "1.2.6",
-    libXmtpVersion: "bfeba9f",
     auto: false,
   },
 ];
