@@ -1,5 +1,5 @@
-name: Dms
-description: "dms"
+name: Wildcard
+description: "wildcard pull request"
 
 on:
   workflow_dispatch:
@@ -10,12 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [dms]
-        environment: [dev]
+        test: [performance]
+        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 250
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:

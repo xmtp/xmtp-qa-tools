@@ -1,5 +1,6 @@
+import { getAutoVersions } from "@workers/versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
-import { getAutoVersions, loadEnv, VersionList } from "./client";
+import { loadEnv } from "./client";
 import {
   flushMetrics,
   getNetworkStats,
