@@ -1,4 +1,4 @@
-import { nodeVersionOptions } from "@helpers/client";
+import { sdkVersionList } from "@helpers/client";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -6,12 +6,12 @@ import { describe, expect, it } from "vitest";
 describe("regression", () => {
   let workers: WorkerManager;
   //limit to 2 versions for testing
-  const versions = nodeVersionOptions().slice(0, 3);
+  const versions = sdkVersionList().slice(0, 3);
   const receiverInboxId = getInboxIds(1)[0];
 
   for (const version of versions) {
-    it(`downgrade to ${version}`, async () => {
-      workers = await getWorkers(["bob-" + "a" + "-" + version], {
+    it(`downgrade to ${version.nodeVersion}`, async () => {
+      workers = await getWorkers(["bob-" + "a" + "-" + version.nodeVersion], {
         useVersions: false,
       });
 
@@ -23,8 +23,8 @@ describe("regression", () => {
     });
   }
   for (const version of versions.reverse()) {
-    it(`upgrade to ${version}`, async () => {
-      workers = await getWorkers(["alice-" + "a" + "-" + version], {
+    it(`upgrade to ${version.nodeVersion}`, async () => {
+      workers = await getWorkers(["alice-" + "a" + "-" + version.nodeVersion], {
         useVersions: false,
       });
 

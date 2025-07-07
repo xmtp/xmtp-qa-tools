@@ -9,8 +9,10 @@ const testName = "failtowait";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
 
-  const workers = await getWorkers(["creator"]);
-  const creator = workers.get("creator")!;
+  const workers = await getWorkers(1, {
+    nodeVersion: "3.1.0",
+  });
+  const creator = workers.getAll()[0];
 
   it("should create a group with 50 members", async () => {
     // Get 100 inbox IDs for group members
@@ -21,6 +23,7 @@ describe(testName, async () => {
     const group = (await creator.client.conversations.newGroup(
       memberInboxIds,
     )) as Group;
+    await group.sync();
 
     console.log(`Group created with ID: ${group.id}`);
   });
@@ -34,7 +37,7 @@ describe(testName, async () => {
     const group = (await creator.client.conversations.newGroup(
       memberInboxIds,
     )) as Group;
-
+    await group.sync();
     console.log(`Group created with ID: ${group.id}`);
   });
 });

@@ -4,9 +4,9 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  getLatestSdkVersion,
-  nodeVersionOptions,
+  sdkVersionList,
   sleep,
+  VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -31,7 +31,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = nodeVersionOptions().slice(0, testVersions);
+  const availableVersions = sdkVersionList().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
@@ -41,9 +41,9 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
 
     // If workerName already contains installation ID (has dash), don't add another "-a"
     if (workerName.includes("-")) {
-      descriptors.push(`${workerName}-${randomVersion}`);
+      descriptors.push(`${workerName}-${randomVersion.nodeVersion}`);
     } else {
-      descriptors.push(`${workerName}-a-${randomVersion}`);
+      descriptors.push(`${workerName}-a-${randomVersion.nodeVersion}`);
     }
   }
 
@@ -222,6 +222,7 @@ export class WorkerManager {
     const workers = this.getAll();
     return workers[0];
   }
+
   getReceiver(): Worker {
     const workers = this.getAll();
     const creator = this.getCreator();
@@ -380,12 +381,13 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let sdk = getLatestSdkVersion();
+    let defaultSdk = sdkVersionList()[0].nodeVersion;
+
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && nodeVersionOptions().includes(lastPart)) {
-        sdk = lastPart;
+      if (lastPart && VersionList.some((v) => v.nodeVersion === lastPart)) {
+        defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
           providedInstallId = parts.slice(1, -1).join("-");
@@ -411,7 +413,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: getLatestSdkVersion(),
+      sdk: defaultSdk,
       folder,
       walletKey,
       encryptionKey,
@@ -425,7 +427,6 @@ export class WorkerManager {
     // Create the complete worker
     const worker: Worker = {
       ...workerData,
-      sdk: sdk,
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
@@ -450,57 +451,46 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrMap: string[] | Record<string, string> | number,
+  workers: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
+    nodeVersion?: string;
     useVersions?: boolean;
     randomNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = true, randomNames = true } = options;
+  const { useVersions = false, randomNames = true, nodeVersion } = options;
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
 
   // Handle different input types
-  if (typeof descriptorsOrMap === "number") {
-    // Number input - generate worker names based on mode
-    const count = descriptorsOrMap;
-    let names: string[];
-
-    if (randomNames) {
-      names = getRandomNames(count);
-    } else {
-      names = getFixedNames(count);
-    }
-
-    // Apply versioning if requested
-    const descriptors = useVersions ? getWorkersWithVersions(names) : names;
-
-    workerPromises = descriptors.map((descriptor) =>
-      manager.createWorker(descriptor),
-    );
-  } else if (Array.isArray(descriptorsOrMap)) {
-    // Array input - apply versioning if requested
-    const descriptors = useVersions
-      ? getWorkersWithVersions(descriptorsOrMap)
-      : descriptorsOrMap;
+  if (typeof workers === "number" || Array.isArray(workers)) {
+    const names =
+      typeof workers === "number"
+        ? randomNames
+          ? getRandomNames(workers)
+          : getFixedNames(workers)
+        : workers;
+    let descriptors = nodeVersion
+      ? names.map((name) => `${name}-${nodeVersion}`)
+      : useVersions
+        ? getWorkersWithVersions(names)
+        : names;
 
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
   } else {
     // Record input - apply versioning if requested
-    let entries = Object.entries(descriptorsOrMap);
+    let entries = Object.entries(workers);
 
     if (useVersions) {
-      const versionedKeys = getWorkersWithVersions(
-        Object.keys(descriptorsOrMap),
-      );
+      const versionedKeys = getWorkersWithVersions(Object.keys(workers));
       entries = versionedKeys.map((key, index) => [
         key,
-        Object.values(descriptorsOrMap)[index],
+        Object.values(workers)[index],
       ]);
     }
 

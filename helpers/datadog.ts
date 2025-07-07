@@ -24,7 +24,7 @@ interface MetricTags {
   metric_subtype: string;
   env?: string;
   region?: string;
-  sdk?: string;
+  sdk: string;
   operation?: string;
   test?: string;
   country_iso_code?: string;

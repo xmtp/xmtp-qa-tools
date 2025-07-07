@@ -50,8 +50,8 @@ describe(testName, async () => {
   it("should send a message in DM conversation", async () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-    console.log(
-      `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
+    console.debug(
+      `Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
     );
 
     const dmId = await convo.send(message);

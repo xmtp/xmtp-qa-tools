@@ -70,8 +70,8 @@ import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
-export function nodeVersionOptions() {
-  return VersionList.map((v) => v.nodeVersion).reverse();
+export function sdkVersionList() {
+  return VersionList.filter((v) => v.auto).reverse();
 }
 
 // SDK version mappings
@@ -84,6 +84,7 @@ export const VersionList = [
     nodeVersion: "0.0.13",
     bindingsPackage: "0.0.9",
     libXmtpVersion: "0.0.9",
+    auto: true,
   },
   {
     Client: Client47,
@@ -93,6 +94,7 @@ export const VersionList = [
     nodeVersion: "0.0.47",
     bindingsPackage: "0.4.1",
     libXmtpVersion: "6bd613d",
+    auto: true,
   },
   {
     Client: Client105,
@@ -102,6 +104,7 @@ export const VersionList = [
     nodeVersion: "1.0.5",
     bindingsPackage: "1.1.3",
     libXmtpVersion: "6eb1ce4",
+    auto: true,
   },
   {
     Client: Client209,
@@ -111,6 +114,7 @@ export const VersionList = [
     nodeVersion: "2.0.9",
     bindingsPackage: "1.1.8",
     libXmtpVersion: "bfadb76",
+    auto: true,
   },
   {
     Client: Client210,
@@ -120,6 +124,7 @@ export const VersionList = [
     nodeVersion: "2.1.0",
     bindingsPackage: "1.2.0",
     libXmtpVersion: "7b9b4d0",
+    auto: true,
   },
   {
     Client: Client220,
@@ -129,6 +134,7 @@ export const VersionList = [
     nodeVersion: "2.2.1",
     bindingsPackage: "1.2.2",
     libXmtpVersion: "d0f0b67",
+    auto: true,
   },
   {
     Client: Client300,
@@ -138,16 +144,18 @@ export const VersionList = [
     nodeVersion: "3.0.1",
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
+    auto: true,
   },
-  // {
-  //   Client: Client310,
-  //   Conversation: Conversation310,
-  //   Dm: Dm310,
-  //   Group: Group310,
-  //   nodeVersion: "3.1.0",
-  //   bindingsPackage: "1.2.6",
-  //   libXmtpVersion: "bfeba9f",
-  // },
+  {
+    Client: Client310,
+    Conversation: Conversation310,
+    Dm: Dm310,
+    Group: Group310,
+    nodeVersion: "3.1.0",
+    bindingsPackage: "1.2.6",
+    libXmtpVersion: "bfeba9f",
+    auto: false,
+  },
 ];
 
 export type GroupMetadataContent = {
@@ -321,7 +329,7 @@ export async function createClient(
   };
 }
 export const regressionClient = async (
-  sdk: string,
+  nodeVersion: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -332,17 +340,13 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.log(
-      `Creating API client with: SDK version: ${sdk} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${nodeVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
-  const versionConfig = VersionList.find(
-    (v) =>
-      v.nodeVersion === sdk.split("-")[0] &&
-      v.libXmtpVersion === sdk.split("-")[1],
-  );
+  const versionConfig = VersionList.find((v) => v.nodeVersion === nodeVersion);
   if (!versionConfig) {
-    throw new Error(`SDK version ${sdk} not found in VersionList`);
+    throw new Error(`SDK version ${nodeVersion} not found in VersionList`);
   }
   const ClientClass = versionConfig.Client;
   let client = null;
@@ -382,26 +386,12 @@ export const regressionClient = async (
   }
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${sdk}`);
+    throw new Error(`Failed to create client for SDK version ${nodeVersion}`);
   }
 
   return client;
 };
 
-export const getLibXmtpVersion = (client: any) => {
-  try {
-    const version = client.version;
-    if (!version || typeof version !== "string") return "unknown";
-
-    const parts = version.split("-");
-    if (parts.length <= 1) return "unknown";
-
-    const spaceParts = parts[1].split(" ");
-    return spaceParts[0] || "unknown";
-  } catch {
-    return "unknown";
-  }
-};
 export const createSigner47 = (privateKey: `0x${string}`) => {
   const account = privateKeyToAccount(privateKey);
   return {
@@ -457,15 +447,7 @@ export function getEnvPath(): string {
   }
   return envPath;
 }
-export function getLatestSdkVersion(): string {
-  const sdkVersion = nodeVersionOptions()[0];
-  // Find the version config by nodeVersion
-  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
-  if (!config) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
-  return config.nodeVersion + "-" + config.libXmtpVersion;
-}
+
 /**
  * Loads environment variables from the specified test's .env file if it exists
  */
