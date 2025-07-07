@@ -225,7 +225,7 @@ export function checkForCriticalErrors(failLines: string[]): void {
         console.error(
           "Test suite failed to execute properly. Infrastructure or setup issue.",
         );
-        process.exit(2); // Exit code 2 for infrastructure failure
+        process.exit(1); // Exit code 2 for infrastructure failure
       }
     }
   }
