@@ -195,35 +195,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
-function checkForCriticalErrors(content: string): void {
-  const criticalErrors = [
-    "transport error",
-    "Error: api client error",
-    "Connection refused",
-    "Network timeout",
-    "Service unavailable",
-  ];
-
-  for (const errorPattern of criticalErrors) {
-    if (content.includes(errorPattern)) {
-      console.error(
-        `❌ CRITICAL INFRASTRUCTURE ERROR DETECTED: ${errorPattern}`,
-      );
-      console.error(
-        "Network/transport failure prevents tests from running. Exiting immediately.",
-      );
-      process.exit(2); // Exit code 2 for infrastructure failure
-    }
-  }
-
-  // Check for test suite execution failure pattern
-  // Pattern: "FAIL  suites/path/test.ts [ suites/path/test.ts ]"
-  // where the same path appears both outside and inside brackets
-  const lines = content.split("\n");
-  const failLines = lines.filter(
-    (line) => line.includes("FAIL  suites/") && line.includes("[ suites/"),
-  );
-
+function checkForCriticalErrors(failLines: string[]): void {
   if (failLines.length === 1) {
     const failLine = failLines[0];
     const match = failLine.match(
@@ -266,11 +238,13 @@ export function extractErrorLogs(testName: string): Set<string> {
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
+      const lines = content.split("\n");
+
+      // Extract fail lines first for critical error checking
+      const failLines = lines.filter((line) => line.includes("FAIL  suites/"));
 
       // Check for critical transport errors first
-      checkForCriticalErrors(content);
-
-      const lines = content.split("\n");
+      checkForCriticalErrors(failLines);
 
       for (const line of lines) {
         if (!PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
