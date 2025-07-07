@@ -273,7 +273,7 @@ export const getDbPath = (description: string = "xmtp") => {
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
-  sdkVersion: string,
+  sdk: string,
   name: string,
   folder: string,
   env: XmtpEnv,
@@ -281,8 +281,6 @@ export async function createClient(
 ): Promise<{
   client: unknown;
   dbPath: string;
-  sdkVersion: string;
-  libXmtpVersion: string;
   address: `0x${string}`;
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
@@ -293,7 +291,7 @@ export async function createClient(
 
   // Use type assertion to handle the client creation
   const client = await regressionClient(
-    sdkVersion,
+    sdk,
     walletKey,
     encryptionKey,
     dbPath,
@@ -305,7 +303,6 @@ export async function createClient(
     client,
     dbPath,
     address,
-    sdk: String(sdkVersion),
   };
 }
 export const regressionClient = async (
