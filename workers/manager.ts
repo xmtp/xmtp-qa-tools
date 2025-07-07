@@ -453,6 +453,7 @@ export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
+    nodeVersion?: string;
     useVersions?: boolean;
     randomNames?: boolean;
   } = {},
