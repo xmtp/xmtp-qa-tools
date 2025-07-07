@@ -25,7 +25,7 @@ const enabledOps = process.env.ENABLED_OPS
     "addMember",
     "removeMember",
     "promoteAdmin",
-    "demoteAdmin"
+    "demoteAdmin",
   ];
 
 console.log("=== Key Rotation Test Configuration ===");
@@ -37,7 +37,7 @@ console.table({
   CHAOS_EGRESS_LATENCY_MS: chaosEgressLatencyMs,
   CHAOS_EGRESS_JITTER_MS: chaosEgressJitterMs,
   CHAOS_EGRESS_PACKET_LOSS_PCT: chaosEgressLossPct,
-  ENABLED_OPS: enabledOps.join(", ")
+  ENABLED_OPS: enabledOps.join(", "),
 });
 console.log("=======================================");
 
@@ -67,7 +67,9 @@ describe(testName, async () => {
     await group.sync();
 
     const startTime = Date.now();
-    let chaosInterval, verifyInterval, opInterval;
+    let chaosInterval: NodeJS.Timer | undefined,
+      verifyInterval: NodeJS.Timer | undefined,
+      opInterval: NodeJS.Timer | undefined;
 
     const sendLoop = async () => {
       while (Date.now() - startTime < durationMs) {
@@ -129,10 +131,12 @@ describe(testName, async () => {
           }
 
           if (enabledOps.includes("addMember")) {
-            const currentMembers = (await group.info()).members.map(m => m.identityKey);
-            const available = workers.getAll()
-              .map(w => w.client.inboxId)
-              .filter(id => !currentMembers.includes(id));
+            const info = await group.debugInfo();
+            const currentMembers = info.members.map((m: { identityKey: string }) => m.identityKey);
+            const available = workers
+              .getAll()
+              .map((w) => w.client.inboxId)
+              .filter((id) => !currentMembers.includes(id));
 
             if (available.length > 0) {
               const rand = available[Math.floor(Math.random() * available.length)];
