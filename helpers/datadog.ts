@@ -290,7 +290,7 @@ export async function sendDatadogLog(
 
   const errorLogs = extractErrorLogs(logFileName);
   const fail_lines = extractfail_lines(errorLogs);
-  await checkForCriticalErrors(fail_lines);
+  await checkForCriticalErrors(testName, fail_lines);
   const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
   if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
     console.warn(`Slack notification skipped (branch: ${branchName})`);

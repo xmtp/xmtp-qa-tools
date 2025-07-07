@@ -196,6 +196,7 @@ export async function cleanAllRawLogs(): Promise<void> {
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
 export async function checkForCriticalErrors(
+  testName: string,
   failLines: string[],
 ): Promise<void> {
   if (failLines.length === 1) {
@@ -217,7 +218,7 @@ export async function checkForCriticalErrors(
         console.error(
           `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
         );
-        await workflowFailed("Critical test suite failure detected");
+        await workflowFailed(tesName);
       }
     }
   }
