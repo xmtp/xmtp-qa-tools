@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
-    "prod-update": "./inboxes/gen.sh --envs dev,production --installations 15,20,25,30 --count 500",
+    "prod-update": "./inboxes/gen.sh --envs production --installations 2",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn test suites/functional --versions 3",
     "run:agent": "./suites/agents/run.sh",
