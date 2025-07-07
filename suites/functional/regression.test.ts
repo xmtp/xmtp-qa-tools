@@ -1,4 +1,4 @@
-import { sdkVersionList } from "@helpers/client";
+import { getAutoVersions } from "@helpers/client";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 describe("regression", () => {
   let workers: WorkerManager;
   //limit to 2 versions for testing
-  const versions = sdkVersionList().slice(0, 3);
+  const versions = getAutoVersions().slice(0, 3);
   const receiverInboxId = getInboxIds(1)[0];
 
   for (const version of versions) {

@@ -48,7 +48,6 @@ function discoverPackages(): VersionConfig[] {
     if (matchingBindings) {
       // Try to get actual version from package.json
       let nodeVersion = "";
-      let libXmtpVersion = "";
 
       try {
         const nodeVersionJson = JSON.parse(
@@ -63,18 +62,17 @@ function discoverPackages(): VersionConfig[] {
         nodeVersion = "unknown";
       }
 
-      try {
-        const bindingsPackageJson = JSON.parse(
-          fs.readFileSync(
-            path.join(xmtpDir, matchingBindings, "package.json"),
-            "utf8",
-          ),
-        );
-        libXmtpVersion = bindingsPackageJson.version || "";
-      } catch (error: unknown) {
-        console.error(error);
-        libXmtpVersion = "unknown";
-      }
+      // try {
+      //   const bindingsPackageJson = JSON.parse(
+      //     fs.readFileSync(
+      //       path.join(xmtpDir, matchingBindings, "package.json"),
+      //       "utf8",
+      //     ),
+      //   );
+      //   libXmtpVersion_NOT_NEEDED = bindingsPackageJson.version || "";
+      // } catch (error: unknown) {
+      //   console.error(error);
+      // }
 
       // For dynamically discovered packages, we can't import the specific types
       // so we'll set them to null or use a placeholder
@@ -86,7 +84,6 @@ function discoverPackages(): VersionConfig[] {
         Group: null as any,
         bindingsPackage: matchingBindings,
         nodeVersion,
-        libXmtpVersion,
         auto: false,
       });
 
