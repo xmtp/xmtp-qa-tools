@@ -14,10 +14,34 @@ describe(testName, async () => {
 
   // Measurement data collection
   const measurements = {
-    small: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 10 },
-    medium: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 100 },
-    large: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 200 },
-    xl: { syncTime: 0, dbSize: 0, queryCount: 0, targetSizeMB: 400 },
+    small: {
+      syncTime: 0,
+      dbSize: 0,
+      queryCount: 0,
+      targetSizeMB: 10,
+      existingGroups: 0,
+    },
+    medium: {
+      syncTime: 0,
+      dbSize: 0,
+      queryCount: 0,
+      targetSizeMB: 100,
+      existingGroups: 0,
+    },
+    large: {
+      syncTime: 0,
+      dbSize: 0,
+      queryCount: 0,
+      targetSizeMB: 200,
+      existingGroups: 0,
+    },
+    xl: {
+      syncTime: 0,
+      dbSize: 0,
+      queryCount: 0,
+      targetSizeMB: 400,
+      existingGroups: 0,
+    },
   };
 
   // Helper function to populate inbox to target size
@@ -101,8 +125,11 @@ describe(testName, async () => {
       const stats = inbox.worker.client.debugInformation?.apiStatistics();
 
       // Store measurements
-      measurements[inbox.key].syncTime = syncTimeSeconds;
+      measurements[inbox.key].syncTime = syncTimeSeconds * 1000;
       measurements[inbox.key].dbSize = dbSizes.total;
+      measurements[inbox.key].existingGroups = await (
+        await inbox.worker.client.conversations.list()
+      ).length;
       measurements[inbox.key].queryCount = Number(
         stats?.queryGroupMessages || 0,
       );
@@ -124,19 +151,23 @@ describe(testName, async () => {
 
     // Generate summary table
     console.log("\n=== LARGE INBOX SYNC PERFORMANCE SUMMARY ===");
-    console.log("| Inbox Size | Sync Time (s) | DB Size (MB) | Query Count |");
-    console.log("|------------|---------------|--------------|-------------|");
     console.log(
-      `| Small      | ${measurements.small.syncTime}             | ${measurements.small.dbSize}            | ${measurements.small.queryCount} |`,
+      "| Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |",
     );
     console.log(
-      `| Medium     | ${measurements.medium.syncTime}             | ${measurements.medium.dbSize}           | ${measurements.medium.queryCount}      |`,
+      "|------------|----------------|--------------|-----------------|------------------|",
     );
     console.log(
-      `| Large      | ${measurements.large.syncTime}             | ${measurements.large.dbSize}          | ${measurements.large.queryCount}      |`,
+      `| Small      | ${measurements.small.syncTime}             | ${measurements.small.dbSize}            | ${measurements.small.existingGroups} | ${measurements.small.queryCount} |`,
     );
     console.log(
-      `| XL         | ${measurements.xl.syncTime}             | ${measurements.xl.dbSize}          | ${measurements.xl.queryCount}      |`,
+      `| Medium     | ${measurements.medium.syncTime}             | ${measurements.medium.dbSize}           | ${measurements.medium.existingGroups} | ${measurements.medium.queryCount}      |`,
+    );
+    console.log(
+      `| Large      | ${measurements.large.syncTime}             | ${measurements.large.dbSize}          | ${measurements.large.existingGroups} | ${measurements.large.queryCount}      |`,
+    );
+    console.log(
+      `| XL         | ${measurements.xl.syncTime}             | ${measurements.xl.dbSize}          | ${measurements.xl.existingGroups} | ${measurements.xl.queryCount}      |`,
     );
     console.log("==============================================\n");
   });
