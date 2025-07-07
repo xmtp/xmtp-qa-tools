@@ -344,11 +344,8 @@ export const regressionClient = async (
     );
   }
 
-  const versionConfig = VersionList.find(
-    (v) =>
-      v.nodeVersion === sdk.split("-")[0] &&
-      v.libXmtpVersion === sdk.split("-")[1],
-  );
+  const versionConfig = VersionList.find((v) => v.nodeVersion === sdk);
+  console.log(versionConfig, sdk);
   if (!versionConfig) {
     throw new Error(`SDK version ${sdk} not found in VersionList`);
   }

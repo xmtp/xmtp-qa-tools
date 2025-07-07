@@ -429,7 +429,6 @@ export class WorkerManager {
     // Create the complete worker
     const worker: Worker = {
       ...workerData,
-      sdk: defaultSdk,
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
@@ -462,7 +461,7 @@ export async function getWorkers(
     randomNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = true, randomNames = true, nodeVersion } = options;
+  const { useVersions = false, randomNames = true, nodeVersion } = options;
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
@@ -481,8 +480,7 @@ export async function getWorkers(
       : useVersions
         ? getWorkersWithVersions(names)
         : names;
-
-    console.log(descriptors);
+    console.log("descriptors", descriptors);
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
