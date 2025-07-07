@@ -218,7 +218,7 @@ export async function checkForCriticalErrors(
         console.error(
           `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
         );
-        await workflowFailed(tesName);
+        await workflowFailed(testName);
       }
     }
   }
