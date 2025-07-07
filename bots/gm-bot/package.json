@@ -10,7 +10,6 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@xmtp/node-sdk": "2.0.8",
     "uint8arrays": "^5.1.0",
     "viem": "^2.22.17"
   },
