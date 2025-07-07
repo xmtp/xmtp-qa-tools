@@ -4,7 +4,7 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  nodeVersionOptions,
+  sdkVersionList,
   sleep,
   VersionList,
 } from "@helpers/client";
@@ -31,7 +31,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = nodeVersionOptions().slice(0, testVersions);
+  const availableVersions = sdkVersionList().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
@@ -222,6 +222,7 @@ export class WorkerManager {
     const workers = this.getAll();
     return workers[0];
   }
+
   getReceiver(): Worker {
     const workers = this.getAll();
     const creator = this.getCreator();
@@ -380,10 +381,7 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk =
-      nodeVersionOptions()[0].nodeVersion +
-      "-" +
-      nodeVersionOptions()[0].libXmtpVersion;
+    let defaultSdk = sdkVersionList()[0].nodeVersion;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
