@@ -93,6 +93,15 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "key-check",
+    "baseName": "key-check.base.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "sendMessage": "/kc help",
+    "networks": ["dev", "production"],
+    "slackChannel": "#key-check-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "tokenbot",
     "baseName": "0x9e73…3466",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
