@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
-import { loadEnv, VersionList } from "./client";
+import { getAutoVersions, loadEnv, VersionList } from "./client";
 import {
   flushMetrics,
   getNetworkStats,
@@ -49,7 +49,7 @@ export const setupTestLifecycle = ({
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
-      sdk: sdk || VersionList[0].nodeVersion,
+      sdk: sdk || getAutoVersions()[0].nodeVersion,
       installations: members,
       members,
     };
@@ -74,7 +74,7 @@ export const setupTestLifecycle = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || VersionList[0].nodeVersion,
+          sdk: sdk || getAutoVersions()[0].nodeVersion,
           operation: operationName,
           test: testNameExtracted,
         };

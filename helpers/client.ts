@@ -70,6 +70,10 @@ import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
+export const getAutoVersions = () => {
+  return VersionList.filter((v) => v.auto);
+};
+
 // SDK version mappings
 export const VersionList = [
   {
