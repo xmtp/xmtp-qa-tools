@@ -67,9 +67,9 @@ describe(testName, async () => {
     await group.sync();
 
     const startTime = Date.now();
-    let chaosInterval: NodeJS.Timer | undefined,
-      verifyInterval: NodeJS.Timer | undefined,
-      opInterval: NodeJS.Timer | undefined;
+    let chaosInterval: ReturnType<typeof setInterval> | undefined,
+      verifyInterval: ReturnType<typeof setInterval> | undefined,
+      opInterval: ReturnType<typeof setInterval> | undefined;
 
     const sendLoop = async () => {
       while (Date.now() - startTime < durationMs) {
@@ -131,8 +131,8 @@ describe(testName, async () => {
           }
 
           if (enabledOps.includes("addMember")) {
-            const info = await group.debugInfo();
-            const currentMembers = info.members.map((m: { identityKey: string }) => m.identityKey);
+            const members = await group.members();
+            const currentMembers = members.map((m: { identityKey: string }) => m.identityKey);
             const available = workers
               .getAll()
               .map((w) => w.client.inboxId)
@@ -204,9 +204,10 @@ describe(testName, async () => {
     };
 
     const clearAll = () => {
-      clearInterval(chaosInterval);
-      clearInterval(verifyInterval);
-      clearInterval(opInterval);
+      if (chaosInterval) clearInterval(chaosInterval);
+      if (verifyInterval) clearInterval(verifyInterval);
+      if (opInterval) clearInterval(opInterval);
+
       for (const node of allNodes) {
         node.clearLatency();
         node.clearEgressLatency();
