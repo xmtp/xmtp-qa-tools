@@ -195,7 +195,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
-function checkForCriticalErrors(failLines: string[]): void {
+export function checkForCriticalErrors(failLines: string[]): void {
   console.log(
     `DEBUG: checkForCriticalErrors called with ${failLines.length} fail lines`,
   );
