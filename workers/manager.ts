@@ -450,7 +450,7 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrMap: string[] | Record<string, string> | number,
+  workers: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
     nodeVersion?: string;
@@ -465,47 +465,31 @@ export async function getWorkers(
   let workerPromises: Promise<Worker>[] = [];
 
   // Handle different input types
-  if (typeof descriptorsOrMap === "number") {
-    // Number input - generate worker names based on mode
-    const count = descriptorsOrMap;
-    let names: string[];
-
-    if (randomNames) {
-      names = getRandomNames(count);
-    } else {
-      names = getFixedNames(count);
-    }
-
-    // Apply versioning if requested
-    let descriptors = useVersions ? getWorkersWithVersions(names) : names;
-    if (nodeVersion) {
-      descriptors = descriptors.map((descriptor) =>
-        descriptor.replace(/-[a-z]$/, `-${nodeVersion}`),
-      );
-    }
-    workerPromises = descriptors.map((descriptor) =>
-      manager.createWorker(descriptor),
-    );
-  } else if (Array.isArray(descriptorsOrMap)) {
-    // Array input - apply versioning if requested
-    const descriptors = useVersions
-      ? getWorkersWithVersions(descriptorsOrMap)
-      : descriptorsOrMap;
+  if (typeof workers === "number" || Array.isArray(workers)) {
+    const names =
+      typeof workers === "number"
+        ? randomNames
+          ? getRandomNames(workers)
+          : getFixedNames(workers)
+        : workers;
+    let descriptors = useVersions
+      ? getWorkersWithVersions(names)
+      : nodeVersion
+        ? names.map((name) => `${name}-${nodeVersion}`)
+        : names;
 
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
   } else {
     // Record input - apply versioning if requested
-    let entries = Object.entries(descriptorsOrMap);
+    let entries = Object.entries(workers);
 
     if (useVersions) {
-      const versionedKeys = getWorkersWithVersions(
-        Object.keys(descriptorsOrMap),
-      );
+      const versionedKeys = getWorkersWithVersions(Object.keys(workers));
       entries = versionedKeys.map((key, index) => [
         key,
-        Object.values(descriptorsOrMap)[index],
+        Object.values(workers)[index],
       ]);
     }
 
