@@ -207,12 +207,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ### Large Inbox Sync Performance Summary
 
-| Inbox Size | Sync Time (s) | DB Size (MB) | Query Count |
-| ---------- | ------------- | ------------ | ----------- |
-| Small      | 0.452         | 13           | 19          |
-| Medium     | 0.47          | 100          | 139         |
-| Large      | 0.505         | 201          | 279         |
-| XL         | 0.505         | 404          | 559         |
+| Inbox Size | Sync Time | DB Size (MB) | queryGroupMessages |
+| ---------- | --------- | ------------ | ------------------ |
+| Small      | 452       | 13           | 19                 |
+| Medium     | 47        | 100          | 139                |
+| Large      | 505       | 201          | 279                |
+| XL         | 505       | 404          | 559                |
 
 ## Success criteria summary
 
