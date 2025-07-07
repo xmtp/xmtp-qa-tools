@@ -132,7 +132,7 @@ describe(testName, async () => {
 
           if (enabledOps.includes("addMember")) {
             const members = await group.members();
-            const currentMembers = members.map((m: { identityKey: string }) => m.identityKey);
+            const currentMembers = members.map((m) => m.identityKey);
             const available = workers
               .getAll()
               .map((w) => w.client.inboxId)
