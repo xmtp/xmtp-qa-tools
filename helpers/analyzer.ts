@@ -219,6 +219,7 @@ export async function checkForCriticalErrors(
           `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
         );
         await workflowFailed(testName);
+        throw new Error("Critical test suite failure detected");
       }
     }
   }
