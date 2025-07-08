@@ -13,7 +13,7 @@ const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS ? parseInt(proc
 const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS) : 0;
 const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT) : 0;
 
-const durationMs = process.env.DURATION_MS ? parseInt(process.env.DURATION_MS) : 100000;
+const durationMs = process.env.DURATION_MS ? parseInt(process.env.DURATION_MS) : 50000;
 
 const enabledOps = process.env.ENABLED_OPS
   ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
