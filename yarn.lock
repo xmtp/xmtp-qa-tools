@@ -1498,17 +1498,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-1.2.6@npm:@xmtp/node-bindings@1.2.6, @xmtp/node-bindings@npm:1.2.6":
-  version: 1.2.6
-  resolution: "@xmtp/node-bindings@npm:1.2.6"
-  checksum: 10/34bc1988be3ffe0e1f4f9f82b65b9d914f9bd5d8d779522484b3f97c34fb1ee7f74d5a97a8512c6946dbf48ede3901d753cc8ae2cd1cba4857382f3aa1723df6
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-1.2.6dev@npm:@xmtp/node-bindings@1.2.6-dev.ef25041":
+"@xmtp/node-bindings-1.2.6@npm:@xmtp/node-bindings@1.2.6-dev.ef25041, @xmtp/node-bindings@npm:1.2.6-dev.ef25041":
   version: 1.2.6-dev.ef25041
   resolution: "@xmtp/node-bindings@npm:1.2.6-dev.ef25041"
   checksum: 10/958090cad4665d3dd19ac86431b9bd497920865c519d764e64f04e613570b69ea3c1fbb8371a53c40f97e6833cf0ce837dac5c15f1fa89647364a3dc8f52545b
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-bindings@npm:1.2.6":
+  version: 1.2.6
+  resolution: "@xmtp/node-bindings@npm:1.2.6"
+  checksum: 10/34bc1988be3ffe0e1f4f9f82b65b9d914f9bd5d8d779522484b3f97c34fb1ee7f74d5a97a8512c6946dbf48ede3901d753cc8ae2cd1cba4857382f3aa1723df6
   languageName: node
   linkType: hard
 
@@ -4700,7 +4700,7 @@ __metadata:
     "@vitest/ui": "npm:^3.2.4"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.6"
+    "@xmtp/node-bindings": "npm:1.2.6-dev.ef25041"
     "@xmtp/node-bindings-0.0.9": "npm:@xmtp/mls-client-bindings-node@0.0.9"
     "@xmtp/node-bindings-0.4.1": "npm:@xmtp/node-bindings@0.0.41"
     "@xmtp/node-bindings-1.0.0": "npm:@xmtp/node-bindings@1.0.0"
@@ -4709,8 +4709,7 @@ __metadata:
     "@xmtp/node-bindings-1.2.0": "npm:@xmtp/node-bindings@1.2.0"
     "@xmtp/node-bindings-1.2.2": "npm:@xmtp/node-bindings@1.2.2"
     "@xmtp/node-bindings-1.2.5": "npm:@xmtp/node-bindings@1.2.5"
-    "@xmtp/node-bindings-1.2.6": "npm:@xmtp/node-bindings@1.2.6"
-    "@xmtp/node-bindings-1.2.6dev": "npm:@xmtp/node-bindings@1.2.6-dev.ef25041"
+    "@xmtp/node-bindings-1.2.6": "npm:@xmtp/node-bindings@1.2.6-dev.ef25041"
     "@xmtp/node-sdk": "npm:3.1.0"
     "@xmtp/node-sdk-0.0.13": "npm:@xmtp/mls-client@0.0.13"
     "@xmtp/node-sdk-0.0.47": "npm:@xmtp/node-sdk@0.0.47"
