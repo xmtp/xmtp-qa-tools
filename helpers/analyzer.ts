@@ -195,10 +195,10 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Check for critical transport/infrastructure errors that should cause immediate process exit
  */
-export async function checkForCriticalErrors(
+export function checkForCriticalErrors(
   testName: string,
   failLines: string[],
-): Promise<void> {
+): void {
   if (failLines.length === 1) {
     const failLine = failLines[0];
 
@@ -218,7 +218,7 @@ export async function checkForCriticalErrors(
         console.error(
           `❌ CRITICAL TEST SUITE FAILURE DETECTED: ${outsidePath}`,
         );
-        await workflowFailed(testName);
+        process.exit(2);
       }
     }
   }
