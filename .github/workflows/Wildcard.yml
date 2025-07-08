@@ -7,10 +7,11 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      test_type:
+      test_type:source ~/.bashrc;pr_push
+      
         description: "Type of test to run (functional or performance)"
         required: false
-        default: "dms"
+        default: "functional"
         type: choice
         options:
           - functional # full functional test
@@ -25,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: ${{ github.event.inputs.test_type || 'functional' }}
+        test: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.test_type || 'functional' }}
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
