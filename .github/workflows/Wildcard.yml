@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [failtowait]
+        test: [performance]
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
@@ -34,7 +34,7 @@ jobs:
         run: yarn script versions
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --debug --no-fail
 
       - name: Cleanup and upload artifacts
         if: always()

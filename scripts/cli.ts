@@ -15,6 +15,8 @@ interface RetryOptions {
   explicitLogFlag: boolean;
   verboseLogging: boolean;
   parallel: boolean;
+  cleanLogs: boolean;
+  logLevel: string;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -36,6 +38,56 @@ function expandGlobPattern(pattern: string): string[] {
   }
 
   return [pattern];
+}
+
+async function cleanSpecificLogFile(
+  logFileName: string,
+  pattern?: string,
+): Promise<void> {
+  if (!logFileName) {
+    console.debug("No log file name provided for cleaning");
+    return;
+  }
+
+  const logsDir = path.join(process.cwd(), "logs");
+  let outputPath: string;
+  const rawFilePath = path.join(logsDir, logFileName);
+
+  // Check if the raw file exists
+  if (!fs.existsSync(rawFilePath)) {
+    console.debug(`Raw log file not found: ${rawFilePath}`);
+    return;
+  }
+
+  if (pattern) {
+    // If a pattern is provided, use logs/cleaned/cleaned-<original>.log with pattern detection
+    const outputDir = path.join(logsDir, "cleaned");
+    if (!fs.existsSync(outputDir)) {
+      await fs.promises.mkdir(outputDir, { recursive: true });
+    }
+    const outputFileName = `cleaned-${logFileName}`;
+    outputPath = path.join(outputDir, outputFileName);
+
+    try {
+      // Import processLogFile dynamically to avoid circular dependencies
+      const { processLogFile } = await import("@helpers/logger");
+      await processLogFile(rawFilePath, outputPath);
+      console.debug(`Cleaned log file: ${logFileName} -> ${outputPath}`);
+    } catch (error) {
+      console.error(`Failed to clean log file ${logFileName}:`, error);
+    }
+  } else {
+    // Default: simple ANSI cleaning without pattern detection
+    try {
+      const content = await fs.promises.readFile(rawFilePath, "utf8");
+      const { stripAnsi } = await import("@helpers/logger");
+      const cleanedContent = stripAnsi(content);
+      await fs.promises.writeFile(rawFilePath, cleanedContent);
+      console.debug(`Cleaned ANSI codes from log file: ${logFileName}`);
+    } catch (error) {
+      console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
+    }
+  }
 }
 
 function showUsageAndExit(): never {
@@ -93,6 +145,12 @@ function showUsageAndExit(): never {
     "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.0)",
   );
   console.error(
+    "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
+  );
+  console.error(
+    "      --log-level <level> Set logging level (debug, info, error) (default: debug)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -121,6 +179,12 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --env production # Sets XMTP_ENV to production",
+  );
+  console.error(
+    "  yarn cli test functional --no-clean-logs  # Disable automatic log cleaning",
+  );
+  console.error(
+    "  yarn cli test functional --log-level error  # Set logging level to error",
   );
   process.exit(1);
 }
@@ -161,6 +225,8 @@ function parseTestArgs(args: string[]): {
     explicitLogFlag: false,
     verboseLogging: true, // Show terminal output by default
     parallel: false,
+    cleanLogs: true,
+    logLevel: "debug", // Default log level
   };
 
   let currentArgs = [...args];
@@ -251,6 +317,19 @@ function parseTestArgs(args: string[]): {
           i++;
         } else {
           console.warn("--env flag requires a value (e.g., --env local)");
+        }
+        break;
+      case "--no-clean-logs":
+        options.cleanLogs = false;
+        break;
+      case "--log-level":
+        if (nextArg) {
+          options.logLevel = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--log-level flag requires a value (e.g., --log-level debug)",
+          );
         }
         break;
       default:
@@ -358,6 +437,7 @@ async function runVitestTest(
     customLogFile: options.customLogFile,
     testName,
     verboseLogging: options.verboseLogging,
+    logLevel: options.logLevel, // Pass the logLevel option
   });
 
   console.debug(
@@ -414,10 +494,8 @@ async function runVitestTest(
     );
   }
 
-  // Only set debug logging if --debug was explicitly passed
-  if (options.explicitLogFlag) {
-    env.LOGGING_LEVEL = "debug";
-  }
+  // Set logging level
+  env.LOGGING_LEVEL = options.logLevel;
 
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);
@@ -435,6 +513,12 @@ async function runVitestTest(
       if (exitCode === 0) {
         console.debug("Tests passed successfully!");
         logger.close();
+
+        // Clean the log file if enabled
+        if (options.cleanLogs) {
+          await cleanSpecificLogFile(logger.logFileName);
+        }
+
         return;
       } else {
         console.debug("Tests failed!");
@@ -449,6 +533,11 @@ async function runVitestTest(
           await sendDatadogLog(logger.logFileName, testName);
 
         logger.close();
+
+        // Clean the log file if enabled (even for failed tests)
+        if (options.cleanLogs) {
+          await cleanSpecificLogFile(logger.logFileName);
+        }
 
         if (options.noFail) {
           process.exit(0);
