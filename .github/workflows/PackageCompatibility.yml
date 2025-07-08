@@ -97,6 +97,6 @@ jobs:
           cd xmtp-qa-tools/bots/gm-bot
           if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
             yarn run build
-          else
+                    else
             ${{ matrix.package-manager }} run build
           fi
