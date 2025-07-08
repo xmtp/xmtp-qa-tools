@@ -10,11 +10,13 @@ on:
       test_type:
         description: "Type of test to run (functional or performance)"
         required: false
-        default: "functional"
+        default: "dms"
         type: choice
         options:
-          - functional
-          - performance
+          - functional # full functional test
+          - performance #  performarce test with more large groups
+          - regression # regression test with more large groups
+          - dms # health check
 
 jobs:
   test:
