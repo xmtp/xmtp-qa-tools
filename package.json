@@ -49,7 +49,6 @@
     "@xmtp/node-bindings-1.2.0": "npm:@xmtp/node-bindings@1.2.0",
     "@xmtp/node-bindings-1.2.2": "npm:@xmtp/node-bindings@1.2.2",
     "@xmtp/node-bindings-1.2.5": "npm:@xmtp/node-bindings@1.2.5",
-    "@xmtp/node-bindings-1.2.6": "npm:@xmtp/node-bindings@1.2.6-dev.ef25041",
     "@xmtp/node-bindings-1.2.7": "npm:@xmtp/node-bindings@1.2.7",
     "@xmtp/node-sdk": "3.1.1",
     "@xmtp/node-sdk-0.0.13": "npm:@xmtp/mls-client@0.0.13",
@@ -59,7 +58,6 @@
     "@xmtp/node-sdk-2.1.0": "npm:@xmtp/node-sdk@2.1.0",
     "@xmtp/node-sdk-2.2.1": "npm:@xmtp/node-sdk@2.2.1",
     "@xmtp/node-sdk-3.0.1": "npm:@xmtp/node-sdk@3.0.1",
-    "@xmtp/node-sdk-3.1.0": "npm:@xmtp/node-sdk@3.1.0",
     "@xmtp/node-sdk-3.1.0dev": "npm:@xmtp/node-sdk@3.1.0",
     "@xmtp/node-sdk-3.1.1": "npm:@xmtp/node-sdk@3.1.1",
     "axios": "^1.8.2",
@@ -135,11 +133,6 @@
     "@xmtp/node-sdk@3.0.1": {
       "dependencies": {
         "@xmtp/node-bindings": "1.2.5"
-      }
-    },
-    "@xmtp/node-sdk@3.1.0": {
-      "dependencies": {
-        "@xmtp/node-bindings": "1.2.6-dev.ef25041"
       }
     },
     "@xmtp/node-sdk@3.1.1": {

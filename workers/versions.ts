@@ -43,12 +43,6 @@ import {
   Group as Group300,
 } from "@xmtp/node-sdk-3.0.1";
 import {
-  Client as Client310,
-  Conversation as Conversation310,
-  Dm as Dm310,
-  Group as Group310,
-} from "@xmtp/node-sdk-3.1.0";
-import {
   Client as Client311,
   Conversation as Conversation311,
   Dm as Dm311,
@@ -69,15 +63,6 @@ export const VersionList = [
     nodeVersion: "3.1.1",
     bindingsPackage: "1.2.7",
     auto: false,
-  },
-  {
-    Client: Client310,
-    Conversation: Conversation310,
-    Dm: Dm310,
-    Group: Group310,
-    nodeVersion: "3.1.0",
-    bindingsPackage: "1.2.6",
-    auto: true,
   },
   {
     Client: Client300,
