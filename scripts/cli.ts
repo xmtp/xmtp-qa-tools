@@ -16,6 +16,7 @@ interface RetryOptions {
   verboseLogging: boolean;
   parallel: boolean;
   cleanLogs: boolean;
+  logLevel: string;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -141,6 +142,9 @@ function showUsageAndExit(): never {
     "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
   );
   console.error(
+    "      --log-level <level> Set logging level (debug, info, error) (default: debug)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -172,6 +176,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --no-clean-logs  # Disable automatic log cleaning",
+  );
+  console.error(
+    "  yarn cli test functional --log-level error  # Set logging level to error",
   );
   process.exit(1);
 }
@@ -213,6 +220,7 @@ function parseTestArgs(args: string[]): {
     verboseLogging: true, // Show terminal output by default
     parallel: false,
     cleanLogs: true,
+    logLevel: "debug", // Default log level
   };
 
   let currentArgs = [...args];
@@ -307,6 +315,16 @@ function parseTestArgs(args: string[]): {
         break;
       case "--no-clean-logs":
         options.cleanLogs = false;
+        break;
+      case "--log-level":
+        if (nextArg) {
+          options.logLevel = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--log-level flag requires a value (e.g., --log-level debug)",
+          );
+        }
         break;
       default:
         options.vitestArgs.push(arg);
@@ -413,6 +431,7 @@ async function runVitestTest(
     customLogFile: options.customLogFile,
     testName,
     verboseLogging: options.verboseLogging,
+    logLevel: options.logLevel, // Pass the logLevel option
   });
 
   console.debug(
@@ -469,10 +488,8 @@ async function runVitestTest(
     );
   }
 
-  // Only set debug logging if --debug was explicitly passed
-  if (options.explicitLogFlag) {
-    env.LOGGING_LEVEL = "debug";
-  }
+  // Set logging level
+  env.LOGGING_LEVEL = options.logLevel;
 
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);

@@ -212,6 +212,7 @@ export interface TestLogOptions {
   testName: string;
   logFileName?: string;
   verboseLogging?: boolean;
+  logLevel?: string;
 }
 
 /**
@@ -245,6 +246,12 @@ export const createTestLogger = (options: TestLogOptions) => {
         ? "Verbose logging enabled: output will be shown in terminal AND logged to file."
         : "Test output will be hidden from terminal and logged to file only.",
     );
+
+    // Set logging level if provided
+    if (options.logLevel) {
+      process.env.LOGGING_LEVEL = options.logLevel;
+      console.log(`Log level set to: ${options.logLevel}`);
+    }
   } else {
     console.log(
       "Warning: Logging is disabled. Test output will not be visible anywhere.",
