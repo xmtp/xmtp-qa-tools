@@ -6,14 +6,18 @@ XMTP_ENV="local"
 DURATION_MS_LIST=(300)
 CHAOS_LATENCY_MS_LIST=(0 100)
 CHAOS_JITTER_MS_LIST=(0 50)
-CHAOS_PACKET_LOSS_PCT_LIST=(0 5)
-CHAOS_EGRESS_LATENCY_MS_LIST=(100)
+CHAOS_PACKET_LOSS_PCT_LIST=(0 10)
+CHAOS_EGRESS_LATENCY_MS_LIST=(50)
 CHAOS_EGRESS_JITTER_MS_LIST=(0)
 CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0)
 WORKER_COUNTS=(10 20)
 
-# Ops can be customized; default set includes all commit-inducing ops
-ENABLED_OPS="rotateKey,sendMessage,verify,updateName,modifyMembership,promoteAdmin,demoteAdmin"
+# Enabled ops permutations (modify/add/remove as needed)
+ENABLED_OPS_LIST=(
+  "sendMessage,verify,modifyMembership"
+  "sendMessage,verify,updateName"
+  "sendMessage,verify,promoteAdmin,demoteAdmin"
+)
 
 i=1
 
@@ -25,6 +29,7 @@ for CHAOS_EGRESS_LATENCY_MS in "${CHAOS_EGRESS_LATENCY_MS_LIST[@]}"; do
 for CHAOS_EGRESS_JITTER_MS in "${CHAOS_EGRESS_JITTER_MS_LIST[@]}"; do
 for CHAOS_EGRESS_PACKET_LOSS_PCT in "${CHAOS_EGRESS_PACKET_LOSS_PCT_LIST[@]}"; do
 for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
+for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
 
   echo ""
   echo "========================================================="
@@ -56,6 +61,7 @@ for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
   ./chaossuite-batchrunner.sh
   ((i++))
 
+done
 done
 done
 done

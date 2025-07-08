@@ -18,7 +18,6 @@ const durationMs = process.env.DURATION_MS ? parseInt(process.env.DURATION_MS) :
 const enabledOps = process.env.ENABLED_OPS
   ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
   : [
-    "rotateKey",
     "sendMessage",
     "verify",
     "updateName",
@@ -27,7 +26,7 @@ const enabledOps = process.env.ENABLED_OPS
     "demoteAdmin"
   ];
 
-console.log("=== Key Rotation Test Configuration ===");
+console.log("=== Fork Matrix Test Configuration ===");
 console.table({
   DURATION_MS: durationMs,
   CHAOS_LATENCY_MS: chaosLatencyMs,
@@ -40,7 +39,7 @@ console.table({
 });
 console.log("=======================================");
 
-const testName = "keyrotation-chaos";
+const testName = "forkmatrix-chaos";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
 
@@ -61,8 +60,8 @@ describe(testName, async () => {
   const workers = await getWorkers(userDescriptors);
   workers.startStream(typeofStream.MessageandResponse);
 
-  it("should run matrixed key rotation chaos test", async () => {
-    const group = await workers.createGroupBetweenAll("Key Rotation Matrixed Group");
+  it("should run matrixed fork heatmap chaos test", async () => {
+    const group = await workers.createGroupBetweenAll("Fork Matrix Group");
     await group.sync();
 
     const startTime = Date.now();
@@ -117,13 +116,6 @@ describe(testName, async () => {
           if (!convo) return;
 
           const inboxId = target.client.inboxId;
-
-          if (enabledOps.includes("rotateKey")) {
-            await group.removeMembers([inboxId]);
-            await group.addMembers([inboxId]);
-            const info = await group.debugInfo();
-            console.log("[rotateKey] Epoch after rotate:", info.epoch);
-          }
 
           if (enabledOps.includes("updateName")) {
             await group.updateName("Update Group Name Test " + Date.now());
