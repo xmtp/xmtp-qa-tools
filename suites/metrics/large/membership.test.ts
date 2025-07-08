@@ -11,7 +11,7 @@ import {
   saveLog,
 } from "./helpers";
 
-const testName = "m_large_membership";
+const testName = "large_membership";
 describe(testName, async () => {
   let newGroup: Group;
 
@@ -30,6 +30,7 @@ describe(testName, async () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
+    metrics: true,
   });
 
   for (

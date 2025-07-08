@@ -4,10 +4,11 @@ import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
 
-const testName = "m_large_syncs";
+const testName = "large_syncs";
 describe(testName, async () => {
   setupTestLifecycle({
     testName,
+    metrics: true,
   });
   const summaryMap: Record<number, any> = {};
 
