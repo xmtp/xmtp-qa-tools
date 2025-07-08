@@ -30,6 +30,9 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
+      - name: Run script version
+        run: yarn script version
+
       - name: Run tests
         run: yarn test ${{ matrix.test }}
 
