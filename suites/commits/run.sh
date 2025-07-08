@@ -22,7 +22,7 @@ echo "Completed $num_runs iterations. Waiting 1 minute before next cycle..."
 
 echo "Cleaning up..."
 
-yarn ansi
+yarn ansi:forks
 
 echo "Finished cleaning up"
 fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
