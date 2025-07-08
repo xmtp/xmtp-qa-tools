@@ -2,6 +2,9 @@ name: Performance
 description: "should verify performance "
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
@@ -14,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        environment: [dev, production]
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}

@@ -2,9 +2,9 @@ name: Wildcard
 description: "wildcard pull request"
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -14,8 +14,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [dms]
-        environment: [dev, s]
+        test: [failtowait]
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -30,8 +30,11 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
+      - name: Run script version
+        run: yarn script versions
+
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --debug --no-fail
+        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
