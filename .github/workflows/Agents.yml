@@ -11,6 +11,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         test: [agents-dms, agents-tagged, agents-untagged]
         environment: [dev, production]

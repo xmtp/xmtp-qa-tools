@@ -12,8 +12,8 @@ jobs:
     timeout-minutes: 30
 
     strategy:
-      max-parallel: 1
       fail-fast: false
+      max-parallel: 1
       matrix:
         test_file:
           - smoketests.test.ts
