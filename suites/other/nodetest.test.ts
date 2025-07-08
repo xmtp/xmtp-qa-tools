@@ -5,9 +5,9 @@ import {
   generatePrivateKey,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
-import { LogLevel } from "@xmtp/node-bindings";
 import {
   Client,
+  LogLevel,
   type ClientOptions,
   type Group,
   type Signer,
