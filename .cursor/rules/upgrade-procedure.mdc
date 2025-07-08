@@ -21,6 +21,10 @@ When upgrading XMTP node-sdk versions, update these 3 files:
 - Add import for new SDK version
 - Add VersionList entry (`auto: false` for latest)
 
+### 3. bots/gm-bot/package.json
+
+- Update `@xmtp/node-sdk` version
+
 ### 3. Run commands
 
 ```bash
