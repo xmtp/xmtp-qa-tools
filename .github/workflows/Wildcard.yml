@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [failtowait]
-        environment: [dev, production]
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run script version
-        run: yarn script version
+        run: yarn script versions
 
       - name: Run tests
         run: yarn test ${{ matrix.test }}
