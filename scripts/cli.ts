@@ -15,6 +15,7 @@ interface RetryOptions {
   explicitLogFlag: boolean;
   verboseLogging: boolean;
   parallel: boolean;
+  cleanLogs: boolean;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -36,6 +37,50 @@ function expandGlobPattern(pattern: string): string[] {
   }
 
   return [pattern];
+}
+
+async function cleanSpecificLogFile(
+  logFileName: string,
+  pattern?: string,
+): Promise<void> {
+  if (!logFileName) {
+    console.debug("No log file name provided for cleaning");
+    return;
+  }
+
+  const logsDir = path.join(process.cwd(), "logs");
+  let outputPath: string;
+  const rawFilePath = path.join(logsDir, logFileName);
+
+  // Check if the raw file exists
+  if (!fs.existsSync(rawFilePath)) {
+    console.debug(`Raw log file not found: ${rawFilePath}`);
+    return;
+  }
+
+  // Generate cleaned filename
+  const outputFileName = `cleaned-${logFileName}`;
+
+  if (pattern) {
+    // If a pattern is provided, use logs/cleaned/cleaned-<original>.log
+    const outputDir = path.join(logsDir, "cleaned");
+    if (!fs.existsSync(outputDir)) {
+      await fs.promises.mkdir(outputDir, { recursive: true });
+    }
+    outputPath = path.join(outputDir, outputFileName);
+  } else {
+    // Default: logs/cleaned-<original>.log
+    outputPath = path.join(logsDir, outputFileName);
+  }
+
+  try {
+    // Import processLogFile dynamically to avoid circular dependencies
+    const { processLogFile } = await import("@helpers/logger");
+    await processLogFile(rawFilePath, outputPath);
+    console.debug(`Cleaned log file: ${logFileName} -> ${outputPath}`);
+  } catch (error) {
+    console.error(`Failed to clean log file ${logFileName}:`, error);
+  }
 }
 
 function showUsageAndExit(): never {
@@ -93,6 +138,9 @@ function showUsageAndExit(): never {
     "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.0)",
   );
   console.error(
+    "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -121,6 +169,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --env production # Sets XMTP_ENV to production",
+  );
+  console.error(
+    "  yarn cli test functional --no-clean-logs  # Disable automatic log cleaning",
   );
   process.exit(1);
 }
@@ -161,6 +212,7 @@ function parseTestArgs(args: string[]): {
     explicitLogFlag: false,
     verboseLogging: true, // Show terminal output by default
     parallel: false,
+    cleanLogs: true,
   };
 
   let currentArgs = [...args];
@@ -252,6 +304,9 @@ function parseTestArgs(args: string[]): {
         } else {
           console.warn("--env flag requires a value (e.g., --env local)");
         }
+        break;
+      case "--no-clean-logs":
+        options.cleanLogs = false;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -435,6 +490,12 @@ async function runVitestTest(
       if (exitCode === 0) {
         console.debug("Tests passed successfully!");
         logger.close();
+
+        // Clean the log file if enabled
+        if (options.cleanLogs) {
+          await cleanSpecificLogFile(logger.logFileName);
+        }
+
         return;
       } else {
         console.debug("Tests failed!");
@@ -449,6 +510,11 @@ async function runVitestTest(
           await sendDatadogLog(logger.logFileName, testName);
 
         logger.close();
+
+        // Clean the log file if enabled (even for failed tests)
+        if (options.cleanLogs) {
+          await cleanSpecificLogFile(logger.logFileName);
+        }
 
         if (options.noFail) {
           process.exit(0);
