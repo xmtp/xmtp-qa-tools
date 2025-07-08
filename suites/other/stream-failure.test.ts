@@ -1,5 +1,6 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
+import type { Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
@@ -26,10 +27,9 @@ describe(testName, async () => {
     const receivers = workers.getAllButCreator();
 
     // Verify stream works before chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "before-latency-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "before-latency-{i}")).toBe(
+      true,
+    );
 
     // Apply high latency
     for (const node of allNodes) {
@@ -37,10 +37,9 @@ describe(testName, async () => {
     }
 
     // Verify stream fails under chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "during-latency-{i}"))
-        .allReceived,
-    ).toBe(false);
+    expect(await streamWorks(group, receivers, "during-latency-{i}")).toBe(
+      false,
+    );
 
     // Clear chaos
     for (const node of allNodes) {
@@ -48,10 +47,7 @@ describe(testName, async () => {
     }
 
     // Verify stream recovers
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "after-latency-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "after-latency-{i}")).toBe(true);
   });
 
   it("should fail stream under packet loss", async () => {
@@ -70,10 +66,7 @@ describe(testName, async () => {
     }
 
     // Verify stream fails under chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "during-loss-{i}"))
-        .allReceived,
-    ).toBe(false);
+    expect(await streamWorks(group, receivers, "during-loss-{i}")).toBe(false);
 
     // Clear chaos
     for (const node of allNodes) {
@@ -81,10 +74,7 @@ describe(testName, async () => {
     }
 
     // Verify stream recovers
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "after-loss-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "after-loss-{i}")).toBe(true);
   });
 
   it("should fail stream under jitter", async () => {
@@ -92,10 +82,7 @@ describe(testName, async () => {
     const receivers = workers.getAllButCreator();
 
     // Verify stream works before chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "before-jitter-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "before-jitter-{i}")).toBe(true);
 
     // Apply jitter
     for (const node of allNodes) {
@@ -103,10 +90,9 @@ describe(testName, async () => {
     }
 
     // Verify stream fails under chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "during-jitter-{i}"))
-        .allReceived,
-    ).toBe(false);
+    expect(await streamWorks(group, receivers, "during-jitter-{i}")).toBe(
+      false,
+    );
 
     // Clear chaos
     for (const node of allNodes) {
@@ -114,10 +100,7 @@ describe(testName, async () => {
     }
 
     // Verify stream recovers
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "after-jitter-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "after-jitter-{i}")).toBe(true);
   });
 
   it("should fail stream under network partition", async () => {
@@ -125,20 +108,18 @@ describe(testName, async () => {
     const receivers = workers.getAllButCreator();
 
     // Verify stream works before chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "before-partition-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "before-partition-{i}")).toBe(
+      true,
+    );
 
     // Partition nodes 1 and 2 from 3 and 4
     allNodes[0].addLatency(1000);
     allNodes[1].addLatency(1000);
 
     // Verify stream fails under chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "during-partition-{i}"))
-        .allReceived,
-    ).toBe(false);
+    expect(await streamWorks(group, receivers, "during-partition-{i}")).toBe(
+      false,
+    );
 
     // Clear chaos
     for (const node of allNodes) {
@@ -146,10 +127,9 @@ describe(testName, async () => {
     }
 
     // Verify stream recovers
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "after-partition-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "after-partition-{i}")).toBe(
+      true,
+    );
   });
 
   it("should fail stream under blackhole", async () => {
@@ -157,27 +137,33 @@ describe(testName, async () => {
     const receivers = workers.getAllButCreator();
 
     // Verify stream works before chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "before-blackhole-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "before-blackhole-{i}")).toBe(
+      true,
+    );
 
     // Create blackhole between nodes
     allNodes[0].simulateBlackhole([allNodes[1], allNodes[2], allNodes[3]]);
 
     // Verify stream fails under chaos
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "during-blackhole-{i}"))
-        .allReceived,
-    ).toBe(false);
+    expect(await streamWorks(group, receivers, "during-blackhole-{i}")).toBe(
+      false,
+    );
 
     // Clear chaos
     allNodes[0].clearBlackhole([allNodes[1], allNodes[2], allNodes[3]]);
 
     // Verify stream recovers
-    expect(
-      (await verifyMessageStream(group, receivers, 3, "after-blackhole-{i}"))
-        .allReceived,
-    ).toBe(true);
+    expect(await streamWorks(group, receivers, "after-blackhole-{i}")).toBe(
+      true,
+    );
   });
 });
+
+async function streamWorks(
+  group: Conversation,
+  receivers: Worker[],
+  prefix: string,
+): Promise<boolean> {
+  const result = await verifyMessageStream(group, receivers, 3, prefix);
+  return result.allReceived;
+}
