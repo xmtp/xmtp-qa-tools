@@ -32,8 +32,8 @@ yarn build
 
 ## Testing
 
-- PR triggers Performance workflow automatically
-- Wildcard workflow available for manual testing
+- PR triggers Wildcard workflow automatically
+- Dont run any other test manually. Just trigger the Wildcard workflow.
 
 ## Notes
 
