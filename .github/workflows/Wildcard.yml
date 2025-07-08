@@ -1,11 +1,20 @@
 name: Wildcard
-description: "wildcard pull request"
+description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
   pull_request:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      test_type:
+        description: "Type of test to run (functional or performance)"
+        required: false
+        default: "functional"
+        type: choice
+        options:
+          - functional
+          - performance
 
 jobs:
   test:
@@ -14,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [performance]
+        test: ${{ github.event.inputs.test_type || 'functional' }}
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}

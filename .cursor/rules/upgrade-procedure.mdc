@@ -1,0 +1,42 @@
+---
+description: "When upgrading XMTP node-sdk versions, update these 3 files"
+globs:
+alwaysApply: true
+---
+
+# XMTP SDK Upgrade Procedure
+
+## Quick Checklist
+
+When upgrading XMTP node-sdk versions, update these 3 files:
+
+### 1. package.json (3 sections)
+
+- Main deps: `@xmtp/node-sdk` and `@xmtp/node-bindings`
+- Versioned deps: Add `@xmtp/node-sdk-X.X.X`
+- Package extensions: Add SDK → bindings mapping
+
+### 2. workers/versions.ts (2 sections)
+
+- Add import for new SDK version
+- Add VersionList entry (`auto: false` for latest)
+
+### 3. Run commands
+
+```bash
+yarn script versions
+yarn format
+yarn lint
+yarn build
+```
+
+## Testing
+
+- PR triggers Performance workflow automatically
+- Wildcard workflow available for manual testing
+
+## Notes
+
+- Remove buggy versions from all files
+- Set previous stable to `auto: true` for regression testing
+- Verify package extension bindings version matches
