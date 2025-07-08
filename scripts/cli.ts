@@ -59,28 +59,34 @@ async function cleanSpecificLogFile(
     return;
   }
 
-  // Generate cleaned filename
-  const outputFileName = `cleaned-${logFileName}`;
-
   if (pattern) {
-    // If a pattern is provided, use logs/cleaned/cleaned-<original>.log
+    // If a pattern is provided, use logs/cleaned/cleaned-<original>.log with pattern detection
     const outputDir = path.join(logsDir, "cleaned");
     if (!fs.existsSync(outputDir)) {
       await fs.promises.mkdir(outputDir, { recursive: true });
     }
+    const outputFileName = `cleaned-${logFileName}`;
     outputPath = path.join(outputDir, outputFileName);
-  } else {
-    // Default: logs/cleaned-<original>.log
-    outputPath = path.join(logsDir, outputFileName);
-  }
 
-  try {
-    // Import processLogFile dynamically to avoid circular dependencies
-    const { processLogFile } = await import("@helpers/logger");
-    await processLogFile(rawFilePath, outputPath);
-    console.debug(`Cleaned log file: ${logFileName} -> ${outputPath}`);
-  } catch (error) {
-    console.error(`Failed to clean log file ${logFileName}:`, error);
+    try {
+      // Import processLogFile dynamically to avoid circular dependencies
+      const { processLogFile } = await import("@helpers/logger");
+      await processLogFile(rawFilePath, outputPath);
+      console.debug(`Cleaned log file: ${logFileName} -> ${outputPath}`);
+    } catch (error) {
+      console.error(`Failed to clean log file ${logFileName}:`, error);
+    }
+  } else {
+    // Default: simple ANSI cleaning without pattern detection
+    try {
+      const content = await fs.promises.readFile(rawFilePath, "utf8");
+      const { stripAnsi } = await import("@helpers/logger");
+      const cleanedContent = stripAnsi(content);
+      await fs.promises.writeFile(rawFilePath, cleanedContent);
+      console.debug(`Cleaned ANSI codes from log file: ${logFileName}`);
+    } catch (error) {
+      console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
+    }
   }
 }
 
