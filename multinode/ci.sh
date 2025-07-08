@@ -11,7 +11,7 @@ for x in {1..3}; {
   echo "Waiting 10 seconds before checking liveliness..."
   sleep 10
 
-  NODE_COUNT=$(docker ps --filter "ancestor=xmtp/node-go:latest" --format "{{.ID}}" | wc -l)
+  NODE_COUNT=$(docker ps --filter "ancestor=ghcr.io/xmtp/node-go:main" --format "{{.ID}}" | wc -l)
   [ "$NODE_COUNT" -eq 4 ] && echo "Found $NODE_COUNT XMTP node(s) running" && exit 0
   echo "Error: Expected 4 XMTP nodes to be running."
   docker ps
