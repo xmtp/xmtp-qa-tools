@@ -120,7 +120,9 @@ async function fileContainsString(
   });
 }
 
-export async function cleanAllRawLogs(): Promise<void> {
+export async function cleanAllRawLogs(
+  justForks: boolean = false,
+): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
@@ -151,15 +153,17 @@ export async function cleanAllRawLogs(): Promise<void> {
     const inputPath = path.join(logsDir, file);
 
     try {
-      // Check if non-raw file contains "fork" using streaming
-      const containsTargetString = await fileContainsString(
-        inputPath,
-        "Fork detected",
-      );
+      if (justForks) {
+        // Check if non-raw file contains "fork" using streaming
+        const containsTargetString = await fileContainsString(
+          inputPath,
+          "Fork detected",
+        );
 
-      if (!containsTargetString) {
-        console.log(`Skipping ${file} - does not contain "fork"`);
-        continue;
+        if (!containsTargetString) {
+          console.log(`Skipping ${file} - does not contain "fork"`);
+          continue;
+        }
       }
 
       // Construct the corresponding raw filename

@@ -48,6 +48,12 @@ import {
   Dm as Dm310,
   Group as Group310,
 } from "@xmtp/node-sdk-3.1.0";
+import {
+  Client as Client310Dev,
+  Conversation as Conversation310Dev,
+  Dm as Dm310Dev,
+  Group as Group310Dev,
+} from "@xmtp/node-sdk-3.1.0dev";
 
 export const getAutoVersions = () => {
   return VersionList.filter((v) => v.auto);
@@ -55,6 +61,15 @@ export const getAutoVersions = () => {
 
 // SDK version mappings
 export const VersionList = [
+  {
+    Client: Client310Dev,
+    Conversation: Conversation310Dev,
+    Dm: Dm310Dev,
+    Group: Group310Dev,
+    nodeVersion: "3.1.0dev",
+    bindingsPackage: "1.2.6-dev.ef25041",
+    auto: false,
+  },
   {
     Client: Client310,
     Conversation: Conversation310,
