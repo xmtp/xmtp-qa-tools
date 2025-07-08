@@ -5,18 +5,6 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      test_type:
-        description: "Type of test to run (functional or performance)"
-        required: false
-        default: "functional"
-        type: choice
-        options:
-          - functional # full functional test
-          - performance #  performarce test with more large groups
-          - regression # regression test with more large groups
-          - dms # health check
 
 jobs:
   test:
@@ -25,8 +13,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: ${{ github.event.inputs.test_type || 'functional' }}
-        environment: [production]
+        test: [performance] # performance test with more large groups
+        # test: [functional] # full functional test
+        # test: [regression] # regression test with more large groups
+        # test: [dms] # health check
+        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
