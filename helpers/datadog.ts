@@ -1,7 +1,11 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import { extractErrorLogs, extractfail_lines } from "./analyzer";
+import {
+  checkForCriticalErrors,
+  extractErrorLogs,
+  extractfail_lines,
+} from "./analyzer";
 
 // Consolidated interfaces
 interface MetricData {
@@ -286,7 +290,7 @@ export async function sendDatadogLog(
 
   const errorLogs = extractErrorLogs(logFileName);
   const fail_lines = extractfail_lines(errorLogs);
-
+  await checkForCriticalErrors(testName, fail_lines);
   const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
   if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
     console.warn(`Slack notification skipped (branch: ${branchName})`);

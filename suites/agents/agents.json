@@ -75,11 +75,19 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "gm-restarts",
+    "address": "0xB45DAC55eE7F7598868b270783EBC7CF157A2c55",
+    "sendMessage": "hi",
+    "networks": ["dev"],
+    "slackChannel": "#gm-restarts-alerts",
+    "shouldRespondOnTagged": false
+  },
+  {
     "name": "gm",
     "baseName": "gm.base.eth",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     "sendMessage": "hola",
-    "networks": ["production"],
+    "networks": ["dev"],
     "slackChannel": "#gm-alerts",
     "shouldRespondOnTagged": false
   },
@@ -90,6 +98,15 @@
     "sendMessage": "hey there how are you?",
     "networks": ["production"],
     "slackChannel": "#bankr-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "key-check",
+    "baseName": "key-check.base.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "sendMessage": "/kc help",
+    "networks": ["dev", "production"],
+    "slackChannel": "#key-check-alerts",
     "shouldRespondOnTagged": true
   },
   {

@@ -84,6 +84,9 @@ function showUsageAndExit(): never {
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
   );
   console.error(
+    "      --env <environment> Set XMTP_ENV (options: local, dev, production)",
+  );
+  console.error(
     "      --versions count   Number of SDK versions to use (e.g., 3)",
   );
   console.error(
@@ -115,6 +118,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --nodeVersion 3.1.0 # Uses workers with SDK version 3.1.0",
+  );
+  console.error(
+    "  yarn cli test functional --env production # Sets XMTP_ENV to production",
   );
   process.exit(1);
 }
@@ -238,6 +244,14 @@ function parseTestArgs(args: string[]): {
         break;
       case "--parallel":
         options.parallel = true;
+        break;
+      case "--env":
+        if (nextArg) {
+          options.vitestArgs.push(`--env=${nextArg}`);
+          i++;
+        } else {
+          console.warn("--env flag requires a value (e.g., --env local)");
+        }
         break;
       default:
         options.vitestArgs.push(arg);
@@ -387,6 +401,19 @@ async function runVitestTest(
     );
   }
 
+  // Extract --env parameter and set as environment variable
+  const envArg = options.vitestArgs.find((arg) => arg.startsWith("--env="));
+  if (envArg) {
+    const envValue = envArg.split("=")[1];
+    env.XMTP_ENV = envValue;
+    console.debug(`Setting XMTP_ENV environment variable to: ${envValue}`);
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--env="),
+    );
+  }
+
   // Only set debug logging if --debug was explicitly passed
   if (options.explicitLogFlag) {
     env.LOGGING_LEVEL = "debug";
@@ -526,6 +553,23 @@ async function main(): Promise<void> {
             // Remove from vitestArgs since it's not a vitest parameter
             options.vitestArgs = options.vitestArgs.filter(
               (arg) => !arg.startsWith("--nodeVersion="),
+            );
+          }
+
+          // Extract --env parameter and set as environment variable
+          const envArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--env="),
+          );
+          if (envArg) {
+            const envValue = envArg.split("=")[1];
+            env.XMTP_ENV = envValue;
+            console.debug(
+              `Setting XMTP_ENV environment variable to: ${envValue}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--env="),
             );
           }
 
