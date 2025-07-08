@@ -135,13 +135,10 @@ describe(testName, async () => {
     allNodes[1].addLatency(1000);
 
     // Verify stream fails under chaos
-    const duringResult = await verifyMessageStream(
-      group,
-      receivers,
-      3,
-      "during-partition-{i}",
-    );
-    expect(duringResult.allReceived).toBe(false);
+    expect(
+      (await verifyMessageStream(group, receivers, 3, "during-partition-{i}"))
+        .allReceived,
+    ).toBe(false);
 
     // Clear chaos
     for (const node of allNodes) {
