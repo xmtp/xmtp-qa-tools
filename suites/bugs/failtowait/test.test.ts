@@ -36,9 +36,9 @@ describe(testName, () => {
     await group.sync();
     console.log(`Group created with ID: ${group.id}`);
   });
-  it("should create a group with 100 members in sdk 3.1.0-dev", async () => {
+  it("should create a group with 100 members in sdk 3.1.1", async () => {
     const workers = await getWorkers(1, {
-      nodeVersion: "3.1.0",
+      nodeVersion: "3.1.1",
     });
     const creator = workers.getAll()[0];
     console.log(`Creating group with ${memberInboxIds.length} members`);

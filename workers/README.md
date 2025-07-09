@@ -54,7 +54,7 @@ await getWorkers(3); // 3 workers with random names, latest version
 await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
 await getWorkers(["alice", "bob"]); // Specific names, latest version
 await getWorkers(["alice", "bob"], { useVersions: true }); // Specific names, random versions
-await getWorkers(1, { nodeVersion: "3.1.0" }); // Specific SDK version
+await getWorkers(1, { nodeVersion: "3.1.1" }); // Specific SDK version
 await getWorkers(5, { env: "production" }); // 5 random workers on production
 ```
 
@@ -65,15 +65,15 @@ await getWorkers(5, { env: "production" }); // 5 random workers on production
 ```typescript
 // Enable random version assignment across available SDK versions
 const workers = await getWorkers(3, { useVersions: true });
-// Creates workers with random versions like: alice-a-3.1.0, bob-a-2.2.1, charlie-a-3.0.1
+// Creates workers with random versions like: alice-a-3.1.1, bob-a-2.2.1, charlie-a-3.0.1
 ```
 
 #### Specific Version Testing
 
 ```typescript
 // Test with a specific SDK version
-const workers = await getWorkers(1, { nodeVersion: "3.1.0" });
-// Creates: alice-3.1.0
+const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
+// Creates: alice-3.1.1
 
 // Regression testing across multiple specific versions
 const versions = getAutoVersions().slice(0, 3);
@@ -249,7 +249,7 @@ import { getAutoVersions, VersionList } from "@workers/versions";
 const autoVersions = getAutoVersions();
 
 // Access default SDK version
-let defaultSdk = getAutoVersions()[0].nodeVersion; // Currently "3.1.0"
+let defaultSdk = getAutoVersions()[0].nodeVersion; // Currently "3.1.1"
 ```
 
 ### SDK Version Mappings
@@ -261,8 +261,8 @@ export const VersionList = [
     Conversation: Conversation310,
     Dm: Dm310,
     Group: Group310,
-    nodeVersion: "3.1.0",
-    bindingsPackage: "1.2.6",
+    nodeVersion: "3.1.1",
+    bindingsPackage: "1.2.7",
     auto: true, // Included in getAutoVersions()
   },
   {
@@ -335,7 +335,7 @@ for (const version of versions) {
 
 ```typescript
 // Example from failtowait test - create large groups with specific SDK
-const workers = await getWorkers(1, { nodeVersion: "3.1.0" });
+const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
 const creator = workers.getAll()[0];
 
 const memberInboxIds = getInboxIds(100);

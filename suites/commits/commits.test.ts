@@ -8,7 +8,7 @@ import { describe, it } from "vitest";
 // Count of groups to create
 const groupCount = 5;
 const parallelOperations = 1; // How many operations to perform in parallel
-const NODE_VERSION = "3.1.0"; // --nodeVersion=3.1.0
+const NODE_VERSION = "3.1.1"; // --nodeVersion=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
 const workerNames = [
