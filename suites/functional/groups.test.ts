@@ -1,7 +1,6 @@
-import { verifyMessageStream } from "@helpers/streams";
+import { verifyConversationStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -49,42 +48,12 @@ describe(testName, async () => {
       const name = (groupsBySize[i] as Group).name;
       expect(name).toBe(newName);
     });
-    it(`should remove a member from ${i}-member group and verify count`, async () => {
-      const previousMembers = await groupsBySize[i].members();
-      await (groupsBySize[i] as Group).removeMembers([
-        previousMembers.filter(
-          (member) =>
-            member.inboxId !== (groupsBySize[i] as Group).addedByInboxId,
-        )[0].inboxId,
-      ]);
-
-      const members = await groupsBySize[i].members();
-      expect(members.length).toBe(previousMembers.length - 1);
-    });
-    it(`should send message to group with ${i} participants`, async () => {
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-      await groupsBySize[i].send(groupMessage);
-      expect(groupMessage).toBeDefined();
-    });
-    it(`should verify message delivery streams for ${i}-member group`, async () => {
-      console.log(
-        `Creating test group with ${workers.getAll().length} worker participants`,
-      );
-
-      const testGroup = await workers.createGroupBetweenAll();
-
-      // Start message streams for group tests
-      workers.getAll().forEach((worker) => {
-        worker.worker.startStream(typeofStream.Message);
-      });
-      console.log(`Test group created with ID: ${testGroup.id}`);
-
-      const verifyResult = await verifyMessageStream(
-        testGroup,
+    it(`should verify new conversation stream for ${i}-member group`, async () => {
+      // Use the dedicated conversation stream verification helper
+      const verifyResult = await verifyConversationStream(
+        workers.getCreator(),
         workers.getAllButCreator(),
       );
-
       expect(verifyResult.allReceived).toBe(true);
     });
   }

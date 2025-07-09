@@ -57,9 +57,12 @@ export const setupTestLifecycle = ({
       members,
     };
 
-    if (metrics || process.env.XMTP_ENV === "local") {
+    if (metrics) {
       sendMetric("duration", duration, values);
     }
+    // if (process.env.XMTP_ENV === "local" || metrics) {
+    //   sendMetric("duration", duration, values);
+    // }
 
     // Network stats handling for performance tests
     if (metrics && testName.includes("performance") && !skipNetworkStats) {

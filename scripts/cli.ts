@@ -14,6 +14,7 @@ interface RetryOptions {
   noFail: boolean;
   explicitLogFlag: boolean;
   verboseLogging: boolean;
+  jsLoggingLevel: string;
   parallel: boolean;
   cleanLogs: boolean;
   logLevel: string;
@@ -227,6 +228,7 @@ function parseTestArgs(args: string[]): {
     parallel: false,
     cleanLogs: true,
     logLevel: "debug", // Default log level
+    jsLoggingLevel: "silly",
   };
 
   let currentArgs = [...args];
@@ -285,12 +287,14 @@ function parseTestArgs(args: string[]): {
       case "--debug":
         options.enableLogging = true;
         options.explicitLogFlag = true;
-        options.verboseLogging = false; // Hide terminal output when --debug is used
+        options.verboseLogging = false;
+        options.jsLoggingLevel = "silly";
         break;
       case "--debug-verbose":
         options.enableLogging = true;
         options.explicitLogFlag = true;
         options.verboseLogging = true;
+        options.jsLoggingLevel = "silly";
         break;
       case "--no-log":
         options.enableLogging = false;

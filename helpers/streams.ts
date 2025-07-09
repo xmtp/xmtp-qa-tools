@@ -464,34 +464,6 @@ export async function verifyAddMemberStream(
 }
 
 /**
- * Verifies conversation streaming functionality for group member additions
- */
-export async function verifyNewConversationStream(
-  group: Group,
-  receivers: Worker[],
-): Promise<VerifyStreamResult> {
-  receivers.forEach((worker) => {
-    worker.worker.startStream(typeofStream.Conversation);
-  });
-  const creatorInboxId = (await group.metadata()).creatorInboxId;
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectConversations(creatorInboxId, 1),
-    triggerEvents: async () => {
-      const sentAt = Date.now();
-      await group.addMembers(receivers.map((r) => r.client?.inboxId));
-      return [{ id: "conversation", sentAt }];
-    },
-    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
-    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
-    statsLabel: "conversation:",
-    count: 1,
-    messageTemplate: "",
-    participantsForStats: receivers,
-  });
-}
-
-/**
  * Calculates message reception and order statistics
  */
 export function calculateMessageStats(

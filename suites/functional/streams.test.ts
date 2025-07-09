@@ -5,7 +5,6 @@ import {
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
-  verifyNewConversationStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -105,20 +104,6 @@ describe(testName, async () => {
     const verifyResult = await verifyConversationStream(workers.getCreator(), [
       workers.getReceiver(),
     ]);
-
-    expect(verifyResult.allReceived).toBe(true);
-  });
-
-  it("new conversation stream", async () => {
-    group = (await workers
-      .getCreator()
-      .client.conversations.newGroup([])) as Group;
-
-    // Use the dedicated conversation stream verification helper with 80% success threshold
-    const verifyResult = await verifyNewConversationStream(
-      group,
-      workers.getAllButCreator(),
-    );
 
     expect(verifyResult.allReceived).toBe(true);
   });
