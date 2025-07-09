@@ -3,45 +3,26 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 const testName = "welcome";
-describe(testName, () => {
-  setupTestLifecycle({ testName });
+describe(testName, async () => {
   let groupId: string;
   const headless = false;
   let xmtpTester: playwright;
-  let creator: Worker;
   let xmtpChat: Worker;
+  let creator: Worker;
 
-  beforeAll(async () => {
-    const convoStreamBot = await getWorkers(2);
-    const names = convoStreamBot.getAll().map((w) => w.name);
-    convoStreamBot.startStream(typeofStream.Conversation);
+  const convoStreamBot = await getWorkers(2);
+  const names = convoStreamBot.getAll().map((w) => w.name);
+  convoStreamBot.startStream(typeofStream.Conversation);
 
-    creator = convoStreamBot.get(names[0]) as Worker;
-    xmtpChat = convoStreamBot.get(names[1]) as Worker;
-    xmtpTester = new playwright({
-      headless,
-      defaultUser: {
-        inboxId: xmtpChat.inboxId,
-        dbEncryptionKey: xmtpChat.encryptionKey,
-        walletKey: xmtpChat.walletKey,
-        accountAddress: xmtpChat.address,
-      },
-    });
-    await xmtpTester.startPage();
+  creator = convoStreamBot.get(names[0]) as Worker;
+  xmtpChat = convoStreamBot.get(names[1]) as Worker;
+  xmtpTester = new playwright({
+    headless,
   });
-
-  it("conversation stream adding it as member", async () => {
-    const conversationStream = await creator.client.conversations.stream();
-    groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
-    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
-
-    for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation?.id);
-    }
-  }, 10000);
+  await xmtpTester.startPage();
 
   it("conversation stream when creating the group", async () => {
     const conversationStream = await creator.client.conversations.stream();
@@ -58,8 +39,18 @@ describe(testName, () => {
 
     await xmtpTester.page?.getByRole("button", { name: "Create" }).click();
     for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation?.id);
+      console.log("conversation found", conversation);
       break;
+    }
+  }, 10000);
+
+  it("conversation stream adding it as member", async () => {
+    const conversationStream = await creator.client.conversations.stream();
+    groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+
+    for await (const conversation of conversationStream) {
+      console.log("conversation found", conversation);
     }
   }, 10000);
 });
