@@ -10,8 +10,6 @@ const testName = "large_conversations";
 describe(testName, async () => {
   let workers = await getWorkers(WORKER_COUNT);
 
-  let newGroup: Group;
-
   const summaryMap: Record<number, any> = {};
 
   let customDuration: number | undefined = undefined;
@@ -30,10 +28,6 @@ describe(testName, async () => {
 
   for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
     it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
-      const creator = workers.getCreator();
-      newGroup = (await creator.client.conversations.newGroup(
-        getInboxIds(i),
-      )) as Group;
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),
