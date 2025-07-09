@@ -142,7 +142,7 @@ function showUsageAndExit(): never {
     "      --versions count   Number of SDK versions to use (e.g., 3)",
   );
   console.error(
-    "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.0)",
+    "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.1)",
   );
   console.error(
     "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
@@ -175,7 +175,7 @@ function showUsageAndExit(): never {
     "  yarn cli test functional --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   console.error(
-    "  yarn cli test functional --nodeVersion 3.1.0 # Uses workers with SDK version 3.1.0",
+    "  yarn cli test functional --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
   );
   console.error(
     "  yarn cli test functional --env production # Sets XMTP_ENV to production",
@@ -278,7 +278,7 @@ function parseTestArgs(args: string[]): {
           i++;
         } else {
           console.warn(
-            "--nodeVersion flag requires a value (e.g., --nodeVersion 3.1.0)",
+            "--nodeVersion flag requires a value (e.g., --nodeVersion 3.1.1)",
           );
         }
         break;

@@ -21,7 +21,7 @@ Stress test XMTP group to produce forks.
 ## Parameters
 
 - **groupCount**: `5` - Number of groups to create in parallel
-- **nodeVersion**: `3.1.0` - Node SDK version to use
+- **nodeVersion**: `3.1.1` - Node SDK version to use
 - **parallelOperations**: `1` - How many operations to perform in parallel
 - **enabledOperations**: - Operations configuration - enable/disable specific operations
   - `updateName`: true, // updates the name of the group
