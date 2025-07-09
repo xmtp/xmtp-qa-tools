@@ -2,7 +2,7 @@ name: Self Test XMTP QA Tools
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # every 6 hours
+    - cron: "25 */5 * * *" # every 5 hours at 25 minutes past
   workflow_dispatch:
 
 jobs:

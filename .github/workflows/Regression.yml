@@ -3,7 +3,7 @@ description: "should verify last 3 versions of the library"
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # Runs every 6 hours
+    - cron: "25 */6 * * *" # Runs every 6 hours at 25 minutes past
   workflow_dispatch:
 
 jobs:
