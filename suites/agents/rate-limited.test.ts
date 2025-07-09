@@ -1,38 +1,40 @@
-import { verifyBotMessageStream } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Group } from "@xmtp/node-sdk";
+import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
-  const workers = await getWorkers(8);
-  // Start message and response streams for rate limiting test
-  workers.startStream(typeofStream.MessageandResponse);
-  workers.getAll().forEach((worker) => {
-    worker.worker.startSync(typeOfSync.Both);
-  });
+
+  // Create 10 workers for parallel message sending
+  const workers = await getWorkers(10);
 
   let targetInboxId: string = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
-  // Handle case where no agents are configured for the current environment
-
-  it("should send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
+  it("should send 100 messages from 10 workers in parallel to test rate limiting", async () => {
+    // Create a conversation with the target inbox
     const conversation = (await workers
       .getCreator()
       .client.conversations.newDmWithIdentifier({
         identifier: targetInboxId,
         identifierKind: IdentifierKind.Ethereum,
-      })) as unknown as Group;
+      })) as Conversation;
 
-    const result = await verifyBotMessageStream(
+    // Send 100 messages in parallel from 10 workers (10 messages per worker)
+    const result = await verifyMessageStream(
       conversation,
-      [workers.getCreator()],
-      "hi",
-      3, // maxRetries
+      workers.getAll(),
+      10, // 10 messages per worker = 100 total messages
+      "rate-test-{i}-{randomSuffix}",
     );
-    expect(result).toBe(true);
+
+    // Verify that messages were sent and received
+    expect(result.allReceived).toBe(true);
+    expect(result.receptionPercentage).toBeGreaterThan(90); // Allow some tolerance for rate limiting
+    console.log(
+      `Rate limiting test completed: ${result.receptionPercentage}% messages received`,
+    );
   });
 });
