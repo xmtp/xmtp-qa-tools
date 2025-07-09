@@ -26,7 +26,7 @@ describe("notifications", () => {
     }
     await (group as Group).addMembers([receiverInboxId]);
     await (group as Group).addSuperAdmin(receiverInboxId);
-    console.debug("added super admin", receiverInboxId);
+    console.log("added super admin", receiverInboxId);
     await group.sync();
     await group.send("Start group test");
     console.log(`Created group ${group.id}`);

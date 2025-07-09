@@ -40,11 +40,7 @@ describe(testName, async () => {
         ? agent.sendMessage
         : `@${agent.baseName} ${agent.sendMessage}`;
 
-      console.debug(
-        `sending ${testMessage} to agent`,
-        agent.name,
-        agent.address,
-      );
+      console.log(`sending ${testMessage} to agent`, agent.name, agent.address);
       const conversation = await workers
         .getCreator()
         .client.conversations.newGroupWithIdentifiers([

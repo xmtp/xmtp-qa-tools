@@ -140,7 +140,7 @@ export const regressionClient = async (
   const loggingLevel = (process.env.LOGGING_LEVEL || "error") as LogLevel;
   const apiUrl = apiURL;
   if (apiUrl) {
-    console.log(
+    console.debug(
       `Creating API client with: SDK version: ${nodeVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }

@@ -51,7 +51,7 @@ describe(testName, () => {
         let receiverSizes = await receiver?.worker.getSQLiteFileSizes();
         currentTotalSize =
           (senderSizes?.dbFile ?? 0) - (senderInstallationSize?.dbFile ?? 0);
-        console.debug(
+        console.log(
           `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
             currentTotalSize,
           )} and receiver size: ${formatBytes(

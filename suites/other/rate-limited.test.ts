@@ -45,7 +45,7 @@ describe(testName, async () => {
         for (let i = 0; i < messagesPerWorker; i++) {
           const message = `${worker.name}-${i}-${Date.now()}-${Math.random()}`;
           await dm.send(message);
-          console.debug(i);
+          console.log(i);
         }
       } catch (e) {
         console.error(e);
