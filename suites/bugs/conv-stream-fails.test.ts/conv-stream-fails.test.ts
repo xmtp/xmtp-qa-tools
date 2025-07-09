@@ -9,17 +9,11 @@ const testName = "welcome";
 describe(testName, async () => {
   let groupId: string;
   const headless = false;
-  let xmtpTester: playwright;
-  let xmtpChat: Worker;
-  let creator: Worker;
-
   const convoStreamBot = await getWorkers(2);
   const names = convoStreamBot.getAll().map((w) => w.name);
-  convoStreamBot.startStream(typeofStream.Conversation);
-
-  creator = convoStreamBot.get(names[0]) as Worker;
-  xmtpChat = convoStreamBot.get(names[1]) as Worker;
-  xmtpTester = new playwright({
+  let creator = convoStreamBot.get(names[0]) as Worker;
+  let xmtpChat = convoStreamBot.get(names[1]) as Worker;
+  let xmtpTester = new playwright({
     headless,
   });
   await xmtpTester.startPage();
