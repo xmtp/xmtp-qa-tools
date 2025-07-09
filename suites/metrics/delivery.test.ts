@@ -5,9 +5,9 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "m_delivery";
+const testName = "delivery";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupTestLifecycle({ testName, metrics: true });
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 

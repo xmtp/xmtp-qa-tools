@@ -4,10 +4,11 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
 
-const testName = "m_large_cumulative_syncs";
+const testName = "large_cumulative_syncs";
 describe(testName, async () => {
   setupTestLifecycle({
     testName,
+    metrics: true,
   });
   let workers: WorkerManager;
 

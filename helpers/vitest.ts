@@ -15,11 +15,13 @@ export const setupTestLifecycle = ({
   sdk,
   getCustomDuration,
   setCustomDuration,
+  metrics = false,
 }: {
   testName: string;
   sdk?: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
+  metrics?: boolean;
 }) => {
   beforeAll(() => {
     loadEnv(testName);
@@ -55,12 +57,12 @@ export const setupTestLifecycle = ({
       members,
     };
 
-    if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
+    if (metrics || process.env.XMTP_ENV === "local") {
       sendMetric("duration", duration, values);
     }
 
     // Network stats handling for performance tests
-    if (testName.includes("m_performance") && !skipNetworkStats) {
+    if (metrics && testName.includes("performance") && !skipNetworkStats) {
       const networkStats = await getNetworkStats();
 
       for (const [statName, statValue] of Object.entries(networkStats)) {

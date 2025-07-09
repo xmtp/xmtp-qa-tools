@@ -1,10 +1,12 @@
 import { getMessageByMb } from "@helpers/client";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, beforeAll, describe, it } from "vitest";
 
-const testName = "m_large_installations";
+const testName = "large_installations";
 describe(testName, async () => {
+  setupTestLifecycle({ testName, metrics: true });
   let workers = await getWorkers(["creator", "small", "medium", "large", "xl"]);
 
   let smallInbox: Worker;

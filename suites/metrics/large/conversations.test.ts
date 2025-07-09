@@ -11,7 +11,7 @@ import {
   saveLog,
 } from "./helpers";
 
-const testName = "m_large_conversations";
+const testName = "large_conversations";
 describe(testName, async () => {
   let workers = await getWorkers(m_large_WORKER_COUNT);
 
@@ -30,6 +30,7 @@ describe(testName, async () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
+    metrics: true,
   });
 
   for (
