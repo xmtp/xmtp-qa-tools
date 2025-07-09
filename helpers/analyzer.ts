@@ -125,7 +125,7 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
   const outputDir = path.join(logsDir, "cleaned");
 
   if (!fs.existsSync(logsDir)) {
-    console.log("No logs directory found");
+    console.debug("No logs directory found");
     return;
   }
 
@@ -140,11 +140,11 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
   );
 
   if (nonRawLogFiles.length === 0) {
-    console.log("No non-raw *.log files found to check");
+    console.debug("No non-raw *.log files found to check");
     return;
   }
 
-  console.log(`Found ${nonRawLogFiles.length} non-raw log files to check`);
+  console.debug(`Found ${nonRawLogFiles.length} non-raw log files to check`);
 
   let processedCount = 0;
   for (const file of nonRawLogFiles) {
@@ -157,7 +157,7 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
           pattern,
         );
         if (!containsTargetString) {
-          console.log(`Skipping ${file} - does not contain "${pattern}"`);
+          console.debug(`Skipping ${file} - does not contain "${pattern}"`);
           continue;
         }
       }
@@ -168,7 +168,7 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
 
       // Check if the raw file exists
       if (!fs.existsSync(rawFilePath)) {
-        console.log(
+        console.debug(
           `Skipping ${file} - corresponding raw file ${rawFileName} not found`,
         );
         continue;
@@ -178,7 +178,7 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
       const outputPath = path.join(outputDir, outputFileName);
 
       await processLogFile(rawFilePath, outputPath);
-      console.log(
+      console.debug(
         `Cleaned: ${rawFileName} -> ${outputFileName} (triggered by ${file})`,
       );
       processedCount++;
@@ -187,7 +187,7 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
     }
   }
 
-  console.log(
+  console.debug(
     `Processed ${processedCount} raw files based on non-raw files containing "fork"`,
   );
 }
@@ -210,9 +210,9 @@ export function checkForCriticalErrors(
       const outsidePath = match[1]?.trim();
       const insidePath = match[2]?.trim();
 
-      console.log(`DEBUG: outsidePath: "${outsidePath}"`);
-      console.log(`DEBUG: insidePath: "${insidePath}"`);
-      console.log(`DEBUG: Are paths equal? ${outsidePath === insidePath}`);
+      console.debug(`DEBUG: outsidePath: "${outsidePath}"`);
+      console.debug(`DEBUG: insidePath: "${insidePath}"`);
+      console.debug(`DEBUG: Are paths equal? ${outsidePath === insidePath}`);
 
       if (outsidePath === insidePath) {
         console.error(
@@ -270,7 +270,7 @@ export function extractErrorLogs(testName: string): Set<string> {
       }
     }
 
-    console.log(`Found ${errorLines.length} error lines`);
+    console.debug(`Found ${errorLines.length} error lines`);
 
     // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
@@ -278,7 +278,7 @@ export function extractErrorLogs(testName: string): Set<string> {
         errorLines[0]?.includes(pattern),
       );
       if (hasKnownPattern) {
-        console.log("hasKnownPattern, returning empty string");
+        console.debug("hasKnownPattern, returning empty string");
         return new Set();
       }
     }
@@ -286,7 +286,7 @@ export function extractErrorLogs(testName: string): Set<string> {
     if (errorLines.length > 0) {
       const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
-      console.log(resultSet);
+      console.debug(resultSet);
       return resultSet;
     }
   } catch (error) {
@@ -353,7 +353,7 @@ export async function workflowFailed(workflowName: string): Promise<void> {
   };
 
   if (data && data.ok) {
-    console.log(
+    console.debug(
       `✅ Slack notification sent successfully to ${process.env.SLACK_CHANNEL}!`,
     );
   } else {
