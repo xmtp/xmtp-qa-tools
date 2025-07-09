@@ -86,20 +86,31 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it("conversation stream for new member", async () => {
-    groupId = await xmtpTester.newGroupFromUI([
-      ...getInboxIds(4),
-      receiver.inboxId,
-    ]);
-    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
-    const conversationStream = await creator.client.conversations.stream();
+  it("conversation stream when creating the group", async () => {
+    await xmtpTester.newGroupFromUI(
+      [...getInboxIds(4), creator.inboxId],
+      false,
+    );
+    const conversationStream = creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
+      console.log("conversation found", conversation);
+      expect(conversation?.id).toBeDefined();
+      break;
+    }
+  }, 5000);
+
+  it("conversation stream for new member", async () => {
+    const groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+    const conversationStream = creator.client.conversations.stream();
+    for await (const conversation of conversationStream) {
+      console.log("conversation found", conversation);
       if (conversation?.id === groupId) {
         expect(conversation.id).toBe(groupId);
         break;
       }
     }
-  });
+  }, 5000);
 
   it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
