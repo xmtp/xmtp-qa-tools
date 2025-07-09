@@ -1,4 +1,4 @@
-import { verifyNewConversationStream } from "@helpers/streams";
+import { verifyConversationStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
@@ -44,8 +44,8 @@ describe(testName, async () => {
         getInboxIds(i),
       )) as Group;
       // Use the dedicated conversation stream verification helper
-      const verifyResult = await verifyNewConversationStream(
-        newGroup,
+      const verifyResult = await verifyConversationStream(
+        workers.getCreator(),
         workers.getAllButCreator(),
       );
 
