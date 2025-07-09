@@ -11,7 +11,7 @@ const testName = "playwright";
 describe(testName, () => {
   setupTestLifecycle({ testName });
   let groupId: string;
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
@@ -99,7 +99,23 @@ describe(testName, () => {
     }
   });
 
-  it("conversation stream for new member", async () => {
+  it("node new conversation stream", async () => {
+    groupId = await xmtpTester.newGroupFromUI([
+      ...getInboxIds(4),
+      creator.inboxId,
+    ]);
+    const conversationStream = await creator.client.conversations.stream();
+    for await (const conversation of conversationStream) {
+      if (conversation?.id === groupId) {
+        console.log("conversation", conversation.id);
+        expect(conversation.id).toBe(groupId);
+        break;
+      }
+    }
+    await xmtpTester.takeSnapshot("async-member-addition");
+  }, 10000);
+
+  it("node conversation stream for new member", async () => {
     groupId = await xmtpTester.newGroupFromUI([
       ...getInboxIds(4),
       receiver.inboxId,
@@ -108,12 +124,13 @@ describe(testName, () => {
     const conversationStream = await creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
       if (conversation?.id === groupId) {
+        console.log("conversation", conversation.id);
         expect(conversation.id).toBe(groupId);
         break;
       }
     }
     await xmtpTester.takeSnapshot("async-member-addition");
-  });
+  }, 10000);
 
   it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
