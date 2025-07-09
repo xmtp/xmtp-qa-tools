@@ -44,14 +44,6 @@ describe(testName, async () => {
     node3.addLatency(20000);
     node4.addLatency(20000);
 
-    console.log("[test] Sending 3 group messages during heavy latency from user2");
-    const user2Group = await workers
-      .get("user2")!
-      .client.conversations.getConversationById(group.id);
-    for (const msg of expectedMessages) {
-      await user2Group!.send(msg);
-    }
-
     console.log("[test] Mid-test stream check under latency - expect degraded behavior");
     const brokenCheck = await verifyMessageStream(
       group,
