@@ -50,9 +50,9 @@ yarn test large/cumulative_syncs.test.ts # Progressive sync performance analysis
 
 The suite uses configurable parameters in `helpers.ts`:
 
-- `m_large_WORKER_COUNT` - Number of concurrent test workers (default: 5)
-- `m_large_BATCH_SIZE` - Group size increment for testing (default: 5)
-- `m_large_TOTAL` - Maximum group size to test (default: 10)
+- `WORKER_COUNT` - Number of concurrent test workers (default: 5)
+- `BATCH_SIZE` - Group size increment for testing (default: 5)
+- `TOTAL` - Maximum group size to test (default: 10)
 
 ### Test Execution Pattern
 

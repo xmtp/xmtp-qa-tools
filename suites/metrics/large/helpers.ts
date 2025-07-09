@@ -1,8 +1,8 @@
 import fs from "fs";
 
-export const m_large_WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
-export const m_large_BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
-export const m_large_TOTAL = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
+export const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
+export const BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
+export const MAX_GROUP_SIZE = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
 export function saveLog(summaryMap: Record<string, any>) {
   if (Object.keys(summaryMap).length === 0) {
