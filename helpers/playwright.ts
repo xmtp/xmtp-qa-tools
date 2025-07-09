@@ -96,7 +96,10 @@ export class playwright {
     }
   }
 
-  public async newGroupFromUI(addresses: string[]): Promise<string> {
+  public async newGroupFromUI(
+    addresses: string[],
+    wait = true,
+  ): Promise<string> {
     try {
       if (!this.page) throw new Error("Page is not initialized");
 
@@ -111,11 +114,14 @@ export class playwright {
       }
 
       await this.page.getByRole("button", { name: "Create" }).click();
-      await addressInput.waitFor({ state: "hidden" });
-      const url = this.page.url();
-      const groupId = url.split("/conversations/")[1];
-      console.debug("Created group with ID:", groupId);
-      return groupId;
+      if (wait) {
+        await addressInput.waitFor({ state: "hidden" });
+        const url = this.page.url();
+        const groupId = url.split("/conversations/")[1];
+        console.debug("Created group with ID:", groupId);
+        return groupId;
+      }
+      return "";
     } catch (error) {
       await this.takeSnapshot("newGroupFromUI-error");
       throw error;
