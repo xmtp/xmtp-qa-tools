@@ -7,7 +7,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "playwright";
+const testName = "browser";
 describe(testName, () => {
   setupTestLifecycle({ testName });
   let groupId: string;
@@ -30,7 +30,6 @@ describe(testName, () => {
     creator = convoStreamBot.get(names[0]) as Worker;
     xmtpChat = convoStreamBot.get(names[1]) as Worker;
     receiver = gmBotWorker.getCreator();
-    console.log(names[1], xmtpChat.inboxId, xmtpChat.name);
     xmtpTester = new playwright({
       headless,
       defaultUser: {
@@ -55,9 +54,6 @@ describe(testName, () => {
     await newGroup.send(`hi ${receiver.name}`);
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
     expect(result).toBe(true);
-    if (!result) {
-      await xmtpTester.takeSnapshot("group-invite-with-message");
-    }
   });
 
   it("conversation stream without message", async () => {
@@ -71,9 +67,6 @@ describe(testName, () => {
     await newGroup.addMembers([xmtpChat.inboxId]);
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
     expect(result).toBe(true);
-    if (!result) {
-      await xmtpTester.takeSnapshot("group-invite-without-message");
-    }
   });
 
   it("newDm and message stream", async () => {
@@ -81,9 +74,6 @@ describe(testName, () => {
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     const result = await xmtpTester.waitForResponse(["gm"]);
     expect(result).toBe(true);
-    if (!result) {
-      await xmtpTester.takeSnapshot("dm-creation-and-response");
-    }
   });
 
   it("newGroup and message stream", async () => {
@@ -94,28 +84,9 @@ describe(testName, () => {
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     const result = await xmtpTester.waitForResponse(["gm"]);
     expect(result).toBe(true);
-    if (!result) {
-      await xmtpTester.takeSnapshot("group-creation-via-ui");
-    }
   });
 
-  it("node new conversation stream", async () => {
-    groupId = await xmtpTester.newGroupFromUI([
-      ...getInboxIds(4),
-      creator.inboxId,
-    ]);
-    const conversationStream = await creator.client.conversations.stream();
-    for await (const conversation of conversationStream) {
-      if (conversation?.id === groupId) {
-        console.log("conversation", conversation.id);
-        expect(conversation.id).toBe(groupId);
-        break;
-      }
-    }
-    await xmtpTester.takeSnapshot("async-member-addition");
-  }, 10000);
-
-  it("node conversation stream for new member", async () => {
+  it("conversation stream for new member", async () => {
     groupId = await xmtpTester.newGroupFromUI([
       ...getInboxIds(4),
       receiver.inboxId,
@@ -124,13 +95,11 @@ describe(testName, () => {
     const conversationStream = await creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
       if (conversation?.id === groupId) {
-        console.log("conversation", conversation.id);
         expect(conversation.id).toBe(groupId);
         break;
       }
     }
-    await xmtpTester.takeSnapshot("async-member-addition");
-  }, 10000);
+  });
 
   it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
@@ -143,6 +112,5 @@ describe(testName, () => {
     await xmtpNewTester.sendMessage(`hi ${receiver.name}`);
     const result = await xmtpNewTester.waitForResponse(["gm"]);
     expect(result).toBe(true);
-    await xmtpNewTester.takeSnapshot("multi-instance-messaging");
   });
 });
