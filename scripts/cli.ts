@@ -495,7 +495,7 @@ async function runVitestTest(
   }
 
   // Set logging level
-  env.LOGGING_LEVEL = options.logLevel;
+  env.LOGGING_LEVEL = options.logLevel || "error";
 
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);

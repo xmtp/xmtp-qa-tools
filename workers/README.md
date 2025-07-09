@@ -262,7 +262,7 @@ export const VersionList = [
     Dm: Dm310,
     Group: Group310,
     nodeVersion: "3.1.1",
-    bindingsPackage: "1.2.6",
+    bindingsPackage: "1.2.7",
     auto: true, // Included in getAutoVersions()
   },
   {
