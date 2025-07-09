@@ -207,7 +207,11 @@ export function parseTestName(testName: string): ParsedTestName {
 
   let testNameExtracted = operationParts[0];
   if (testNameExtracted.includes("large_")) {
-    testNameExtracted = "large";
+    testNameExtracted = "m_large";
+  } else if (testNameExtracted === "delivery") {
+    testNameExtracted = "m_delivery";
+  } else if (testNameExtracted === "performance") {
+    testNameExtracted = "m_performance";
   }
 
   let operationName = "";
