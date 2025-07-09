@@ -11,7 +11,7 @@ describe(testName, async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
-  console.debug(
+  console.log(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
   let workers = await getWorkers(receiverAmount);
@@ -20,7 +20,7 @@ describe(testName, async () => {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   beforeAll(async () => {
-    console.debug("creating group");
+    console.log("creating group");
     group = await workers.createGroupBetweenAll();
   });
 
@@ -34,13 +34,13 @@ describe(testName, async () => {
     const receptionPercentage = verifyResult.receptionPercentage ?? 0;
     const orderPercentage = verifyResult.orderPercentage ?? 0;
 
-    console.debug(
+    console.log(
       `Stream reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
     );
 
     // Don't fail if stats are missing or incomplete, just log and continue
     if (!verifyResult.receptionPercentage || !verifyResult.orderPercentage)
-      console.debug("Warning: No stats were generated for stream verification");
+      console.log("Warning: No stats were generated for stream verification");
 
     // Only run expectations if we have values
     if (receptionPercentage > 0) {
@@ -104,7 +104,7 @@ describe(testName, async () => {
     const receptionPercentage = stats.receptionPercentage ?? 0;
     const orderPercentage = stats.orderPercentage ?? 0;
 
-    console.debug(
+    console.log(
       `Poll reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
     );
 
@@ -140,7 +140,7 @@ describe(testName, async () => {
     const offlineWorker = workers.getCreator(); // Second worker
     const onlineWorker = workers.getReceiver(); // First worker
 
-    console.debug(`Taking ${offlineWorker.name} offline`);
+    console.log(`Taking ${offlineWorker.name} offline`);
 
     // Disconnect the selected worker
     await offlineWorker.worker.terminate();
@@ -148,17 +148,15 @@ describe(testName, async () => {
     // Send messages from an online worker
     const conversation =
       await onlineWorker.client.conversations.getConversationById(group.id);
-    console.debug(
-      `Sending ${amountofMessages} messages while client is offline`,
-    );
+    console.log(`Sending ${amountofMessages} messages while client is offline`);
     for (let i = 0; i < amountofMessages; i++) {
       const message = `offline-msg-${i + 1}-${randomSuffix}`;
       await conversation!.send(message);
     }
-    console.debug("Sent messages");
+    console.log("Sent messages");
 
     // Reconnect the offline worker
-    console.debug(`Reconnecting ${offlineWorker.name}`);
+    console.log(`Reconnecting ${offlineWorker.name}`);
     const { client } = await offlineWorker.worker.initialize();
     offlineWorker.client = client;
     await offlineWorker.client.conversations.sync();
@@ -192,7 +190,7 @@ describe(testName, async () => {
     const receptionPercentage = stats.receptionPercentage ?? 0;
     const orderPercentage = stats.orderPercentage ?? 0;
 
-    console.debug(
+    console.log(
       `Recovery reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
     );
 

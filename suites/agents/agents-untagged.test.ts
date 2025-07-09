@@ -35,7 +35,7 @@ describe(testName, async () => {
 
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} should not respond to untagged hi : ${agent.address}`, async () => {
-      console.debug("sending message to agent", agent.name, agent.address);
+      console.log("sending message to agent", agent.name, agent.address);
       const conversation = await workers
         .getCreator()
         .client.conversations.newGroupWithIdentifiers([

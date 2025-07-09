@@ -47,7 +47,7 @@ describe(testName, async () => {
   it("should send a message in DM conversation", async () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-    console.debug(
+    console.log(
       `Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
     );
 

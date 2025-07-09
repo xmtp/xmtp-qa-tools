@@ -36,7 +36,7 @@ describe("spam", () => {
         await group?.send("hi");
         groupCount++;
         installationSize = await creator?.worker.getSQLiteFileSizes();
-        console.debug(
+        console.log(
           `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
             installationSize?.dbFile ?? 0,
           )}`,

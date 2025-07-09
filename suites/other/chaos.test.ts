@@ -57,7 +57,7 @@ describe(testName, () => {
     // Load all existing groups
     const existingGroups =
       process.env.CREATED_GROUPS?.split(",").filter((id) => id.trim()) || [];
-    console.debug(`Loaded ${existingGroups.length} existing groups`);
+    console.log(`Loaded ${existingGroups.length} existing groups`);
 
     const group = (await creator.client.conversations.newGroup(
       testConfig.randomInboxIds,
@@ -65,12 +65,12 @@ describe(testName, () => {
 
     allGroups = [...existingGroups, group.id];
     appendToEnv("CREATED_GROUPS", allGroups.join(","));
-    console.debug(`Created new group: ${group.id}`);
+    console.log(`Created new group: ${group.id}`);
 
-    console.debug("adding manual users");
+    console.log("adding manual users");
     await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
 
-    console.debug("adding members");
+    console.log("adding members");
     await group.addMembers(
       workers.getAllBut("bot").map((w) => w.client.inboxId),
     );
@@ -126,7 +126,7 @@ describe(testName, () => {
             break;
         }
 
-        console.debug(`Group ${groupId} - Completed: ${feature}`);
+        console.log(`Group ${groupId} - Completed: ${feature}`);
       }
       await workers.checkForks();
       await workers.checkStatistics();
@@ -144,7 +144,7 @@ export async function verifyAddRandomInstallations(
 
     for (let i = 0; i < randomInstallations; i++) {
       await worker.worker.addNewInstallation();
-      console.debug(
+      console.log(
         `Added installation ${i + 1}/${randomInstallations} for worker ${worker.name}`,
       );
     }
@@ -183,7 +183,7 @@ export async function verifyEpochChange(
       try {
         await group.removeMembers([member]);
         await group.addMembers([member]);
-        console.debug(`Membership update: ${member}`);
+        console.log(`Membership update: ${member}`);
         await group.sync();
       } catch (e) {
         console.error(`Error in membership cycle ${i}:`, e);
