@@ -3,7 +3,7 @@ description: "should verify browser support"
 
 on:
   schedule:
-    - cron: "15, 45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
