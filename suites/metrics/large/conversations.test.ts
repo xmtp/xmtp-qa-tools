@@ -1,21 +1,12 @@
 import { verifyConversationStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
-import {
-  m_large_BATCH_SIZE,
-  m_large_TOTAL,
-  m_large_WORKER_COUNT,
-  saveLog,
-} from "./helpers";
+import { BATCH_SIZE, MAX_GROUP_SIZE, saveLog, WORKER_COUNT } from "./helpers";
 
 const testName = "large_conversations";
 describe(testName, async () => {
-  let workers = await getWorkers(m_large_WORKER_COUNT);
-
-  let newGroup: Group;
+  let workers = await getWorkers(WORKER_COUNT);
 
   const summaryMap: Record<number, any> = {};
 
@@ -33,16 +24,8 @@ describe(testName, async () => {
     metrics: true,
   });
 
-  for (
-    let i = m_large_BATCH_SIZE;
-    i <= m_large_TOTAL;
-    i += m_large_BATCH_SIZE
-  ) {
+  for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
     it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
-      const creator = workers.getCreator();
-      newGroup = (await creator.client.conversations.newGroup(
-        getInboxIds(i),
-      )) as Group;
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),

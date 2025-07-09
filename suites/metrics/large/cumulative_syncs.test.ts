@@ -2,7 +2,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
-import { m_large_BATCH_SIZE, m_large_TOTAL, saveLog } from "./helpers";
+import { BATCH_SIZE, MAX_GROUP_SIZE, saveLog } from "./helpers";
 
 const testName = "large_cumulative_syncs";
 describe(testName, async () => {
@@ -14,18 +14,14 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, any> = {};
 
-  workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1);
+  workers = await getWorkers((MAX_GROUP_SIZE / BATCH_SIZE) * 2 + 1);
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];
   // Use different workers for each measurement
   allWorkers = workers.getAllButCreator();
 
   let run = 0;
-  for (
-    let i = m_large_BATCH_SIZE;
-    i <= m_large_TOTAL;
-    i += m_large_BATCH_SIZE
-  ) {
+  for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
     it(`newGroup-${i}: should create ${i} member group and add all worker members`, async () => {
       const createTime = performance.now();
       const creator = workers.getCreator();
