@@ -1,8 +1,6 @@
 import { verifyConversationStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import { BATCH_SIZE, MAX_GROUP_SIZE, saveLog, WORKER_COUNT } from "./helpers";
 
