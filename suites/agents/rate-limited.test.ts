@@ -7,7 +7,7 @@ const testName = "rate-limited";
 const WORKER_COUNT = 1000;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 50;
 let targetInboxId: string = "0x163C3AFf82D7C350d9f41730FC95C43243A357d0";
 
 describe(testName, async () => {
@@ -59,6 +59,7 @@ describe(testName, async () => {
                 conversation,
                 [worker],
                 `rate-test-worker-${actualWorkerIndex}-msg-${i}-${Date.now()}`,
+                2000,
               );
               const responseTime = result?.averageEventTiming;
 

@@ -825,8 +825,9 @@ export class WorkerClient extends Worker {
     type: typeofStream;
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
+    customTimeout?: number;
   }): Promise<T[]> {
-    const { type, filterFn, count } = options;
+    const { type, filterFn, count, customTimeout = streamTimeout } = options;
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
@@ -896,13 +897,13 @@ export class WorkerClient extends Worker {
           this.off("worker_message", onMessage);
           console.error(
             `[${this.nameId}] Collector timed out. ${
-              streamTimeout / 1000
+              customTimeout / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
           resolve(events);
         }
-      }, streamTimeout);
+      }, customTimeout);
     });
   }
 
@@ -913,6 +914,7 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
     types: string[] = ["text"],
+    customTimeout?: number,
   ): Promise<StreamTextMessage[]> {
     // console.debug(
     //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
@@ -937,6 +939,7 @@ export class WorkerClient extends Worker {
         return shouldAccept;
       },
       count,
+      customTimeout,
     });
   }
   /**
@@ -945,6 +948,7 @@ export class WorkerClient extends Worker {
   collectGroupUpdates(
     groupId: string,
     count: number,
+    customTimeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
@@ -964,12 +968,14 @@ export class WorkerClient extends Worker {
         return matches;
       },
       count,
+      customTimeout,
     });
   }
 
   collectAddedMembers(
     groupId: string,
     count: number = 1,
+    customTimeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
@@ -985,15 +991,16 @@ export class WorkerClient extends Worker {
         return matches && hasAddedMembers;
       },
       count,
+      customTimeout,
     });
   }
   /**
    * Collect conversations
    */
   collectConversations(
-    fromPeerAddress: string,
+    conversationId: string,
     count: number = 1,
-    conversationId?: string,
+    customTimeout?: number,
   ): Promise<StreamConversationMessage[]> {
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
@@ -1004,6 +1011,7 @@ export class WorkerClient extends Worker {
           }
         : undefined,
       count,
+      customTimeout,
     });
   }
 

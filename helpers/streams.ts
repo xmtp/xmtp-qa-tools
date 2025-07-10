@@ -515,6 +515,7 @@ export async function verifyBotMessageStream(
   receivers: Worker[],
   triggerMessage: string,
   maxRetries: number = 1,
+  customTimeout?: number,
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
@@ -529,12 +530,12 @@ export async function verifyBotMessageStream(
     result = await collectAndTimeEventsWithStats({
       receivers,
       startCollectors: (r) =>
-        r.worker.collectMessages(group.id, 1, [
-          "text",
-          "reply",
-          "reaction",
-          "actions",
-        ]),
+        r.worker.collectMessages(
+          group.id,
+          1,
+          ["text", "reply", "reaction", "actions"],
+          customTimeout ?? undefined,
+        ),
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage);
