@@ -115,7 +115,6 @@ interface StreamConversationMessage extends BaseStreamMessage {
   type: StreamCollectorType.Conversation;
   conversation: {
     id: string;
-    peerAddress?: string;
   };
 }
 
@@ -825,14 +824,15 @@ export class WorkerClient extends Worker {
     type: typeofStream;
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
+    customTimeout?: number;
   }): Promise<T[]> {
-    const { type, filterFn, count } = options;
+    const { type, filterFn, count, customTimeout = streamTimeout } = options;
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    // console.debug(
-    //   `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
-    // );
+    console.debug(
+      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
+    );
 
     return new Promise((resolve) => {
       const events: T[] = [];
@@ -861,23 +861,23 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
-        // console.debug(
-        //   `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
-        // );
+        console.debug(
+          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
+        );
 
         if (isRightType && passesFilter) {
           events.push(msg as T);
-          // console.debug(
-          //   `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
-          // );
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
+          );
 
           if (events.length >= count) {
             resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
-            // console.debug(
-            //   `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
-            // );
+            console.debug(
+              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
+            );
             resolve(events);
           }
         } else {
@@ -896,13 +896,13 @@ export class WorkerClient extends Worker {
           this.off("worker_message", onMessage);
           console.error(
             `[${this.nameId}] Collector timed out. ${
-              streamTimeout / 1000
+              customTimeout / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
           resolve(events);
         }
-      }, streamTimeout);
+      }, customTimeout);
     });
   }
 
@@ -913,6 +913,7 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
     types: string[] = ["text"],
+    customTimeout?: number,
   ): Promise<StreamTextMessage[]> {
     // console.debug(
     //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
@@ -937,6 +938,7 @@ export class WorkerClient extends Worker {
         return shouldAccept;
       },
       count,
+      customTimeout,
     });
   }
   /**
@@ -945,6 +947,7 @@ export class WorkerClient extends Worker {
   collectGroupUpdates(
     groupId: string,
     count: number,
+    customTimeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
@@ -964,12 +967,14 @@ export class WorkerClient extends Worker {
         return matches;
       },
       count,
+      customTimeout,
     });
   }
 
   collectAddedMembers(
     groupId: string,
     count: number = 1,
+    customTimeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
@@ -985,25 +990,27 @@ export class WorkerClient extends Worker {
         return matches && hasAddedMembers;
       },
       count,
+      customTimeout,
     });
   }
   /**
    * Collect conversations
    */
   collectConversations(
-    fromPeerAddress: string,
+    fromInboxId: string,
     count: number = 1,
-    conversationId?: string,
+    customTimeout?: number,
   ): Promise<StreamConversationMessage[]> {
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
-      filterFn: conversationId
+      filterFn: fromInboxId
         ? (msg) => {
             if (msg.type !== StreamCollectorType.Conversation) return false;
-            return msg.conversation.id === conversationId;
+            return msg.conversation.id !== undefined;
           }
         : undefined,
       count,
+      customTimeout,
     });
   }
 

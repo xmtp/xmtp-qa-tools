@@ -157,7 +157,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     ),
   );
   await sleep(streamColdStartTimeout); // wait for stream to start
+  console.debug("sleeping done");
   const sentEvents = await options.triggerEvents();
+  console.debug("triggerEvents done");
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -411,6 +413,7 @@ export async function verifyConversationStream(
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Conversation);
   });
+  console.debug("verifying conversation stream");
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
@@ -421,8 +424,13 @@ export async function verifyConversationStream(
         return p.client.inboxId;
       });
       const sentAt = Date.now();
-      await initiator.client.conversations.newGroup(participantAddresses);
-      return [{ id: "conversation", sentAt }];
+      const conversation =
+        await initiator.client.conversations.newGroup(participantAddresses);
+      const members = await conversation.members();
+      console.debug("conversation created", conversation.id);
+      return [
+        { id: "conversation", sentAt, members: members.map((m) => m.inboxId) },
+      ];
     },
     getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
@@ -514,7 +522,8 @@ export async function verifyBotMessageStream(
   group: Conversation,
   receivers: Worker[],
   triggerMessage: string,
-  maxRetries: number = 3,
+  maxRetries: number = 1,
+  customTimeout?: number,
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
@@ -529,12 +538,12 @@ export async function verifyBotMessageStream(
     result = await collectAndTimeEventsWithStats({
       receivers,
       startCollectors: (r) =>
-        r.worker.collectMessages(group.id, 1, [
-          "text",
-          "reply",
-          "reaction",
-          "actions",
-        ]),
+        r.worker.collectMessages(
+          group.id,
+          1,
+          ["text", "reply", "reaction", "actions"],
+          customTimeout ?? undefined,
+        ),
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage);
