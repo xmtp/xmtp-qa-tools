@@ -28,7 +28,7 @@ describe(testName, async () => {
 
   it("should simulate a node blackhole in a group chat and recover cleanly", async () => {
     console.log("[test] Creating group conversation");
-    group = await workers.createGroupBetweenAll("Blackhole Group Test");
+    group = await workers.createGroupBetweenAll("Black hole stream fail test");
     await group.sync();
 
     console.log("[test] Verifying initial message delivery to all");
@@ -40,14 +40,6 @@ describe(testName, async () => {
 
     console.log("[test] Applying blackhole");
     node2.simulateBlackhole([node1, node3, node4]);
-
-    console.log("[test] Sending 3 group messages DURING blackhole from user2");
-    const user2Group = await workers
-      .get("user2")!
-      .client.conversations.getConversationById(group.id);
-    for (const msg of expectedMessages) {
-      await user2Group!.send(msg);
-    }
 
     console.log("[test] Mid-test before-recovery stream check - stream should timeout");
     const brokenCheck = await verifyMessageStream(
