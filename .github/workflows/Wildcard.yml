@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [dms] # performance test with more large groups
+        test: [browser] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
