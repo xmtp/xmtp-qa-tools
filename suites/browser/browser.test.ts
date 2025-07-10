@@ -100,7 +100,7 @@ describe(testName, () => {
   }, 5000);
 
   it("conversation stream for new member", async () => {
-    const groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+    groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
     await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
     const conversationStream = creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
