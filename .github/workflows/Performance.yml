@@ -3,7 +3,7 @@ description: "should verify performance "
 
 on:
   schedule:
-    - cron: "45,15 * * * *" # Runs every 30 minutes at 15 and 45 minutes past
+    - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
   workflow_dispatch:
 
 jobs:
