@@ -3,7 +3,7 @@ description: "should verify performance of the group streams"
 
 on:
   schedule:
-    - cron: "15 */2 * * *" # Runs every 2 hours at 15 minutes past
+    - cron: "0 */2 * * *" # Runs every 2 hours at top of hour (30+ min separation from Performance at :15 and :45)
   workflow_dispatch:
 
 jobs:
