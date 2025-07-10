@@ -291,23 +291,18 @@ export class playwright {
 
       console.debug("Navigating to:", url);
       await page.goto(url);
-      console.debug("Navigated to:", url);
-      if (!this.defaultUser.walletKey) {
-        console.debug("Navigating to welcome");
-        await page.goto("https://xmtp.chat/welcome");
-        console.debug("Clicked connect");
+      await page.getByRole("button", { name: "Connect" }).last().click();
+      console.debug("Clicked connect button");
 
-        // await page.getByRole("button", { name: "Connect" }).click();
-        // console.debug("Clicked ephemeral wallet");
-        // await page.getByText("Ephemeral wallet").click();
-        // console.debug("Clicked ephemeral wallet");
+      await page.waitForTimeout(1000);
+      if (page.url() === "https://xmtp.chat/conversations") {
+        console.debug("Logged in");
+        this.page = page;
+        this.browser = browser;
+        return { browser, page };
+      } else {
+        throw new Error("Failed to log in");
       }
-      console.debug("Waiting for title");
-      await page.waitForSelector(".mantine-Title-root");
-      console.debug("Navigated to welcome");
-      this.page = page;
-      this.browser = browser;
-      return { browser, page };
     } catch (error) {
       await this.takeSnapshot("startPage-error");
       throw error;
