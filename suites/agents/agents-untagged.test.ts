@@ -53,7 +53,6 @@ describe(testName, async () => {
         conversation as Conversation,
         [workers.getCreator()],
         "hi",
-        1,
       );
 
       const responseMetricTags: ResponseMetricTags = {

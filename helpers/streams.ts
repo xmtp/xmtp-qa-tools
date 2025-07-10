@@ -514,7 +514,7 @@ export async function verifyBotMessageStream(
   group: Conversation,
   receivers: Worker[],
   triggerMessage: string,
-  maxRetries: number = 3,
+  maxRetries: number = 1,
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
