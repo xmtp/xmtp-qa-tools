@@ -115,7 +115,6 @@ interface StreamConversationMessage extends BaseStreamMessage {
   type: StreamCollectorType.Conversation;
   conversation: {
     id: string;
-    members: string[];
   };
 }
 
@@ -1007,8 +1006,7 @@ export class WorkerClient extends Worker {
       filterFn: fromInboxId
         ? (msg) => {
             if (msg.type !== StreamCollectorType.Conversation) return false;
-            const members = msg.conversation.members;
-            return members.includes(fromInboxId);
+            return msg.conversation.id !== undefined;
           }
         : undefined,
       count,
