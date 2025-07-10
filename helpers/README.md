@@ -139,7 +139,7 @@ await cleanAllRawLogs();
 - **Log processing**: Utilities for cleaning and processing large log files
 - **Winston integration**: Professional logging with multiple transports
 
-## 🧪 Vitest Module (`vitest.ts`)
+## Vitest Module (`vitest.ts`)
 
 The `vitest.ts` module provides test lifecycle management and performance tracking integration.
 
@@ -262,7 +262,7 @@ interface NetworkStats {
 }
 ```
 
-## 🔄 Streams Module (`streams.ts`)
+## Streams Module (`streams.ts`)
 
 The `streams.ts` module provides utilities for testing message delivery and conversation streams.
 
@@ -322,7 +322,7 @@ const stats = calculateMessageStats(
 - Membership streams (member additions/removals)
 - Consent streams (contact approvals)
 
-## 🔧 Environment Configuration
+## Environment Configuration
 
 All helper modules work together through environment configuration:
 
@@ -346,7 +346,7 @@ The helpers reference data files in other directories:
 - **`@inboxes/*.json`**: Generated test identities and wallet data
 - **Environment variables**: Loaded from `.env` files
 
-## 🚀 Getting Started
+## Getting Started
 
 To use the helpers in your tests:
 

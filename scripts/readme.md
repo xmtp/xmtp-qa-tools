@@ -28,7 +28,7 @@ A Slack bot that integrates with Anthropic's Claude SDK for AI responses and pro
 
 ## Features
 
-### 🤖 AI Chat with Claude
+### AI Chat with Claude
 
 - Direct message support
 - @mention support in channels

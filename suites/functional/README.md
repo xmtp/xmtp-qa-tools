@@ -290,7 +290,7 @@ it("should deliver messages in the correct order", async () => {
 - Timestamp ordering
 - Delivery confirmation
 
-## 🐛 Regression Testing
+## Regression Testing
 
 The `regression.test.ts` module verifies fixes for historical issues.
 
@@ -307,7 +307,7 @@ it("should handle edge case that previously caused issues", async () => {
 - Edge case testing
 - Version compatibility
 
-## 🔄 Stream Testing
+## Stream Testing
 
 The `streams.test.ts` module tests message streaming functionality.
 
@@ -325,7 +325,7 @@ it("receiveGM: should receive a message via stream", async () => {
 - Delivery verification
 - Stream performance
 
-## 🔄 Sync Comparison
+## Sync Comparison
 
 The `sync.test.ts` module compares different synchronization approaches.
 

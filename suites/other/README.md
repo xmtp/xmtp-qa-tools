@@ -1,4 +1,4 @@
-# 🔧 Other Test Suite
+# Other Test Suite
 
 Specialized edge case testing and miscellaneous scenarios for validating XMTP protocol resilience, performance limits, and system behavior under unusual conditions.
 
@@ -156,7 +156,7 @@ yarn test other/storage
 | 50 members | 200    | 5.0 MB        | 0.025 MB       | 2.1 MB          | 2.5× better     |
 ```
 
-## 🚀 Running Specialized Tests
+## Running Specialized Tests
 
 ### Individual Test Execution
 
@@ -207,9 +207,9 @@ Worker Statistics: forks=0, errors=0, messages=500
 
 ```
 ## Detailed Analysis
-✅ 2-member groups: 1000 groups, 5.00 MB total
-✅ 50-member groups: 200 groups, 5.00 MB total
-✅ 200-member groups: 50 groups, 5.00 MB total
+2-member groups: 1000 groups, 5.00 MB total
+50-member groups: 200 groups, 5.00 MB total
+200-member groups: 50 groups, 5.00 MB total
 
 Efficiency Gain: 4× better storage efficiency with larger groups
 ```
@@ -217,13 +217,13 @@ Efficiency Gain: 4× better storage efficiency with larger groups
 ### Rate Limiting Output
 
 ```
-🚀 LAUNCHING 8 WORKER THREADS EACH SENDING 5000 MESSAGES!
+LAUNCHING 8 WORKER THREADS EACH SENDING 5000 MESSAGES!
 🧵 Each worker runs in its own thread for TRUE parallelism
 🔥 Worker thread henry starting burst...
 Rate limiting engaged after 1,000 messages per thread
 ```
 
-## 🔧 Configuration & Customization
+## Configuration & Customization
 
 ### Environment Variables
 

@@ -1,4 +1,4 @@
-# 🧪 Test Suites
+# Test Suites
 
 Comprehensive end-to-end test suites for validating XMTP protocol functionality, performance, and reliability across different scenarios and environments.
 
@@ -6,18 +6,18 @@ Comprehensive end-to-end test suites for validating XMTP protocol functionality,
 
 | Test Suite                      | Purpose                            | Key Features                                 | Documentation                       |
 | ------------------------------- | ---------------------------------- | -------------------------------------------- | ----------------------------------- |
-| **[agents](./agents/)**         | Production agent health monitoring | Live agent testing, response validation      | [📖 README](./agents/README.md)     |
-| **[bench](./bench/)**           | Performance benchmarking           | Throughput measurement, latency analysis     | [📖 README](./bench/README.md)      |
-| **[browser](./browser/)**       | Browser integration validation     | Playwright automation, cross-browser testing | [📖 README](./browser/README.md)    |
-| **[bugs](./bugs/)**             | Bug reproduction and tracking      | Historical issues, regression prevention     | [📖 README](./bugs/README.md)       |
-| **[functional](./functional/)** | Core protocol functionality        | Complete feature coverage, integration tests | [📖 README](./functional/README.md) |
-| **[group](./group/)**           | Group conversation testing         | Stress testing, multi-version compatibility  | [📖 README](./group/README.md)      |
-| **[large](./large/)**           | Large-scale performance testing    | Scalability validation, resource monitoring  | [📖 README](./large/README.md)      |
-| **[metrics](./metrics/)**       | Performance metrics collection     | Delivery reliability, operational metrics    | [📖 README](./metrics/README.md)    |
-| **[mobile](./mobile/)**         | Mobile performance testing         | Load testing, responsiveness validation      | [📖 README](./mobile/README.md)     |
+| **[agents](./agents/)**         | Production agent health monitoring | Live agent testing, response validation      | [README](./agents/README.md)     |
+| **[bench](./bench/)**           | Performance benchmarking           | Throughput measurement, latency analysis     | [README](./bench/README.md)      |
+| **[browser](./browser/)**       | Browser integration validation     | Playwright automation, cross-browser testing | [README](./browser/README.md)    |
+| **[bugs](./bugs/)**             | Bug reproduction and tracking      | Historical issues, regression prevention     | [README](./bugs/README.md)       |
+| **[functional](./functional/)** | Core protocol functionality        | Complete feature coverage, integration tests | [README](./functional/README.md) |
+| **[group](./group/)**           | Group conversation testing         | Stress testing, multi-version compatibility  | [README](./group/README.md)      |
+| **[large](./large/)**           | Large-scale performance testing    | Scalability validation, resource monitoring  | [README](./large/README.md)      |
+| **[metrics](./metrics/)**       | Performance metrics collection     | Delivery reliability, operational metrics    | [README](./metrics/README.md)    |
+| **[mobile](./mobile/)**         | Mobile performance testing         | Load testing, responsiveness validation      | [README](./mobile/README.md)     |
 | **[other](./other/)**           | Specialized edge case testing      | Rate limiting, storage, notifications, etc   | [View tests →](./other/)            |
 
-## 🤖 Production & Monitoring
+## Production & Monitoring
 
 ### Agent Health Testing
 
@@ -49,7 +49,7 @@ yarn test bench
 - Performance regression detection
 - CSV data export for analysis
 
-## ⚙️ Core Functionality Testing
+## Core Functionality Testing
 
 ### Functional Test Suite
 
@@ -97,7 +97,7 @@ yarn test browser
 - Web integration scenarios
 - UI/UX validation
 
-## 🔄 Group & Conversation Testing
+## Group & Conversation Testing
 
 ### Group Stress Testing
 
@@ -116,7 +116,7 @@ yarn test group
 - Message stream performance
 - Concurrent worker scenarios
 
-## 🚀 Performance & Scale Testing
+## Performance & Scale Testing
 
 ### Large-Scale Testing
 
@@ -196,7 +196,7 @@ yarn test storage
 - Space utilization optimization
 - Performance vs. storage trade-offs
 
-## 🔒 Security & Quality Assurance
+## Security & Quality Assurance
 
 ### Spam & Security Testing
 
@@ -228,7 +228,7 @@ yarn test notifications
 - Delivery reliability validation
 - Multi-platform support
 
-## 🐛 Bug Documentation & Regression
+## Bug Documentation & Regression
 
 ### Bug Reproduction Testing
 
@@ -254,7 +254,7 @@ yarn test bugs
 - Log files and error traces
 - Resolution documentation
 
-## 🔧 Specialized Testing
+## Specialized Testing
 
 ### Rate Limiting & Edge Cases
 
@@ -271,7 +271,7 @@ yarn test other/rate-limited.test.ts
 - Boundary condition validation
 - Error handling verification
 
-## 🏃‍♂️ Running Tests
+## Running Tests
 
 ### Basic Test Execution
 
