@@ -115,7 +115,7 @@ interface StreamConversationMessage extends BaseStreamMessage {
   type: StreamCollectorType.Conversation;
   conversation: {
     id: string;
-    peerAddress?: string;
+    peerInboxId?: string;
   };
 }
 
@@ -998,16 +998,16 @@ export class WorkerClient extends Worker {
    * Collect conversations
    */
   collectConversations(
-    conversationId: string,
+    fromInboxId: string,
     count: number = 1,
     customTimeout?: number,
   ): Promise<StreamConversationMessage[]> {
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
-      filterFn: conversationId
+      filterFn: fromInboxId
         ? (msg) => {
             if (msg.type !== StreamCollectorType.Conversation) return false;
-            return msg.conversation.id === conversationId;
+            return msg.conversation.peerInboxId === fromInboxId;
           }
         : undefined,
       count,

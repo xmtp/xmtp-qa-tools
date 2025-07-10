@@ -157,7 +157,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     ),
   );
   await sleep(streamColdStartTimeout); // wait for stream to start
+  console.debug("sleeping done");
   const sentEvents = await options.triggerEvents();
+  console.debug("triggerEvents done");
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -411,6 +413,7 @@ export async function verifyConversationStream(
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Conversation);
   });
+  console.debug("verifying conversation stream");
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
@@ -421,8 +424,9 @@ export async function verifyConversationStream(
         return p.client.inboxId;
       });
       const sentAt = Date.now();
-      await initiator.client.conversations.newGroup(participantAddresses);
-      return [{ id: "conversation", sentAt }];
+      const conversation =
+        await initiator.client.conversations.newGroup(participantAddresses);
+      return [{ id: conversation.id, sentAt }];
     },
     getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
