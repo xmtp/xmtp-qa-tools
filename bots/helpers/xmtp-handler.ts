@@ -20,9 +20,6 @@ const MAX_RETRIES = 5;
 // wait 5 seconds before each retry
 const RETRY_INTERVAL = 5000;
 
-// Module-level retry tracking
-let retries = MAX_RETRIES;
-
 /**
  * Core options for XMTP client initialization that includes skill options
  */
@@ -57,6 +54,7 @@ const handleStream = async (
   callBack: MessageHandler,
   skillOpts: SkillOptions,
 ): Promise<void> => {
+  let retries = MAX_RETRIES; // Per-stream retry counter
   const env = client.options?.env;
 
   const retry = () => {
@@ -92,6 +90,9 @@ const handleStream = async (
   console.log(`[${env}] Waiting for messages...`);
 
   for await (const message of stream) {
+    // Reset retry counter on successful message processing
+    retries = MAX_RETRIES;
+
     if (message) {
       void (async () => {
         try {
