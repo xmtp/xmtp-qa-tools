@@ -4,8 +4,8 @@ Comprehensive end-to-end test suites for validating XMTP protocol functionality,
 
 ## Quick Reference
 
-| Test Suite                      | Purpose                            | Key Features                                 | Documentation                       |
-| ------------------------------- | ---------------------------------- | -------------------------------------------- | ----------------------------------- |
+| Test Suite                      | Purpose                            | Key Features                                 | Documentation                    |
+| ------------------------------- | ---------------------------------- | -------------------------------------------- | -------------------------------- |
 | **[agents](./agents/)**         | Production agent health monitoring | Live agent testing, response validation      | [README](./agents/README.md)     |
 | **[bench](./bench/)**           | Performance benchmarking           | Throughput measurement, latency analysis     | [README](./bench/README.md)      |
 | **[browser](./browser/)**       | Browser integration validation     | Playwright automation, cross-browser testing | [README](./browser/README.md)    |
@@ -15,7 +15,7 @@ Comprehensive end-to-end test suites for validating XMTP protocol functionality,
 | **[large](./large/)**           | Large-scale performance testing    | Scalability validation, resource monitoring  | [README](./large/README.md)      |
 | **[metrics](./metrics/)**       | Performance metrics collection     | Delivery reliability, operational metrics    | [README](./metrics/README.md)    |
 | **[mobile](./mobile/)**         | Mobile performance testing         | Load testing, responsiveness validation      | [README](./mobile/README.md)     |
-| **[other](./other/)**           | Specialized edge case testing      | Rate limiting, storage, notifications, etc   | [View tests →](./other/)            |
+| **[other](./other/)**           | Specialized edge case testing      | Rate limiting, storage, notifications, etc   | [View tests →](./other/)         |
 
 ## Production & Monitoring
 
