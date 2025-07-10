@@ -14,9 +14,9 @@ WORKER_COUNTS=(10 20)
 
 # Enabled ops permutations (modify/add/remove as needed)
 ENABLED_OPS_LIST=(
-  "sendMessage,verify,modifyMembership"
-  "sendMessage,verify,updateName"
-  "sendMessage,verify,promoteAdmin,demoteAdmin"
+  "verify,modifyMembership"
+  "verify,updateName"
+  "verify,promoteAdmin,demoteAdmin"
 )
 
 i=1
