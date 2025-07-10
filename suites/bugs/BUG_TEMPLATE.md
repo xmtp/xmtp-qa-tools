@@ -1,4 +1,4 @@
-# 🐛 Bug Report
+# Bug Report
 
 ## Description
 

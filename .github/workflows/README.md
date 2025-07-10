@@ -1,4 +1,4 @@
-# 🔄 GitHub Workflows
+# GitHub Workflows
 
 This directory contains GitHub Actions workflows for automating testing, deployment, and maintenance processes for the XMTP testing framework. These workflows provide continuous monitoring, performance testing, and quality assurance for XMTP protocol functionality.
 
@@ -30,7 +30,7 @@ gh workflow run workflow-name.yml
 gh workflow run Agents.yml
 ```
 
-## 🤖 Agent Health Monitoring
+## Agent Health Monitoring
 
 The `Agents.yml` workflow monitors the health and responsiveness of XMTP agents in production.
 
@@ -57,7 +57,7 @@ jobs:
 - Test reporting via Datadog metrics
 - Response time tracking
 
-## 🚂 Deployment Automation
+## Deployment Automation
 
 The `Deploy.yml` workflow automates Railway deployments when version bumps are detected.
 
@@ -92,7 +92,7 @@ jobs:
 - Auto-merge capability
 - Deployment metadata tracking
 
-## 💾 Installation Data Backup
+## Installation Data Backup
 
 The `upload-installations.yml` workflow backs up installation data and keys.
 
@@ -111,7 +111,7 @@ on:
 - Long-term artifact retention (365 days)
 - Environment variable capture
 
-## 📝 Configuration
+## Configuration
 
 Workflows are configured using GitHub repository secrets and variables:
 
@@ -131,7 +131,7 @@ Workflows are configured using GitHub repository secrets and variables:
 - `BATCH_SIZE`: Number of participants per batch
 - `MAX_GROUP_SIZE`: Maximum group size for testing
 
-## 📊 Monitoring and Reporting
+## Monitoring and Reporting
 
 Workflow results are accessible through multiple channels:
 
@@ -145,12 +145,12 @@ Workflow results are accessible through multiple channels:
 
 The workflows are organized into logical categories:
 
-- **🤖 Automated Tests**: `Agents.yml`, `Gm.yml` - Continuous monitoring
-- **📊 Metrics Tests**: `Delivery.yml`, `Large.yml`, `Performance.yml` - Performance measurement
-- **🚨 Stress Tests**: `GroupStress.yml` - High-load scenario testing
-- **🔧 Infrastructure**: `Deploy.yml`, `PackageCompatibility.yml` - Deployment and compatibility
+- **Automated Tests**: `Agents.yml`, `Gm.yml` - Continuous monitoring
+- **Metrics Tests**: `Delivery.yml`, `Large.yml`, `Performance.yml` - Performance measurement
+- **Stress Tests**: `GroupStress.yml` - High-load scenario testing
+- **Infrastructure**: `Deploy.yml`, `PackageCompatibility.yml` - Deployment and compatibility
 
-## 📝 Best practices
+## Best practices
 
 When working with these workflows, consider the following best practices:
 
@@ -160,7 +160,7 @@ When working with these workflows, consider the following best practices:
 4. **Concurrency limits**: Avoid excessive parallel executions
 5. **Timeout configuration**: Set appropriate timeouts to prevent hung jobs
 
-## 🔄 Recent Changes
+## Recent Changes
 
 The workflows have been updated to use standardized naming conventions:
 

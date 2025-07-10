@@ -1,4 +1,4 @@
-# 🤖 XMTP Test Bots
+# XMTP Test Bots
 
 This directory contains test bots for the XMTP protocol. These bots help validate the functionality of XMTP, automate testing scenarios, and provide interactive agents for development purposes.
 
@@ -131,7 +131,7 @@ const stressTest = async (count) => {
 - Large group scale testing
 - Performance benchmarking
 
-## 🧪 Test Bot
+## Test Bot
 
 The `test` bot provides a command interface for testing XMTP features.
 

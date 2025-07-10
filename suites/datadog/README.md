@@ -116,9 +116,9 @@ This test suite replaces the previous Slack bot functionality:
 🚨 Found 23 test failures
 ⏰ Query period: 2024-01-15T10:00:00.000Z to 2024-01-15T14:00:00.000Z
 📄 Found 23 processed issue entries
-🤖 Claude analysis length: 847 characters
+Claude analysis length: 847 characters
 📝 Analysis preview: *Critical Test Failures Analysis*
 
 The most significant issues in the last 4 hours involve...
-🔄 Data refresh completed in 3,421ms
+Data refresh completed in 3,421ms
 ```
