@@ -4,16 +4,21 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-const WORKER_COUNT = 50;
-const MESSAGES_PER_WORKER = 20;
+const WORKER_COUNT = 150;
+const MESSAGES_PER_WORKER = 1000 / WORKER_COUNT;
 const SUCCESS_THRESHOLD = 99;
 let targetInboxId: string = "0x163C3AFf82D7C350d9f41730FC95C43243A357d0";
 
 describe(testName, async () => {
+  let names: string[] = [];
+  for (let i = 0; i < WORKER_COUNT; i++) {
+    names.push(`fabri${i}`);
+  }
   // Create workers for parallel message sending
-  const workers = await getWorkers(WORKER_COUNT);
+  const workers = await getWorkers(names);
 
   it(`should receive ${MESSAGES_PER_WORKER} bot responses from ${WORKER_COUNT} workers in parallel with >${SUCCESS_THRESHOLD}% success rate per worker`, async () => {
+    expect(workers.getAll().length).toBe(WORKER_COUNT);
     // Create a conversation with the target inbox from the creator
     const processes = workers.getAll().map(async (worker, index) => {
       const conversation =
