@@ -88,8 +88,8 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Core SDK Operations Performance
 
-| Operation                | Description                            | Avg | Target | Performance  |
-| ------------------------ | -------------------------------------- | --- | ------ | ------------ |
+| Operation                | Description                            | Avg | Target | Performance |
+| ------------------------ | -------------------------------------- | --- | ------ | ----------- |
 | clientCreate             | Creating a client                      | 588 | <350   | Concern     |
 | inboxState               | Checking inbox state                   | 41  | <350   | On Target   |
 | newDm                    | Creating a direct message conversation | 258 | <350   | On Target   |
@@ -108,46 +108,46 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 #### Sender-Side average performance
 
-| Size | Send message | Update name | Remove members | Create  | Performance  |
-| ---- | ------------ | ----------- | -------------- | ------- | ------------ |
-| 50   | 86           | 135         | 139            | 1329    | On Target |
-| 100  | 88           | 145         | 157            | 1522    | On Target |
-| 150  | 95           | 203         | 190            | 2306    | On Target |
-| 200  | 93           | 193         | 205            | 3344    | On Target |
-| 250  | 108          | 219         | 237            | 4276    | On Target |
-| 300  | 97           | 244         | 247            | 5463    | On Target |
-| 350  | 101          | 264         | 308            | 6641    | On Target |
-| 400  | 111          | 280         | 320            | 7641    | On Target |
+| Size | Send message | Update name | Remove members | Create | Performance |
+| ---- | ------------ | ----------- | -------------- | ------ | ----------- |
+| 50   | 86           | 135         | 139            | 1329   | On Target   |
+| 100  | 88           | 145         | 157            | 1522   | On Target   |
+| 150  | 95           | 203         | 190            | 2306   | On Target   |
+| 200  | 93           | 193         | 205            | 3344   | On Target   |
+| 250  | 108          | 219         | 237            | 4276   | On Target   |
+| 300  | 97           | 244         | 247            | 5463   | On Target   |
+| 350  | 101          | 264         | 308            | 6641   | On Target   |
+| 400  | 111          | 280         | 320            | 7641   | On Target   |
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
 #### Receiver-Side stream performance
 
-| Group Size | New conversation | Metadata | Messages | Add Members | Performance  |
-| ---------- | ---------------- | -------- | -------- | ----------- | ------------ |
-| 50         | 687              | 141      | 131      | 401         | On Target |
-| 100        | 746              | 155      | 117      | 420         | On Target |
-| 150        | 833              | 163      | 147      | 435         | On Target |
-| 200        | 953              | 179      | 173      | 499         | On Target |
-| 250        | 1007             | 187      | 161      | 526         | Concern   |
-| 300        | 1040             | 195      | 167      | 543         | Concern   |
-| 350        | 1042             | 198      | 178      | 581         | Concern   |
-| 400        | 1192             | 214      | 173      | 609         | Concern   |
+| Group Size | New conversation | Metadata | Messages | Add Members | Performance |
+| ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
+| 50         | 687              | 141      | 131      | 401         | On Target   |
+| 100        | 746              | 155      | 117      | 420         | On Target   |
+| 150        | 833              | 163      | 147      | 435         | On Target   |
+| 200        | 953              | 179      | 173      | 499         | On Target   |
+| 250        | 1007             | 187      | 161      | 526         | Concern     |
+| 300        | 1040             | 195      | 167      | 543         | Concern     |
+| 350        | 1042             | 198      | 178      | 581         | Concern     |
+| 400        | 1192             | 214      | 173      | 609         | Concern     |
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
 #### Receiver-Side sync performance
 
-| Size | syncAll |      | sync |      | Performance  |
-| ---- | ------- | ---- | ---- | ---- | ------------ |
-| 50   | 366     | ...  | 291  | ...  | On Target |
-| 100  | 503     | 521  | 424  | 372  | On Target |
-| 150  | 665     | 727  | 522  | 622  | On Target |
-| 200  | 854     | 1066 | 653  | 936  | On Target |
-| 250  | 966     | 1582 | 768  | 1148 | Concern   |
-| 300  | 1225    | 1619 | 861  | 1362 | Concern   |
-| 350  | 1322    | 1846 | 1218 | 2017 | Concern   |
-| 400  | 1292    | 2082 | 1325 | 1792 | Concern   |
+| Size | syncAll |      | sync |      | Performance |
+| ---- | ------- | ---- | ---- | ---- | ----------- |
+| 50   | 366     | ...  | 291  | ...  | On Target   |
+| 100  | 503     | 521  | 424  | 372  | On Target   |
+| 150  | 665     | 727  | 522  | 622  | On Target   |
+| 200  | 854     | 1066 | 653  | 936  | On Target   |
+| 250  | 966     | 1582 | 768  | 1148 | Concern     |
+| 300  | 1225    | 1619 | 861  | 1362 | Concern     |
+| 350  | 1322    | 1846 | 1218 | 2017 | Concern     |
+| 400  | 1292    | 2082 | 1325 | 1792 | Concern     |
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
@@ -155,23 +155,23 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ### Network performance
 
-| Performance Metric | Average | Target | Performance  |
-| ------------------ | ------- | ------ | ------------ |
-| DNS Lookup         | 13      | <50    | On Target |
-| TCP Connection     | 48      | <70    | On Target |
-| TLS Handshake      | 124     | <150   | On Target |
-| Processing         | 35      | <100   | On Target |
-| Server Call        | 159     | <250   | On Target |
+| Performance Metric | Average | Target | Performance |
+| ------------------ | ------- | ------ | ----------- |
+| DNS Lookup         | 13      | <50    | On Target   |
+| TCP Connection     | 48      | <70    | On Target   |
+| TLS Handshake      | 124     | <150   | On Target   |
+| Processing         | 35      | <100   | On Target   |
+| Server Call        | 159     | <250   | On Target   |
 
 ### Regional Network Performance
 
-| Region        | Server Call | TLS | ~ us-east | Performance  |
-| ------------- | ----------- | --- | --------- | ------------ |
-| us-east       | 140         | 123 | Baseline  | On Target |
-| us-west       | 151         | 118 | <20% ~    | On Target |
-| europe        | 230         | 180 | <40% ~    | On Target |
-| asia          | 450         | 350 | >100% ~   | Concern   |
-| south-america | 734         | 573 | >200% ~   | Concern   |
+| Region        | Server Call | TLS | ~ us-east | Performance |
+| ------------- | ----------- | --- | --------- | ----------- |
+| us-east       | 140         | 123 | Baseline  | On Target   |
+| us-west       | 151         | 118 | <20% ~    | On Target   |
+| europe        | 230         | 180 | <40% ~    | On Target   |
+| asia          | 450         | 350 | >100% ~   | Concern     |
+| south-america | 734         | 573 | >200% ~   | Concern     |
 
 _Note: Baseline is `us-east` region and `production` network._
 
@@ -181,14 +181,14 @@ _Note: `Production` network consistently shows better network performance across
 
 ### Message delivery testing
 
-| Test Area            | Average         | Target         | Performance  |
-| -------------------- | --------------- | -------------- | ------------ |
-| Stream Delivery Rate | 100% successful | 99.9% minimum  | On Target |
-| Poll Delivery Rate   | 100% successful | 99.9% minimum  | On Target |
-| Recovery Rate        | 100% successful | 99.9% minimum  | On Target |
-| Stream Order         | 100% in order   | 99.9% in order | On Target |
-| Poll Order           | 100% in order   | 99.9% in order | On Target |
-| Recovery Order       | 100% in order   | 99.9% in order | On Target |
+| Test Area            | Average         | Target         | Performance |
+| -------------------- | --------------- | -------------- | ----------- |
+| Stream Delivery Rate | 100% successful | 99.9% minimum  | On Target   |
+| Poll Delivery Rate   | 100% successful | 99.9% minimum  | On Target   |
+| Recovery Rate        | 100% successful | 99.9% minimum  | On Target   |
+| Stream Order         | 100% in order   | 99.9% in order | On Target   |
+| Poll Order           | 100% in order   | 99.9% in order | On Target   |
+| Recovery Order       | 100% in order   | 99.9% in order | On Target   |
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
@@ -216,19 +216,19 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Success criteria summary
 
-| Metric                  | Current Performance         | Target                 | Performance  |
-| ----------------------- | --------------------------- | ---------------------- | ------------ |
-| Core SDK Operations     | All within targets          | Meet defined targets   | On Target |
-| Small Group Operations  | ≤300                        | ≤300 for <50 members   | On Target |
-| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | Concern   |
-| Network Performance     | All metrics within target   | Meet defined targets   | On Target |
-| Message Delivery        | 100%                        | 99.9% minimum          | On Target |
-| Stream Message Loss     | 100%                        | 99.9% minimum          | On Target |
-| Poll Message Loss       | 100%                        | 99.9% minimum          | On Target |
-| Message Order           | 100%                        | 100% in order          | On Target |
-| South-america & Asia    | more than 40%               | <20% difference        | Concern   |
-| US & Europe             | less than 20% variance      | <20% difference        | On Target |
-| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | On Target |
+| Metric                  | Current Performance         | Target                 | Performance |
+| ----------------------- | --------------------------- | ---------------------- | ----------- |
+| Core SDK Operations     | All within targets          | Meet defined targets   | On Target   |
+| Small Group Operations  | ≤300                        | ≤300 for <50 members   | On Target   |
+| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | Concern     |
+| Network Performance     | All metrics within target   | Meet defined targets   | On Target   |
+| Message Delivery        | 100%                        | 99.9% minimum          | On Target   |
+| Stream Message Loss     | 100%                        | 99.9% minimum          | On Target   |
+| Poll Message Loss       | 100%                        | 99.9% minimum          | On Target   |
+| Message Order           | 100%                        | 100% in order          | On Target   |
+| South-america & Asia    | more than 40%               | <20% difference        | Concern     |
+| US & Europe             | less than 20% variance      | <20% difference        | On Target   |
+| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | On Target   |
 
 ## Tools & utilities
 

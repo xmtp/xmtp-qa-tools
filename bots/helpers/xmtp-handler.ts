@@ -1,4 +1,9 @@
-import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
+import {
+  Client,
+  type DecodedMessage,
+  type LogLevel,
+  type XmtpEnv,
+} from "@xmtp/node-sdk";
 import "dotenv/config";
 import {
   createSigner,
@@ -47,7 +52,7 @@ export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Handle message streaming with retry logic following the new async iterator approach
+ * Handle message streaming with retry logic using onMessage callback
  */
 const handleStream = async (
   client: Client,
@@ -77,38 +82,46 @@ const handleStream = async (
     retry();
   };
 
+  const onMessage = (err: Error | null, message?: DecodedMessage) => {
+    if (err) {
+      console.error(`[${env}] Stream error:`, err);
+      return;
+    }
+
+    if (!message) {
+      return;
+    }
+
+    // Reset retry counter on successful message processing
+    retries = MAX_RETRIES;
+
+    // Process message asynchronously without blocking the callback
+    void (async () => {
+      try {
+        await processMessage(
+          client,
+          message,
+          callBack,
+          skillOpts,
+          env || "unknown",
+        );
+      } catch (err: unknown) {
+        console.error(`[${env}] Error processing message:`, err);
+      }
+    })();
+  };
+
   console.log(`[${env}] Syncing conversations...`);
   await client.conversations.sync();
 
-  const stream = await client.conversations.streamAllMessages(
-    undefined,
+  await client.conversations.streamAllMessages(
+    onMessage,
     undefined,
     undefined,
     onFail,
   );
 
   console.log(`[${env}] Waiting for messages...`);
-
-  for await (const message of stream) {
-    // Reset retry counter on successful message processing
-    retries = MAX_RETRIES;
-
-    if (message) {
-      void (async () => {
-        try {
-          await processMessage(
-            client,
-            message,
-            callBack,
-            skillOpts,
-            env || "unknown",
-          );
-        } catch (err: unknown) {
-          console.error(`[${env}] Error processing message:`, err);
-        }
-      })();
-    }
-  }
 };
 
 /**
