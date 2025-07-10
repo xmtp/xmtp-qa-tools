@@ -22,7 +22,8 @@ for ((x=1; x<=tranche_parts; x++)); do
 
       #LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout $DURATION_MS npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
       #LOG_LEVEL=info timeout $DURATION_MS time yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
-      LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
+      #LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
+      LOG_LEVEL=info timeout 300 time npx vitest run suites/networkchaos/forkmatrix-streamonly.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | tee test-${x}.log
       exit_code=$?
 
       echo "Test iteration $i completed with exit code $exit_code"
