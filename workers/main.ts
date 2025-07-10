@@ -605,15 +605,13 @@ export class WorkerClient extends Worker {
     streamType: typeofStream,
   ) {
     try {
-      // Filter out messages from the same client
-      if (message.senderInboxId === this.client.inboxId) {
-        console.warn(
-          `[${this.nameId}] Skipping message from self, ${message.content as string}`,
-        );
-        return;
-      }
-      // Only respond if this is a MessageandResponse stream
-      if (streamType !== typeofStream.MessageandResponse) {
+      // Short-circuit early if message shouldn't be handled
+      if (
+        streamType !== typeofStream.MessageandResponse ||
+        message.senderInboxId === this.client.inboxId ||
+        message?.contentType?.typeId !== "text" ||
+        typeof message.content !== "string"
+      ) {
         return;
       }
 
@@ -621,20 +619,17 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
       if (!conversation) {
-        console.warn(
-          `[${this.nameId}] Skipping message, conversation not found`,
-        );
+        console.warn(`[${this.nameId}] Skipping message, conversation not found`);
         return;
       }
+
       const baseName = this.name.split("-")[0].toLowerCase();
+      const content = message.content.toLowerCase();
       const isDm = conversation instanceof Dm;
-      const content = (message.content as string).toLowerCase();
+
       let shouldRespond = false;
       if (
-        ((message?.contentType?.typeId === "text" ||
-          message?.contentType?.typeId === "reaction" ||
-          message?.contentType?.typeId === "reply") &&
-          content.includes(baseName) &&
+        (content.includes(baseName) &&
           !content.includes("/") &&
           !content.includes("workers") &&
           !content.includes("members") &&
@@ -643,12 +638,11 @@ export class WorkerClient extends Worker {
       ) {
         shouldRespond = true;
       }
+
       if (!shouldRespond) {
-        // console.warn(
-        //   `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
-        // );
         return;
       }
+
       let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
       if (conversation && conversation.debugInfo !== undefined) {
         const debugInfo = await conversation.debugInfo();
@@ -659,6 +653,7 @@ export class WorkerClient extends Worker {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }
   }
+
 
   /**
    * Initialize conversation stream
