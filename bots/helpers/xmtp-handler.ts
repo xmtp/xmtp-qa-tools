@@ -20,6 +20,9 @@ const MAX_RETRIES = 5;
 // wait 5 seconds before each retry
 const RETRY_INTERVAL = 5000;
 
+// Module-level retry tracking
+let retries = MAX_RETRIES;
+
 /**
  * Core options for XMTP client initialization that includes skill options
  */
@@ -55,7 +58,6 @@ const handleStream = async (
   skillOpts: SkillOptions,
 ): Promise<void> => {
   const env = client.options?.env;
-  let retries = MAX_RETRIES;
 
   const retry = () => {
     console.log(
@@ -77,34 +79,34 @@ const handleStream = async (
     retry();
   };
 
-  try {
-    console.log(`[${env}] Syncing conversations...`);
-    await client.conversations.sync();
+  console.log(`[${env}] Syncing conversations...`);
+  await client.conversations.sync();
 
-    const stream = await client.conversations.streamAllMessages();
+  const stream = await client.conversations.streamAllMessages(
+    undefined,
+    undefined,
+    undefined,
+    onFail,
+  );
 
-    console.log(`[${env}] Waiting for messages...`);
+  console.log(`[${env}] Waiting for messages...`);
 
-    for await (const message of stream) {
-      if (message) {
-        void (async () => {
-          try {
-            await processMessage(
-              client,
-              message,
-              callBack,
-              skillOpts,
-              env || "unknown",
-            );
-          } catch (err: unknown) {
-            console.error(`[${env}] Error processing message:`, err);
-          }
-        })();
-      }
+  for await (const message of stream) {
+    if (message) {
+      void (async () => {
+        try {
+          await processMessage(
+            client,
+            message,
+            callBack,
+            skillOpts,
+            env || "unknown",
+          );
+        } catch (err: unknown) {
+          console.error(`[${env}] Error processing message:`, err);
+        }
+      })();
     }
-  } catch (error) {
-    console.error(`[${env}] Error in handleStream:`, error);
-    onFail();
   }
 };
 
