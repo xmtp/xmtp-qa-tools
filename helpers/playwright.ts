@@ -297,9 +297,7 @@ export class playwright {
         await page
           .getByRole("button", { name: "Use ephemeral wallet" })
           .click();
-
-        await page.waitForTimeout(1000);
-        const connectButton = await page.getByRole("button", {
+        const connectButton = page.getByRole("button", {
           name: "Connect",
         });
         console.debug("Connect button:", connectButton);
