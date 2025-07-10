@@ -426,7 +426,11 @@ export async function verifyConversationStream(
       const sentAt = Date.now();
       const conversation =
         await initiator.client.conversations.newGroup(participantAddresses);
-      return [{ id: conversation.id, sentAt }];
+      const members = await conversation.members();
+      console.debug("conversation created", conversation.id);
+      return [
+        { id: "conversation", sentAt, members: members.map((m) => m.inboxId) },
+      ];
     },
     getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",

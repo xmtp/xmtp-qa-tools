@@ -115,7 +115,7 @@ interface StreamConversationMessage extends BaseStreamMessage {
   type: StreamCollectorType.Conversation;
   conversation: {
     id: string;
-    peerInboxId?: string;
+    members: string[];
   };
 }
 
@@ -831,9 +831,9 @@ export class WorkerClient extends Worker {
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    // console.debug(
-    //   `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
-    // );
+    console.debug(
+      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
+    );
 
     return new Promise((resolve) => {
       const events: T[] = [];
@@ -862,23 +862,23 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
-        // console.debug(
-        //   `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
-        // );
+        console.debug(
+          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
+        );
 
         if (isRightType && passesFilter) {
           events.push(msg as T);
-          // console.debug(
-          //   `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
-          // );
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
+          );
 
           if (events.length >= count) {
             resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
-            // console.debug(
-            //   `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
-            // );
+            console.debug(
+              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
+            );
             resolve(events);
           }
         } else {
@@ -1007,7 +1007,8 @@ export class WorkerClient extends Worker {
       filterFn: fromInboxId
         ? (msg) => {
             if (msg.type !== StreamCollectorType.Conversation) return false;
-            return msg.conversation.peerInboxId === fromInboxId;
+            const members = msg.conversation.members;
+            return members.includes(fromInboxId);
           }
         : undefined,
       count,
