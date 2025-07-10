@@ -294,7 +294,7 @@ export class playwright {
       await page.getByRole("button", { name: "Connect" }).last().click();
       console.debug("Clicked connect button");
 
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(3000);
       if (page.url() === "https://xmtp.chat/conversations") {
         console.debug("Logged in");
         this.page = page;
