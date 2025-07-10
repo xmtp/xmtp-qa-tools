@@ -90,6 +90,9 @@ const handleStream = async (
   console.log(`[${env}] Waiting for messages...`);
 
   for await (const message of stream) {
+    // Reset retry counter on successful message processing
+    retries = MAX_RETRIES;
+
     if (message) {
       void (async () => {
         try {
