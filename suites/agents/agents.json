@@ -78,7 +78,7 @@
     "name": "gm-restarts",
     "address": "0xB45DAC55eE7F7598868b270783EBC7CF157A2c55",
     "sendMessage": "hi",
-    "networks": ["production"],
+    "networks": ["dev", "production"],
     "slackChannel": "#gm-restarts-alerts",
     "shouldRespondOnTagged": false
   },
@@ -87,7 +87,7 @@
     "baseName": "gm.base.eth",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     "sendMessage": "hola",
-    "networks": ["production"],
+    "networks": ["dev", "production"],
     "slackChannel": "#gm-alerts",
     "shouldRespondOnTagged": false
   },
