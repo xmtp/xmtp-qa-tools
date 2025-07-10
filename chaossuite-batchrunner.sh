@@ -6,7 +6,6 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 num_runs=10
 
 rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
-rm -rf .data/
 
 tranche_parts=5
 tranche=$((num_runs/tranche_parts))
@@ -16,6 +15,8 @@ for ((x=1; x<=tranche_parts; x++)); do
   for ((i=1; i<=tranche; i++)); do
       echo "Restarting singlehost docker env..."
       cd multinode && docker compose down && ./ci.sh && cd ..
+      rm -rf .data/
+
       sleep 10
       tid=$(date +%s)
       echo "Running test iteration $i of $num_runs in tranche $tranche_parts"
