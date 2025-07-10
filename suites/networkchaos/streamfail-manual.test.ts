@@ -5,13 +5,20 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "stream-timeout-monitor";
+const NODE_VERSION = "3.1.2";
 
 describe(testName, async () => {
   setupTestLifecycle({ testName });
 
-  const workers = await getWorkers({
-    user1: "http://localhost:5556",
-  });
+  const workers = await getWorkers(
+    {
+      user1: "http://localhost:5556",
+    },
+    {
+      nodeVersion: NODE_VERSION,
+    }
+  );
+
 
   const user1 = workers.get("user1");
   if (!user1) {
