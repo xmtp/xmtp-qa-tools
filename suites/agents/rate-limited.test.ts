@@ -4,7 +4,7 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-const WORKER_COUNT = 150;
+const WORKER_COUNT = 101;
 const MESSAGES_PER_WORKER = 1000 / WORKER_COUNT;
 const SUCCESS_THRESHOLD = 99;
 let targetInboxId: string = "0x163C3AFf82D7C350d9f41730FC95C43243A357d0";
