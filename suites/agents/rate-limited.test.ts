@@ -8,6 +8,8 @@ const WORKER_COUNT = 1000;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50;
+const DEFAULT_STREAM_TIMEOUT_MS = 50000;
+
 let targetInboxId: string = "0x163C3AFf82D7C350d9f41730FC95C43243A357d0";
 
 describe(testName, async () => {
@@ -54,23 +56,17 @@ describe(testName, async () => {
           const responseTimes: number[] = [];
 
           for (let i = 0; i < MESSAGES_PER_WORKER; i++) {
-            try {
-              const result = await verifyBotMessageStream(
-                conversation,
-                [worker],
-                `rate-test-worker-${actualWorkerIndex}-msg-${i}-${Date.now()}`,
-                2000,
-              );
-              const responseTime = result?.averageEventTiming;
+            const result = await verifyBotMessageStream(
+              conversation,
+              [worker],
+              `rate-test-worker-${actualWorkerIndex}-msg-${i}-${Date.now()}`,
+              DEFAULT_STREAM_TIMEOUT_MS,
+            );
+            const responseTime = result?.averageEventTiming;
 
-              if (result?.allReceived) {
-                successCount++;
-                responseTimes.push(responseTime ?? 0);
-              }
-            } catch (error) {
-              console.log(
-                `Worker ${actualWorkerIndex} failed to receive response ${i}: ${String(error)}`,
-              );
+            if (result?.allReceived) {
+              successCount++;
+              responseTimes.push(responseTime ?? 0);
             }
           }
 
