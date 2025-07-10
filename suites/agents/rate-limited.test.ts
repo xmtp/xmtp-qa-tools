@@ -103,18 +103,18 @@ describe(testName, async () => {
 
     // Calculate overall statistics after all batches complete
     const totalResponses = allResults.reduce(
-      (sum: number, result: any) => sum + result.successCount,
+      (sum: number, result: WorkerResult) => sum + result.successCount,
       0,
     );
     const totalAttempts = allResults.reduce(
-      (sum: number, result: any) => sum + result.totalAttempts,
+      (sum: number, result: WorkerResult) => sum + result.totalAttempts,
       0,
     );
     const overallPercentage = (totalResponses / totalAttempts) * 100;
 
     // Calculate overall average response time
     const allResponseTimes = allResults.flatMap(
-      (result: any) => result.responseTimes,
+      (result: WorkerResult) => result.responseTimes,
     );
     const overallAverageResponseTime =
       allResponseTimes.length > 0
