@@ -292,16 +292,16 @@ export class playwright {
       console.debug("Navigating to:", url);
       await page.goto(url);
       if (!this.defaultUser.walletKey) {
-        console.debug("Logging in");
+        console.debug("Logging in with ephemeral wallet");
         await page.goto("https://xmtp.chat/welcome");
         await page
           .getByRole("button", { name: "Use ephemeral wallet" })
           .click();
-        const connectButton = page.getByRole("button", {
-          name: "Connect",
-        });
-        console.debug("Connect button:", connectButton);
+        console.debug("Clicked ephemeral wallet");
       }
+      await page.getByRole("button", { name: "Connect" }).last().click();
+      console.debug("Clicked connect button");
+
       await page.waitForTimeout(1000);
       if (page.url() === "https://xmtp.chat/conversations") {
         console.debug("Logged in");
