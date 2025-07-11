@@ -19,7 +19,6 @@ describe(testName, () => {
 
   beforeAll(async () => {
     const convoStreamBot = await getWorkers(2);
-    const names = convoStreamBot.getAll().map((w) => w.name);
     // Start conversation streams for group event detection
     convoStreamBot.startStream(typeofStream.Conversation);
 
@@ -27,8 +26,8 @@ describe(testName, () => {
     // Start message and response streams for gm bot
     gmBotWorker.startStream(typeofStream.MessageandResponse);
 
-    creator = convoStreamBot.get(names[0]) as Worker;
-    xmtpChat = convoStreamBot.get(names[1]) as Worker;
+    creator = convoStreamBot.get(0)!;
+    xmtpChat = convoStreamBot.get(1)!;
     receiver = gmBotWorker.getCreator();
     xmtpTester = new playwright({
       headless,

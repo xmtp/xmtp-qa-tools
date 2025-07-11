@@ -5,6 +5,7 @@ import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { getAutoVersions, VersionList } from "@workers/versions";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { base } from "viem/chains";
 import { installationThreshold, WorkerClient, type typeofStream } from "./main";
 
 // Deprecated: Use getWorkers with count and options instead
@@ -277,16 +278,24 @@ export class WorkerManager {
    * Gets a specific worker by name and optional installation ID
    */
   public get(
-    baseName: string,
+    baseName: string | number,
     installationId: string = "a",
   ): Worker | undefined {
-    if (baseName.includes("-")) {
-      const parts = baseName.split("-");
-      const name = parts[0];
-      const id = parts[1];
-      return this.workers[name]?.[id];
+    if (typeof baseName === "number") {
+      let index = baseName;
+      if (index >= this.getAll().length) {
+        throw new Error(`Worker index ${index} out of bounds`);
+      }
+      return this.getAll()[index];
+    } else {
+      if (baseName.includes("-")) {
+        const parts = baseName.split("-");
+        const name = parts[0];
+        const id = parts[1];
+        return this.workers[name]?.[id];
+      }
+      return this.workers[baseName]?.[installationId];
     }
-    return this.workers[baseName]?.[installationId];
   }
 
   /**

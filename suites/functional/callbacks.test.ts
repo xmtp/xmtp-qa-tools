@@ -8,11 +8,9 @@ describe(testName, async () => {
   setupTestLifecycle({ testName });
   const workers = await getWorkers(5);
 
-  const names = workers.getAll().map((w) => w.name);
-
   it("should receive messages using await async", async () => {
-    const sender = workers.get(names[0])!;
-    const receiver = workers.get(names[1])!;
+    const sender = workers.get(0)!;
+    const receiver = workers.get(1)!;
 
     // Set up stream first
     const receiverConversation =
@@ -50,8 +48,8 @@ describe(testName, async () => {
   });
 
   it("should receive messages using callback", async () => {
-    const sender = workers.get(names[2])!;
-    const receiver = workers.get(names[1])!;
+    const sender = workers.get(2)!;
+    const receiver = workers.get(1)!;
 
     // Set up stream first
     const messagePromise = new Promise<DecodedMessage>((resolve, reject) => {
@@ -85,7 +83,7 @@ describe(testName, async () => {
   });
 
   // it("should receive conversation with async", async () => {
-  //   const receiver = workers.get(names[1])!;
+  //   const receiver = workers.get(1])!;
 
   //   // Set up stream first
   //   const stream = await receiver.client.conversations.stream();
@@ -118,7 +116,7 @@ describe(testName, async () => {
   // });
 
   // it("should receive conversation with callback", async () => {
-  //   const receiver = workers.get(names[1])!;
+  //   const receiver = workers.get(1])!;
 
   //   // Set up stream first
   //   const conversationPromise = new Promise<Dm>((resolve, reject) => {
