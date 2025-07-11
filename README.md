@@ -292,7 +292,7 @@ cd xmtp-qa-tools
 yarn install
 ```
 
-## Environment variables
+### Environment variables
 
 ```bash
 XMTP_ENV="dev" # XMTP environment (dev, production, local, multinode)
