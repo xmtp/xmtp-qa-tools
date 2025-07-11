@@ -3,6 +3,11 @@ import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
+/*
+- **Read operations**: 20,000 requests per 5-minute window
+- **Write operations**: 3,000 messages published per 5-minute window
+*/
+
 const testName = "rate-limited";
 const WORKER_COUNT = 100;
 const MESSAGES_PER_WORKER = 1;
