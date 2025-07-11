@@ -313,16 +313,13 @@ yarn test functional
 yarn test performance
 ```
 
-### Test Commands
+### Debug mode
 
 ```bash
-# Advanced retry mode (when retry options are present)
-yarn test functional --no-fail --debug
+yarn test functional --debug
 ```
 
-- `--max-attempts <N>` - Number of retry attempts (default: 3)
-- `--debug` - Enable debug logging and file output a saves logs to `logs/` directory (no terminal verbosity)
-- `--no-fail` - Exit successfully even on test failures
+> This will save logs to `logs/` directory and will not print to the terminal.
 
 ### Rate limits
 
