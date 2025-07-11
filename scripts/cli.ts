@@ -108,9 +108,7 @@ function showUsageAndExit(): never {
     "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Simple vitest execution (default):");
-  console.error(
-    "      yarn cli test functional         - Runs vitest directly",
-  );
+  console.error("      yarn cli test dms        - Runs vitest directly");
   console.error(
     "      yarn cli test ./path/to/test.ts  - Runs specific test file",
   );
@@ -159,33 +157,29 @@ function showUsageAndExit(): never {
   console.error("  yarn cli bot gm-bot");
   console.error("  yarn cli bot stress 5");
   console.error("  yarn cli script gen");
+  console.error("  yarn script versions");
   console.error("  yarn cli test functional");
+  console.error("  yarn cli test dms --max-attempts 2");
+  console.error("  yarn cli test dms --parallel");
   console.error(
-    "  yarn cli test functional --max-attempts 2  # Uses retry mode",
+    "  yarn cli test dms --debug-verbose   # Shows output in terminal AND logs to file",
+  );
+  console.error("  yarn cli test dms --no-fail        # Uses retry mode");
+  console.error("  yarn cli test dms --debug        # Uses retry mode");
+  console.error(
+    "  yarn cli test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   console.error(
-    "  yarn cli test functional --parallel       # Runs tests in parallel",
+    "  yarn cli test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
   );
   console.error(
-    "  yarn cli test functional --debug-verbose   # Shows output in terminal AND logs to file",
+    "  yarn cli test dms --env production # Sets XMTP_ENV to production",
   );
   console.error(
-    "  yarn cli test functional --no-fail        # Uses retry mode",
+    "  yarn cli test dms --no-clean-logs  # Disable automatic log cleaning",
   );
   console.error(
-    "  yarn cli test functional --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
-  );
-  console.error(
-    "  yarn cli test functional --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
-  );
-  console.error(
-    "  yarn cli test functional --env production # Sets XMTP_ENV to production",
-  );
-  console.error(
-    "  yarn cli test functional --no-clean-logs  # Disable automatic log cleaning",
-  );
-  console.error(
-    "  yarn cli test functional --log-level error  # Set logging level to error",
+    "  yarn cli test dms --log-level error  # Set logging level to error",
   );
   process.exit(1);
 }
@@ -359,7 +353,7 @@ function buildTestCommand(
   if (testName === "functional") {
     const expandedFiles = expandGlobPattern("./suites/functional/*.test.ts");
     if (expandedFiles.length === 0) {
-      throw new Error("No functional test files found");
+      throw new Error("No dmstest files found");
     }
     return `npx vitest run ${expandedFiles.join(" ")} ${threadingOptions} ${vitestArgsString}`.trim();
   }
