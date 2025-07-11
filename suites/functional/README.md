@@ -1,4 +1,4 @@
-# XMTP Functional Testing Suite
+# Functional Testing Suite
 
 This test suite validates core XMTP protocol functionality including direct messages, group conversations, consent management, and message delivery systems.
 

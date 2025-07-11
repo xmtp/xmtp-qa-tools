@@ -295,7 +295,7 @@ yarn install
 ### Environment variables
 
 ```bash
-XMTP_ENV="dev" # XMTP environment (dev, production, local, multinode)
+XMTP_ENV="dev" #  environment (dev, production, local, multinode)
 LOGGING_LEVEL="error" # Rust library logs
 LOG_LEVEL="debug" # JS logs level
 ```
