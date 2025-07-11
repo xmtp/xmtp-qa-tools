@@ -16,7 +16,7 @@ export const setupTestLifecycle = ({
   getCustomDuration,
   setCustomDuration,
   metrics = false,
-  networkStats = true,
+  networkStats = false,
 }: {
   testName: string;
   sdk?: string;
