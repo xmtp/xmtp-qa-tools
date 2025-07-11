@@ -302,7 +302,7 @@ LOG_LEVEL="debug" # JS logs level
 
 ### Running tests
 
-To get started set up the environment variables in [./env.example](./env.example) and run the tests with:
+To get started set up the environment in [variables](./.env.example) and run the tests with:
 
 ```bash
 # Simple dms test
