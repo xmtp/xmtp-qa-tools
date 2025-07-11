@@ -384,7 +384,8 @@ function main() {
   }
 
   // Check for --help flag
-  const shouldShowHelp = process.argv.includes("--help") || process.argv.includes("-h");
+  const shouldShowHelp =
+    process.argv.includes("--help") || process.argv.includes("-h");
   if (shouldShowHelp) {
     showHelp();
     return;

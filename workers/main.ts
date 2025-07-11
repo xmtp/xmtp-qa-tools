@@ -19,6 +19,7 @@ export enum typeOfSync {
   Both = "both",
   None = "none",
 }
+
 export enum typeofStream {
   Message = "message",
   MessageandResponse = "message_and_response",
@@ -143,7 +144,6 @@ export class WorkerClient extends Worker {
   public client!: Client;
   private env: XmtpEnv;
   private apiUrl?: string;
-  private activeStreams: boolean = false;
   private activeStreamTypes: Set<typeofStream> = new Set();
   private streamControllers: Map<typeofStream, AbortController> = new Map();
   private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
@@ -196,7 +196,6 @@ export class WorkerClient extends Worker {
    * Stops all active streams without terminating the worker
    */
   stopStreams(): void {
-    this.activeStreams = false;
     this.activeStreamTypes.clear();
 
     // End streams using their .end() method if available, otherwise abort
@@ -263,7 +262,6 @@ export class WorkerClient extends Worker {
     }
 
     this.activeStreamTypes.add(streamType);
-    this.activeStreams = true;
 
     try {
       switch (streamType) {
@@ -322,11 +320,6 @@ export class WorkerClient extends Worker {
       if (controller) {
         controller.abort();
         this.streamControllers.delete(streamType);
-      }
-
-      // If no streams are active, set activeStreams to false
-      if (this.activeStreamTypes.size === 0) {
-        this.activeStreams = false;
       }
     } else {
       console.debug(`[${this.nameId}] Stopping all streams`);
@@ -463,9 +456,6 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    this.startInitialStream();
-    this.startSyncs();
-
     const installationId = this.client.installationId;
 
     return {
@@ -474,23 +464,6 @@ export class WorkerClient extends Worker {
       address: address,
       installationId,
     };
-  }
-
-  /**
-   * Starts a periodic sync of all conversations
-   * @param interval - The interval in milliseconds to sync
-   */
-  private startSyncs() {
-    // No automatic syncs - everything is on-demand now
-    // Use startSync() method to start syncs manually
-  }
-
-  /**
-   * Unified method to start the appropriate stream based on configuration
-   */
-  private startInitialStream() {
-    // No automatic streams - everything is on-demand now
-    // Use startStream() method to start streams manually
   }
 
   /**
@@ -830,22 +803,12 @@ export class WorkerClient extends Worker {
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    console.debug(
-      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
-    );
 
     return new Promise((resolve) => {
       const events: T[] = [];
       let resolved = false;
 
       const onMessage = (msg: StreamMessage) => {
-        if (resolved) {
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} already resolved, ignoring message`,
-          );
-          return;
-        }
-
         // Map from typeofStream to StreamCollectorType
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
@@ -1198,10 +1161,6 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
     this.folder = newFolder; // Update folder reference
-
-    // Restart streams and syncs with new installation
-    this.startInitialStream();
-    this.startSyncs();
 
     const newInstallationId = this.client.installationId;
 

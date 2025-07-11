@@ -171,6 +171,9 @@ function showUsageAndExit(): never {
     "      --log-level <level> Set logging level (debug, info, error) (default: debug)",
   );
   console.error(
+    "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -366,6 +369,16 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
+      case "--sync":
+        if (nextArg) {
+          options.vitestArgs.push(`--sync=${nextArg}`);
+          i++;
+        } else {
+          console.warn(
+            "--sync flag requires a value (e.g., --sync all,conversations)",
+          );
+        }
+        break;
       default:
         options.vitestArgs.push(arg);
     }
@@ -525,6 +538,21 @@ async function runVitestTest(
     // Remove from vitestArgs since it's not a vitest parameter
     options.vitestArgs = options.vitestArgs.filter(
       (arg) => !arg.startsWith("--env="),
+    );
+  }
+
+  // Extract --sync parameter and set as environment variable
+  const syncArg = options.vitestArgs.find((arg) => arg.startsWith("--sync="));
+  if (syncArg) {
+    const syncValue = syncArg.split("=")[1];
+    env.SYNC_STRATEGY = syncValue;
+    console.debug(
+      `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
+    );
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--sync="),
     );
   }
 
@@ -693,6 +721,23 @@ async function main(): Promise<void> {
             // Remove from vitestArgs since it's not a vitest parameter
             options.vitestArgs = options.vitestArgs.filter(
               (arg) => !arg.startsWith("--env="),
+            );
+          }
+
+          // Extract --sync parameter and set as environment variable
+          const syncArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--sync="),
+          );
+          if (syncArg) {
+            const syncValue = syncArg.split("=")[1];
+            env.SYNC_STRATEGY = syncValue;
+            console.debug(
+              `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--sync="),
             );
           }
 
