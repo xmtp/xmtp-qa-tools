@@ -256,6 +256,7 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         if (syncType === typeOfSync.SyncAll) {
+          console.debug(`[${this.nameId}] Starting ${syncType} sync`);
           await this.client.conversations.syncAll();
         } else if (syncType === typeOfSync.Sync) {
           await this.client.conversations.sync();
