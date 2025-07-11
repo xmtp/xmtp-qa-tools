@@ -4,21 +4,21 @@ import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "rate-limited";
+const testName = "stress-test";
 const WORKER_COUNT = 500;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const BATCH_SIZE = 50; // Workers per batch
+const BATCH_SIZE = 25; // Workers per batch (reduced from 50)
 const DEFAULT_STREAM_TIMEOUT_MS = 50000;
-const XMTP_ENV = "dev";
-let targetInboxId: string = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
+const BATCH_DELAY_MS = 2000; // 2 second delay between batches
+const XMTP_ENV = "production";
+const TARGET_INBOX_ID = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupTestLifecycle({ testName, networkStats: false });
   let names: string[] = [];
-  for (let i = 0; i < WORKER_COUNT; i++) {
-    names.push(`fabri${i}`);
-  }
+  for (let i = 0; i < WORKER_COUNT; i++) names.push(`fabri${i}`);
+
   console.log(`Getting ${WORKER_COUNT} workers`);
   const workers = await getWorkers(names, { env: XMTP_ENV });
 
@@ -37,9 +37,12 @@ describe(testName, async () => {
 
     // Calculate number of batches needed
     const numBatches = Math.ceil(WORKER_COUNT / BATCH_SIZE);
+    const totalMessages = WORKER_COUNT * MESSAGES_PER_WORKER;
     console.log(
       `Processing ${WORKER_COUNT} workers in ${numBatches} parallel batches of ~${BATCH_SIZE} workers each`,
     );
+    console.log(`Total messages to send: ${totalMessages}`);
+    console.log(`Starting message sending process...`);
 
     // Create all batch promises to run in parallel
     const batchPromises = Array.from(
@@ -60,7 +63,7 @@ describe(testName, async () => {
           const actualWorkerIndex = startIndex + index;
           const conversation =
             (await worker.client.conversations.newDmWithIdentifier({
-              identifier: targetInboxId,
+              identifier: TARGET_INBOX_ID,
               identifierKind: IdentifierKind.Ethereum,
             })) as Conversation;
 
@@ -69,11 +72,6 @@ describe(testName, async () => {
           const responseTimes: number[] = [];
 
           for (let i = 0; i < MESSAGES_PER_WORKER; i++) {
-            totalMessagesSent++;
-            const totalMessages = WORKER_COUNT * MESSAGES_PER_WORKER;
-            console.log(
-              `Sending message ${totalMessagesSent}/${totalMessages}`,
-            );
             const result = await verifyBotMessageStream(
               conversation,
               [worker],
@@ -87,6 +85,10 @@ describe(testName, async () => {
               successCount++;
               responseTimes.push(responseTime ?? 0);
             }
+            totalMessagesSent++;
+            console.log(
+              `Total messages sent: ${totalMessagesSent}/${totalMessages}`,
+            );
           }
 
           const successPercentage = (successCount / totalAttempts) * 100;
@@ -95,10 +97,6 @@ describe(testName, async () => {
               ? responseTimes.reduce((sum, time) => sum + time, 0) /
                 responseTimes.length
               : 0;
-
-          console.log(
-            `Worker ${actualWorkerIndex}: ${successCount}/${totalAttempts} bot responses received (${successPercentage.toFixed(1)}%), avg response time: ${averageResponseTime.toFixed(0)}ms`,
-          );
 
           return {
             workerIndex: actualWorkerIndex,
@@ -147,7 +145,6 @@ describe(testName, async () => {
     console.log(
       `Rate limiting test completed: ${totalResponses}/${totalAttempts} bot responses received overall (${overallPercentage.toFixed(1)}%)`,
     );
-    console.log(`Total messages sent: ${totalMessagesSent}`);
     console.log(
       `Overall average response time: ${overallAverageResponseTime.toFixed(0)}ms`,
     );
