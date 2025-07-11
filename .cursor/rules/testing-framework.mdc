@@ -3,7 +3,7 @@ globs: *.test.ts
 alwaysApply: false
 ---
 
-# XMTP Testing Worker Framework Rules
+# Testing Worker Framework Rules
 
 ## Core Testing Pattern
 
@@ -510,7 +510,7 @@ import { IdentifierKind } from "@xmtp/node-sdk";
 
 ```
 
-# XMTP Testing Worker Framework Rules
+# Testing Worker Framework Rules
 
 ## Core Testing Pattern
 

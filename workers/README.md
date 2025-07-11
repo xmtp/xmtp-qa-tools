@@ -1,4 +1,4 @@
-# XMTP Testing Worker Framework Rules
+# Testing Worker Framework Rules
 
 ## Core Testing Pattern
 

@@ -1,4 +1,4 @@
-# XMTP Test Bots
+# Test Bots
 
 Test bots for the XMTP protocol that validate functionality, automate testing scenarios, and provide interactive agents for development.
 

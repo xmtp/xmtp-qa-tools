@@ -1,4 +1,4 @@
-# XMTP Inboxes
+# Inboxes
 
 Pre-generated XMTP inbox data for testing with multiple device installations.
 

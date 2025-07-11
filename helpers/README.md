@@ -1,4 +1,4 @@
-# XMTP Testing Helpers
+# Testing Helpers
 
 Utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test workers, collecting metrics, and validating test results.
 

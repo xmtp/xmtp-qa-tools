@@ -21,7 +21,7 @@ DATADOG_APP_KEY=your_datadog_app_key
 # Claude AI analysis (optional - runs in mock mode without it)
 ANTHROPIC_API_KEY=your_anthropic_api_key
 
-# XMTP environment
+#  environment
 XMTP_ENV=dev  # or production, local
 ```
 
