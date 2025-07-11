@@ -221,28 +221,6 @@ export class WorkerClient extends Worker {
   }
 
   /**
-   * Apply sync strategy by starting sync and streams
-   * @param strategy - The sync strategy to apply
-   */
-  public applySyncStrategy(strategy: SyncStrategy): void {
-    console.debug(
-      `[${this.nameId}] Applying sync strategy: ${JSON.stringify(strategy)}`,
-    );
-
-    // Start sync if specified
-    if (strategy.syncType !== typeOfSync.None) {
-      this.startSync(strategy.syncType, strategy.syncInterval);
-    }
-
-    // Start streams if specified
-    for (const streamType of strategy.streamTypes) {
-      if (streamType !== typeofStream.None) {
-        this.startStream(streamType);
-      }
-    }
-  }
-
-  /**
    * Starts a specific sync type
    * @param syncType - The type of sync to start
    * @param interval - The interval in milliseconds to sync
