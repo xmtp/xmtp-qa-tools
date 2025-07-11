@@ -5,30 +5,24 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 num_runs=10
 
-rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
+#rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
 
-tranche_parts=5
-tranche=$((num_runs/tranche_parts))
-
-for ((x=1; x<=tranche_parts; x++)); do
+for ((x=1; x<=num_runs; x++)); do
   echo "Starting test cycle at $(date)"
-  for ((i=1; i<=tranche; i++)); do
-      echo "Restarting singlehost docker env..."
-      cd multinode && docker compose down && ./ci.sh && cd ..
-      rm -rf .data
 
-      sleep 10
-      tid=$(date +%s)
-      echo "Running test iteration $i of $num_runs in tranche $tranche_parts"
+  cd multinode && docker compose down && ./ci.sh && cd ..
+  rm -rf .data
+  sleep 10
+  tid=$(date +%s)
+  echo "Running test iteration $x of 10..." 
 
-      #LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout $DURATION_MS npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
-      #LOG_LEVEL=info timeout $DURATION_MS time yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
-      LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
-      #LOG_LEVEL=info timeout 300 time npx vitest run suites/networkchaos/forkmatrix-streamonly.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | tee test-${x}.log
-      exit_code=$?
+  #LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout $DURATION_MS npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
+  #LOG_LEVEL=info timeout $DURATION_MS time yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
+  LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
+  #LOG_LEVEL=info timeout 300 time npx vitest run suites/networkchaos/forkmatrix-streamonly.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | tee test-${x}.log
+  exit_code=$?
 
-      echo "Test iteration $i completed with exit code $exit_code"
-  done
+  echo "Test iteration $i completed with exit code $exit_code"
 
   echo "Cleaning up test logs and results..."
   yarn ansi
