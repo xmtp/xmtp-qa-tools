@@ -463,9 +463,6 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    this.startInitialStream();
-    this.startSyncs();
-
     const installationId = this.client.installationId;
 
     return {
@@ -474,23 +471,6 @@ export class WorkerClient extends Worker {
       address: address,
       installationId,
     };
-  }
-
-  /**
-   * Starts a periodic sync of all conversations
-   * @param interval - The interval in milliseconds to sync
-   */
-  private startSyncs() {
-    // No automatic syncs - everything is on-demand now
-    // Use startSync() method to start syncs manually
-  }
-
-  /**
-   * Unified method to start the appropriate stream based on configuration
-   */
-  private startInitialStream() {
-    // No automatic streams - everything is on-demand now
-    // Use startStream() method to start streams manually
   }
 
   /**
@@ -1198,10 +1178,6 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
     this.folder = newFolder; // Update folder reference
-
-    // Restart streams and syncs with new installation
-    this.startInitialStream();
-    this.startSyncs();
 
     const newInstallationId = this.client.installationId;
 
