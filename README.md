@@ -46,7 +46,7 @@ flowchart LR
     backendServices["Backend Services"]
   end
 
-  centralNode["Node"] --> libxmtp["LibXMTP<br>(openmls)<br>(diesel)"]
+  decentralNode["Decentralized<br>Nodes"] --> libxmtp["LibXMTP<br>(openmls)<br>(diesel)"]
   libxmtp --- wasm
   libxmtp --- ffi
   kotlinSDK --- mobileApps
@@ -66,9 +66,6 @@ flowchart LR
   napi --- nodesdk
   nodesdk --- botAgents
   nodesdk --- backendServices
-
-  decentralNode["Decentralized Nodes"] -.- libxmtp
-
 
   reactNativeSDK --- messagingApps
   napi -.- reactNativeSDK
