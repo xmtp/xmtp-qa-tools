@@ -46,7 +46,7 @@ flowchart LR
     backendServices["Backend Services"]
   end
 
-  decentralNode["Decentralized Nodes"] --> libxmtp["LibXMTP<br>(openmls)<br>(diesel)"]
+  decentralNode["Decentralized<br>Nodes"] --> libxmtp["LibXMTP<br>(openmls)<br>(diesel)"]
   libxmtp --- wasm
   libxmtp --- ffi
   kotlinSDK --- mobileApps
