@@ -49,6 +49,13 @@ describe(testName, async () => {
           },
         ]);
 
+      //Ignore welcome message
+      await verifyBotMessageStream(
+        conversation as Conversation,
+        [workers.getCreator()],
+        "hi",
+      );
+      //Ignore welcome message
       const result = await verifyBotMessageStream(
         conversation as Conversation,
         [workers.getCreator()],

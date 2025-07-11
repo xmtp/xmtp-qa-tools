@@ -26,6 +26,7 @@ describe(testName, async () => {
       customDuration = v;
     },
     metrics: true,
+    networkStats: true,
   });
 
   it("clientCreate: should measure creating a client", async () => {

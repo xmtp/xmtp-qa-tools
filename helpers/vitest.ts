@@ -16,12 +16,14 @@ export const setupTestLifecycle = ({
   getCustomDuration,
   setCustomDuration,
   metrics = false,
+  networkStats = true,
 }: {
   testName: string;
   sdk?: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
   metrics?: boolean;
+  networkStats?: boolean;
 }) => {
   beforeAll(() => {
     loadEnv(testName);
@@ -65,7 +67,7 @@ export const setupTestLifecycle = ({
     // }
 
     // Network stats handling for performance tests
-    if (metrics && testName.includes("performance") && !skipNetworkStats) {
+    if (networkStats && !skipNetworkStats) {
       const networkStats = await getNetworkStats();
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
