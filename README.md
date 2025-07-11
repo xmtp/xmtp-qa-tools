@@ -292,6 +292,14 @@ cd xmtp-qa-tools
 yarn install
 ```
 
+## Environment variables
+
+```bash
+XMTP_ENV="dev" # XMTP environment (dev, production, local, multinode)
+LOGGING_LEVEL="error" # Rust library logs
+LOG_LEVEL="debug" # JS logs level
+```
+
 ### Running tests
 
 To get started set up the environment variables in [./env.example](./env.example) and run the tests with:
