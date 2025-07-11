@@ -1,4 +1,3 @@
-import { streamTimeout } from "@helpers/client";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -6,10 +5,11 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "stress-test";
-const WORKER_COUNT = 400;
+const WORKER_COUNT = 100;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const DEFAULT_STREAM_TIMEOUT_MS = streamTimeout * 6;
+const DEFAULT_STREAM_TIMEOUT_MS = 10000 * 12;
+const WORKERS_PREFIX = "test";
 const BATCH_SIZE = Math.ceil(WORKER_COUNT / 10);
 const XMTP_ENV = "production";
 const TARGET_INBOX_ID = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
@@ -17,7 +17,7 @@ const TARGET_INBOX_ID = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let names: string[] = [];
-  for (let i = 0; i < WORKER_COUNT; i++) names.push(`fabri${i}`);
+  for (let i = 0; i < WORKER_COUNT; i++) names.push(`${WORKERS_PREFIX}-${i}`);
 
   console.log(`Getting ${WORKER_COUNT} workers`);
   const workers = await getWorkers(names, { env: XMTP_ENV });

@@ -262,7 +262,6 @@ export function loadEnv(testName: string) {
 
   setupPrettyLogs(testName);
   addFileLogging(testName);
-  initDataDog();
 }
 
 // Add type definition for manual users

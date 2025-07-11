@@ -4,6 +4,7 @@ import { loadEnv } from "./client";
 import {
   flushMetrics,
   getNetworkStats,
+  initDataDog,
   parseTestName,
   sendMetric,
   type DurationMetricTags,
@@ -27,6 +28,7 @@ export const setupTestLifecycle = ({
 }) => {
   beforeAll(() => {
     loadEnv(testName);
+    if (metrics) initDataDog();
   });
   let skipNetworkStats = false;
   let start: number;
