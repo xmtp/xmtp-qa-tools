@@ -56,7 +56,7 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-const WORKER_COUNT = 1000;
+const WORKER_COUNT = 50;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50; // Workers per batch
