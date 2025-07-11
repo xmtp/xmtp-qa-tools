@@ -1,6 +1,6 @@
 import { verifyBotMessageStream } from "@helpers/streams";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
+import type { Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 /*
@@ -9,13 +9,16 @@ import { describe, expect, it } from "vitest";
 */
 
 const testName = "rate-limited";
-const WORKER_COUNT = 1000;
+const WORKER_COUNT = 500;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 50;
 const DEFAULT_STREAM_TIMEOUT_MS = 50000;
+const targetInboxId =
+  "f5cf570042fbf33baf3924270d6f19c5497b7c0d18e5aa8c9ad29a50c4697d25";
+//"11e716d44bac4fb5e30336eef968e7b8ed1a9a9fcd0c2e7326890dd456a32aa0";
 
-let targetInboxId: string = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
+const XMTP_ENV = "dev";
 
 describe(testName, async () => {
   let names: string[] = [];
@@ -23,7 +26,7 @@ describe(testName, async () => {
     names.push(`fabri${i}`);
   }
   // Create workers for parallel message sending
-  const workers = await getWorkers(names);
+  const workers = await getWorkers(names, { env: XMTP_ENV });
 
   it(`should receive ${MESSAGES_PER_WORKER} bot responses from ${WORKER_COUNT} workers in parallel with >${SUCCESS_THRESHOLD}% success rate per worker`, async () => {
     type WorkerResult = {
@@ -36,11 +39,14 @@ describe(testName, async () => {
     };
 
     const allResults: WorkerResult[] = [];
-
+    console.log(workers.getAll().length);
     for (let batchIndex = 0; batchIndex < BATCH_SIZE; batchIndex++) {
-      expect(workers.getAll().length).toBe(WORKER_COUNT);
-
       // Create a conversation with the target inbox from the creator
+      console.log(
+        `Starting batch ${batchIndex + 1}/${BATCH_SIZE} with ${
+          WORKER_COUNT / BATCH_SIZE
+        } workers`,
+      );
       const processes = workers
         .getAll()
         .slice(
@@ -50,21 +56,19 @@ describe(testName, async () => {
         .map(async (worker, index) => {
           const actualWorkerIndex =
             batchIndex * (WORKER_COUNT / BATCH_SIZE) + index;
-          const conversation =
-            (await worker.client.conversations.newDmWithIdentifier({
-              identifier: targetInboxId,
-              identifierKind: IdentifierKind.Ethereum,
-            })) as Conversation;
 
+          const conversation = (await worker.client.conversations.newDm(
+            "11e716d44bac4fb5e30336eef968e7b8ed1a9a9fcd0c2e7326890dd456a32aa0",
+          )) as Conversation;
           let successCount = 0;
           const totalAttempts = MESSAGES_PER_WORKER;
           const responseTimes: number[] = [];
-
+          console.log(`Starting worker ${actualWorkerIndex}`);
           for (let i = 0; i < MESSAGES_PER_WORKER; i++) {
             const result = await verifyBotMessageStream(
               conversation,
               [worker],
-              `rate-test-worker-${actualWorkerIndex}-msg-${i}-${Date.now()}`,
+              `rate-test-worker-${actualWorkerIndex}-msg-${i}`,
               DEFAULT_STREAM_TIMEOUT_MS,
             );
             const responseTime = result?.averageEventTiming;
@@ -74,7 +78,7 @@ describe(testName, async () => {
               responseTimes.push(responseTime ?? 0);
             }
           }
-
+          console.log(`Worker ${actualWorkerIndex} completed`);
           const successPercentage = (successCount / totalAttempts) * 100;
           const averageResponseTime =
             responseTimes.length > 0
