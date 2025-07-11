@@ -17,7 +17,7 @@ const ADDRESS = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let names: string[] = [];
-  for (let i = 0; i < WORKER_COUNT; i++) names.push(`${WORKERS_PREFIX}-${i}`);
+  for (let i = 0; i < WORKER_COUNT; i++) names.push(`${WORKERS_PREFIX}${i}`);
 
   console.log(`Getting ${WORKER_COUNT} workers`);
   const workers = await getWorkers(names, { env: XMTP_ENV });
