@@ -9,13 +9,13 @@ import { describe, expect, it } from "vitest";
 */
 
 const testName = "rate-limited";
-const WORKER_COUNT = 500;
+const WORKER_COUNT = 2000;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50;
 const DEFAULT_STREAM_TIMEOUT_MS = 50000;
 
-let targetInboxId: string = "0x618e2797e4922809e7f93472f27d9842f24aa027";
+let targetInboxId: string = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
 describe(testName, async () => {
   let names: string[] = [];
