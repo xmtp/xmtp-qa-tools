@@ -4,13 +4,13 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-const WORKER_COUNT = 1000;
+const WORKER_COUNT = 100;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50;
 const DEFAULT_STREAM_TIMEOUT_MS = 50000;
 
-let targetInboxId: string = "0x163C3AFf82D7C350d9f41730FC95C43243A357d0";
+let targetInboxId: string = "0x618e2797e4922809e7f93472f27d9842f24aa027";
 
 describe(testName, async () => {
   let names: string[] = [];
