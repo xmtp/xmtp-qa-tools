@@ -316,6 +316,11 @@ yarn test functional --no-fail --debug
 - `--debug` - Enable debug logging and file output a saves logs to `logs/` directory (no terminal verbosity)
 - `--no-fail` - Exit successfully even on test failures
 
+### Rate limits
+
+- **Read operations**: 20,000 requests per 5-minute window
+- **Write operations**: 3,000 messages published per 5-minute window
+
 ### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)
