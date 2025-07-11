@@ -326,6 +326,11 @@ yarn test functional --debug
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
 
+### Rate limits
+
+- **Read operations**: 20,000 requests per 5-minute window
+- **Write operations**: 3,000 messages published per 5-minute window
+
 ### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)

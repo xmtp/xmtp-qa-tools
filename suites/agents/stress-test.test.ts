@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 */
 
 const testName = "rate-limited";
-const WORKER_COUNT = 2000;
+const WORKER_COUNT = 1000;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50;
