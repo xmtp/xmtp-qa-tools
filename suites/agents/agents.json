@@ -106,7 +106,7 @@
     "baseName": "0x9e73…3466",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
-    "networks": ["production"],
+    "networks": [],
     "slackChannel": "#tokenbot-alerts",
     "shouldRespondOnTagged": true
   }

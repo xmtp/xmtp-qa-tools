@@ -1,54 +1,3 @@
-/**
- * # Stress Test: Bot Response Rate Limiting
- *
- * ## Purpose
- * This test validates bot response reliability under XMTP network rate limiting conditions.
- * It creates a large number of concurrent workers that send messages to a target bot and
- * measures response success rates and timing under load.
- *
- * ## Test Configuration
- * - **WORKER_COUNT**: 500 concurrent workers sending messages
- * - **MESSAGES_PER_WORKER**: 1 message per worker (500 total messages)
- * - **SUCCESS_THRESHOLD**: 99% - minimum success rate required per worker
- * - **BATCH_SIZE**: 50 - workers are processed in batches to manage load
- * - **DEFAULT_STREAM_TIMEOUT_MS**: 50s timeout for bot responses
- * - **Target Bot**: Uses hardcoded inbox ID for consistent testing
- *
- * ## XMTP Network Rate Limits (Being Tested)
- * - **Read operations**: 20,000 requests per 5-minute window
- * - **Write operations**: 3,000 messages published per 5-minute window
- *
- * ## Expected Behavior
- * Each worker should:
- * 1. Create a DM conversation with the target bot
- * 2. Send a timestamped message
- * 3. Receive a bot response within the timeout period
- * 4. Achieve >99% success rate for message delivery
- *
- * ## Metrics Tracked
- * - Individual worker success rates (must exceed 99%)
- * - Overall success percentage across all workers
- * - Response timing per worker and overall average
- * - Total messages sent and responses received
- *
- * ## Usage
- * ```bash
- * # Run the stress test
- * yarn test suites/agents/stress-test.test.ts
- *
- * # Run with debug logging
- * yarn test suites/agents/stress-test.test.ts --debug
- *
- * # Run in CI/monitoring context
- * XMTP_ENV=production yarn test suites/agents/stress-test.test.ts --no-fail --debug
- * ```
- *
- * ## Test Environment
- * - Default environment: "dev"
- * - Can be overridden with XMTP_ENV environment variable
- * - Production testing should use appropriate rate limiting awareness
- */
-
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -56,7 +5,7 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-const WORKER_COUNT = 50;
+const WORKER_COUNT = 500;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const BATCH_SIZE = 50; // Workers per batch
@@ -121,6 +70,10 @@ describe(testName, async () => {
 
           for (let i = 0; i < MESSAGES_PER_WORKER; i++) {
             totalMessagesSent++;
+            const totalMessages = WORKER_COUNT * MESSAGES_PER_WORKER;
+            console.log(
+              `Sending message ${totalMessagesSent}/${totalMessages}`,
+            );
             const result = await verifyBotMessageStream(
               conversation,
               [worker],
