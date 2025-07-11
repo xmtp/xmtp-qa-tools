@@ -2,12 +2,10 @@
 
 This document provides practical instructions for using the scripts in the `/scripts` directory.
 
-## Quick reference
-
-| Script          | Purpose                     | Key Features                         |
-| --------------- | --------------------------- | ------------------------------------ |
-| **cli.ts**      | General-purpose task runner | Configurable operations              |
-| **versions.ts** | Manages SDK versions        | XMTP SDK version management/symlinks |
+| Script                           | Purpose                     | Key Features                         |
+| -------------------------------- | --------------------------- | ------------------------------------ |
+| **[cli.ts](./cli.ts)**           | General-purpose task runner | Configurable operations              |
+| **[versions.ts](./versions.ts)** | Manages SDK versions        | XMTP SDK version management/symlinks |
 
 ## Usage
 
@@ -25,8 +23,11 @@ yarn bot <bot-name> [args]
 ## CLI
 
 ```bash
+yarn cli --help
+```
+
+```bash
 Usage: yarn cli <command_type> <name_or_path> [args...]
-   or (if alias 'cli' is set up): cli <command_type> <name_or_path> [args...]
 
 Command Types:
   bot <bot_name> [bot_args...]        - Runs a bot (e.g., gm-bot)
@@ -67,4 +68,34 @@ Examples:
   yarn cli test dms --no-clean-logs  # Disable automatic log cleaning
   yarn cli test dms --log-level error  # Set logging level to error
 
+```
+
+## Versions
+
+```bash
+yarn script versions
+```
+
+```bash
+Found 9 SDK packages and 10 bindings packages
+Creating bindings symlinks...
+Linked: 3.1.2 -> 1.2.8
+3.1.2 -> 1.2.8 (3562697)
+Linked: 3.1.1 -> 1.2.7
+3.1.1 -> 1.2.7 (ec4b933)
+Linked: 3.0.1 -> 1.2.5
+3.0.1 -> 1.2.5 (dc3e8c8)
+Linked: 2.2.1 -> 1.2.2
+2.2.1 -> 1.2.2 (d0f0b67)
+Linked: 2.1.0 -> 1.2.0
+2.1.0 -> 1.2.0 (7b9b4d0)
+Linked: 2.0.9 -> 1.1.8
+2.0.9 -> 1.1.8 (bfadb76)
+Linked: 1.0.5 -> 1.1.3
+1.0.5 -> 1.1.3 (6eb1ce4)
+Linked: 0.0.47 -> 0.4.1
+0.0.47 -> 0.4.1 (6bd613d)
+Linked: 0.0.13 -> 0.0.9
+
+Verifying SDK versions...
 ```
