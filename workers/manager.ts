@@ -538,9 +538,9 @@ export async function getWorkers(
 
   await Promise.all(workerPromises);
 
-  manager.checkCLI();
-  await manager.printWorkers();
-  await manager.revokeExcessInstallations();
+  // manager.checkCLI();
+  // await manager.printWorkers();
+  // await manager.revokeExcessInstallations();
 
   return manager;
 }
