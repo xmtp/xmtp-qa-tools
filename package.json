@@ -20,7 +20,7 @@
     "cli": "tsx scripts/cli.ts",
     "dms": "yarn test functional/dms.test.ts",
     "format": "prettier -w .",
-    "functional": "yarn test suites/functional",
+    "functional": "yarn test suites/functional --sync all",
     "gen": "tsx inboxes/gen.ts",
     "large": "yarn test suites/metrics/large",
     "lint": "eslint .",

@@ -5,8 +5,12 @@ import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { getAutoVersions, VersionList } from "@workers/versions";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { base } from "viem/chains";
-import { installationThreshold, WorkerClient, type typeofStream } from "./main";
+import {
+  installationThreshold,
+  typeOfSync,
+  WorkerClient,
+  type typeofStream,
+} from "./main";
 
 // Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
@@ -191,6 +195,27 @@ export class WorkerManager {
     const workers = this.getAll();
     for (const worker of workers) {
       await worker.worker.revokeExcessInstallations(threshold);
+    }
+  }
+
+  public checkCLI() {
+    // Apply sync strategy if specified in environment
+    const syncStrategyString = process.env.SYNC_STRATEGY;
+    if (syncStrategyString) {
+      console.debug(
+        `Found SYNC_STRATEGY environment variable: ${syncStrategyString}`,
+      );
+      for (const worker of this.getAll()) {
+        let syncType: typeOfSync = typeOfSync.None;
+        if (syncStrategyString === "all") {
+          syncType = typeOfSync.SyncAll;
+        } else if (syncStrategyString === "sync") {
+          syncType = typeOfSync.Sync;
+        } else if (syncStrategyString === "both") {
+          syncType = typeOfSync.Both;
+        }
+        worker.worker.startSync(syncType);
+      }
     }
   }
   public async printWorkers() {
@@ -512,6 +537,8 @@ export async function getWorkers(
   }
 
   await Promise.all(workerPromises);
+
+  manager.checkCLI();
   await manager.printWorkers();
   await manager.revokeExcessInstallations();
 

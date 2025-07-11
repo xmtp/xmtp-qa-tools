@@ -20,11 +20,6 @@ export enum typeOfSync {
   None = "none",
 }
 
-export interface SyncStrategy {
-  syncType: typeOfSync;
-  streamTypes: typeofStream[];
-  syncInterval?: number;
-}
 export enum typeofStream {
   Message = "message",
   MessageandResponse = "message_and_response",
@@ -223,6 +218,28 @@ export class WorkerClient extends Worker {
       controller.abort();
     }
     this.streamControllers.clear();
+  }
+
+  /**
+   * Apply sync strategy by starting sync and streams
+   * @param strategy - The sync strategy to apply
+   */
+  public applySyncStrategy(strategy: SyncStrategy): void {
+    console.debug(
+      `[${this.nameId}] Applying sync strategy: ${JSON.stringify(strategy)}`,
+    );
+
+    // Start sync if specified
+    if (strategy.syncType !== typeOfSync.None) {
+      this.startSync(strategy.syncType, strategy.syncInterval);
+    }
+
+    // Start streams if specified
+    for (const streamType of strategy.streamTypes) {
+      if (streamType !== typeofStream.None) {
+        this.startStream(streamType);
+      }
+    }
   }
 
   /**
@@ -808,22 +825,12 @@ export class WorkerClient extends Worker {
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    console.debug(
-      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
-    );
 
     return new Promise((resolve) => {
       const events: T[] = [];
       let resolved = false;
 
       const onMessage = (msg: StreamMessage) => {
-        if (resolved) {
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} already resolved, ignoring message`,
-          );
-          return;
-        }
-
         // Map from typeofStream to StreamCollectorType
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
