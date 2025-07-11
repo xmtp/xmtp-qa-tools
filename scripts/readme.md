@@ -1,101 +1,247 @@
-# Scripts documentation
+# Scripts
 
-This document provides practical instructions for using the scripts in the `/scripts` directory.
+Core utility scripts for XMTP QA Tools CLI operations.
 
-| Script                           | Purpose                     | Key Features                         |
-| -------------------------------- | --------------------------- | ------------------------------------ |
-| **[cli.ts](./cli.ts)**           | General-purpose task runner | Configurable operations              |
-| **[versions.ts](./versions.ts)** | Manages SDK versions        | XMTP SDK version management/symlinks |
+For quick reference, see [REFERENCE.md](./REFERENCE.md)
 
-## Usage
+## Available Scripts
 
-You can run these scripts using the yarn commands defined in package.json:
+| Script        | Purpose                  | Main Functions                                             |
+| ------------- | ------------------------ | ---------------------------------------------------------- |
+| `cli.ts`      | Universal command router | Test execution, bot management, script running             |
+| `versions.ts` | SDK version manager      | Version discovery, symlink creation, dependency management |
+
+## Quick Start
 
 ```bash
-# Generate XMTP keys
-yarn gen:keys
-# Run a specific script without the extension
-yarn script <script-name>
-# Run a bot with arguments
-yarn bot <bot-name> [args]
+# Run any script
+yarn cli <command_type> <name> [options]
+
+# Common shortcuts
+yarn script versions     # Setup SDK versions
+yarn bot gm-bot         # Start GM bot
+yarn test functional    # Run functional tests
 ```
 
-## CLI
+## CLI Command Reference
+
+### Command Types
 
 ```bash
-yarn cli --help
+# Bot commands
+yarn cli bot <bot_name> [args]
+yarn cli bot gm-bot
+yarn cli bot stress 5
+
+# Script commands
+yarn cli script <script_name> [args]
+yarn cli script gen
+yarn cli script versions
+
+# Test commands
+yarn cli test <test_name> [options]
+yarn cli test functional
+yarn cli test dms --debug
 ```
 
+### Test Options
+
+#### Basic Testing
+
 ```bash
-Usage: yarn cli <command_type> <name_or_path> [args...]
-
-Command Types:
-  bot <bot_name> [bot_args...]        - Runs a bot (e.g., gm-bot)
-  script <script_name> [script_args...] - Runs a script (e.g., gen)
-  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)
-    Simple vitest execution (default):
-      yarn cli test dms        - Runs vitest directly
-      yarn cli test ./path/to/test.ts  - Runs specific test file
-    Retry mode (when retry options are present):
-      --max-attempts <N>  Max number of attempts for tests (default: 3)
-      --retry-delay <S>   Delay in seconds between retries (default: 10)
-      --parallel          Run tests in parallel (default: consecutive)
-      --debug / --no-log    Enable/disable logging to file (default: enabled)
-      --debug-verbose     Enable logging to both file AND terminal output
-      --debug-file <n>   Custom log file name (default: auto-generated)
-      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)
-      --env <environment> Set XMTP_ENV (options: local, dev, production)
-      --versions count   Number of SDK versions to use (e.g., 3)
-      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.1)
-      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)
-      --log-level <level> Set logging level (debug, info, error) (default: debug)
-      [vitest_options...] Other options passed directly to vitest
-
-Examples:
-  yarn cli bot gm-bot
-  yarn cli bot stress 5
-  yarn cli script gen
-  yarn script versions
-  yarn cli test functional
-  yarn cli test dms --max-attempts 2
-  yarn cli test dms --parallel
-  yarn cli test dms --debug-verbose   # Shows output in terminal AND logs to file
-  yarn cli test dms --no-fail        # Uses retry mode
-  yarn cli test dms --debug        # Uses retry mode
-  yarn cli test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0
-  yarn cli test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1
-  yarn cli test dms --env production # Sets XMTP_ENV to production
-  yarn cli test dms --no-clean-logs  # Disable automatic log cleaning
-  yarn cli test dms --log-level error  # Set logging level to error
-
+yarn cli test functional              # Simple execution
+yarn cli test dms                     # Direct message tests
+yarn cli test ./path/to/test.ts       # Specific test file
 ```
 
-## Versions
+#### Advanced Testing (Retry Mode)
 
 ```bash
-yarn script versions
+yarn cli test functional --debug                    # Enable logging
+yarn cli test functional --debug-verbose           # Log + terminal output
+yarn cli test functional --no-fail                 # Always exit 0
+yarn cli test functional --max-attempts 3         # Retry up to 3 times
+yarn cli test functional --retry-delay 10          # 10s delay between retries
+yarn cli test functional --parallel                # Parallel execution
 ```
 
+#### Version Testing
+
 ```bash
+yarn cli test functional --versions 3              # Use 3 random SDK versions
+yarn cli test functional --nodeVersion 3.1.1       # Use specific SDK version
+```
+
+#### Environment Control
+
+```bash
+yarn cli test functional --env production          # Set XMTP_ENV
+yarn cli test functional --log-level error         # Set log level
+yarn cli test functional --debug-file custom       # Custom log filename
+```
+
+### Option Combinations
+
+```bash
+# Production monitoring setup
+yarn cli test functional --env production --no-fail --debug --max-attempts 5
+
+# Development debugging
+yarn cli test dms --debug-verbose --retry-delay 5 --max-attempts 2
+
+# CI/CD pattern
+yarn cli test functional --no-fail --debug --versions 3 --parallel
+```
+
+## SDK Version Management
+
+### Basic Version Setup
+
+```bash
+yarn script versions                    # Discover and setup all SDK versions
+yarn script versions --clean          # Clean package.json imports first
+```
+
+### What It Does
+
+```bash
+# Discovers packages
 Found 9 SDK packages and 10 bindings packages
-Creating bindings symlinks...
-Linked: 3.1.2 -> 1.2.8
-3.1.2 -> 1.2.8 (3562697)
-Linked: 3.1.1 -> 1.2.7
-3.1.1 -> 1.2.7 (ec4b933)
-Linked: 3.0.1 -> 1.2.5
-3.0.1 -> 1.2.5 (dc3e8c8)
-Linked: 2.2.1 -> 1.2.2
-2.2.1 -> 1.2.2 (d0f0b67)
-Linked: 2.1.0 -> 1.2.0
-2.1.0 -> 1.2.0 (7b9b4d0)
-Linked: 2.0.9 -> 1.1.8
-2.0.9 -> 1.1.8 (bfadb76)
-Linked: 1.0.5 -> 1.1.3
-1.0.5 -> 1.1.3 (6eb1ce4)
-Linked: 0.0.47 -> 0.4.1
-0.0.47 -> 0.4.1 (6bd613d)
-Linked: 0.0.13 -> 0.0.9
 
+# Creates symlinks
+Linked: 3.1.2 -> 1.2.8
+Linked: 3.1.1 -> 1.2.7
+Linked: 3.0.1 -> 1.2.5
+
+# Verifies versions
 Verifying SDK versions...
+```
+
+## Environment Variables
+
+### Required
+
+```bash
+XMTP_ENV=dev                    # Network: local, dev, production
+LOGGING_LEVEL=off              # Logging: off, debug, info, warn, error
+```
+
+### Optional
+
+```bash
+SLACK_BOT_TOKEN=xoxb-...       # Slack notifications
+SLACK_CHANNEL=C...             # Slack channel
+DATADOG_API_KEY=...            # Datadog integration
+TEST_VERSIONS=3                # SDK version count
+NODE_VERSION=3.1.1             # Specific SDK version
+```
+
+## Log Management
+
+### Default Behavior
+
+```bash
+# Logs saved to logs/raw-<testname>-<env>-<timestamp>.log
+yarn cli test functional --debug
+
+# Auto-cleaned after completion
+yarn cli test functional --debug --no-clean-logs    # Disable cleaning
+```
+
+### Log Levels
+
+```bash
+--debug                        # File logging only
+--debug-verbose               # File + terminal output
+--debug-file mylog            # Custom filename
+--log-level error             # Set log level
+```
+
+## Script Integration
+
+### Package.json Shortcuts
+
+```bash
+# Direct shortcuts (from package.json)
+yarn functional               # yarn cli test functional
+yarn bot                     # yarn cli bot
+yarn gen                     # yarn cli script gen
+
+# With options
+yarn functional --debug      # Passes options through
+```
+
+### CI/CD Usage
+
+```bash
+# GitHub Actions patterns
+XMTP_ENV=production yarn cli test functional --no-fail --debug
+XMTP_ENV=production yarn cli test performance --no-fail --debug --parallel
+```
+
+## Error Handling
+
+### Exit Codes
+
+```bash
+# Normal behavior
+yarn cli test functional      # Exit 1 on failure
+
+# CI-friendly behavior
+yarn cli test functional --no-fail    # Always exit 0, send notifications
+```
+
+### Retry Logic
+
+```bash
+# Automatic retries with exponential backoff
+yarn cli test functional --max-attempts 3 --retry-delay 10
+
+# Immediate retry
+yarn cli test functional --max-attempts 3 --retry-delay 0
+```
+
+## File Structure
+
+```
+scripts/
+├── cli.ts          # Main CLI router and test execution
+├── versions.ts     # SDK version management and symlinks
+├── readme.md       # Complete documentation
+└── REFERENCE.md    # Quick reference guide
+```
+
+## Advanced Examples
+
+### Multi-Version Testing
+
+```bash
+# Test compatibility across 3 random SDK versions
+yarn cli test functional --versions 3 --parallel --debug
+
+# Test specific SDK version
+yarn cli test functional --nodeVersion 3.1.1 --debug
+```
+
+### Production Monitoring
+
+```bash
+# Full production test suite
+XMTP_ENV=production yarn cli test functional --no-fail --debug --max-attempts 5 --retry-delay 30
+
+# Performance monitoring
+XMTP_ENV=production yarn cli test performance --no-fail --debug --parallel
+```
+
+### Development Workflow
+
+```bash
+# Quick local test
+yarn cli test dms
+
+# Debug failing test
+yarn cli test dms --debug-verbose --max-attempts 1
+
+# Setup versions for development
+yarn script versions --clean
 ```

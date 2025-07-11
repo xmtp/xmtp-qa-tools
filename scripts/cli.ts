@@ -1,3 +1,17 @@
+/**
+ * XMTP QA Tools CLI
+ *
+ * Universal command router for running tests, bots, and scripts.
+ * Provides advanced retry mechanisms, logging, and version management.
+ *
+ * Usage: yarn cli <command_type> <name> [options]
+ *
+ * Command Types:
+ *   bot     - Run interactive bots (gm-bot, stress)
+ *   script  - Execute utility scripts (gen, versions)
+ *   test    - Run test suites with retry logic
+ */
+
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
@@ -5,21 +19,28 @@ import { sendDatadogLog } from "@helpers/datadog";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
 
+/**
+ * Configuration for test retry behavior and logging
+ */
 interface RetryOptions {
-  maxAttempts: number;
-  retryDelay: number;
-  enableLogging: boolean;
-  customLogFile?: string;
-  vitestArgs: string[];
-  noFail: boolean;
-  explicitLogFlag: boolean;
-  verboseLogging: boolean;
-  jsLoggingLevel: string;
-  parallel: boolean;
-  cleanLogs: boolean;
-  logLevel: string;
+  maxAttempts: number; // Maximum retry attempts
+  retryDelay: number; // Delay between retries (seconds)
+  enableLogging: boolean; // Enable file logging
+  customLogFile?: string; // Custom log filename
+  vitestArgs: string[]; // Additional vitest arguments
+  noFail: boolean; // Exit 0 even on failure
+  explicitLogFlag: boolean; // User explicitly set logging
+  verboseLogging: boolean; // Show terminal output
+  jsLoggingLevel: string; // JavaScript logging level
+  parallel: boolean; // Run tests in parallel
+  cleanLogs: boolean; // Auto-clean logs after completion
+  logLevel: string; // Log level (debug, info, error)
 }
 
+/**
+ * Expands glob patterns to actual file paths
+ * Used for test file discovery (e.g., *.test.ts)
+ */
 function expandGlobPattern(pattern: string): string[] {
   // Simple glob expansion for *.test.ts patterns
   if (pattern.includes("*")) {
@@ -184,6 +205,10 @@ function showUsageAndExit(): never {
   process.exit(1);
 }
 
+/**
+ * Runs an interactive bot with watch mode
+ * Bots are located in bots/<bot_name>/index.ts
+ */
 function runBot(botName: string, args: string[]): void {
   const botFilePath = path.join("bots", botName, "index.ts");
   const botArgs = args.join(" ");
@@ -195,6 +220,10 @@ function runBot(botName: string, args: string[]): void {
   });
 }
 
+/**
+ * Executes a utility script once
+ * Scripts are located in scripts/<script_name>.ts
+ */
 function runScript(scriptName: string, args: string[]): void {
   const scriptFilePath = path.join("scripts", `${scriptName}.ts`);
   const scriptArgs = args.join(" ");
@@ -206,6 +235,13 @@ function runScript(scriptName: string, args: string[]): void {
   });
 }
 
+/**
+ * Parses test command arguments and options
+ * Handles both simple test runs and advanced retry mode
+ *
+ * @param args - Command line arguments
+ * @returns Parsed test name and retry options
+ */
 function parseTestArgs(args: string[]): {
   testName: string;
   options: RetryOptions;

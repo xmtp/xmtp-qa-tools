@@ -1,3 +1,19 @@
+/**
+ * XMTP SDK Version Manager
+ *
+ * Manages multiple XMTP SDK versions for compatibility testing.
+ * Creates symlinks between SDK and bindings packages to ensure
+ * proper version resolution across different SDK versions.
+ *
+ * Usage: yarn script versions [--clean]
+ *
+ * Functions:
+ *   - Auto-discovers SDK packages in node_modules
+ *   - Creates symlinks for proper bindings resolution
+ *   - Verifies version compatibility
+ *   - Manages package.json imports field
+ */
+
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -6,7 +22,12 @@ import { VersionList } from "@workers/versions";
 type VersionConfig = (typeof VersionList)[number];
 const staticConfigs = VersionList;
 /**
- * Auto-discover SDK and bindings packages in node_modules/@xmtp
+ * Auto-discovers SDK and bindings packages in node_modules/@xmtp
+ *
+ * Scans for versioned packages (e.g., node-sdk-3.1.1, node-bindings-1.2.8)
+ * and matches them with their corresponding bindings packages.
+ *
+ * @returns Array of version configurations including static and discovered packages
  */
 function discoverPackages(): VersionConfig[] {
   const configs: VersionConfig[] = [...staticConfigs];
@@ -95,7 +116,13 @@ function discoverPackages(): VersionConfig[] {
 }
 
 /**
- * Create symlinks for node bindings to ensure proper version resolution
+ * Creates symlinks for node bindings to ensure proper version resolution
+ *
+ * Each SDK version needs its own node_modules/@xmtp/node-bindings symlink
+ * pointing to the correct bindings package version. This ensures that
+ * when an SDK is imported, it uses the correct native bindings.
+ *
+ * @param configs - Array of version configurations to process
  */
 function createBindingsSymlinks(configs: VersionConfig[]) {
   const rootDir = process.cwd();
@@ -176,7 +203,12 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
 }
 
 /**
- * Verify each SDK imports the correct version
+ * Verifies each SDK imports the correct bindings version
+ *
+ * Checks that each SDK package correctly imports from its
+ * corresponding bindings package through the symlinks.
+ *
+ * @param configs - Array of version configurations to verify
  */
 function verifyVersions(configs: VersionConfig[]) {
   const rootDir = process.cwd();
@@ -205,7 +237,10 @@ function verifyVersions(configs: VersionConfig[]) {
 }
 
 /**
- * Clean up the imports field from package.json
+ * Cleans up the imports field from package.json
+ *
+ * Removes the "imports" field that may interfere with
+ * proper module resolution during version testing.
  */
 function cleanPackageJson() {
   const packageJsonPath = path.join(process.cwd(), "package.json");
@@ -244,7 +279,10 @@ function cleanPackageJson() {
 }
 
 /**
- * Remove the node_modules folder
+ * Removes the node_modules folder
+ *
+ * Clean removal of node_modules to ensure fresh package installation
+ * when setting up SDK versions.
  */
 function removeNodeModules() {
   const rootDir = process.cwd();
@@ -267,7 +305,9 @@ function removeNodeModules() {
 }
 
 /**
- * Run yarn install
+ * Runs yarn install to install dependencies
+ *
+ * Installs all package dependencies after node_modules cleanup.
  */
 function runYarnInstall() {
   console.log("Running yarn install...");
@@ -282,7 +322,57 @@ function runYarnInstall() {
   }
 }
 
-// Main function
+/**
+ * Displays help information for the versions command
+ */
+function showHelp() {
+  console.log(`
+XMTP SDK Version Manager
+
+Manages multiple XMTP SDK versions for compatibility testing.
+Creates symlinks between SDK and bindings packages to ensure
+proper version resolution across different SDK versions.
+
+Usage:
+  yarn script versions [options]
+
+Options:
+  --clean                         Clean package.json imports field before setup
+  --help, -h                      Show this help message
+
+Description:
+  This tool automatically discovers XMTP SDK packages in node_modules
+  and creates the necessary symlinks for proper version resolution.
+  
+  The tool performs the following operations:
+  • Auto-discovers SDK packages in node_modules/@xmtp
+  • Creates symlinks for proper bindings resolution
+  • Verifies version compatibility
+  • Manages package.json imports field (when --clean is used)
+  • Removes and reinstalls node_modules (except in CI environments)
+
+Examples:
+  yarn script versions            # Standard version setup
+  yarn script versions --clean   # Clean imports field and setup versions
+  yarn script versions --help    # Show this help message
+
+Notes:
+  • In CI environments (GITHUB_ACTIONS=true), node_modules is not removed
+  • Symlinks are created to ensure each SDK version uses correct bindings
+  • Version compatibility is verified after symlink creation
+`);
+}
+
+/**
+ * Main execution function
+ *
+ * Orchestrates the SDK version setup process:
+ * 1. Optionally cleans package.json imports
+ * 2. Removes and reinstalls node_modules (except in CI)
+ * 3. Discovers all SDK packages
+ * 4. Creates necessary symlinks
+ * 5. Verifies version compatibility
+ */
 function main() {
   console.log("Starting SDK Version Fixer");
 
@@ -292,6 +382,14 @@ function main() {
   if (shouldClean) {
     cleanPackageJson();
   }
+
+  // Check for --help flag
+  const shouldShowHelp = process.argv.includes("--help") || process.argv.includes("-h");
+  if (shouldShowHelp) {
+    showHelp();
+    return;
+  }
+
   if (!process.env.GITHUB_ACTIONS) {
     // Remove node_modules folder
     removeNodeModules();
