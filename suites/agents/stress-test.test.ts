@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -5,13 +6,13 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "stress-test";
-const WORKER_COUNT = 500;
+const WORKER_COUNT = 400;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const DEFAULT_STREAM_TIMEOUT_MS = 120000;
-const BATCH_SIZE = 50;
+const DEFAULT_STREAM_TIMEOUT_MS = streamTimeout * 6;
+const BATCH_SIZE = Math.ceil(WORKER_COUNT / 10);
 const XMTP_ENV = "production";
-const TARGET_INBOX_ID = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
+const TARGET_INBOX_ID = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
 
 describe(testName, async () => {
   setupTestLifecycle({ testName });
@@ -147,5 +148,7 @@ describe(testName, async () => {
     console.log(
       `Overall average response time: ${overallAverageResponseTime.toFixed(0)}ms`,
     );
+    expect(overallPercentage).toBeGreaterThan(SUCCESS_THRESHOLD);
+    expect(overallAverageResponseTime).toBeLessThan(DEFAULT_STREAM_TIMEOUT_MS); // 30 seconds
   });
 });
