@@ -12,7 +12,7 @@ const testName = "rate-limited";
 const WORKER_COUNT = 1000;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const BATCH_SIZE = 50;
+const BATCH_SIZE = 100;
 const DEFAULT_STREAM_TIMEOUT_MS = 50000;
 
 let targetInboxId: string = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
