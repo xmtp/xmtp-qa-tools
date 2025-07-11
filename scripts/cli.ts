@@ -171,6 +171,9 @@ function showUsageAndExit(): never {
     "      --log-level <level> Set logging level (debug, info, error) (default: debug)",
   );
   console.error(
+    "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -363,6 +366,16 @@ function parseTestArgs(args: string[]): {
         } else {
           console.warn(
             "--log-level flag requires a value (e.g., --log-level debug)",
+          );
+        }
+        break;
+      case "--sync":
+        if (nextArg) {
+          options.vitestArgs.push(`--sync=${nextArg}`);
+          i++;
+        } else {
+          console.warn(
+            "--sync flag requires a value (e.g., --sync all,conversations)",
           );
         }
         break;
