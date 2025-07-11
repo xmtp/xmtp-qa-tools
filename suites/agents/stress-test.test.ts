@@ -11,7 +11,7 @@ const SUCCESS_THRESHOLD = 99;
 const DEFAULT_STREAM_TIMEOUT_MS = 120000;
 const BATCH_SIZE = 50;
 const XMTP_ENV = "production";
-const TARGET_INBOX_ID = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
+const TARGET_INBOX_ID = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
 describe(testName, async () => {
   setupTestLifecycle({ testName });
