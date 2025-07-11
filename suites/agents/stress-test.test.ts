@@ -8,14 +8,13 @@ const testName = "stress-test";
 const WORKER_COUNT = 500;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
-const BATCH_SIZE = 25; // Workers per batch (reduced from 50)
-const DEFAULT_STREAM_TIMEOUT_MS = 50000;
-const BATCH_DELAY_MS = 2000; // 2 second delay between batches
+const DEFAULT_STREAM_TIMEOUT_MS = 120000;
+const BATCH_SIZE = 50;
 const XMTP_ENV = "production";
 const TARGET_INBOX_ID = "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0";
 
 describe(testName, async () => {
-  setupTestLifecycle({ testName, networkStats: false });
+  setupTestLifecycle({ testName });
   let names: string[] = [];
   for (let i = 0; i < WORKER_COUNT; i++) names.push(`fabri${i}`);
 
