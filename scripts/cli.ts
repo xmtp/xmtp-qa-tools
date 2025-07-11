@@ -541,6 +541,21 @@ async function runVitestTest(
     );
   }
 
+  // Extract --sync parameter and set as environment variable
+  const syncArg = options.vitestArgs.find((arg) => arg.startsWith("--sync="));
+  if (syncArg) {
+    const syncValue = syncArg.split("=")[1];
+    env.SYNC_STRATEGY = syncValue;
+    console.debug(
+      `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
+    );
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--sync="),
+    );
+  }
+
   // Set logging level
   env.LOGGING_LEVEL = options.logLevel || "error";
 
@@ -706,6 +721,23 @@ async function main(): Promise<void> {
             // Remove from vitestArgs since it's not a vitest parameter
             options.vitestArgs = options.vitestArgs.filter(
               (arg) => !arg.startsWith("--env="),
+            );
+          }
+
+          // Extract --sync parameter and set as environment variable
+          const syncArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--sync="),
+          );
+          if (syncArg) {
+            const syncValue = syncArg.split("=")[1];
+            env.SYNC_STRATEGY = syncValue;
+            console.debug(
+              `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--sync="),
             );
           }
 

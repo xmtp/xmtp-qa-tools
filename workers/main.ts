@@ -19,6 +19,12 @@ export enum typeOfSync {
   Both = "both",
   None = "none",
 }
+
+export interface SyncStrategy {
+  syncType: typeOfSync;
+  streamTypes: typeofStream[];
+  syncInterval?: number;
+}
 export enum typeofStream {
   Message = "message",
   MessageandResponse = "message_and_response",
@@ -143,7 +149,6 @@ export class WorkerClient extends Worker {
   public client!: Client;
   private env: XmtpEnv;
   private apiUrl?: string;
-  private activeStreams: boolean = false;
   private activeStreamTypes: Set<typeofStream> = new Set();
   private streamControllers: Map<typeofStream, AbortController> = new Map();
   private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
@@ -196,7 +201,6 @@ export class WorkerClient extends Worker {
    * Stops all active streams without terminating the worker
    */
   stopStreams(): void {
-    this.activeStreams = false;
     this.activeStreamTypes.clear();
 
     // End streams using their .end() method if available, otherwise abort
@@ -263,7 +267,6 @@ export class WorkerClient extends Worker {
     }
 
     this.activeStreamTypes.add(streamType);
-    this.activeStreams = true;
 
     try {
       switch (streamType) {
@@ -322,11 +325,6 @@ export class WorkerClient extends Worker {
       if (controller) {
         controller.abort();
         this.streamControllers.delete(streamType);
-      }
-
-      // If no streams are active, set activeStreams to false
-      if (this.activeStreamTypes.size === 0) {
-        this.activeStreams = false;
       }
     } else {
       console.debug(`[${this.nameId}] Stopping all streams`);
