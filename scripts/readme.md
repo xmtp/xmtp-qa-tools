@@ -1,4 +1,4 @@
-# 📜 Scripts documentation
+# Scripts documentation
 
 This document provides practical instructions for using the scripts in the `/scripts` directory.
 
@@ -22,130 +22,49 @@ yarn script <script-name>
 yarn bot <bot-name> [args]
 ```
 
-# Slack Bot for XMTP QA Tools
-
-A Slack bot that integrates with Anthropic's Claude SDK for AI responses and provides utilities for fetching Slack channel history and DataDog logs.
-
-## Features
-
-### AI Chat with Claude
-
-- Direct message support
-- @mention support in channels
-- Powered by Anthropic's Claude SDK (replacing Claude Code)
-
-### 📋 Channel History
-
-- Fetch recent messages from any channel
-- Search through message history
-- Configurable message limits
-
-### 📊 DataDog Integration
-
-- Send logs to DataDog
-- Track bot interactions
-- Monitor test results
-
-## Available Commands
-
-### `/history [limit] [search_query]`
-
-Fetch channel message history with optional filtering.
-
-**Examples:**
-
-- `/history 20` - Get last 20 messages
-- `/history 10 xmtp` - Get last 10 messages containing "xmtp"
-- `/history 50 error` - Get last 50 messages containing "error"
-
-### `/logs [test_name]`
-
-Send a log entry to DataDog for tracking.
-
-**Examples:**
-
-- `/logs integration-test` - Send DataDog log for integration-test
-- `/logs performance-check` - Send DataDog log for performance-check
-
-### `/help`
-
-Show available commands and usage examples.
-
-## Environment Variables
-
-Required environment variables:
+## CLI
 
 ```bash
-SLACK_BOT_TOKEN=xoxb-your-bot-token
-SLACK_APP_TOKEN=xapp-your-app-token
-ANTHROPIC_API_KEY=your-anthropic-api-key
-DATADOG_API_KEY=your-datadog-api-key # Optional, for DataDog integration
-XMTP_ENV=dev # Optional, defaults to 'dev'
-GEOLOCATION=us-east # Optional, for DataDog region tracking
+Usage: yarn cli <command_type> <name_or_path> [args...]
+   or (if alias 'cli' is set up): cli <command_type> <name_or_path> [args...]
+
+Command Types:
+  bot <bot_name> [bot_args...]        - Runs a bot (e.g., gm-bot)
+  script <script_name> [script_args...] - Runs a script (e.g., gen)
+  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)
+    Simple vitest execution (default):
+      yarn cli test dms        - Runs vitest directly
+      yarn cli test ./path/to/test.ts  - Runs specific test file
+    Retry mode (when retry options are present):
+      --max-attempts <N>  Max number of attempts for tests (default: 3)
+      --retry-delay <S>   Delay in seconds between retries (default: 10)
+      --parallel          Run tests in parallel (default: consecutive)
+      --debug / --no-log    Enable/disable logging to file (default: enabled)
+      --debug-verbose     Enable logging to both file AND terminal output
+      --debug-file <n>   Custom log file name (default: auto-generated)
+      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)
+      --env <environment> Set XMTP_ENV (options: local, dev, production)
+      --versions count   Number of SDK versions to use (e.g., 3)
+      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.1)
+      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)
+      --log-level <level> Set logging level (debug, info, error) (default: debug)
+      [vitest_options...] Other options passed directly to vitest
+
+Examples:
+  yarn cli bot gm-bot
+  yarn cli bot stress 5
+  yarn cli script gen
+  yarn script versions
+  yarn cli test functional
+  yarn cli test dms --max-attempts 2
+  yarn cli test dms --parallel
+  yarn cli test dms --debug-verbose   # Shows output in terminal AND logs to file
+  yarn cli test dms --no-fail        # Uses retry mode
+  yarn cli test dms --debug        # Uses retry mode
+  yarn cli test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0
+  yarn cli test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1
+  yarn cli test dms --env production # Sets XMTP_ENV to production
+  yarn cli test dms --no-clean-logs  # Disable automatic log cleaning
+  yarn cli test dms --log-level error  # Set logging level to error
+
 ```
-
-## Usage
-
-### Running the Bot
-
-```bash
-# Install dependencies
-yarn install
-
-# Set up environment variables in .env file
-cp .env.example .env
-# Edit .env with your tokens
-```
-
-### Interacting with the Bot
-
-1. **Direct Messages**: Send any message directly to the bot
-2. **Channel Mentions**: Mention the bot with `@bot-name your message`
-3. **Commands**: Use slash commands like `/history 10` or `/logs test-name`
-
-## Features in Detail
-
-### Channel History Fetching
-
-- Fetches up to 100 messages per request (Slack API limit)
-- Automatically formats timestamps and user mentions
-- Supports text search across message content
-- Truncates long messages for readability
-
-### DataDog Integration
-
-- Uses existing DataDog helper functions from `@helpers/datadog`
-- Tracks bot commands and interactions
-- Includes metadata like test names, regions, and timestamps
-- Integrates with existing XMTP QA monitoring infrastructure
-
-### Error Handling
-
-- Comprehensive error logging
-- Graceful degradation for API failures
-- User-friendly error messages
-- Automatic retry mechanisms where appropriate
-
-## Development
-
-### File Structure
-
-- `helpers/datadog.ts` - DataDog integration utilities
-- `helpers/logger.ts` - Logging utilities
-
-### Key Functions
-
-- `processMessage()` - Main message processing pipeline
-- `fetchChannelHistory()` - Slack history retrieval
-- `handleDataDogLogsCommand()` - DataDog log management
-- `processWithAnthropic()` - Claude AI integration
-
-## Deployment
-
-The bot can be deployed to any Node.js environment with access to:
-
-- Slack Bot API
-- Anthropic API
-- DataDog API (optional)
-
-Make sure to configure the required environment variables and ensure the bot has appropriate Slack permissions for reading channel history and posting messages.
