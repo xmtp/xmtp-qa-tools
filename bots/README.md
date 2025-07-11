@@ -1,62 +1,31 @@
 # XMTP Test Bots
 
-This directory contains test bots for the XMTP protocol. These bots help validate the functionality of XMTP, automate testing scenarios, and provide interactive agents for development purposes.
+Test bots for the XMTP protocol that validate functionality, automate testing scenarios, and provide interactive agents for development.
 
-## Quick reference
+## Quick Reference
 
-| Bot         | Purpose                     | Key Features                             |
-| ----------- | --------------------------- | ---------------------------------------- |
-| **bots/**   | AI-powered personality bots | GPT integration, persistent identities   |
-| **gm-bot/** | Simple greeting bot         | Basic response, standalone deployment    |
-| **simple/** | Diagnostics bot             | Identity info, conversation details      |
-| **stress/** | Load testing bot            | Group scaling, performance benchmarking  |
-| **test/**   | Command-based testing bot   | Test automation, conversation management |
+| Bot         | Purpose             | Key Features                            |
+| ----------- | ------------------- | --------------------------------------- |
+| **gm-bot/** | Simple greeting bot | Basic response, standalone deployment   |
+| **simple/** | Diagnostics bot     | Identity info, conversation details     |
+| **stress/** | Load testing bot    | Group scaling, performance benchmarking |
 
 ## Usage
 
-You can run these bots using the yarn commands defined in package.json:
-
 ```bash
 # Run the GM bot
-yarn bot gm
+yarn bot gm-bot
 
-# Run the stress test bot
-yarn bot stress
+# Run the stress test bot with 5 workers
+yarn bot stress 5
 
-# Run the test bot with command interface
-yarn bot test
-
-# Run the simple bot
+# Run the simple diagnostics bot
 yarn bot simple
-
-# Run the agents bot
-yarn bot agents
 ```
 
-## 🧠 AI Agents
+## GM Bot
 
-The `agents` bot provides AI-powered chat personalities using GPT integration.
-
-```typescript
-// Initialize multiple agent personalities
-const workersGpt = await getWorkers(["sam", "tina", "walt"]);
-
-// Start message streams with GPT responses on demand
-workersGpt.getAll().forEach((worker) => {
-  worker.worker.startStream(typeofStream.MessageandResponse);
-});
-```
-
-**Key features:**
-
-- Persistent GPT-powered personalities
-- Multiple character identities
-- Natural language interaction
-- Automatic message streaming
-
-## 👋 GM Bot
-
-The `gm-bot` is a simple bot that responds with "gm" to any message it receives.
+Simple bot that responds with "gm" to any message.
 
 ```typescript
 // Process incoming messages
@@ -71,16 +40,11 @@ for await (const message of stream) {
 }
 ```
 
-**Key features:**
+Functions: Simple greeting response, deployable to custom ENS domains, minimal configuration, standalone operation.
 
-- Simple greeting response
-- Deployable to custom ENS domains
-- Minimal configuration
-- Standalone operation
+## Simple Bot
 
-## 🔍 Simple Bot
-
-The `simple` bot provides diagnostic information about the XMTP protocol.
+Diagnostic information about the XMTP protocol.
 
 ```typescript
 // Process incoming messages and provide diagnostic info
@@ -96,16 +60,11 @@ for await (const message of stream) {
 }
 ```
 
-**Key features:**
+Functions: Identity information, conversation details, protocol diagnostics, connection testing.
 
-- Identity information
-- Conversation details
-- Protocol diagnostics
-- Connection testing
+## Stress Test Bot
 
-## 🔥 Stress Test Bot
-
-The `stress` bot performs load testing for XMTP groups and DMs.
+Load testing for XMTP groups and DMs.
 
 ```typescript
 // Run stress test with specified number of workers
@@ -124,57 +83,28 @@ const stressTest = async (count) => {
 };
 ```
 
-**Key features:**
+Functions: Configurable worker count, group creation testing, large group scale testing, performance benchmarking.
 
-- Configurable worker count
-- Group creation testing
-- Large group scale testing
-- Performance benchmarking
+## Configuration
 
-## Test Bot
+Environment variables:
 
-The `test` bot provides a command interface for testing XMTP features.
-
-```typescript
-// Process commands from incoming messages
-async function processCommand(message, conversation) {
-  const content = message.content as string;
-
-  if (!content.startsWith("/")) return;
-
-  const [command, ...args] = content.substring(1).split(" ");
-
-  switch (command) {
-    case "create":
-      await createTestGroup(client, args[0] || "5");
-      break;
-    case "members":
-      await listGroupMembers(conversation);
-      break;
-    // ...more commands
-  }
-}
+```bash
+XMTP_ENV=dev                    # Network: local, dev, production
+LOGGING_LEVEL=off              # Logging: off, debug, info, warn, error
+SLACK_BOT_TOKEN=xoxb-...       # Optional: Slack notifications
+SLACK_CHANNEL=C...             # Optional: Slack channel
 ```
 
-**Key features:**
+## Best Practices
 
-- Command-based interface
-- Group management
-- Conversation testing
-- Member management
-- Broadcasting capabilities
-
-## 📝 Best practices
-
-When using these test bots, consider the following best practices:
-
-1. **Environment configuration:** Set proper environment variables for network and logging
-2. **Error handling:** Add error reporting to catch and log failures
-3. **Resource management:** Close streams and clients properly when shutting down
-4. **Identity management:** Use appropriate wallet keys for different environments
-5. **Network selection:** Choose the appropriate XMTP network (dev, production) for testing
+1. Set proper environment variables for network and logging
+2. Add error reporting to catch and log failures
+3. Close streams and clients properly when shutting down
+4. Use appropriate wallet keys for different environments
+5. Choose the appropriate XMTP network for testing
 
 ```bash
 # Launch test environment
-yarn bot gm
+yarn bot gm-bot
 ```

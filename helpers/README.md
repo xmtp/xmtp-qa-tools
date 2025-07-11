@@ -1,8 +1,8 @@
-# 🧰 XMTP Testing Helpers
+# XMTP Testing Helpers
 
-This directory contains utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test workers, collecting metrics, and validating test results.
+Utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test workers, collecting metrics, and validating test results.
 
-## Quick reference
+## Quick Reference
 
 | Module            | Purpose                          | Key Features                                         |
 | ----------------- | -------------------------------- | ---------------------------------------------------- |
@@ -15,8 +15,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing        |
 
 ## Usage
-
-The helper modules are designed to be imported and used in test suites:
 
 ```typescript
 import {
@@ -34,9 +32,9 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 ```
 
-## 🔑 Client Module (`client.ts`)
+## Client Module
 
-The `client.ts` module provides utilities for creating and managing XMTP clients across different SDK versions.
+Create and manage XMTP clients across different SDK versions.
 
 ```typescript
 // Create a signer for an XMTP client
@@ -57,17 +55,11 @@ const clientData = await createClient(
 await logAgentDetails(client);
 ```
 
-**Key features:**
+Functions: Multi-version SDK support, signer creation, database management, environment configuration, key generation.
 
-- **Multi-version SDK support**: Works with SDK versions
-- **Signer creation**: Compatible signers for different SDK versions
-- **Database management**: Automatic database path creation and management
-- **Environment configuration**: Loading and validating environment variables
-- **Key generation**: Private key and encryption key utilities
+## Analyzer Module
 
-## 🔍 Analyzer Module (`analyzer.ts`)
-
-The `analyzer.ts` module provides log analysis and error detection capabilities for identifying test failures and patterns.
+Log analysis and error detection capabilities for identifying test failures and patterns.
 
 ```typescript
 // Extract error logs from test output
@@ -83,14 +75,7 @@ const fail_lines = extractfail_lines(errorLogs);
 const { cleanLine, shouldSkip } = processErrorLine(rawLogLine);
 ```
 
-**Key features:**
-
-- **Error pattern matching**: Identifies known test issues and failure patterns
-- **Log deduplication**: Removes duplicate error messages to reduce noise
-- **ANSI code handling**: Cleans logs from terminal formatting codes
-- **Test filtering**: Determines if test failures are known issues to avoid false alerts
-
-**Known Issue Patterns:**
+Known issue patterns:
 
 ```typescript
 export const PATTERNS = {
@@ -109,9 +94,11 @@ export const PATTERNS = {
 };
 ```
 
-## 📝 Logger Module (`logger.ts`)
+Functions: Error pattern matching, log deduplication, ANSI code handling, test filtering.
 
-The `logger.ts` module provides comprehensive logging utilities with file output and formatting.
+## Logger Module
+
+Logging utilities with file output and formatting.
 
 ```typescript
 // Set up pretty console logging
@@ -131,17 +118,11 @@ const logger = createTestLogger({
 await cleanAllRawLogs();
 ```
 
-**Key features:**
+Functions: File logging, ANSI code stripping, pretty formatting, log processing, Winston integration.
 
-- **File logging**: Automatic log file creation with timestamps
-- **ANSI code stripping**: Removes terminal formatting for clean log files
-- **Pretty formatting**: Colorized console output with timestamps
-- **Log processing**: Utilities for cleaning and processing large log files
-- **Winston integration**: Professional logging with multiple transports
+## Vitest Module
 
-## Vitest Module (`vitest.ts`)
-
-The `vitest.ts` module provides test lifecycle management and performance tracking integration.
+Test lifecycle management and performance tracking integration.
 
 ```typescript
 // Set up test lifecycle with automatic metrics
@@ -155,23 +136,18 @@ setupTestLifecycle({
 });
 ```
 
-**Key features:**
-
-- **Automatic setup**: Handles environment loading and metric initialization
-- **Performance tracking**: Measures test duration and sends metrics to Datadog
-- **Custom duration support**: Allows tests to override automatic timing
-- **Cleanup management**: Ensures proper cleanup after test completion
-
-**Lifecycle hooks:**
+Lifecycle hooks:
 
 - `beforeAll`: Loads environment configuration
 - `beforeEach`: Starts performance timing
 - `afterEach`: Sends performance metrics
 - `afterAll`: Flushes metrics and cleanup
 
-## 🌐 Playwright Module (`playwright.ts`)
+Functions: Automatic setup, performance tracking, custom duration support, cleanup management.
 
-The `playwright.ts` module provides browser automation for testing XMTP web applications.
+## Playwright Module
+
+Browser automation for testing XMTP web applications.
 
 ```typescript
 // Create a Playwright instance
@@ -202,17 +178,11 @@ const received = await browser.waitForResponse(["Hello", "response"]);
 await browser.takeSnapshot("test-completed");
 ```
 
-**Key features:**
+Functions: Headless browser automation, XMTP web app integration, group management, message testing, screenshot capture.
 
-- **Headless browser automation**: Runs tests in Chrome/Chromium
-- **XMTP web app integration**: Pre-configured for XMTP chat interfaces
-- **Group management**: Create groups and manage members through UI
-- **Message testing**: Send messages and verify delivery
-- **Screenshot capture**: Visual debugging and test verification
+## Datadog Module
 
-## 📊 Datadog Module (`datadog.ts`)
-
-The `datadog.ts` module provides metrics collection and performance tracking integration.
+Metrics collection and performance tracking integration.
 
 ```typescript
 // Initialize Datadog metrics
@@ -242,148 +212,24 @@ sendDatadogLog(["Error line 1", "Error line 2"], {
 });
 ```
 
-**Key features:**
+Functions: Performance monitoring, network statistics, metric aggregation, geographic tracking.
 
-- **Performance monitoring**: Tracks test execution times and operation durations
-- **Network statistics**: Measures DNS, TCP, TLS, and processing times
-- **Metric aggregation**: Collects and groups metrics by operation and member count
-- **Geographic tracking**: Includes region and country information
-- **Log integration**: Sends structured logs to Datadog Logs
+## Streams Module
 
-**Network Statistics:**
+Message streaming utilities for verifying stream functionality and message delivery.
 
 ```typescript
-interface NetworkStats {
-  "DNS Lookup": number;
-  "TCP Connection": number;
-  "TLS Handshake": number;
-  Processing: number;
-  "Server Call": number;
-}
+// Verify conversation stream
+await verifyConversationStream(worker, expectedCount);
+
+// Verify message stream
+await verifyMessageStream(worker, expectedMessages);
+
+// Stream message verification with timeout
+const messages = await streamMessages(worker, timeout);
+
+// Check stream health
+const isHealthy = await checkStreamHealth(stream);
 ```
 
-## Streams Module (`streams.ts`)
-
-The `streams.ts` module provides utilities for testing message delivery and conversation streams.
-
-```typescript
-// Verify message delivery to all participants
-const result = await verifyMessageStream(
-  conversation,
-  participants,
-  "text",
-  messageCount,
-  messageGenerator,
-  messageSender,
-);
-
-// Verify metadata updates are received
-const metadataResult = await verifyMetadataStream(
-  group,
-  participants,
-  metadataUpdates,
-);
-
-// Verify membership changes
-const membershipResult = await verifyMembershipStream(
-  group,
-  participants,
-  membershipChanges,
-);
-
-// Verify conversation creation events
-const conversationResult = await verifyConversationStream(
-  initiator,
-  participants,
-);
-
-// Calculate message delivery statistics
-const stats = calculateMessageStats(
-  messagesByWorker,
-  messagePrefix,
-  messageCount,
-  suffix,
-);
-```
-
-**Key features:**
-
-- **Message verification**: Ensures all participants receive expected messages
-- **Stream testing**: Tests real-time message, conversation, and metadata streams
-- **Delivery statistics**: Calculates success rates and timing metrics
-- **Content type support**: Works with text, reactions, replies, and other content types
-- **Group operations**: Verifies group updates, member additions, and metadata changes
-
-**Stream Types Supported:**
-
-- Message streams (text, reactions, replies)
-- Conversation streams (new conversations)
-- Metadata streams (group name, description changes)
-- Membership streams (member additions/removals)
-- Consent streams (contact approvals)
-
-## Environment Configuration
-
-All helper modules work together through environment configuration:
-
-```bash
-# Required environment variables
-XMTP_ENV=dev                    # XMTP environment (dev, production)
-LOGGING_LEVEL=info              # Log level (debug, info, warn, error)
-DATADOG_API_KEY=...             # For metrics reporting
-SLACK_BOT_TOKEN=...             # For failure notifications
-SLACK_CHANNEL=general           # Slack channel for notifications
-GEOLOCATION=us-east             # Geographic region for testing
-```
-
-## 📁 Data Files
-
-### External Dependencies
-
-The helpers reference data files in other directories:
-
-- **`@inboxes/manualusers.json`**: Pre-configured test user accounts
-- **`@inboxes/*.json`**: Generated test identities and wallet data
-- **Environment variables**: Loaded from `.env` files
-
-## Getting Started
-
-To use the helpers in your tests:
-
-1. **Import the required helpers**:
-
-```typescript
-import { createSigner } from "@helpers/client";
-import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
-```
-
-2. **Set up test lifecycle**:
-
-```typescript
-describe("My Test Suite", () => {
-  setupTestLifecycle({ testName });
-
-  // Your tests here
-});
-```
-
-3. **Create XMTP clients**:
-
-```typescript
-const signer = createSigner(walletKey);
-const client = await createClient(walletKey, encryptionKey, config, env);
-```
-
-4. **Verify message delivery**:
-
-```typescript
-const result = await verifyMessageStream(
-  conversation,
-  participants,
-  messageCount,
-);
-expect(result.allReceived).toBe(true);
-```
-
-The helpers are designed to work together seamlessly, providing a comprehensive testing framework for XMTP applications.
+Functions: Stream verification, message delivery testing, timeout handling, stream health monitoring.
