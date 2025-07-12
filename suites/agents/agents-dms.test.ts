@@ -1,6 +1,6 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { verifyBotMessageStream } from "@helpers/streams";
+import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import {
@@ -46,7 +46,7 @@ describe(testName, async () => {
           identifierKind: IdentifierKind.Ethereum,
         });
 
-      const result = await verifyBotMessageStream(
+      const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
         agent.sendMessage,

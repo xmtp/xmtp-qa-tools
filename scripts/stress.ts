@@ -343,8 +343,8 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
         const responseTimes: number[] = [];
 
         const result = await verifyAgentMessageStream(
-          config.botAddress,
-          worker,
+          conversation,
+          [worker],
           `msg-${actualWorkerIndex}`,
           1,
           config.streamTimeoutInSeconds * 1000,
