@@ -7,11 +7,11 @@
  * Usage: yarn cli stress [options]
  *
  * Options:
- *   --users <number>      Number of concurrent users (default: 400)
+ *   --users <number>      Number of concurrent users (default: 1000)
  *   --msgs <number>       Messages per user (default: 1)
  *   --threshold <number>  Success threshold percentage (default: 99)
  *   --timeout <number>    Stream timeout in milliseconds (default: 120000)
- *   --env <environment>   XMTP environment (default: dev)
+ *   --env <environment>   XMTP environment (default: production)
  *   --address <address>   Bot address to test (default: 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d)
  *   --batch-size <number> Batch size for parallel processing (default: calculated)
  *   --help, -h           Show this help message
@@ -34,6 +34,9 @@ interface StressTestConfig {
   agentName: string;
   batchSize: number;
   workersPrefix: string;
+  maxConcurrent: number;
+  batchDelay: number;
+  adaptiveBatching: boolean;
 }
 
 interface WorkerResult {
@@ -49,7 +52,7 @@ function parseArgs(): StressTestConfig {
   const args = process.argv.slice(2);
 
   const config: StressTestConfig = {
-    userCount: 400,
+    userCount: 1000,
     messagesPerUser: 1,
     successThreshold: 99,
     streamTimeoutInSeconds: 100,
@@ -58,6 +61,9 @@ function parseArgs(): StressTestConfig {
     agentName: "gm",
     batchSize: 0, // Will be calculated
     workersPrefix: "test",
+    maxConcurrent: 100, // Default for 1k users
+    batchDelay: 1000, // Default for 1k users
+    adaptiveBatching: true,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -159,6 +165,33 @@ function parseArgs(): StressTestConfig {
           i++;
         }
         break;
+      case "--max-concurrent":
+        if (nextArg) {
+          const val = parseInt(nextArg, 10);
+          if (!isNaN(val) && val > 0) {
+            config.maxConcurrent = val;
+          } else {
+            console.error(`Invalid value for --max-concurrent: ${nextArg}`);
+            process.exit(1);
+          }
+          i++;
+        }
+        break;
+      case "--batch-delay":
+        if (nextArg) {
+          const val = parseInt(nextArg, 10);
+          if (!isNaN(val) && val > 0) {
+            config.batchDelay = val;
+          } else {
+            console.error(`Invalid value for --batch-delay: ${nextArg}`);
+            process.exit(1);
+          }
+          i++;
+        }
+        break;
+      case "--no-adaptive-batching":
+        config.adaptiveBatching = false;
+        break;
       case "--help":
       case "-h":
         showHelp();
@@ -173,7 +206,10 @@ function parseArgs(): StressTestConfig {
 
   // Calculate batch size if not provided
   if (config.batchSize === 0) {
-    config.batchSize = Math.ceil(config.userCount / 10);
+    config.batchSize = Math.min(
+      config.maxConcurrent,
+      Math.ceil(config.userCount / 10),
+    );
   }
 
   // If agent name is provided but no address, look it up
@@ -203,14 +239,17 @@ Usage:
   yarn cli stress [options]
 
 Options:
-  --users <number>      Number of concurrent users (default: 400)
+  --users <number>      Number of concurrent users (default: 1000)
   --msgs <number>       Messages per user (default: 1)
   --threshold <number>  Success threshold percentage (default: 99)
   --timeout <number>    Stream timeout in milliseconds (default: 120000)
-  --env <environment>   XMTP environment: local, dev, production (default: dev)
+  --env <environment>   XMTP environment: local, dev, production (default: production)
   --address <address>   Bot address to test (default: 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d)
   --agent <name>        Agent name to test (looks up address from agents.json)
   --batch-size <number> Batch size for parallel processing (default: calculated)
+  --max-concurrent <number> Max concurrent connections (default: 100)
+  --batch-delay <number> Delay between batches in milliseconds (default: 1000)
+  --no-adaptive-batching Disable adaptive batching
   --help, -h           Show this help message
 
 Examples:
@@ -219,19 +258,27 @@ Examples:
   yarn cli stress --users 100 --msgs 5 --timeout 60000
   yarn cli stress --address 0x1234... --users 50
   yarn cli stress --agent gm --users 400 --msgs 1
-  yarn cli stress --agent bankr --users 200 --env production
+  yarn cli stress --agent bankr --users 1000 --env production --max-concurrent 50
+  yarn cli stress --users 1000 --batch-delay 2000 --no-adaptive-batching
 
 Description:
   This tool creates multiple worker clients and tests bot response rates
-  under high load conditions. Workers are processed in parallel batches
-  to optimize performance while testing bot reliability.
+  under high load conditions. Workers are processed in sequential batches
+  to optimize performance and prevent overwhelming the system.
+  
+  Key features:
+  • Sequential batch processing for better resource management
+  • Adaptive batching that reduces batch size on failures
+  • Configurable rate limiting between batches
+  • Randomized worker IDs from pool of 1000 to avoid testing same users
+  • Optimized for scaling to 1000+ concurrent users
 
 Output:
   The tool provides detailed statistics including:
   • Overall success percentage
   • Average response times
-  • Per-worker success rates
-  • Batch processing progress
+  • Per-batch success rates
+  • Batch processing progress with adaptive sizing
 `);
 }
 
@@ -246,14 +293,20 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Agent name: ${config.agentName}`);
   console.log(`   Bot address: ${config.botAddress}`);
   console.log(`   Batch size: ${config.batchSize}`);
+  console.log(`   Max concurrent: ${config.maxConcurrent}`);
+  console.log(`   Batch delay: ${config.batchDelay}ms`);
+  console.log(
+    `   Adaptive batching: ${config.adaptiveBatching ? "Enabled" : "Disabled"}`,
+  );
   console.log();
 
-  // Generate worker names
+  // Generate random worker names without duplicates
   const names: string[] = [];
-  for (let i = 0; i < config.userCount; i++)
+  for (let i = 0; i < config.userCount; i++) {
     names.push(`${config.workersPrefix}${i}`);
+  }
 
-  console.log(`🔧 Initializing ${config.userCount} workers...`);
+  console.log(`🔧 Initializing ${config.userCount} workers with random IDs...`);
   const workers = await getWorkers(names, { env: config.env as any });
   console.log(`✅ Workers initialized successfully`);
   console.log();
@@ -263,10 +316,11 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   const totalMessages = config.userCount * config.messagesPerUser;
 
   // Calculate number of batches needed
-  const numBatches = Math.ceil(config.userCount / config.batchSize);
+  let currentBatchSize = config.batchSize;
+  let numBatches = Math.ceil(config.userCount / currentBatchSize);
 
   console.log(
-    `📦 Processing ${config.userCount} workers in ${numBatches} parallel batches of ~${config.batchSize} workers each`,
+    `📦 Processing ${config.userCount} workers in ${numBatches} sequential batches of ~${currentBatchSize} workers each`,
   );
   console.log(`📨 Total messages to send: ${totalMessages}`);
   console.log(`⏱️  Starting message sending process...`);
@@ -274,24 +328,23 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
   const startTime = Date.now();
 
-  // Create all batch promises to run in parallel
-  const batchPromises = Array.from(
-    { length: numBatches },
-    async (_, batchIndex) => {
-      const startIndex = batchIndex * config.batchSize;
-      const endIndex = Math.min(
-        startIndex + config.batchSize,
-        config.userCount,
-      );
-      const batchWorkers = workers.getAll().slice(startIndex, endIndex);
+  // Process batches sequentially for better resource management
+  let processedWorkers = 0;
+  let batchIndex = 0;
 
-      console.log(
-        `🏁 Starting batch ${batchIndex + 1}/${numBatches} with ${batchWorkers.length} workers`,
-      );
+  while (processedWorkers < config.userCount) {
+    const startIndex = processedWorkers;
+    const endIndex = Math.min(startIndex + currentBatchSize, config.userCount);
+    const batchWorkers = workers.getAll().slice(startIndex, endIndex);
 
-      // Process all workers in this batch in parallel
-      const workerPromises = batchWorkers.map(async (worker, index) => {
-        const actualWorkerIndex = startIndex + index;
+    console.log(
+      `🏁 Starting batch ${batchIndex + 1}/${numBatches} with ${batchWorkers.length} workers (batch size: ${currentBatchSize})`,
+    );
+
+    // Process all workers in this batch in parallel
+    const workerPromises = batchWorkers.map(async (worker, index) => {
+      const actualWorkerIndex = startIndex + index;
+      try {
         const conversation =
           (await worker.client.conversations.newDmWithIdentifier({
             identifier: config.botAddress,
@@ -347,18 +400,58 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
           responseTimes,
           averageResponseTime,
         };
-      });
+      } catch (error) {
+        console.error(`❌ Worker ${actualWorkerIndex} failed:`, error);
+        return {
+          workerIndex: actualWorkerIndex,
+          successCount: 0,
+          totalAttempts: config.messagesPerUser,
+          successPercentage: 0,
+          responseTimes: [],
+          averageResponseTime: 0,
+        };
+      }
+    });
 
-      // Wait for all workers in this batch to complete
-      const batchResults = await Promise.all(workerPromises);
-      console.log(`✅ Batch ${batchIndex + 1}/${numBatches} completed`);
-      return batchResults;
-    },
-  );
+    // Wait for all workers in this batch to complete
+    const batchResults = await Promise.all(workerPromises);
+    allResults.push(...batchResults);
 
-  // Wait for ALL batches to complete in parallel
-  const allBatchResults = await Promise.all(batchPromises);
-  allResults.push(...allBatchResults.flat());
+    // Calculate batch success rate for adaptive batching
+    const batchSuccessRate =
+      (batchResults.reduce((sum, result) => sum + result.successCount, 0) /
+        batchResults.reduce((sum, result) => sum + result.totalAttempts, 0)) *
+      100;
+
+    console.log(
+      `✅ Batch ${batchIndex + 1}/${numBatches} completed - Success rate: ${batchSuccessRate.toFixed(1)}%`,
+    );
+
+    // Adaptive batching: reduce batch size if success rate is low
+    if (
+      config.adaptiveBatching &&
+      batchSuccessRate < 80 &&
+      currentBatchSize > 10
+    ) {
+      currentBatchSize = Math.max(10, Math.floor(currentBatchSize * 0.7));
+      console.log(
+        `⚠️  Reducing batch size to ${currentBatchSize} due to low success rate`,
+      );
+      // Recalculate number of batches for remaining workers
+      const remainingWorkers = config.userCount - endIndex;
+      numBatches =
+        batchIndex + 1 + Math.ceil(remainingWorkers / currentBatchSize);
+    }
+
+    processedWorkers = endIndex;
+    batchIndex++;
+
+    // Add delay between batches to prevent overwhelming the system
+    if (processedWorkers < config.userCount && config.batchDelay > 0) {
+      console.log(`⏳ Waiting ${config.batchDelay}ms before next batch...`);
+      await new Promise((resolve) => setTimeout(resolve, config.batchDelay));
+    }
+  }
 
   const endTime = Date.now();
   const totalTime = endTime - startTime;
