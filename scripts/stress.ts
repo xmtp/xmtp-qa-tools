@@ -28,7 +28,7 @@ interface StressTestConfig {
   userCount: number;
   messagesPerUser: number;
   successThreshold: number;
-  streamTimeout: number;
+  streamTimeoutInSeconds: number;
   env: string;
   botAddress: string;
   agentName: string;
@@ -52,7 +52,7 @@ function parseArgs(): StressTestConfig {
     userCount: 400,
     messagesPerUser: 1,
     successThreshold: 99,
-    streamTimeout: 120000,
+    streamTimeoutInSeconds: 100,
     env: "production",
     botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     agentName: "gm",
@@ -107,7 +107,7 @@ function parseArgs(): StressTestConfig {
         if (nextArg) {
           const val = parseInt(nextArg, 10);
           if (!isNaN(val) && val > 0) {
-            config.streamTimeout = val;
+            config.streamTimeoutInSeconds = val;
           } else {
             console.error(`Invalid value for --timeout: ${nextArg}`);
             process.exit(1);
@@ -241,7 +241,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Users: ${config.userCount}`);
   console.log(`   Messages per user: ${config.messagesPerUser}`);
   console.log(`   Success threshold: ${config.successThreshold}%`);
-  console.log(`   Stream timeout: ${config.streamTimeout}ms`);
+  console.log(`   Stream timeout: ${config.streamTimeoutInSeconds}s`);
   console.log(`   Environment: ${config.env}`);
   console.log(`   Agent name: ${config.agentName}`);
   console.log(`   Bot address: ${config.botAddress}`);
@@ -306,9 +306,9 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
           const result = await verifyBotMessageStream(
             conversation,
             [worker],
-            `stress-test-worker-${actualWorkerIndex}-msg-${i}-${Date.now()}`,
+            `${actualWorkerIndex}-msg-${i}`,
             1,
-            config.streamTimeout,
+            config.streamTimeoutInSeconds * 1000,
           );
           const responseTime = result?.averageEventTiming;
 

@@ -492,8 +492,7 @@ export class WorkerClient extends Worker {
           });
           for await (const message of stream) {
             console.debug(
-              `[${this.nameId}] Received message`,
-              JSON.stringify(message, null, 2),
+              `[${this.nameId}] Received message: ${message?.content as string}`,
             );
             if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
               break;
@@ -831,9 +830,6 @@ export class WorkerClient extends Worker {
             resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
-            console.debug(
-              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
-            );
             resolve(events);
           }
         } else {
