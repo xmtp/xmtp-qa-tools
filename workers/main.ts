@@ -492,8 +492,7 @@ export class WorkerClient extends Worker {
           });
           for await (const message of stream) {
             console.debug(
-              `[${this.nameId}] Received message`,
-              JSON.stringify(message, null, 2),
+              `[${this.nameId}] Received message: ${message?.content as string}`,
             );
             if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
               break;
@@ -824,23 +823,13 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
-        console.debug(
-          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
-        );
-
         if (isRightType && passesFilter) {
           events.push(msg as T);
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
-          );
 
           if (events.length >= count) {
             resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
-            console.debug(
-              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
-            );
             resolve(events);
           }
         } else {

@@ -126,6 +126,9 @@ function showUsageAndExit(): never {
     "  script <script_name> [script_args...] - Runs a script (e.g., gen)",
   );
   console.error(
+    "  stress [options...]                 - Runs stress testing (e.g., --users 400 --msgs 1)",
+  );
+  console.error(
     "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Simple vitest execution (default):");
@@ -182,6 +185,8 @@ function showUsageAndExit(): never {
   console.error("  yarn cli bot stress 5");
   console.error("  yarn cli script gen");
   console.error("  yarn script versions");
+  console.error("  yarn cli stress --users 400 --msgs 1");
+  console.error("  yarn cli stress --users 200 --msgs 2 --env production");
   console.error("  yarn cli test functional");
   console.error("  yarn cli test dms --max-attempts 2");
   console.error("  yarn cli test dms --parallel");
@@ -650,6 +655,16 @@ async function main(): Promise<void> {
           showUsageAndExit();
         }
         runScript(nameOrPath, additionalArgs);
+        break;
+      }
+
+      case "stress": {
+        // Handle stress command - run stress script directly
+        const allArgs = nameOrPath
+          ? [nameOrPath, ...additionalArgs]
+          : additionalArgs;
+        console.debug("Running stress test with args:", allArgs);
+        runScript("stress", allArgs);
         break;
       }
 
