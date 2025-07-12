@@ -32,6 +32,7 @@
     "run:agent": "./suites/agents/run.sh",
     "run:commits": "./suites/commits/run.sh",
     "script": "yarn cli script",
+    "stress": "yarn cli stress",
     "test": "yarn cli test",
     "ui": "vitest --ui --standalone --watch",
     "workflow-failure": "tsx -e \"import { workflowFailed } from './helpers/analyzer'; (async () => { await workflowFailed(process.argv[1] || 'Unknown'); })();\""

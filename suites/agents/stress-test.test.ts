@@ -3,16 +3,18 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
+import productionAgents from "./agents.json";
+import type { AgentConfig } from "./helper";
 
 const testName = "stress-test";
-const WORKER_COUNT = 100;
+const WORKER_COUNT = 400;
 const MESSAGES_PER_WORKER = 1;
 const SUCCESS_THRESHOLD = 99;
 const DEFAULT_STREAM_TIMEOUT_MS = 10000 * 12;
 const WORKERS_PREFIX = "test";
+const AGENT_NAME = "gm";
 const BATCH_SIZE = Math.ceil(WORKER_COUNT / 10);
-const XMTP_ENV = "production";
-const ADDRESS = "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d";
+const XMTP_ENV = "dev";
 
 describe(testName, async () => {
   setupTestLifecycle({ testName });
@@ -61,9 +63,17 @@ describe(testName, async () => {
         // Process all workers in this batch in parallel
         const workerPromises = batchWorkers.map(async (worker, index) => {
           const actualWorkerIndex = startIndex + index;
+          const agent = (productionAgents as AgentConfig[]).find(
+            (agent) => agent.name === AGENT_NAME,
+          );
+          if (!agent?.address) {
+            throw new Error(
+              `Agent '${AGENT_NAME}' not found or has no address`,
+            );
+          }
           const conversation =
             (await worker.client.conversations.newDmWithIdentifier({
-              identifier: ADDRESS,
+              identifier: agent.address,
               identifierKind: IdentifierKind.Ethereum,
             })) as Conversation;
 

@@ -824,15 +824,8 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
-        console.debug(
-          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
-        );
-
         if (isRightType && passesFilter) {
           events.push(msg as T);
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
-          );
 
           if (events.length >= count) {
             resolved = true;
