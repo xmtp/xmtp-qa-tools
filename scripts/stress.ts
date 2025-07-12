@@ -26,7 +26,6 @@ import "dotenv/config";
 
 interface StressTestConfig {
   userCount: number;
-  messagesPerUser: number;
   successThreshold: number;
   streamTimeoutInSeconds: number;
   env: string;
@@ -53,7 +52,6 @@ function parseArgs(): StressTestConfig {
 
   const config: StressTestConfig = {
     userCount: 1000,
-    messagesPerUser: 1,
     successThreshold: 99,
     streamTimeoutInSeconds: 100,
     env: "production",
@@ -78,18 +76,6 @@ function parseArgs(): StressTestConfig {
             config.userCount = val;
           } else {
             console.error(`Invalid value for --users: ${nextArg}`);
-            process.exit(1);
-          }
-          i++;
-        }
-        break;
-      case "--msgs":
-        if (nextArg) {
-          const val = parseInt(nextArg, 10);
-          if (!isNaN(val) && val > 0) {
-            config.messagesPerUser = val;
-          } else {
-            console.error(`Invalid value for --msgs: ${nextArg}`);
             process.exit(1);
           }
           i++;
@@ -286,7 +272,6 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log("🚀 Starting XMTP Stress Test");
   console.log(`📊 Configuration:`);
   console.log(`   Users: ${config.userCount}`);
-  console.log(`   Messages per user: ${config.messagesPerUser}`);
   console.log(`   Success threshold: ${config.successThreshold}%`);
   console.log(`   Stream timeout: ${config.streamTimeoutInSeconds}s`);
   console.log(`   Environment: ${config.env}`);
@@ -313,7 +298,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
   const allResults: WorkerResult[] = [];
   let totalMessagesSent = 0;
-  const totalMessages = config.userCount * config.messagesPerUser;
+  const totalMessages = config.userCount * 1;
 
   // Calculate number of batches needed
   let currentBatchSize = config.batchSize;
@@ -352,37 +337,34 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
           })) as Conversation;
 
         let successCount = 0;
-        const totalAttempts = config.messagesPerUser;
+        const totalAttempts = 1;
         const responseTimes: number[] = [];
 
-        for (let i = 0; i < config.messagesPerUser; i++) {
-          const result = await verifyBotMessageStream(
-            conversation,
-            [worker],
-            `${actualWorkerIndex}-msg-${i}`,
+        const result = await verifyBotMessageStream(
+          conversation,
+          [worker],
+          `${actualWorkerIndex}-msg-${i}`,
+          1,
+          config.streamTimeoutInSeconds * 1000,
+        );
+        const responseTime = result?.averageEventTiming;
+
+        if (result?.allReceived) {
+          successCount++;
+          responseTimes.push(responseTime ?? 0);
+        }
+        totalMessagesSent++;
+
+        if (
+          totalMessagesSent % 10 === 0 ||
+          totalMessagesSent === totalMessages
+        ) {
+          const progress = ((totalMessagesSent / totalMessages) * 100).toFixed(
             1,
-            config.streamTimeoutInSeconds * 1000,
           );
-          const responseTime = result?.averageEventTiming;
-
-          if (result?.allReceived) {
-            successCount++;
-            responseTimes.push(responseTime ?? 0);
-          }
-          totalMessagesSent++;
-
-          if (
-            totalMessagesSent % 10 === 0 ||
-            totalMessagesSent === totalMessages
-          ) {
-            const progress = (
-              (totalMessagesSent / totalMessages) *
-              100
-            ).toFixed(1);
-            console.log(
-              `📈 Progress: ${totalMessagesSent}/${totalMessages} (${progress}%)`,
-            );
-          }
+          console.log(
+            `📈 Progress: ${totalMessagesSent}/${totalMessages} (${progress}%)`,
+          );
         }
 
         const successPercentage = (successCount / totalAttempts) * 100;
@@ -405,7 +387,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
         return {
           workerIndex: actualWorkerIndex,
           successCount: 0,
-          totalAttempts: config.messagesPerUser,
+          totalAttempts: 1,
           successPercentage: 0,
           responseTimes: [],
           averageResponseTime: 0,
