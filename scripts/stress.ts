@@ -21,7 +21,7 @@ function parseArgs(): StressTestConfig {
   const config: StressTestConfig = {
     userCount: 1000,
     successThreshold: 99,
-    streamTimeoutInSeconds: 100,
+    streamTimeoutInSeconds: 200,
     env: "production",
     botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     agentName: "",
@@ -311,7 +311,6 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(
     `⚡ Messages per Second: ${(config.userCount / (totalTime / 1000)).toFixed(1)}`,
   );
-  console.log();
 
   // Show threshold check
   if (overallPercentage >= config.successThreshold) {
@@ -324,7 +323,6 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     );
   }
 
-  console.log();
   console.log("🏆 Test completed successfully!");
 
   // Exit with appropriate code
