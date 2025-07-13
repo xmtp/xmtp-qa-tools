@@ -543,9 +543,8 @@ export async function verifyAgentMessageStream(
           ["text", "reply", "reaction", "actions"],
           customTimeout ?? undefined,
         ),
-      triggerEvents: async () => {
+      triggerEvents: () => {
         const sentAt = Date.now();
-        await sleep(0.0000001);
         group
           .send("gm")
           .then(() => {
