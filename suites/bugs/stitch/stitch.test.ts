@@ -1,72 +1,90 @@
-import { defaultNames, getWorkers, type Worker } from "@workers/manager";
-import { describe, it } from "vitest";
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+import { beforeAll, describe, expect, it } from "vitest";
 
-const users: {
-  [key: string]: {
-    inboxId: string;
-  };
-} = {
-  // cb: {
-  //   inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
-  //
-  // },
-  // convos: {
-  //   inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
-  //
-  // },
-  xmtpchat: {
-    inboxId: "a4e97a970fbe76a2189fc340182aa7f605e5dcb66f4ff8f22b74c489ee8b1d26",
-  },
-};
+const testName = "stitch";
 
-describe("bug_stitch", () => {
-  const randomName =
-    defaultNames[Math.floor(Math.random() * defaultNames.length)];
-  for (const user of Object.keys(users)) {
-    describe(`User: ${user}`, () => {
-      let randomWorker: Worker;
-      const receiver = users[user].inboxId;
+describe(testName, () => {
+  setupTestLifecycle({ testName });
 
-      it("should initialize clients and sync conversations", async () => {
-        console.log(`Setting up test for ${user}`);
-        const workers = await getWorkers([randomName]);
-        randomWorker = workers.get(randomName) as Worker;
-        const newConvo =
-          await randomWorker.client.conversations.newDm(receiver);
+  // Global variables to encapsulate shared state
+  let workers: WorkerManager;
+  let random1: Worker;
+  let bob: Worker;
+  let initialDm: any;
+  let secondDm: any;
+  let random1InboxId: string;
+  let random1Fresh: Worker;
 
-        console.log("sending message");
-        const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
-        await newConvo?.send(message);
-      });
+  beforeAll(async () => {
+    // Initialize base workers
+    workers = await getWorkers(["random1", "bob"]);
+    random1 = workers.get("random1")!;
+    bob = workers.get("bob")!;
 
-      it("should create new DM and group conversations", async () => {
-        console.log(`Setting up test for ${user}`);
-        const workers = await getWorkers([randomName + "-b"]);
-        randomWorker = workers.get(randomName, "b") as Worker;
-        const sender = randomWorker?.client;
-        const newConvo = await sender.conversations.newDm(receiver);
+    initialDm = await random1.client.conversations.newDm(bob.client.inboxId);
+  });
 
-        console.log("sending message");
-        const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
-        await newConvo?.send(message);
-      });
-      it("terminate and restart", async () => {
-        // Simulate termination and restart
-        console.warn(" terminates, deletes local data, and restarts");
-        await randomWorker?.worker?.clearDB();
-        await randomWorker?.worker?.initialize();
-      });
-      it("should create new DM and group conversations", async () => {
-        console.log(`Setting up test for ${user}`);
-        const workers = await getWorkers([randomName + "-c"]);
-        randomWorker = workers.get(randomName, "c") as Worker;
-        const sender = randomWorker?.client;
-        const newConvo = await sender.conversations.newDm(receiver);
+  it("should verify message delivery works after DM stitching", async () => {
+    // Send a test message and verify delivery
+    const verifyResult = await verifyMessageStream(initialDm as Conversation, [
+      bob,
+    ]);
 
-        console.log("sending message");
-        const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
-        await newConvo?.send(message);
-      });
-    });
-  }
+    // Verify message delivery works after stitching
+    expect(verifyResult.allReceived).toBe(true);
+    expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+  });
+
+  // it("should revoke all installations for random1", async () => {
+  //   // Get current installations
+  //   const currentState = await Client.inboxStateFromInboxIds(
+  //     [random1.client.inboxId],
+  //     (process.env.XMTP_ENV as XmtpEnv) || "dev",
+  //   );
+
+  //   const currentInstallations = currentState[0].installations;
+
+  //   // Revoke all installations
+  //   const installationsToRevokeBytes = currentInstallations.map(
+  //     (installation) => installation.bytes,
+  //   );
+
+  //   if (!random1.client.signer) {
+  //     throw new Error("random1 client signer is undefined");
+  //   }
+
+  //   await Client.revokeInstallations(
+  //     random1.client.signer,
+  //     random1.client.inboxId,
+  //     installationsToRevokeBytes,
+  //     (process.env.XMTP_ENV as XmtpEnv) || "dev",
+  //   );
+  // });
+
+  it("should create fresh random1 client and verify DM accessibility", async () => {
+    // Create fresh random1 client
+    const freshrandom1 = await getWorkers(["random1-fresh"]);
+    random1Fresh = freshrandom1.get("random1", "fresh")!;
+
+    // Send a test message and verify delivery
+    await random1Fresh.client.conversations.syncAll();
+    await bob.client.conversations.syncAll();
+
+    const testDm = await random1Fresh.client.conversations.newDm(
+      bob.client.inboxId,
+    );
+    await testDm.send("Test message from random1's fresh client");
+
+    const verifyResult = await verifyMessageStream(testDm as Conversation, [
+      bob,
+    ]);
+
+    // Verify message delivery works after stitching
+    expect(verifyResult.allReceived).toBe(true);
+    expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+  });
 });

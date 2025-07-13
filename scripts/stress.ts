@@ -217,6 +217,8 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     averageResponseTime: number;
   }> = [];
   let totalStartTime = Date.now();
+  let totalMessagesSent = 0;
+  let totalMessageSendTime = 0;
 
   for (let run = 1; run <= config.runs; run++) {
     if (config.runs > 1) {
@@ -226,6 +228,10 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
     console.log(`📨 Starting ${config.userCount} workers in parallel...`);
     const startTime = Date.now();
+    const messageSendStartTime = Date.now();
+
+    // Count messages that will be sent (1 per worker)
+    totalMessagesSent += config.userCount;
 
     // Process all workers in parallel
     const workerPromises = workers
@@ -300,6 +306,9 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
     const endTime = Date.now();
     const runTime = endTime - startTime;
+    const messageSendEndTime = Date.now();
+    const messageSendTime = messageSendEndTime - messageSendStartTime;
+    totalMessageSendTime += messageSendTime;
 
     if (config.runs > 1) {
       console.log(
@@ -312,6 +321,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   const totalEndTime = Date.now();
   const totalTime = totalEndTime - totalStartTime;
 
+  console.log("=".repeat(50));
   console.log("📊 STRESS TEST RESULTS");
   console.log("=".repeat(50));
 
@@ -347,24 +357,24 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
       ? sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.95)]
       : 0;
 
-  console.log(`Agent: ${config.agentName}`);
-  console.log(`Env: ${config.env}`);
-  console.log(`Runs: ${config.runs}`);
+  console.log(`- Agent: ${config.agentName}`);
+  console.log(`- Env: ${config.env}`);
+  console.log(`- Runs: ${config.runs}`);
   console.log(
-    `Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
+    `- Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
   );
-  console.log(`⏱️  Total Execution Time: ${(totalTime / 1000).toFixed(1)}s`);
+  console.log(`- Total Execution Time: ${(totalTime / 1000).toFixed(1)}s`);
   console.log(
-    `Average Response Time: ${(overallAverageResponseTime / 1000).toFixed(2)}s`,
-  );
-  console.log(
-    `Median Response Time: ${(medianResponseTime / 1000).toFixed(2)}s`,
+    `- Average Response Time: ${(overallAverageResponseTime / 1000).toFixed(2)}s`,
   );
   console.log(
-    `95th Percentile Response Time: ${(p95ResponseTime / 1000).toFixed(2)}s`,
+    `- Median Response Time: ${(medianResponseTime / 1000).toFixed(2)}s`,
   );
   console.log(
-    `Messages per Second: ${((config.userCount * config.runs) / (totalTime / 1000)).toFixed(1)}`,
+    `- 95th Percentile Response Time: ${(p95ResponseTime / 1000).toFixed(2)}s`,
+  );
+  console.log(
+    `- Messages per Second: ${(totalMessagesSent / (totalMessageSendTime / 1000)).toFixed(1)}`,
   );
 
   // Show threshold check
