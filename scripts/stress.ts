@@ -1,22 +1,3 @@
-/**
- * XMTP Stress Testing CLI Tool
- *
- * Runs stress tests against XMTP bots with configurable parameters.
- * Tests bot response rates under high load conditions.
- *
- * Usage: yarn cli stress [options]
- *
- * Options:
- *   --users <number>      Number of concurrent users (default: 1000)
- *   --msgs <number>       Messages per user (default: 1)
- *   --threshold <number>  Success threshold percentage (default: 99)
- *   --timeout <number>    Stream timeout in milliseconds (default: 120000)
- *   --env <environment>   XMTP environment (default: production)
- *   --address <address>   Bot address to test (default: 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d)
- *   --batch-size <number> Batch size for parallel processing (default: calculated)
- *   --help, -h           Show this help message
- */
-
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
@@ -55,7 +36,7 @@ function parseArgs(): StressTestConfig {
     successThreshold: 99,
     streamTimeoutInSeconds: 100,
     env: "production",
-    botAddress: "", // will be set later
+    botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d", // Set the default address from help text
     agentName: "", // will be set later
     batchSize: 0, // Will be calculated
     workersPrefix: "test",
@@ -198,12 +179,7 @@ function parseArgs(): StressTestConfig {
     );
   }
 
-  // If agent name is provided but no address, look it up
-  if (config.agentName) {
-    const agent = (productionAgents as AgentConfig[]).find(
-      (a) => a.name === config.agentName,
-    );
-  }
+  // Remove the duplicate agent lookup logic - it's already handled in the switch statement above
 
   return config;
 }
@@ -280,20 +256,21 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log();
 
   // Generate random worker names without duplicates
-  // Generate random worker names without duplicates
   const names: string[] = [];
-  const usedNumbers = new Set<number>();
-
-  // Generate unique random numbers between 0-999
   for (let i = 0; i < config.userCount; i++) {
-    const randomNum = Math.floor(Math.random() * 1000);
-    if (!usedNumbers.has(randomNum)) {
-      usedNumbers.add(randomNum);
-      names.push(`${config.workersPrefix}${randomNum}`);
-    }
+    names.push(`${config.workersPrefix}${i}`);
   }
+  // // Generate unique random numbers between 0-999
+  // const usedNumbers = new Set<number>();
+  // for (let i = 0; i < config.userCount; i++) {
+  //   const randomNum = Math.floor(Math.random() * 1000);
+  //   if (!usedNumbers.has(randomNum)) {
+  //     usedNumbers.add(randomNum);
+  //     names.push(`${config.workersPrefix}${randomNum}`);
+  //   }
+  // }
 
-  console.log(`🔧 Initializing ${config.userCount} workers with random IDs...`);
+  console.log(`🔧 Initializing ${config.userCount} workers...`);
   const workers = await getWorkers(names, { env: config.env as any });
   console.log(`✅ Workers initialized successfully`);
   console.log();
@@ -479,6 +456,8 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(
     `📊 Overall Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
   );
+  console.log("Address", config.botAddress);
+  console.log("Env", config.env);
   console.log(`⏱️  Total Execution Time: ${(totalTime / 1000).toFixed(1)}s`);
   console.log(
     `🎯 Average Response Time: ${overallAverageResponseTime.toFixed(0)}ms`,

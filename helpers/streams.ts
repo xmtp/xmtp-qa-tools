@@ -545,7 +545,14 @@ export async function verifyAgentMessageStream(
         ),
       triggerEvents: async () => {
         const sentAt = Date.now();
-        await group.send(triggerMessage);
+        await sleep(0.0000001);
+        group
+          .send("gm")
+          .then(() => {
+            console.log("gm sent");
+          })
+          .catch(console.error);
+
         return [{ sessionId, sentAt }];
       },
       getKey: () => sessionId, // Use consistent sessionId for both sent and received
