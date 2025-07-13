@@ -19,7 +19,6 @@ import {
   generatePrivateKey as viemGeneratePrivateKey,
 } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 export type GroupMetadataContent = {

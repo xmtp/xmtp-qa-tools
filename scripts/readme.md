@@ -67,6 +67,9 @@ yarn cli test regression --nodeVersion 3.1.1 --debug
 ## Stress Testing
 
 ```bash
-# Run stress test
-yarn cli stress --users 100 --msgs 1 --threshold 99 --timeout 100 --env production
+
+Local env
+yarn stress --address 0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b --env dev --users 200
+
+yarn stress --agent gm --env dev --users 200
 ```

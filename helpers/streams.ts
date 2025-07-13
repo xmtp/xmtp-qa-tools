@@ -543,9 +543,11 @@ export async function verifyAgentMessageStream(
           ["text", "reply", "reaction", "actions"],
           customTimeout ?? undefined,
         ),
-      triggerEvents: async () => {
+      // @ts-expect-error - TODO: fix this
+      triggerEvents: () => {
         const sentAt = Date.now();
-        await group.send(triggerMessage);
+        group.send(triggerMessage).catch(console.error);
+
         return [{ sessionId, sentAt }];
       },
       getKey: () => sessionId, // Use consistent sessionId for both sent and received
