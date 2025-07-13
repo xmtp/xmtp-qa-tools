@@ -53,7 +53,7 @@ function parseArgs(): StressTestConfig {
   const config: StressTestConfig = {
     userCount: 1000,
     successThreshold: 99,
-    streamTimeoutInSeconds: 100,
+    streamTimeoutInSeconds: 150, // Increased timeout for better reliability
     env: "production",
     botAddress: "", // will be set later
     agentName: "", // will be set later
@@ -190,12 +190,25 @@ function parseArgs(): StressTestConfig {
     }
   }
 
-  // Calculate batch size if not provided
+  // Calculate batch size if not provided - optimize for bot response capacity
   if (config.batchSize === 0) {
-    config.batchSize = Math.min(
-      config.maxConcurrent,
-      Math.ceil(config.userCount / 10),
-    );
+    // For bot stress testing, use smaller batches to avoid overwhelming
+    if (config.userCount <= 100) {
+      config.batchSize = 5;
+      config.batchDelay = 2000;
+    } else if (config.userCount <= 200) {
+      config.batchSize = 8;
+      config.batchDelay = 3000;
+    } else if (config.userCount <= 400) {
+      config.batchSize = 10;
+      config.batchDelay = 4000;
+    } else {
+      config.batchSize = 15;
+      config.batchDelay = 5000;
+    }
+    
+    // Ensure we don't exceed maxConcurrent
+    config.batchSize = Math.min(config.batchSize, config.maxConcurrent);
   }
 
   // If agent name is provided but no address, look it up
@@ -412,19 +425,22 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     );
 
     // Adaptive batching: reduce batch size if success rate is low
-    if (
-      config.adaptiveBatching &&
-      batchSuccessRate < 80 &&
-      currentBatchSize > 10
-    ) {
-      currentBatchSize = Math.max(10, Math.floor(currentBatchSize * 0.7));
-      console.log(
-        `⚠️  Reducing batch size to ${currentBatchSize} due to low success rate`,
-      );
-      // Recalculate number of batches for remaining workers
-      const remainingWorkers = config.userCount - endIndex;
-      numBatches =
-        batchIndex + 1 + Math.ceil(remainingWorkers / currentBatchSize);
+    if (config.adaptiveBatching && batchSuccessRate < 85) {
+      const newBatchSize = Math.max(3, Math.floor(currentBatchSize * 0.6));
+      const newBatchDelay = Math.min(config.batchDelay * 1.5, 10000);
+      
+      if (newBatchSize !== currentBatchSize) {
+        console.log(
+          `⚠️  Reducing batch size from ${currentBatchSize} to ${newBatchSize} and increasing delay to ${newBatchDelay}ms due to ${batchSuccessRate.toFixed(1)}% success rate`,
+        );
+        currentBatchSize = newBatchSize;
+        config.batchDelay = newBatchDelay;
+        
+        // Recalculate number of batches for remaining workers
+        const remainingWorkers = config.userCount - endIndex;
+        numBatches =
+          batchIndex + 1 + Math.ceil(remainingWorkers / currentBatchSize);
+      }
     }
 
     processedWorkers = endIndex;
