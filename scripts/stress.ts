@@ -36,6 +36,8 @@ interface StressTestConfig {
   maxConcurrent: number;
   batchDelay: number;
   adaptiveBatching: boolean;
+  retryFailedUsers: boolean;
+  maxRetries: number;
 }
 
 interface WorkerResult {
@@ -45,6 +47,7 @@ interface WorkerResult {
   successPercentage: number;
   responseTimes: number[];
   averageResponseTime: number;
+  retryCount: number;
 }
 
 function parseArgs(): StressTestConfig {
@@ -62,6 +65,8 @@ function parseArgs(): StressTestConfig {
     maxConcurrent: 100, // Default for 1k users
     batchDelay: 1000, // Default for 1k users
     adaptiveBatching: true,
+    retryFailedUsers: true,
+    maxRetries: 2,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -122,20 +127,6 @@ function parseArgs(): StressTestConfig {
       case "--agent":
         if (nextArg) {
           config.agentName = nextArg;
-          // Look up the agent address from agents.json
-          const agent = (productionAgents as AgentConfig[]).find(
-            (a) => a.name === nextArg,
-          );
-          if (agent) {
-            config.botAddress = agent.address;
-          } else {
-            console.error(`Agent '${nextArg}' not found in agents.json`);
-            console.error(
-              "Available agents:",
-              (productionAgents as AgentConfig[]).map((a) => a.name).join(", "),
-            );
-            process.exit(1);
-          }
           i++;
         }
         break;
@@ -151,58 +142,61 @@ function parseArgs(): StressTestConfig {
           i++;
         }
         break;
-      case "--max-concurrent":
-        if (nextArg) {
-          const val = parseInt(nextArg, 10);
-          if (!isNaN(val) && val > 0) {
-            config.maxConcurrent = val;
-          } else {
-            console.error(`Invalid value for --max-concurrent: ${nextArg}`);
-            process.exit(1);
-          }
-          i++;
-        }
-        break;
-      case "--batch-delay":
-        if (nextArg) {
-          const val = parseInt(nextArg, 10);
-          if (!isNaN(val) && val > 0) {
-            config.batchDelay = val;
-          } else {
-            console.error(`Invalid value for --batch-delay: ${nextArg}`);
-            process.exit(1);
-          }
-          i++;
-        }
-        break;
-      case "--no-adaptive-batching":
-        config.adaptiveBatching = false;
-        break;
       case "--help":
       case "-h":
         showHelp();
         process.exit(0);
         break;
       default:
-        console.error(`Unknown argument: ${arg}`);
-        showHelp();
-        process.exit(1);
+        if (arg.startsWith("--")) {
+          console.error(`Unknown option: ${arg}`);
+          process.exit(1);
+        }
+        break;
     }
   }
 
-  // Calculate batch size if not provided
+  // Auto-calculate optimal batch size based on user count
   if (config.batchSize === 0) {
-    config.batchSize = Math.min(
-      config.maxConcurrent,
-      Math.ceil(config.userCount / 10),
-    );
+    if (config.userCount <= 50) {
+      config.batchSize = Math.min(20, config.userCount);
+      config.batchDelay = 500;
+    } else if (config.userCount <= 100) {
+      config.batchSize = 25;
+      config.batchDelay = 300;
+    } else if (config.userCount <= 200) {
+      config.batchSize = 30;
+      config.batchDelay = 200;
+    } else if (config.userCount <= 400) {
+      config.batchSize = 40;
+      config.batchDelay = 100;
+    } else {
+      config.batchSize = 50;
+      config.batchDelay = 50;
+    }
+  }
+
+  // Auto-adjust timeout based on user count for better success rates
+  if (config.userCount >= 200 && config.streamTimeoutInSeconds < 90) {
+    config.streamTimeoutInSeconds = 90;
+    console.log(`⚠️  Auto-adjusted timeout to ${config.streamTimeoutInSeconds}s for ${config.userCount} users`);
   }
 
   // If agent name is provided but no address, look it up
-  if (config.agentName) {
+  if (config.agentName && !config.botAddress) {
     const agent = (productionAgents as AgentConfig[]).find(
       (a) => a.name === config.agentName,
     );
+    if (agent) {
+      config.botAddress = agent.address;
+    } else {
+      console.error(`Agent '${config.agentName}' not found in agents.json`);
+      console.error(
+        "Available agents:",
+        (productionAgents as AgentConfig[]).map((a) => a.name).join(", "),
+      );
+      process.exit(1);
+    }
   }
 
   return config;
@@ -274,23 +268,25 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Batch size: ${config.batchSize}`);
   console.log(`   Max concurrent: ${config.maxConcurrent}`);
   console.log(`   Batch delay: ${config.batchDelay}ms`);
+  console.log(`   Retry failed users: ${config.retryFailedUsers ? "Yes" : "No"}`);
+  console.log(`   Max retries: ${config.maxRetries}`);
   console.log(
     `   Adaptive batching: ${config.adaptiveBatching ? "Enabled" : "Disabled"}`,
   );
   console.log();
 
   // Generate random worker names without duplicates
-  // Generate random worker names without duplicates
   const names: string[] = [];
   const usedNumbers = new Set<number>();
 
   // Generate unique random numbers between 0-999
   for (let i = 0; i < config.userCount; i++) {
-    const randomNum = Math.floor(Math.random() * 1000);
-    if (!usedNumbers.has(randomNum)) {
-      usedNumbers.add(randomNum);
-      names.push(`${config.workersPrefix}${randomNum}`);
-    }
+    let randomNum;
+    do {
+      randomNum = Math.floor(Math.random() * 1000);
+    } while (usedNumbers.has(randomNum));
+    usedNumbers.add(randomNum);
+    names.push(`${config.workersPrefix}${randomNum}`);
   }
 
   console.log(`🔧 Initializing ${config.userCount} workers with random IDs...`);
@@ -318,6 +314,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   // Process batches sequentially for better resource management
   let processedWorkers = 0;
   let batchIndex = 0;
+  let failedWorkers: { worker: any; index: number }[] = [];
 
   while (processedWorkers < config.userCount) {
     const startIndex = processedWorkers;
@@ -331,75 +328,29 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     // Process all workers in this batch in parallel
     const workerPromises = batchWorkers.map(async (worker, index) => {
       const actualWorkerIndex = startIndex + index;
-      try {
-        const conversation =
-          (await worker.client.conversations.newDmWithIdentifier({
-            identifier: config.botAddress,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
-
-        let successCount = 0;
-        const totalAttempts = 1;
-        const responseTimes: number[] = [];
-
-        const result = await verifyAgentMessageStream(
-          conversation,
-          [worker],
-          `msg-${actualWorkerIndex}`,
-          1,
-          config.streamTimeoutInSeconds * 1000,
-        );
-        const responseTime = result?.averageEventTiming;
-
-        if (result?.allReceived) {
-          successCount++;
-          responseTimes.push(responseTime ?? 0);
-        }
-        totalMessagesSent++;
-
-        if (
-          totalMessagesSent % 10 === 0 ||
-          totalMessagesSent === totalMessages
-        ) {
-          const progress = ((totalMessagesSent / totalMessages) * 100).toFixed(
-            1,
-          );
-          console.log(
-            `📈 Progress: ${totalMessagesSent}/${totalMessages} (${progress}%)`,
-          );
-        }
-
-        const successPercentage = (successCount / totalAttempts) * 100;
-        const averageResponseTime =
-          responseTimes.length > 0
-            ? responseTimes.reduce((sum, time) => sum + time, 0) /
-              responseTimes.length
-            : 0;
-
-        return {
-          workerIndex: actualWorkerIndex,
-          successCount,
-          totalAttempts,
-          successPercentage,
-          responseTimes,
-          averageResponseTime,
-        };
-      } catch (error) {
-        console.error(`❌ Worker ${actualWorkerIndex} failed:`, error);
-        return {
-          workerIndex: actualWorkerIndex,
-          successCount: 0,
-          totalAttempts: 1,
-          successPercentage: 0,
-          responseTimes: [],
-          averageResponseTime: 0,
-        };
-      }
+      return await processWorker(worker, actualWorkerIndex, config);
     });
 
     // Wait for all workers in this batch to complete
     const batchResults = await Promise.all(workerPromises);
     allResults.push(...batchResults);
+
+    // Track failed workers for retry
+    batchResults.forEach((result, index) => {
+      if (result.successCount === 0) {
+        failedWorkers.push({
+          worker: batchWorkers[index],
+          index: result.workerIndex,
+        });
+      }
+    });
+
+    // Update progress tracking
+    totalMessagesSent += batchWorkers.length;
+    const progress = ((totalMessagesSent / totalMessages) * 100).toFixed(1);
+    console.log(
+      `📈 Progress: ${totalMessagesSent}/${totalMessages} (${progress}%)`,
+    );
 
     // Calculate batch success rate for adaptive batching
     const batchSuccessRate =
@@ -411,16 +362,20 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
       `✅ Batch ${batchIndex + 1}/${numBatches} completed - Success rate: ${batchSuccessRate.toFixed(1)}%`,
     );
 
-    // Adaptive batching: reduce batch size if success rate is low
-    if (
-      config.adaptiveBatching &&
-      batchSuccessRate < 80 &&
-      currentBatchSize > 10
-    ) {
-      currentBatchSize = Math.max(10, Math.floor(currentBatchSize * 0.7));
-      console.log(
-        `⚠️  Reducing batch size to ${currentBatchSize} due to low success rate`,
-      );
+    // Adaptive batching: adjust batch size based on success rate
+    if (config.adaptiveBatching) {
+      if (batchSuccessRate < 70 && currentBatchSize > 15) {
+        currentBatchSize = Math.max(15, Math.floor(currentBatchSize * 0.6));
+        console.log(
+          `⚠️  Reducing batch size to ${currentBatchSize} due to low success rate`,
+        );
+      } else if (batchSuccessRate > 95 && currentBatchSize < config.batchSize) {
+        currentBatchSize = Math.min(config.batchSize, currentBatchSize + 5);
+        console.log(
+          `⬆️  Increasing batch size to ${currentBatchSize} due to high success rate`,
+        );
+      }
+      
       // Recalculate number of batches for remaining workers
       const remainingWorkers = config.userCount - endIndex;
       numBatches =
@@ -434,6 +389,41 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     if (processedWorkers < config.userCount && config.batchDelay > 0) {
       console.log(`⏳ Waiting ${config.batchDelay}ms before next batch...`);
       await new Promise((resolve) => setTimeout(resolve, config.batchDelay));
+    }
+  }
+
+  // Retry failed workers if enabled
+  if (config.retryFailedUsers && failedWorkers.length > 0) {
+    console.log();
+    console.log(`🔄 Retrying ${failedWorkers.length} failed workers...`);
+    
+    for (let retryAttempt = 1; retryAttempt <= config.maxRetries; retryAttempt++) {
+      if (failedWorkers.length === 0) break;
+
+      console.log(`🔄 Retry attempt ${retryAttempt}/${config.maxRetries} for ${failedWorkers.length} workers`);
+      
+      const retryPromises = failedWorkers.map(async ({ worker, index }) => {
+        return await processWorker(worker, index, config, retryAttempt);
+      });
+
+      const retryResults = await Promise.all(retryPromises);
+      
+      // Update results and remove successful retries
+      const newFailedWorkers: { worker: any; index: number }[] = [];
+      retryResults.forEach((result, i) => {
+        const originalIndex = allResults.findIndex(r => r.workerIndex === result.workerIndex);
+        if (originalIndex !== -1) {
+          allResults[originalIndex] = result;
+        }
+        
+        if (result.successCount === 0) {
+          newFailedWorkers.push(failedWorkers[i]);
+        }
+      });
+
+      failedWorkers = newFailedWorkers;
+      const retrySuccessRate = ((retryResults.length - failedWorkers.length) / retryResults.length) * 100;
+      console.log(`✅ Retry ${retryAttempt} completed - Success rate: ${retrySuccessRate.toFixed(1)}%`);
     }
   }
 
@@ -453,61 +443,118 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     (sum: number, result: WorkerResult) => sum + result.totalAttempts,
     0,
   );
-  const overallPercentage = (totalResponses / totalAttempts) * 100;
+  const overallSuccessRate = (totalResponses / totalAttempts) * 100;
 
-  // Calculate overall average response time
+  // Calculate response time statistics
   const allResponseTimes = allResults.flatMap(
     (result: WorkerResult) => result.responseTimes,
   );
-  const overallAverageResponseTime =
+  const averageResponseTime =
     allResponseTimes.length > 0
       ? allResponseTimes.reduce((sum: number, time: number) => sum + time, 0) /
         allResponseTimes.length
       : 0;
 
-  // Calculate response time statistics
+  // Calculate median response time
   const sortedResponseTimes = allResponseTimes.sort((a, b) => a - b);
   const medianResponseTime =
     sortedResponseTimes.length > 0
       ? sortedResponseTimes[Math.floor(sortedResponseTimes.length / 2)]
       : 0;
+
+  // Calculate 95th percentile response time
   const p95ResponseTime =
     sortedResponseTimes.length > 0
       ? sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.95)]
       : 0;
 
-  console.log(
-    `📊 Overall Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
-  );
+  const messagesPerSecond = totalResponses / (totalTime / 1000);
+
+  console.log(`📊 Overall Success Rate: ${totalResponses}/${totalAttempts} (${overallSuccessRate.toFixed(1)}%)`);
   console.log(`⏱️  Total Execution Time: ${(totalTime / 1000).toFixed(1)}s`);
-  console.log(
-    `🎯 Average Response Time: ${overallAverageResponseTime.toFixed(0)}ms`,
-  );
+  console.log(`🎯 Average Response Time: ${averageResponseTime.toFixed(0)}ms`);
   console.log(`📈 Median Response Time: ${medianResponseTime.toFixed(0)}ms`);
-  console.log(
-    `🔥 95th Percentile Response Time: ${p95ResponseTime.toFixed(0)}ms`,
-  );
-  console.log(
-    `⚡ Messages per Second: ${(totalMessages / (totalTime / 1000)).toFixed(1)}`,
-  );
+  console.log(`🔥 95th Percentile Response Time: ${p95ResponseTime.toFixed(0)}ms`);
+  console.log(`⚡ Messages per Second: ${messagesPerSecond.toFixed(1)}`);
   console.log();
 
-  // Show threshold check
-  if (overallPercentage >= config.successThreshold) {
-    console.log(
-      `✅ SUCCESS: ${overallPercentage.toFixed(1)}% ≥ ${config.successThreshold}% threshold`,
-    );
+  if (overallSuccessRate >= config.successThreshold) {
+    console.log(`✅ SUCCESS: ${overallSuccessRate.toFixed(1)}% >= ${config.successThreshold}% threshold`);
+    console.log();
+    console.log(`🏆 Test completed successfully!`);
+    process.exit(0);
   } else {
-    console.log(
-      `❌ FAILURE: ${overallPercentage.toFixed(1)}% < ${config.successThreshold}% threshold`,
-    );
+    console.log(`❌ FAILURE: ${overallSuccessRate.toFixed(1)}% < ${config.successThreshold}% threshold`);
+    console.log();
+    console.log(`🏆 Test completed successfully!`);
+    process.exit(1);
   }
+}
 
-  console.log();
-  console.log("🏆 Test completed successfully!");
+async function processWorker(
+  worker: any,
+  workerIndex: number,
+  config: StressTestConfig,
+  retryAttempt: number = 0
+): Promise<WorkerResult> {
+  try {
+    const conversation =
+      (await worker.client.conversations.newDmWithIdentifier({
+        identifier: config.botAddress,
+        identifierKind: IdentifierKind.Ethereum,
+      })) as Conversation;
 
-  // Exit with appropriate code
-  process.exit(overallPercentage >= config.successThreshold ? 0 : 1);
+    let successCount = 0;
+    const totalAttempts = 1;
+    const responseTimes: number[] = [];
+
+    // Increase timeout for retries (streamTimeoutInSeconds is already in seconds, convert to milliseconds)
+    const timeout = retryAttempt > 0 
+      ? config.streamTimeoutInSeconds * 1000 * (1 + retryAttempt * 0.5)
+      : config.streamTimeoutInSeconds * 1000;
+
+    const result = await verifyAgentMessageStream(
+      conversation,
+      [worker],
+      `msg-${workerIndex}`,
+      1,
+      timeout,
+    );
+    const responseTime = result?.averageEventTiming;
+
+    if (result?.allReceived) {
+      successCount++;
+      responseTimes.push(responseTime ?? 0);
+    }
+
+    const successPercentage = (successCount / totalAttempts) * 100;
+    const averageResponseTime =
+      responseTimes.length > 0
+        ? responseTimes.reduce((sum, time) => sum + time, 0) /
+          responseTimes.length
+        : 0;
+
+    return {
+      workerIndex,
+      successCount,
+      totalAttempts,
+      successPercentage,
+      responseTimes,
+      averageResponseTime,
+      retryCount: retryAttempt,
+    };
+  } catch (error) {
+    console.error(`❌ Worker ${workerIndex} failed:`, error);
+    return {
+      workerIndex,
+      successCount: 0,
+      totalAttempts: 1,
+      successPercentage: 0,
+      responseTimes: [],
+      averageResponseTime: 0,
+      retryCount: retryAttempt,
+    };
+  }
 }
 
 async function main(): Promise<void> {
