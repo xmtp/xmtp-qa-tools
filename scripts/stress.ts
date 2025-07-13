@@ -21,7 +21,7 @@ function parseArgs(): StressTestConfig {
   const config: StressTestConfig = {
     userCount: 1000,
     successThreshold: 99,
-    streamTimeoutInSeconds: 200,
+    streamTimeoutInSeconds: 120,
     env: "production",
     botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     agentName: "",
