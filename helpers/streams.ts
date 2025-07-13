@@ -564,5 +564,8 @@ export async function verifyAgentMessageStream(
 
     attempts++;
   }
+  receivers.forEach((worker) => {
+    worker.worker.stopStreams();
+  });
   return result;
 }
