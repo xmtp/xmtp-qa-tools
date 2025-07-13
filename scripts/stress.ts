@@ -282,16 +282,20 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   // Generate random worker names without duplicates
   // Generate random worker names without duplicates
   const names: string[] = [];
-  const usedNumbers = new Set<number>();
 
-  // Generate unique random numbers between 0-999
   for (let i = 0; i < config.userCount; i++) {
-    const randomNum = Math.floor(Math.random() * 1000);
-    if (!usedNumbers.has(randomNum)) {
-      usedNumbers.add(randomNum);
-      names.push(`${config.workersPrefix}${randomNum}`);
-    }
+    names.push(`${config.workersPrefix}${i}`);
   }
+  //const usedNumbers = new Set<number>();
+
+  // // Generate unique random numbers between 0-999
+  // for (let i = 0; i < config.userCount; i++) {
+  //   const randomNum = Math.floor(Math.random() * 1000);
+  //   if (!usedNumbers.has(randomNum)) {
+  //     usedNumbers.add(randomNum);
+  //     names.push(`${config.workersPrefix}${randomNum}`);
+  //   }
+  // }
 
   console.log(`🔧 Initializing ${config.userCount} workers with random IDs...`);
   const workers = await getWorkers(names, { env: config.env as any });
