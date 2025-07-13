@@ -66,28 +66,10 @@ yarn cli test regression --nodeVersion 3.1.1 --debug
 
 ## Stress Testing
 
-````bash
+```bash
 
 Local env
 yarn stress --address 0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b --env dev --users 200
 
 yarn stress --agent gm --env dev --users 200
-```
-
-
-### Fast (optimized defaults):
-```bash
-yarn cli stress --users 200
-````
-
-### Ultra-fast (parallel batches):
-
-```bash
-yarn cli stress --users 200 --parallel-batches 3 --batch-delay 50
-```
-
-### Maximum speed (no delays):
-
-```bash
-yarn cli stress --users 200 --batch-size 100 --batch-delay 0
 ```
