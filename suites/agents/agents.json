@@ -84,6 +84,15 @@
     "shouldRespondOnTagged": false
   },
   {
+    "name": "local",
+    "baseName": "local.base.eth",
+    "address": "0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b",
+    "sendMessage": "hola",
+    "networks": ["local"],
+    "slackChannel": "#local-alerts",
+    "shouldRespondOnTagged": false
+  },
+  {
     "name": "bankr",
     "baseName": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
