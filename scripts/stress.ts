@@ -173,6 +173,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Stream timeout: ${config.streamTimeoutInSeconds}s`);
   console.log(`   Environment: ${config.env}`);
   console.log(`   Agent name: ${config.agentName}`);
+  console.log(`   Env: ${config.env}`);
   console.log(`   Bot address: ${config.botAddress}`);
   console.log();
 
@@ -295,21 +296,23 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
       ? sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.95)]
       : 0;
 
+  console.log(`Agent: ${config.agentName}`);
+  console.log(`Env: ${config.env}`);
   console.log(
-    `📊 Overall Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
+    `Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
   );
-  console.log("Address", config.botAddress);
-  console.log("Env", config.env);
   console.log(`⏱️  Total Execution Time: ${(totalTime / 1000).toFixed(1)}s`);
   console.log(
-    `🎯 Average Response Time: ${overallAverageResponseTime.toFixed(0)}ms`,
-  );
-  console.log(`📈 Median Response Time: ${medianResponseTime.toFixed(0)}ms`);
-  console.log(
-    `🔥 95th Percentile Response Time: ${p95ResponseTime.toFixed(0)}ms`,
+    `Average Response Time: ${(overallAverageResponseTime / 1000).toFixed(2)}s`,
   );
   console.log(
-    `⚡ Messages per Second: ${(config.userCount / (totalTime / 1000)).toFixed(1)}`,
+    `Median Response Time: ${(medianResponseTime / 1000).toFixed(2)}s`,
+  );
+  console.log(
+    `95th Percentile Response Time: ${(p95ResponseTime / 1000).toFixed(2)}s`,
+  );
+  console.log(
+    `Messages per Second: ${(config.userCount / (totalTime / 1000)).toFixed(1)}`,
   );
 
   // Show threshold check

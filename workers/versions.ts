@@ -178,6 +178,7 @@ export const regressionClient = async (
       env,
       loggingLevel,
       apiUrl,
+      codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } else if (versionConfig.nodeVersion === "1.0.5") {
     const signer = createSigner(walletKey);
@@ -187,6 +188,7 @@ export const regressionClient = async (
       env,
       loggingLevel,
       apiUrl,
+      codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } else {
     const signer = createSigner(walletKey);
