@@ -105,7 +105,7 @@ async function cleanSpecificLogFile(
       const { stripAnsi } = await import("@helpers/logger");
       const cleanedContent = stripAnsi(content);
       await fs.promises.writeFile(rawFilePath, cleanedContent);
-      console.debug(`Cleaned ANSI codes from log file: ${logFileName}`);
+      console.debug(logFileName);
     } catch (error) {
       console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
     }

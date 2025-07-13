@@ -173,6 +173,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Stream timeout: ${config.streamTimeoutInSeconds}s`);
   console.log(`   Environment: ${config.env}`);
   console.log(`   Agent name: ${config.agentName}`);
+  console.log(`   Env: ${config.env}`);
   console.log(`   Bot address: ${config.botAddress}`);
   console.log();
 
