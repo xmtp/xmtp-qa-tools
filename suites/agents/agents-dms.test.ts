@@ -50,6 +50,7 @@ describe(testName, async () => {
         conversation as Conversation,
         [workers.getCreator()],
         agent.sendMessage,
+        3,
       );
       console.log(JSON.stringify(result, null, 2));
 
