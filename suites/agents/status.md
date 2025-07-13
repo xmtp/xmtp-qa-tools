@@ -1,4 +1,4 @@
-# Concurrent messages on production
+### Concurrent messages on production
 
 | Metric              |   local    |     gm     |   bankr    |
 | ------------------- | :--------: | :--------: | :--------: |
@@ -15,7 +15,7 @@
 
 > This measurments were taking over 10 runs of 500 parallel messages each totaling 5000 messages.
 
-# First run comparison
+### First run comparison
 
 | Metric                        | First Run         | Second Run        |
 | ----------------------------- | ----------------- | ----------------- |
