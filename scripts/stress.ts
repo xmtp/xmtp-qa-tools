@@ -13,6 +13,7 @@ interface StressTestConfig {
   botAddress: string;
   agentName: string;
   workersPrefix: string;
+  runs: number;
 }
 
 function parseArgs(): StressTestConfig {
@@ -26,6 +27,7 @@ function parseArgs(): StressTestConfig {
     botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     agentName: "",
     workersPrefix: "test",
+    runs: 1,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -103,6 +105,18 @@ function parseArgs(): StressTestConfig {
           i++;
         }
         break;
+      case "--runs":
+        if (nextArg) {
+          const val = parseInt(nextArg, 10);
+          if (!isNaN(val) && val > 0) {
+            config.runs = val;
+          } else {
+            console.error(`Invalid value for --runs: ${nextArg}`);
+            process.exit(1);
+          }
+          i++;
+        }
+        break;
       case "--help":
       case "-h":
         showHelp();
@@ -135,6 +149,7 @@ Options:
   --env <environment>   XMTP environment: local, dev, production (default: production)
   --address <address>   Bot address to test (default: 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d)
   --agent <name>        Agent name to test (looks up address from agents.json)
+  --runs <number>       Number of consecutive runs to perform (default: 1)
   --help, -h           Show this help message
 
 Examples:
@@ -144,15 +159,19 @@ Examples:
   yarn cli stress --address 0x1234... --users 50
   yarn cli stress --agent gm --users 400
   yarn cli stress --agent bankr --users 1000 --env production
+  yarn cli stress --users 500 --runs 10
+  yarn cli stress --agent gm --users 200 --runs 5 --threshold 95
 
 Description:
   This tool creates multiple worker clients and tests bot response rates
   under high load conditions. All workers are processed in parallel for
-  maximum performance.
+  maximum performance. Multiple consecutive runs can be performed to
+  gather larger sample sizes for more reliable statistics.
   
   Key features:
   • All workers run in parallel (no batching)
   • Configurable success thresholds
+  • Multiple consecutive runs for larger samples
   • Randomized worker IDs to avoid testing same users
   • Detailed performance metrics and statistics
 
@@ -173,11 +192,11 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Stream timeout: ${config.streamTimeoutInSeconds}s`);
   console.log(`   Environment: ${config.env}`);
   console.log(`   Agent name: ${config.agentName}`);
-  console.log(`   Env: ${config.env}`);
   console.log(`   Bot address: ${config.botAddress}`);
+  console.log(`   Runs: ${config.runs}`);
   console.log();
 
-  // Generate worker names
+  // Generate worker names once
   const names: string[] = [];
   for (let i = 0; i < config.userCount; i++) {
     names.push(`${config.workersPrefix}${i}`);
@@ -188,97 +207,129 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`✅ Workers initialized successfully`);
   console.log();
 
-  console.log(`📨 Starting ${config.userCount} workers in parallel...`);
-  const startTime = Date.now();
+  // Accumulate results across all runs
+  const allRunResults: Array<{
+    workerIndex: number;
+    successCount: number;
+    totalAttempts: number;
+    successPercentage: number;
+    responseTimes: number[];
+    averageResponseTime: number;
+  }> = [];
+  let totalStartTime = Date.now();
 
-  // Process all workers in parallel
-  const workerPromises = workers
-    .getAll()
-    .map(async (worker: any, index: number) => {
-      try {
-        const conversation =
-          (await worker.client.conversations.newDmWithIdentifier({
-            identifier: config.botAddress,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
+  for (let run = 1; run <= config.runs; run++) {
+    if (config.runs > 1) {
+      console.log(`🔄 Starting run ${run}/${config.runs}`);
+      console.log();
+    }
 
-        let successCount = 0;
-        const totalAttempts = 1;
-        const responseTimes: number[] = [];
+    console.log(`📨 Starting ${config.userCount} workers in parallel...`);
+    const startTime = Date.now();
 
-        const result = await verifyAgentMessageStream(
-          conversation,
-          [worker as Worker],
-          `msg-${index}`,
-          1,
-          config.streamTimeoutInSeconds * 1000,
-        );
-        const responseTime = result?.averageEventTiming;
+    // Process all workers in parallel
+    const workerPromises = workers
+      .getAll()
+      .map(async (worker: any, index: number) => {
+        try {
+          const conversation =
+            (await worker.client.conversations.newDmWithIdentifier({
+              identifier: config.botAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            })) as Conversation;
 
-        if (result?.allReceived) {
-          successCount++;
-          responseTimes.push(responseTime ?? 0);
-        }
+          let successCount = 0;
+          const totalAttempts = 1;
+          const responseTimes: number[] = [];
 
-        // Progress logging every 10 workers
-        if ((index + 1) % 10 === 0 || index + 1 === config.userCount) {
-          const progress = (((index + 1) / config.userCount) * 100).toFixed(1);
-          console.log(
-            `📈 Progress: ${index + 1}/${config.userCount} (${progress}%)`,
+          const result = await verifyAgentMessageStream(
+            conversation,
+            [worker as Worker],
+            `msg-${index}`,
+            1,
+            config.streamTimeoutInSeconds * 1000,
           );
+          const responseTime = result?.averageEventTiming;
+
+          if (result?.allReceived) {
+            successCount++;
+            responseTimes.push(responseTime ?? 0);
+          }
+
+          // Progress logging every 10 workers
+          if ((index + 1) % 10 === 0 || index + 1 === config.userCount) {
+            const progress = (((index + 1) / config.userCount) * 100).toFixed(
+              1,
+            );
+            console.log(
+              `📈 Progress: ${index + 1}/${config.userCount} (${progress}%)`,
+            );
+          }
+
+          const successPercentage = (successCount / totalAttempts) * 100;
+          const averageResponseTime =
+            responseTimes.length > 0
+              ? responseTimes.reduce((sum, time) => sum + time, 0) /
+                responseTimes.length
+              : 0;
+
+          return {
+            workerIndex: index,
+            successCount,
+            totalAttempts,
+            successPercentage,
+            responseTimes,
+            averageResponseTime,
+          };
+        } catch (error) {
+          console.error(`❌ Worker ${index} failed:`, error);
+          return {
+            workerIndex: index,
+            successCount: 0,
+            totalAttempts: 1,
+            successPercentage: 0,
+            responseTimes: [],
+            averageResponseTime: 0,
+          };
         }
+      });
 
-        const successPercentage = (successCount / totalAttempts) * 100;
-        const averageResponseTime =
-          responseTimes.length > 0
-            ? responseTimes.reduce((sum, time) => sum + time, 0) /
-              responseTimes.length
-            : 0;
+    // Wait for all workers to complete
+    const runResults = await Promise.all(workerPromises);
+    allRunResults.push(...runResults);
 
-        return {
-          workerIndex: index,
-          successCount,
-          totalAttempts,
-          successPercentage,
-          responseTimes,
-          averageResponseTime,
-        };
-      } catch (error) {
-        console.error(`❌ Worker ${index} failed:`, error);
-        return {
-          workerIndex: index,
-          successCount: 0,
-          totalAttempts: 1,
-          successPercentage: 0,
-          responseTimes: [],
-          averageResponseTime: 0,
-        };
-      }
-    });
+    const endTime = Date.now();
+    const runTime = endTime - startTime;
 
-  // Wait for all workers to complete
-  const allResults = await Promise.all(workerPromises);
+    if (config.runs > 1) {
+      console.log(
+        `✅ Run ${run}/${config.runs} completed in ${(runTime / 1000).toFixed(1)}s`,
+      );
+      console.log();
+    }
+  }
 
-  const endTime = Date.now();
-  const totalTime = endTime - startTime;
+  const totalEndTime = Date.now();
+  const totalTime = totalEndTime - totalStartTime;
 
-  console.log();
   console.log("📊 STRESS TEST RESULTS");
   console.log("=".repeat(50));
 
-  // Calculate overall statistics
-  const totalResponses = allResults.reduce(
+  // Calculate overall statistics from all runs
+  const totalResponses = allRunResults.reduce(
     (sum, result) => sum + result.successCount,
     0,
   );
-  const totalAttempts = allResults.reduce(
+  const totalAttempts = allRunResults.reduce(
     (sum, result) => sum + result.totalAttempts,
     0,
   );
   const overallPercentage = (totalResponses / totalAttempts) * 100;
 
   // Calculate overall average response time
-  const allResponseTimes = allResults.flatMap((result) => result.responseTimes);
+  const allResponseTimes = allRunResults.flatMap(
+    (result) => result.responseTimes,
+  );
   const overallAverageResponseTime =
     allResponseTimes.length > 0
       ? allResponseTimes.reduce((sum, time) => sum + time, 0) /
@@ -298,6 +349,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
   console.log(`Agent: ${config.agentName}`);
   console.log(`Env: ${config.env}`);
+  console.log(`Runs: ${config.runs}`);
   console.log(
     `Success Rate: ${totalResponses}/${totalAttempts} (${overallPercentage.toFixed(1)}%)`,
   );
@@ -312,7 +364,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     `95th Percentile Response Time: ${(p95ResponseTime / 1000).toFixed(2)}s`,
   );
   console.log(
-    `Messages per Second: ${(config.userCount / (totalTime / 1000)).toFixed(1)}`,
+    `Messages per Second: ${((config.userCount * config.runs) / (totalTime / 1000)).toFixed(1)}`,
   );
 
   // Show threshold check
