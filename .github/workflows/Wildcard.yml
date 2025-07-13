@@ -2,9 +2,9 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   test:
@@ -36,8 +36,10 @@ jobs:
       - name: Run script version
         run: yarn script versions
 
-      - name: Run tests
-        run: yarn test ${{ matrix.test }} --debug --no-fail
+      # - name: Run tests
+      #   run: yarn test ${{ matrix.test }} --debug --no-fail
+      - name: Run stress test
+        run: yarn stress --agent gm --env production --users 500
 
       - name: Cleanup and upload artifacts
         if: always()
