@@ -50,8 +50,8 @@ describe(testName, async () => {
         conversation as Conversation,
         [workers.getCreator()],
         agent.sendMessage,
-        3, // maxRetries
       );
+      console.log(JSON.stringify(result, null, 2));
 
       const responseMetricTags: ResponseMetricTags = {
         test: testName,
