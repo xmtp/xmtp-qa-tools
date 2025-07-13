@@ -3,15 +3,15 @@
 | Metric          |   local    |     gm     |   bankr    |
 | --------------- | :--------: | :--------: | :--------: |
 | Strategy        |   normal   |   normal   |   normal   |
+| Timeout         |    120s    |    120s    |    120s    |
 | Environment     | production | production | production |
 | Total Messages  |    5000    |    5000    |    5000    |
-| Success Rate    |    100%    |   99.8%    |   58.8%    |
+| Success Rate    |    100%    |  99.8% ✅  |  58.8% ❌  |
 | Total Time      |   366.7s   |   636.0s   |   121.6s   |
-| Avg Response    |   16.78s   |   21.60s   |   74.38s   |
+| Avg Response    |   16.78s   | 21.60s ⚠️  | 74.38s ❌  |
 | Median Response |   1.19s    |   14.32s   |   76.62s   |
 | 95th Percentile |   57.44s   |   57.81s   |  113.05s   |
 | Messages/Second |    13.6    |    7.9     |    4.1     |
-| Status          | Success ✅ | Success ✅ | Failure ❌ |
 
 > This measurments were taking over 10 runs of 500 parallel messages each totaling 5000 messages.
 
