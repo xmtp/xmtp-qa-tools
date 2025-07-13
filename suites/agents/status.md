@@ -5,7 +5,7 @@
 | Environment         |   local    |  railway   |  railway   |
 | Timeout             |    120s    |    120s    |    120s    |
 | Network             | production | production | production |
-| Total Messages      |    5000    |    5000    |    5000    |
+| Total Messages      |    500     |    500     |    500     |
 | Messages per Second |    100     |    100     |    100     |
 | Success Rate        |    100%    |  99.8% ✅  |  58.8% ❌  |
 | Total Time          |   366.7s   |   636.0s   |   121.6s   |
