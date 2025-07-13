@@ -203,6 +203,12 @@ function parseArgs(): StressTestConfig {
     const agent = (productionAgents as AgentConfig[]).find(
       (a) => a.name === config.agentName,
     );
+    if (agent) {
+      config.botAddress = agent.address;
+    } else {
+      console.error(`Agent '${config.agentName}' not found in agents.json`);
+      process.exit(1);
+    }
   }
 
   return config;
