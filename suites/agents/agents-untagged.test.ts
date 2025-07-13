@@ -1,6 +1,6 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { verifyBotMessageStream } from "@helpers/streams";
+import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
@@ -50,13 +50,13 @@ describe(testName, async () => {
         ]);
 
       //Ignore welcome message
-      await verifyBotMessageStream(
+      await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
         "hi",
       );
       //Ignore welcome message
-      const result = await verifyBotMessageStream(
+      const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
         "hi",

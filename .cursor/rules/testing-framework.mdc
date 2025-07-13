@@ -268,7 +268,7 @@ expect(verifyResult.allReceived).toBe(true);
 
 ```typescript
 // Verify bot response timing
-const verifyResult = await verifyBotMessageStream(
+const verifyResult = await verifyAgentMessageStream(
   conversation,
   [workers.getReceiver()], // receivers
   "trigger message", // message to trigger bot response
@@ -775,7 +775,7 @@ expect(verifyResult.allReceived).toBe(true);
 
 ```typescript
 // Verify bot response timing
-const verifyResult = await verifyBotMessageStream(
+const verifyResult = await verifyAgentMessageStream(
   conversation,
   [workers.getReceiver()], // receivers
   "trigger message", // message to trigger bot response

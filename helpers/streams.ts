@@ -517,7 +517,7 @@ export function calculateMessageStats(
  * Measures the time it takes for a bot to respond to a trigger message
  * Includes retry logic and fallback message count validation
  */
-export async function verifyBotMessageStream(
+export async function verifyAgentMessageStream(
   group: Conversation,
   receivers: Worker[],
   triggerMessage: string,
