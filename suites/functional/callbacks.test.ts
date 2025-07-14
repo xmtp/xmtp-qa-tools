@@ -83,7 +83,7 @@ describe(testName, async () => {
   });
 
   it("should receive conversation with async", async () => {
-    const receiver = workers.get(1])!;
+    const receiver = workers.get(1)!;
 
     // Set up stream first
     const stream = await receiver.client.conversations.stream();
@@ -116,7 +116,7 @@ describe(testName, async () => {
   });
 
   it("should receive conversation with callback", async () => {
-    const receiver = workers.get(1])!;
+    const receiver = workers.get(1)!;
 
     // Set up stream first
     const conversationPromise = new Promise<Dm>((resolve, reject) => {
