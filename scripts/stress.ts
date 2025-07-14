@@ -218,7 +218,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   }> = [];
   let totalStartTime = Date.now();
   let totalMessagesSent = 0;
-  let totalMessageSendTime = 0;
+  let totalActiveTime = 0; // Track only active processing time
 
   for (let run = 1; run <= config.runs; run++) {
     if (config.runs > 1) {
@@ -228,7 +228,6 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
     console.log(`📨 Starting ${config.userCount} workers in parallel...`);
     const startTime = Date.now();
-    const messageSendStartTime = Date.now();
 
     // Count messages that will be sent (1 per worker)
     totalMessagesSent += config.userCount;
@@ -273,11 +272,6 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
           }
 
           const successPercentage = (successCount / totalAttempts) * 100;
-          const averageResponseTime =
-            responseTimes.length > 0
-              ? responseTimes.reduce((sum, time) => sum + time, 0) /
-                responseTimes.length
-              : 0;
 
           return {
             workerIndex: index,
@@ -285,7 +279,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
             totalAttempts,
             successPercentage,
             responseTimes,
-            averageResponseTime,
+            averageResponseTime: result?.averageEventTiming ?? 0,
           };
         } catch (error) {
           console.error(`❌ Worker ${index} failed:`, error);
@@ -306,9 +300,7 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
 
     const endTime = Date.now();
     const runTime = endTime - startTime;
-    const messageSendEndTime = Date.now();
-    const messageSendTime = messageSendEndTime - messageSendStartTime;
-    totalMessageSendTime += messageSendTime;
+    totalActiveTime += runTime;
 
     if (config.runs > 1) {
       console.log(
@@ -374,8 +366,23 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     `- 95th Percentile Response Time: ${(p95ResponseTime / 1000).toFixed(2)}s`,
   );
   console.log(
-    `- Messages per Second: ${(totalMessagesSent / (totalMessageSendTime / 1000)).toFixed(1)}`,
+    `- Messages per Second: ${(totalMessagesSent / (totalActiveTime / 1000)).toFixed(1)}`,
   );
+
+  // Debug: Show response time distribution
+  if (sortedResponseTimes.length > 0) {
+    console.log(`- Response Time Distribution:`);
+    console.log(`  - Min: ${(sortedResponseTimes[0] / 1000).toFixed(2)}s`);
+    console.log(
+      `  - Max: ${(sortedResponseTimes[sortedResponseTimes.length - 1] / 1000).toFixed(2)}s`,
+    );
+    console.log(
+      `  - 90th percentile: ${(sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.9)] / 1000).toFixed(2)}s`,
+    );
+    console.log(
+      `  - 99th percentile: ${(sortedResponseTimes[Math.floor(sortedResponseTimes.length * 0.99)] / 1000).toFixed(2)}s`,
+    );
+  }
 
   // Show threshold check
   if (overallPercentage >= config.successThreshold) {
