@@ -77,9 +77,9 @@
   {
     "name": "onit",
     "baseName": "onit.base.eth",
-    "address": "",
+    "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
     "sendMessage": "hi",
-    "networks": [],
+    "networks": ["production"],
     "slackChannel": "#onit-alerts",
     "shouldRespondOnTagged": true
   },
