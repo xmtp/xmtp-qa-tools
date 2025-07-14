@@ -111,11 +111,20 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "bitte",
+    "baseName": "bitte.base.eth",
+    "address": "0x7b422dbd911043f27f6d891365f636cf4fe3fb0e",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#bitte-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "tokenbot",
     "baseName": "0x9e73…3466",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
-    "networks": [],
+    "networks": ["production"],
     "slackChannel": "#tokenbot-alerts",
     "shouldRespondOnTagged": true
   }
