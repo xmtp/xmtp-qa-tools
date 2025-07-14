@@ -1,6 +1,6 @@
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getAutoVersions, getVersions } from "@workers/versions";
+import { getVersions } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 describe("regression", () => {
