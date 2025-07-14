@@ -39,31 +39,31 @@ describe(testName, () => {
     expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
   });
 
-  // it("should revoke all installations for random1", async () => {
-  //   // Get current installations
-  //   const currentState = await Client.inboxStateFromInboxIds(
-  //     [random1.client.inboxId],
-  //     (process.env.XMTP_ENV as XmtpEnv) || "dev",
-  //   );
+  it("should revoke all installations for random1", async () => {
+    // Get current installations
+    const currentState = await Client.inboxStateFromInboxIds(
+      [random1.client.inboxId],
+      (process.env.XMTP_ENV as XmtpEnv) || "dev",
+    );
 
-  //   const currentInstallations = currentState[0].installations;
+    const currentInstallations = currentState[0].installations;
 
-  //   // Revoke all installations
-  //   const installationsToRevokeBytes = currentInstallations.map(
-  //     (installation) => installation.bytes,
-  //   );
+    // Revoke all installations
+    const installationsToRevokeBytes = currentInstallations.map(
+      (installation) => installation.bytes,
+    );
 
-  //   if (!random1.client.signer) {
-  //     throw new Error("random1 client signer is undefined");
-  //   }
+    if (!random1.client.signer) {
+      throw new Error("random1 client signer is undefined");
+    }
 
-  //   await Client.revokeInstallations(
-  //     random1.client.signer,
-  //     random1.client.inboxId,
-  //     installationsToRevokeBytes,
-  //     (process.env.XMTP_ENV as XmtpEnv) || "dev",
-  //   );
-  // });
+    await Client.revokeInstallations(
+      random1.client.signer,
+      random1.client.inboxId,
+      installationsToRevokeBytes,
+      (process.env.XMTP_ENV as XmtpEnv) || "dev",
+    );
+  });
 
   it("should create fresh random1 client and verify DM accessibility", async () => {
     // Create fresh random1 client
