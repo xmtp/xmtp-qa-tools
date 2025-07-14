@@ -70,7 +70,7 @@ export const VersionList = [
     Group: Group320,
     nodeVersion: "3.2.0-rc1",
     bindingsPackage: "1.3.0-rc1",
-    auto: true,
+    auto: false,
   },
   {
     Client: Client312,
@@ -157,6 +157,9 @@ export const VersionList = [
 
 export const getAutoVersions = () => {
   return VersionList.filter((v) => v.auto);
+};
+export const getVersions = () => {
+  return VersionList;
 };
 
 export const regressionClient = async (
