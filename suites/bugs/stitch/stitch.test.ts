@@ -1,8 +1,7 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+import { type Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "stitch";
@@ -15,8 +14,6 @@ describe(testName, () => {
   let random1: Worker;
   let bob: Worker;
   let initialDm: any;
-  let secondDm: any;
-  let random1InboxId: string;
   let random1Fresh: Worker;
 
   beforeAll(async () => {
