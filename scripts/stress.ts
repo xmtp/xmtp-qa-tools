@@ -4,6 +4,8 @@ import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import productionAgents from "../suites/agents/agents.json";
 import type { AgentConfig } from "../suites/agents/helper";
 import "dotenv/config";
+import * as fs from "fs";
+import * as path from "path";
 
 interface StressTestConfig {
   userCount: number;
@@ -14,6 +16,8 @@ interface StressTestConfig {
   agentName: string;
   workersPrefix: string;
   runs: number;
+  saveData?: boolean;
+  dataFile?: string;
 }
 
 function parseArgs(): StressTestConfig {
@@ -28,6 +32,8 @@ function parseArgs(): StressTestConfig {
     agentName: "",
     workersPrefix: "test",
     runs: 1,
+    saveData: false,
+    dataFile: "",
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -117,6 +123,16 @@ function parseArgs(): StressTestConfig {
           i++;
         }
         break;
+      case "--save-data":
+        config.saveData = true;
+        break;
+      case "--data-file":
+        if (nextArg) {
+          config.dataFile = nextArg;
+          config.saveData = true;
+          i++;
+        }
+        break;
       case "--help":
       case "-h":
         showHelp();
@@ -150,6 +166,8 @@ Options:
   --address <address>   Bot address to test (default: 0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d)
   --agent <name>        Agent name to test (looks up address from agents.json)
   --runs <number>       Number of consecutive runs to perform (default: 1)
+  --save-data           Save response time data to JSON file for charting
+  --data-file <path>    Custom path for data file (enables --save-data)
   --help, -h           Show this help message
 
 Examples:
@@ -161,6 +179,8 @@ Examples:
   yarn cli stress --agent bankr --users 1000 --env production
   yarn cli stress --users 500 --runs 10
   yarn cli stress --agent gm --users 200 --runs 5 --threshold 95
+  yarn cli stress --agent gm --users 200 --save-data
+  yarn cli stress --agent gm --users 200 --data-file ./chart-data.json
 
 Description:
   This tool creates multiple worker clients and tests bot response rates
@@ -174,6 +194,7 @@ Description:
   • Multiple consecutive runs for larger samples
   • Randomized worker IDs to avoid testing same users
   • Detailed performance metrics and statistics
+  • Data export for charting and analysis
 
 Output:
   The tool provides detailed statistics including:
@@ -181,6 +202,7 @@ Output:
   • Average response times
   • Response time percentiles (median, 95th percentile)
   • Messages per second throughput
+  • JSON data export for charting (when --save-data is used)
 `);
 }
 
@@ -194,6 +216,11 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
   console.log(`   Agent name: ${config.agentName}`);
   console.log(`   Bot address: ${config.botAddress}`);
   console.log(`   Runs: ${config.runs}`);
+  if (config.saveData) {
+    console.log(
+      `   Data export: ${config.dataFile || "auto-generated filename"}`,
+    );
+  }
   console.log();
 
   // Generate worker names once
@@ -386,6 +413,79 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
     console.log(
       `❌ FAILURE: ${overallPercentage.toFixed(1)}% < ${config.successThreshold}% threshold`,
     );
+  }
+
+  // Save data for charting if requested
+  if (config.saveData) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const defaultFilename = `stress-test-data-${config.agentName || "unknown"}-${config.env}-${timestamp}.json`;
+    const filename = config.dataFile || defaultFilename;
+
+    const chartData = {
+      messageCount: totalMessagesSent,
+      averageResponseTime: overallAverageResponseTime,
+    };
+
+    try {
+      fs.writeFileSync(filename, JSON.stringify(chartData, null, 2));
+      console.log(`📊 Chart data saved to: ${filename}`);
+    } catch (error) {
+      console.error(`❌ Failed to save chart data:`, error);
+    }
+  }
+
+  // Log individual user responses to logs folder
+  const logsDir = path.join(process.cwd(), "logs");
+  if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+  }
+
+  const logFile = path.join(logsDir, "stress-test-entries.json");
+
+  try {
+    let entries = [];
+    if (fs.existsSync(logFile)) {
+      const existingData = fs.readFileSync(logFile, "utf8");
+      try {
+        entries = JSON.parse(existingData);
+        if (!Array.isArray(entries)) {
+          console.warn("⚠️  Existing log file is not an array, starting fresh");
+          entries = [];
+        }
+      } catch (parseError) {
+        console.warn(
+          "⚠️  Failed to parse existing log file, starting fresh:",
+          parseError,
+        );
+        entries = [];
+      }
+    }
+
+    // Log each successful user response
+    let loggedCount = 0;
+    allRunResults.forEach((result, index) => {
+      if (result.successCount > 0 && result.responseTimes.length > 0) {
+        result.responseTimes.forEach((responseTime, responseIndex) => {
+          const logEntry = {
+            timestamp: new Date().toISOString(),
+            agent: config.agentName,
+            environment: config.env,
+            userIndex: result.workerIndex,
+            responseTime: responseTime,
+            testId: `${config.agentName}-${config.env}-${Date.now()}-${result.workerIndex}-${responseIndex}`,
+          };
+          entries.push(logEntry);
+          loggedCount++;
+        });
+      }
+    });
+
+    fs.writeFileSync(logFile, JSON.stringify(entries, null, 2));
+    console.log(
+      `📝 ${loggedCount} individual responses logged to: ${logFile} (${entries.length} total entries)`,
+    );
+  } catch (error) {
+    console.error(`❌ Failed to log entries:`, error);
   }
 
   console.log("🏆 Test completed successfully!");
