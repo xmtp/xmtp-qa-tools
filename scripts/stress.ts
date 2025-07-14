@@ -49,35 +49,44 @@ async function runStressTest(config: Config): Promise<void> {
 
   // Initialize workers
   const names = Array.from({ length: config.userCount }, (_, i) => `test${i}`);
-  const workers = await getWorkers(names, { env: config.env as XmtpEnv });
+  const workers = await getWorkers(names, { env: config.env as any });
 
   // Run all workers in parallel
   const promises = workers.getAll().map((worker: any, index: number) => {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<{
+      success: boolean;
+      newDmTime: number;
+      sendTime: number;
+      responseTime: number;
+    }>((resolve) => {
       let responseReceived = false;
-      let streamCanceller: any = null;
+      let sendCompleteTime = 0;
 
       const timeout = setTimeout(() => {
         if (!responseReceived) {
           console.log(`❌ Worker ${index} timed out`);
-          if (streamCanceller && typeof streamCanceller === "function") {
-            streamCanceller();
-          }
-          resolve(false);
+          resolve({
+            success: false,
+            newDmTime: 0,
+            sendTime: 0,
+            responseTime: 0,
+          });
         }
       }, config.timeout);
 
       const process = async () => {
         try {
-          // Create DM
+          // 1. Time NewDM creation
+          const newDmStart = Date.now();
           const conversation =
             (await worker.client.conversations.newDmWithIdentifier({
               identifier: config.botAddress,
               identifierKind: IdentifierKind.Ethereum,
             })) as Conversation;
+          const newDmTime = Date.now() - newDmStart;
 
           // Set up stream
-          streamCanceller = worker.client.conversations.streamAllMessages(
+          worker.client.conversations.streamAllMessages(
             (error: any, message: any) => {
               if (error) return;
 
@@ -89,42 +98,61 @@ async function runStressTest(config: Config): Promise<void> {
               ) {
                 responseReceived = true;
                 clearTimeout(timeout);
-                if (streamCanceller && typeof streamCanceller === "function") {
-                  streamCanceller();
-                }
+
+                // 3. Calculate response time
+                const responseTime = Date.now() - sendCompleteTime;
                 console.log(
-                  `✅ Worker ${index} got response: "${message.content}"`,
+                  `✅ Worker ${index}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms`,
                 );
-                resolve(true);
+                resolve({ success: true, newDmTime, sendTime, responseTime });
               }
             },
           );
 
-          // Send message
+          // 2. Time message send
+          const sendStart = Date.now();
           await conversation.send(`test-${index}-${Date.now()}`);
+          const sendTime = Date.now() - sendStart;
+          sendCompleteTime = Date.now();
         } catch (error) {
           console.log(`❌ Worker ${index} failed:`, error);
           clearTimeout(timeout);
-          if (streamCanceller && typeof streamCanceller === "function") {
-            streamCanceller();
-          }
-          resolve(false);
+          resolve({
+            success: false,
+            newDmTime: 0,
+            sendTime: 0,
+            responseTime: 0,
+          });
         }
       };
 
       process().catch(() => {
-        resolve(false);
+        resolve({ success: false, newDmTime: 0, sendTime: 0, responseTime: 0 });
       });
     });
   });
 
   // Wait for all workers
   const results = await Promise.all(promises);
-  const successful = results.filter(Boolean).length;
+  const successful = results.filter((r) => r.success);
 
   console.log(
-    `📊 Results: ${successful}/${config.userCount} successful (${Math.round((successful / config.userCount) * 100)}%)`,
+    `📊 Results: ${successful.length}/${config.userCount} successful (${Math.round((successful.length / config.userCount) * 100)}%)`,
   );
+
+  if (successful.length > 0) {
+    const avgNewDm =
+      successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
+    const avgSend =
+      successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
+    const avgResponse =
+      successful.reduce((sum, r) => sum + r.responseTime, 0) /
+      successful.length;
+
+    console.log(
+      `📈 Averages: NewDM=${Math.round(avgNewDm)}ms, Send=${Math.round(avgSend)}ms, Response=${Math.round(avgResponse)}ms`,
+    );
+  }
   process.exit(0);
 }
 
