@@ -8,7 +8,7 @@ const testName = "large_syncs";
 describe(testName, async () => {
   setupTestLifecycle({
     testName,
-    metrics: true,
+    sendMetrics: true,
   });
   const summaryMap: Record<number, any> = {};
 

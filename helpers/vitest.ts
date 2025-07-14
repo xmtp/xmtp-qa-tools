@@ -16,19 +16,19 @@ export const setupTestLifecycle = ({
   sdk,
   getCustomDuration,
   setCustomDuration,
-  metrics = false,
+  sendMetrics = false,
   networkStats = false,
 }: {
   testName: string;
   sdk?: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
-  metrics?: boolean;
+  sendMetrics?: boolean;
   networkStats?: boolean;
 }) => {
   beforeAll(() => {
     loadEnv(testName);
-    if (metrics) initDataDog();
+    if (sendMetrics) initDataDog();
   });
   let skipNetworkStats = false;
   let start: number;
@@ -61,7 +61,7 @@ export const setupTestLifecycle = ({
       members,
     };
 
-    if (metrics) {
+    if (sendMetrics) {
       sendMetric("duration", duration, values);
     }
     // if (process.env.XMTP_ENV === "local" || metrics) {

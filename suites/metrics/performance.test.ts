@@ -25,7 +25,7 @@ describe(testName, async () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    metrics: true,
+    sendMetrics: true,
     networkStats: true,
   });
 

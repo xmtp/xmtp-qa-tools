@@ -2,9 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
 
 jobs:
   test:
@@ -13,12 +11,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [browser] # performance test with more large groups
+        test: [agents-dms] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
         # test: [dms] # health check
-        environment: [production]
+        environment: [dev]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -33,11 +31,11 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run script version
-        run: yarn script versions
+      # - name: Run script version
+      #   run: yarn script versions
 
-      # - name: Run tests
-      #   run: yarn test ${{ matrix.test }} --debug --no-fail
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --debug --no-fail
 
       - name: Cleanup and upload artifacts
         if: always()

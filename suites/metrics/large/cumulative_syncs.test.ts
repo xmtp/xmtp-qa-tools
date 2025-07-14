@@ -8,7 +8,7 @@ const testName = "large_cumulative_syncs";
 describe(testName, async () => {
   setupTestLifecycle({
     testName,
-    metrics: true,
+    sendMetrics: true,
   });
   let workers: WorkerManager;
 

@@ -14,7 +14,7 @@ import { type AgentConfig } from "./helper";
 
 const testName = "agents-dms";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupTestLifecycle({ testName, sendMetrics: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["randomguy"]);
 
