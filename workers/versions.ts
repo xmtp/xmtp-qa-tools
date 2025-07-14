@@ -156,7 +156,19 @@ export const VersionList = [
 ];
 
 export const getVersions = (filterAuto: boolean = true) => {
+  checkNoNameContains(VersionList);
   return filterAuto ? VersionList.filter((v) => v.auto) : VersionList;
+};
+
+export const checkNoNameContains = (versionList: typeof VersionList) => {
+  // Versions should no include - because it messes   up with the worker name-installation conversion. FIX
+  for (const version of versionList) {
+    if (version.nodeVersion.includes("-")) {
+      throw new Error(`Version ${version.nodeVersion} contains -`);
+    } else if (version.bindingsPackage.includes("-")) {
+      throw new Error(`Bindings package ${version.bindingsPackage} contains -`);
+    }
+  }
 };
 
 export const regressionClient = async (
