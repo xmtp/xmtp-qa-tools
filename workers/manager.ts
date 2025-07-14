@@ -32,7 +32,6 @@ export function nameWithVersions(workerNames: string[]): string[] {
   }
 
   const availableVersions = getVersions().slice(0, testVersions);
-  console.log(availableVersions);
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
     // Pick a random version from the specified list

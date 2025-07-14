@@ -59,7 +59,7 @@ import {
   Conversation as Conversation320,
   Dm as Dm320,
   Group as Group320,
-} from "@xmtp/node-sdk-3.2.0-rc1";
+} from "@xmtp/node-sdk-3.2.0rc1";
 
 // SDK version mappings
 export const VersionList = [
@@ -68,8 +68,8 @@ export const VersionList = [
     Conversation: Conversation320,
     Dm: Dm320,
     Group: Group320,
-    nodeVersion: "3.2.0-rc1",
-    bindingsPackage: "1.3.0-rc1",
+    nodeVersion: "3.2.0rc1",
+    bindingsPackage: "1.3.0rc1",
     auto: false,
   },
   {
@@ -156,7 +156,19 @@ export const VersionList = [
 ];
 
 export const getVersions = (filterAuto: boolean = true) => {
+  checkNoNameContains(VersionList);
   return filterAuto ? VersionList.filter((v) => v.auto) : VersionList;
+};
+
+export const checkNoNameContains = (versionList: typeof VersionList) => {
+  // Versions should no include - because it messes   up with the worker name-installation conversion. FIX
+  for (const version of versionList) {
+    if (version.nodeVersion.includes("-")) {
+      throw new Error(`Version ${version.nodeVersion} contains -`);
+    } else if (version.bindingsPackage.includes("-")) {
+      throw new Error(`Bindings package ${version.bindingsPackage} contains -`);
+    }
+  }
 };
 
 export const regressionClient = async (
