@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, it } from "vitest";
 
 const testName = "large_installations";
 describe(testName, async () => {
-  setupTestLifecycle({ testName, metrics: true });
+  setupTestLifecycle({ testName, sendMetrics: true });
   let workers = await getWorkers(["creator", "small", "medium", "large", "xl"]);
 
   let smallInbox: Worker;
