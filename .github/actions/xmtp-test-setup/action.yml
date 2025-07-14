@@ -1,0 +1,24 @@
+name: "XMTP Test Setup"
+description: "Sets up Node.js environment with caching and installs dependencies for XMTP tests"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: ".node-version"
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          .yarn/cache
+        key: deps-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          deps-
+
+    - name: Install dependencies
+      run: yarn
+      shell: bash

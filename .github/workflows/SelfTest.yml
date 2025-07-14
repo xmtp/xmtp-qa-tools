@@ -1,0 +1,49 @@
+name: Self Test XMTP QA Tools
+
+on:
+  schedule:
+    - cron: "25 */5 * * *" # every 5 hours at 25 minutes past
+  workflow_dispatch:
+
+jobs:
+  run-self-test:
+    runs-on: ubuntu-latest
+
+    env:
+      XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
+      LOGGING_LEVEL: "error"
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Clone XMTP QA Tools repo
+        run: |
+          git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools.git qa-tools-test
+          cd qa-tools-test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          cd qa-tools-test
+          yarn install
+
+      - name: Run DM tests
+        run: |
+          cd qa-tools-test
+          timeout 300s yarn dms
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}

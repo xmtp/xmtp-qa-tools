@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+WHen creating a PR always verify with this at the end.
+
+`yarn format `                         
+`yarn lint  `                          
+`yarn build`   
+
+And `yarn functional` for a whole passs.

@@ -1,0 +1,51 @@
+name: Wildcard
+description: "Manual PR verification workflow - supports functional and performance tests"
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [browser] # performance test with more large groups
+        # test: [functional] # full functional test
+        # test: [performance] # performance test with more large groups
+        # test: [regression] # regression test with more large groups
+        # test: [dms] # health check
+        environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 150
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test environment
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: Run script version
+        run: yarn script versions
+
+      # - name: Run tests
+      #   run: yarn test ${{ matrix.test }} --debug --no-fail
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "${{ matrix.test }}"

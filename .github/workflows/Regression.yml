@@ -1,0 +1,45 @@
+name: Regression
+description: "should verify last 3 versions of the library"
+
+on:
+  schedule:
+    - cron: "25 */6 * * *" # Runs every 6 hours at 25 minutes past
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [functional]
+        environment: [dev, production]
+    env:
+      LOGGING_LEVEL: "off"
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup test environment
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: Run versions
+        run: yarn script versions
+
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --no-fail --debug
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "Regression"

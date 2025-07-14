@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "allowJs": false,
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "baseUrl": ".",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "types": ["node", "vitest"],
+    "paths": {
+      "@helpers/*": ["./helpers/*"],
+      "@scripts/*": ["./scripts/*"],
+      "@workers/*": ["./workers/*"],
+      "@inboxes/*": ["./inboxes/*"],
+      "@bots/*": ["./bots/helpers/*"]
+    }
+  },
+  "include": ["**/*.ts", "vitest.config.ts", "vite.config.js"]
+}
