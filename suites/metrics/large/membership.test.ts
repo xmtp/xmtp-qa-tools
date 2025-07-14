@@ -25,7 +25,7 @@ describe(testName, async () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    metrics: true,
+    sendMetrics: true,
   });
 
   for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
