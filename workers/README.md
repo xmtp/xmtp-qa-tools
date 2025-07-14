@@ -76,7 +76,7 @@ const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
 // Creates: alice-3.1.1
 
 // Regression testing across multiple specific versions
-const versions = getAutoVersions().slice(0, 3);
+const versions = getVersions(true).slice(0, 3);
 for (const version of versions) {
   const workers = await getWorkers([`bob-a-${version.nodeVersion}`], {
     useVersions: false, // Don't apply additional versioning
@@ -91,7 +91,7 @@ for (const version of versions) {
 import { getAutoVersions } from "@workers/versions";
 
 // Test downgrade scenarios
-const versions = getAutoVersions().slice(0, 3);
+const versions = getVersions(true).slice(0, 3);
 for (const version of versions) {
   const workers = await getWorkers([`bob-a-${version.nodeVersion}`], {
     useVersions: false,
@@ -246,10 +246,10 @@ Use predefined names from the 61 available:
 import { getAutoVersions, VersionList } from "@workers/versions";
 
 // Get all auto-enabled versions (used for random version assignment)
-const autoVersions = getAutoVersions();
+const autoVersions = getVersions(true);
 
 // Access default SDK version
-let defaultSdk = getAutoVersions()[0].nodeVersion; // Currently "3.1.1"
+let defaultSdk = getVersions(true)[0].nodeVersion; // Currently "3.1.1"
 ```
 
 ### SDK Version Mappings
@@ -263,7 +263,7 @@ export const VersionList = [
     Group: Group310,
     nodeVersion: "3.1.1",
     bindingsPackage: "1.2.7",
-    auto: true, // Included in getAutoVersions()
+    auto: true, // Included in getVersions(true)
   },
   {
     Client: Client300,
@@ -295,7 +295,7 @@ process.env.TEST_VERSIONS = "3"; // Use up to 3 random versions
 
 // Use in tests
 const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-const availableVersions = getAutoVersions().slice(0, testVersions);
+const availableVersions = getVersions(true).slice(0, testVersions);
 ```
 
 ## Common Usage Patterns
@@ -320,7 +320,7 @@ const workers = await getWorkers(3, { useVersions: true });
 
 ```typescript
 // Test all available versions systematically
-const versions = getAutoVersions().slice(0, 3);
+const versions = getVersions(true).slice(0, 3);
 for (const version of versions) {
   it(`should work with SDK ${version.nodeVersion}`, async () => {
     const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
