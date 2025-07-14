@@ -1,7 +1,7 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { type Conversation } from "@xmtp/node-sdk";
+import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "stitch";
