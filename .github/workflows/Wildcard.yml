@@ -31,11 +31,11 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run script version
-        run: yarn script versions
+      # - name: Run script version
+      #   run: yarn script versions
 
-      # - name: Run tests
-      #   run: yarn test ${{ matrix.test }} --debug --no-fail
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --debug --no-fail
 
       - name: Cleanup and upload artifacts
         if: always()
