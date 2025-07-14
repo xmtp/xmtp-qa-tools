@@ -31,7 +31,7 @@ export function nameWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = getVersions(true).slice(0, testVersions);
+  const availableVersions = getVersions().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
@@ -508,7 +508,7 @@ export async function getWorkers(
     let descriptors = options.nodeVersion
       ? names.map((name) => `${name}-${options.nodeVersion}`)
       : options.useVersions
-        ? getWorkersWithVersions(names)
+        ? nameWithVersions(names)
         : names;
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),

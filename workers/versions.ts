@@ -155,7 +155,7 @@ export const VersionList = [
   },
 ];
 
-export const getVersions = (filterAuto: boolean = true) => {
+export const getVersions = (filterAuto: boolean = false) => {
   return filterAuto ? VersionList.filter((v) => v.auto) : VersionList;
 };
 

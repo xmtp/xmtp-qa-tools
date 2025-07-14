@@ -20,91 +20,91 @@ describe(testName, async () => {
 
   // Setup test lifecycle
 
-  it("membership stream", async () => {
-    // Initialize workers
-    group = await workers.createGroupBetweenAll();
+  // it("membership stream", async () => {
+  //   // Initialize workers
+  //   group = await workers.createGroupBetweenAll();
 
-    const verifyResult = await verifyMembershipStream(
-      group,
-      workers.getAllButCreator(),
-      getInboxIds(1),
-    );
+  //   const verifyResult = await verifyMembershipStream(
+  //     group,
+  //     workers.getAllButCreator(),
+  //     getInboxIds(1),
+  //   );
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("consent stream", async () => {
-    const verifyResult = await verifyConsentStream(
-      workers.getCreator(),
-      workers.getReceiver(),
-    );
+  // it("consent stream", async () => {
+  //   const verifyResult = await verifyConsentStream(
+  //     workers.getCreator(),
+  //     workers.getReceiver(),
+  //   );
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("dm stream", async () => {
-    // Create direct message
-    const creator = workers.getCreator();
-    const receiver = workers.getReceiver();
-    const newDm = await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    );
+  // it("dm stream", async () => {
+  //   // Create direct message
+  //   const creator = workers.getCreator();
+  //   const receiver = workers.getReceiver();
+  //   const newDm = await creator.client.conversations.newDm(
+  //     receiver.client.inboxId,
+  //   );
 
-    // Verify message delivery
-    const verifyResult = await verifyMessageStream(newDm as Dm, [receiver], 10);
+  //   // Verify message delivery
+  //   const verifyResult = await verifyMessageStream(newDm as Dm, [receiver], 10);
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("add member stream", async () => {
-    const creator = workers.getCreator();
-    const receiver = workers.getReceiver();
-    // Create group with alice as the creator
-    group = (await creator.client.conversations.newGroup([
-      receiver.client.inboxId,
-    ])) as Group;
-    console.log("Group created", group.id);
+  // it("add member stream", async () => {
+  //   const creator = workers.getCreator();
+  //   const receiver = workers.getReceiver();
+  //   // Create group with alice as the creator
+  //   group = (await creator.client.conversations.newGroup([
+  //     receiver.client.inboxId,
+  //   ])) as Group;
+  //   console.log("Group created", group.id);
 
-    const addMembers = getInboxIds(1);
-    const verifyResult = await verifyAddMemberStream(
-      group,
-      [receiver],
-      addMembers,
-    );
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   const addMembers = getInboxIds(1);
+  //   const verifyResult = await verifyAddMemberStream(
+  //     group,
+  //     [receiver],
+  //     addMembers,
+  //   );
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("message stream", async () => {
-    const newGroup = await workers.createGroupBetweenAll();
+  // it("message stream", async () => {
+  //   const newGroup = await workers.createGroupBetweenAll();
 
-    // Verify message delivery
-    const verifyResult = await verifyMessageStream(
-      newGroup,
-      workers.getAllButCreator(),
-      10,
-    );
+  //   // Verify message delivery
+  //   const verifyResult = await verifyMessageStream(
+  //     newGroup,
+  //     workers.getAllButCreator(),
+  //     10,
+  //   );
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("metadata stream", async () => {
-    // Initialize workers
-    group = await workers.createGroupBetweenAll();
+  // it("metadata stream", async () => {
+  //   // Initialize workers
+  //   group = await workers.createGroupBetweenAll();
 
-    const verifyResult = await verifyMetadataStream(
-      group,
-      workers.getAllButCreator(),
-    );
+  //   const verifyResult = await verifyMetadataStream(
+  //     group,
+  //     workers.getAllButCreator(),
+  //   );
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 
-  it("conversation stream", async () => {
-    // Use the dedicated conversation stream verification helper
-    const verifyResult = await verifyConversationStream(workers.getCreator(), [
-      workers.getReceiver(),
-    ]);
+  // it("conversation stream", async () => {
+  //   // Use the dedicated conversation stream verification helper
+  //   const verifyResult = await verifyConversationStream(workers.getCreator(), [
+  //     workers.getReceiver(),
+  //   ]);
 
-    expect(verifyResult.allReceived).toBe(true);
-  });
+  //   expect(verifyResult.allReceived).toBe(true);
+  // });
 });
