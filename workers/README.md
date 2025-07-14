@@ -88,7 +88,7 @@ for (const version of versions) {
 #### Advanced Regression Testing
 
 ```typescript
-import { getAutoVersions } from "@workers/versions";
+import { getVersions } from "@workers/versions";
 
 // Test downgrade scenarios
 const versions = getVersions(true).slice(0, 3);
@@ -243,7 +243,7 @@ Use predefined names from the 61 available:
 ### Available Versions
 
 ```typescript
-import { getAutoVersions, VersionList } from "@workers/versions";
+import { getVersions, VersionList } from "@workers/versions";
 
 // Get all auto-enabled versions (used for random version assignment)
 const autoVersions = getVersions(true);
@@ -363,6 +363,6 @@ const workers = await getWorkers(["alice"], { env: "local" });
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import { getAutoVersions, VersionList } from "@workers/versions";
+import { getVersions, VersionList } from "@workers/versions";
 import { IdentifierKind } from "@xmtp/node-sdk";
 ```
