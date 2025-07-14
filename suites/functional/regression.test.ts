@@ -1,7 +1,6 @@
-import { verifyMessageStream } from "@helpers/streams";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getVersions } from "@workers/versions";
+import { getAutoVersions, getVersions } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 describe("regression", () => {
@@ -32,6 +31,7 @@ describe("regression", () => {
       const alice = workers.get("alice");
       console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
       let convo = await alice?.client.conversations.newDm(receiverInboxId);
+
       expect(convo?.id).toBeDefined();
     });
   }
