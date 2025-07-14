@@ -246,20 +246,23 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
           let successCount = 0;
           const totalAttempts = 1;
           const responseTimes: number[] = [];
-
-          const result = await verifyAgentMessageStream(
-            conversation,
-            [worker as Worker],
-            `msg-${index}`,
-            1,
-            config.streamTimeoutInSeconds * 1000,
+          let responseTimeStart = Date.now();
+          worker.client.conversations.streamAllMessages(
+            conversation.id,
+            (error: any, message: any) => {
+              if (error) {
+                console.error("Stream error:", error);
+              } else {
+                console.log("Message received:", message.content);
+                successCount++;
+                responseTimes.push(Date.now() - responseTimeStart);
+                responseTimeStart = Date.now();
+              }
+            },
           );
-          const responseTime = result?.averageEventTiming;
 
-          if (result?.allReceived) {
-            successCount++;
-            responseTimes.push(responseTime ?? 0);
-          }
+          await conversation.send(`msg-${index}`);
+          console.log("Started stream");
 
           // Progress logging every 10 workers
           if ((index + 1) % 10 === 0 || index + 1 === config.userCount) {
@@ -279,7 +282,11 @@ async function runStressTest(config: StressTestConfig): Promise<void> {
             totalAttempts,
             successPercentage,
             responseTimes,
-            averageResponseTime: result?.averageEventTiming ?? 0,
+            averageResponseTime:
+              responseTimes.length > 0
+                ? responseTimes.reduce((sum, time) => sum + time, 0) /
+                  responseTimes.length
+                : 0,
           };
         } catch (error) {
           console.error(`❌ Worker ${index} failed:`, error);
