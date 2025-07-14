@@ -1,6 +1,9 @@
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import "dotenv/config";
+import { setupPrettyLogs } from "../helpers/logger";
+
+setupPrettyLogs("stress");
 
 // yarn stress --address 0x7b422dbd911043f27f6d891365f636cf4fe3fb0e --users 5
 
@@ -16,7 +19,7 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     botAddress: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
-    timeout: 60000, // 60 seconds
+    timeout: 20000, // 60 seconds
     env: "production",
   };
 
@@ -48,10 +51,13 @@ async function runStressTest(config: Config): Promise<void> {
   );
 
   // Initialize workers
+  console.log(`📋 Initializing ${config.userCount} workers...`);
   const names = Array.from({ length: config.userCount }, (_, i) => `test${i}`);
   const workers = await getWorkers(names, { env: config.env as any });
+  console.log(`✅ Workers initialized successfully`);
 
   // Run all workers in parallel
+  console.log(`🔄 Starting parallel worker execution...`);
   const promises = workers.getAll().map((worker: any, index: number) => {
     return new Promise<{
       success: boolean;
@@ -76,6 +82,7 @@ async function runStressTest(config: Config): Promise<void> {
 
       const process = async () => {
         try {
+          console.log(`🔧 Worker ${index}: Creating new DM...`);
           // 1. Time NewDM creation
           const newDmStart = Date.now();
           const conversation =
@@ -84,7 +91,9 @@ async function runStressTest(config: Config): Promise<void> {
               identifierKind: IdentifierKind.Ethereum,
             })) as Conversation;
           const newDmTime = Date.now() - newDmStart;
+          console.log(`💬 Worker ${index}: DM created in ${newDmTime}ms`);
 
+          console.log(`📡 Worker ${index}: Setting up message stream...`);
           // Set up stream
           worker.client.conversations.streamAllMessages(
             (error: any, message: any) => {
@@ -102,6 +111,9 @@ async function runStressTest(config: Config): Promise<void> {
                 // 3. Calculate response time
                 const responseTime = Date.now() - sendCompleteTime;
                 console.log(
+                  `🎉 Worker ${index}: Bot responded in ${responseTime}ms`,
+                );
+                console.log(
                   `✅ Worker ${index}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms`,
                 );
                 resolve({ success: true, newDmTime, sendTime, responseTime });
@@ -109,11 +121,14 @@ async function runStressTest(config: Config): Promise<void> {
             },
           );
 
+          console.log(`📤 Worker ${index}: Sending test message...`);
           // 2. Time message send
           const sendStart = Date.now();
           await conversation.send(`test-${index}-${Date.now()}`);
           const sendTime = Date.now() - sendStart;
           sendCompleteTime = Date.now();
+          console.log(`📩 Worker ${index}: Message sent in ${sendTime}ms`);
+          console.log(`⏳ Worker ${index}: Waiting for bot response...`);
         } catch (error) {
           console.log(`❌ Worker ${index} failed:`, error);
           clearTimeout(timeout);
@@ -133,7 +148,10 @@ async function runStressTest(config: Config): Promise<void> {
   });
 
   // Wait for all workers
+  console.log(`⏳ Waiting for all workers to complete...`);
   const results = await Promise.all(promises);
+  console.log(`🏁 All workers completed`);
+
   const successful = results.filter((r) => r.success);
 
   console.log(
