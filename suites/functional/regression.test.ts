@@ -1,12 +1,13 @@
+import { verifyMessageStream } from "@helpers/streams";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getAutoVersions } from "@workers/versions";
+import { getVersions } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 describe("regression", () => {
   let workers: WorkerManager;
   //limit to 2 versions for testing
-  const versions = getAutoVersions().slice(0, 3);
+  const versions = getVersions().slice(0, 3);
   const receiverInboxId = getInboxIds(1)[0];
 
   for (const version of versions) {
@@ -31,7 +32,6 @@ describe("regression", () => {
       const alice = workers.get("alice");
       console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
       let convo = await alice?.client.conversations.newDm(receiverInboxId);
-
       expect(convo?.id).toBeDefined();
     });
   }

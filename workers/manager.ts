@@ -2,7 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
-import { getAutoVersions, VersionList } from "@workers/versions";
+import { getVersions, VersionList } from "@workers/versions";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
@@ -23,7 +23,7 @@ export const getRandomNames = (count: number): string[] => {
 };
 
 // Deprecated: Use getWorkers with useVersions option instead
-export function getWorkersWithVersions(workerNames: string[]): string[] {
+export function nameWithVersions(workerNames: string[]): string[] {
   const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
 
   if (!testVersions) {
@@ -31,8 +31,8 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = getAutoVersions().slice(0, testVersions);
-
+  const availableVersions = getVersions().slice(0, testVersions);
+  console.log(availableVersions);
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
     // Pick a random version from the specified list
@@ -410,7 +410,7 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = getAutoVersions()[0].nodeVersion;
+    let defaultSdk = getVersions()[0].nodeVersion;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
@@ -486,19 +486,14 @@ export async function getWorkers(
     nodeVersion?: string;
     useVersions?: boolean;
     randomNames?: boolean;
-  } = {},
+  } = {
+    env: (process.env.XMTP_ENV as XmtpEnv) || "dev",
+    useVersions: true,
+    randomNames: true,
+    nodeVersion: undefined,
+  },
 ): Promise<WorkerManager> {
-  const { useVersions = false, randomNames = true, nodeVersion } = options;
-
-  // Only use NODE_VERSION from environment if nodeVersion wasn't explicitly provided
-  // and NODE_VERSION is explicitly set (by CLI)
-  const finalNodeVersion =
-    nodeVersion ||
-    (process.env.NODE_VERSION && process.env.NODE_VERSION.trim() !== ""
-      ? process.env.NODE_VERSION
-      : undefined);
-  const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
-  const manager = new WorkerManager(env);
+  const manager = new WorkerManager(options.env as XmtpEnv);
 
   let workerPromises: Promise<Worker>[] = [];
 
@@ -506,16 +501,15 @@ export async function getWorkers(
   if (typeof workers === "number" || Array.isArray(workers)) {
     const names =
       typeof workers === "number"
-        ? randomNames
+        ? options.randomNames
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    let descriptors = finalNodeVersion
-      ? names.map((name) => `${name}-${finalNodeVersion}`)
-      : useVersions
-        ? getWorkersWithVersions(names)
+    let descriptors = options.nodeVersion
+      ? names.map((name) => `${name}-${options.nodeVersion}`)
+      : options.useVersions
+        ? nameWithVersions(names)
         : names;
-
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
@@ -523,8 +517,8 @@ export async function getWorkers(
     // Record input - apply versioning if requested
     let entries = Object.entries(workers);
 
-    if (useVersions) {
-      const versionedKeys = getWorkersWithVersions(Object.keys(workers));
+    if (options.useVersions) {
+      const versionedKeys = Object.keys(workers);
       entries = versionedKeys.map((key, index) => [
         key,
         Object.values(workers)[index],
