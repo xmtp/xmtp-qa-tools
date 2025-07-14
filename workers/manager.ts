@@ -23,7 +23,7 @@ export const getRandomNames = (count: number): string[] => {
 };
 
 // Deprecated: Use getWorkers with useVersions option instead
-export function getWorkersWithVersions(workerNames: string[]): string[] {
+export function nameWithVersions(workerNames: string[]): string[] {
   const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
 
   if (!testVersions) {
@@ -518,7 +518,7 @@ export async function getWorkers(
     let entries = Object.entries(workers);
 
     if (options.useVersions) {
-      const versionedKeys = getWorkersWithVersions(Object.keys(workers));
+      const versionedKeys = Object.keys(workers);
       entries = versionedKeys.map((key, index) => [
         key,
         Object.values(workers)[index],
