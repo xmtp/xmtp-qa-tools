@@ -66,6 +66,24 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "arma",
+    "baseName": "arma.base.eth",
+    "address": "0x1456350CD79c51814567b0c1E767d3032dBD1647",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#arma-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "onit",
+    "baseName": "onit.base.eth",
+    "address": "",
+    "sendMessage": "hi",
+    "networks": [],
+    "slackChannel": "#onit-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "byte",
     "baseName": "byte.base.eth",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
@@ -108,6 +126,15 @@
     "sendMessage": "/kc help",
     "networks": ["dev", "production"],
     "slackChannel": "#key-check-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "bitte",
+    "baseName": "bitte.base.eth",
+    "address": "0xb177e33734e982828eBb5993627ebcD7C8A9106a",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#bitte-alerts",
     "shouldRespondOnTagged": true
   },
   {

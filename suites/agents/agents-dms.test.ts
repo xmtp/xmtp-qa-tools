@@ -69,6 +69,7 @@ describe(testName, async () => {
         responseMetricTags,
       );
 
+      if (!result?.allReceived) console.warn(agent.name, "FAILED");
       expect(result?.allReceived).toBe(true);
     });
   }
