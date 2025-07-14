@@ -483,7 +483,7 @@ const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
 const workers = await getWorkers(3, { useVersions: true });
 
 // Regression testing pattern
-const versions = getVersions(true).slice(0, 3);
+const versions = getVersions().slice(0, 3);
 for (const version of versions) {
   const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
     useVersions: false,
@@ -990,7 +990,7 @@ const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
 const workers = await getWorkers(3, { useVersions: true });
 
 // Regression testing pattern
-const versions = getVersions(true).slice(0, 3);
+const versions = getVersions().slice(0, 3);
 for (const version of versions) {
   const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
     useVersions: false,

@@ -32,7 +32,7 @@ export function nameWithVersions(workerNames: string[]): string[] {
   }
 
   const availableVersions = getVersions().slice(0, testVersions);
-
+  console.log(availableVersions);
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
     // Pick a random version from the specified list
@@ -410,7 +410,7 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = getVersions(true)[0].nodeVersion;
+    let defaultSdk = getVersions()[0].nodeVersion;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
