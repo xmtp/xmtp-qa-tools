@@ -82,66 +82,66 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  // it("should receive conversation with async", async () => {
-  //   const receiver = workers.get(1])!;
+  it("should receive conversation with async", async () => {
+    const receiver = workers.get(1])!;
 
-  //   // Set up stream first
-  //   const stream = await receiver.client.conversations.stream();
-  //   const conversationPromise = new Promise<Dm>((resolve, reject) => {
-  //     const timeout = setTimeout(() => {
-  //       reject(new Error("Timeout waiting for conversation"));
-  //     }, 5000);
+    // Set up stream first
+    const stream = await receiver.client.conversations.stream();
+    const conversationPromise = new Promise<Dm>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout waiting for conversation"));
+      }, 5000);
 
-  //     void (async () => {
-  //       try {
-  //         for await (const conversation of stream) {
-  //           console.log("Stream received conversation:", conversation?.id);
-  //           if (conversation?.id) {
-  //             clearTimeout(timeout);
-  //             resolve(conversation as Dm);
-  //             break;
-  //           }
-  //         }
-  //       } catch (e) {
-  //         clearTimeout(timeout);
-  //         reject(e instanceof Error ? e : new Error(String(e)));
-  //       }
-  //     })();
-  //   });
+      void (async () => {
+        try {
+          for await (const conversation of stream) {
+            console.log("Stream received conversation:", conversation?.id);
+            if (conversation?.id) {
+              clearTimeout(timeout);
+              resolve(conversation as Dm);
+              break;
+            }
+          }
+        } catch (e) {
+          clearTimeout(timeout);
+          reject(e instanceof Error ? e : new Error(String(e)));
+        }
+      })();
+    });
 
-  //   // Create group after stream is ready
-  //   const convo = await workers.createGroupBetweenAll();
-  //   const conversation = await conversationPromise;
-  //   expect(conversation.id).toBe(convo.id);
-  // });
+    // Create group after stream is ready
+    const convo = await workers.createGroupBetweenAll();
+    const conversation = await conversationPromise;
+    expect(conversation.id).toBe(convo.id);
+  });
 
-  // it("should receive conversation with callback", async () => {
-  //   const receiver = workers.get(1])!;
+  it("should receive conversation with callback", async () => {
+    const receiver = workers.get(1])!;
 
-  //   // Set up stream first
-  //   const conversationPromise = new Promise<Dm>((resolve, reject) => {
-  //     const timeout = setTimeout(() => {
-  //       reject(new Error("Timeout waiting for conversation"));
-  //     }, 5000);
+    // Set up stream first
+    const conversationPromise = new Promise<Dm>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error("Timeout waiting for conversation"));
+      }, 5000);
 
-  //     void receiver.client.conversations.stream((err, conversation) => {
-  //       if (err) {
-  //         clearTimeout(timeout);
-  //         reject(err instanceof Error ? err : new Error(String(err)));
-  //         return;
-  //       }
-  //       console.log("Callback received conversation:", conversation?.id);
-  //       if (conversation?.id) {
-  //         clearTimeout(timeout);
-  //         resolve(conversation as Dm);
-  //         return;
-  //       }
-  //     });
-  //   });
+      void receiver.client.conversations.stream((err, conversation) => {
+        if (err) {
+          clearTimeout(timeout);
+          reject(err instanceof Error ? err : new Error(String(err)));
+          return;
+        }
+        console.log("Callback received conversation:", conversation?.id);
+        if (conversation?.id) {
+          clearTimeout(timeout);
+          resolve(conversation as Dm);
+          return;
+        }
+      });
+    });
 
-  //   // Create group after stream is ready
-  //   await workers.createGroupBetweenAll();
-  //   const conversation = await conversationPromise;
-  //   expect(conversation.id).toBeDefined();
-  // });
+    // Create group after stream is ready
+    await workers.createGroupBetweenAll();
+    const conversation = await conversationPromise;
+    expect(conversation.id).toBeDefined();
+  });
 });

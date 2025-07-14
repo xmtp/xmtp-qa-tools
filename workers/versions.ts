@@ -59,7 +59,7 @@ import {
   Conversation as Conversation320,
   Dm as Dm320,
   Group as Group320,
-} from "@xmtp/node-sdk-3.2.0-rc1";
+} from "@xmtp/node-sdk-3.2.0rc1";
 
 // SDK version mappings
 export const VersionList = [
@@ -68,9 +68,9 @@ export const VersionList = [
     Conversation: Conversation320,
     Dm: Dm320,
     Group: Group320,
-    nodeVersion: "3.2.0-rc1",
-    bindingsPackage: "1.3.0-rc1",
-    auto: false,
+    nodeVersion: "3.2.0rc1",
+    bindingsPackage: "1.3.0rc1",
+    auto: true,
   },
   {
     Client: Client312,
