@@ -1,0 +1,405 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# QA Tools CLI Usage Guide
+
+This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
+
+## Environment Setup
+
+### Required Environment Variables
+
+Before running any tests, you must set up a `.env` file with the following variables:
+
+```bash
+# Required for all operations
+XMTP_ENV=dev                    # Options: local, dev, production
+LOGGING_LEVEL=off               # Options: off, debug, info, warn, error
+
+# Optional - for Slack notifications and monitoring
+SLACK_BOT_TOKEN=xoxb-...        # Slack bot token for notifications
+SLACK_CHANNEL=C...              # Slack channel ID for alerts
+
+# Optional - for Datadog log analysis
+DATADOG_API_KEY=...             # Datadog API key for log retrieval
+DATADOG_APP_KEY=...             # Datadog app key for log retrieval
+ANTHROPIC_API_KEY=...           # Claude AI API key for log analysis
+
+# Optional - for geolocation testing
+GEOLOCATION=us-east-1           # AWS region for testing
+```
+
+### Environment Options
+
+- **`local`**: Local XMTP network for development
+- **`dev`**: Development XMTP network (default for testing)
+- **`production`**: Production XMTP network (for staging/production tests)
+
+## Core CLI Commands
+
+### Basic Command Structure
+
+```bash
+yarn cli <command_type> <name_or_path> [options...]
+```
+
+### Command Types
+
+#### 1. Test Commands
+
+The primary way to run tests in this repository:
+
+```bash
+# Basic test execution
+yarn test <test_suite>                    # Direct vitest execution
+yarn cli test <test_suite>                # Via CLI wrapper
+
+# Test suites available:
+yarn test functional                      # Core protocol functionality
+yarn test dms                            # Direct message tests
+yarn test groups                         # Group conversation tests
+yarn test performance                    # Performance benchmarks
+yarn test large                          # Large group testing (50-400 members)
+yarn test delivery                       # Message delivery reliability
+yarn test browser                        # Cross-browser compatibility
+yarn test agents                         # Live bot monitoring
+yarn test regression                     # Multi-version compatibility
+yarn test bench                          # Benchmarking suite
+```
+
+#### 2. Bot Commands
+
+Run interactive bots for testing and monitoring:
+
+```bash
+yarn bot <bot_name> [args...]
+yarn cli bot <bot_name> [args...]
+
+# Available bots:
+yarn bot gm-bot                          # GM greeting bot
+yarn bot stress 5                        # Stress testing with 5 concurrent users
+```
+
+#### 3. Script Commands
+
+Execute utility scripts:
+
+```bash
+yarn script <script_name> [args...]
+yarn cli script <script_name> [args...]
+
+# Available scripts:
+yarn script gen                          # Generate test inboxes
+yarn script versions                     # Setup SDK version testing
+```
+
+## Advanced Test Options
+
+### Retry and Debugging Mode
+
+When you include retry options, tests run in advanced mode with logging, retries, and error analysis:
+
+```bash
+# Enable retry mode with debugging
+yarn test functional --no-fail --debug
+
+# Retry mode options:
+--max-attempts <N>      # Max retry attempts (default: 3)
+--retry-delay <S>       # Delay between retries in seconds (default: 10)
+--debug                 # Enable file logging (logs saved to logs/ directory)
+--debug-verbose         # Enable both file logging AND terminal output
+--debug-file <name>     # Custom log filename
+--no-fail              # Exit with success code even on failures (still sends notifications)
+--parallel             # Run tests in parallel (default: consecutive)
+```
+
+### Version Testing
+
+Test compatibility across multiple XMTP SDK versions:
+
+```bash
+# Test with specific number of SDK versions
+yarn test functional --versions 3        # Uses 3 random SDK versions
+yarn regression                          # Shortcut for version testing
+yarn functional --versions 3             # Alternative syntax
+
+# Available SDK versions for testing:
+# - 0.0.47 (Legacy)
+# - 1.0.5, 2.0.9, 2.1.0, 2.2.1 (Stable)
+# - 3.0.1 (Latest)
+```
+
+### Parallel vs Sequential Execution
+
+```bash
+# Sequential execution (default - better for debugging)
+yarn test functional
+
+# Parallel execution (faster but harder to debug)
+yarn test functional --parallel
+```
+
+## Test Suite Categories
+
+### Core Functionality Tests
+
+```bash
+yarn test functional                     # Complete functional suite
+yarn test dms                           # Direct message functionality
+yarn test groups                        # Group conversation functionality
+yarn test suites/functional/consent.test.ts  # Specific test file
+```
+
+### Performance & Scale Tests
+
+```bash
+yarn test performance                   # Core performance metrics
+yarn test large                        # Large group testing (50-400 members)
+yarn test delivery                     # Message delivery reliability
+yarn bench                            # Benchmarking suite
+```
+
+### Cross-Platform & Compatibility Tests
+
+```bash
+yarn test browser                      # Playwright browser automation
+yarn test regression                  # Multi-version SDK compatibility
+yarn test agents                      # Live production bot monitoring
+yarn test mobile                      # Cross-platform mobile testing
+```
+
+### Network & Reliability Tests
+
+```bash
+yarn test networkchaos                # Network partition tolerance
+yarn test other                       # Security, spam detection, rate limiting
+yarn test commits                     # Git commit-based testing
+yarn test datadog                     # Datadog log analysis and monitoring
+```
+
+## Environment-Specific Testing
+
+### Local Development
+
+```bash
+# Set up local environment
+XMTP_ENV=local yarn test functional
+
+# Update local test data
+yarn local-update                      # Generate 500 inboxes for local testing
+```
+
+### Development Network
+
+```bash
+# Most common for day-to-day testing
+XMTP_ENV=dev yarn test functional
+```
+
+### Production Network
+
+```bash
+# Production testing (use carefully)
+XMTP_ENV=production yarn test functional
+XMTP_ENV=production yarn test agents    # Monitor live production bots
+```
+
+## Key Generation and Setup
+
+```bash
+# Generate cryptographic keys for testing
+yarn gen:keys                          # Generates wallet and encryption keys
+yarn gen                               # Generate test inboxes
+
+# Update production inbox data
+yarn prod-update                       # Generate 500 inboxes for dev/production
+```
+
+## Monitoring and Analysis
+
+### Log Analysis
+
+```bash
+# Clean and analyze logs
+yarn ansi                              # Clean raw logs of ANSI escape codes
+
+# Logs are automatically saved when using --debug flag
+# Location: logs/raw-<testname>-<env>-<timestamp>.log
+```
+
+### UI and Monitoring
+
+```bash
+# Start development monitoring
+yarn start:dev                        # Starts UI for development
+yarn ui                               # Vitest UI for interactive testing
+yarn datadog                          # Fetch and analyze Datadog logs
+
+# External monitoring
+yarn monitor:yarn                      # Monitor XMTP network health
+```
+
+## Common Testing Patterns
+
+### Quick Development Testing
+
+```bash
+# Fast local testing
+yarn test dms                         # Quick DM functionality test
+yarn test groups                      # Quick group functionality test
+```
+
+### Comprehensive Testing
+
+```bash
+# Full functional suite with debugging
+yarn test functional --no-fail --debug
+
+# Multi-version compatibility
+yarn test functional --versions 3 --debug
+```
+
+### Production Monitoring
+
+```bash
+# Live production monitoring
+XMTP_ENV=production yarn test agents --no-fail --debug
+
+# Performance benchmarking
+XMTP_ENV=production yarn test performance --debug
+
+# Datadog log analysis
+yarn datadog                          # Fetch and analyze latest Datadog logs
+XMTP_ENV=production yarn test suites/datadog --debug
+```
+
+### CI/CD Patterns
+
+```bash
+# GitHub Actions patterns (from workflows)
+yarn test functional --no-fail --debug                    # Functional testing
+yarn test functional --no-fail --debug                    # Regression testing
+yarn test large --no-fail --debug                         # Large group testing
+yarn test performance --no-fail --debug                   # Performance testing
+```
+
+## Error Handling and Debugging
+
+### Debug Output
+
+- `--debug`: Saves logs to files, minimal terminal output
+- `--debug-verbose`: Saves logs to files AND shows full terminal output
+- Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
+
+### Notification Systems
+
+When using `--debug` flag, test failures can be analyzed through various systems:
+
+- Structured logging in the logs/ directory
+- Datadog integration for centralized log analysis
+- Optional Slack notifications for CI/CD alerts
+
+### Exit Codes
+
+- `--no-fail`: Always exits with code 0 (useful for CI monitoring)
+- Default: Exits with code 1 on test failures
+
+## Best Practices
+
+1. **Always set XMTP_ENV** before running tests
+2. **Use --debug for CI/CD** to get proper logging and notifications
+3. **Use --no-fail for monitoring** to prevent CI failures on expected issues
+4. **Test locally first** before running against dev/production
+5. **Use version testing** to catch compatibility issues early
+6. **Monitor logs** in the logs/ directory for detailed analysis
+
+## Examples from CI/CD
+
+```bash
+# Functional testing (every 6 hours)
+XMTP_ENV=production yarn test functional --no-fail --debug
+
+# Regression testing (every 6 hours)
+XMTP_ENV=production yarn script versions
+XMTP_ENV=production yarn test functional --no-fail --debug
+
+# Performance monitoring (every 30 minutes)
+XMTP_ENV=production yarn test performance --no-fail --debug
+
+# Large group testing (every 2 hours)
+XMTP_ENV=production yarn test large --no-fail --debug
+
+# Agent monitoring (every 30 minutes)
+XMTP_ENV=production yarn test agents --no-fail --debug
+```
+
+## Shortcut Commands (from package.json)
+
+### Direct Test Shortcuts
+
+```bash
+yarn functional                        # yarn test suites/functional
+yarn bench                            # yarn test suites/bench/bench.test.ts
+yarn large                            # yarn test suites/metrics/large
+yarn regression                       # yarn test suites/functional --versions 3
+```
+
+### Bot Shortcuts
+
+```bash
+yarn bot                             # yarn cli bot
+yarn datadog                         # yarn test suites/datadog
+```
+
+### Utility Shortcuts
+
+```bash
+yarn gen                             # tsx inboxes/gen.ts
+yarn clean                           # rimraf .data/ logs/
+yarn format                          # prettier -w .
+yarn lint                            # eslint .
+yarn build                           # tsc
+```
+
+### Development Shortcuts
+
+```bash
+yarn ui                              # vitest --ui --standalone --watch
+yarn start:dev                      # yarn ui
+yarn record                         # npx playwright codegen 'https://xmtp.chat/'
+```
+
+## Advanced Features
+
+### Custom Log Files
+
+```bash
+yarn test functional --debug-file my-custom-log
+# Saves to: logs/my-custom-log-<env>-<timestamp>.log
+```
+
+### Multiple Test Files
+
+```bash
+# Run specific test files
+yarn test ./suites/functional/dms.test.ts
+yarn test ./suites/functional/groups.test.ts ./suites/functional/consent.test.ts
+```
+
+### Environment Variables in Commands
+
+```bash
+# Set environment variables inline
+XMTP_ENV=production LOGGING_LEVEL=debug yarn test functional --debug
+TEST_VERSIONS=3 yarn test functional
+```
+
+### Combining Options
+
+```bash
+# Advanced example with multiple options
+yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verbose --parallel
+```

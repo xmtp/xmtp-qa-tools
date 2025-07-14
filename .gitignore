@@ -1,0 +1,70 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+.yarn/
+.vscode/
+.env
+.data copy/
+# testing
+coverage
+.data/
+scripts/db/
+scripts/db/*
+bugs/**/.data/
+bugs/**/.env
+bugs/**/.data/.env
+bugs/**/.data/**/.env
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+yarn-debug.log*
+yarn-error.log*
+
+!.env.example
+
+# turbo
+.turbo
+
+# logs
+logs/
+logs/*
+
+
+# editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# build artifacts
+dist
+
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/qa-agent/releases
+!.yarn/sdks
+!.yarn/versions
+
+# typescript
+*.tsbuildinfo
+
+# xmtp
+*.db3*
+
+# Claude Code (keep config, ignore session data)
+.claude/session-*
+.claude/.tmp/

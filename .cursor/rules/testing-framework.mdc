@@ -1,0 +1,1018 @@
+---
+globs: *.test.ts
+alwaysApply: false
+---
+
+# Testing Worker Framework Rules
+
+## Core Testing Pattern
+
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { describe, it } from "vitest";
+
+const testName = "my-test";
+
+describe(testName, async () => {
+  // Simplified API - versioning enabled by default
+  const workers = await getWorkers(["alice", "bob"]);
+
+  setupTestLifecycle({ testName });
+
+  it("should do something", async () => {
+    // Test logic here
+  });
+});
+```
+
+## getWorkers API
+
+The `getWorkers` function has three input modes with optional configuration:
+
+### Input Modes
+
+```typescript
+// 1. Number - creates that many workers with random names (default)
+const workers = await getWorkers(5);
+
+// 2. Array of specific worker names
+const workers = await getWorkers(["alice", "bob", "charlie"]);
+
+// 3. Record for API URL mapping (for distributed testing)
+const workers = await getWorkers({
+  alice: "https://api1.example.com",
+  bob: "https://api2.example.com",
+});
+```
+
+### Options Configuration
+
+```typescript
+type GetWorkersOptions = {
+  env?: XmtpEnv; // XMTP environment (default: from XMTP_ENV)
+  useVersions?: boolean; // Apply version descriptors (default: true)
+  randomNames?: boolean; // Use random names for number input (default: true)
+};
+
+// Examples:
+await getWorkers(3); // 3 workers with random names, versioned
+await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
+await getWorkers(["alice", "bob"]); // Specific names, versioned
+await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
+await getWorkers(5, { env: "production" }); // 5 random workers on production
+```
+
+## Worker Access Patterns
+
+```typescript
+// Get specific workers
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Access worker properties
+alice.client; // XMTP client
+alice.worker; // Worker thread
+alice.name; // "alice"
+alice.address; // Ethereum address
+alice.client.inboxId; // Inbox ID
+
+// Utility methods
+workers.getCreator(); // First worker
+workers.getReceiver(); // Random non-creator
+workers.getAll(); // All workers array
+workers.getAllButCreator(); // All except first
+workers.getRandomWorkers(2); // Random subset
+
+// Get worker names array (useful for logging/debugging)
+const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
+```
+
+## Common Usage Patterns
+
+### Simple Testing
+
+```typescript
+// Most common patterns
+const workers = await getWorkers(5); // 5 random workers
+const workers = await getWorkers(["alice", "bob"]); // Specific workers
+```
+
+### Version Testing
+
+```typescript
+// Versioning is enabled by default
+const workers = await getWorkers(3); // Uses random SDK versions
+const workers = await getWorkers(3, { useVersions: false }); // All latest version
+```
+
+### Environment-Specific Testing
+
+```typescript
+const workers = await getWorkers(5, { env: "production" });
+const workers = await getWorkers(["alice"], { env: "local" });
+```
+
+## Conversation Operations
+
+```typescript
+// Create DM by inbox ID
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+// Create DM by Ethereum address
+const dm2 = await alice.client.conversations.newDmWithIdentifier({
+  identifier: bob.address,
+  identifierKind: IdentifierKind.Ethereum,
+});
+
+// Create group with inbox IDs
+const group = await alice.client.conversations.newGroup([
+  bob.client.inboxId,
+  workers.get("charlie").client.inboxId,
+]);
+
+// Create group between all workers
+const testGroup = await workers.createGroupBetweenAll("My Group");
+
+// Send messages
+await dm.send("Hello DM");
+await group.send("Hello Group");
+```
+
+## Group Operations
+
+```typescript
+// Group metadata
+await group.updateName("New Name");
+await group.updateDescription("New Description");
+
+// Member management
+await group.addMembers([newMemberInboxId]);
+await group.removeMembers([memberInboxId]);
+
+// Admin management
+await group.addAdmin(memberInboxId);
+await group.addSuperAdmin(memberInboxId);
+
+// Get group info
+const members = await group.members();
+const name = group.name;
+const admins = group.admins;
+```
+
+## Streams and Stream Verification
+
+### Stream Types Available
+
+```typescript
+import { typeofStream } from "@workers/main";
+
+// Available stream types
+typeofStream.Message; // Message delivery streams
+typeofStream.MessageandResponse; // Message streams with automatic responses
+typeofStream.GroupUpdated; // Group metadata and membership updates
+typeofStream.Conversation; // New conversation creation events
+typeofStream.Consent; // Consent state changes
+```
+
+### Manual Stream Control
+
+Start and stop streams dynamically during test execution:
+
+```typescript
+// Start specific stream types on demand
+workers.getReceiver().worker.startStream(typeofStream.Message);
+workers.getReceiver().worker.startStream(typeofStream.GroupUpdated);
+workers.getReceiver().worker.startStream(typeofStream.Conversation);
+
+// Start streams for multiple workers
+workers.getAllButCreator().forEach((worker) => {
+  worker.worker.startStream(typeofStream.Message);
+});
+
+// Stop all streams for a worker
+workers.getReceiver().worker.endStream();
+
+// Stop specific stream type
+workers.getReceiver().worker.endStream(typeofStream.Message);
+```
+
+### Stream Verification Functions
+
+#### Message Streams
+
+```typescript
+// Verify message delivery with custom template
+const verifyResult = await verifyMessageStream(
+  conversation,
+  [workers.get("bob")], // receivers
+  10, // message count
+  "test-{i}-{randomSuffix}", // message template
+);
+
+// Check delivery results
+expect(verifyResult.allReceived).toBe(true);
+expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+expect(verifyResult.averageEventTiming).toBeLessThan(500);
+```
+
+#### Group Metadata Streams
+
+```typescript
+// Verify group metadata updates (name changes)
+const verifyResult = await verifyMetadataStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  3, // number of name updates
+  "GroupName-{i}-{randomSuffix}", // name template
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Membership Streams
+
+```typescript
+// Verify member addition notifications
+const verifyResult = await verifyMembershipStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  [newMemberInboxId], // members to add
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Conversation Streams
+
+```typescript
+// Verify new conversation creation notifications
+const verifyResult = await verifyConversationStream(
+  workers.getCreator(), // initiator
+  [workers.getReceiver()], // receivers
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Consent Streams
+
+```typescript
+// Verify consent state change notifications
+const verifyResult = await verifyConsentStream(
+  workers.getCreator(), // initiator
+  workers.getReceiver(), // receiver
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Bot Response Streams
+
+```typescript
+// Verify bot response timing
+const verifyResult = await verifyAgentMessageStream(
+  conversation,
+  [workers.getReceiver()], // receivers
+  "trigger message", // message to trigger bot response
+);
+expect(verifyResult.averageEventTiming).toBeLessThan(1000);
+```
+
+### Stream Result Analysis
+
+All stream verification functions return a `VerifyStreamResult` object:
+
+```typescript
+type VerifyStreamResult = {
+  allReceived: boolean; // True if all expected events received
+  almostAllReceived: boolean; // True if ≤2 events missing
+  receiverCount: number; // Number of receiving workers
+  messages: string; // Comma-separated received messages
+  eventTimings: string; // Timing data per receiver
+  averageEventTiming: number; // Average delivery time in ms
+  receptionPercentage: number; // Percentage of successfully received events
+  orderPercentage: number; // Percentage of receivers with correct order
+};
+
+// Example usage
+const result = await verifyMessageStream(conversation, receivers, 5);
+
+console.log(`Reception: ${result.receptionPercentage}%`);
+console.log(`Order: ${result.orderPercentage}%`);
+console.log(`Average timing: ${result.averageEventTiming}ms`);
+
+// Flexible assertions based on requirements
+expect(result.allReceived || result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(90);
+expect(result.averageEventTiming).toBeLessThan(2000);
+```
+
+### Stream Testing Best Practices
+
+#### 1. Start Streams Before Actions
+
+```typescript
+// ✅ Good: Start streams before triggering events
+workers.getReceiver().worker.startStream(typeofStream.Message);
+await conversation.send("Hello");
+
+// ❌ Bad: Start streams after triggering events
+await conversation.send("Hello");
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+#### 2. Use Appropriate Stream Types
+
+```typescript
+// For message delivery testing
+worker.worker.startStream(typeofStream.Message);
+
+// For group updates (name, description, membership)
+worker.worker.startStream(typeofStream.GroupUpdated);
+
+// For new conversation notifications
+worker.worker.startStream(typeofStream.Conversation);
+
+// For consent state changes
+worker.worker.startStream(typeofStream.Consent);
+```
+
+#### 3. Handle Stream Cleanup
+
+```typescript
+// Streams are automatically cleaned up by setupTestLifecycle
+// Manual cleanup if needed:
+afterEach(() => {
+  workers.getAll().forEach((worker) => {
+    worker.worker.endStream();
+  });
+});
+```
+
+#### 4. Performance-Aware Assertions
+
+```typescript
+// For high-performance requirements
+expect(result.allReceived).toBe(true);
+expect(result.averageEventTiming).toBeLessThan(200);
+
+// For reliability testing with some tolerance
+expect(result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(95);
+
+// For large-scale testing with relaxed requirements
+expect(result.receptionPercentage).toBeGreaterThan(80);
+expect(result.orderPercentage).toBeGreaterThan(90);
+```
+
+### Common Stream Testing Patterns
+
+#### Real-time Message Testing
+
+```typescript
+it("should deliver messages in real-time", async () => {
+  // Start message streams
+  workers.getReceiver().worker.startStream(typeofStream.Message);
+
+  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+  const verifyResult = await verifyMessageStream(
+    dm,
+    [workers.get("bob")],
+    5,
+    "realtime-{i}-{randomSuffix}",
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
+  expect(verifyResult.averageEventTiming).toBeLessThan(500);
+});
+```
+
+#### Group Update Notifications
+
+```typescript
+it("should notify all members of group updates", async () => {
+  // Start group update streams
+  workers.getAllButCreator().forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
+
+  const group = await workers.createGroupBetweenAll();
+
+  const verifyResult = await verifyMetadataStream(
+    group,
+    workers.getAllButCreator(),
+    3,
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
+});
+```
+
+## Available Worker Names
+
+Use predefined names from the 61 available:
+
+```typescript
+["bob", "alice", "fabri", "elon", "joe", "charlie", "dave", "eve",
+ "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary",
+ "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula",
+ "victor", "wendy", "xavier", "yolanda", "zack", ...]
+```
+
+## Test Organization
+
+- Use `useVersions: true` option for version testing
+- Use `typeofStream.Message` for message streaming
+- Always call `setupTestLifecycle({testName})` for proper cleanup
+- Test file naming: `*.test.ts` in `suites/` directory
+
+## Key Imports
+
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+```
+
+## Quick Snippets
+
+### Basic Test Setup
+
+```typescript
+// Simple DM test
+const workers = await getWorkers(["alice", "bob"]);
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+```
+
+### Group Test Setup
+
+```typescript
+// 3-person group test
+const workers = await getWorkers(3);
+const group = await workers.createGroupBetweenAll("Test Group");
+```
+
+### Message Verification
+
+```typescript
+// Simple message test
+const result = await verifyMessageStream(dm, [bob], 1, "test-{i}");
+expect(result.allReceived).toBe(true);
+```
+
+### Large Group Creation
+
+```typescript
+// Large group with external members
+const workers = await getWorkers(1);
+const memberInboxIds = getInboxIds(100);
+const group = await workers
+  .getCreator()
+  .client.conversations.newGroup(memberInboxIds);
+```
+
+### Version-Specific Testing
+
+```typescript
+// Test with specific SDK version
+const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
+
+// Multi-version testing
+const workers = await getWorkers(3, { useVersions: true });
+
+// Regression testing pattern
+const versions = getVersions().slice(0, 3);
+for (const version of versions) {
+  const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
+    useVersions: false,
+  });
+}
+
+// Version comparison
+const workers = await getWorkers(["alice", "bob"], { useVersions: true });
+// Creates: alice-a-3.1.1, bob-a-2.2.1 (random versions)
+```
+
+### Stream Setup
+
+```typescript
+// Start message streaming
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+
+```
+
+```
+
+# Testing Worker Framework Rules
+
+## Core Testing Pattern
+
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { describe, it } from "vitest";
+
+const testName = "my-test";
+
+describe(testName, async () => {
+  // Simplified API - versioning enabled by default
+  const workers = await getWorkers(["alice", "bob"]);
+
+  setupTestLifecycle({ testName });
+
+  it("should do something", async () => {
+    // Test logic here
+  });
+});
+```
+
+## getWorkers API
+
+The `getWorkers` function has three input modes with optional configuration:
+
+### Input Modes
+
+```typescript
+// 1. Number - creates that many workers with random names (default)
+const workers = await getWorkers(5);
+
+// 2. Array of specific worker names
+const workers = await getWorkers(["alice", "bob", "charlie"]);
+
+// 3. Record for API URL mapping (for distributed testing)
+const workers = await getWorkers({
+  alice: "https://api1.example.com",
+  bob: "https://api2.example.com",
+});
+```
+
+### Options Configuration
+
+```typescript
+type GetWorkersOptions = {
+  env?: XmtpEnv; // XMTP environment (default: from XMTP_ENV)
+  useVersions?: boolean; // Apply version descriptors (default: true)
+  randomNames?: boolean; // Use random names for number input (default: true)
+};
+
+// Examples:
+await getWorkers(3); // 3 workers with random names, versioned
+await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
+await getWorkers(["alice", "bob"]); // Specific names, versioned
+await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
+await getWorkers(5, { env: "production" }); // 5 random workers on production
+```
+
+## Worker Access Patterns
+
+```typescript
+// Get specific workers
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Access worker properties
+alice.client; // XMTP client
+alice.worker; // Worker thread
+alice.name; // "alice"
+alice.address; // Ethereum address
+alice.client.inboxId; // Inbox ID
+
+// Utility methods
+workers.getCreator(); // First worker
+workers.getReceiver(); // Random non-creator
+workers.getAll(); // All workers array
+workers.getAllButCreator(); // All except first
+workers.getRandomWorkers(2); // Random subset
+
+// Get worker names array (useful for logging/debugging)
+const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
+```
+
+## Common Usage Patterns
+
+### Simple Testing
+
+```typescript
+// Most common patterns
+const workers = await getWorkers(5); // 5 random workers
+const workers = await getWorkers(["alice", "bob"]); // Specific workers
+```
+
+### Version Testing
+
+```typescript
+// Versioning is enabled by default
+const workers = await getWorkers(3); // Uses random SDK versions
+const workers = await getWorkers(3, { useVersions: false }); // All latest version
+```
+
+### Environment-Specific Testing
+
+```typescript
+const workers = await getWorkers(5, { env: "production" });
+const workers = await getWorkers(["alice"], { env: "local" });
+```
+
+## Conversation Operations
+
+```typescript
+// Create DM by inbox ID
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+// Create DM by Ethereum address
+const dm2 = await alice.client.conversations.newDmWithIdentifier({
+  identifier: bob.address,
+  identifierKind: IdentifierKind.Ethereum,
+});
+
+// Create group with inbox IDs
+const group = await alice.client.conversations.newGroup([
+  bob.client.inboxId,
+  workers.get("charlie").client.inboxId,
+]);
+
+// Create group between all workers
+const testGroup = await workers.createGroupBetweenAll("My Group");
+
+// Send messages
+await dm.send("Hello DM");
+await group.send("Hello Group");
+```
+
+## Group Operations
+
+```typescript
+// Group metadata
+await group.updateName("New Name");
+await group.updateDescription("New Description");
+
+// Member management
+await group.addMembers([newMemberInboxId]);
+await group.removeMembers([memberInboxId]);
+
+// Admin management
+await group.addAdmin(memberInboxId);
+await group.addSuperAdmin(memberInboxId);
+
+// Get group info
+const members = await group.members();
+const name = group.name;
+const admins = group.admins;
+```
+
+## Streams and Stream Verification
+
+### Stream Types Available
+
+```typescript
+import { typeofStream } from "@workers/main";
+
+// Available stream types
+typeofStream.Message; // Message delivery streams
+typeofStream.MessageandResponse; // Message streams with automatic responses
+typeofStream.GroupUpdated; // Group metadata and membership updates
+typeofStream.Conversation; // New conversation creation events
+typeofStream.Consent; // Consent state changes
+```
+
+### Manual Stream Control
+
+Start and stop streams dynamically during test execution:
+
+```typescript
+// Start specific stream types on demand
+workers.getReceiver().worker.startStream(typeofStream.Message);
+workers.getReceiver().worker.startStream(typeofStream.GroupUpdated);
+workers.getReceiver().worker.startStream(typeofStream.Conversation);
+
+// Start streams for multiple workers
+workers.getAllButCreator().forEach((worker) => {
+  worker.worker.startStream(typeofStream.Message);
+});
+
+// Stop all streams for a worker
+workers.getReceiver().worker.endStream();
+
+// Stop specific stream type
+workers.getReceiver().worker.endStream(typeofStream.Message);
+```
+
+### Stream Verification Functions
+
+#### Message Streams
+
+```typescript
+// Verify message delivery with custom template
+const verifyResult = await verifyMessageStream(
+  conversation,
+  [workers.get("bob")], // receivers
+  10, // message count
+  "test-{i}-{randomSuffix}", // message template
+);
+
+// Check delivery results
+expect(verifyResult.allReceived).toBe(true);
+expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+expect(verifyResult.averageEventTiming).toBeLessThan(500);
+```
+
+#### Group Metadata Streams
+
+```typescript
+// Verify group metadata updates (name changes)
+const verifyResult = await verifyMetadataStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  3, // number of name updates
+  "GroupName-{i}-{randomSuffix}", // name template
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Membership Streams
+
+```typescript
+// Verify member addition notifications
+const verifyResult = await verifyMembershipStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  [newMemberInboxId], // members to add
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Conversation Streams
+
+```typescript
+// Verify new conversation creation notifications
+const verifyResult = await verifyConversationStream(
+  workers.getCreator(), // initiator
+  [workers.getReceiver()], // receivers
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Consent Streams
+
+```typescript
+// Verify consent state change notifications
+const verifyResult = await verifyConsentStream(
+  workers.getCreator(), // initiator
+  workers.getReceiver(), // receiver
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Bot Response Streams
+
+```typescript
+// Verify bot response timing
+const verifyResult = await verifyAgentMessageStream(
+  conversation,
+  [workers.getReceiver()], // receivers
+  "trigger message", // message to trigger bot response
+);
+expect(verifyResult.averageEventTiming).toBeLessThan(1000);
+```
+
+### Stream Result Analysis
+
+All stream verification functions return a `VerifyStreamResult` object:
+
+```typescript
+type VerifyStreamResult = {
+  allReceived: boolean; // True if all expected events received
+  almostAllReceived: boolean; // True if ≤2 events missing
+  receiverCount: number; // Number of receiving workers
+  messages: string; // Comma-separated received messages
+  eventTimings: string; // Timing data per receiver
+  averageEventTiming: number; // Average delivery time in ms
+  receptionPercentage: number; // Percentage of successfully received events
+  orderPercentage: number; // Percentage of receivers with correct order
+};
+
+// Example usage
+const result = await verifyMessageStream(conversation, receivers, 5);
+
+console.log(`Reception: ${result.receptionPercentage}%`);
+console.log(`Order: ${result.orderPercentage}%`);
+console.log(`Average timing: ${result.averageEventTiming}ms`);
+
+// Flexible assertions based on requirements
+expect(result.allReceived || result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(90);
+expect(result.averageEventTiming).toBeLessThan(2000);
+```
+
+### Stream Testing Best Practices
+
+#### 1. Start Streams Before Actions
+
+```typescript
+// ✅ Good: Start streams before triggering events
+workers.getReceiver().worker.startStream(typeofStream.Message);
+await conversation.send("Hello");
+
+// ❌ Bad: Start streams after triggering events
+await conversation.send("Hello");
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+#### 2. Use Appropriate Stream Types
+
+```typescript
+// For message delivery testing
+worker.worker.startStream(typeofStream.Message);
+
+// For group updates (name, description, membership)
+worker.worker.startStream(typeofStream.GroupUpdated);
+
+// For new conversation notifications
+worker.worker.startStream(typeofStream.Conversation);
+
+// For consent state changes
+worker.worker.startStream(typeofStream.Consent);
+```
+
+#### 3. Handle Stream Cleanup
+
+```typescript
+// Streams are automatically cleaned up by setupTestLifecycle
+// Manual cleanup if needed:
+afterEach(() => {
+  workers.getAll().forEach((worker) => {
+    worker.worker.endStream();
+  });
+});
+```
+
+#### 4. Performance-Aware Assertions
+
+```typescript
+// For high-performance requirements
+expect(result.allReceived).toBe(true);
+expect(result.averageEventTiming).toBeLessThan(200);
+
+// For reliability testing with some tolerance
+expect(result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(95);
+
+// For large-scale testing with relaxed requirements
+expect(result.receptionPercentage).toBeGreaterThan(80);
+expect(result.orderPercentage).toBeGreaterThan(90);
+```
+
+### Common Stream Testing Patterns
+
+#### Real-time Message Testing
+
+```typescript
+it("should deliver messages in real-time", async () => {
+  // Start message streams
+  workers.getReceiver().worker.startStream(typeofStream.Message);
+
+  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+  const verifyResult = await verifyMessageStream(
+    dm,
+    [workers.get("bob")],
+    5,
+    "realtime-{i}-{randomSuffix}",
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
+  expect(verifyResult.averageEventTiming).toBeLessThan(500);
+});
+```
+
+#### Group Update Notifications
+
+```typescript
+it("should notify all members of group updates", async () => {
+  // Start group update streams
+  workers.getAllButCreator().forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
+
+  const group = await workers.createGroupBetweenAll();
+
+  const verifyResult = await verifyMetadataStream(
+    group,
+    workers.getAllButCreator(),
+    3,
+  );
+
+  expect(verifyResult.allReceived).toBe(true);
+});
+```
+
+## Available Worker Names
+
+Use predefined names from the 61 available:
+
+```typescript
+["bob", "alice", "fabri", "elon", "joe", "charlie", "dave", "eve",
+ "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary",
+ "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula",
+ "victor", "wendy", "xavier", "yolanda", "zack", ...]
+```
+
+## Test Organization
+
+- Use `useVersions: true` option for version testing
+- Use `typeofStream.Message` for message streaming
+- Always call `setupTestLifecycle({testName})` for proper cleanup
+- Test file naming: `*.test.ts` in `suites/` directory
+
+## Key Imports
+
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+```
+
+## Quick Snippets
+
+### Basic Test Setup
+
+```typescript
+// Simple DM test
+const workers = await getWorkers(["alice", "bob"]);
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+```
+
+### Group Test Setup
+
+```typescript
+// 3-person group test
+const workers = await getWorkers(3);
+const group = await workers.createGroupBetweenAll("Test Group");
+```
+
+### Message Verification
+
+```typescript
+// Simple message test
+const result = await verifyMessageStream(dm, [bob], 1, "test-{i}");
+expect(result.allReceived).toBe(true);
+```
+
+### Large Group Creation
+
+```typescript
+// Large group with external members
+const workers = await getWorkers(1);
+const memberInboxIds = getInboxIds(100);
+const group = await workers
+  .getCreator()
+  .client.conversations.newGroup(memberInboxIds);
+```
+
+### Version-Specific Testing
+
+```typescript
+// Test with specific SDK version
+const workers = await getWorkers(1, { nodeVersion: "3.1.1" });
+
+// Multi-version testing
+const workers = await getWorkers(3, { useVersions: true });
+
+// Regression testing pattern
+const versions = getVersions().slice(0, 3);
+for (const version of versions) {
+  const workers = await getWorkers([`alice-a-${version.nodeVersion}`], {
+    useVersions: false,
+  });
+}
+
+// Version comparison
+const workers = await getWorkers(["alice", "bob"], { useVersions: true });
+// Creates: alice-a-3.1.1, bob-a-2.2.1 (random versions)
+```
+
+### Stream Setup
+
+```typescript
+// Start message streaming
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+
+```
+
+```

@@ -1,0 +1,102 @@
+name: Package Compatibility
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 21, 22, 23]
+        package-manager: [npm, yarn, yarn1, pnpm, bun]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: xmtp/xmtp-qa-tools
+          path: xmtp-qa-tools
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install pnpm
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.7.0
+
+      - name: Install Bun
+        if: matrix.package-manager == 'bun'
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install Yarn 1
+        if: matrix.package-manager == 'yarn1'
+        run: |
+          npm install -g yarn@1.22.19
+          yarn --version
+
+      - name: Navigate to gm-bot directory
+        run: cd xmtp-qa-tools/bots/gm-bot
+
+      - name: Clean previous installations
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          rm -rf node_modules
+          rm -rf dist
+          rm -rf .yarn
+          rm -f package-lock.json
+          rm -f yarn.lock
+          rm -f pnpm-lock.yaml
+          rm -f bun.lockb
+
+      - name: Install dependencies with npm
+        if: matrix.package-manager == 'npm'
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          npm install
+
+      - name: Install dependencies with yarn
+        if: matrix.package-manager == 'yarn'
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          touch yarn.lock
+          yarn install --no-immutable
+
+      - name: Install dependencies with yarn 1
+        if: matrix.package-manager == 'yarn1'
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          touch yarn.lock
+          yarn install --no-immutable
+
+      - name: Install dependencies with pnpm
+        if: matrix.package-manager == 'pnpm'
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          pnpm install
+          pnpm add @xmtp/node-bindings
+
+      - name: Install dependencies with bun
+        if: matrix.package-manager == 'bun'
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          bun install
+
+      - name: Build project
+        run: |
+          cd xmtp-qa-tools/bots/gm-bot
+          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
+            yarn run build
+                    else
+            ${{ matrix.package-manager }} run build
+          fi

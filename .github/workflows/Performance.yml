@@ -1,0 +1,44 @@
+name: Performance
+description: "should verify performance "
+
+on:
+  schedule:
+    - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [performance]
+        environment: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 150
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test environment
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --no-fail --debug
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "Performance"

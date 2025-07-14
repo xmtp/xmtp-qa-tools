@@ -1,0 +1,85 @@
+name: Network Chaos Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  chaos-test:
+    name: Local Network Chaos Tests Against 4-node XMTP-go cluster
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        test_file:
+          - smoketests.test.ts
+          - dm-duplicate-prevention.test.ts
+          - group-partition-delayedreceive.test.ts
+          - node-blackhole.test.ts
+          - networkchaos.test.ts
+          - group-reconciliation.test.ts
+          - group-client-partition.test.ts
+          - keyrotation.test.ts
+
+    env:
+      XMTP_ENV: local
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux Networking Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iproute2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          # Disable built-in cache to use shared cache below
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+          key: deps-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            deps-
+
+      - name: Install Dependencies
+        run: yarn
+
+      - name: Initial Docker Setup
+        run: ./multinode/ci.sh
+
+      - name: Run ${{ matrix.test_file }}
+        run: |
+          FILE=suites/networkchaos/${{ matrix.test_file }}
+          echo "Running $FILE"
+          if ! npx vitest run $FILE; then
+            echo "Initial run failed for $FILE. Retrying after env reset..."
+            ./multinode/ci.sh
+            npx vitest run $FILE
+          fi
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "NetworkChaos"
+
+      - name: Tear Down Docker
+        if: always()
+        run: cd multinode && docker compose down
