@@ -2,9 +2,6 @@ name: Large
 description: "should verify performance of the group streams"
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 */2 * * *" # Runs every 2 hours at top of hour (30+ min separation from Performance at :15 and :45)
   workflow_dispatch:
