@@ -52,16 +52,21 @@ The suite uses configurable parameters in `helpers.ts`:
 
 - `WORKER_COUNT` - Number of concurrent test workers (default: 5)
 - `BATCH_SIZE` - Group size increment for testing (default: 5)
-- `TOTAL` - Maximum group size to test (default: 10)
+- `MAX_GROUP_SIZE` - Maximum group size to test (default: 10)
+
+### Baseline Testing
+
+Each test suite now starts with a dedicated 10-person group baseline test, independent of the batch configuration. This ensures consistent measurement of a standardized group size regardless of how `BATCH_SIZE` and `MAX_GROUP_SIZE` are configured. Baseline tests are clearly marked in the performance logs with `[BASELINE]` for easy identification.
 
 ### Test Execution Pattern
 
 Each test file follows a consistent pattern:
 
-1. Creates groups of increasing sizes (batch increments from 5 to 10 members by default)
-2. Measures specific performance metrics for each group size
-3. Verifies that operations complete within acceptable time limits
-4. Logs detailed timing results for analysis
+1. **Baseline Test**: Creates a dedicated 10-person group test independent of batch configuration
+2. **Batch Tests**: Creates groups of increasing sizes (batch increments from 5 to 10 members by default)
+3. Measures specific performance metrics for each group size
+4. Verifies that operations complete within acceptable time limits
+5. Logs detailed timing results for analysis with baseline measurements clearly marked
 
 ## Performance Results
 

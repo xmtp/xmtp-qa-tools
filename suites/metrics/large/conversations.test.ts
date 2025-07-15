@@ -24,6 +24,26 @@ describe(testName, async () => {
     sendMetrics: true,
   });
 
+  // Dedicated 10-person group test (independent of batch configuration)
+  it(`receiveNewConversation-10-baseline: should create 10 member group (baseline)`, async () => {
+    // Use the dedicated conversation stream verification helper
+    const verifyResult = await verifyConversationStream(
+      workers.getCreator(),
+      workers.getAllButCreator(),
+    );
+
+    setCustomDuration(verifyResult.averageEventTiming);
+    expect(verifyResult.almostAllReceived).toBe(true);
+
+    // Save metrics with special key for baseline
+    summaryMap[10] = {
+      ...(summaryMap[10] ?? { groupSize: 10 }),
+      conversationStreamTimeMs: verifyResult.averageEventTiming,
+      isBaseline: true,
+    };
+  });
+
+  // Batch-based tests (existing behavior)
   for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
     it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
       // Use the dedicated conversation stream verification helper
@@ -35,7 +55,7 @@ describe(testName, async () => {
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
 
-      // Save metrics
+      // Save metrics (merge with baseline if same size)
       summaryMap[i] = {
         ...(summaryMap[i] ?? { groupSize: i }),
         conversationStreamTimeMs: verifyResult.averageEventTiming,

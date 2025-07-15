@@ -27,33 +27,54 @@ describe(testName, async () => {
     },
     sendMetrics: true,
   });
+
+  // Dedicated 10-person group test (independent of batch configuration)
+  it(`receiveMetadataUpdate-10-baseline: should notify all members of metadata changes in 10 member group (baseline)`, async () => {
+    const creator = workers.getCreator();
+    newGroup = (await creator.client.conversations.newGroup(
+      getInboxIds(10),
+    )) as Group;
+
+    const verifyResult = await verifyMetadataStream(
+      newGroup,
+      workers.getAllButCreator(),
+    );
+
+    // Save metrics with special key for baseline
+    summaryMap[10] = {
+      ...(summaryMap[10] ?? { groupSize: 10 }),
+      metadataStreamTimeMs: verifyResult.averageEventTiming,
+      isBaseline: true,
+    };
+
+    setCustomDuration(verifyResult.averageEventTiming);
+    expect(verifyResult.almostAllReceived).toBe(true);
+  });
+
+  // Batch-based tests (existing behavior)
   for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
-    it(`receiveGroupUpdated-${i}: should create ${i} member group`, async () => {
+    it(`receiveMetadataUpdate-${i}: should notify all members of metadata changes in ${i} member group`, async () => {
       const creator = workers.getCreator();
       newGroup = (await creator.client.conversations.newGroup(
         getInboxIds(i),
       )) as Group;
 
-      await newGroup.addMembers(
-        workers.getAllButCreator().map((worker) => worker.inboxId),
-      );
       const verifyResult = await verifyMetadataStream(
         newGroup,
         workers.getAllButCreator(),
       );
 
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-
-      // Save metrics
+      // Save metrics (merge with baseline if same size)
       summaryMap[i] = {
         ...(summaryMap[i] ?? { groupSize: i }),
-        groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
+        metadataStreamTimeMs: verifyResult.averageEventTiming,
       };
+
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
     });
   }
 
-  // Aft
   // After all tests have run, output a concise summary of all timings per group size
   afterAll(() => {
     saveLog(summaryMap);

@@ -22,6 +22,9 @@ export function saveLog(summaryMap: Record<string, any>) {
     if (entry.installations !== undefined) {
       messageToLog += ` (${entry.installations} inst)`;
     }
+    if (entry.isBaseline) {
+      messageToLog += " [BASELINE]";
+    }
     messageToLog += " → ";
     messageToLog += JSON.stringify(entry, null, 0);
     messageToLog += "\n";
