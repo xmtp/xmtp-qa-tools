@@ -1,7 +1,6 @@
 import {
   verifyConversationStream,
   verifyMembershipStream,
-  verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -12,7 +11,6 @@ import { describe, expect, it } from "vitest";
 // Configuration
 const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
 const BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
-const MAX_GROUP_SIZE = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
 const testName = "large";
 describe(testName, async () => {
@@ -20,12 +18,7 @@ describe(testName, async () => {
 
   const batchSizes = getBatchSizes();
 
-  // Setup workers with enough capacity for all tests
-  const maxWorkersNeeded = Math.max(
-    WORKER_COUNT,
-    (MAX_GROUP_SIZE / BATCH_SIZE) * 2 + 5,
-  );
-  workers = await getWorkers(maxWorkersNeeded);
+  workers = await getWorkers(WORKER_COUNT);
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -152,11 +145,3 @@ describe(testName, async () => {
     });
   }
 });
-
-const getBatchSizes = (): number[] => {
-  const sizes = new Set([10]); // Always include baseline
-  for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
-    sizes.add(i);
-  }
-  return Array.from(sizes).sort((a, b) => a - b);
-};

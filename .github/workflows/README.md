@@ -129,7 +129,6 @@ Workflows are configured using GitHub repository secrets and variables:
 - `XMTP_ENV`: Target XMTP environment (dev/production)
 - `GEOLOCATION`: Target geographic region
 - `BATCH_SIZE`: Number of participants per batch
-- `MAX_GROUP_SIZE`: Maximum group size for testing
 
 ## Monitoring and Reporting
 

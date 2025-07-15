@@ -8,7 +8,6 @@ import { describe, expect, it } from "vitest";
 const testName = "performance";
 describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
-  const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
   let dm: Dm | undefined;
   let workers = await getWorkers(10);
 
