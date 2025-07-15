@@ -514,7 +514,9 @@ export class WorkerClient extends Worker {
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
-                `Received group updated ${JSON.stringify(message.content)}`,
+                `Received group updated ${
+                  (message.content as any)?.addedInboxes.length
+                }`,
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes

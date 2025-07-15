@@ -28,7 +28,7 @@ DATADOG_API_KEY=...             # Datadog API key for log retrieval
 DATADOG_APP_KEY=...             # Datadog app key for log retrieval
 ANTHROPIC_API_KEY=...           # Claude AI API key for log analysis
 
-# Optional - for geolocation testing
+# Optional - for REGION testing
 REGION=us-east-1           # AWS region for testing
 ```
 

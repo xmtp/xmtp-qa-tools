@@ -16,7 +16,7 @@ const BATCH_SIZE = process.env.BATCH_SIZE
   ? (JSON.parse(process.env.BATCH_SIZE) as number[])
   : [5, 10];
 
-const testName = "large";
+const testName = "large_";
 describe(testName, async () => {
   setupTestLifecycle({ testName, sendMetrics: true });
   let workers: WorkerManager;
@@ -43,7 +43,7 @@ describe(testName, async () => {
   let run = 0; // Worker allocation counter
 
   for (const groupSize of BATCH_SIZE) {
-    it(`receiveNewConversation-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
+    it(`conversationStream-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),
         workers.getAllButCreator(),
@@ -63,7 +63,7 @@ describe(testName, async () => {
       );
     });
 
-    it(`receiveMembershipUpdate-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+    it(`addMember-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
       const extraMember = allMembersWithExtra.slice(groupSize, groupSize + 1);
       console.log("extraMember", extraMember);
       const verifyResult = await verifyMembershipStream(
@@ -76,7 +76,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`receiveGroupMessage-${groupSize}: should notify all members of message changes in ${groupSize} member group`, async () => {
+    it(`streamMessage-${groupSize}: should notify all members of message changes in ${groupSize} member group`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
@@ -86,7 +86,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
+    it(`updateName-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
       const verifyResult = await verifyMetadataStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
@@ -96,7 +96,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`verifySyncColdStart-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
+    it(`sync-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
       const allWorkers = workers.getAllButCreator();
       const workerA = allWorkers[run % allWorkers.length];
@@ -119,7 +119,7 @@ describe(testName, async () => {
       );
     });
 
-    it(`verifySyncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
+    it(`syncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
       const allWorkers = workers.getAllButCreator();
 
