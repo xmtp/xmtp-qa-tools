@@ -18,7 +18,7 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      REGION: ${{ vars.REGION }}
       WORKER_COUNT: 5
       BATCH_SIZE: [10, 50, 100, 150]
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

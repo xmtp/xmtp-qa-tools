@@ -12,7 +12,7 @@ jobs:
     env:
       XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
       LOGGING_LEVEL: "error"
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
