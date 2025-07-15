@@ -94,20 +94,20 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    // it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
-    //   const creator = workers.getCreator();
-    //   const metadataGroup = (await creator.client.conversations.newGroup(
-    //     getInboxIds(groupSize),
-    //   )) as Group;
+    it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
+      const creator = workers.getCreator();
+      const metadataGroup = (await creator.client.conversations.newGroup(
+        getInboxIds(groupSize),
+      )) as Group;
 
-    //   const verifyResult = await verifyMetadataStream(
-    //     metadataGroup,
-    //     workers.getAllButCreator(),
-    //   );
+      const verifyResult = await verifyMetadataStream(
+        metadataGroup,
+        workers.getAllButCreator(),
+      );
 
-    //   setCustomDuration(verifyResult.averageEventTiming);
-    //   expect(verifyResult.almostAllReceived).toBe(true);
-    // });
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
 
     it(`verifySyncColdStart-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
