@@ -41,7 +41,7 @@ jobs:
         run: sleep ${{ matrix.delay_minutes * 60 }}
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
