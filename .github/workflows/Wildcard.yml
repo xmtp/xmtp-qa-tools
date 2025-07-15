@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  pull_request:
+  #pull_request:
 
 jobs:
   test:
@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-dms] # performance test with more large groups
+        test: [large] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
@@ -20,9 +20,8 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: 50
-      MAX_GROUP_SIZE: 150
+      REGION: ${{ vars.REGION }}
+      BATCH_SIZE: [10, 20]
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:

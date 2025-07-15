@@ -8,8 +8,7 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
-export const BATCH_SIZE = 10;
-export const TOTAL = 200;
+export const BATCH_SIZE = [10, 20, 50, 100, 150];
 export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
 export const MIN_MAX_INSTALLATIONS = [1000, 2000];
 
@@ -32,7 +31,7 @@ describe(testName, () => {
     },
   });
 
-  for (let i = BATCH_SIZE; i <= TOTAL; i += BATCH_SIZE) {
+  for (const i of BATCH_SIZE) {
     for (const installation of CHECK_INSTALLATIONS) {
       if (
         installation * i < MIN_MAX_INSTALLATIONS[0] ||

@@ -114,11 +114,11 @@ function enrichTags(tags: MetricTags): MetricTags {
   return {
     ...tags,
     env: tags.env || process.env.XMTP_ENV,
-    region: tags.region || process.env.GEOLOCATION,
+    region: tags.region || process.env.REGION,
     country_iso_code:
       tags.country_iso_code ||
       GEO_TO_COUNTRY_CODE[
-        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+        process.env.REGION as keyof typeof GEO_TO_COUNTRY_CODE
       ],
   };
 }
@@ -206,7 +206,7 @@ export function parseTestName(testName: string): ParsedTestName {
   const operationParts = metricName.split(".");
 
   let testNameExtracted = operationParts[0];
-  if (testNameExtracted.includes("large_")) {
+  if (testNameExtracted === "large") {
     testNameExtracted = "m_large";
   } else if (testNameExtracted === "delivery") {
     testNameExtracted = "m_delivery";
@@ -323,10 +323,10 @@ export async function sendDatadogLog(
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
     environment: process.env.XMTP_ENV || "unknown",
     env: process.env.XMTP_ENV || "unknown",
-    region: process.env.GEOLOCATION || "unknown",
+    region: process.env.REGION || "unknown",
     country_iso_code:
       GEO_TO_COUNTRY_CODE[
-        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+        process.env.REGION as keyof typeof GEO_TO_COUNTRY_CODE
       ],
   };
   //console.debug(logPayload);

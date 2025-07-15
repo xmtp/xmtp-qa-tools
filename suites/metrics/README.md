@@ -18,8 +18,7 @@ Set `XMTP_ENV` to `dev` or `production` to test against the corresponding networ
 
 - `DELIVERY_AMOUNT` - Number of messages to send for testing (default: 10)
 - `DELIVERY_RECEIVERS` - Number of receiving clients (default: 4)
-- `BATCH_SIZE` - Increment size for scaling tests (default: 5)
-- `MAX_GROUP_SIZE` - Maximum group size to test (default: 10)
+- `BATCH_SIZE` - Increment size for scaling tests (default: [10, 20])
 
 ## How to run
 
@@ -43,7 +42,7 @@ yarn test metrics/performance.test.ts # Performance benchmarking tests
 DELIVERY_AMOUNT=20 DELIVERY_RECEIVERS=6 yarn test metrics/delivery.test.ts
 
 # Performance testing with larger scales
-BATCH_SIZE=10 MAX_GROUP_SIZE=50 yarn test metrics/performance.test.ts
+BATCH_SIZE=[5,10] yarn test metrics/performance.test.ts
 ```
 
 ## Test Components
