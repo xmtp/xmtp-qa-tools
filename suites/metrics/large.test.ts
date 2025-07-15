@@ -1,5 +1,4 @@
 import {
-  verifyConversationStream,
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
@@ -37,8 +36,6 @@ describe(testName, async () => {
     },
     sendMetrics: true,
   });
-
-  let run = 0; // Worker allocation counter
 
   for (const groupSize of BATCH_SIZE) {
     it(`newGroup-${groupSize}: should create a large group of ${groupSize} participants`, async () => {
@@ -103,6 +100,7 @@ describe(testName, async () => {
       setCustomDuration(end - start);
     });
 
+    // let run = 0; // Worker allocation counter
     // it(`syncAllCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
     //   const allWorkers = workers.getAllButCreator();
     //   const workerA = allWorkers[run % allWorkers.length];
