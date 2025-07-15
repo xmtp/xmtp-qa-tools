@@ -40,7 +40,7 @@ jobs:
 
       - name: Delay execution to spread batch runs
         if: ${{ matrix.delay_minutes > 0 }}
-        run: sleep ${{ matrix.delay_minutes * 60 }}
+        run: sleep $((${{ matrix.delay_minutes }} * 60))
 
       - name: Run tests
         run: yarn test ${{ matrix.test }}
