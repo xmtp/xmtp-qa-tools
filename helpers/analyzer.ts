@@ -21,6 +21,7 @@ export const PATTERNS = {
   DEDUPE: [
     "sqlcipher_mlock",
     "Collector timed out.",
+    "DeviceSync worker error:",
     "welcome with cursor",
     "group with welcome id",
     "receiveGroupMessage",
