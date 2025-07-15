@@ -27,7 +27,7 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: ${{ toJSON(matrix.BATCH_SIZE) }}
+      BATCH_SIZE: ${{ toJSON(matriBATCHCSIZEZE) }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -40,9 +40,7 @@ jobs:
         run: sleep $((${{ matrix.delay_minutes }} * 60))
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
-
-      - name: Cleanup and upload artifacts
+        run: yarn test ${{ matrix.test }} -- --no-fail --debug     - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
