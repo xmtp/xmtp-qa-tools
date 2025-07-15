@@ -2,6 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
+import { getInboxIds } from "@inboxes/utils";
 import { getVersions, VersionList } from "@workers/versions";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -251,20 +252,18 @@ export class WorkerManager {
   }
   async createGroupBetweenAll(
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
-    members: string[] | null = null,
+    extraMemberCount?: number,
   ): Promise<Group> {
     const creator = this.getCreator();
-    const memberList = members
-      ? members.map((name) => {
-          const worker = this.get(name);
-          if (!worker) throw new Error(`Worker not registered: ${name}`);
-          return worker.client.inboxId;
-        })
-      : this.getAllButCreator().map((worker) => worker.client.inboxId);
-
+    const memberList = this.getAllButCreator().map(
+      (worker) => worker.client.inboxId,
+    );
     const group = await creator.client.conversations.newGroup(memberList, {
       groupName,
     });
+    if (extraMemberCount && extraMemberCount > 0) {
+      await group.addMembers(getInboxIds(extraMemberCount));
+    }
 
     return group as Group;
   }

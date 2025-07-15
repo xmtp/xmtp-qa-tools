@@ -5,9 +5,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 // Configuration
@@ -45,36 +43,29 @@ describe(testName, async () => {
   let run = 0; // Worker allocation counter
 
   for (const groupSize of batchSizes) {
-    // it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
-    //   const creator = workers.getCreator();
-    //   const membershipGroup = (await creator.client.conversations.newGroup(
-    //     getInboxIds(groupSize),
-    //   )) as Group;
-
-    //   const verifyResult = await verifyMembershipStream(
-    //     membershipGroup,
-    //     workers.getAllButCreator(),
-    //     getInboxIds(1),
-    //   );
-
-    //   setCustomDuration(verifyResult.averageEventTiming);
-    //   expect(verifyResult.almostAllReceived).toBe(true);
-    // });
-
-    it(`verifyMessageStream-${groupSize}: should deliver messages to all ${groupSize} members`, async () => {
-      const creator = workers.getCreator();
-      const group = (await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
-      )) as Group;
-      await group.sync();
-      await group.addMembers(
-        workers
-          .getAllButCreator()
-
-          .map((worker) => worker.client.inboxId),
+    it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+      const membershipGroup = await workers.createGroupBetweenAll(
+        "Membership Stream Test",
+        groupSize,
       );
 
+      const verifyResult = await verifyMembershipStream(
+        membershipGroup,
+        workers.getAllButCreator(),
+        [workers.getCreator().client.inboxId],
+      );
+
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
+
+    it(`verifyMessageStream-${groupSize}: should deliver messages to all ${groupSize} members`, async () => {
+      const group = await workers.createGroupBetweenAll(
+        "Message Stream Test",
+        groupSize,
+      );
       await group.sync();
+
       const verifyResult = await verifyMessageStream(
         group,
         workers.getAllButCreator(),
@@ -95,10 +86,12 @@ describe(testName, async () => {
     });
 
     it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
-      const creator = workers.getCreator();
-      const metadataGroup = (await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
-      )) as Group;
+      const metadataGroup = await workers.createGroupBetweenAll(
+        "Metadata Stream Test",
+        groupSize,
+      );
+
+      await metadataGroup.sync();
 
       const verifyResult = await verifyMetadataStream(
         metadataGroup,
@@ -111,15 +104,15 @@ describe(testName, async () => {
 
     it(`verifySyncColdStart-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
-      const creator = workers.getCreator();
+
       const allWorkers = workers.getAllButCreator();
       const workerA = allWorkers[run % allWorkers.length];
       const workerB = allWorkers[(run + 1) % allWorkers.length];
 
-      const newGroup = await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
+      const newGroup = await workers.createGroupBetweenAll(
+        "Sync Cold Start Test",
+        groupSize,
       );
-      await newGroup.addMembers([workerA.inboxId, workerB.inboxId]);
       const createTimeMs = performance.now() - createTime;
 
       // Test syncAll
@@ -139,11 +132,11 @@ describe(testName, async () => {
 
     it(`verifySyncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
-      const creator = workers.getCreator();
       const allWorkers = workers.getAllButCreator();
 
-      const newGroup = await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
+      const newGroup = await workers.createGroupBetweenAll(
+        "Sync Cumulative Test",
+        groupSize,
       );
 
       const workersToAdd = allWorkers.slice(
@@ -155,7 +148,6 @@ describe(testName, async () => {
         workersToAdd.push(...allWorkers.slice(0, 3 - workersToAdd.length));
       }
 
-      await newGroup.addMembers(workersToAdd.map((worker) => worker.inboxId));
       const cumulativeCreateTimeMs = performance.now() - createTime;
 
       // Test cumulative syncAll
