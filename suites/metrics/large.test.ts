@@ -14,7 +14,7 @@ const BATCH_SIZE = process.env.BATCH_SIZE
   ? (JSON.parse(process.env.BATCH_SIZE) as number[])
   : [5, 10];
 
-const testName = "large_";
+const testName = "large";
 describe(testName, async () => {
   setupTestLifecycle({ testName, sendMetrics: true });
   let workers: WorkerManager;

@@ -206,7 +206,7 @@ export function parseTestName(testName: string): ParsedTestName {
   const operationParts = metricName.split(".");
 
   let testNameExtracted = operationParts[0];
-  if (testNameExtracted.includes("large_")) {
+  if (testNameExtracted === "large") {
     testNameExtracted = "m_large";
   } else if (testNameExtracted === "delivery") {
     testNameExtracted = "m_delivery";
