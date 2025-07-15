@@ -1,238 +1,142 @@
 # Test Suites
 
-Comprehensive end-to-end test suites for validating XMTP protocol functionality, performance, and reliability across different scenarios and environments.
+End-to-end test suites for XMTP protocol validation across environments and scenarios.
 
 ## Quick Reference
 
-| Test Suite                      | Purpose                            | Key Features                                 | Documentation                    |
-| ------------------------------- | ---------------------------------- | -------------------------------------------- | -------------------------------- |
-| **[agents](./agents/)**         | Production agent health monitoring | Live agent testing, response validation      | [README](./agents/README.md)     |
-| **[bench](./bench/)**           | Performance benchmarking           | Throughput measurement, latency analysis     | [README](./bench/README.md)      |
-| **[browser](./browser/)**       | Browser integration validation     | Playwright automation, cross-browser testing | [README](./browser/README.md)    |
-| **[bugs](./bugs/)**             | Bug reproduction and tracking      | Historical issues, regression prevention     | [README](./bugs/README.md)       |
-| **[functional](./functional/)** | Core protocol functionality        | Complete feature coverage, integration tests | [README](./functional/README.md) |
-| **[group](./group/)**           | Group conversation testing         | Stress testing, multi-version compatibility  | [README](./group/README.md)      |
-| **[large](./large/)**           | Large-scale performance testing    | Scalability validation, resource monitoring  | [README](./large/README.md)      |
-| **[metrics](./metrics/)**       | Performance metrics collection     | Delivery reliability, operational metrics    | [README](./metrics/README.md)    |
-| **[mobile](./mobile/)**         | Mobile performance testing         | Load testing, responsiveness validation      | [README](./mobile/README.md)     |
-| **[other](./other/)**           | Specialized edge case testing      | Rate limiting, storage, notifications, etc   | [View tests →](./other/)         |
+| Suite                           | Purpose                          | Command                  |
+| ------------------------------- | -------------------------------- | ------------------------ |
+| [functional](./functional/)     | Core protocol functionality      | `yarn test functional`   |
+| [metrics](./metrics/)           | Performance and delivery testing | `yarn test metrics`      |
+| [agents](./agents/)             | Production agent monitoring      | `yarn test agents`       |
+| [bench](./bench/)               | Performance benchmarking         | `yarn test bench`        |
+| [networkchaos](./networkchaos/) | Network partition testing        | `yarn test networkchaos` |
+| [other](./other/)               | Edge cases and specialized tests | `yarn test other`        |
+| [bugs](./bugs/)                 | Bug reproduction and tracking    | `yarn test bugs`         |
+| [commits](./commits/)           | Git commit-based testing         | `yarn test commits`      |
 
-## Production & Monitoring
+## Core Functionality
 
-### Agent Health Testing
+### Functional Tests
 
-Validates production XMTP agents for responsiveness and functionality.
-
-```bash
-yarn test agents
-```
-
-**Key Features:**
-
-- Live agent health checks
-- Response time validation
-- Message delivery verification
-- Multi-network support (dev/production)
-
-### Performance Benchmarking
-
-Comprehensive performance measurement and analysis toolkit.
-
-```bash
-yarn test bench
-```
-
-**Key Features:**
-
-- Message throughput benchmarking
-- Latency measurement across operations
-- Performance regression detection
-- CSV data export for analysis
-
-## Core Functionality Testing
-
-### Functional Test Suite
-
-Complete validation of XMTP protocol features and capabilities.
+Complete protocol feature validation.
 
 ```bash
 yarn test functional
+yarn test functional --versions 3  # Multi-version testing
 ```
 
-**Test Coverage:**
-
-- **Client Management**: Connection, authentication, lifecycle
-- **Conversations**: DMs, groups, metadata management
-- **Messaging**: Content types, delivery, ordering
-- **Streams**: Real-time message streaming, callbacks
-- **Consent**: Permission management, blocking/allowing
-- **Installations**: Multi-device support, synchronization
-- **Codec**: Content encoding/decoding, error handling
-- **Offline**: Disconnection handling, message queuing
-- **Sync**: Data synchronization, consistency
-- **Regression**: Historical bug prevention
-
-**Individual Test Files:**
+**Individual Tests:**
 
 ```bash
-yarn test suites/functional/streams.test.ts     # Message streaming
-yarn test suites/functional/groups.test.ts      # Group functionality
-yarn test suites/functional/dms.test.ts         # Direct messaging
-yarn test suites/functional/sync.test.ts        # Synchronization
-yarn test suites/functional/consent.test.ts     # Consent management
+yarn test suites/functional/dms.test.ts          # Direct messaging
+yarn test suites/functional/groups.test.ts       # Group conversations
+yarn test suites/functional/streams.test.ts      # Message streaming
+yarn test suites/functional/sync.test.ts         # Data synchronization
+yarn test suites/functional/consent.test.ts      # Permission management
+yarn test suites/functional/clients.test.ts      # Client lifecycle
+yarn test suites/functional/installations.test.ts # Multi-device support
+yarn test suites/functional/callbacks.test.ts    # Event handling
+yarn test suites/functional/metadata.test.ts     # Conversation metadata
+yarn test suites/functional/offline.test.ts      # Offline handling
+yarn test suites/functional/order.test.ts        # Message ordering
+yarn test suites/functional/codec.test.ts        # Content encoding
+yarn test suites/functional/browser.test.ts      # Browser integration
+yarn test suites/functional/regression.test.ts   # Regression prevention
 ```
 
-### Browser Integration Testing
+## Performance Testing
 
-Cross-browser compatibility and web integration validation.
+### Metrics Suite
 
-```bash
-yarn test browser
-```
-
-**Key Features:**
-
-- Playwright-based automation
-- Cross-browser compatibility testing
-- Web integration scenarios
-- UI/UX validation
-
-## Group & Conversation Testing
-
-### Group Stress Testing
-
-Specialized testing for group conversations under various stress conditions.
-
-```bash
-yarn test group
-```
-
-**Key Features:**
-
-- Multi-version compatibility testing
-- Membership change stress testing
-- Group metadata operations
-- Admin permission validation
-- Message stream performance
-- Concurrent worker scenarios
-
-## Performance & Scale Testing
-
-### Large-Scale Testing
-
-Comprehensive scalability and performance validation under high load.
-
-```bash
-yarn test large
-```
-
-**Test Categories:**
-
-- **Conversations**: Large conversation set management
-- **Cumulative Syncs**: Progressive synchronization testing
-- **Membership**: Large group member management
-- **Messages**: High-volume message handling
-- **Metadata**: Bulk metadata operations
-- **Syncs**: Large-scale synchronization performance
-
-**Individual Test Files:**
-
-```bash
-yarn test suites/large/conversations.test.ts    # Conversation scaling
-yarn test suites/large/membership.test.ts       # Member management
-yarn test suites/large/messages.test.ts         # Message volume
-yarn test suites/large/syncs.test.ts           # Sync performance
-```
-
-### Performance Metrics
-
-Detailed performance measurement and reliability validation.
+Performance measurement and delivery validation.
 
 ```bash
 yarn test metrics
 ```
 
-**Key Metrics:**
-
-- **Delivery Testing**: End-to-end message delivery reliability
-- **Performance Analysis**: Operational performance measurement
-- **Latency Tracking**: Response time analysis
-- **Throughput Measurement**: Message processing capacity
-
-**Individual Test Files:**
+**Individual Tests:**
 
 ```bash
-yarn test suites/metrics/delivery.test.ts       # Delivery reliability
-yarn test suites/metrics/performance.test.ts    # Performance metrics
+yarn test suites/metrics/performance.test.ts     # Performance metrics
+yarn test suites/metrics/delivery.test.ts        # Message delivery
+yarn test suites/metrics/large.test.ts          # Large-scale testing
 ```
 
-### Mobile Performance Testing
+### Benchmarking
 
-Mobile application performance validation under various load conditions.
+Throughput and latency measurement.
 
 ```bash
-yarn test mobile
+yarn test bench
 ```
 
-**Load Configurations:**
+## Production Monitoring
 
-- **Small**: Basic mobile performance
-- **Medium**: Moderate load scenarios
-- **Large**: High load testing
-- **XL**: Maximum capacity testing
+### Agent Health
 
-### Storage Efficiency Testing
-
-Database optimization and storage utilization analysis.
+Live production agent validation.
 
 ```bash
-yarn test storage
+yarn test agents
+XMTP_ENV=production yarn test agents --no-fail --debug
 ```
 
-**Key Features:**
-
-- Storage cost analysis across group sizes
-- Database efficiency measurement
-- Space utilization optimization
-- Performance vs. storage trade-offs
-
-## Security & Quality Assurance
-
-### Spam & Security Testing
-
-Comprehensive security validation and threat prevention testing.
+**Individual Tests:**
 
 ```bash
-yarn test spam
+yarn test suites/agents/agents-dms.test.ts       # DM functionality
+yarn test suites/agents/agents-tagged.test.ts    # Tagged agents
+yarn test suites/agents/agents-untagged.test.ts  # Untagged agents
 ```
 
-**Key Features:**
+## Network Testing
 
-- Spam detection validation
-- Security threat simulation
-- Content filtering testing
-- Protection mechanism verification
+### Network Chaos
 
-### Notification Testing
-
-Push notification delivery and integration validation.
+Network partition and failure scenarios.
 
 ```bash
-yarn test notifications
+yarn test networkchaos
 ```
 
-**Key Features:**
+**Individual Tests:**
 
-- Notification delivery testing
-- Integration with notification services
-- Delivery reliability validation
-- Multi-platform support
+```bash
+yarn test suites/networkchaos/group-reconciliation.test.ts
+yarn test suites/networkchaos/dm-duplicate-prevention.test.ts
+yarn test suites/networkchaos/group-client-partition.test.ts
+yarn test suites/networkchaos/keyrotation.test.ts
+yarn test suites/networkchaos/node-blackhole.test.ts
+yarn test suites/networkchaos/smoketests.test.ts
+```
 
-## Bug Documentation & Regression
+## Specialized Testing
 
-### Bug Reproduction Testing
+### Edge Cases
 
-Historical bug tracking and regression prevention.
+Rate limiting, storage, and specialized scenarios.
+
+```bash
+yarn test other
+```
+
+**Individual Tests:**
+
+```bash
+yarn test suites/other/mobile.test.ts           # Mobile performance
+yarn test suites/other/storage.test.ts          # Storage efficiency
+yarn test suites/other/spam.test.ts             # Spam detection
+yarn test suites/other/notifications.test.ts    # Push notifications
+yarn test suites/other/rate-limited.test.ts     # Rate limiting
+yarn test suites/other/fullinbox.test.ts        # Full inbox scenarios
+yarn test suites/other/chaos.test.ts            # Chaos testing
+yarn test suites/other/nodetest.test.ts         # Node testing
+```
+
+### Bug Reproduction
+
+Historical bug tracking and regression testing.
 
 ```bash
 yarn test bugs
@@ -240,95 +144,57 @@ yarn test bugs
 
 **Bug Categories:**
 
-- **Member Addition Issues**: Group membership problems
-- **KPKE Errors**: Key package encryption issues
-- **Panic Scenarios**: System crash conditions
-- **Welcome Message Problems**: Onboarding issues
-- **Stitching Bugs**: Message continuity problems
-- **Other Issues**: Miscellaneous edge cases
+- `addmember/` - Group membership issues
+- `kpke/` - Key package encryption errors
+- `panic/` - System crash conditions
+- `stitch/` - Message continuity problems
 
-**Bug Documentation Structure:**
+### Commit Testing
 
-- Individual directories for each bug category
-- Reproduction test cases
-- Log files and error traces
-- Resolution documentation
-
-## Specialized Testing
-
-### Rate Limiting & Edge Cases
-
-Testing for specialized scenarios and edge cases.
+Git commit-based validation.
 
 ```bash
-yarn test other/rate-limited.test.ts
+yarn test commits
 ```
-
-**Coverage:**
-
-- Rate limiting validation
-- Edge case scenario testing
-- Boundary condition validation
-- Error handling verification
 
 ## Running Tests
 
-### Basic Test Execution
+### Basic Execution
 
 ```bash
-# Run specific test suites
-yarn test agents              # Production agent health
-yarn test functional          # Core functionality
-yarn test groups             # Group stress testing
-yarn test mobile             # Mobile performance
-yarn test storage            # Storage efficiency
-yarn test metrics/delivery   # Delivery reliability
-yarn test metrics/performance # Performance metrics
-yarn test browser            # Browser integration
-yarn test notifications      # Push notifications
-yarn test spam               # Security testing
-yarn test bench              # Performance benchmarking
+# Run test suites
+yarn test functional
+yarn test metrics
+yarn test agents
+yarn bench
 
-# Run individual test files
-yarn test suites/functional/streams.test.ts
-yarn test suites/large/membership.test.ts
-yarn test suites/mobile/mobile.test.ts
-yarn test suites/bugs/bug_addmember/test.test.ts
+# Run individual files
+yarn test suites/functional/dms.test.ts
+yarn test suites/metrics/performance.test.ts
 ```
 
-### Advanced Test Configuration
-
-#### Multi-Version Testing
-
-Test compatibility across different SDK versions:
+### Advanced Options
 
 ```bash
-# Test with random mix of versions 2.0.9 and 2.1.0
-yarn cli test functional --versions 3
+# Multi-version testing
+yarn test functional --versions 3
+
+# Debug mode with logging
+yarn test functional --debug --no-fail
+
+# Environment-specific
+XMTP_ENV=production yarn test agents --debug
+XMTP_ENV=dev yarn test functional
+
+# Parallel execution
+yarn test functional --parallel
 ```
 
-#### Environment Configuration
-
-Configure test environment and network:
+### Environment Variables
 
 ```bash
-# Set environment for testing
 export XMTP_ENV=dev          # Development network
 export XMTP_ENV=production   # Production network
 export XMTP_ENV=local        # Local testing
-```
-
-#### Custom Test Configuration
-
-Configure specific test parameters:
-
-```bash
-# Run with custom worker count
-yarn test large --workers 10
-
-# Run with specific timeout
-yarn test functional --timeout 30000
-
-# Run with verbose output
-yarn test --verbose
+export LOGGING_LEVEL=debug   # Logging level
 ```
