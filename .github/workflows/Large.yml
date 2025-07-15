@@ -17,6 +17,13 @@ jobs:
         test: [large]
         environment: [dev, production]
         batch_sizes: [[10, 50], [100, 150], [200, 250]]
+        include:
+          - batch_sizes: [10, 50]
+            delay_minutes: 0
+          - batch_sizes: [100, 150]
+            delay_minutes: 5
+          - batch_sizes: [200, 250]
+            delay_minutes: 10
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -28,6 +35,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
+
+      - name: Delay execution to spread batch runs
+        if: ${{ matrix.delay_minutes > 0 }}
+        run: sleep ${{ matrix.delay_minutes * 60 }}
 
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
