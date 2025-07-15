@@ -1,15 +1,25 @@
 # Large-Scale Performance Testing Suite
 
-This test suite benchmarks XMTP protocol performance and scalability with large group conversations, providing comprehensive metrics for enterprise-scale deployments.
+This unified test suite benchmarks XMTP protocol performance and scalability with large group conversations, providing comprehensive metrics for enterprise-scale deployments in a single, efficient test file.
 
 ## What it does
 
-- **Message Delivery Performance**: Tests message stream delivery times with groups ranging from 5-10 members
+- **Message Delivery Performance**: Tests message stream delivery times with groups ranging from baseline 10-person to configured max size
 - **Sync Performance Analysis**: Measures cold start sync times for group creation, syncAll, and individual sync operations
 - **Conversation Stream Testing**: Evaluates new conversation notification delivery times across multiple group sizes
 - **Cumulative Sync Impact**: Tests progressive sync performance degradation as group database grows
 - **Membership Management**: Benchmarks group member addition notification delivery times across varying group sizes
 - **Metadata Updates**: Analyzes group metadata update notification delivery times across different group sizes
+
+## Architecture
+
+The test suite is now consolidated into a single file (`suites/metrics/large.test.ts`) that efficiently manages all test types with shared worker pools, eliminating the previous limitation of one stream per worker.
+
+### Test Structure
+
+- **Baseline Tests**: Always run 10-person group tests first (independent of batch configuration)
+- **Batch Tests**: Run variable group sizes based on `BATCH_SIZE` and `MAX_GROUP_SIZE` configuration
+- **Unified Logging**: All metrics are collected in a single summary with clear baseline identification
 
 ## Environment Setup
 
@@ -17,38 +27,27 @@ Set `XMTP_ENV` to `dev` or `production` to test against the corresponding networ
 
 ## How to run
 
-### Run all large-scale tests
+### Run the complete large-scale test suite
 
 ```bash
 yarn test large
 ```
 
-### Run specific test files
+### Run with specific configuration
 
 ```bash
-yarn test large/messages.test.ts      # Message stream delivery performance
-yarn test large/syncs.test.ts         # Cold start sync performance testing
-yarn test large/membership.test.ts    # Member addition notification testing
-yarn test large/conversations.test.ts # New conversation notification delivery
-yarn test large/metadata.test.ts      # Metadata update notification delivery
-yarn test large/cumulative_syncs.test.ts # Progressive sync performance analysis
+BATCH_SIZE=25 MAX_GROUP_SIZE=100 WORKER_COUNT=10 yarn test large
 ```
 
-## Test Components
+### Run with debug logging
 
-### Core Test Files
+```bash
+yarn test large --debug --no-fail
+```
 
-- **[conversations.test.ts](./conversations.test.ts)** - **Large Group Conversation Stream Performance**: Tests new conversation notification delivery times across multiple group sizes, verifying all workers receive notifications within acceptable time limits
-- **[messages.test.ts](./messages.test.ts)** - **Large Group Message Delivery Performance**: Tests message stream delivery times with groups ranging from 5-10 members, verifying message delivery to all group members within acceptable time limits and stream consistency
-- **[metadata.test.ts](./metadata.test.ts)** - **Large Group Metadata Stream Performance**: Tests group metadata update notification delivery times across different group sizes, verifying all workers receive group metadata update notifications within acceptable time
-- **[syncs.test.ts](./syncs.test.ts)** - **Large Group Sync Performance**: Tests cold start sync times for group creation, syncAll, and individual sync operations, measuring performance impact of fresh synchronization
-- **[cumulative_syncs.test.ts](./cumulative_syncs.test.ts)** - **Large Group Cumulative Sync Performance**: Tests progressive sync performance degradation as group database grows, measuring cumulative performance impact with growing conversation history
-- **[membership.test.ts](./membership.test.ts)** - **Large Group Membership Stream Performance**: Tests group member addition notification delivery times across varying group sizes, verifying all workers receive membership update notifications within acceptable time
-- **[helpers.ts](./helpers.ts)** - Shared utilities and test configuration
+## Test Configuration
 
-### Test Configuration
-
-The suite uses configurable parameters in `helpers.ts`:
+The suite uses configurable parameters:
 
 - `WORKER_COUNT` - Number of concurrent test workers (default: 5)
 - `BATCH_SIZE` - Group size increment for testing (default: 5)
@@ -56,44 +55,35 @@ The suite uses configurable parameters in `helpers.ts`:
 
 ### Baseline Testing
 
-Each test suite now starts with a dedicated 10-person group baseline test, independent of the batch configuration. This ensures consistent measurement of a standardized group size regardless of how `BATCH_SIZE` and `MAX_GROUP_SIZE` are configured. Baseline tests are clearly marked in the performance logs with `[BASELINE]` for easy identification.
+Every test run starts with dedicated 10-person group baseline tests, independent of the batch configuration. This ensures consistent measurement of a standardized group size regardless of how `BATCH_SIZE` and `MAX_GROUP_SIZE` are configured. Baseline tests are clearly marked in the performance logs with `[BASELINE]` for easy identification.
 
 ### Test Execution Pattern
 
-Each test file follows a consistent pattern:
+The unified test suite follows this pattern:
 
-1. **Baseline Test**: Creates a dedicated 10-person group test independent of batch configuration
-2. **Batch Tests**: Creates groups of increasing sizes (batch increments from 5 to 10 members by default)
-3. Measures specific performance metrics for each group size
-4. Verifies that operations complete within acceptable time limits
-5. Logs detailed timing results for analysis with baseline measurements clearly marked
+1. **Baseline Tests**: Creates dedicated 10-person group tests for all test types (messages, conversations, membership, metadata, syncs)
+2. **Batch Tests**: Creates groups of increasing sizes based on batch configuration
+3. **Comprehensive Coverage**: Each group size tests all performance aspects (streams, syncs, etc.)
+4. **Unified Metrics**: All results are collected in a single summary with baseline measurements clearly marked
+5. **Efficient Resource Management**: Shared worker pools across all test types
 
 ## Performance Results
 
-Results and timing summaries are automatically saved to `logs/large.log` after each test run.
+Results and timing summaries are automatically saved to `logs/large.log` after each test run with comprehensive metrics for all test types.
 
-### Message Stream Performance
+### Measured Performance Metrics
 
-Tests verify that all group members receive messages within acceptable time limits and maintain stream consistency across different group sizes.
-
-### Sync Performance Metrics
-
-| Operation Type                 | Description                                | Performance Focus                 |
-| ------------------------------ | ------------------------------------------ | --------------------------------- |
-| **Cold Start Group Creation**  | Fresh group creation with member additions | Initial setup performance         |
-| **Cold Start SyncAll**         | Complete synchronization from clean state  | Full sync performance             |
-| **Cold Start Individual Sync** | Single conversation sync from clean state  | Targeted sync performance         |
-| **Cumulative SyncAll**         | Sync with growing conversation history     | Performance degradation over time |
-| **Cumulative Individual Sync** | Individual sync with accumulated data      | Incremental sync impact           |
-
-### Stream Notification Performance
-
-| Stream Type              | What's Tested                         | Success Criteria                                     |
-| ------------------------ | ------------------------------------- | ---------------------------------------------------- |
-| **Conversation Streams** | New group creation notifications      | All workers receive notifications within time limits |
-| **Message Streams**      | Message delivery across group members | Consistent delivery and stream integrity             |
-| **Membership Streams**   | Member addition/removal notifications | Timely notification delivery to all participants     |
-| **Metadata Streams**     | Group settings and info updates       | Reliable metadata propagation                        |
+| Metric Type                    | Description                                | Baseline | Batch Tests |
+| ------------------------------ | ------------------------------------------ | -------- | ----------- |
+| **Message Stream Performance** | Message delivery across group members      | ✅       | ✅          |
+| **Conversation Streams**       | New group creation notifications           | ✅       | ✅          |
+| **Membership Streams**         | Member addition/removal notifications      | ✅       | ✅          |
+| **Metadata Streams**           | Group settings and info updates            | ✅       | ✅          |
+| **Cold Start Group Creation**  | Fresh group creation with member additions | ✅       | ✅          |
+| **Cold Start SyncAll**         | Complete synchronization from clean state  | ✅       | ✅          |
+| **Cold Start Individual Sync** | Single conversation sync from clean state  | ✅       | ✅          |
+| **Cumulative SyncAll**         | Sync with growing conversation history     | ✅       | ✅          |
+| **Cumulative Individual Sync** | Individual sync with accumulated data      | ✅       | ✅          |
 
 ### Performance Benchmarks
 
@@ -132,13 +122,20 @@ Based on historical test data:
 3. **Stream Notifications**: All workers should receive updates within 1 second
 4. **Cumulative Performance**: Watch for degradation as conversation history grows
 
-## Key Files Reference
+## Benefits of Unified Architecture
 
-- **[conversations.test.ts](./conversations.test.ts)** - New conversation notification delivery testing
-- **[messages.test.ts](./messages.test.ts)** - Message stream delivery performance and consistency
-- **[syncs.test.ts](./syncs.test.ts)** - Cold start synchronization performance analysis
-- **[membership.test.ts](./membership.test.ts)** - Member management notification testing
-- **[metadata.test.ts](./metadata.test.ts)** - Group metadata update notification delivery
-- **[cumulative_syncs.test.ts](./cumulative_syncs.test.ts)** - Progressive sync performance degradation analysis
-- **[helpers.ts](./helpers.ts)** - Shared utilities, configuration, and logging functions
-- **[README.md](./README.md)** - This comprehensive documentation
+✅ **Single Test File**: All functionality consolidated for easier maintenance  
+✅ **Efficient Resource Usage**: Shared worker pools across all test types  
+✅ **No Stream Limitations**: Multiple streams per worker now supported  
+✅ **Comprehensive Metrics**: All performance aspects measured in one run  
+✅ **Consistent Baseline**: Always get standardized 10-person measurements  
+✅ **Clear Organization**: Baseline and batch tests clearly separated
+
+## Key File Reference
+
+- **[large.test.ts](../large.test.ts)** - Unified comprehensive test suite covering all performance aspects
+- **[README.md](./README.md)** - This documentation
+
+## Migration Notes
+
+This suite has been consolidated from multiple separate test files into a single efficient implementation. The previous separation was due to a limitation of one stream per worker, which has been resolved.
