@@ -90,7 +90,7 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "slackChannel": "#byte-alerts",
-    "shouldRespondOnTagged": true
+    "shouldRespondOnTagged": false
   },
   {
     "name": "gm",
