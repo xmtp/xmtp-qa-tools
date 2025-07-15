@@ -54,7 +54,6 @@ describe(testName, async () => {
 
     it(`addMember-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
       const extraMember = allMembersWithExtra.slice(groupSize, groupSize + 1);
-      console.log("extraMember", extraMember);
       const verifyResult = await verifyMembershipStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
