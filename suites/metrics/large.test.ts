@@ -16,6 +16,7 @@ const BATCH_SIZE = process.env.BATCH_SIZE
 
 const testName = "large";
 describe(testName, async () => {
+  setupTestLifecycle({ testName, sendMetrics: true });
   let workers: WorkerManager;
 
   workers = await getWorkers(WORKER_COUNT);
@@ -46,16 +47,19 @@ describe(testName, async () => {
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
     });
-    const allMembers = getInboxIds(groupSize + 1);
+    const allMembersWithExtra = getInboxIds(groupSize + 1);
+    const allMembers = allMembersWithExtra.slice(0, groupSize);
     const newGroupBetweenAll = await workers.createGroupBetweenAll(
       "Membership Stream Test",
-      allMembers.slice(0, groupSize),
+      allMembers,
     );
+
     it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+      const extraMember = allMembersWithExtra.slice(groupSize, groupSize + 1);
       const verifyResult = await verifyMembershipStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
-        allMembers.slice(groupSize, groupSize + 1),
+        extraMember,
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
@@ -99,14 +103,8 @@ describe(testName, async () => {
       const createTime = performance.now();
       const allWorkers = workers.getAllButCreator();
 
-      const workersToAdd = allWorkers.slice(
-        run % allWorkers.length,
-        (run % allWorkers.length) + 3,
-      );
-      if (workersToAdd.length < 3) {
-        // Wrap around if needed
-        workersToAdd.push(...allWorkers.slice(0, 3 - workersToAdd.length));
-      }
+      const workersToAdd = allWorkers.slice(run % allWorkers.length, run + 2);
+
       const cumulativeCreateTimeMs = performance.now() - createTime;
 
       // Test cumulative syncAll
