@@ -7,7 +7,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "delivery";
 describe(testName, async () => {
-  setupTestLifecycle({ testName, sendMetrics: true });
+  setupTestLifecycle({
+    testName,
+    sendMetrics: true,
+    sendDurationMetrics: true,
+  });
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 

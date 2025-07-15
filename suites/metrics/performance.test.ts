@@ -28,6 +28,7 @@ describe(testName, async () => {
       customDuration = v;
     },
     sendMetrics: true,
+    sendDurationMetrics: true,
     networkStats: true,
   });
 
