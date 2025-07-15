@@ -53,7 +53,7 @@ function parseArgs(): Config {
   return config;
 }
 
-async function cleanupStressDatabases(env: string): Promise<void> {
+function cleanupStressDatabases(env: string): void {
   const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
   const dataDir = path.resolve(volumePath);
 
@@ -92,7 +92,7 @@ async function runStressTest(config: Config): Promise<void> {
   console.log(`🚀 Testing ${config.userCount} users against ${ADDRESS}`);
 
   // Clean up previous stress test database files
-  await cleanupStressDatabases(config.env);
+  cleanupStressDatabases(config.env);
 
   const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
@@ -149,26 +149,28 @@ async function runStressTest(config: Config): Promise<void> {
 
           console.log(`📡 Worker ${i}: Setting up message stream...`);
           // Set up stream
-          worker.conversations.streamAllMessages((error: any, message: any) => {
-            if (error) return;
+          void worker.conversations.streamAllMessages(
+            (error: any, message: any) => {
+              if (error) return;
 
-            // Check for bot response
-            if (
-              message.senderInboxId.toLowerCase() !==
-                worker.inboxId.toLowerCase() &&
-              !responseReceived
-            ) {
-              responseReceived = true;
+              // Check for bot response
+              if (
+                message.senderInboxId.toLowerCase() !==
+                  worker.inboxId.toLowerCase() &&
+                !responseReceived
+              ) {
+                responseReceived = true;
 
-              // 3. Calculate response time
-              const responseTime = Date.now() - sendCompleteTime;
+                // 3. Calculate response time
+                const responseTime = Date.now() - sendCompleteTime;
 
-              console.log(
-                `✅ Worker ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms`,
-              );
-              resolve({ success: true, newDmTime, sendTime, responseTime });
-            }
-          });
+                console.log(
+                  `✅ Worker ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms`,
+                );
+                resolve({ success: true, newDmTime, sendTime, responseTime });
+              }
+            },
+          );
 
           console.log(`📤 Worker ${i}: Sending test message...`);
           // 2. Time message send
