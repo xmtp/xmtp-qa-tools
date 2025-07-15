@@ -10,13 +10,13 @@ import { describe, expect, it } from "vitest";
 
 // Configuration
 const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
-const BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
+const BATCH_SIZE = process.env.BATCH_SIZE
+  ? process.env.BATCH_SIZE.split(",").map((s) => parseInt(s.trim()))
+  : [5, 10];
 
 const testName = "large";
 describe(testName, async () => {
   let workers: WorkerManager;
-
-  const batchSizes = getBatchSizes();
 
   workers = await getWorkers(WORKER_COUNT);
 
@@ -36,7 +36,7 @@ describe(testName, async () => {
 
   let run = 0; // Worker allocation counter
 
-  for (const groupSize of batchSizes) {
+  for (const groupSize of BATCH_SIZE) {
     it(`verifyConversationStream-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),
