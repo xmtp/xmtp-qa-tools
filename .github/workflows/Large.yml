@@ -15,19 +15,19 @@ jobs:
       matrix:
         test: [large]
         environment: [dev, production]
-        batch_sizes: [[10, 50], [100, 150], [200, 250]]
+        BATCH_SIZE: [[10, 50], [100, 150], [200, 250]]
         include:
-          - batch_sizes: [10, 50]
+          - BATCH_SIZE: [10, 50]
             delay_minutes: 0
-          - batch_sizes: [100, 150]
+          - BATCH_SIZE: [100, 150]
             delay_minutes: 5
-          - batch_sizes: [200, 250]
+          - BATCH_SIZE: [200, 250]
             delay_minutes: 10
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZES: ${{ join(matrix.batch_sizes, ',') }}
+      BATCH_SIZE: ${{ join(matrix.BATCH_SIZE, ',') }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
