@@ -50,7 +50,10 @@ function saveLog(summaryMap: Record<string, any>) {
   try {
     fs.appendFileSync("logs/large.log", messageToLog);
   } catch (error) {
-    console.warn("Could not write to logs/large.log:", error instanceof Error ? error.message : String(error));
+    console.warn(
+      "Could not write to logs/large.log:",
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
 
@@ -248,7 +251,7 @@ describe(testName, async () => {
   // ==========================================================================
 
   describe("Batch Tests (Variable Group Sizes)", () => {
-    let run = 5; // Start worker allocation after baseline tests
+    let workerIndex = 0; // Track worker allocation for better cycling
 
     for (let i = BATCH_SIZE; i <= MAX_GROUP_SIZE; i += BATCH_SIZE) {
       describe(`Group Size ${i}`, () => {
@@ -298,13 +301,8 @@ describe(testName, async () => {
         });
 
         it(`should notify all members of additions in ${i} member group`, async () => {
-          const creator = workers.getCreator();
-          const membershipGroup = (await creator.client.conversations.newGroup(
-            getInboxIds(i),
-          )) as Group;
-
           const verifyResult = await verifyMembershipStream(
-            membershipGroup,
+            batchGroup,
             workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
             getInboxIds(1),
           );
@@ -319,13 +317,8 @@ describe(testName, async () => {
         });
 
         it(`should notify all members of metadata changes in ${i} member group`, async () => {
-          const creator = workers.getCreator();
-          const metadataGroup = (await creator.client.conversations.newGroup(
-            getInboxIds(i),
-          )) as Group;
-
           const verifyResult = await verifyMetadataStream(
-            metadataGroup,
+            batchGroup,
             workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
           );
 
@@ -342,8 +335,8 @@ describe(testName, async () => {
           const createTime = performance.now();
           const creator = workers.getCreator();
           const allWorkers = workers.getAllButCreator();
-          const workerA = allWorkers[run];
-          const workerB = allWorkers[run + 1];
+          const workerA = allWorkers[workerIndex % allWorkers.length];
+          const workerB = allWorkers[(workerIndex + 1) % allWorkers.length];
 
           const newGroup = await creator.client.conversations.newGroup(
             getInboxIds(i),
@@ -367,29 +360,28 @@ describe(testName, async () => {
             singleSyncAllTimeMs,
             singleSyncTimeMs,
           };
+
+          setCustomDuration(createTimeMs);
         });
 
         it(`should perform cumulative sync operations on ${i} member group`, async () => {
           const createTime = performance.now();
           const creator = workers.getCreator();
           const allWorkers = workers.getAllButCreator();
+          const workerA = allWorkers[workerIndex % allWorkers.length];
+          const workerB = allWorkers[(workerIndex + 1) % allWorkers.length];
 
-          const newGroup = await creator.client.conversations.newGroup(
-            getInboxIds(i),
-          );
-          await newGroup.addMembers(
-            allWorkers.slice(run, run + 3).map((worker) => worker.inboxId),
-          );
+          await creator.client.conversations.newGroup(getInboxIds(i));
           const cumulativeCreateTimeMs = performance.now() - createTime;
 
           // Test cumulative syncAll
           const syncAllStart = performance.now();
-          await allWorkers[run].client.conversations.syncAll();
+          await workerA.client.conversations.syncAll();
           const cumulativeSyncAllTimeMs = performance.now() - syncAllStart;
 
           // Test cumulative individual sync
           const syncStart = performance.now();
-          await allWorkers[run + 1].client.conversations.sync();
+          await workerB.client.conversations.sync();
           const cumulativeSyncTimeMs = performance.now() - syncStart;
 
           summaryMap[i] = {
@@ -399,7 +391,10 @@ describe(testName, async () => {
             cumulativeSyncTimeMs,
           };
 
-          run += 2; // Move to next worker pair
+          setCustomDuration(cumulativeCreateTimeMs);
+
+          // Increment worker index for next batch
+          workerIndex += 2;
         });
       });
     }
