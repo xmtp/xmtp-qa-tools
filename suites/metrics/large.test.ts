@@ -15,7 +15,11 @@ const BATCH_SIZE = process.env.BATCH_SIZE
 
 const testName = "large";
 describe(testName, async () => {
-  setupTestLifecycle({ testName, sendMetrics: true });
+  setupTestLifecycle({
+    testName,
+    sendMetrics: true,
+    sendDurationMetrics: true,
+  });
   let workers: WorkerManager;
 
   workers = await getWorkers(5);
