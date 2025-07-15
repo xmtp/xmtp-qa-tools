@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  #pull_request:
+  pull_request:
 
 jobs:
   test:
@@ -11,12 +11,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [large] # performance test with more large groups
+        environment: [dev]
+        BATCH_SIZE: [[10, 50, 100, 150]]
+        test: [performance] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
         # test: [dms] # health check
-        environment: [dev]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
