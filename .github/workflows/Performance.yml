@@ -16,12 +16,11 @@ jobs:
       matrix:
         test: [performance]
         environment: [dev, production]
-        BATCH_SIZE: [10, 50, 100, 150]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: ${{ toJSON(matrix.BATCH_SIZE) }}
+      BATCH_SIZE: ${{ toJSON([10, 50, 100, 150]) }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
