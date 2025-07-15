@@ -211,22 +211,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | Large      | 365            | 208          | 31              | 95                 |
 | XL         | 376            | 410          | 59              | 179                |
 
-## Success criteria summary
-
-| Metric                  | Current Performance         | Target                 | Performance |
-| ----------------------- | --------------------------- | ---------------------- | ----------- |
-| Core SDK Operations     | All within targets          | Meet defined targets   | On Target   |
-| Small Group Operations  | ≤300                        | ≤300 for <50 members   | On Target   |
-| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | Concern     |
-| Network Performance     | All metrics within target   | Meet defined targets   | On Target   |
-| Message Delivery        | 100%                        | 99.9% minimum          | On Target   |
-| Stream Message Loss     | 100%                        | 99.9% minimum          | On Target   |
-| Poll Message Loss       | 100%                        | 99.9% minimum          | On Target   |
-| Message Order           | 100%                        | 100% in order          | On Target   |
-| South-america & Asia    | more than 40%               | <20% difference        | Concern     |
-| US & Europe             | less than 20% variance      | <20% difference        | On Target   |
-| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | On Target   |
-
 ## Tools & utilities
 
 - **Status:** XMTP network status - [see section](https://status.xmtp.org/)
