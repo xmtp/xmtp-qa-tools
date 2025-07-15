@@ -10,7 +10,8 @@ CHAOS_PACKET_LOSS_PCT_LIST=(0 10)
 CHAOS_EGRESS_LATENCY_MS_LIST=(50)
 CHAOS_EGRESS_JITTER_MS_LIST=(0)
 CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0)
-WORKER_COUNTS=(10 20)
+WORKER_COUNTS=(10 100)
+OP_FREQS=(10000 2000)
 
 # Enabled ops permutations (modify/add/remove as needed)
 ENABLED_OPS_LIST=(
@@ -30,6 +31,7 @@ for CHAOS_EGRESS_JITTER_MS in "${CHAOS_EGRESS_JITTER_MS_LIST[@]}"; do
 for CHAOS_EGRESS_PACKET_LOSS_PCT in "${CHAOS_EGRESS_PACKET_LOSS_PCT_LIST[@]}"; do
 for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
 for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
+for OP_FREQ in "${OP_FREQS[@]}"; do
 
   echo ""
   echo "========================================================="
@@ -42,6 +44,7 @@ for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
   echo "CHAOS_EGRESS_JITTER_MS=$CHAOS_EGRESS_JITTER_MS"
   echo "CHAOS_EGRESS_PACKET_LOSS_PCT=$CHAOS_EGRESS_PACKET_LOSS_PCT"
   echo "WORKER_COUNT=$WORKER_COUNT"
+  echo "OP_FREQ=$OP_FREQ"
   echo "ENABLED_OPS=$ENABLED_OPS"
   echo "XMTP_ENV=$XMTP_ENV"
   echo "========================================================="
@@ -54,6 +57,7 @@ for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
   export CHAOS_EGRESS_JITTER_MS
   export CHAOS_EGRESS_PACKET_LOSS_PCT
   export WORKER_COUNT
+  export OP_FREQ
   export ENABLED_OPS
   export XMTP_ENV
 
@@ -61,6 +65,7 @@ for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
   ./chaossuite-batchrunner.sh
   ((i++))
 
+done
 done
 done
 done

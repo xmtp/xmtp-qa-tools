@@ -13,6 +13,9 @@ const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS ? parseInt(proc
 const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS) : 0;
 const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT) : 0;
 
+const workerCount = process.env.GROUP_SIZE ? parseInt(process.env.GROUP_SIZE) : 20;
+const opFreq = process.env.OP_FREQ ? parseInt(process.env.OP_FREQ) : 10000;
+
 const durationMs = 300000;
 
 const enabledOps = process.env.ENABLED_OPS
@@ -34,7 +37,9 @@ console.table({
   CHAOS_EGRESS_LATENCY_MS: chaosEgressLatencyMs,
   CHAOS_EGRESS_JITTER_MS: chaosEgressJitterMs,
   CHAOS_EGRESS_PACKET_LOSS_PCT: chaosEgressLossPct,
-  ENABLED_OPS: enabledOps.join(", ")
+  ENABLED_OPS: enabledOps.join(", "),
+  GROUP_SIZE: workerCount,
+  OP_FREQ: opFreq
 });
 console.log("=======================================");
 
@@ -50,7 +55,7 @@ describe(testName, async () => {
   ];
 
   const userDescriptors = {};
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < workerCount; i++) {
     const user = "user" + (i + 1);
     const port = 5556 + 1000 * Math.floor(Math.random() * 4);
     userDescriptors[user] = "http://localhost:" + port;
@@ -85,8 +90,12 @@ describe(testName, async () => {
     };
 
     const operationLoop = () => {
+      let opCounter = 0;
+
       opInterval = setInterval(() => {
         void (async () => {
+          opCounter++;
+
           const groupId = group.id;
           const target = workers.getRandomWorker();
           const convo = await target.client.conversations.getConversationById(groupId);
@@ -95,24 +104,29 @@ describe(testName, async () => {
           const inboxId = target.client.inboxId;
 
           if (enabledOps.includes("updateName")) {
+            console.log(`[op #${opCounter}] executing updateName - setting new name for group`);
             await group.updateName("Update Group Name Test " + Date.now());
           }
 
           if (enabledOps.includes("modifyMembership")) {
+            console.log(`[op #${opCounter}] executing modifyMembership - removing and re-adding user ${inboxId}`);
             await group.removeMembers([inboxId]);
             await group.addMembers([inboxId]);
           }
 
           if (enabledOps.includes("promoteAdmin")) {
+            console.log(`[op #${opCounter}] executing promoteAdmin - promoting user ${inboxId}`);
             await group.addSuperAdmin(inboxId);
           }
 
           if (enabledOps.includes("demoteAdmin")) {
+            console.log(`[op #${opCounter}] executing demoteAdmin - demoting user ${inboxId}`);
             await group.removeSuperAdmin(inboxId);
           }
         })();
-      }, 10000);
+      }, opFreq);
     };
+
 
     const startChaos = () => {
       const ingressEnabled = chaosLatencyMs || chaosJitterMs || chaosLossPct;
@@ -124,7 +138,7 @@ describe(testName, async () => {
       }
 
       chaosInterval = setInterval(() => {
-        console.log("[chaos] Injecting chaos...");
+        console.log("[chaos] Updating network chaos settings...");
         for (const node of allNodes) {
           try {
             if (chaosJitterMs > 0) {
