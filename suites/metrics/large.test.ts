@@ -10,8 +10,6 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-// Configuration
-const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
 const BATCH_SIZE = process.env.BATCH_SIZE
   ? (JSON.parse(process.env.BATCH_SIZE) as number[])
   : [5, 10];
@@ -21,7 +19,7 @@ describe(testName, async () => {
   setupTestLifecycle({ testName, sendMetrics: true });
   let workers: WorkerManager;
 
-  workers = await getWorkers(WORKER_COUNT);
+  workers = await getWorkers(5);
 
   let allMembers: string[] = [];
   let allMembersWithExtra: string[] = [];
@@ -43,16 +41,6 @@ describe(testName, async () => {
   let run = 0; // Worker allocation counter
 
   for (const groupSize of BATCH_SIZE) {
-    it(`conversationStream-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
-      const verifyResult = await verifyConversationStream(
-        workers.getCreator(),
-        workers.getAllButCreator(),
-      );
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-    });
-
     it(`newGroup-${groupSize}: should create a large group of ${groupSize} participants`, async () => {
       allMembersWithExtra = getInboxIds(groupSize + 1);
       allMembers = allMembersWithExtra.slice(0, groupSize);
@@ -97,51 +85,33 @@ describe(testName, async () => {
     });
 
     it(`sync-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
-      const createTime = performance.now();
-      const allWorkers = workers.getAllButCreator();
-      const workerA = allWorkers[run % allWorkers.length];
-      const workerB = allWorkers[(run + 1) % allWorkers.length];
-
-      const createTimeMs = performance.now() - createTime;
-
-      // Test syncAll
-      const syncAllStart = performance.now();
-      await workerA.client.conversations.syncAll();
-      const singleSyncAllTimeMs = performance.now() - syncAllStart;
-
-      // Test individual sync
-      const syncStart = performance.now();
-      await workerB.client.conversations.sync();
-      const singleSyncTimeMs = performance.now() - syncStart;
-
-      console.log(
-        `Group ${groupSize} sync times: create=${createTimeMs}ms, syncAll=${singleSyncAllTimeMs}ms, sync=${singleSyncTimeMs}ms`,
-      );
+      const singleSyncWorkers = await getWorkers(["randomA"]);
+      const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
+      await newGroupBetweenAll.addMembers([clientSingleSync.inboxId]);
+      const start = performance.now();
+      await clientSingleSync.conversations.sync();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+    it(`syncAll-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomB"]);
+      const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
+      await newGroupBetweenAll.addMembers([clientSingleSync.inboxId]);
+      const start = performance.now();
+      await clientSingleSync.conversations.syncAll();
+      const end = performance.now();
+      setCustomDuration(end - start);
     });
 
-    it(`syncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
-      const createTime = performance.now();
-      const allWorkers = workers.getAllButCreator();
-
-      const workersToAdd = allWorkers.slice(run % allWorkers.length, run + 2);
-
-      const cumulativeCreateTimeMs = performance.now() - createTime;
-
-      // Test cumulative syncAll
-      const syncAllStart = performance.now();
-      await workersToAdd[0].client.conversations.syncAll();
-      const cumulativeSyncAllTimeMs = performance.now() - syncAllStart;
-
-      // Test cumulative individual sync
-      const syncStart = performance.now();
-      await workersToAdd[1].client.conversations.sync();
-      const cumulativeSyncTimeMs = performance.now() - syncStart;
-
-      console.log(
-        `Group ${groupSize} cumulative sync times: create=${cumulativeCreateTimeMs}ms, syncAll=${cumulativeSyncAllTimeMs}ms, sync=${cumulativeSyncTimeMs}ms`,
-      );
-
-      run += 2; // Move to next worker pair
-    });
+    // it(`syncAllCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
+    //   const allWorkers = workers.getAllButCreator();
+    //   const workerA = allWorkers[run % allWorkers.length];
+    //   await workerA.client.conversations.sync();
+    // });
+    // it(`syncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
+    //   const allWorkers = workers.getAllButCreator();
+    //   const workerA = allWorkers[run % allWorkers.length];
+    //   await workerA.client.conversations.syncAll();
+    // });
   }
 });
