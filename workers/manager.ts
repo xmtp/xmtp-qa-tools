@@ -252,7 +252,7 @@ export class WorkerManager {
   }
   async createGroupBetweenAll(
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
-    extraMemberCount?: number,
+    extraMembers: string[] = [],
   ): Promise<Group> {
     const creator = this.getCreator();
     const memberList = this.getAllButCreator().map(
@@ -261,8 +261,8 @@ export class WorkerManager {
     const group = await creator.client.conversations.newGroup(memberList, {
       groupName,
     });
-    if (extraMemberCount && extraMemberCount > 0) {
-      await group.addMembers(getInboxIds(extraMemberCount));
+    if (extraMembers.length > 0) {
+      await group.addMembers(extraMembers);
     }
 
     return group as Group;

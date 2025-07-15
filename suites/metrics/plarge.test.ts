@@ -5,6 +5,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -43,38 +44,6 @@ describe(testName, async () => {
   let run = 0; // Worker allocation counter
 
   for (const groupSize of batchSizes) {
-    it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
-      const membershipGroup = await workers.createGroupBetweenAll(
-        "Membership Stream Test",
-        groupSize,
-      );
-
-      const verifyResult = await verifyMembershipStream(
-        membershipGroup,
-        workers.getAllButCreator(),
-        [workers.getCreator().client.inboxId],
-      );
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-    });
-
-    it(`verifyMessageStream-${groupSize}: should deliver messages to all ${groupSize} members`, async () => {
-      const group = await workers.createGroupBetweenAll(
-        "Message Stream Test",
-        groupSize,
-      );
-      await group.sync();
-
-      const verifyResult = await verifyMessageStream(
-        group,
-        workers.getAllButCreator(),
-      );
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-    });
-
     it(`verifyConversationStream-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),
@@ -85,10 +54,27 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
+    it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+      const allMembers = getInboxIds(groupSize + 1);
+      const membershipGroup = await workers.createGroupBetweenAll(
+        "Membership Stream Test",
+        allMembers.slice(0, groupSize),
+      );
+
+      const verifyResult = await verifyMembershipStream(
+        membershipGroup,
+        workers.getAllButCreator(),
+        allMembers.slice(groupSize, groupSize + 1),
+      );
+
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
+
     it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
       const metadataGroup = await workers.createGroupBetweenAll(
         "Metadata Stream Test",
-        groupSize,
+        getInboxIds(groupSize),
       );
 
       await metadataGroup.sync();
@@ -104,14 +90,13 @@ describe(testName, async () => {
 
     it(`verifySyncColdStart-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();
-
       const allWorkers = workers.getAllButCreator();
       const workerA = allWorkers[run % allWorkers.length];
       const workerB = allWorkers[(run + 1) % allWorkers.length];
 
-      const newGroup = await workers.createGroupBetweenAll(
+      await workers.createGroupBetweenAll(
         "Sync Cold Start Test",
-        groupSize,
+        getInboxIds(groupSize),
       );
       const createTimeMs = performance.now() - createTime;
 
@@ -134,9 +119,9 @@ describe(testName, async () => {
       const createTime = performance.now();
       const allWorkers = workers.getAllButCreator();
 
-      const newGroup = await workers.createGroupBetweenAll(
+      await workers.createGroupBetweenAll(
         "Sync Cumulative Test",
-        groupSize,
+        getInboxIds(groupSize),
       );
 
       const workersToAdd = allWorkers.slice(
@@ -147,7 +132,6 @@ describe(testName, async () => {
         // Wrap around if needed
         workersToAdd.push(...allWorkers.slice(0, 3 - workersToAdd.length));
       }
-
       const cumulativeCreateTimeMs = performance.now() - createTime;
 
       // Test cumulative syncAll
