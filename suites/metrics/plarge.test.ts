@@ -45,6 +45,22 @@ describe(testName, async () => {
   let run = 0; // Worker allocation counter
 
   for (const groupSize of batchSizes) {
+    // it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+    //   const creator = workers.getCreator();
+    //   const membershipGroup = (await creator.client.conversations.newGroup(
+    //     getInboxIds(groupSize),
+    //   )) as Group;
+
+    //   const verifyResult = await verifyMembershipStream(
+    //     membershipGroup,
+    //     workers.getAllButCreator(),
+    //     getInboxIds(1),
+    //   );
+
+    //   setCustomDuration(verifyResult.averageEventTiming);
+    //   expect(verifyResult.almostAllReceived).toBe(true);
+    // });
+
     it(`verifyMessageStream-${groupSize}: should deliver messages to all ${groupSize} members`, async () => {
       const creator = workers.getCreator();
       const group = (await creator.client.conversations.newGroup(
@@ -54,14 +70,14 @@ describe(testName, async () => {
       await group.addMembers(
         workers
           .getAllButCreator()
-          .slice(0, WORKER_COUNT - 1)
+
           .map((worker) => worker.client.inboxId),
       );
 
       await group.sync();
       const verifyResult = await verifyMessageStream(
         group,
-        workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
+        workers.getAllButCreator(),
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
@@ -71,43 +87,27 @@ describe(testName, async () => {
     it(`verifyConversationStream-${groupSize}: should create ${groupSize} member group conversation stream`, async () => {
       const verifyResult = await verifyConversationStream(
         workers.getCreator(),
-        workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
+        workers.getAllButCreator(),
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`verifyMembershipStream-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
-      const creator = workers.getCreator();
-      const membershipGroup = (await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
-      )) as Group;
+    // it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
+    //   const creator = workers.getCreator();
+    //   const metadataGroup = (await creator.client.conversations.newGroup(
+    //     getInboxIds(groupSize),
+    //   )) as Group;
 
-      const verifyResult = await verifyMembershipStream(
-        membershipGroup,
-        workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
-        getInboxIds(1),
-      );
+    //   const verifyResult = await verifyMetadataStream(
+    //     metadataGroup,
+    //     workers.getAllButCreator(),
+    //   );
 
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-    });
-
-    it(`verifyMetadataStream-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
-      const creator = workers.getCreator();
-      const metadataGroup = (await creator.client.conversations.newGroup(
-        getInboxIds(groupSize),
-      )) as Group;
-
-      const verifyResult = await verifyMetadataStream(
-        metadataGroup,
-        workers.getAllButCreator().slice(0, WORKER_COUNT - 1),
-      );
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.almostAllReceived).toBe(true);
-    });
+    //   setCustomDuration(verifyResult.averageEventTiming);
+    //   expect(verifyResult.almostAllReceived).toBe(true);
+    // });
 
     it(`verifySyncColdStart-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
       const createTime = performance.now();

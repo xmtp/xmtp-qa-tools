@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-dms] # performance test with more large groups
+        test: [plarge] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
