@@ -10,19 +10,11 @@ import fs from "node:fs";
 import path from "node:path";
 import {
   createSigner,
+  generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
-  validateEnvironment,
 } from "@helpers/client";
 import { generatePrivateKey } from "viem/accounts";
-
-const { ENCRYPTION_KEY, LOGGING_LEVEL, XMTP_ENV, ADDRESS } =
-  validateEnvironment([
-    "ENCRYPTION_KEY",
-    "LOGGING_LEVEL",
-    "XMTP_ENV",
-    "ADDRESS",
-  ]);
 
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 
@@ -30,6 +22,7 @@ interface Config {
   userCount: number;
   timeout: number;
   env: string;
+  address: string;
 }
 
 function parseArgs(): Config {
@@ -37,13 +30,22 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
-    env: XMTP_ENV,
+    env: "production",
+    address: "0x362d666308d90e049404d361b29c41bda42dd38b",
   };
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     const nextArg = args[i + 1];
 
+    if (arg === "--address" && nextArg) {
+      config.address = nextArg;
+      i++;
+    }
+    if (arg === "--env" && nextArg) {
+      config.env = nextArg;
+      i++;
+    }
     if (arg === "--users" && nextArg) {
       config.userCount = parseInt(nextArg, 10);
       i++;
@@ -89,12 +91,12 @@ function cleanupStressDatabases(env: string): void {
 }
 
 async function runStressTest(config: Config): Promise<void> {
-  console.log(`🚀 Testing ${config.userCount} users against ${ADDRESS}`);
+  console.log(`🚀 Testing ${config.userCount} users against `);
 
   // Clean up previous stress test database files
   cleanupStressDatabases(config.env);
 
-  const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+  const dbEncryptionKey = getEncryptionKeyFromHex(generateEncryptionKeyHex());
 
   // Initialize workers concurrently
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
@@ -108,7 +110,7 @@ async function runStressTest(config: Config): Promise<void> {
 
       const client = await Client.create(signer, {
         env: config.env as XmtpEnv,
-        loggingLevel: LOGGING_LEVEL as LogLevel,
+        loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
         dbPath: getDbPath(
           `stress-${config.env}-worker-${i}-${signerIdentifier}`,
         ),
@@ -141,7 +143,7 @@ async function runStressTest(config: Config): Promise<void> {
           // 1. Time NewDM creation
           const newDmStart = Date.now();
           const conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: ADDRESS,
+            identifier: config.address,
             identifierKind: IdentifierKind.Ethereum,
           })) as Conversation;
           const newDmTime = Date.now() - newDmStart;
