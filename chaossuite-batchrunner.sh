@@ -22,16 +22,17 @@ for ((x=1; x<=num_runs; x++)); do
   #LOG_LEVEL=info timeout 300 time npx vitest run suites/networkchaos/forkmatrix-streamonly.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | tee test-${x}.log
   exit_code=$?
 
-  echo "Test iteration $i completed with exit code $exit_code"
+  echo "Test iteration $x completed with exit code $exit_code"
 
-  echo "Cleaning up test logs and results..."
-  yarn ansi
-  echo "Finished cleaning up"
-  fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
-  echo "Found $fork_count forks in logs/cleaned"
+  #echo "Cleaning up test logs and results..."
+  #yarn ansi
+  #echo "Finished cleaning up"
+  #fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
+  #echo "Found $fork_count forks in logs/cleaned"
 done
 
 echo "Writing env config to output dir..."
+mkdir -p logs/cleaned
 
 {
   echo "DURATION_MS=$DURATION_MS"
