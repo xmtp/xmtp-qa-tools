@@ -22,10 +22,10 @@ runs:
     - name: Cache test data
       uses: actions/cache@v4
       with:
-        path: .data
-        key: test-data-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        path: .data|.env
+        key: installation
         restore-keys: |
-          test-data-${{ runner.os }}-
+          installation
 
     - name: Install dependencies
       run: yarn
