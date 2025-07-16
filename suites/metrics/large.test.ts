@@ -17,7 +17,7 @@ describe(testName, async () => {
     sendDurationMetrics: true,
   });
   const BATCH_SIZE = process.env.BATCH_SIZE
-    ? (JSON.parse(process.env.BATCH_SIZE) as number[])
+    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
   let workers: WorkerManager;
 

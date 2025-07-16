@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 const testName = "performance";
 describe(testName, async () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
-    ? (JSON.parse(process.env.BATCH_SIZE) as number[])
+    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
   let dm: Dm | undefined;
   let workers = await getWorkers(10);
