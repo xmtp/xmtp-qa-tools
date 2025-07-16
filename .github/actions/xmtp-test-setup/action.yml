@@ -1,6 +1,12 @@
 name: "XMTP Test Setup"
 description: "Sets up Node.js environment with caching and installs dependencies for XMTP tests"
 
+inputs:
+  cache-data:
+    description: "Whether to cache .data and .env files"
+    required: false
+    default: "false"
+
 runs:
   using: "composite"
   steps:
@@ -18,6 +24,22 @@ runs:
         key: deps-${{ hashFiles('yarn.lock') }}
         restore-keys: |
           deps-
+
+    - name: Cache test data
+      if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          .data
+          .env
+        key: installation-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          installation-
+
+    - name: Show cache status
+      if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
+      run: echo "Data caching is ENABLED for .data and .env files"
+      shell: bash
 
     - name: Install dependencies
       run: yarn
