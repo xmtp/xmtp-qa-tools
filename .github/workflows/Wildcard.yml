@@ -36,7 +36,7 @@ jobs:
       #   run: yarn script versions
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --debug --no-fail
+        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
