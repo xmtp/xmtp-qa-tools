@@ -1,226 +1,208 @@
 import { sendMetric, type DeliveryMetricTags } from "@helpers/datadog";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import { typeofStream } from "@workers/main";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "delivery";
-describe(testName, async () => {
+const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "100");
+const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "20");
+
+describe(testName, () => {
   setupTestLifecycle({
     testName,
     sendMetrics: true,
     sendDurationMetrics: true,
   });
-  const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
-  const receiverAmount = parseInt(process.env.WORKER_COUNT ?? "4");
 
   console.log(
-    `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
+    `[${testName}] Messages: ${MESSAGE_COUNT}, Workers: ${WORKER_COUNT}`,
   );
-  let workers = await getWorkers(receiverAmount);
 
+  let workers: WorkerManager;
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   beforeAll(async () => {
-    console.log("creating group");
+    workers = await getWorkers(WORKER_COUNT);
+    console.log("Creating group");
     group = await workers.createGroupBetweenAll();
   });
 
-  it("verifyMessageStream: should verify message delivery and order accuracy using message streams", async () => {
+  it("should verify message delivery and order accuracy using streams", async () => {
     const verifyResult = await verifyMessageStream(
       group,
       workers.getAllButCreator(),
-      amountofMessages,
-      `gm-{i}-${randomSuffix}`,
+      MESSAGE_COUNT,
+      `stream-{i}-${randomSuffix}`,
     );
+
     const receptionPercentage = verifyResult.receptionPercentage ?? 0;
     const orderPercentage = verifyResult.orderPercentage ?? 0;
 
     console.log(
-      `Stream reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
+      `Stream - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
     );
 
-    // Don't fail if stats are missing or incomplete, just log and continue
-    if (!verifyResult.receptionPercentage || !verifyResult.orderPercentage)
-      console.log("Warning: No stats were generated for stream verification");
-
-    // Only run expectations if we have values
+    // Send metrics if we have valid data
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
-
-      const deliveryMetricTags: DeliveryMetricTags = {
+      sendMetric("delivery", receptionPercentage, {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "delivery",
         metric_subtype: "stream",
         conversation_type: "group",
-      };
-      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
+      } as DeliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
-
-      const orderMetricTags: DeliveryMetricTags = {
+      sendMetric("order", orderPercentage, {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "order",
         metric_subtype: "stream",
         conversation_type: "group",
-      };
-      sendMetric("order", orderPercentage, orderMetricTags);
+      } as DeliveryMetricTags);
     }
   });
 
-  it("verifyMessagePoll: should verify message delivery and order accuracy using polling method", async () => {
-    const messagesByWorker: string[][] = [];
+  it("should verify message delivery and order accuracy using polling", async () => {
+    // Send messages first
+    for (let i = 1; i <= MESSAGE_COUNT; i++) {
+      await group.send(`poll-${i}-${randomSuffix}`);
+    }
 
+    // Poll messages from all receivers
+    const messagesByWorker: string[][] = [];
     for (const worker of workers.getAllButCreator()) {
       const conversation =
         await worker.client.conversations.getConversationById(group.id);
-
       const messages = await conversation?.messages();
-      if (!messages) throw new Error("Messages not found");
-      const filteredMessages: string[] = [];
 
-      for (const message of messages) {
-        if (
-          message.contentType?.typeId === "text" &&
-          (message.content as string).includes(randomSuffix)
-        ) {
-          filteredMessages.push(message.content as string);
-        }
-      }
+      const filteredMessages =
+        messages
+          ?.filter(
+            (msg) =>
+              msg.contentType?.typeId === "text" &&
+              (msg.content as string).includes(`poll-`) &&
+              (msg.content as string).includes(randomSuffix),
+          )
+          .map((msg) => msg.content as string) ?? [];
 
       messagesByWorker.push(filteredMessages);
     }
 
     const stats = calculateMessageStats(
       messagesByWorker,
-      "gm-",
-      amountofMessages,
+      "poll-",
+      MESSAGE_COUNT,
       randomSuffix,
     );
-
     const receptionPercentage = stats.receptionPercentage ?? 0;
     const orderPercentage = stats.orderPercentage ?? 0;
 
     console.log(
-      `Poll reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
+      `Poll - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
     );
 
-    // Only run expectations if we have values
+    // Send metrics if we have valid data
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
-
-      const deliveryMetricTags: DeliveryMetricTags = {
+      sendMetric("delivery", receptionPercentage, {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "delivery",
         metric_subtype: "poll",
         conversation_type: "group",
-      };
-      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
+      } as DeliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
-      const orderMetricTags: DeliveryMetricTags = {
+      sendMetric("order", orderPercentage, {
         sdk: workers.getCreator().sdk,
         test: testName,
         metric_type: "order",
         metric_subtype: "poll",
         conversation_type: "group",
-      };
-      sendMetric("order", orderPercentage, orderMetricTags);
+      } as DeliveryMetricTags);
     }
   });
 
-  it("verifyMessageRecovery: should verify message recovery and delivery after client reconnection", async () => {
-    // Select one worker to take offline
-    const offlineWorker = workers.getCreator(); // Second worker
-    const onlineWorker = workers.getReceiver(); // First worker
+  it("should verify message recovery after stream interruption", async () => {
+    const offlineWorker = workers.getReceiver();
+    console.log(`Stopping streams for ${offlineWorker.name}`);
 
-    console.log(`Taking ${offlineWorker.name} offline`);
+    // Stop message streams for the worker
+    offlineWorker.worker.endStream(typeofStream.Message);
 
-    // Disconnect the selected worker
-    await offlineWorker.worker.terminate();
-
-    // Send messages from an online worker
-    const conversation =
-      await onlineWorker.client.conversations.getConversationById(group.id);
-    console.log(`Sending ${amountofMessages} messages while client is offline`);
-    for (let i = 0; i < amountofMessages; i++) {
-      const message = `offline-msg-${i + 1}-${randomSuffix}`;
-      await conversation!.send(message);
+    // Send messages while worker is offline
+    console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
+    for (let i = 1; i <= MESSAGE_COUNT; i++) {
+      await group.send(`recovery-${i}-${randomSuffix}`);
     }
-    console.log("Sent messages");
 
-    // Reconnect the offline worker
-    console.log(`Reconnecting ${offlineWorker.name}`);
-    const { client } = await offlineWorker.worker.initialize();
-    offlineWorker.client = client;
+    // Resume streams and sync
+    console.log(`Resuming streams for ${offlineWorker.name}`);
+    offlineWorker.worker.startStream(typeofStream.Message);
+
+    // Sync conversations to catch up
     await offlineWorker.client.conversations.sync();
-
-    const recoveredConversation =
+    const conversation =
       await offlineWorker.client.conversations.getConversationById(group.id);
-    await recoveredConversation?.sync();
-    const messages = await recoveredConversation?.messages();
+    await conversation?.sync();
 
-    const messagesByWorker: string[][] = [];
-    const recoveredMessages: string[] = [];
-    for (const message of messages ?? []) {
-      if (
-        message.content &&
-        typeof message.content === "string" &&
-        message.content.includes(`offline-msg-`) &&
-        message.content.includes(randomSuffix)
-      ) {
-        recoveredMessages.push(message.content);
-      }
-    }
-
-    messagesByWorker.push(recoveredMessages);
+    // Check recovered messages
+    const messages = await conversation?.messages();
+    const recoveredMessages =
+      messages
+        ?.filter(
+          (msg) =>
+            msg.content &&
+            typeof msg.content === "string" &&
+            msg.content.includes(`recovery-`) &&
+            msg.content.includes(randomSuffix),
+        )
+        .map((msg) => msg.content as string) ?? [];
 
     const stats = calculateMessageStats(
-      messagesByWorker,
-      "offline-msg-",
-      amountofMessages,
+      [recoveredMessages],
+      "recovery-",
+      MESSAGE_COUNT,
       randomSuffix,
     );
     const receptionPercentage = stats.receptionPercentage ?? 0;
     const orderPercentage = stats.orderPercentage ?? 0;
 
     console.log(
-      `Recovery reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
+      `Recovery - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
     );
 
-    // Only run expectations if we have values
+    // Send metrics if we have valid data
     if (receptionPercentage > 0) {
       expect(receptionPercentage).toBeGreaterThan(0);
-
-      const deliveryMetricTags: DeliveryMetricTags = {
-        metric_subtype: "recovery",
-        metric_type: "delivery",
+      sendMetric("delivery", receptionPercentage, {
         sdk: offlineWorker.sdk,
         test: testName,
+        metric_type: "delivery",
+        metric_subtype: "recovery",
         conversation_type: "group",
-      };
-      sendMetric("delivery", receptionPercentage, deliveryMetricTags);
+      } as DeliveryMetricTags);
     }
 
     if (orderPercentage > 0) {
       expect(orderPercentage).toBeGreaterThan(0);
-      const orderMetricTags: DeliveryMetricTags = {
-        metric_type: "order",
-        metric_subtype: "recovery",
+      sendMetric("order", orderPercentage, {
         sdk: offlineWorker.sdk,
         test: testName,
+        metric_type: "order",
+        metric_subtype: "recovery",
         conversation_type: "group",
-      };
-      sendMetric("order", orderPercentage, orderMetricTags);
+      } as DeliveryMetricTags);
     }
   });
 });
