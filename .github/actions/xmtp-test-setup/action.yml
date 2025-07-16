@@ -19,6 +19,14 @@ runs:
         restore-keys: |
           deps-
 
+    - name: Cache test data
+      uses: actions/cache@v4
+      with:
+        path: .data
+        key: test-data-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          test-data-${{ runner.os }}-
+
     - name: Install dependencies
       run: yarn
       shell: bash
