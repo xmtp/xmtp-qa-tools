@@ -8,30 +8,35 @@ import {
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
+import { generatePrivateKey } from "viem/accounts";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
-} from "@helpers/client";
-import { generatePrivateKey } from "viem/accounts";
+  validateEnvironment,
+} from "../helpers/client";
 
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
+// yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
+const { XMTP_ENV, ADDRESS } = validateEnvironment(["XMTP_ENV", "ADDRESS"]);
 
 interface Config {
   userCount: number;
   timeout: number;
   env: string;
   address: string;
+  tresshold: number;
 }
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     userCount: 5,
-    timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
-    env: "production",
-    address: "0x362d666308d90e049404d361b29c41bda42dd38b",
+    timeout: 30 * 1000, // 120 seconds - increased for XMTP operations
+    env: XMTP_ENV,
+    address: ADDRESS,
+    tresshold: 95,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -48,6 +53,10 @@ function parseArgs(): Config {
     }
     if (arg === "--users" && nextArg) {
       config.userCount = parseInt(nextArg, 10);
+      i++;
+    }
+    if (arg === "--tresshold" && nextArg) {
+      config.tresshold = parseInt(nextArg, 10);
       i++;
     }
   }
@@ -110,7 +119,6 @@ async function runStressTest(config: Config): Promise<void> {
 
       const client = await Client.create(signer, {
         env: config.env as XmtpEnv,
-        loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
         dbPath: getDbPath(
           `stress-${config.env}-worker-${i}-${signerIdentifier}`,
         ),
@@ -127,6 +135,17 @@ async function runStressTest(config: Config): Promise<void> {
 
   // Run all workers in parallel
   console.log(`🔄 Starting parallel worker execution...`);
+
+  // Shared counters
+  let totalMessagesSent = 0;
+  let completedWorkers = 0;
+  const results: Array<{
+    success: boolean;
+    newDmTime: number;
+    sendTime: number;
+    responseTime: number;
+  }> = [];
+
   const promises = workers.map((worker, i) => {
     return new Promise<{
       success: boolean;
@@ -166,49 +185,112 @@ async function runStressTest(config: Config): Promise<void> {
                 // 3. Calculate response time
                 const responseTime = Date.now() - sendCompleteTime;
 
+                const result = {
+                  success: true,
+                  newDmTime,
+                  sendTime,
+                  responseTime,
+                };
+                results.push(result);
+                completedWorkers++;
+
+                const successRate =
+                  (results.filter((r) => r.success).length / config.userCount) *
+                  100;
                 console.log(
-                  `✅ Worker ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms`,
+                  `✅ Worker ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
                 );
-                resolve({ success: true, newDmTime, sendTime, responseTime });
+
+                // Check if we've reached 95% success rate
+                if (successRate >= config.tresshold) {
+                  console.log(
+                    `🎯 Reached ${config.tresshold}% success rate! Ending test early.`,
+                  );
+                  globalThis.process.exit(0);
+                }
+
+                resolve(result);
               }
             },
           );
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
           console.log(`📤 Worker ${i}: Sending test message...`);
           // 2. Time message send
           const sendStart = Date.now();
           await conversation.send(`test-${i}-${Date.now()}`);
+          totalMessagesSent++;
           sendTime = Date.now() - sendStart;
           sendCompleteTime = Date.now();
-          console.log(`📩 Worker ${i}: Message sent in ${sendTime}ms`);
+          console.log(
+            `📩 Worker ${i}: Message sent in ${sendTime}ms (Total sent: ${totalMessagesSent})`,
+          );
         } catch (error) {
           console.error(error);
         }
       };
 
       process().catch(() => {
-        resolve({ success: false, newDmTime: 0, sendTime: 0, responseTime: 0 });
+        const result = {
+          success: false,
+          newDmTime: 0,
+          sendTime: 0,
+          responseTime: 0,
+        };
+        results.push(result);
+        completedWorkers++;
+        console.log(
+          `❌ Worker ${i}: Failed (${completedWorkers}/${config.userCount})`,
+        );
+        resolve(result);
       });
     });
   });
 
-  // Wait for all workers with global timeout
+  // Wait for all workers with global timeout and 95% success monitoring
   console.log(`⏳ Waiting for all workers to complete...`);
+
+  // Create a promise that resolves when 95% success rate is reached
+  const earlyExitPromise = new Promise<typeof results>((resolve) => {
+    const checkInterval = setInterval(() => {
+      const currentSuccessful = results.filter((r) => r.success).length;
+      const currentSuccessRate = (currentSuccessful / config.userCount) * 100;
+
+      if (currentSuccessRate >= config.tresshold) {
+        clearInterval(checkInterval);
+        console.log(
+          `🎯 ${config.tresshold}% success rate achieved with ${completedWorkers} workers completed`,
+        );
+        resolve(results.slice()); // Return current results
+      }
+    }, 100); // Check every 100ms
+  });
+
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
-      reject(new Error(`Test timed out after ${config.timeout}ms`));
+      reject(
+        new Error(
+          `Test timed out after ${config.timeout}ms, ${config.tresshold}% success rate achieved with ${completedWorkers} workers completed   `,
+        ),
+      );
     }, config.timeout);
   });
 
   try {
-    const results = await Promise.race([Promise.all(promises), timeoutPromise]);
-    console.log(`🏁 All workers completed`);
+    const finalResults = await Promise.race([
+      Promise.all(promises),
+      earlyExitPromise,
+      timeoutPromise,
+    ]);
+    console.log(`🏁 Test completed`);
 
-    const successful = results.filter((r) => r.success);
+    const successful = finalResults.filter((r) => r.success);
+    const successRate = (successful.length / config.userCount) * 100;
 
     console.log(
-      `📊 Results: ${successful.length}/${config.userCount} successful (${Math.round((successful.length / config.userCount) * 100)}%)`,
+      `📊 Final Results: ${successful.length}/${config.userCount} successful (${successRate.toFixed(1)}%)`,
     );
+    console.log(`📤 Total messages sent: ${totalMessagesSent}`);
 
     if (successful.length > 0) {
       const avgNewDm =
