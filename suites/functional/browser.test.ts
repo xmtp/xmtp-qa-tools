@@ -11,7 +11,7 @@ const testName = "browser";
 describe(testName, () => {
   setupTestLifecycle({ testName });
   let groupId: string;
-  const headless = false;
+  const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
