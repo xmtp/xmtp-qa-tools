@@ -46,7 +46,7 @@ runs:
         retention-days: ${{ inputs.retention-days }}
 
     - name: Save processed data to cache
-      if: ${{ always() && inputs.save-to-cache == 'true' }}
+      if: ${{ always() && (inputs.save-to-cache == 'true' || inputs.save-to-cache == true) }}
       uses: actions/cache@v4
       with:
         path: |
