@@ -58,6 +58,7 @@ export const setupTestLifecycle = ({
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
+      GH_CACHE: process.env.GH_CACHE || "false",
       sdk: sdk || getVersions()[0].nodeVersion,
       installations: members,
       members,
