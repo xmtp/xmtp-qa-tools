@@ -13,7 +13,7 @@ describe(testName, async () => {
     sendDurationMetrics: true,
   });
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
-  const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
+  const receiverAmount = parseInt(process.env.WORKER_COUNT ?? "4");
 
   console.log(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
