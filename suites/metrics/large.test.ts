@@ -11,11 +11,6 @@ import { describe, expect, it } from "vitest";
 
 const testName = "large";
 describe(testName, async () => {
-  setupTestLifecycle({
-    testName,
-    sendMetrics: true,
-    sendDurationMetrics: true,
-  });
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
@@ -38,6 +33,7 @@ describe(testName, async () => {
       customDuration = v;
     },
     sendMetrics: true,
+    sendDurationMetrics: true,
   });
 
   for (const groupSize of BATCH_SIZE) {
