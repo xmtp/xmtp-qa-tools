@@ -222,7 +222,7 @@ async function runStressTest(config: Config): Promise<void> {
       );
     }
   } catch (error) {
-    console.log(`❌ Test timed out - gathering partial results...`);
+    console.log(`❌ Test timed out - gathering partial results...`, error);
 
     // Collect partial results from completed workers
     const partialResults = await Promise.allSettled(promises);

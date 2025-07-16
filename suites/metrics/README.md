@@ -10,7 +10,7 @@ Tests group performance with varying member counts.
 
 ```bash
 yarn test large
-BATCH_SIZE=10,50 yarn test large
+BATCH_SIZE=10-50 yarn test large
 ```
 
 ### Performance
@@ -40,6 +40,6 @@ DELIVERY_AMOUNT=100 yarn test delivery
 
 ```bash
 XMTP_ENV=dev|production
-BATCH_SIZE=10,50,100     # Large test only
+BATCH_SIZE=10-50     # Large test only
 DELIVERY_AMOUNT=100       # Delivery test only
 ```
