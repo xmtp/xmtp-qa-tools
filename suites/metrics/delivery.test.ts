@@ -31,7 +31,7 @@ describe(testName, () => {
     group = await workers.createGroupBetweenAll();
   });
 
-  it("should verify message delivery and order accuracy using streams", async () => {
+  it("verifyMessageStream: should verify message delivery and order accuracy using streams", async () => {
     const verifyResult = await verifyMessageStream(
       group,
       workers.getAllButCreator(),
@@ -70,7 +70,7 @@ describe(testName, () => {
     }
   });
 
-  it("should verify message delivery and order accuracy using polling", async () => {
+  it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
     // Send messages first
     for (let i = 1; i <= MESSAGE_COUNT; i++) {
       await group.send(`poll-${i}-${randomSuffix}`);
@@ -133,7 +133,7 @@ describe(testName, () => {
     }
   });
 
-  it("should verify message recovery after stream interruption", async () => {
+  it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
     const offlineWorker = workers.getReceiver();
     console.log(`Stopping streams for ${offlineWorker.name}`);
 
