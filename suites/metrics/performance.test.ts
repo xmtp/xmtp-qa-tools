@@ -134,6 +134,9 @@ describe(testName, async () => {
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
+    it(`addMembers-${i}: should add members to a group`, async () => {
+      await newGroup.addMembers([workers.getAll()[2].inboxId]);
+    });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       const previousMembers = await newGroup.members();
       await newGroup.removeMembers([
