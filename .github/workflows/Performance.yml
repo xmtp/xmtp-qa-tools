@@ -28,6 +28,8 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: true
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
         run: yarn test ${{ matrix.test }} --no-fail --debug
@@ -38,6 +40,7 @@ jobs:
         with:
           test-name: ${{ matrix.test }}
           environment: ${{ matrix.environment }}
+          save-to-cache: true
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
