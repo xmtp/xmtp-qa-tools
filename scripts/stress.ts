@@ -2,20 +2,19 @@ import {
   Client,
   IdentifierKind,
   type Conversation,
-  type LogLevel,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { generatePrivateKey } from "viem/accounts";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
   validateEnvironment,
-} from "../helpers/client";
+} from "@helpers/client";
+import { generatePrivateKey } from "viem/accounts";
 
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
