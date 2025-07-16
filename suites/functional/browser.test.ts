@@ -7,7 +7,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "playwright";
+const testName = "browser";
 describe(testName, () => {
   setupTestLifecycle({ testName });
   let groupId: string;
