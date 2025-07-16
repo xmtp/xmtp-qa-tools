@@ -75,10 +75,9 @@ describe(testName, async () => {
   });
 
   it("verifyMessagePoll: should verify message delivery and order accuracy using polling method", async () => {
-    const workersFromGroup = await getWorkersFromGroup(group, workers);
     const messagesByWorker: string[][] = [];
 
-    for (const worker of workersFromGroup) {
+    for (const worker of workers.getAllButCreator()) {
       const conversation =
         await worker.client.conversations.getConversationById(group.id);
 
@@ -225,12 +224,3 @@ describe(testName, async () => {
     }
   });
 });
-
-export async function getWorkersFromGroup(
-  group: Group,
-  workers: WorkerManager,
-): Promise<Worker[]> {
-  await group.sync();
-  const memberIds = (await group.members()).map((m) => m.inboxId);
-  return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
-}
