@@ -7,10 +7,9 @@ import { describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, async () => {
-  const batchSize = process.env.BATCH_SIZE
-    ? (JSON.parse(process.env.BATCH_SIZE) as number[])
+  const BATCH_SIZE = process.env.BATCH_SIZE
+    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
-
   let dm: Dm | undefined;
   let workers = await getWorkers(10);
 
@@ -160,7 +159,7 @@ describe(testName, async () => {
     expect(members.length).toBe(previousMembers.length - 1);
   });
 
-  for (const i of batchSize) {
+  for (const i of BATCH_SIZE) {
     let newGroup: Group;
     it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = getInboxIds(i);

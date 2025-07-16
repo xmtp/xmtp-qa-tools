@@ -9,10 +9,6 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const BATCH_SIZE = process.env.BATCH_SIZE
-  ? (JSON.parse(process.env.BATCH_SIZE) as number[])
-  : [5, 10];
-
 const testName = "large";
 describe(testName, async () => {
   setupTestLifecycle({
@@ -20,6 +16,9 @@ describe(testName, async () => {
     sendMetrics: true,
     sendDurationMetrics: true,
   });
+  const BATCH_SIZE = process.env.BATCH_SIZE
+    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
+    : [5, 10];
   let workers: WorkerManager;
 
   workers = await getWorkers(5);

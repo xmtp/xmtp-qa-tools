@@ -2,6 +2,7 @@ name: Performance
 description: "should verify performance "
 
 on:
+  pull_request:
   schedule:
     - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
   workflow_dispatch:
@@ -15,12 +16,11 @@ jobs:
       matrix:
         test: [performance]
         environment: [dev, production]
-        BATCH_SIZE: [[10, 50, 100, 150]]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: ${{ join(matrix.BATCH_SIZE, ',') }}
+      BATCH_SIZE: "10-50-100-150"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -29,7 +29,7 @@ jobs:
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run tests
+      - name: Run tests ${{ matrix.BATCH_SIZE }}
         run: yarn test ${{ matrix.test }} --no-fail --debug
 
       - name: Cleanup and upload artifacts
