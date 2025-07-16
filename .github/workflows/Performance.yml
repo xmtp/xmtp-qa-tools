@@ -16,11 +16,32 @@ jobs:
       matrix:
         test: [performance]
         environment: [dev, production]
+        BATCH_SIZE: [5-10, 50-100, 150-200]
+        cache_data: [false, true]
+        include:
+          - BATCH_SIZE: 5-10
+            delay_minutes: 0
+            cache_data: false
+          - BATCH_SIZE: 5-10
+            delay_minutes: 2
+            cache_data: true
+          - BATCH_SIZE: 50-100
+            delay_minutes: 5
+            cache_data: false
+          - BATCH_SIZE: 50-100
+            delay_minutes: 7
+            cache_data: true
+          - BATCH_SIZE: 150-200
+            delay_minutes: 10
+            cache_data: false
+          - BATCH_SIZE: 150-200
+            delay_minutes: 12
+            cache_data: true
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: 5-10-50-100-150"
+      BATCH_SIZE: ${{ matrix.BATCH_SIZE }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -28,8 +49,14 @@ jobs:
 
       - name: Setup test environment
         uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: ${{ matrix.cache_data }}
 
-      - name: Run tests ${{ matrix.BATCH_SIZE }}
+      - name: Delay execution to spread batch runs
+        if: ${{ matrix.delay_minutes > 0 }}
+        run: sleep $((${{ matrix.delay_minutes }} * 60))
+
+      - name: Run tests ${{ matrix.BATCH_SIZE }} (cache: ${{ matrix.cache_data }})
         run: yarn test ${{ matrix.test }} --no-fail --debug
 
       - name: Cleanup and upload artifacts
