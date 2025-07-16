@@ -39,8 +39,10 @@ jobs:
         if: ${{ matrix.delay_minutes > 0 }}
         run: sleep $((${{ matrix.delay_minutes }} * 60))
 
-      - name: Run tests
-        run: yarn test ${{ matrix.test }} -- --no-fail --debug     - name: Cleanup and upload artifacts
+      - name: Run tests ${{ matrix.BATCH_SIZE }}
+        run: yarn test ${{ matrix.test }} --no-fail --debug
+
+      - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
