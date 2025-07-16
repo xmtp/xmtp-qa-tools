@@ -20,10 +20,10 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      REGION: ${{ vars.REGION }}
-      BATCH_SIZE: "5-10"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      REGION: ${{ vars.REGION }}
+      BATCH_SIZE: "5-10"
     steps:
       - uses: actions/checkout@v4
 
