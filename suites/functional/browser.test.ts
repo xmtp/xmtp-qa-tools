@@ -11,7 +11,7 @@ const testName = "browser";
 describe(testName, () => {
   setupTestLifecycle({ testName });
   let groupId: string;
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
@@ -92,7 +92,7 @@ describe(testName, () => {
     );
     const conversationStream = creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation);
+      console.log("conversation found", conversation?.id);
       expect(conversation?.id).toBeDefined();
       break;
     }
@@ -103,7 +103,7 @@ describe(testName, () => {
     await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
     const conversationStream = creator.client.conversations.stream();
     for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation);
+      console.log("conversation found", conversation?.id);
       if (conversation?.id === groupId) {
         expect(conversation.id).toBe(groupId);
         break;
