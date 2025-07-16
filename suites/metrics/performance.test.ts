@@ -134,7 +134,15 @@ describe(testName, async () => {
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
-    it(`addMembers-${i}: should add members to a group`, async () => {
+    it(`verifyGroupMessage-${i}: should verify group message`, async () => {
+      const verifyResult = await verifyMessageStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
+      setCustomDuration(verifyResult?.averageEventTiming ?? 0);
+      expect(verifyResult.allReceived).toBe(true);
+    });
+    it(`addMember-${i}: should add members to a group`, async () => {
       await newGroup.addMembers([workers.getAll()[2].inboxId]);
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
