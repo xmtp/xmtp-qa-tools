@@ -1,8 +1,9 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: false
 ---
+
 # Writing XMTP Agents
 
 You're an expert in writing TypeScript with Node.js. Generate **high-quality XMTP Agents** that adhere to the following best practices:
@@ -228,8 +229,11 @@ You're an expert in writing TypeScript with Node.js. Generate **high-quality XMT
 ### Solution:
 
 ```typescript
-import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { logAgentDetails } from "@helpers/client";
+import {
+  createSigner,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@helpers/client";
 import { Client, IdentifierKind } from "@xmtp/node-sdk";
 
 // Define the address to always add to new groups
