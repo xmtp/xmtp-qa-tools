@@ -14,16 +14,10 @@ import {
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
-  validateEnvironment,
 } from "../helpers/client";
 
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
-const {
-  XMTP_ENV,
-  ADDRESS,
-  LOGGING_LEVEL = "info",
-} = validateEnvironment(["XMTP_ENV", "ADDRESS", "LOGGING_LEVEL"]);
 
 interface Config {
   userCount: number;
@@ -40,11 +34,11 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     timeout: 30 * 1000, // 120 seconds - increased for XMTP operations
-    env: XMTP_ENV,
-    address: ADDRESS,
+    env: process.env.XMTP_ENV ?? "local",
+    address: process.env.ADDRESS ?? "",
     tresshold: 95,
     keepDb: false,
-    loggingLevel: LOGGING_LEVEL as LogLevel,
+    loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
   };
 
   for (let i = 0; i < args.length; i++) {
