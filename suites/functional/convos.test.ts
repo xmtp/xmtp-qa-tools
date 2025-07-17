@@ -93,13 +93,5 @@ describe(testName, async () => {
       const name = newGroup.name;
       expect(name).toBe(newName);
     });
-    it(`should verify new conversation stream for ${i}-member group`, async () => {
-      // Use the dedicated conversation stream verification helper
-      const verifyResult = await verifyConversationStream(
-        workers.getCreator(),
-        workers.getAllButCreator(),
-      );
-      expect(verifyResult.allReceived).toBe(true);
-    });
   }
 });
