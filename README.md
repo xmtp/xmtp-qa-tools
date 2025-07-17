@@ -2,7 +2,7 @@
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
-## Automated workflows
+## Automated Workflows
 
 | Test suite  | Performance                                                                                                                                                                  | Resources                                                                                                                                                                             | Run frequency | Networks           |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
@@ -81,7 +81,7 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Operation performance
+## Operation Performance
 
 ### Core SDK Operations Performance
 
@@ -101,9 +101,9 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | sendGroupMessage         | Sending a group message                | 85  | <200   | On Target   |
 | receiveGroupMessage      | Processing group message strea         | 124 | <200   | On Target   |
 
-### Group operations performance
+### Group Operations Performance
 
-#### Sender-Side average performance
+#### Sender-Side Average Performance
 
 | Size | Send message | Update name | Remove members | Create | Performance |
 | ---- | ------------ | ----------- | -------------- | ------ | ----------- |
@@ -118,7 +118,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
-#### Receiver-Side stream performance
+#### Receiver-Side Stream Performance
 
 | Group Size | New conversation | Metadata | Messages | Add Members | Performance |
 | ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
@@ -133,7 +133,7 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
-#### Receiver-Side sync performance
+#### Receiver-Side Sync Performance
 
 | Size | syncAll |      | sync |      | Performance |
 | ---- | ------- | ---- | ---- | ---- | ----------- |
@@ -148,9 +148,9 @@ _Note: This measurments are taken only from the receiver side and after the grou
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
-## Networks performance
+## Networks Performance
 
-### Network performance
+### Network Performance
 
 | Performance Metric | Average | Target | Performance |
 | ------------------ | ------- | ------ | ----------- |
@@ -174,7 +174,7 @@ _Note: Baseline is `us-east` region and `production` network._
 
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
-## Message reliability
+## Message Reliability
 
 ### Message delivery testing
 
@@ -261,12 +261,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Development
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js (>20.18.0)
 - Yarn 4.6.0
 
-### Installation
+#### Installation
 
 ```bash
 # Installation For a faster download with just the latest code
@@ -283,7 +283,7 @@ LOGGING_LEVEL="error" # Rust library logs
 LOG_LEVEL="debug" # JS logs level
 ```
 
-### Running tests
+#### Running tests
 
 To get started set up the environment in [variables](./.env.example) and run the tests with:
 
@@ -296,7 +296,7 @@ yarn test functional
 yarn test performance
 ```
 
-### Debug mode
+#### Debug mode
 
 ```bash
 yarn test functional --debug
@@ -304,7 +304,7 @@ yarn test functional --debug
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-### Rate limits
+#### Rate limits
 
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
