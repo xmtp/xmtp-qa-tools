@@ -31,7 +31,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
       MESSAGE_COUNT,
-      `stream-{i}-${randomSuffix}`,
+      `gm-{i}-${randomSuffix}`, // Use "gm-" prefix to match the expected statsLabel
     );
 
     const responseMetricTags: ResponseMetricTags = {
