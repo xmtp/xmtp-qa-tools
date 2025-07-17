@@ -25,7 +25,6 @@ const processMessage = async (
   await conversation.send(message.senderInboxId);
   await conversation.send("conversationId");
   await conversation.send(conversation.id);
-  await conversation.send("gm");
   console.log("Waiting for messages...");
 };
 
@@ -35,5 +34,6 @@ await initializeClient(processMessage, [
     walletKey: process.env.WALLET_KEY as `0x${string}`,
     dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
     networks: ["dev", "production", "local"],
+    acceptGroups: true,
   },
 ]);
