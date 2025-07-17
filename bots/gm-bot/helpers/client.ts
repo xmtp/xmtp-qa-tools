@@ -1,6 +1,7 @@
 import { getRandomValues } from "node:crypto";
 import fs from "node:fs";
-import { IdentifierKind, type Client, type Signer } from "@xmtp/node-sdk";
+import path from "node:path";
+import { Client, IdentifierKind, type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -52,7 +53,7 @@ export const generateEncryptionKeyHex = () => {
   /* Generate a random encryption key */
   const uint8Array = getRandomValues(new Uint8Array(32));
   /* Convert the encryption key to a hex string */
-  return toString(uint8Array, "hex") as string;
+  return toString(uint8Array, "hex");
 };
 
 /**
@@ -62,7 +63,7 @@ export const generateEncryptionKeyHex = () => {
  */
 export const getEncryptionKeyFromHex = (hex: string) => {
   /* Convert the hex string to an encryption key */
-  return fromString(hex, "hex") as Uint8Array;
+  return fromString(hex, "hex");
 };
 
 export const getDbPath = (description: string = "xmtp") => {
@@ -75,23 +76,26 @@ export const getDbPath = (description: string = "xmtp") => {
   return `${volumePath}/${description}.db3`;
 };
 
-export const logAgentDetails = (clients: Client | Client[]): void => {
-  const clientsByAddress = Array.isArray(clients)
-    ? clients.reduce<Record<string, Client[]>>((acc, client) => {
-        const address = client.accountIdentifier?.identifier ?? "";
-        acc[address] = acc[address] ?? [];
-        acc[address].push(client);
-        return acc;
-      }, {})
-    : {
-        [clients.accountIdentifier?.identifier ?? ""]: [clients],
-      };
+export const logAgentDetails = async (
+  clients: Client | Client[],
+): Promise<void> => {
+  const clientArray = Array.isArray(clients) ? clients : [clients];
+  const clientsByAddress = clientArray.reduce<Record<string, Client[]>>(
+    (acc, client) => {
+      const address = client.accountIdentifier?.identifier as string;
+      acc[address] = acc[address] ?? [];
+      acc[address].push(client);
+      return acc;
+    },
+    {},
+  );
 
   for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
     const firstClient = clientGroup[0];
     const inboxId = firstClient.inboxId;
+    const installationId = firstClient.installationId;
     const environments = clientGroup
-      .map((c) => c.options?.env ?? "dev")
+      .map((c: Client) => c.options?.env ?? "dev")
       .join(", ");
     console.log(`\x1b[38;2;252;76;52m
         ██╗  ██╗███╗   ███╗████████╗██████╗ 
@@ -104,11 +108,56 @@ export const logAgentDetails = (clients: Client | Client[]): void => {
 
     const urls = [`http://xmtp.chat/dm/${address}`];
 
+    const conversations = await firstClient.conversations.list();
+    const inboxState = await firstClient.preferences.inboxState();
+
     console.log(`
     ✓ XMTP Client:
-    • Address: ${address}
     • InboxId: ${inboxId}
+    • Version: ${Client.version}
+    • Address: ${address}
+    • Conversations: ${conversations.length}
+    • Installations: ${inboxState.installations.length}
+    • InstallationId: ${installationId}
     • Networks: ${environments}
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
 };
+export function validateEnvironment(vars: string[]): Record<string, string> {
+  const missing = vars.filter((v) => !process.env[v]);
+
+  if (missing.length) {
+    try {
+      const envPath = path.resolve(process.cwd(), ".env");
+      if (fs.existsSync(envPath)) {
+        const envVars = fs
+          .readFileSync(envPath, "utf-8")
+          .split("\n")
+          .filter((line) => line.trim() && !line.startsWith("#"))
+          .reduce<Record<string, string>>((acc, line) => {
+            const [key, ...val] = line.split("=");
+            if (key && val.length) acc[key.trim()] = val.join("=").trim();
+            return acc;
+          }, {});
+
+        missing.forEach((v) => {
+          if (envVars[v]) process.env[v] = envVars[v];
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      /* ignore errors */
+    }
+
+    const stillMissing = vars.filter((v) => !process.env[v]);
+    if (stillMissing.length) {
+      console.error("Missing env vars:", stillMissing.join(", "));
+      process.exit(1);
+    }
+  }
+
+  return vars.reduce<Record<string, string>>((acc, key) => {
+    acc[key] = process.env[key] as string;
+    return acc;
+  }, {});
+}
