@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [dev]
+        env: [dev]
         test: [dms] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
@@ -19,7 +19,7 @@ jobs:
         # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: ${{ matrix.env }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
       REGION: ${{ vars.REGION }}
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup test environment
+      - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
           cache-data: true
@@ -43,7 +43,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
-          environment: ${{ matrix.environment }}
+          env: ${{ matrix.env }}
           save-to-cache: true
 
       - name: Send Slack notification on failure

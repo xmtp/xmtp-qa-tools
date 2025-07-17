@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [large]
-        environment: [dev, production]
+        env: [dev, production]
         BATCH_SIZE: [10-50, 100-150, 200-250]
         include:
           - BATCH_SIZE: 10-50
@@ -25,14 +25,14 @@ jobs:
             delay_minutes: 10
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       BATCH_SIZE: ${{ matrix.BATCH_SIZE }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup test environment
+      - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Delay execution to spread batch runs
@@ -47,7 +47,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
-          environment: ${{ matrix.environment }}
+          env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
