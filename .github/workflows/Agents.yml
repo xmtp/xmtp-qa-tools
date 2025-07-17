@@ -14,17 +14,17 @@ jobs:
       fail-fast: false
       matrix:
         test: [agents-dms, agents-tagged, agents-untagged]
-        environment: [dev, production]
+        env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup test environment
+      - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
@@ -35,7 +35,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
-          environment: ${{ matrix.environment }}
+          env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()

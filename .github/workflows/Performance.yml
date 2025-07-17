@@ -15,10 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        environment: [dev, production]
+        env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       GH_CACHE: true
       BATCH_SIZE: 5-10-50-100-150"
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup test environment
+      - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
@@ -38,7 +38,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
-          environment: ${{ matrix.environment }}
+          env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()

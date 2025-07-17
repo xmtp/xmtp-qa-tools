@@ -46,4 +46,4 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           test-name: ${{ matrix.test }}
-          environment: ${{ matrix.environment }}
+          env: ${{ matrix.env }}

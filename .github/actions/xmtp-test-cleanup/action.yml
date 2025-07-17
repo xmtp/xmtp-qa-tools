@@ -5,8 +5,8 @@ inputs:
   test-name:
     description: "Name of the test for notifications and artifact naming"
     required: true
-  environment:
-    description: "Test environment (dev, production, etc.)"
+  env:
+    description: "Test env (dev, production, etc.)"
     required: true
   retention-days:
     description: "Number of days to retain artifacts"
@@ -20,11 +20,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Upload logs and environment
+    - name: Upload logs and env
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.environment }}-${{ inputs.test-name }}-logs
+        name: ${{ inputs.env }}-${{ inputs.test-name }}-logs
         path: |
           logs/**/*
           .env
@@ -37,7 +37,7 @@ runs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.environment }}-${{ inputs.test-name }}-dbs
+        name: ${{ inputs.env }}-${{ inputs.test-name }}-dbs
         path: |
           .data/**/*
         if-no-files-found: ignore

@@ -79,7 +79,7 @@ async function main() {
   console.log(`Revoking installations for ${exampleName}...`);
   console.log(`Inbox ID: ${inboxId}`);
   console.log(`Max installations: ${maxInstallations}`);
-  console.log(`Environment: ${envVars.XMTP_ENV}`);
+  console.log(`Env: ${envVars.XMTP_ENV}`);
   if (installationsToRevoke !== null) {
     console.log(`Manual revoke count: ${installationsToRevoke}`);
   }

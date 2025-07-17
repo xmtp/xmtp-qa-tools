@@ -29,7 +29,7 @@ describe(testName, async () => {
   // Handle case where no agents are configured for the current environment
   if (filteredAgents.length === 0) {
     it(`${env}: No agents configured for this environment`, () => {
-      console.log(`No agents found for environment: ${env}`);
+      console.log(`No agents found for env: ${env}`);
       expect(true).toBe(true); // Pass the test
     });
     return;
