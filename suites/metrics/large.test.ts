@@ -69,18 +69,13 @@ describe(testName, async () => {
         newGroupBetweenAll,
         workers.getAllButCreator(),
       );
-      const responseMetricTags: ResponseMetricTags = {
+
+      sendMetric("response", verifyResult.averageEventTiming, {
         test: testName,
         metric_type: "stream",
         metric_subtype: "message",
         sdk: workers.getCreator().sdk,
-      };
-
-      sendMetric(
-        "response",
-        verifyResult.averageEventTiming,
-        responseMetricTags,
-      );
+      } as ResponseMetricTags);
 
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);

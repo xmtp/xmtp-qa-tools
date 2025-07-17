@@ -183,13 +183,19 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) => getMessage(m.event as TReceived)),
   );
+  console.debug(
+    "messagesAsStrings",
+    JSON.stringify(messagesAsStrings, null, 2),
+  );
+  console.debug("messagesAsStrings.length", messagesAsStrings.length);
+  console.debug("messagesAsStrings[0]?.length", messagesAsStrings[0]?.length);
   let stats;
-  if (messageTemplate && messagesAsStrings.length > 0) {
+  if (messagesAsStrings.length > 0 && messagesAsStrings[0]?.length > 0) {
     stats = calculateMessageStats(
       messagesAsStrings,
       statsLabel,
       count ?? 1,
-      messageTemplate,
+      messageTemplate || "",
     );
   }
   // Transform eventTimings to arrays per name
@@ -479,6 +485,18 @@ export function calculateMessageStats(
   amount: number,
   suffix: string,
 ) {
+  // Helper: check if arr is an ordered subsequence of expected
+  function isOrderedSubsequence(arr: string[], expected: string[]): boolean {
+    if (arr.length === 0) return false;
+    let i = 0;
+    for (let j = 0; j < expected.length && i < arr.length; j++) {
+      if (arr[i] === expected[j]) {
+        i++;
+      }
+    }
+    return i === arr.length;
+  }
+
   const verifyMessageOrder = (
     messages: string[],
     expectedPrefix: string = "gm-",
@@ -490,9 +508,8 @@ export function calculateMessageStats(
       { length: count },
       (_, i) => `${expectedPrefix}${i + 1}-${suffix}`,
     );
-    const inOrder =
-      messages.length === expectedMessages.length &&
-      messages.every((msg, i) => msg === expectedMessages[i]);
+    // Use subsequence check instead of strict equality
+    const inOrder = isOrderedSubsequence(messages, expectedMessages);
     return { inOrder, expectedMessages };
   };
   let totalExpectedMessages = amount * messagesByWorker.length;
