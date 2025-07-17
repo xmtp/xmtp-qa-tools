@@ -2,7 +2,7 @@ name: Cached Performance
 description: "should verify performance with cache"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "30 */5 * * *" # Runs every 5 hours at 30 minutes past
   workflow_dispatch:
