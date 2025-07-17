@@ -1,3 +1,4 @@
+import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
@@ -92,6 +93,15 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     const verifyResult = await verifyMessageStream(dm!, [workers.getAll()[1]]);
+
+    const responseMetricTags: ResponseMetricTags = {
+      test: testName,
+      metric_type: "stream",
+      metric_subtype: "message",
+      sdk: workers.getCreator().sdk,
+    };
+    sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
+
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.almostAllReceived).toBe(true);
   });
@@ -138,6 +148,17 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getAllButCreator(),
+      );
+      const responseMetricTags: ResponseMetricTags = {
+        test: testName,
+        metric_type: "stream",
+        metric_subtype: "message",
+        sdk: workers.getCreator().sdk,
+      };
+      sendMetric(
+        "response",
+        verifyResult.averageEventTiming,
+        responseMetricTags,
       );
       setCustomDuration(verifyResult?.averageEventTiming ?? 0);
       expect(verifyResult.allReceived).toBe(true);
