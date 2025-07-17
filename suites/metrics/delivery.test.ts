@@ -1,4 +1,8 @@
-import { sendMetric, type DeliveryMetricTags } from "@helpers/datadog";
+import {
+  sendMetric,
+  type DeliveryMetricTags,
+  type ResponseMetricTags,
+} from "@helpers/datadog";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -38,6 +42,14 @@ describe(testName, () => {
       MESSAGE_COUNT,
       `stream-{i}-${randomSuffix}`,
     );
+
+    const responseMetricTags: ResponseMetricTags = {
+      test: testName,
+      metric_type: "stream",
+      metric_subtype: "message",
+      sdk: workers.getCreator().sdk,
+    };
+    sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
 
     const receptionPercentage = verifyResult.receptionPercentage ?? 0;
     const orderPercentage = verifyResult.orderPercentage ?? 0;
