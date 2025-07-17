@@ -202,7 +202,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### Large inbox sync performance summary
+### Large inbox syncs
 
 | Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
 | ---------- | -------------- | ------------ | --------------- | ------------------ |
@@ -223,9 +223,9 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
-## Testing Summary
+## Testing summary
 
-### Test coverage
+#### Test coverage
 
 - Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
 - Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
@@ -237,7 +237,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - Bugs: Historical issue reproduction and regression prevention
 - Other: Security, spam detection, rate limiting, storage efficiency
 
-### Testing framework
+#### Testing framework
 
 - Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
 - Stream verification: Message delivery, conversation streams, metadata updates
@@ -251,7 +251,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - Slack Bot: AI-powered responses, history fetching, log management
 - Geographic testing: Multi-region performance across US, Europe, Asia, South America
 
-### Metrics tracked
+#### Metrics tracked
 
 - Delivery: 100% success rate (target: 99.9%)
 - Performance: <350ms core operations, <200ms messaging, <150ms TLS
@@ -283,7 +283,7 @@ LOGGING_LEVEL="error" # Rust library logs
 LOG_LEVEL="debug" # JS logs level
 ```
 
-#### Running tests
+### Running tests
 
 To get started set up the environment in [variables](./.env.example) and run the tests with:
 
@@ -309,7 +309,7 @@ yarn test functional --debug
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
 
-### Resources
+#### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)
 - **Local:** Work in local network - [see section](/dev/)
