@@ -1,4 +1,4 @@
-import { sleep } from "@helpers/client";
+import { sleep, streamTimeout } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -85,31 +85,39 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it("conversation stream when creating the group", async () => {
-    await xmtpTester.newGroupFromUI(
-      [...getInboxIds(4), creator.inboxId],
-      false,
-    );
-    const conversationStream = creator.client.conversations.stream();
-    for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation?.id);
-      expect(conversation?.id).toBeDefined();
-      break;
-    }
-  }, 5000);
-
-  it("conversation stream for new member", async () => {
-    groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
-    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
-    const conversationStream = creator.client.conversations.stream();
-    for await (const conversation of conversationStream) {
-      console.log("conversation found", conversation?.id);
-      if (conversation?.id === groupId) {
-        expect(conversation.id).toBe(groupId);
+  it(
+    "conversation stream when creating the group",
+    async () => {
+      await xmtpTester.newGroupFromUI(
+        [...getInboxIds(4), creator.inboxId],
+        false,
+      );
+      const conversationStream = creator.client.conversations.stream();
+      for await (const conversation of conversationStream) {
+        console.log("conversation found", conversation?.id);
+        expect(conversation?.id).toBeDefined();
         break;
       }
-    }
-  }, 5000);
+    },
+    streamTimeout,
+  );
+
+  it(
+    "conversation stream for new member",
+    async () => {
+      groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+      await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+      const conversationStream = creator.client.conversations.stream();
+      for await (const conversation of conversationStream) {
+        console.log("conversation found", conversation?.id);
+        if (conversation?.id === groupId) {
+          expect(conversation.id).toBe(groupId);
+          break;
+        }
+      }
+    },
+    streamTimeout,
+  );
 
   it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({

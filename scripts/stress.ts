@@ -12,13 +12,8 @@ import {
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
-  validateEnvironment,
 } from "@helpers/client";
 import { generatePrivateKey } from "viem/accounts";
-
-// yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
-// yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
-const { XMTP_ENV, ADDRESS } = validateEnvironment(["XMTP_ENV", "ADDRESS"]);
 
 interface Config {
   userCount: number;
@@ -33,8 +28,8 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     timeout: 30 * 1000, // 120 seconds - increased for XMTP operations
-    env: XMTP_ENV,
-    address: ADDRESS,
+    env: process.env.XMTP_ENV ?? "production",
+    address: "0x2d72a5910ca8df3ab6ff457161f9101539edf5f8",
     tresshold: 95,
   };
 
