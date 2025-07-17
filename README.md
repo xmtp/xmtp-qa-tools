@@ -283,7 +283,7 @@ LOGGING_LEVEL="error" # Rust library logs
 LOG_LEVEL="debug" # JS logs level
 ```
 
-### Running tests
+#### Running tests
 
 To get started set up the environment in [variables](./.env.example) and run the tests with:
 
