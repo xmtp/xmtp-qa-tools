@@ -293,6 +293,24 @@ export const processMessageCommands = (
 };
 
 /**
+ * Get sender address from inbox ID
+ */
+export const getSenderAddress = async (
+  client: Client,
+  senderInboxId: string,
+): Promise<string> => {
+  const inboxState = await client.preferences.inboxStateFromInboxIds([
+    senderInboxId,
+  ]);
+
+  if (!inboxState[0]?.identifiers[0]?.identifier) {
+    throw new Error(`Unable to get address for inbox ID: ${senderInboxId}`);
+  }
+
+  return inboxState[0].identifiers[0].identifier;
+};
+
+/**
  * Core message processing logic moved from xmtp-handler
  * @param client The XMTP client
  * @param message The decoded message
