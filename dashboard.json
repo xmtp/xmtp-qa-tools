@@ -385,7 +385,7 @@
             "response_format": "event_list",
             "query": {
               "data_source": "logs_stream",
-              "query_string": "@service:xmtp-qa-tools env:$env",
+              "query_string": "@service:xmtp-qa-tools",
               "indexes": [],
               "storage": "hot"
             },
