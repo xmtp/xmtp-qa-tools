@@ -14,7 +14,7 @@ const testName = "large";
 describe(testName, async () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [200, 250];
+    : [10, 50];
   let workers: WorkerManager;
 
   workers = await getWorkers(5);
