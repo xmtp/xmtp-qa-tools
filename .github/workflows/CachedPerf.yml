@@ -4,7 +4,7 @@ description: "should verify performance "
 on:
   #pull_request:
   schedule:
-    - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
+    - cron: "30 */5 * * *" # Runs every 5 hours at 30 minutes past
   workflow_dispatch:
 
 jobs:
