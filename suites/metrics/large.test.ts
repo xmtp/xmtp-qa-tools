@@ -1,3 +1,5 @@
+import { streamTimeout } from "@helpers/client";
+import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -63,6 +65,18 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
+      );
+      const responseMetricTags: ResponseMetricTags = {
+        test: testName,
+        metric_type: "stream",
+        metric_subtype: "message",
+        sdk: workers.getCreator().sdk,
+      };
+
+      sendMetric(
+        "response",
+        verifyResult.averageEventTiming,
+        responseMetricTags,
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
