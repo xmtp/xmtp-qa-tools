@@ -1,4 +1,3 @@
-import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import {
   verifyMembershipStream,
@@ -15,7 +14,7 @@ const testName = "large";
 describe(testName, async () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [5, 10];
+    : [200, 250];
   let workers: WorkerManager;
 
   workers = await getWorkers(5);
@@ -49,8 +48,12 @@ describe(testName, async () => {
       );
     });
 
+    it(`syncGroup-${groupSize}: should sync a large group of ${groupSize} participants ${groupSize}`, async () => {
+      await newGroupBetweenAll.sync();
+    });
     it(`addMember-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
       const extraMember = allMembersWithExtra.slice(groupSize, groupSize + 1);
+      console.log(extraMember);
       const verifyResult = await verifyMembershipStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
