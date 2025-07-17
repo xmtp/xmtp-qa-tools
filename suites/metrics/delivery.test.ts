@@ -58,125 +58,125 @@ describe(testName, async () => {
     expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
   });
 
-  // it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
-  //   // Send messages first
-  //   const randomSuffix = Math.random().toString(36).substring(2, 15);
-  //   for (let i = 1; i <= MESSAGE_COUNT; i++) {
-  //     await group.send(`poll-${i}-${randomSuffix}`);
-  //   }
+  it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
+    // Send messages first
+    const randomSuffix = Math.random().toString(36).substring(2, 15);
+    for (let i = 1; i <= MESSAGE_COUNT; i++) {
+      await group.send(`poll-${i}-${randomSuffix}`);
+    }
 
-  //   // Poll messages from all receivers
-  //   const messagesByWorker: string[][] = [];
-  //   for (const worker of workers.getAllButCreator()) {
-  //     const conversation =
-  //       await worker.client.conversations.getConversationById(group.id);
-  //     const messages = await conversation?.messages();
+    // Poll messages from all receivers
+    const messagesByWorker: string[][] = [];
+    for (const worker of workers.getAllButCreator()) {
+      const conversation =
+        await worker.client.conversations.getConversationById(group.id);
+      const messages = await conversation?.messages();
 
-  //     const filteredMessages =
-  //       messages
-  //         ?.filter(
-  //           (msg) =>
-  //             msg.contentType?.typeId === "text" &&
-  //             (msg.content as string).includes(`poll-`) &&
-  //             (msg.content as string).includes(randomSuffix),
-  //         )
-  //         .map((msg) => msg.content as string) ?? [];
+      const filteredMessages =
+        messages
+          ?.filter(
+            (msg) =>
+              msg.contentType?.typeId === "text" &&
+              (msg.content as string).includes(`poll-`) &&
+              (msg.content as string).includes(randomSuffix),
+          )
+          .map((msg) => msg.content as string) ?? [];
 
-  //     messagesByWorker.push(filteredMessages);
-  //   }
+      messagesByWorker.push(filteredMessages);
+    }
 
-  //   const stats = calculateMessageStats(
-  //     messagesByWorker,
-  //     "poll-",
-  //     MESSAGE_COUNT,
-  //     randomSuffix,
-  //   );
+    const stats = calculateMessageStats(
+      messagesByWorker,
+      "poll-",
+      MESSAGE_COUNT,
+      randomSuffix,
+    );
 
-  //   sendMetric("delivery", stats.receptionPercentage, {
-  //     sdk: workers.getCreator().sdk,
-  //     test: testName,
-  //     metric_type: "delivery",
-  //     metric_subtype: "poll",
-  //     conversation_type: "group",
-  //   } as DeliveryMetricTags);
+    sendMetric("delivery", stats.receptionPercentage, {
+      sdk: workers.getCreator().sdk,
+      test: testName,
+      metric_type: "delivery",
+      metric_subtype: "poll",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
 
-  //   sendMetric("order", stats.orderPercentage, {
-  //     sdk: workers.getCreator().sdk,
-  //     test: testName,
-  //     metric_type: "order",
-  //     metric_subtype: "poll",
-  //     conversation_type: "group",
-  //   } as DeliveryMetricTags);
+    sendMetric("order", stats.orderPercentage, {
+      sdk: workers.getCreator().sdk,
+      test: testName,
+      metric_type: "order",
+      metric_subtype: "poll",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
 
-  //   console.log("orderPercentage", stats.orderPercentage);
-  //   console.log("receptionPercentage", stats.receptionPercentage);
-  //   expect(stats.orderPercentage).toBeGreaterThan(99);
-  //   expect(stats.receptionPercentage).toBeGreaterThan(99);
-  // });
+    console.log("orderPercentage", stats.orderPercentage);
+    console.log("receptionPercentage", stats.receptionPercentage);
+    expect(stats.orderPercentage).toBeGreaterThan(99);
+    expect(stats.receptionPercentage).toBeGreaterThan(99);
+  });
 
-  // it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
-  //   const offlineWorker = workers.getReceiver();
-  //   const randomSuffix = Math.random().toString(36).substring(2, 15);
-  //   console.log(`Stopping streams for ${offlineWorker.name}`);
+  it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
+    const offlineWorker = workers.getReceiver();
+    const randomSuffix = Math.random().toString(36).substring(2, 15);
+    console.log(`Stopping streams for ${offlineWorker.name}`);
 
-  //   // Stop message streams for the worker
-  //   offlineWorker.worker.endStream(typeofStream.Message);
+    // Stop message streams for the worker
+    offlineWorker.worker.endStream(typeofStream.Message);
 
-  //   // Send messages while worker is offline
-  //   console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
-  //   for (let i = 1; i <= MESSAGE_COUNT; i++) {
-  //     await group.send(`recovery-${i}-${randomSuffix}`);
-  //   }
+    // Send messages while worker is offline
+    console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
+    for (let i = 1; i <= MESSAGE_COUNT; i++) {
+      await group.send(`recovery-${i}-${randomSuffix}`);
+    }
 
-  //   // Resume streams and sync
-  //   console.log(`Resuming streams for ${offlineWorker.name}`);
-  //   offlineWorker.worker.startStream(typeofStream.Message);
+    // Resume streams and sync
+    console.log(`Resuming streams for ${offlineWorker.name}`);
+    offlineWorker.worker.startStream(typeofStream.Message);
 
-  //   // Sync conversations to catch up
-  //   await offlineWorker.client.conversations.sync();
-  //   const conversation =
-  //     await offlineWorker.client.conversations.getConversationById(group.id);
-  //   await conversation?.sync();
+    // Sync conversations to catch up
+    await offlineWorker.client.conversations.sync();
+    const conversation =
+      await offlineWorker.client.conversations.getConversationById(group.id);
+    await conversation?.sync();
 
-  //   // Check recovered messages
-  //   const messages = await conversation?.messages();
-  //   const recoveredMessages =
-  //     messages
-  //       ?.filter(
-  //         (msg) =>
-  //           msg.content &&
-  //           typeof msg.content === "string" &&
-  //           msg.content.includes(`recovery-`) &&
-  //           msg.content.includes(randomSuffix),
-  //       )
-  //       .map((msg) => msg.content as string) ?? [];
+    // Check recovered messages
+    const messages = await conversation?.messages();
+    const recoveredMessages =
+      messages
+        ?.filter(
+          (msg) =>
+            msg.content &&
+            typeof msg.content === "string" &&
+            msg.content.includes(`recovery-`) &&
+            msg.content.includes(randomSuffix),
+        )
+        .map((msg) => msg.content as string) ?? [];
 
-  //   const stats = calculateMessageStats(
-  //     [recoveredMessages],
-  //     "recovery-",
-  //     MESSAGE_COUNT,
-  //     randomSuffix,
-  //   );
+    const stats = calculateMessageStats(
+      [recoveredMessages],
+      "recovery-",
+      MESSAGE_COUNT,
+      randomSuffix,
+    );
 
-  //   sendMetric("delivery", stats.receptionPercentage, {
-  //     sdk: offlineWorker.sdk,
-  //     test: testName,
-  //     metric_type: "delivery",
-  //     metric_subtype: "recovery",
-  //     conversation_type: "group",
-  //   } as DeliveryMetricTags);
+    sendMetric("delivery", stats.receptionPercentage, {
+      sdk: offlineWorker.sdk,
+      test: testName,
+      metric_type: "delivery",
+      metric_subtype: "recovery",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
 
-  //   sendMetric("order", stats.orderPercentage, {
-  //     sdk: offlineWorker.sdk,
-  //     test: testName,
-  //     metric_type: "order",
-  //     metric_subtype: "recovery",
-  //     conversation_type: "group",
-  //   } as DeliveryMetricTags);
+    sendMetric("order", stats.orderPercentage, {
+      sdk: offlineWorker.sdk,
+      test: testName,
+      metric_type: "order",
+      metric_subtype: "recovery",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
 
-  //   console.log("orderPercentage", stats.orderPercentage);
-  //   console.log("receptionPercentage", stats.receptionPercentage);
-  //   expect(stats.orderPercentage).toBeGreaterThan(99);
-  //   expect(stats.receptionPercentage).toBeGreaterThan(99);
-  // });
+    console.log("orderPercentage", stats.orderPercentage);
+    console.log("receptionPercentage", stats.receptionPercentage);
+    expect(stats.orderPercentage).toBeGreaterThan(99);
+    expect(stats.receptionPercentage).toBeGreaterThan(99);
+  });
 });
