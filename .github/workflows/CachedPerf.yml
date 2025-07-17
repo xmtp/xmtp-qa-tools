@@ -1,8 +1,8 @@
-name: Performance
-description: "should verify performance "
+name: Cached Performance
+description: "should verify performance with cache"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "30 */5 * * *" # Runs every 5 hours at 30 minutes past
   workflow_dispatch:
@@ -15,13 +15,13 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        env: [dev, production]
+        env: [dev]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       GH_CACHE: true
-      BATCH_SIZE: 5-10-50-100-150"
+      BATCH_SIZE: 5-10-50-100-150
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
