@@ -81,9 +81,9 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Operation performance
+## Operations
 
-### Core SDK operations performance
+### Core SDK operations
 
 | Operation                | Description                            | Avg | Target | Performance |
 | ------------------------ | -------------------------------------- | --- | ------ | ----------- |
@@ -101,9 +101,9 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | sendGroupMessage         | Sending a group message                | 85  | <200   | On Target   |
 | receiveGroupMessage      | Processing group message strea         | 124 | <200   | On Target   |
 
-### Group operations performance
+### Group operations
 
-#### Sender-side average performance
+#### Sender-side average
 
 | Size | Send message | Update name | Remove members | Create | Performance |
 | ---- | ------------ | ----------- | -------------- | ------ | ----------- |
@@ -118,7 +118,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
-#### Receiver-side stream performance
+#### Receiver-side stream
 
 | Group Size | New conversation | Metadata | Messages | Add Members | Performance |
 | ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
@@ -133,7 +133,7 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
-#### Receiver-side sync performance
+#### Receiver-side sync
 
 | Size | syncAll |      | sync |      | Performance |
 | ---- | ------- | ---- | ---- | ---- | ----------- |
@@ -148,7 +148,7 @@ _Note: This measurments are taken only from the receiver side and after the grou
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
-## Networks performance
+## Networks
 
 ### Network performance
 
