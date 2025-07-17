@@ -1,7 +1,7 @@
 import { getRandomValues } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { IdentifierKind,  Client,  Signer } from "@xmtp/node-sdk";
+import { Client, IdentifierKind, type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -75,8 +75,6 @@ export const getDbPath = (description: string = "xmtp") => {
   }
   return `${volumePath}/${description}.db3`;
 };
-
-
 
 export const logAgentDetails = async (
   clients: Client | Client[],
