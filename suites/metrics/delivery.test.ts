@@ -10,8 +10,6 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "delivery";
-const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "100");
-const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
 
 describe(testName, async () => {
   setupTestLifecycle({
@@ -19,6 +17,8 @@ describe(testName, async () => {
     sendMetrics: true,
     sendDurationMetrics: true,
   });
+  const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "100");
+  const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
   const workers = await getWorkers(WORKER_COUNT);
   const group = await workers.createGroupBetweenAll();
 
@@ -29,22 +29,14 @@ describe(testName, async () => {
       MESSAGE_COUNT,
     );
 
-    const responseMetricTags: ResponseMetricTags = {
+    sendMetric("response", verifyResult.averageEventTiming, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
       sdk: workers.getCreator().sdk,
-    };
-    sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
+    } as ResponseMetricTags);
 
-    const receptionPercentage = verifyResult.receptionPercentage ?? 0;
-    const orderPercentage = verifyResult.orderPercentage ?? 0;
-
-    console.log(
-      `Stream - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
-    );
-
-    sendMetric("delivery", receptionPercentage, {
+    sendMetric("delivery", verifyResult.receptionPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "delivery",
@@ -52,7 +44,7 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    sendMetric("order", orderPercentage, {
+    sendMetric("order", verifyResult.orderPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "order",
@@ -60,8 +52,10 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    expect(orderPercentage).toBeGreaterThan(99);
-    expect(receptionPercentage).toBeGreaterThan(99);
+    console.log("orderPercentage", verifyResult.orderPercentage);
+    console.log("receptionPercentage", verifyResult.receptionPercentage);
+    expect(verifyResult.orderPercentage).toBeGreaterThan(99);
+    expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
   });
 
   it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
@@ -97,14 +91,8 @@ describe(testName, async () => {
       MESSAGE_COUNT,
       randomSuffix,
     );
-    const receptionPercentage = stats.receptionPercentage ?? 0;
-    const orderPercentage = stats.orderPercentage ?? 0;
 
-    console.log(
-      `Poll - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
-    );
-
-    sendMetric("delivery", receptionPercentage, {
+    sendMetric("delivery", stats.receptionPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "delivery",
@@ -112,7 +100,7 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    sendMetric("order", orderPercentage, {
+    sendMetric("order", stats.orderPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "order",
@@ -120,8 +108,10 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    expect(orderPercentage).toBeGreaterThan(99);
-    expect(receptionPercentage).toBeGreaterThan(99);
+    console.log("orderPercentage", stats.orderPercentage);
+    console.log("receptionPercentage", stats.receptionPercentage);
+    expect(stats.orderPercentage).toBeGreaterThan(99);
+    expect(stats.receptionPercentage).toBeGreaterThan(99);
   });
 
   it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
@@ -167,14 +157,8 @@ describe(testName, async () => {
       MESSAGE_COUNT,
       randomSuffix,
     );
-    const receptionPercentage = stats.receptionPercentage ?? 0;
-    const orderPercentage = stats.orderPercentage ?? 0;
 
-    console.log(
-      `Recovery - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
-    );
-
-    sendMetric("delivery", receptionPercentage, {
+    sendMetric("delivery", stats.receptionPercentage, {
       sdk: offlineWorker.sdk,
       test: testName,
       metric_type: "delivery",
@@ -182,7 +166,7 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    sendMetric("order", orderPercentage, {
+    sendMetric("order", stats.orderPercentage, {
       sdk: offlineWorker.sdk,
       test: testName,
       metric_type: "order",
@@ -190,7 +174,9 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    expect(orderPercentage).toBeGreaterThan(99);
-    expect(receptionPercentage).toBeGreaterThan(99);
+    console.log("orderPercentage", stats.orderPercentage);
+    console.log("receptionPercentage", stats.receptionPercentage);
+    expect(stats.orderPercentage).toBeGreaterThan(99);
+    expect(stats.receptionPercentage).toBeGreaterThan(99);
   });
 });
