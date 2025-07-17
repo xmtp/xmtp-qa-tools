@@ -83,7 +83,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Operation performance
 
-### Core SDK Operations Performance
+### Core SDK operations performance
 
 | Operation                | Description                            | Avg | Target | Performance |
 | ------------------------ | -------------------------------------- | --- | ------ | ----------- |
@@ -103,7 +103,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Group operations performance
 
-#### Sender-Side average performance
+#### Sender-side average performance
 
 | Size | Send message | Update name | Remove members | Create | Performance |
 | ---- | ------------ | ----------- | -------------- | ------ | ----------- |
@@ -118,7 +118,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
-#### Receiver-Side stream performance
+#### Receiver-side stream performance
 
 | Group Size | New conversation | Metadata | Messages | Add Members | Performance |
 | ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
@@ -133,7 +133,7 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
-#### Receiver-Side sync performance
+#### Receiver-side sync performance
 
 | Size | syncAll |      | sync |      | Performance |
 | ---- | ------- | ---- | ---- | ---- | ----------- |
@@ -160,7 +160,7 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 | Processing         | 35      | <100   | On Target   |
 | Server Call        | 159     | <250   | On Target   |
 
-### Regional Network Performance
+### Regional network performance
 
 | Region        | Server Call | TLS | ~ us-east | Performance |
 | ------------- | ----------- | --- | --------- | ----------- |
@@ -191,7 +191,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Storage
 
-### Storage by Group Size
+### Storage by group size
 
 | Group Size  | Groups | Sender storage | Avg Group Size | Receiver storage | Efficiency Gain |
 | ----------- | ------ | -------------- | -------------- | ---------------- | --------------- |
@@ -202,7 +202,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### Large Inbox Sync Performance Summary
+### Large inbox sync performance summary
 
 | Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
 | ---------- | -------------- | ------------ | --------------- | ------------------ |
@@ -261,12 +261,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Development
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js (>20.18.0)
 - Yarn 4.6.0
 
-### Installation
+#### Installation
 
 ```bash
 # Installation For a faster download with just the latest code
@@ -275,7 +275,7 @@ cd xmtp-qa-tools
 yarn install
 ```
 
-### Environment variables
+#### Environment variables
 
 ```bash
 XMTP_ENV="dev" #  environment (dev, production, local, multinode)
@@ -296,7 +296,7 @@ yarn test functional
 yarn test performance
 ```
 
-### Debug mode
+#### Debug mode
 
 ```bash
 yarn test functional --debug
@@ -304,7 +304,7 @@ yarn test functional --debug
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-### Rate limits
+#### Rate limits
 
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
