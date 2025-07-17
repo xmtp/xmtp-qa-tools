@@ -73,7 +73,7 @@
     {
       "id": 2409904999307821,
       "definition": {
-        "title": "Avg Agent Response Time (ms)",
+        "title": "Avg response time (ms)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -84,14 +84,14 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.response{$env,$region,metric_type:agent}"
+                "query": "avg:xmtp.sdk.response{$env,$region, $sdk}"
               }
             ],
             "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
               {
                 "comparator": "<=",
-                "value": 1000,
+                "value": 3000,
                 "palette": "white_on_green"
               },
               {
@@ -147,7 +147,7 @@
     {
       "id": 5871193681027559,
       "definition": {
-        "title": "Delivery Rate & Order",
+        "title": "Streams",
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
@@ -167,7 +167,7 @@
             "response_format": "timeseries",
             "on_right_yaxis": true,
             "style": {
-              "palette": "dog_classic",
+              "palette": "cool",
               "line_type": "solid",
               "line_width": "normal"
             },
@@ -184,8 +184,8 @@
             ],
             "response_format": "timeseries",
             "style": {
-              "palette": "blue",
-              "order_reverse": true,
+              "palette": "datadog16",
+              "order_reverse": false,
               "line_type": "solid",
               "line_width": "thick"
             },
@@ -226,7 +226,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.response{$env,$region, metric_subtype:dm, metric_type:agent} by {agent}"
+                "query": "avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}"
               }
             ],
             "formulas": [{ "formula": "query1" }],
@@ -237,7 +237,8 @@
             },
             "display_type": "line"
           }
-        ]
+        ],
+        "yaxis": { "include_zero": true, "max": "auto" }
       },
       "layout": { "x": 0, "y": 3, "width": 6, "height": 3 }
     },
@@ -252,7 +253,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,installations,members}"
+                "query": "avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,members,region,env}"
               }
             ],
             "response_format": "scalar",
@@ -271,7 +272,6 @@
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
-        "time": {},
         "type": "query_table",
         "requests": [
           {
@@ -321,7 +321,7 @@
               {
                 "name": "query2",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members,operation:newgroup} by {members,operation}"
+                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_large, operation:newgroup} by {members,operation}"
               }
             ],
             "formulas": [{ "alias": "newGroup", "formula": "query2" }],
@@ -344,7 +344,6 @@
         "show_legend": true,
         "legend_layout": "auto",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -386,7 +385,7 @@
             "response_format": "event_list",
             "query": {
               "data_source": "logs_stream",
-              "query_string": "@service:xmtp-qa-tools",
+              "query_string": "@service:xmtp-qa-tools env:$env",
               "indexes": [],
               "storage": "hot"
             },
@@ -418,7 +417,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call} by {country_iso_code}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call, $sdk, $env} by {country_iso_code}"
               }
             ],
             "response_format": "scalar",

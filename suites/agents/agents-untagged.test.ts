@@ -1,6 +1,7 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
+import { sleep } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
@@ -49,12 +50,8 @@ describe(testName, async () => {
           },
         ]);
 
-      //Ignore welcome message
-      await verifyAgentMessageStream(
-        conversation as Conversation,
-        [workers.getCreator()],
-        "hi",
-      );
+      await conversation.send("ignore welcome");
+      await sleep(2000);
       //Ignore welcome message
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
@@ -71,7 +68,7 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
 
-      if (!result?.allReceived) console.warn(agent.name, "FAILED");
+      if (result?.allReceived) console.warn(agent.name, "FAILED");
       expect(result?.allReceived).toBe(false);
     });
   }
