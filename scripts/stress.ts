@@ -305,6 +305,7 @@ async function runStressTest(config: Config): Promise<void> {
       );
     }
   } catch (error) {
+    console.log(error);
     console.log(`❌ Test timed out - gathering partial results...`);
 
     // Collect partial results from completed workers
