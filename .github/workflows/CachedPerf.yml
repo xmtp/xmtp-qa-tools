@@ -1,5 +1,5 @@
-name: Performance
-description: "should verify performance "
+name: Cached Performance
+description: "should verify performance with cache"
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        env: [dev, production]
+        env: [dev]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
