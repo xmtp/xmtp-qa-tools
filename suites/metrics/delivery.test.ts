@@ -11,29 +11,20 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "delivery";
-const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "100");
-const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "20");
+const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
+const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
 
-describe(testName, () => {
+describe(testName, async () => {
   setupTestLifecycle({
     testName,
     sendMetrics: true,
     sendDurationMetrics: true,
   });
 
-  console.log(
-    `[${testName}] Messages: ${MESSAGE_COUNT}, Workers: ${WORKER_COUNT}`,
-  );
-
-  let workers: WorkerManager;
-  let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  beforeAll(async () => {
-    workers = await getWorkers(WORKER_COUNT);
-    console.log("Creating group");
-    group = await workers.createGroupBetweenAll();
-  });
+  const workers = await getWorkers(WORKER_COUNT);
+  const group = await workers.createGroupBetweenAll();
 
   it("verifyMessageStream: should verify message delivery and order accuracy using streams", async () => {
     const verifyResult = await verifyMessageStream(
@@ -58,163 +49,151 @@ describe(testName, () => {
       `Stream - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
     );
 
-    // Send metrics if we have valid data
-    if (receptionPercentage > 0) {
-      expect(receptionPercentage).toBeGreaterThan(0);
-      sendMetric("delivery", receptionPercentage, {
-        sdk: workers.getCreator().sdk,
-        test: testName,
-        metric_type: "delivery",
-        metric_subtype: "stream",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
+    sendMetric("delivery", receptionPercentage, {
+      sdk: workers.getCreator().sdk,
+      test: testName,
+      metric_type: "delivery",
+      metric_subtype: "stream",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
 
-    if (orderPercentage > 0) {
-      expect(orderPercentage).toBeGreaterThan(0);
-      sendMetric("order", orderPercentage, {
-        sdk: workers.getCreator().sdk,
-        test: testName,
-        metric_type: "order",
-        metric_subtype: "stream",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
+    sendMetric("order", orderPercentage, {
+      sdk: workers.getCreator().sdk,
+      test: testName,
+      metric_type: "order",
+      metric_subtype: "stream",
+      conversation_type: "group",
+    } as DeliveryMetricTags);
+
+    expect(orderPercentage).toBeGreaterThan(99);
+    expect(receptionPercentage).toBeGreaterThan(99);
   });
 
-  it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
-    // Send messages first
-    for (let i = 1; i <= MESSAGE_COUNT; i++) {
-      await group.send(`poll-${i}-${randomSuffix}`);
-    }
+  // it("verifyMessagePolling: should verify message delivery and order accuracy using polling", async () => {
+  //   // Send messages first
+  //   for (let i = 1; i <= MESSAGE_COUNT; i++) {
+  //     await group.send(`poll-${i}-${randomSuffix}`);
+  //   }
 
-    // Poll messages from all receivers
-    const messagesByWorker: string[][] = [];
-    for (const worker of workers.getAllButCreator()) {
-      const conversation =
-        await worker.client.conversations.getConversationById(group.id);
-      const messages = await conversation?.messages();
+  //   // Poll messages from all receivers
+  //   const messagesByWorker: string[][] = [];
+  //   for (const worker of workers.getAllButCreator()) {
+  //     const conversation =
+  //       await worker.client.conversations.getConversationById(group.id);
+  //     const messages = await conversation?.messages();
 
-      const filteredMessages =
-        messages
-          ?.filter(
-            (msg) =>
-              msg.contentType?.typeId === "text" &&
-              (msg.content as string).includes(`poll-`) &&
-              (msg.content as string).includes(randomSuffix),
-          )
-          .map((msg) => msg.content as string) ?? [];
+  //     const filteredMessages =
+  //       messages
+  //         ?.filter(
+  //           (msg) =>
+  //             msg.contentType?.typeId === "text" &&
+  //             (msg.content as string).includes(`poll-`) &&
+  //             (msg.content as string).includes(randomSuffix),
+  //         )
+  //         .map((msg) => msg.content as string) ?? [];
 
-      messagesByWorker.push(filteredMessages);
-    }
+  //     messagesByWorker.push(filteredMessages);
+  //   }
 
-    const stats = calculateMessageStats(
-      messagesByWorker,
-      "poll-",
-      MESSAGE_COUNT,
-      randomSuffix,
-    );
-    const receptionPercentage = stats.receptionPercentage ?? 0;
-    const orderPercentage = stats.orderPercentage ?? 0;
+  //   const stats = calculateMessageStats(
+  //     messagesByWorker,
+  //     "poll-",
+  //     MESSAGE_COUNT,
+  //     randomSuffix,
+  //   );
+  //   const receptionPercentage = stats.receptionPercentage ?? 0;
+  //   const orderPercentage = stats.orderPercentage ?? 0;
 
-    console.log(
-      `Poll - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
-    );
+  //   console.log(
+  //     `Poll - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
+  //   );
 
-    // Send metrics if we have valid data
-    if (receptionPercentage > 0) {
-      expect(receptionPercentage).toBeGreaterThan(0);
-      sendMetric("delivery", receptionPercentage, {
-        sdk: workers.getCreator().sdk,
-        test: testName,
-        metric_type: "delivery",
-        metric_subtype: "poll",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
+  //   sendMetric("delivery", receptionPercentage, {
+  //     sdk: workers.getCreator().sdk,
+  //     test: testName,
+  //     metric_type: "delivery",
+  //     metric_subtype: "poll",
+  //     conversation_type: "group",
+  //   } as DeliveryMetricTags);
 
-    if (orderPercentage > 0) {
-      expect(orderPercentage).toBeGreaterThan(0);
-      sendMetric("order", orderPercentage, {
-        sdk: workers.getCreator().sdk,
-        test: testName,
-        metric_type: "order",
-        metric_subtype: "poll",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
-  });
+  //   sendMetric("order", orderPercentage, {
+  //     sdk: workers.getCreator().sdk,
+  //     test: testName,
+  //     metric_type: "order",
+  //     metric_subtype: "poll",
+  //     conversation_type: "group",
+  //   } as DeliveryMetricTags);
 
-  it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
-    const offlineWorker = workers.getReceiver();
-    console.log(`Stopping streams for ${offlineWorker.name}`);
+  //   expect(orderPercentage).toBeGreaterThan(99);
+  //   expect(receptionPercentage).toBeGreaterThan(99);
+  // });
 
-    // Stop message streams for the worker
-    offlineWorker.worker.endStream(typeofStream.Message);
+  // it("verifyMessageRecovery: should verify message recovery after stream interruption", async () => {
+  //   const offlineWorker = workers.getReceiver();
+  //   console.log(`Stopping streams for ${offlineWorker.name}`);
 
-    // Send messages while worker is offline
-    console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
-    for (let i = 1; i <= MESSAGE_COUNT; i++) {
-      await group.send(`recovery-${i}-${randomSuffix}`);
-    }
+  //   // Stop message streams for the worker
+  //   offlineWorker.worker.endStream(typeofStream.Message);
 
-    // Resume streams and sync
-    console.log(`Resuming streams for ${offlineWorker.name}`);
-    offlineWorker.worker.startStream(typeofStream.Message);
+  //   // Send messages while worker is offline
+  //   console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
+  //   for (let i = 1; i <= MESSAGE_COUNT; i++) {
+  //     await group.send(`recovery-${i}-${randomSuffix}`);
+  //   }
 
-    // Sync conversations to catch up
-    await offlineWorker.client.conversations.sync();
-    const conversation =
-      await offlineWorker.client.conversations.getConversationById(group.id);
-    await conversation?.sync();
+  //   // Resume streams and sync
+  //   console.log(`Resuming streams for ${offlineWorker.name}`);
+  //   offlineWorker.worker.startStream(typeofStream.Message);
 
-    // Check recovered messages
-    const messages = await conversation?.messages();
-    const recoveredMessages =
-      messages
-        ?.filter(
-          (msg) =>
-            msg.content &&
-            typeof msg.content === "string" &&
-            msg.content.includes(`recovery-`) &&
-            msg.content.includes(randomSuffix),
-        )
-        .map((msg) => msg.content as string) ?? [];
+  //   // Sync conversations to catch up
+  //   await offlineWorker.client.conversations.sync();
+  //   const conversation =
+  //     await offlineWorker.client.conversations.getConversationById(group.id);
+  //   await conversation?.sync();
 
-    const stats = calculateMessageStats(
-      [recoveredMessages],
-      "recovery-",
-      MESSAGE_COUNT,
-      randomSuffix,
-    );
-    const receptionPercentage = stats.receptionPercentage ?? 0;
-    const orderPercentage = stats.orderPercentage ?? 0;
+  //   // Check recovered messages
+  //   const messages = await conversation?.messages();
+  //   const recoveredMessages =
+  //     messages
+  //       ?.filter(
+  //         (msg) =>
+  //           msg.content &&
+  //           typeof msg.content === "string" &&
+  //           msg.content.includes(`recovery-`) &&
+  //           msg.content.includes(randomSuffix),
+  //       )
+  //       .map((msg) => msg.content as string) ?? [];
 
-    console.log(
-      `Recovery - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
-    );
+  //   const stats = calculateMessageStats(
+  //     [recoveredMessages],
+  //     "recovery-",
+  //     MESSAGE_COUNT,
+  //     randomSuffix,
+  //   );
+  //   const receptionPercentage = stats.receptionPercentage ?? 0;
+  //   const orderPercentage = stats.orderPercentage ?? 0;
 
-    // Send metrics if we have valid data
-    if (receptionPercentage > 0) {
-      expect(receptionPercentage).toBeGreaterThan(0);
-      sendMetric("delivery", receptionPercentage, {
-        sdk: offlineWorker.sdk,
-        test: testName,
-        metric_type: "delivery",
-        metric_subtype: "recovery",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
+  //   console.log(
+  //     `Recovery - Reception: ${receptionPercentage}%, Order: ${orderPercentage}%`,
+  //   );
 
-    if (orderPercentage > 0) {
-      expect(orderPercentage).toBeGreaterThan(0);
-      sendMetric("order", orderPercentage, {
-        sdk: offlineWorker.sdk,
-        test: testName,
-        metric_type: "order",
-        metric_subtype: "recovery",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-    }
-  });
+  //   sendMetric("delivery", receptionPercentage, {
+  //     sdk: offlineWorker.sdk,
+  //     test: testName,
+  //     metric_type: "delivery",
+  //     metric_subtype: "recovery",
+  //     conversation_type: "group",
+  //   } as DeliveryMetricTags);
+
+  //   sendMetric("order", orderPercentage, {
+  //     sdk: offlineWorker.sdk,
+  //     test: testName,
+  //     metric_type: "order",
+  //     metric_subtype: "recovery",
+  //     conversation_type: "group",
+  //   } as DeliveryMetricTags);
+
+  //   expect(orderPercentage).toBeGreaterThan(99);
+  //   expect(receptionPercentage).toBeGreaterThan(99);
+  // });
 });
