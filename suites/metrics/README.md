@@ -39,7 +39,7 @@ DELIVERY_AMOUNT=100 yarn test delivery
 ## Environment Variables
 
 ```bash
-XMTP_ENV=dev|production
+XMTP_ENV=dev # dev or production
 BATCH_SIZE=10-50     # Large test only
 DELIVERY_AMOUNT=100       # Delivery test only
 ```
