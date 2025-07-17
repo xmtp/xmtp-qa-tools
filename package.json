@@ -17,6 +17,7 @@
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
+    "dms": "yarn test functional/convos --versions 3",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional --sync all",
     "gen": "tsx inboxes/gen.ts",
