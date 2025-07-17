@@ -78,6 +78,7 @@ describe(testName, async () => {
         result?.averageEventTiming || streamTimeout,
         responseMetricTags,
       );
+      if (!result?.allReceived) console.warn(agent.name, "FAILED");
       expect(result?.allReceived).toBe(true);
     });
   }
