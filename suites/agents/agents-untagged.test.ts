@@ -62,19 +62,14 @@ describe(testName, async () => {
         "hi",
       );
 
-      const responseMetricTags: ResponseMetricTags = {
+      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
-      };
-      sendMetric(
-        "response",
-        result?.averageEventTiming || streamTimeout,
-        responseMetricTags,
-      );
+      } as ResponseMetricTags);
 
       if (!result?.allReceived) console.warn(agent.name, "FAILED");
       expect(result?.allReceived).toBe(false);

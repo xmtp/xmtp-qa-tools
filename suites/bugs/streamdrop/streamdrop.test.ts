@@ -17,7 +17,7 @@ describe(testName, async () => {
     sendMetrics: true,
     sendDurationMetrics: true,
   });
-  const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
+  const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "100");
   const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
   const workers = await getWorkers(WORKER_COUNT);
   const group = await workers.createGroupBetweenAll();
