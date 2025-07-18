@@ -3,7 +3,7 @@ description: "should verify performance of the group streams"
 
 on:
   schedule:
-    - cron: "0 */2 * * *" # Runs every 2 hours at top of hour (30+ min separation from Performance at :15 and :45)
+    - cron: "0 */4 * * *" # Runs every 4 hours at top of hour
   workflow_dispatch:
 
 jobs:
@@ -20,9 +20,9 @@ jobs:
           - BATCH_SIZE: 10-50
             delay_minutes: 0
           - BATCH_SIZE: 100-150
-            delay_minutes: 5
+            delay_minutes: 15
           - BATCH_SIZE: 200-250
-            delay_minutes: 10
+            delay_minutes: 30
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
