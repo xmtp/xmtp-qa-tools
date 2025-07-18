@@ -5,8 +5,8 @@ import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { regressionClient } from "@workers/versions";
 import {
+  Client,
   IdentifierKind,
-  type Client,
   type Conversation,
   type Signer,
   type XmtpEnv,
@@ -177,6 +177,7 @@ export const logAgentDetails = async (
     console.log(`
     ✓ XMTP Client:
     • InboxId: ${inboxId}
+    • Bindings: ${Client.version}
     • Address: ${address}
     • Conversations: ${conversations.length}
     • Installations: ${inboxState.installations.length}
