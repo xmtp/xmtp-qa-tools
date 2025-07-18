@@ -424,7 +424,7 @@ export class WorkerManager {
       }
     }
 
-    // Check if the worker already exists in our internal storage
+    // Check if the worker already exists in our production storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.debug(`Reusing existing worker for ${descriptor}`);
       return this.workers[baseName][providedInstallId];
@@ -466,7 +466,7 @@ export class WorkerManager {
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);
 
-    // Add to our internal storage
+    // Add to our production storage
     this.addWorker(baseName, folder, worker);
 
     return worker;
