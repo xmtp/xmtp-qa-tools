@@ -1,4 +1,4 @@
-import { createSigner, createSigner47 } from "@helpers/client";
+import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
