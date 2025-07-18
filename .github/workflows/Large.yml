@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 20
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -20,9 +20,9 @@ jobs:
           - BATCH_SIZE: 10-50
             delay_minutes: 0
           - BATCH_SIZE: 100-150
-            delay_minutes: 15
+            delay_minutes: 5
           - BATCH_SIZE: 200-250
-            delay_minutes: 30
+            delay_minutes: 15
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}

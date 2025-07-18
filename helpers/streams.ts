@@ -183,21 +183,14 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) => getMessage(m.event as TReceived)),
   );
-  console.debug(
-    "messagesAsStrings",
-    JSON.stringify(messagesAsStrings, null, 2),
+
+  const stats = calculateMessageStats(
+    messagesAsStrings,
+    statsLabel,
+    count ?? 1,
+    messageTemplate || "",
   );
-  console.debug("messagesAsStrings.length", messagesAsStrings.length);
-  console.debug("messagesAsStrings[0]?.length", messagesAsStrings[0]?.length);
-  let stats;
-  if (messagesAsStrings.length > 0 && messagesAsStrings[0]?.length > 0) {
-    stats = calculateMessageStats(
-      messagesAsStrings,
-      statsLabel,
-      count ?? 1,
-      messageTemplate || "",
-    );
-  }
+
   // Transform eventTimings to arrays per name
   const eventTimingsArray: Record<string, number[]> = {};
   for (const [name, timingsObj] of Object.entries(eventTimings)) {
