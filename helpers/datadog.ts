@@ -34,6 +34,7 @@ interface MetricTags {
   test?: string;
   country_iso_code?: string;
   members?: string;
+  installations?: string;
 }
 export interface DeliveryMetricTags extends MetricTags {
   metric_type: "delivery" | "order";
@@ -62,8 +63,6 @@ export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
-  installations?: string;
-  members?: string;
 }
 interface LogPayload {
   metric_type: "log";
