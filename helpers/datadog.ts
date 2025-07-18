@@ -54,6 +54,7 @@ export interface NetworkMetricTags extends MetricTags {
 export interface ResponseMetricTags extends MetricTags {
   agent?: string;
   address?: string;
+  internal?: boolean;
 }
 
 // Legacy interface exports for backward compatibility

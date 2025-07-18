@@ -70,6 +70,7 @@ describe(testName, async () => {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
+        internal: agent.internal || false,
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
