@@ -64,7 +64,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`streamMessage-${groupSize}: should notify all members of message changes in ${groupSize} member group`, async () => {
+    it(`stream-${groupSize}: should notify all members of message changes in ${groupSize} member group`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
