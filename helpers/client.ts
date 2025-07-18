@@ -231,19 +231,6 @@ export async function createClient(
   };
 }
 
-export const createSigner47 = (privateKey: `0x${string}`) => {
-  const account = privateKeyToAccount(privateKey);
-  return {
-    getAddress: () => account.address,
-    signMessage: async (message: string) => {
-      const signature = await account.signMessage({
-        message,
-      });
-      return toBytes(signature);
-    },
-  };
-};
-
 function loadDataPath(name: string, installationId: string): string {
   // Extract the base name without installation ID for folder structure
   const baseName = name.toLowerCase().split("-")[0];
