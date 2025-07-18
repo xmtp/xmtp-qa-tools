@@ -433,7 +433,7 @@ export class WorkerClient extends Worker {
     installationId: string;
     address: `0x${string}`;
   }> {
-    // Tell the Worker to do any internal initialization
+    // Tell the Worker to do any production initialization
     this.postMessage({
       type: "initialize",
       data: {
