@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [dev]
-        test: [agents-dms] # performance test with more large groups
+        test: [performance] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [regression] # regression test with more large groups
