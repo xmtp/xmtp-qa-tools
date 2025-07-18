@@ -190,7 +190,7 @@ export function sendMetric(
       );
     }
 
-    metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
+    //metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
     metrics.histogram(
       `${fullMetricName}.histogram`,
       Math.round(metricValue),
