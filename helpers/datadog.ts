@@ -291,7 +291,6 @@ export async function sendDatadogLog(
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
-
   const errorLogs = extractErrorLogs(logFileName);
   const fail_lines = extractfail_lines(errorLogs);
   checkForCriticalErrors(testName, fail_lines);
