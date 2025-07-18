@@ -22,6 +22,8 @@ export interface AgentConfig {
   slackChannel?: string;
   /** Whether to test this agent in groups (default: false) */
   groupTesting?: boolean;
+  /** Whether the agent is internal */
+  internal?: boolean;
 }
 
 /**
