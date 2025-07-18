@@ -190,8 +190,12 @@ export function sendMetric(
       );
     }
 
-    metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
-    metrics.histogram(fullMetricName, Math.round(metricValue), formattedTags);
+    //metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
+    metrics.histogram(
+      `${fullMetricName}.histogram`,
+      Math.round(metricValue),
+      formattedTags,
+    );
   } catch (error) {
     console.error(
       `❌ Error sending metric '${metricName}':`,
