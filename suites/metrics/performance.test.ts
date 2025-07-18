@@ -1,4 +1,8 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
+import {
+  sendHistogramMetric,
+  sendMetric,
+  type ResponseMetricTags,
+} from "@helpers/datadog";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
@@ -101,6 +105,11 @@ describe(testName, async () => {
       sdk: workers.getCreator().sdk,
     };
     sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
+    sendHistogramMetric(
+      "response",
+      verifyResult.averageEventTiming,
+      responseMetricTags,
+    );
 
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.almostAllReceived).toBe(true);
@@ -150,6 +159,14 @@ describe(testName, async () => {
         workers.getAllButCreator(),
       );
       sendMetric("response", verifyResult.averageEventTiming, {
+        test: testName,
+        metric_type: "stream",
+        metric_subtype: "message",
+        sdk: workers.getCreator().sdk,
+        members: i.toString(),
+        installations: i.toString(),
+      } as ResponseMetricTags);
+      sendHistogramMetric("response", verifyResult.averageEventTiming, {
         test: testName,
         metric_type: "stream",
         metric_subtype: "message",
