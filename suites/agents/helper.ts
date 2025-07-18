@@ -20,10 +20,8 @@ export interface AgentConfig {
   disabled?: boolean;
   /** Slack channel for notifications */
   slackChannel?: string;
-  /** Whether to test this agent in groups (default: false) */
-  groupTesting?: boolean;
   /** Whether the agent is production */
-  production?: boolean;
+  live: boolean;
 }
 
 /**
