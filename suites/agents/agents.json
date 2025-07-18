@@ -6,7 +6,7 @@
     "sendMessage": "/help",
     "networks": ["production"],
     "slackChannel": "#tbachat-alerts",
-    "production": true,
+    "production": false,
     "shouldRespondOnTagged": true
   },
   {
