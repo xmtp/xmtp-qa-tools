@@ -58,7 +58,11 @@ describe(testName, async () => {
       );
       console.log(JSON.stringify(result, null, 2));
 
-      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
+      // If the agent didn't respond, log the timeout value instead of 0
+      const metricValue = result?.allReceived
+        ? result.averageEventTiming
+        : streamTimeout;
+      sendMetric("response", metricValue, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
