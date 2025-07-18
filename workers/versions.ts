@@ -126,33 +126,6 @@ export const VersionList = [
     bindingsPackage: "1.1.8",
     auto: true,
   },
-  {
-    Client: Client105,
-    Conversation: Conversation105,
-    Dm: Dm105,
-    Group: Group105,
-    nodeVersion: "1.0.5",
-    bindingsPackage: "1.1.3",
-    auto: true,
-  },
-  {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-    nodeVersion: "0.0.47",
-    bindingsPackage: "0.4.1",
-    auto: true,
-  },
-  {
-    Client: Client13,
-    Conversation: Conversation13,
-    Dm: Conversation13,
-    Group: Conversation13,
-    nodeVersion: "0.0.13",
-    bindingsPackage: "0.0.9",
-    auto: true,
-  },
 ];
 
 export const getVersions = (filterAuto: boolean = true) => {
