@@ -18,12 +18,12 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, it } from "vitest";
 
 export const features = [
-  "verifyMessageStream",
-  "verifyMembershipStream",
-  "verifyMetadataStream",
-  "verifyEpochChange",
-  "addRandomInstallations",
-  "createGroup",
+  "stream",
+  "membership",
+  "metadata",
+  "epoch",
+  "installations",
+  "create",
 ];
 const testConfig = {
   groupName: `Group ${getTime()}`,
@@ -85,17 +85,17 @@ describe(testName, () => {
         )) as Group;
         await workers.checkForks();
         switch (feature) {
-          case "createGroup": {
+          case "create": {
             const newGroup = (await creator.client.conversations.newGroup(
               allInboxIds,
             )) as Group;
             await newGroup.sync();
             break;
           }
-          case "addRandomInstallations":
+          case "installations":
             await verifyAddRandomInstallations(workers);
             break;
-          case "verifyMessageStream":
+          case "stream":
             await verifyMessageStream(
               group,
               workers.getAllBut("bot"),
@@ -104,7 +104,7 @@ describe(testName, () => {
             );
             break;
 
-          case "verifyMembershipStream":
+          case "membership":
             await verifyMembershipStream(
               group,
               workers.getAllBut("bot"),
@@ -112,7 +112,7 @@ describe(testName, () => {
             );
             break;
 
-          case "verifyMetadataStream":
+          case "metadata":
             await verifyMetadataStream(
               group,
               workers.getAllBut("bot"),
@@ -121,7 +121,7 @@ describe(testName, () => {
             );
             break;
 
-          case "verifyEpochChange":
+          case "epoch":
             await verifyEpochChange(workers, group.id, testConfig.epochs);
             break;
         }
