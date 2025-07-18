@@ -1,23 +1,7 @@
-import { createSigner, createSigner47 } from "@helpers/client";
+import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
-import {
-  Client as Client13,
-  Conversation as Conversation13,
-} from "@xmtp/node-sdk-0.0.13";
-import {
-  Client as Client47,
-  Conversation as Conversation47,
-  Dm as Dm47,
-  Group as Group47,
-} from "@xmtp/node-sdk-0.0.47";
-import {
-  Client as Client105,
-  Conversation as Conversation105,
-  Dm as Dm105,
-  Group as Group105,
-} from "@xmtp/node-sdk-1.0.5";
 import {
   Client as Client209,
   Conversation as Conversation209,
@@ -167,41 +151,16 @@ export const regressionClient = async (
   const ClientClass = versionConfig.Client;
   let client = null;
 
-  if (versionConfig.nodeVersion === "0.0.13") {
-    throw new Error("Invalid version");
-  } else if (versionConfig.nodeVersion === "0.0.47") {
-    const signer = createSigner47(walletKey);
-
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, dbEncryptionKey, {
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
-  } else if (versionConfig.nodeVersion === "1.0.5") {
-    const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, dbEncryptionKey, {
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
-  } else {
-    const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
-  }
+  const signer = createSigner(walletKey);
+  // @ts-expect-error: SDK version compatibility - signer interface differs across versions
+  client = await ClientClass.create(signer, {
+    dbEncryptionKey,
+    dbPath,
+    env,
+    loggingLevel,
+    apiUrl,
+    codecs: [new ReactionCodec(), new ReplyCodec()],
+  });
 
   if (!client) {
     throw new Error(`Failed to create client for SDK version ${nodeVersion}`);
