@@ -95,7 +95,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-untagged tests
-        run: yarn test agents-untagged --no-fail --debug --no-error-logs
+        run: yarn test agents-untagged --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
