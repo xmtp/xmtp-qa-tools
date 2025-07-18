@@ -138,13 +138,13 @@ describe(testName, async () => {
       const name = newGroup.name;
       expect(name).toBe(newName);
     });
-    it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
+    it(`send-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
-    it(`verifyGroupMessage-${i}: should verify group message`, async () => {
+    it(`stream-${i}: should verify group message`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getAllButCreator(),
@@ -154,6 +154,8 @@ describe(testName, async () => {
         metric_type: "stream",
         metric_subtype: "message",
         sdk: workers.getCreator().sdk,
+        members: i.toString(),
+        installations: i.toString(),
       } as ResponseMetricTags);
 
       setCustomDuration(verifyResult?.averageEventTiming ?? 0);

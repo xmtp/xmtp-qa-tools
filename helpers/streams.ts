@@ -411,7 +411,6 @@ export async function verifyConversationStream(
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Conversation);
   });
-  console.debug("verifying conversation stream");
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
