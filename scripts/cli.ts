@@ -35,6 +35,7 @@ interface RetryOptions {
   parallel: boolean; // Run tests in parallel
   cleanLogs: boolean; // Auto-clean logs after completion
   logLevel: string; // Log level (debug, info, error)
+  noErrorLogs: boolean; // Disable sending error logs to Datadog
 }
 
 /**
@@ -159,6 +160,9 @@ function showUsageAndExit(): never {
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
   );
   console.error(
+    "      --no-error-logs     Disable sending error logs to Datadog (default: enabled)",
+  );
+  console.error(
     "      --env <environment> Set XMTP_ENV (options: local, dev, production)",
   );
   console.error(
@@ -267,6 +271,7 @@ function parseTestArgs(args: string[]): {
     cleanLogs: true,
     logLevel: "debug", // Default log level
     jsLoggingLevel: "silly",
+    noErrorLogs: false,
   };
 
   let currentArgs = [...args];
@@ -383,6 +388,9 @@ function parseTestArgs(args: string[]): {
             "--sync flag requires a value (e.g., --sync all,conversations)",
           );
         }
+        break;
+      case "--no-error-logs":
+        options.noErrorLogs = true;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -596,7 +604,7 @@ async function runVitestTest(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        if (options.explicitLogFlag)
+        if (options.explicitLogFlag && !options.noErrorLogs)
           await sendDatadogLog(logger.logFileName, testName);
 
         logger.close();
