@@ -20,6 +20,7 @@ jobs:
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       DELIVERY_AMOUNT: 100
+      ERROR_TRESHOLD: 90
       LOGGING_LEVEL: error
       LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
