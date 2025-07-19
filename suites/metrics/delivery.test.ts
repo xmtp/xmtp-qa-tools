@@ -17,6 +17,7 @@ describe(testName, async () => {
     sendMetrics: true,
     sendDurationMetrics: true,
   });
+  const ERROR_TRESHOLD = parseInt(process.env.ERROR_TRESHOLD ?? "90");
   const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
   const workers = await getWorkers(WORKER_COUNT);
@@ -63,8 +64,8 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
-    expect(stats.orderPercentage).toBeGreaterThan(80);
-    expect(stats.receptionPercentage).toBeGreaterThan(80);
+    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
   });
 
   it("poll: should verify message delivery and order accuracy using polling", async () => {
@@ -128,8 +129,8 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
-    expect(stats.orderPercentage).toBeGreaterThan(80);
-    expect(stats.receptionPercentage).toBeGreaterThan(80);
+    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
   });
 
   it("recovery: should verify message recovery after stream interruption", async () => {
@@ -203,7 +204,7 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
-    expect(stats.orderPercentage).toBeGreaterThan(80);
-    expect(stats.receptionPercentage).toBeGreaterThan(80);
+    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
   });
 });
