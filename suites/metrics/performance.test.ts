@@ -126,12 +126,12 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     });
-    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+    it(`sync-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
     });
-    it(`updateGroupName-${i}: should update the group name`, async () => {
+    it(`updateName-${i}: should update the group name`, async () => {
       const newName = "Large Group";
       await newGroup.updateName(newName);
       await newGroup.sync();
