@@ -338,10 +338,10 @@ export class WorkerManager {
    * Ensures a worker has wallet and encryption keys
    * Either retrieves from env vars or generates new ones
    */
-  private async ensureKeys(name: string): Promise<{
+  private ensureKeys(name: string): {
     walletKey: string;
     encryptionKey: string;
-  }> {
+  } {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
@@ -387,22 +387,10 @@ export class WorkerManager {
       // Append to .env file for persistence across runs
       const filePath =
         process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
-      try {
-        await appendFile(
-          filePath,
-          `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
-        );
-      } catch (error) {
-        // If .env file doesn't exist, create it first
-        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-          await appendFile(
-            filePath,
-            `${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
-          );
-        } else {
-          console.warn(`Failed to append to .env file: ${error as string}`);
-        }
-      }
+      void appendFile(
+        filePath,
+        `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
+      );
     }
 
     return this.keysCache[baseName];
@@ -446,7 +434,7 @@ export class WorkerManager {
     const folder = providedInstallId || getNextFolderName();
 
     // Get or generate keys
-    const { walletKey, encryptionKey } = await this.ensureKeys(baseName);
+    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
 
     // Create the base worker data
     const workerData: WorkerBase = {
@@ -498,7 +486,7 @@ export async function getWorkers(
   } = {
     env: (process.env.XMTP_ENV as XmtpEnv) || "dev",
     useVersions: true,
-    randomNames: false,
+    randomNames: true,
     nodeVersion: undefined,
   },
 ): Promise<WorkerManager> {
