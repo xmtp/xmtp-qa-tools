@@ -64,7 +64,7 @@ export class playwright {
    * Takes a screenshot and saves it to the logs directory
    */
   async takeSnapshot(name: string): Promise<void> {
-    if (!this.page) throw new Error("Page is not initialized");
+    if (!this.page) return;
 
     const snapshotDir = path.join(process.cwd(), "./logs/screenshots");
     if (!fs.existsSync(snapshotDir)) {
