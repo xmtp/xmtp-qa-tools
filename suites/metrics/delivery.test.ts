@@ -23,20 +23,20 @@ describe(testName, async () => {
   const group = await workers.createGroupBetweenAll();
 
   it("stream: should verify message delivery and order accuracy using streams", async () => {
-    const verifyResult = await verifyMessageStream(
+    const stats = await verifyMessageStream(
       group,
       workers.getAllButCreator(),
       MESSAGE_COUNT,
     );
 
-    sendMetric("response", verifyResult.averageEventTiming, {
+    sendMetric("response", stats.averageEventTiming, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
       sdk: workers.getCreator().sdk,
     } as ResponseMetricTags);
 
-    sendMetric("delivery", verifyResult.receptionPercentage, {
+    sendMetric("delivery", stats.receptionPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "delivery",
@@ -44,7 +44,7 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    sendMetric("order", verifyResult.orderPercentage, {
+    sendMetric("order", stats.orderPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "order",
