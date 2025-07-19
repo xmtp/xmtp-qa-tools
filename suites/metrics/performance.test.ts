@@ -72,7 +72,7 @@ describe(testName, async () => {
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
   });
-  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+  it("newDmByAddress: should measure creating a DM", async () => {
     const dm2 = await creatorClient.conversations.newDmWithIdentifier({
       identifier: workers.getAll()[2].address,
       identifierKind: IdentifierKind.Ethereum,
@@ -115,7 +115,7 @@ describe(testName, async () => {
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
-    it(`newGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroupByAddress-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = getAddresses(i);
       const newGroupByIdentifier =
         await creatorClient.conversations.newGroupWithIdentifiers(

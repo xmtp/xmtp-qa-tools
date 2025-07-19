@@ -38,7 +38,7 @@ describe(testName, async () => {
     expect(convo.id).toBeDefined();
   });
 
-  it("newDmWithIdentifier should create a new DM conversation using Ethereum address", async () => {
+  it("newDmByAddress: should create a new DM conversation using Ethereum address", async () => {
     const dm2 = await workers
       .get("henry")!
       .client.conversations.newDmWithIdentifier({
@@ -49,7 +49,7 @@ describe(testName, async () => {
     expect(dm2).toBeDefined();
     expect(dm2.id).toBeDefined();
   });
-  it("should send a message in DM conversation", async () => {
+  it("send: should send a message in DM conversation", async () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
@@ -61,7 +61,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("should receive and verify message delivery in DM conversation", async () => {
+  it("stream: should receive and verify message delivery in DM conversation", async () => {
     const verifyResult = await verifyMessageStream(convo, [
       workers.get("randomguy")!,
     ]);
