@@ -64,7 +64,7 @@ export class playwright {
    * Takes a screenshot and saves it to the logs directory
    */
   async takeSnapshot(name: string): Promise<void> {
-    if (!this.page) throw new Error("Page is not initialized");
+    if (!this.page) return;
 
     const snapshotDir = path.join(process.cwd(), "./logs/screenshots");
     if (!fs.existsSync(snapshotDir)) {
@@ -294,20 +294,20 @@ export class playwright {
       await page.getByRole("button", { name: "Connect" }).last().click();
       console.debug("Clicked connect button");
 
-      await page.waitForTimeout(streamColdStartTimeout);
-      if (page.url() === "https://xmtp.chat/conversations") {
-        console.debug("Logged in");
-        this.page = page;
-        this.browser = browser;
-        return { browser, page };
-      } else {
-        throw new Error("Failed to log in");
+      let maxRetries = 10;
+      while (
+        page.url() !== "https://xmtp.chat/conversations" &&
+        maxRetries > 0
+      ) {
+        await page.waitForTimeout(1000);
+        maxRetries--;
       }
+      console.debug("Logged in");
+      this.page = page;
+      this.browser = browser;
+      return { browser, page };
     } catch (error) {
-      // Only take snapshot if page is initialized
-      if (this.page) {
-        await this.takeSnapshot("startPage-error");
-      }
+      await this.takeSnapshot("startPage-error");
       throw error;
     }
   }
