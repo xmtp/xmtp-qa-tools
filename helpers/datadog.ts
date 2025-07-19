@@ -197,16 +197,6 @@ export function sendMetric(
       Math.round(metricValue),
       formattedTags,
     );
-    metrics.histogram(
-      fullMetricName + ".histogram",
-      Math.round(metricValue),
-      formattedTags,
-    );
-    metrics.distribution(
-      fullMetricName + ".distribution",
-      Math.round(metricValue),
-      formattedTags,
-    );
   } catch (error) {
     console.error(
       `❌ Error sending metric '${metricName}':`,
