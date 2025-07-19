@@ -52,4 +52,4 @@ runs:
         path: |
           .data
           .env
-        key: installation-${{ hashFiles('yarn.lock') }}
+        key: installation-${{ inputs.test-name }}
