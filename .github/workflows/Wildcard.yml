@@ -104,6 +104,9 @@ jobs:
             echo "File does not exist"
           fi
 
+      - name: Run tests
+        run: yarn test ${{ matrix.test }}
+
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
