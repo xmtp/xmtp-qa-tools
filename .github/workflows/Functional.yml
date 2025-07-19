@@ -1,9 +1,10 @@
 name: Functional
-description: "should verify message loss when receiving via 200 streams"
+description: "should verify last 3 versions of the library"
 
 on:
+  #ull_request:
   schedule:
-    - cron: "30 */2 * * *" # Runs every hour at 30 minutes past
+    - cron: "25 */2 * * *" # Runs every 6 hours at 25 minutes past
   workflow_dispatch:
 
 jobs:
@@ -13,13 +14,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [functional]
         env: [dev, production]
     env:
+      LOGGING_LEVEL: "off"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
-      DELIVERY_AMOUNT: 100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -28,7 +28,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn functional --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -39,4 +39,4 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
+        run: yarn workflow-failure "Regression"
