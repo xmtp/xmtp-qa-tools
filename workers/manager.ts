@@ -486,7 +486,7 @@ export async function getWorkers(
   } = {
     env: (process.env.XMTP_ENV as XmtpEnv) || "dev",
     useVersions: true,
-    randomNames: true,
+    randomNames: false,
     nodeVersion: undefined,
   },
 ): Promise<WorkerManager> {
