@@ -1,4 +1,4 @@
-name: Regression
+name: Functional
 description: "should verify last 3 versions of the library"
 
 on:
@@ -28,7 +28,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test suites/functional --sync all --versions 3 --no-fail --debug
+        run: yarn functional --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
