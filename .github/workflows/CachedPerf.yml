@@ -33,7 +33,7 @@ jobs:
           cache-data: true
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
