@@ -48,7 +48,7 @@ describe(testName, async () => {
       );
     });
 
-    it(`syncGroup-${groupSize}: should sync a large group of ${groupSize} participants ${groupSize}`, async () => {
+    it(`groupsync-${groupSize}: should sync a large group of ${groupSize} participants ${groupSize}`, async () => {
       await newGroupBetweenAll.sync();
     });
     it(`addMember-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {

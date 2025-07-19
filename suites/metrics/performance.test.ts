@@ -82,7 +82,7 @@ describe(testName, async () => {
     expect(dm2.id).toBeDefined();
   });
 
-  it("sendGM: should measure sending a gm", async () => {
+  it("send: should measure sending a gm", async () => {
     // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -91,7 +91,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("receiveGM: should measure receiving a gm", async () => {
+  it("stream: should measure receiving a gm", async () => {
     const verifyResult = await verifyMessageStream(dm!, [workers.getAll()[1]]);
 
     const responseMetricTags: ResponseMetricTags = {
@@ -126,7 +126,7 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     });
-    it(`sync-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+    it(`groupsync-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);

@@ -81,29 +81,27 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Operation performance
+## Operations
 
-### Core SDK Operations Performance
+### Core SDK operations
 
-| Operation                | Description                            | Avg | Target | Performance |
-| ------------------------ | -------------------------------------- | --- | ------ | ----------- |
-| clientCreate             | Creating a client                      | 588 | <350   | Concern     |
-| inboxState               | Checking inbox state                   | 41  | <350   | On Target   |
-| newDm                    | Creating a direct message conversation | 258 | <350   | On Target   |
-| newDmWithIdentifiers     | Creating a dm by address               | 294 | <350   | On Target   |
-| sendGM                   | Sending a group message                | 126 | <200   | On Target   |
-| receiveGM                | Receiving a group message              | 87  | <200   | On Target   |
-| createGroup              | Creating a group                       | 315 | <350   | On Target   |
-| createGroupByIdentifiers | Creating a group by address            | 313 | <350   | On Target   |
-| syncGroup                | Syncing group state                    | 76  | <200   | On Target   |
-| updateGroupName          | Updating group metadata                | 129 | <200   | On Target   |
-| removeMembers            | Removing participants from a group     | 127 | <250   | On Target   |
-| sendGroupMessage         | Sending a group message                | 85  | <200   | On Target   |
-| receiveGroupMessage      | Processing group message strea         | 124 | <200   | On Target   |
+| Operation            | Description                            | Avg | Target | Performance |
+| -------------------- | -------------------------------------- | --- | ------ | ----------- |
+| clientCreate         | Creating a client                      | 588 | <350   | Concern     |
+| inboxState           | Checking inbox state                   | 41  | <350   | On Target   |
+| newDm                | Creating a direct message conversation | 258 | <350   | On Target   |
+| newDmWithIdentifiers | Creating a dm by address               | 294 | <350   | On Target   |
+| send                 | Sending a group message                | 126 | <200   | On Target   |
+| stream               | Receiving a group message              | 87  | <200   | On Target   |
+| newGroup             | Creating a group                       | 315 | <350   | On Target   |
+| newGroupByAddress    | Creating a group by address            | 313 | <350   | On Target   |
+| sync                 | Syncing group state                    | 76  | <200   | On Target   |
+| updateName           | Updating group metadata                | 129 | <200   | On Target   |
+| removeMembers        | Removing participants from a group     | 127 | <250   | On Target   |
 
-### Group operations performance
+### Group operations
 
-#### Sender-Side average performance
+#### Sender-side average
 
 | Size | Send message | Update name | Remove members | Create | Performance |
 | ---- | ------------ | ----------- | -------------- | ------ | ----------- |
@@ -118,7 +116,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
-#### Receiver-Side stream performance
+#### Receiver-side stream
 
 | Group Size | New conversation | Metadata | Messages | Add Members | Performance |
 | ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
@@ -133,7 +131,7 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
-#### Receiver-Side sync performance
+#### Receiver-side sync
 
 | Size | syncAll |      | sync |      | Performance |
 | ---- | ------- | ---- | ---- | ---- | ----------- |
@@ -148,7 +146,7 @@ _Note: This measurments are taken only from the receiver side and after the grou
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
-## Networks performance
+## Networks
 
 ### Network performance
 
@@ -160,7 +158,7 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 | Processing         | 35      | <100   | On Target   |
 | Server Call        | 159     | <250   | On Target   |
 
-### Regional Network Performance
+### Regional network performance
 
 | Region        | Server Call | TLS | ~ us-east | Performance |
 | ------------- | ----------- | --- | --------- | ----------- |
@@ -191,7 +189,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Storage
 
-### Storage by Group Size
+### Storage by group size
 
 | Group Size  | Groups | Sender storage | Avg Group Size | Receiver storage | Efficiency Gain |
 | ----------- | ------ | -------------- | -------------- | ---------------- | --------------- |
@@ -202,7 +200,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### Large Inbox Sync Performance Summary
+### Large inbox syncs
 
 | Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
 | ---------- | -------------- | ------------ | --------------- | ------------------ |
@@ -223,9 +221,9 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
-## Testing Summary
+## Testing summary
 
-### Test coverage
+#### Test coverage
 
 - Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
 - Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
@@ -237,7 +235,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - Bugs: Historical issue reproduction and regression prevention
 - Other: Security, spam detection, rate limiting, storage efficiency
 
-### Testing framework
+#### Testing framework
 
 - Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
 - Stream verification: Message delivery, conversation streams, metadata updates
@@ -251,7 +249,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - Slack Bot: AI-powered responses, history fetching, log management
 - Geographic testing: Multi-region performance across US, Europe, Asia, South America
 
-### Metrics tracked
+#### Metrics tracked
 
 - Delivery: 100% success rate (target: 99.9%)
 - Performance: <350ms core operations, <200ms messaging, <150ms TLS
@@ -261,12 +259,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Development
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js (>20.18.0)
 - Yarn 4.6.0
 
-### Installation
+#### Installation
 
 ```bash
 # Installation For a faster download with just the latest code
@@ -275,7 +273,7 @@ cd xmtp-qa-tools
 yarn install
 ```
 
-### Environment variables
+#### Environment variables
 
 ```bash
 XMTP_ENV="dev" #  environment (dev, production, local, multinode)
@@ -296,7 +294,7 @@ yarn test functional
 yarn test performance
 ```
 
-### Debug mode
+#### Debug mode
 
 ```bash
 yarn test functional --debug
@@ -304,12 +302,12 @@ yarn test functional --debug
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-### Rate limits
+#### Rate limits
 
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
 
-### Resources
+#### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)
 - **Local:** Work in local network - [see section](/dev/)
