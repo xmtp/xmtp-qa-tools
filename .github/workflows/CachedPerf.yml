@@ -30,6 +30,7 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
+          test-name: ${{ matrix.test }}
           cache-data: true
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}

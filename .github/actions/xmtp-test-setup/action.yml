@@ -6,6 +6,9 @@ inputs:
     description: "Whether to cache .data and .env files"
     required: false
     default: "false"
+  test-name:
+    description: "Name of the test for notifications and artifact naming"
+    required: true
 
 runs:
   using: "composite"
@@ -32,7 +35,7 @@ runs:
         path: |
           .data
           .env
-        key: installation-${{ hashFiles('yarn.lock') }}
+        key: installation-${{ inputs.test-name }}
         restore-keys: |
           installation-
 
