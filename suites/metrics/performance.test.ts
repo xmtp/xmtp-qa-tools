@@ -12,23 +12,7 @@ describe(testName, async () => {
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
   let dm: Dm | undefined;
-  // Use fixed names when caching is enabled to reuse cached keys
-  const useFixedNames = process.env.GH_CACHE === "true";
-  const workerNames = useFixedNames
-    ? [
-        "alice",
-        "bob",
-        "charlie",
-        "dave",
-        "eve",
-        "frank",
-        "grace",
-        "henry",
-        "ivy",
-        "jack",
-      ]
-    : 10;
-  let workers = await getWorkers(workerNames, { randomNames: !useFixedNames });
+  let workers = await getWorkers(10);
 
   let newGroup: Group;
   const creator = workers.getCreator();
