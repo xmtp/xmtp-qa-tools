@@ -12,11 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [production]
-        test: [delivery] # performance test with more large groups
-        # test: [functional] # full functional test
-        # test: [performance] # performance test with more large groups
-        # test: [regression] # regression test with more large groups
-        # test: [dms] # health check
+        test: [cache-test] # cache testing instead of actual tests
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
@@ -33,12 +29,80 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
         with:
           cache-data: true
+          test-name: ${{ matrix.test }}
 
-      # - name: Run script version
-      #   run: yarn script versions
+      - name: Log initial state of .data and .env
+        run: |
+          echo "=== INITIAL STATE ==="
+          echo "Current timestamp: $(date)"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run number: ${{ github.run_number }}"
+          echo ""
+          echo "=== .data directory ==="
+          if [ -d ".data" ]; then
+            echo "Directory exists"
+            ls -la .data/ || echo "Cannot list .data contents"
+            find .data -type f -name "*.json" | head -5 || echo "No JSON files found"
+          else
+            echo "Directory does not exist"
+          fi
+          echo ""
+          echo "=== .env file ==="
+          if [ -f ".env" ]; then
+            echo "File exists"
+            ls -la .env
+            echo "First few lines:"
+            head -3 .env || echo "Cannot read .env"
+          else
+            echo "File does not exist"
+          fi
 
-      - name: Run tests
-        run: yarn test ${{ matrix.test }}
+      - name: Create test files for cache verification
+        run: |
+          echo "=== CREATING TEST FILES ==="
+          mkdir -p .data
+          echo "Test data created at $(date)" > .data/cache-test-$(date +%s).txt
+          echo "Cache test run: ${{ github.run_number }}" >> .data/cache-test-$(date +%s).txt
+          echo "Run ID: ${{ github.run_id }}" >> .data/cache-test-$(date +%s).txt
+
+          if [ ! -f ".env" ]; then
+            echo "Creating .env file for testing"
+            echo "XMTP_ENV=${{ matrix.env }}" > .env
+            echo "LOGGING_LEVEL=error" >> .env
+            echo "CACHE_TEST=true" >> .env
+            echo "CREATED_AT=$(date)" >> .env
+          else
+            echo "Appending to existing .env file"
+            echo "CACHE_TEST=true" >> .env
+            echo "UPDATED_AT=$(date)" >> .env
+          fi
+
+          echo "Created files:"
+          ls -la .data/
+          echo "Updated .env:"
+          cat .env
+
+      - name: Log final state before cleanup
+        run: |
+          echo "=== FINAL STATE BEFORE CLEANUP ==="
+          echo "Current timestamp: $(date)"
+          echo ""
+          echo "=== .data directory contents ==="
+          if [ -d ".data" ]; then
+            ls -la .data/
+            echo ""
+            echo "All .data files:"
+            find .data -type f | sort
+          else
+            echo "Directory does not exist"
+          fi
+          echo ""
+          echo "=== .env file contents ==="
+          if [ -f ".env" ]; then
+            cat .env
+          else
+            echo "File does not exist"
+          fi
 
       - name: Cleanup and upload artifacts
         if: always()
