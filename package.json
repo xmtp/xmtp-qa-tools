@@ -19,7 +19,7 @@
     "cli": "tsx scripts/cli.ts",
     "dms": "yarn test functional/convos --versions 3",
     "format": "prettier -w .",
-    "functional": "yarn test suites/functional --sync all",
+    "functional": "yarn test suites/functional --sync all --versions 3",
     "gen": "tsx inboxes/gen.ts",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
