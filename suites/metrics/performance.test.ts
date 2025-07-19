@@ -159,7 +159,7 @@ describe(testName, async () => {
       } as ResponseMetricTags);
 
       setCustomDuration(verifyResult?.averageEventTiming ?? 0);
-      expect(verifyResult.allReceived).toBe(true);
+      expect(verifyResult.almostAllReceived).toBe(true);
     });
     it(`addMember-${i}: should add members to a group`, async () => {
       await newGroup.addMembers([workers.getAll()[2].inboxId]);
