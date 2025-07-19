@@ -685,9 +685,7 @@ async function main(): Promise<void> {
 
         // Check if this is a simple test run (no retry options)
         const isSimpleRun =
-          options.maxAttempts === 1 &&
-          !options.explicitLogFlag &&
-          !options.noFail;
+          options.maxAttempts === 1 && !options.explicitLogFlag;
 
         if (isSimpleRun) {
           // Process environment variables for simple runs too
@@ -772,7 +770,18 @@ async function main(): Promise<void> {
           );
           console.debug(`Running test: ${testName}`);
           console.debug(`Executing: ${command}`);
-          execSync(command, { stdio: "inherit", env });
+          try {
+            execSync(command, { stdio: "inherit", env });
+          } catch (error) {
+            if (options.noFail) {
+              console.debug(
+                "Test failed but --no-fail was specified, exiting with code 0",
+              );
+              process.exit(0);
+            } else {
+              throw error;
+            }
+          }
         } else {
           // Use retry mechanism with logger
           await runVitestTest(testName, options);
