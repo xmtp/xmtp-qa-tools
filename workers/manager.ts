@@ -338,10 +338,10 @@ export class WorkerManager {
    * Ensures a worker has wallet and encryption keys
    * Either retrieves from env vars or generates new ones
    */
-  private ensureKeys(name: string): {
+  private async ensureKeys(name: string): Promise<{
     walletKey: string;
     encryptionKey: string;
-  } {
+  }> {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
@@ -400,7 +400,7 @@ export class WorkerManager {
             `${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
           );
         } else {
-          console.warn(`Failed to append to .env file: ${error}`);
+          console.warn(`Failed to append to .env file: ${error as string}`);
         }
       }
     }
@@ -446,7 +446,7 @@ export class WorkerManager {
     const folder = providedInstallId || getNextFolderName();
 
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
+    const { walletKey, encryptionKey } = await this.ensureKeys(baseName);
 
     // Create the base worker data
     const workerData: WorkerBase = {
