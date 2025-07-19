@@ -72,7 +72,7 @@ describe(testName, async () => {
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
   });
-  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+  it("newDmByAddress: should measure creating a DM", async () => {
     const dm2 = await creatorClient.conversations.newDmWithIdentifier({
       identifier: workers.getAll()[2].address,
       identifierKind: IdentifierKind.Ethereum,
@@ -82,7 +82,7 @@ describe(testName, async () => {
     expect(dm2.id).toBeDefined();
   });
 
-  it("sendGM: should measure sending a gm", async () => {
+  it("send: should measure sending a gm", async () => {
     // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -91,7 +91,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("receiveGM: should measure receiving a gm", async () => {
+  it("stream: should measure receiving a gm", async () => {
     const verifyResult = await verifyMessageStream(dm!, [workers.getAll()[1]]);
 
     const responseMetricTags: ResponseMetricTags = {
@@ -115,7 +115,7 @@ describe(testName, async () => {
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
-    it(`newGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroupByAddress-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = getAddresses(i);
       const newGroupByIdentifier =
         await creatorClient.conversations.newGroupWithIdentifiers(
@@ -126,12 +126,12 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     });
-    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+    it(`groupsync-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
     });
-    it(`updateGroupName-${i}: should update the group name`, async () => {
+    it(`updateName-${i}: should update the group name`, async () => {
       const newName = "Large Group";
       await newGroup.updateName(newName);
       await newGroup.sync();
