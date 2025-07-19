@@ -53,3 +53,5 @@ runs:
           .data
           .env
         key: installation-${{ inputs.test-name }}
+        restore-keys: |
+          installation-
