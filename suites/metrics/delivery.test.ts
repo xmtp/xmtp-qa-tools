@@ -63,6 +63,8 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
+    expect(stats.orderPercentage).toBeGreaterThan(80);
+    expect(stats.receptionPercentage).toBeGreaterThan(80);
   });
 
   it("poll: should verify message delivery and order accuracy using polling", async () => {
@@ -126,6 +128,8 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
+    expect(stats.orderPercentage).toBeGreaterThan(80);
+    expect(stats.receptionPercentage).toBeGreaterThan(80);
   });
 
   it("recovery: should verify message recovery after stream interruption", async () => {
@@ -199,5 +203,7 @@ describe(testName, async () => {
     } else {
       console.log("receptionPercentage", stats.receptionPercentage);
     }
+    expect(stats.orderPercentage).toBeGreaterThan(80);
+    expect(stats.receptionPercentage).toBeGreaterThan(80);
   });
 });
