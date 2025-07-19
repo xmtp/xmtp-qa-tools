@@ -38,7 +38,7 @@ describe(testName, async () => {
   }
 
   for (const agent of filteredAgents) {
-    it(`${env}: ${agent.name} should respond to tagged/command message : ${agent.address}`, async () => {
+    it(`${testName}: ${agent.name} should respond to tagged/command message : ${agent.address}`, async () => {
       const isSlashCommand = agent.sendMessage.startsWith("/");
       const testMessage = isSlashCommand
         ? agent.sendMessage
