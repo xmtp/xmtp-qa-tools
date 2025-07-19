@@ -20,7 +20,7 @@ jobs:
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       DELIVERY_AMOUNT: 100
-      ERROR_TRESHOLD: 90
+      ERROR_TRESHOLD: 10
       LOGGING_LEVEL: error
       LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail
+        run: yarn test ${{ matrix.test }} --no-fail --log-level off
 
       - name: Cleanup and upload artifacts
         if: always()
