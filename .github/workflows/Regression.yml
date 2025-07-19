@@ -2,8 +2,9 @@ name: Regression
 description: "should verify last 3 versions of the library"
 
 on:
+  pull_request:
   schedule:
-    - cron: "25 */6 * * *" # Runs every 6 hours at 25 minutes past
+    - cron: "25 */2 * * *" # Runs every 6 hours at 25 minutes past
   workflow_dispatch:
 
 jobs:
@@ -27,11 +28,8 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run versions
-        run: yarn script versions
-
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test suites/functional --sync all --versions 3 --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
