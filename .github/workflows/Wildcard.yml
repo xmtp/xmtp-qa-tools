@@ -82,6 +82,9 @@ jobs:
           echo "Updated .env:"
           cat .env
 
+      - name: Run tests
+        run: yarn test ${{ matrix.test }}
+
       - name: Log final state before cleanup
         run: |
           echo "=== FINAL STATE BEFORE CLEANUP ==="
@@ -103,9 +106,6 @@ jobs:
           else
             echo "File does not exist"
           fi
-
-      - name: Run tests
-        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
