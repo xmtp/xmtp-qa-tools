@@ -4,7 +4,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "sync-comparison";
+const testName = "sync";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let workers: WorkerManager;

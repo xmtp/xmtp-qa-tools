@@ -85,21 +85,19 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Core SDK operations
 
-| Operation                | Description                            | Avg | Target | Performance |
-| ------------------------ | -------------------------------------- | --- | ------ | ----------- |
-| clientCreate             | Creating a client                      | 588 | <350   | Concern     |
-| inboxState               | Checking inbox state                   | 41  | <350   | On Target   |
-| newDm                    | Creating a direct message conversation | 258 | <350   | On Target   |
-| newDmWithIdentifiers     | Creating a dm by address               | 294 | <350   | On Target   |
-| sendGM                   | Sending a group message                | 126 | <200   | On Target   |
-| receiveGM                | Receiving a group message              | 87  | <200   | On Target   |
-| createGroup              | Creating a group                       | 315 | <350   | On Target   |
-| createGroupByIdentifiers | Creating a group by address            | 313 | <350   | On Target   |
-| syncGroup                | Syncing group state                    | 76  | <200   | On Target   |
-| updateGroupName          | Updating group metadata                | 129 | <200   | On Target   |
-| removeMembers            | Removing participants from a group     | 127 | <250   | On Target   |
-| sendGroupMessage         | Sending a group message                | 85  | <200   | On Target   |
-| receiveGroupMessage      | Processing group message strea         | 124 | <200   | On Target   |
+| Operation         | Description                            | Avg | Target | Performance |
+| ----------------- | -------------------------------------- | --- | ------ | ----------- |
+| clientCreate      | Creating a client                      | 588 | <350   | Concern     |
+| inboxState        | Checking inbox state                   | 41  | <350   | On Target   |
+| newDm             | Creating a direct message conversation | 258 | <350   | On Target   |
+| newDmByAddress    | Creating a dm by address               | 294 | <350   | On Target   |
+| send              | Sending a group message                | 126 | <200   | On Target   |
+| stream            | Receiving a group message              | 87  | <200   | On Target   |
+| newGroup          | Creating a group                       | 315 | <350   | On Target   |
+| newGroupByAddress | Creating a group by address            | 313 | <350   | On Target   |
+| sync              | Syncing group state                    | 76  | <200   | On Target   |
+| updateName        | Updating group metadata                | 129 | <200   | On Target   |
+| removeMembers     | Removing participants from a group     | 127 | <250   | On Target   |
 
 ### Group operations
 
