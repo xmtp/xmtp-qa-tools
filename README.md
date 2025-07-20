@@ -310,12 +310,12 @@ yarn test functional --debug
 - **Scripts:** Monorepo scripts - [see section](/scripts/)
 - **Introduction:** Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
 
-#### Rate limits
+##### Rate limits
 
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
 
-#### Endpoints
+##### Endpoints
 
 - `local`: `http://localhost:5556`
 - `dev`: `https://grpc.dev.xmtp.network:443`
