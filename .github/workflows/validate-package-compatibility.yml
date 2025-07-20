@@ -1,4 +1,4 @@
-name: Package Compatibility
+name: Validate package compatibility
 
 on:
   workflow_dispatch:

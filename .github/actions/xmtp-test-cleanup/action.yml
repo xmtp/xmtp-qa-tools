@@ -52,4 +52,25 @@ runs:
         path: |
           .data
           .env
-        key: installation-${{ hashFiles('yarn.lock') }}
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
+        restore-keys: |
+          data-${{ inputs.env }}-
+
+    - name: Show cache save status
+      if: ${{ always() && (inputs.save-to-cache == 'true' || inputs.save-to-cache == true) }}
+      run: |
+        echo "Saving data to cache with key: data-${{ inputs.env }}-${{ inputs.test-name }}"
+        echo "Environment: ${{ inputs.env }}"
+        echo "Test name: ${{ inputs.test-name }}"
+        echo "Files being cached:"
+        if [ -d ".data" ]; then
+          echo "  .data directory exists with $(find .data -type f | wc -l) files"
+        else
+          echo "  .data directory does not exist"
+        fi
+        if [ -f ".env" ]; then
+          echo "  .env file exists"
+        else
+          echo "  .env file does not exist"
+        fi
+      shell: bash

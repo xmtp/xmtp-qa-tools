@@ -1,5 +1,6 @@
 import fs from "fs";
 import { appendFile } from "fs/promises";
+import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { getVersions, VersionList } from "@workers/versions";
@@ -484,13 +485,15 @@ export async function getWorkers(
     useVersions?: boolean;
     randomNames?: boolean;
   } = {
-    env: (process.env.XMTP_ENV as XmtpEnv) || "dev",
+    env: undefined,
     useVersions: true,
     randomNames: true,
     nodeVersion: undefined,
   },
 ): Promise<WorkerManager> {
-  const manager = new WorkerManager(options.env as XmtpEnv);
+  const manager = new WorkerManager(
+    (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
+  );
 
   let workerPromises: Promise<Worker>[] = [];
 
