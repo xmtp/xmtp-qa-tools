@@ -306,6 +306,12 @@ yarn test functional --debug
 - **Read operations**: 20,000 requests per 5-minute window
 - **Write operations**: 3,000 messages published per 5-minute window
 
+#### Endpoints
+
+- `local`: `http://localhost:5556`
+- `dev`: `https://grpc.dev.xmtp.network:443`
+- `production`: `https://grpc.production.xmtp.network:443`
+
 #### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)
