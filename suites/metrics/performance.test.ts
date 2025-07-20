@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -68,20 +69,12 @@ describe(testName, async () => {
     expect(inboxState.installations.length).toBeGreaterThan(0);
   });
   it("newDm: should measure creating a DM", async () => {
+    console.log(workers.getCreator().name);
     dm = (await creatorClient.conversations.newDm(
-      workers.getAll()[1].client.inboxId,
+      workers.getReceiver().client.inboxId,
     )) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
-  });
-  it("newDmByAddress: should measure creating a DM", async () => {
-    const dm2 = await creatorClient.conversations.newDmWithIdentifier({
-      identifier: workers.getAll()[2].address,
-      identifierKind: IdentifierKind.Ethereum,
-    });
-
-    expect(dm2).toBeDefined();
-    expect(dm2.id).toBeDefined();
   });
 
   it("send: should measure sending a gm", async () => {
@@ -94,18 +87,29 @@ describe(testName, async () => {
   });
 
   it("stream: should measure receiving a gm", async () => {
-    const verifyResult = await verifyMessageStream(dm!, [workers.getAll()[1]]);
+    console.log(workers.getReceiver().name);
+    const verifyResult = await verifyMessageStream(dm!, [
+      workers.getReceiver(),
+    ]);
 
-    const responseMetricTags: ResponseMetricTags = {
+    sendMetric("response", verifyResult.averageEventTiming, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
-      sdk: workers.getCreator().sdk,
-    };
-    sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
+      sdk: workers.getReceiver().sdk,
+    } as ResponseMetricTags);
 
-    setCustomDuration(verifyResult.averageEventTiming);
-    expect(verifyResult.almostAllReceived).toBe(true);
+    setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
+    expect(verifyResult.allReceived).toBe(true);
+  });
+  it("newDmByAddress: should measure creating a DM", async () => {
+    const dm2 = await creatorClient.conversations.newDmWithIdentifier({
+      identifier: workers.getAll()[2].address,
+      identifierKind: IdentifierKind.Ethereum,
+    });
+
+    expect(dm2).toBeDefined();
+    expect(dm2.id).toBeDefined();
   });
 
   for (const i of BATCH_SIZE) {
