@@ -86,7 +86,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 | Operation         | Description                            | Avg | Target | Performance |
 | ----------------- | -------------------------------------- | --- | ------ | ----------- |
-| clientCreate      | Creating a client                      | 588 | <350   | Concern     |
+| create            | Creating a client                      | 588 | <350   | Concern     |
 | inboxState        | Checking inbox state                   | 41  | <350   | On Target   |
 | newDm             | Creating a direct message conversation | 258 | <350   | On Target   |
 | newDmByAddress    | Creating a dm by address               | 294 | <350   | On Target   |
