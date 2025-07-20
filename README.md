@@ -301,6 +301,15 @@ yarn test functional --debug
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
+#### Resources
+
+- **Inboxes:** Inboxes for testing - [see section](/inboxes/)
+- **Local:** Work in local network - [see section](/dev/)
+- **Workers:** Worker for testing - [see section](/workers/)
+- **Helpers:** Coding helpers - [see section](/helpers/)
+- **Scripts:** Monorepo scripts - [see section](/scripts/)
+- **Introduction:** Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
+
 #### Rate limits
 
 - **Read operations**: 20,000 requests per 5-minute window
@@ -311,12 +320,3 @@ yarn test functional --debug
 - `local`: `http://localhost:5556`
 - `dev`: `https://grpc.dev.xmtp.network:443`
 - `production`: `https://grpc.production.xmtp.network:443`
-
-#### Resources
-
-- **Inboxes:** Inboxes for testing - [see section](/inboxes/)
-- **Local:** Work in local network - [see section](/dev/)
-- **Workers:** Worker for testing - [see section](/workers/)
-- **Helpers:** Coding helpers - [see section](/helpers/)
-- **Scripts:** Monorepo scripts - [see section](/scripts/)
-- **Introduction:** Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
