@@ -16,7 +16,6 @@ jobs:
       matrix:
         test: [performance]
         env: [dev, production]
-        cache-data: [true]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
