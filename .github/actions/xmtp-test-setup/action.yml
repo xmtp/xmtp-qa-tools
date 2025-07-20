@@ -6,6 +6,13 @@ inputs:
     description: "Whether to cache .data and .env files"
     required: false
     default: "false"
+  test-name:
+    description: "Name of the test for notifications and artifact naming"
+    required: true
+  env:
+    description: "Test environment (dev, production, etc.)"
+    required: false
+    default: "dev"
 
 runs:
   using: "composite"
@@ -32,13 +39,17 @@ runs:
         path: |
           .data
           .env
-        key: installation-${{ hashFiles('yarn.lock') }}
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
         restore-keys: |
-          installation-
+          data-${{ inputs.env }}-
 
     - name: Show cache status
       if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
-      run: echo "Data caching is ENABLED for .data and .env files"
+      run: |
+        echo "Data caching is ENABLED for .data and .env files"
+        echo "Cache key: data-${{ inputs.env }}-${{ inputs.test-name }}"
+        echo "Environment: ${{ inputs.env }}"
+        echo "Test name: ${{ inputs.test-name }}"
       shell: bash
 
     - name: Install dependencies

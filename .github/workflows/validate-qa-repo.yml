@@ -1,4 +1,4 @@
-name: Self Test XMTP QA Tools
+name: Validate QA repo
 
 on:
   schedule:

@@ -12,7 +12,9 @@ describe(testName, async () => {
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
   let dm: Dm | undefined;
-  let workers = await getWorkers(10);
+  let workers = await getWorkers(10, {
+    randomNames: false,
+  });
 
   let newGroup: Group;
   const creator = workers.getCreator();

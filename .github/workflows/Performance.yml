@@ -16,6 +16,7 @@ jobs:
       matrix:
         test: [performance]
         env: [dev, production]
+        cache-data: [true]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
@@ -29,14 +30,19 @@ jobs:
 
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
 
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
+          cache-data: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 

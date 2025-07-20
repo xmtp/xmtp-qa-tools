@@ -1,4 +1,4 @@
-name: Check agent-examples
+name: Validate agents repo
 
 on:
   schedule:

@@ -13,7 +13,6 @@ describe("notifications", () => {
 
   it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
     workers = await getWorkers(5, {
-      randomNames: false,
       env: receiverObj.network as "production" | "dev" | "local",
     });
     // Start message and response streams for notifications
