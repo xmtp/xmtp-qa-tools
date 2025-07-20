@@ -89,7 +89,7 @@ interface NetworkStats {
 
 export const GEO_TO_COUNTRY_CODE = {
   "us-east": "US",
-  "us-west": "US",
+  "us-east-1": "US",
   europe: "FR",
   asia: "JP",
   "south-america": "BR",
