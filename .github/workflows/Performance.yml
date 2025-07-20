@@ -2,7 +2,7 @@ name: Performance
 description: "should verify performance "
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
   workflow_dispatch:
@@ -14,6 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        cache-data: [true]
         test: [performance]
         env: [dev, production]
     env:
@@ -29,6 +30,10 @@ jobs:
 
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
         run: yarn test ${{ matrix.test }}
@@ -37,6 +42,7 @@ jobs:
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
+          cache-data: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
