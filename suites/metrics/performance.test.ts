@@ -35,7 +35,7 @@ describe(testName, async () => {
     networkStats: true,
   });
 
-  it("clientCreate: should measure creating a client", async () => {
+  it("create: should measure creating a client", async () => {
     const client = await getWorkers(["randomclient"]);
     expect(client).toBeDefined();
   });
