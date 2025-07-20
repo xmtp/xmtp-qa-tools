@@ -30,6 +30,7 @@ jobs:
         with:
           cache-data: true
           test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
 
       - name: Log initial state of .data and .env
         run: |
