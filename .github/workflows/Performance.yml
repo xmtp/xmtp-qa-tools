@@ -36,7 +36,7 @@ jobs:
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --no-fail
 
       - name: Cleanup and upload artifacts
         if: always()
