@@ -52,15 +52,14 @@ runs:
         path: |
           .data
           .env
-        key: data-${{ inputs.env }}-${{ inputs.test-name }}-${{ hashFiles('yarn.lock') }}
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
         restore-keys: |
-          data-${{ inputs.env }}-${{ inputs.test-name }}-
           data-${{ inputs.env }}-
 
     - name: Show cache save status
       if: ${{ always() && (inputs.save-to-cache == 'true' || inputs.save-to-cache == true) }}
       run: |
-        echo "Saving data to cache with key: data-${{ inputs.env }}-${{ inputs.test-name }}-${{ hashFiles('yarn.lock') }}"
+        echo "Saving data to cache with key: data-${{ inputs.env }}-${{ inputs.test-name }}"
         echo "Environment: ${{ inputs.env }}"
         echo "Test name: ${{ inputs.test-name }}"
         echo "Files being cached:"

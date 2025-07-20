@@ -39,16 +39,15 @@ runs:
         path: |
           .data
           .env
-        key: data-${{ inputs.env }}-${{ inputs.test-name }}-${{ hashFiles('yarn.lock') }}
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
         restore-keys: |
-          data-${{ inputs.env }}-${{ inputs.test-name }}-
           data-${{ inputs.env }}-
 
     - name: Show cache status
       if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
       run: |
         echo "Data caching is ENABLED for .data and .env files"
-        echo "Cache key: data-${{ inputs.env }}-${{ inputs.test-name }}-${{ hashFiles('yarn.lock') }}"
+        echo "Cache key: data-${{ inputs.env }}-${{ inputs.test-name }}"
         echo "Environment: ${{ inputs.env }}"
         echo "Test name: ${{ inputs.test-name }}"
       shell: bash
