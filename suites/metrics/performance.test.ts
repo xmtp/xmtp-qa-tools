@@ -113,11 +113,12 @@ describe(testName, async () => {
   });
 
   for (const i of BATCH_SIZE) {
+    const creatorClient = workers.getCreator().client;
     it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = getInboxIds(i);
       newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
-        ...workers.getAll().map((w) => w.client.inboxId),
+        ...workers.getAllButCreator().map((w) => w.client.inboxId),
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
