@@ -157,6 +157,10 @@ export function sendMetric(
   tags: MetricTags,
 ): void {
   try {
+    if (metricValue <= 0) {
+      console.warn(`❌ Metric value is 0 or negative: ${metricName}`);
+      return;
+    }
     const enrichedTags = enrichTags(tags);
     const fullMetricName = `xmtp.sdk.${metricName}`;
     const operationKey = getOperationKey(enrichedTags, metricName);
