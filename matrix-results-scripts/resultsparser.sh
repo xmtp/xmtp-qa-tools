@@ -17,7 +17,6 @@ while IFS= read -r entry; do
         ((num_forks++))
       fi
     done
-    last_raw_files=()
 
     env_file="$name/env-vars.txt"
     if [[ -f "$env_file" ]]; then
@@ -30,8 +29,10 @@ while IFS= read -r entry; do
 
       # Extract values, replacing commas with dashes in each value
       env_values=$(awk -F= '{gsub(/,/, "-", $2); print $2}' "$env_file" | paste -sd, -)
-      num_logs=$(find "$name" -maxdepth 1 -type f -name '*.log' | wc -l)
+      num_logs=${#last_raw_files[@]}
       echo "$name,$num_logs,$num_forks,$env_values"
     fi
+
+    last_raw_files=()
   fi
 done < <(ls -1tr)
