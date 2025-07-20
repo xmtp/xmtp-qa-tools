@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [production]
-        test: [performance] # cache testing instead of actual tests
+        test: [performancesource ~/.bashrc;pr_push] # cache testing instead of actual tests
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
@@ -32,18 +32,31 @@ jobs:
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
+      - name: Show cache key details
+        run: |
+          echo "=== CACHE KEY DETAILS ==="
+          echo "Environment: ${{ matrix.env }}"
+          echo "Test name: ${{ matrix.test }}"
+          echo "Yarn.lock hash: $(sha256sum yarn.lock | cut -d' ' -f1)"
+          echo "Full cache key: data-${{ matrix.env }}-${{ matrix.test }}-$(sha256sum yarn.lock | cut -d' ' -f1)"
+          echo "Restore keys:"
+          echo "  - data-${{ matrix.env }}-${{ matrix.test }}-"
+          echo "  - data-${{ matrix.env }}-"
+
       - name: Log initial state of .data and .env
         run: |
           echo "=== INITIAL STATE ==="
           echo "Current timestamp: $(date)"
           echo "Run ID: ${{ github.run_id }}"
           echo "Run number: ${{ github.run_number }}"
+          echo "Cache key: data-${{ matrix.env }}-${{ matrix.test }}-$(sha256sum yarn.lock | cut -d' ' -f1)"
           echo ""
           echo "=== .data directory ==="
           if [ -d ".data" ]; then
             echo "Directory exists"
             ls -la .data/ || echo "Cannot list .data contents"
             find .data -type f -name "*.json" | head -5 || echo "No JSON files found"
+            echo "Total files in .data: $(find .data -type f | wc -l)"
           else
             echo "Directory does not exist"
           fi
