@@ -19,6 +19,7 @@ describe(testName, async () => {
 
   let newGroup: Group;
   const creator = workers.getCreator();
+  const receiver = workers.getReceiver();
   const creatorClient = creator.client;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -69,9 +70,8 @@ describe(testName, async () => {
     expect(inboxState.installations.length).toBeGreaterThan(0);
   });
   it("newDm: should measure creating a DM", async () => {
-    console.log(workers.getCreator().name);
     dm = (await creatorClient.conversations.newDm(
-      workers.getReceiver().client.inboxId,
+      receiver.client.inboxId,
     )) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
@@ -87,16 +87,13 @@ describe(testName, async () => {
   });
 
   it("stream: should measure receiving a gm", async () => {
-    console.log(workers.getReceiver().name);
-    const verifyResult = await verifyMessageStream(dm!, [
-      workers.getReceiver(),
-    ]);
+    const verifyResult = await verifyMessageStream(dm!, [receiver]);
 
     sendMetric("response", verifyResult.averageEventTiming, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
-      sdk: workers.getReceiver().sdk,
+      sdk: receiver.sdk,
     } as ResponseMetricTags);
 
     setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
