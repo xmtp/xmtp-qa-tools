@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -18,6 +19,7 @@ describe(testName, async () => {
 
   let newGroup: Group;
   const creator = workers.getCreator();
+  const receiver = workers.getReceiver();
   const creatorClient = creator.client;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -69,19 +71,10 @@ describe(testName, async () => {
   });
   it("newDm: should measure creating a DM", async () => {
     dm = (await creatorClient.conversations.newDm(
-      workers.getAll()[1].client.inboxId,
+      receiver.client.inboxId,
     )) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
-  });
-  it("newDmByAddress: should measure creating a DM", async () => {
-    const dm2 = await creatorClient.conversations.newDmWithIdentifier({
-      identifier: workers.getAll()[2].address,
-      identifierKind: IdentifierKind.Ethereum,
-    });
-
-    expect(dm2).toBeDefined();
-    expect(dm2.id).toBeDefined();
   });
 
   it("send: should measure sending a gm", async () => {
@@ -94,26 +87,35 @@ describe(testName, async () => {
   });
 
   it("stream: should measure receiving a gm", async () => {
-    const verifyResult = await verifyMessageStream(dm!, [workers.getAll()[1]]);
+    const verifyResult = await verifyMessageStream(dm!, [receiver]);
 
-    const responseMetricTags: ResponseMetricTags = {
+    sendMetric("response", verifyResult.averageEventTiming, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
-      sdk: workers.getCreator().sdk,
-    };
-    sendMetric("response", verifyResult.averageEventTiming, responseMetricTags);
+      sdk: receiver.sdk,
+    } as ResponseMetricTags);
 
-    setCustomDuration(verifyResult.averageEventTiming);
-    expect(verifyResult.almostAllReceived).toBe(true);
+    setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
+    expect(verifyResult.allReceived).toBe(true);
+  });
+  it("newDmByAddress: should measure creating a DM", async () => {
+    const dm2 = await creatorClient.conversations.newDmWithIdentifier({
+      identifier: workers.getAll()[2].address,
+      identifierKind: IdentifierKind.Ethereum,
+    });
+
+    expect(dm2).toBeDefined();
+    expect(dm2.id).toBeDefined();
   });
 
   for (const i of BATCH_SIZE) {
+    const creatorClient = workers.getCreator().client;
     it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = getInboxIds(i);
       newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
-        ...workers.getAll().map((w) => w.client.inboxId),
+        ...workers.getAllButCreator().map((w) => w.client.inboxId),
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
