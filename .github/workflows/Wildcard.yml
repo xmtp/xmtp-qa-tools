@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  pull_request:
+  #pull_request:
 
 jobs:
   test:
@@ -11,9 +11,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cache-data: [true]
         env: [production]
-        test: [performance] # cache testing instead of actual tests
+        test: [delivery] # performance test with more large groups
+        # test: [functional] # full functional test
+        # test: [performance] # performance test with more large groups
+        # test: [regression] # regression test with more large groups
+        # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
@@ -29,21 +32,10 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
-          cache-data: ${{ matrix.cache-data }}
-          test-name: ${{ matrix.test }}
-          env: ${{ matrix.env }}
+          cache-data: true
 
-      - name: Create test files for cache verification
-        run: |
-          mkdir -p .data
-          echo "Test data created at $(date)" > .data/cache-test-$(date +%s).txt
-          echo "Cache test run: ${{ github.run_number }}" >> .data/cache-test-$(date +%s).txt
-          echo "Run ID: ${{ github.run_id }}" >> .data/cache-test-$(date +%s).txt
-
-          if [ ! -f ".env" ]; then
-            echo "XMTP_ENV=${{ matrix.env }}" > .env
-            echo "LOGGING_LEVEL=error" >> .env
-          fi
+      # - name: Run script version
+      #   run: yarn script versions
 
       - name: Run tests
         run: yarn test ${{ matrix.test }}
