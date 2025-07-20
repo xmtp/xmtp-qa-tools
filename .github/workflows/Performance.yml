@@ -42,7 +42,7 @@ jobs:
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
-          cache-data: ${{ matrix.cache-data }}
+          save-to-cache: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
