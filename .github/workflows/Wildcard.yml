@@ -11,6 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        cache-data: [true]
         env: [production]
         test: [performance] # cache testing instead of actual tests
     env:
@@ -28,7 +29,7 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
-          cache-data: true
+          cache-data: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
