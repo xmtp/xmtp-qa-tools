@@ -11,7 +11,7 @@ describe("notifications", () => {
   let group: Conversation;
   let workers: WorkerManager;
 
-  it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
+  it(`create notification test group and add ${receiverObj.name} as super admin`, async () => {
     workers = await getWorkers(5, {
       env: receiverObj.network as "production" | "dev" | "local",
     });
@@ -31,7 +31,7 @@ describe("notifications", () => {
     console.log(`Created group ${group.id}`);
   });
 
-  it(`should send DM messages to ${receiverInboxId} for notification testing`, async () => {
+  it(`send DM messages to ${receiverInboxId} for notification testing`, async () => {
     let counter = 0;
     console.log(`Starting notification test with random delays...`);
     for (const worker of workers.getAll()) {
@@ -43,7 +43,7 @@ describe("notifications", () => {
     }
   });
 
-  it(`should send group messages to ${receiverObj.inboxId} for notification testing`, async () => {
+  it(`send group messages to ${receiverObj.inboxId} for notification testing`, async () => {
     let counter = 0;
 
     if (!group) {

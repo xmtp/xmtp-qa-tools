@@ -21,7 +21,7 @@ describe(testName, async () => {
 
   setupTestLifecycle({ testName });
 
-  it("should do something", async () => {
+  it("do something", async () => {
     // Test logic here
   });
 });
@@ -368,7 +368,7 @@ expect(result.orderPercentage).toBeGreaterThan(90);
 #### Real-time Message Testing
 
 ```typescript
-it("should deliver messages in real-time", async () => {
+it("deliver messages in real-time", async () => {
   // Start message streams
   workers.getReceiver().worker.startStream(typeofStream.Message);
 
@@ -389,7 +389,7 @@ it("should deliver messages in real-time", async () => {
 #### Group Update Notifications
 
 ```typescript
-it("should notify all members of group updates", async () => {
+it("all members of receive updates", async () => {
   // Start group update streams
   workers.getAllButCreator().forEach((worker) => {
     worker.worker.startStream(typeofStream.GroupUpdated);
@@ -528,7 +528,7 @@ describe(testName, async () => {
 
   setupTestLifecycle({ testName });
 
-  it("should do something", async () => {
+  it("do something", async () => {
     // Test logic here
   });
 });
@@ -875,7 +875,7 @@ expect(result.orderPercentage).toBeGreaterThan(90);
 #### Real-time Message Testing
 
 ```typescript
-it("should deliver messages in real-time", async () => {
+it("deliver messages in real-time", async () => {
   // Start message streams
   workers.getReceiver().worker.startStream(typeofStream.Message);
 
@@ -896,7 +896,7 @@ it("should deliver messages in real-time", async () => {
 #### Group Update Notifications
 
 ```typescript
-it("should notify all members of group updates", async () => {
+it("all members of receive updates", async () => {
   // Start group update streams
   workers.getAllButCreator().forEach((worker) => {
     worker.worker.startStream(typeofStream.GroupUpdated);

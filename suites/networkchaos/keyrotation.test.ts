@@ -26,7 +26,7 @@ describe(testName, async () => {
   // Start message and response streams for the stress testing
   workers.startStream(typeofStream.MessageandResponse);
 
-  it("should handle staggered key rotations and network chaos under load", async () => {
+  it("handle staggered key rotations and network chaos under load", async () => {
     const group = await workers.createGroupBetweenAll(
       "Key Rotation Stress Test",
     );

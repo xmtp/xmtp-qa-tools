@@ -20,7 +20,7 @@ const testName = "storage";
 describe(testName, () => {
   setupTestLifecycle({ testName });
 
-  it("should generate storage efficiency table for different group sizes", async () => {
+  it("generate storage efficiency table for different group sizes", async () => {
     const results: StorageMetrics[] = [];
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     const memberCount = 2;

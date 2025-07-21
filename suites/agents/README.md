@@ -73,7 +73,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ### Agent filtering:
 
-- Only tests agents where `shouldRespondOnTagged: true`
+- Only tests agents where `respondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
 ### Tagged response validation:
@@ -104,7 +104,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ### Agent filtering:
 
-- Only tests agents where `shouldRespondOnTagged: true`
+- Only tests agents where `respondOnTagged: true`
 - Filters by network environment
 
 ### Negative testing:
@@ -124,7 +124,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 - **address**: Ethereum address
 - **sendMessage**: Test message to send
 - **networks**: Supported networks (`["dev", "production"]`)
-- **shouldRespondOnTagged**: Whether agent responds to tagged messages
+- **respondOnTagged**: Whether agent responds to tagged messages
 - **live**: Production status flag
 - **slackChannel**: Alert channel for monitoring
 

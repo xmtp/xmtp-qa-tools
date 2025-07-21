@@ -110,7 +110,7 @@ describe(testName, async () => {
       await group.send(message);
     }
   });
-  it(`should perform syncAll on all inbox sizes`, async () => {
+  it(`perform syncAll on all inbox sizes`, async () => {
     const inboxes = [
       { worker: smallInbox, name: "small", key: "small" as const },
       { worker: mediumInbox, name: "medium", key: "medium" as const },

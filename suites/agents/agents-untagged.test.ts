@@ -21,7 +21,7 @@ describe(testName, async () => {
   const workers = await getWorkers(["randomguy"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env) && agent.shouldRespondOnTagged;
+    return agent.networks.includes(env) && agent.respondOnTagged;
   });
 
   // Handle case where no agents are configured for the current environment

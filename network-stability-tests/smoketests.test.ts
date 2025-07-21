@@ -6,7 +6,7 @@ describe("Basic Network Fault Tests", () => {
   const node2 = new DockerContainer("multinode-node2-1");
   const node4 = new DockerContainer("multinode-node4-1");
 
-  it("should add and remove 200ms latency between node1 and node2", () => {
+  it("add and remove 200ms latency between node1 and node2", () => {
     console.log("[netem] Clearing existing qdisc (ok if already absent)...");
     node1.clearLatency();
 
@@ -28,7 +28,7 @@ describe("Basic Network Fault Tests", () => {
     node1.ping(node2);
   });
 
-  it("should block and restore traffic between node1 and node4", () => {
+  it("block and restore traffic between node1 and node4", () => {
     console.log("[iptables] Pinging node4 from node1 before partition:");
     node1.ping(node4);
 

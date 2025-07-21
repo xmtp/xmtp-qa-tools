@@ -26,7 +26,7 @@ describe(testName, async () => {
   let group: Group;
   const expectedMessages = ["gm-bh-1", "gm-bh-2", "gm-bh-3"];
 
-  it("should simulate a node blackhole in a group chat and recover cleanly", async () => {
+  it("simulate a node blackhole in a group chat and recover cleanly", async () => {
     console.log("[test] Creating group conversation");
     group = await workers.createGroupBetweenAll("Blackhole Group Test");
     await group.sync();
