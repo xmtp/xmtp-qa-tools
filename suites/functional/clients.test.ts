@@ -2,7 +2,6 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { getVersions } from "@workers/versions";
-import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
@@ -76,6 +75,8 @@ describe(testName, async () => {
       let convo = await bob?.client.conversations.newDm(receiverInboxId);
 
       expect(convo?.id).toBeDefined();
+      if (!convo?.id)
+        console.error("Dowgrading from version", version.nodeVersion);
     }
   });
 
@@ -95,6 +96,8 @@ describe(testName, async () => {
       console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
       let convo = await alice?.client.conversations.newDm(receiverInboxId);
       expect(convo?.id).toBeDefined();
+      if (!convo?.id)
+        console.error("Upgrading to version", version.nodeVersion);
     }
   });
 
