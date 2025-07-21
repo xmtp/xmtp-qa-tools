@@ -38,7 +38,7 @@ describe(testName, () => {
   });
 
   for (const groupConfig of config) {
-    it(`Should create ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`, async () => {
+    it(`create ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`, async () => {
       console.log(
         `Creating ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`,
       );

@@ -25,7 +25,7 @@ describe(testName, () => {
     initialDm = await random1.client.conversations.newDm(bob.client.inboxId);
   });
 
-  it("should verify message delivery works after DM stitching", async () => {
+  it("verify message delivery works after DM stitching", async () => {
     // Send a test message and verify delivery
     const verifyResult = await verifyMessageStream(initialDm as Conversation, [
       bob,
@@ -36,7 +36,7 @@ describe(testName, () => {
     expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
   });
 
-  it("should revoke all installations for random1", async () => {
+  it("revoke all installations for random1", async () => {
     // Get current installations
     const currentState = await Client.inboxStateFromInboxIds(
       [random1.client.inboxId],
@@ -62,7 +62,7 @@ describe(testName, () => {
     );
   });
 
-  it("should create fresh random1 client and verify DM accessibility", async () => {
+  it("create fresh random1 client and verify DM accessibility", async () => {
     // Create fresh random1 client
     const freshrandom1 = await getWorkers(["random1-fresh"]);
     random1Fresh = freshrandom1.get("random1", "fresh")!;

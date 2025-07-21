@@ -15,7 +15,7 @@ describe(testName, async () => {
 
   let targetInboxId: string;
 
-  it("should send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
+  it("send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
     // Use ivy as the target that everyone will message
     targetInboxId = workers.getCreator().client.inboxId;
     expect(targetInboxId).toBeDefined();

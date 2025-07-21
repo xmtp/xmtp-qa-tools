@@ -18,7 +18,7 @@ describe(testName, async () => {
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
 
-  it("should not deliver duplicate DMs under retry and degraded network conditions", async () => {
+  it("not deliver duplicate DMs under retry and degraded network conditions", async () => {
     let conversation: Dm;
 
     try {

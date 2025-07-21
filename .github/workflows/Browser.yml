@@ -1,5 +1,5 @@
 name: Browser
-description: "should verify browser support"
+description: "verify browser support"
 
 on:
   schedule:

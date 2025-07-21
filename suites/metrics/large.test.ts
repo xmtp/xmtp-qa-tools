@@ -38,7 +38,7 @@ describe(testName, async () => {
   });
 
   for (const groupSize of BATCH_SIZE) {
-    it(`newGroup-${groupSize}: should create a large group of ${groupSize} participants`, async () => {
+    it(`newGroup-${groupSize}:create a large group of ${groupSize} participants`, async () => {
       allMembersWithExtra = getInboxIds(groupSize + 1);
       allMembers = allMembersWithExtra.slice(0, groupSize);
 
@@ -48,10 +48,10 @@ describe(testName, async () => {
       );
     });
 
-    it(`groupsync-${groupSize}: should sync a large group of ${groupSize} participants ${groupSize}`, async () => {
+    it(`groupsync-${groupSize}:sync a large group of ${groupSize} participants ${groupSize}`, async () => {
       await newGroupBetweenAll.sync();
     });
-    it(`addMember-${groupSize}: should notify all members of additions in ${groupSize} member group`, async () => {
+    it(`addMember-${groupSize}:notify all members of additions in ${groupSize} member group`, async () => {
       const extraMember = allMembersWithExtra.slice(groupSize, groupSize + 1);
       console.log(extraMember);
       const verifyResult = await verifyMembershipStream(
@@ -64,7 +64,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`stream-${groupSize}: should notify all members of message changes in ${groupSize} member group`, async () => {
+    it(`stream-${groupSize}:notify all members of message changes in ${groupSize} member group`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
@@ -81,7 +81,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`updateName-${groupSize}: should notify all members of metadata changes in ${groupSize} member group`, async () => {
+    it(`updateName-${groupSize}:notify all members of metadata changes in ${groupSize} member group`, async () => {
       const verifyResult = await verifyMetadataStream(
         newGroupBetweenAll,
         workers.getAllButCreator(),
@@ -91,7 +91,7 @@ describe(testName, async () => {
       expect(verifyResult.almostAllReceived).toBe(true);
     });
 
-    it(`sync-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
+    it(`sync-${groupSize}:perform cold start sync operations on ${groupSize} member group`, async () => {
       const singleSyncWorkers = await getWorkers(["randomA"]);
       const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
       await newGroupBetweenAll.addMembers([clientSingleSync.inboxId]);
@@ -100,7 +100,7 @@ describe(testName, async () => {
       const end = performance.now();
       setCustomDuration(end - start);
     });
-    it(`syncAll-${groupSize}: should perform cold start sync operations on ${groupSize} member group`, async () => {
+    it(`syncAll-${groupSize}:perform cold start sync operations on ${groupSize} member group`, async () => {
       const singleSyncWorkers = await getWorkers(["randomB"]);
       const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
       await newGroupBetweenAll.addMembers([clientSingleSync.inboxId]);
@@ -111,12 +111,12 @@ describe(testName, async () => {
     });
 
     // let run = 0; // Worker allocation counter
-    // it(`syncAllCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
+    // it(`syncAllCumulative-${groupSize}:perform cumulative sync operations on ${groupSize} member group`, async () => {
     //   const allWorkers = workers.getAllButCreator();
     //   const workerA = allWorkers[run % allWorkers.length];
     //   await workerA.client.conversations.sync();
     // });
-    // it(`syncCumulative-${groupSize}: should perform cumulative sync operations on ${groupSize} member group`, async () => {
+    // it(`syncCumulative-${groupSize}:perform cumulative sync operations on ${groupSize} member group`, async () => {
     //   const allWorkers = workers.getAllButCreator();
     //   const workerA = allWorkers[run % allWorkers.length];
     //   await workerA.client.conversations.syncAll();

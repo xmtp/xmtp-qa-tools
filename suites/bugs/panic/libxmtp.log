@@ -252,7 +252,7 @@ dd657 60545
 2025-03-06T22:06:51.007369Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(7), error_code: CANCEL }
  ✓ bugs/bug_panic/test.test.ts (1 test)2025-03-06T22:06:51.007374Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(15), error_code: CANCEL }
  15311ms
-   ✓ bug_panic > createGroupByInboxIds: should measure creating a group with inbox ids 15310ms
+   ✓ bug_panic > createGroupByInboxIds:measure creating a group with inbox ids 15310ms
 2025-03-06T22:06:51.007417Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(17), error_code: CANCEL }
 2025-03-06T22:06:51.006772Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(7), error_code: CANCEL }
 2025-03-06T22:06:51.007435Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(25), error_code: CANCEL }

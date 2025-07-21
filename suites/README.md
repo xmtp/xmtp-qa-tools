@@ -36,16 +36,16 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Content Handling (`codec.test.ts`)
 
-- `errors: handle codec errors gracefully when sending unsupported content types`
+- `errors:  handle codec errors gracefully when sending unsupported content types`
 
 ### Debug Operations (`debug.test.ts`)
 
-- `debug: retrieve group debug information`
-- `debug: track epoch changes during group operations`
-- `debug: verify epoch consistency across members`
-- `debug: detect potential forks in group state`
-- `debug: verify debug info after metadata changes`
-- `debug: verify debug info structure completeness`
+- `debug:  retrieve group debug information`
+- `debug:  track epoch changes during group operations`
+- `debug:  verify epoch consistency across members`
+- `debug:  detect potential forks in group state`
+- `debug:  verify debug info after metadata changes`
+- `debug:  verify debug info structure completeness`
 
 ### Installation Management (`installations.test.ts`)
 
@@ -53,39 +53,39 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Metadata Operations (`metadata.test.ts`)
 
-- `metadata: update group name and verify persistence`
-- `metadata: update group description and verify persistence`
-- `metadata: update group image URL`
-- `metadata: verify metadata propagation to other members`
-- `metadata: handle empty and special characters in metadata`
-- `metadata: verify metadata state after group operations`
+- `metadata:  update group name and verify persistence`
+- `metadata:  update group description and verify persistence`
+- `metadata:  update group image URL`
+- `metadata:  verify metadata propagation to other members`
+- `metadata:  handle empty and special characters in metadata`
+- `metadata:  verify metadata state after group operations`
 
 ### Permission System (`permissions.test.ts`)
 
-- `permissions: add and remove admin permissions`
-- `permissions: add and remove super admin permissions`
-- `permissions: verify admin list management`
-- `permissions: admin can remove other members`
-- `permissions: super admin can manage other admins`
+- `permissions:  add and remove admin permissions`
+- `permissions:  add and remove super admin permissions`
+- `permissions:  verify admin list management`
+- `permissions:  admin can remove other members`
+- `permissions:  super admin can manage other admins`
 
 ### Stream Validation (`streams.test.ts`)
 
-- `membership: verify member addition notifications`
-- `consent: verify consent state changes for direct messages`
-- `consent: verify consent state changes in groups`
-- `messages: verify direct message delivery`
-- `messages: verify group message delivery`
-- `metadata: verify group metadata updates`
-- `conversations: verify new conversation notifications`
-- `members: verify member addition to existing group`
+- `membership:  verify member addition notifications`
+- `consent:  verify consent state changes for direct messages`
+- `consent:  verify consent state changes in groups`
+- `messages:  verify direct message delivery`
+- `messages:  verify group message delivery`
+- `metadata:  verify group metadata updates`
+- `conversations:  verify new conversation notifications`
+- `members:  verify member addition to existing group`
 
 ### sync (`sync.test.ts`)
 
-- `group sync performance: should establish test environment by creating group with all participants`
-- `group sync performance: should send baseline message to group for sync performance testing`
-- `group sync performance: should measure performance impact of client-level conversations.sync() operation`
-- `group sync performance: should measure performance impact of individual conversation.sync() operation`
-- `group sync performance: should measure message retrieval performance without explicit sync`
+- `group sync performance: establish test environment by creating group with all participants`
+- `group sync performance: send baseline message to group for sync performance testing`
+- `group sync performance: measure performance impact of client-level conversations.sync() operation`
+- `group sync performance: measure performance impact of individual conversation.sync() operation`
+- `group sync performance: measure message retrieval performance without explicit sync`
 
 ---
 
@@ -95,9 +95,9 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Core Tests:
 
-- `stream: should verify message delivery and order accuracy using streams`
-- `poll: should verify message delivery and order accuracy using polling`
-- `recovery: should verify message recovery after stream interruption`
+- `stream: verify message delivery and order accuracy using streams`
+- `poll: verify message delivery and order accuracy using polling`
+- `recovery: verify message recovery after stream interruption`
 
 **Metrics Validated**:
 
@@ -113,24 +113,24 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Individual Operations:
 
-- `create: should measure creating a client`
-- `canMessage: should measure canMessage`
-- `inboxState: should measure inboxState`
-- `newDm: should measure creating a DM`
-- `send: should measure sending a gm`
-- `stream: should measure receiving a gm`
-- `newDmByAddress: should measure creating a DM`
+- `create: measure creating a client`
+- `canMessage: measure canMessage`
+- `inboxState: measure inboxState`
+- `newDm: measure creating a DM`
+- `send: measure sending a gm`
+- `stream: measure receiving a gm`
+- `newDmByAddress: measure creating a DM`
 
 ### Scaled Operations (per group size):
 
-- `newGroup-{i}: should create a large group of {i} participants`
-- `newGroupByAddress-{i}: should create a large group of {i} participants`
-- `groupsync-{i}: should sync a large group of {i} participants`
-- `updateName-{i}: should update the group name`
-- `send-{i}: should measure sending a gm in a group of {i} participants`
-- `stream-{i}: should verify group message`
-- `addMember-{i}: should add members to a group`
-- `removeMembers-{i}: should remove a participant from a group`
+- `newGroup-{i}: create a large group of {i} participants`
+- `newGroupByAddress-{i}: create a large group of {i} participants`
+- `groupsync-{i}: sync a large group of {i} participants`
+- `updateName-{i}: update the group name`
+- `send-{i}: measure sending a gm in a group of {i} participants`
+- `stream-{i}: verify group message`
+- `addMember-{i}: add members to a group`
+- `removeMembers-{i}: remove a participant from a group`
 
 ---
 
@@ -140,13 +140,13 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Scalability Tests (per group size):
 
-- `newGroup-{groupSize}: should create a large group of {groupSize} participants`
-- `groupsync-{groupSize}: should sync a large group of {groupSize} participants`
-- `addMember-{groupSize}: should notify all members of additions in {groupSize} member group`
-- `stream-{groupSize}: should notify all members of message changes in {groupSize} member group`
-- `updateName-{groupSize}: should notify all members of metadata changes in {groupSize} member group`
-- `sync-{groupSize}: should perform cold start sync operations on {groupSize} member group`
-- `syncAll-{groupSize}: should perform cold start sync operations on {groupSize} member group`
+- `newGroup-{groupSize}: create a large group of {groupSize} participants`
+- `groupsync-{groupSize}: sync a large group of {groupSize} participants`
+- `addMember-{groupSize}: notify all members of additions in {groupSize} member group`
+- `stream-{groupSize}: notify all members of message changes in {groupSize} member group`
+- `updateName-{groupSize}: notify all members of metadata changes in {groupSize} member group`
+- `sync-{groupSize}: perform cold start sync operations on {groupSize} member group`
+- `syncAll-{groupSize}: perform cold start sync operations on {groupSize} member group`
 
 **Key Measurements**:
 

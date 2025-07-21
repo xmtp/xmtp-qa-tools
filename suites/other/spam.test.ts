@@ -14,7 +14,7 @@ const testName = "spam";
 describe("spam", () => {
   setupTestLifecycle({ testName });
 
-  it("should generate storage efficiency table for different group sizes", async () => {
+  it("generate storage efficiency table for different group sizes", async () => {
     const workers = await getWorkers(1);
     // Note: No streams or syncs needed for this test (all were set to None)
     const creator = workers.get("bot");

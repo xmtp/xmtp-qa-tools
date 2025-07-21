@@ -1,5 +1,5 @@
 name: Agents
-description: "should verify performance of the library in the production network"
+description: "verify performance of the library in the production network"
 
 on:
   schedule:

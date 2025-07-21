@@ -17,7 +17,7 @@ describe(testName, async () => {
 
   let group: Group;
 
-  it("should recover and sync group state after node isolation", async () => {
+  it("recover and sync group state after node isolation", async () => {
     // Create group with users 1-3
     group = await workers.createGroupBetweenAll("Test Group");
     await group.sync();

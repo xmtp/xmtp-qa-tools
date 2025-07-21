@@ -37,11 +37,11 @@ describe(testName, async () => {
     networkStats: true,
   });
 
-  it("create: should measure creating a client", async () => {
+  it("create:measure creating a client", async () => {
     const client = await getWorkers(["randomclient"]);
     expect(client).toBeDefined();
   });
-  it("canMessage: should measure canMessage", async () => {
+  it("canMessage:measure canMessage", async () => {
     const client = await getWorkers(["randomclient"]);
     if (!client) {
       throw new Error("Client not found");
@@ -65,11 +65,11 @@ describe(testName, async () => {
     expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
   });
 
-  it("inboxState: should measure inboxState", async () => {
+  it("inboxState:measure inboxState", async () => {
     const inboxState = await creatorClient.preferences.inboxState(true);
     expect(inboxState.installations.length).toBeGreaterThan(0);
   });
-  it("newDm: should measure creating a DM", async () => {
+  it("newDm:measure creating a DM", async () => {
     dm = (await creatorClient.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
@@ -77,7 +77,7 @@ describe(testName, async () => {
     expect(dm.id).toBeDefined();
   });
 
-  it("send: should measure sending a gm", async () => {
+  it("send:measure sending a gm", async () => {
     // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -86,7 +86,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("stream: should measure receiving a gm", async () => {
+  it("stream:measure receiving a gm", async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver]);
 
     sendMetric("response", verifyResult.averageEventTiming, {
@@ -99,7 +99,7 @@ describe(testName, async () => {
     setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
     expect(verifyResult.allReceived).toBe(true);
   });
-  it("newDmByAddress: should measure creating a DM", async () => {
+  it("newDmByAddress:measure creating a DM", async () => {
     const dm2 = await creatorClient.conversations.newDmWithIdentifier({
       identifier: workers.getAll()[2].address,
       identifierKind: IdentifierKind.Ethereum,
@@ -111,7 +111,7 @@ describe(testName, async () => {
 
   for (const i of BATCH_SIZE) {
     const creatorClient = workers.getCreator().client;
-    it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroup-${i}:create a large group of ${i} participants ${i}`, async () => {
       const sliced = getInboxIds(i);
       newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
@@ -119,7 +119,7 @@ describe(testName, async () => {
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
-    it(`newGroupByAddress-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroupByAddress-${i}:create a large group of ${i} participants ${i}`, async () => {
       const sliced = getAddresses(i);
       const newGroupByIdentifier =
         await creatorClient.conversations.newGroupWithIdentifiers(
@@ -130,25 +130,25 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     });
-    it(`groupsync-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+    it(`groupsync-${i}:sync a large group of ${i} participants ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
     });
-    it(`updateName-${i}: should update the group name`, async () => {
+    it(`updateName-${i}:update the group name`, async () => {
       const newName = "Large Group";
       await newGroup.updateName(newName);
       await newGroup.sync();
       const name = newGroup.name;
       expect(name).toBe(newName);
     });
-    it(`send-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
+    it(`send-${i}:measure sending a gm in a group of ${i} participants`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
-    it(`stream-${i}: should verify group message`, async () => {
+    it(`stream-${i}:verify group message`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getAllButCreator(),
@@ -165,10 +165,10 @@ describe(testName, async () => {
       setCustomDuration(verifyResult?.averageEventTiming ?? 0);
       expect(verifyResult.almostAllReceived).toBe(true);
     });
-    it(`addMember-${i}: should add members to a group`, async () => {
+    it(`addMember-${i}:add members to a group`, async () => {
       await newGroup.addMembers([workers.getAll()[2].inboxId]);
     });
-    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+    it(`removeMembers-${i}:remove a participant from a group`, async () => {
       const previousMembers = await newGroup.members();
       await newGroup.removeMembers([
         previousMembers.filter(
