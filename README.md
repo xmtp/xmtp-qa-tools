@@ -80,53 +80,48 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Tools & utilities
-
-- **Status:** XMTP network status - [see section](https://status.xmtp.org/)
-- **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
-- **Logging:** Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
-- **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
-- **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
-  - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
-  - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
-- **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
-
 ## Testing summary
 
-#### Test coverage
+**Test coverage**
 
-- Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
-- Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- Regression: Backward compatibility testing for the last 3 versions
-- NetworkChaos: Partition tolerance, duplicate prevention, reconciliation, key rotation
-- Browser: Cross-browser compatibility via Playwright automation
-- Agents: Live production bot health monitoring
-- Mobile: Cross-platform performance testing
-- Bugs: Historical issue reproduction and regression prevention
-- Other: Security, spam detection, rate limiting, storage efficiency
+- Protocol: DMs, groups, streams, sync, consent, codecs, installations
+- Performance: Benchmarking, delivery reliability, large-scale testing (up to 400 members)
+- Compatibility: Backward compatibility across last 3 SDK versions (0.0.47 → 2.2.0+)
+- Cross-platform: Browser automation, mobile testing, multi-region performance
+- Production: Live agent monitoring, security, spam detection, rate limiting
 
-#### Testing framework
+**Testing framework**
 
-- Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
-- Stream verification: Message delivery, conversation streams, metadata updates
-- Performance monitoring: Datadog metrics collection
-- Browser automation: Playwright-based web app testing
-- CI automation: Automated testing with logging and alerting
-- Alerting: Slack notifications with error pattern filtering
-- Log analysis: Automated error detection and deduplication
-- Dashboard: Datadog integration tracking delivery rates, response times, geographic performance
-- CLI Tools: Test execution, version management, key generation
-- Slack Bot: AI-powered responses, history fetching, log management
-- Geographic testing: Multi-region performance across US, Europe, Asia, South America
+- Automation: CI workflows with Datadog metrics, Slack alerting, log analysis
+- Verification: Stream delivery, conversation state, metadata propagation
+- Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
+- Infrastructure: Multi-region testing across US, Europe, Asia, South America
 
-#### Metrics tracked
+**Key metrics**
 
 - Delivery: 100% success rate (target: 99.9%)
 - Performance: <350ms core operations, <200ms messaging, <150ms TLS
 - Scale: Groups up to 400 members, high-volume message testing
 - Network: DNS, TCP, TLS timing across 5 global regions
-- Agent health: Live production bot response time monitoring
+
+## Documentation
+
+- [SLOs](./docs/slos.md)
+- [Monitoring](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
+- [Measuring](./docs/measuring.md)
+- [Datadog](./docs/datadog.md)
+
+## Tools & utilities
+
+- Status: XMTP network status - [see section](https://status.xmtp.org/)
+- Workflows: Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
+- Logging: Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
+- Schedule: Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
+- Railway: Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- Bots: Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
+  - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
+  - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
+- Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
 ## Development
 
@@ -175,17 +170,17 @@ yarn test functional --debug
 
 #### Resources
 
-- **Inboxes:** Inboxes for testing - [see section](/inboxes/)
-- **Local:** Work in local network - [see section](/dev/)
-- **Workers:** Worker for testing - [see section](/workers/)
-- **Helpers:** Coding helpers - [see section](/helpers/)
-- **Scripts:** Monorepo scripts - [see section](/scripts/)
-- **Introduction:** Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
+- Inboxes: Inboxes for testing - [see section](/inboxes/)
+- Local: Work in local network - [see section](/dev/)
+- Workers: Worker for testing - [see section](/workers/)
+- Helpers: Coding helpers - [see section](/helpers/)
+- Scripts: Monorepo scripts - [see section](/scripts/)
+- Introduction: Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
 
 ##### Rate limits
 
-- **Read operations**: 20,000 requests per 5-minute window
-- **Write operations**: 3,000 messages published per 5-minute window
+- Read operations: 20,000 requests per 5-minute window
+- Write operations: 3,000 messages published per 5-minute window
 
 ##### Endpoints
 
