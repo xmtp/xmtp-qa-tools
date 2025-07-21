@@ -1,4 +1,3 @@
-import { sleep } from "@helpers/client";
 import {
   sendMetric,
   type DeliveryMetricTags,

@@ -2,7 +2,6 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { getVersions } from "@workers/versions";
-import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
