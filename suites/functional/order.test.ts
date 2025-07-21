@@ -16,7 +16,7 @@ describe(testName, async () => {
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
+  it("message: should verify message ordering", async () => {
     group = await workers.createGroupBetweenAll();
     await group.sync();
     console.log("group", group.id);
@@ -57,7 +57,7 @@ describe(testName, async () => {
     expect(stats.orderPercentage).toBeGreaterThan(95);
   });
 
-  it("should verify message ordering accuracy when receiving messages via real-time streams", async () => {
+  it("stream: should verify message ordering", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMessageStream(
       group,
@@ -67,4 +67,9 @@ describe(testName, async () => {
     expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
     expect(verifyResult.orderPercentage).toBeGreaterThan(95);
   });
+
+  // it("stream: should verify message ordering", async () => {
+  //
+  //   );
+  // });
 });

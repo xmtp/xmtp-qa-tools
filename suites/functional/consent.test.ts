@@ -11,7 +11,7 @@ describe(testName, async () => {
   setupTestLifecycle({ testName });
   let workers = await getWorkers(3);
 
-  it("should stream consent state changes when users are blocked or unblocked", async () => {
+  it("consent streaming: should stream consent state changes when users are blocked or unblocked", async () => {
     const verifyResult = await verifyConsentStream(
       workers.getCreator(),
       workers.getReceiver(),
@@ -20,7 +20,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("should stream consent state changes when users are blocked or unblocked in a group", async () => {
+  it("consent streaming: should stream consent state changes when users are blocked or unblocked in a group", async () => {
     const group = await workers.createGroupBetweenAll();
     if (!group) {
       throw new Error("Group not found");
