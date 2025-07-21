@@ -19,7 +19,7 @@ describe(testName, async () => {
   const group = await workers.createGroupBetweenAll();
 
   // Debug version with slower message sending and more detailed logging
-  it("debug: should verify message delivery with debugging", async () => {
+  it("debug:verify message delivery with debugging", async () => {
     console.log("=== DEBUG TEST START ===");
     console.log(`Expected messages: ${MESSAGE_COUNT}`);
     console.log(`Workers: ${WORKER_COUNT}`);

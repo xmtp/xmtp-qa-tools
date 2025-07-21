@@ -49,7 +49,7 @@ The `clients.test.ts` module tests XMTP client initialization and configuration.
 
 ```typescript
 // Test client creation with different versions
-it("should create clients with different SDK versions", async () => {
+it("create clients with different SDK versions", async () => {
   const client = await Client.create(signer, {
     dbEncryptionKey: encryptionKey,
     env: XMTP_ENV,
@@ -70,7 +70,7 @@ The `convos.test.ts` module tests conversation creation and management functiona
 
 ```typescript
 // Test DM creation using inbox ID
-it("newDm: should create a new DM conversation using inbox ID", async () => {
+it("newDm:create a new DM conversation using inbox ID", async () => {
   const convo = await workers
     .get("henry")!
     .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
@@ -79,7 +79,7 @@ it("newDm: should create a new DM conversation using inbox ID", async () => {
 });
 
 // Test DM creation using Ethereum address
-it("newDmByAddress: should create a new DM conversation using Ethereum address", async () => {
+it("newDmByAddress:create a new DM conversation using Ethereum address", async () => {
   const dm2 = await workers
     .get("henry")!
     .client.conversations.newDmWithIdentifier({
@@ -105,7 +105,7 @@ The `installations.test.ts` module tests multi-device synchronization.
 
 ```typescript
 // Test installation synchronization
-it("should sync conversations across installations", async () => {
+it("sync conversations across installations", async () => {
   // Create a second installation for the same account
   const installation2 = await Client.create(signer, {
     dbEncryptionKey: encryptionKey,
@@ -134,7 +134,7 @@ The `metadata.test.ts` module tests conversation metadata handling.
 
 ```typescript
 // Test metadata updates and retrieval
-it("should update and retrieve conversation metadata", async () => {
+it("update and retrieve conversation metadata", async () => {
   await group.updateName("Updated Group Name");
   await group.sync();
   expect(group.name).toBe("Updated Group Name");
@@ -197,7 +197,7 @@ The `streams.test.ts` module tests message streaming functionality.
 
 ```typescript
 // Test stream message delivery
-it("receiveGM: should receive a message via stream", async () => {
+it("receiveGM:receive a message via stream", async () => {
   const convo = await client.conversations.newDm(recipientInboxId);
   const verifyResult = await verifyMessageStream(convo, [recipient]);
 });
@@ -251,7 +251,7 @@ The `sync.test.ts` module compares different synchronization approaches.
 
 ```typescript
 // Compare different sync methods
-it("should measure performance of sync methods", async () => {
+it("measure performance of sync methods", async () => {
   // Test client.conversations.sync()
   const syncStartTime = performance.now();
   await client.conversations.sync();

@@ -11,7 +11,7 @@ describe("test", async () => {
   const workers = await getWorkers(["alice", "bob"]);
   setupTestLifecycle({ testName });
 
-  it("should work", async () => {
+  it("work", async () => {
     const alice = workers.get("alice");
     const bob = workers.get("bob");
     const dm = await alice.client.conversations.newDm(bob.client.inboxId);

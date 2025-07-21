@@ -42,7 +42,7 @@ describe(testName, () => {
         );
         continue;
       }
-      const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
+      const test = `${i}-${installation}:create a new conversation of ${i} members with ${installation} installations`;
       console.log(test);
       it(test, async () => {
         workers = await getWorkers(WORKER_COUNT);

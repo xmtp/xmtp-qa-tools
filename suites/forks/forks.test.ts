@@ -80,7 +80,7 @@ describe(testName, () => {
     };
   };
 
-  it("should perform concurrent operations with multiple users across 5 groups", async () => {
+  it("perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
       nodeVersion: NODE_VERSION,

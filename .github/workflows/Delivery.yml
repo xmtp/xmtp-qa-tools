@@ -1,5 +1,5 @@
 name: Delivery
-description: "should verify message loss when receiving via 200 streams"
+description: "verify message loss when receiving via 200 streams"
 
 on:
   schedule:

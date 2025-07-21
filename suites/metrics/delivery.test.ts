@@ -24,7 +24,7 @@ describe(testName, async () => {
   const workers = await getWorkers(WORKER_COUNT);
   const group = await workers.createGroupBetweenAll();
 
-  it("stream: should verify message delivery and order accuracy using streams", async () => {
+  it("stream:verify message delivery and order accuracy using streams", async () => {
     const stats = await verifyMessageStream(
       group,
       workers.getAllButCreator(),
@@ -69,7 +69,7 @@ describe(testName, async () => {
     expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
   });
 
-  it("poll: should verify message delivery and order accuracy using polling", async () => {
+  it("poll:verify message delivery and order accuracy using polling", async () => {
     // Send messages first
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     for (let i = 1; i <= MESSAGE_COUNT; i++) {
@@ -134,7 +134,7 @@ describe(testName, async () => {
     expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
   });
 
-  it("recovery: should verify message recovery after stream interruption", async () => {
+  it("recovery:verify message recovery after stream interruption", async () => {
     const offlineWorker = workers.getReceiver();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     console.log(`Stopping streams for ${offlineWorker.name}`);

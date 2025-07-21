@@ -27,7 +27,7 @@ describe(testName, async () => {
 
   let convo: Dm;
 
-  it("newDm: should create a new DM conversation using inbox ID", async () => {
+  it("newDm:create a new DM conversation using inbox ID", async () => {
     convo = (await workers
       .get("henry")!
       .client.conversations.newDm(
@@ -38,7 +38,7 @@ describe(testName, async () => {
     expect(convo.id).toBeDefined();
   });
 
-  it("newDmByAddress: should create a new DM conversation using Ethereum address", async () => {
+  it("newDmByAddress:create a new DM conversation using Ethereum address", async () => {
     const dm2 = await workers
       .get("henry")!
       .client.conversations.newDmWithIdentifier({
@@ -49,7 +49,7 @@ describe(testName, async () => {
     expect(dm2).toBeDefined();
     expect(dm2.id).toBeDefined();
   });
-  it("send: should send a message in DM conversation", async () => {
+  it("send:send a message in DM conversation", async () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
@@ -61,7 +61,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("stream: should receive and verify message delivery in DM conversation", async () => {
+  it("stream:receive and verify message delivery in DM conversation", async () => {
     const verifyResult = await verifyMessageStream(convo, [
       workers.get("randomguy")!,
     ]);
@@ -69,7 +69,7 @@ describe(testName, async () => {
   });
 
   for (const i of BATCH_SIZE) {
-    it(`should create a group with ${i} participants`, async () => {
+    it(`create a group with ${i} participants`, async () => {
       const sliced = getInboxIds(i);
       console.log("Creating group with", sliced.length, "participants");
       newGroup = (await workers
@@ -78,12 +78,12 @@ describe(testName, async () => {
       console.log("Group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     });
-    it(`should sync group with ${i} participants and verify member count`, async () => {
+    it(`sync group with ${i} participants and verify member count`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(i + 1);
     });
-    it(`should update group name for ${i}-member group`, async () => {
+    it(`update group name for ${i}-member group`, async () => {
       const newName = "Large Group";
       await newGroup.updateName(newName);
       await newGroup.sync();

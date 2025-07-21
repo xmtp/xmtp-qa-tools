@@ -7,7 +7,7 @@
     "networks": ["production"],
     "slackChannel": "#tbachat-alerts",
     "live": false,
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "elsa",
@@ -17,7 +17,7 @@
     "networks": ["production"],
     "live": true,
     "slackChannel": "#elsa-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "csx",
@@ -28,7 +28,7 @@
     "networks": ["dev", "production"],
     "live": false,
     "slackChannel": "#csx-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
 
   {
@@ -40,7 +40,7 @@
     "networks": ["dev", "production"],
     "live": false,
     "slackChannel": "#gang-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
   {
     "name": "flaunchy",
@@ -50,7 +50,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#flaunchy-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "mamo",
@@ -60,7 +60,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#mamo-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "squabble",
@@ -70,7 +70,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#squabble-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "arma",
@@ -80,7 +80,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#arma-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
   {
     "name": "onit",
@@ -90,7 +90,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#onit-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "byte",
@@ -100,7 +100,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#byte-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
   {
     "name": "gm",
@@ -110,7 +110,7 @@
     "live": false,
     "networks": ["dev", "production"],
     "slackChannel": "#gm-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
   {
     "name": "local",
@@ -120,7 +120,7 @@
     "live": false,
     "networks": ["local"],
     "slackChannel": "#local-alerts",
-    "shouldRespondOnTagged": false
+    "respondOnTagged": false
   },
   {
     "name": "bankr",
@@ -130,7 +130,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#bankr-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "key-check",
@@ -140,7 +140,7 @@
     "live": false,
     "networks": ["dev", "production"],
     "slackChannel": "#key-check-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "bitte",
@@ -150,7 +150,7 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#bitte-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   },
   {
     "name": "tokenbot",
@@ -160,6 +160,6 @@
     "live": true,
     "networks": ["production"],
     "slackChannel": "#tokenbot-alerts",
-    "shouldRespondOnTagged": true
+    "respondOnTagged": true
   }
 ]

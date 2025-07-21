@@ -233,7 +233,7 @@ const startInstallationChaos = async (
 
 describe("E2E: Installation syncing", () => {
   it(
-    "should sync groups and messages across multiple installations",
+    "sync groups and messages across multiple installations",
     {
       timeout: 300000,
     },

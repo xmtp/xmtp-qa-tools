@@ -24,7 +24,7 @@ describe(testName, async () => {
 
   let group: Group;
 
-  it("should verify group messaging with partitioning", async () => {
+  it("verify group messaging with partitioning", async () => {
     group = await workers.createGroupBetweenAll("Partition Test Group");
     await group.sync();
 

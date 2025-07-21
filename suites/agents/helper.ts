@@ -9,7 +9,7 @@ export interface AgentConfig {
   /** Ethereum address */
   address: string;
   /** Whether the agent should respond to tagged messages */
-  shouldRespondOnTagged: boolean;
+  respondOnTagged: boolean;
   /** Message to send for testing */
   sendMessage: string;
   /** Expected response messages (optional) */

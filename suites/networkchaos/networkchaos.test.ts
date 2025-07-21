@@ -25,7 +25,7 @@ describe(testName, async () => {
 
   setupTestLifecycle({ testName });
 
-  it("should survive sustained latency + jitter + packet loss under group message load", async () => {
+  it("survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroupBetweenAll(
       "Latency Chaos Spike Test",
     );

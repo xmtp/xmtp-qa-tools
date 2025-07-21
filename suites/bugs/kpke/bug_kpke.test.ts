@@ -12,7 +12,7 @@ describe(testName, () => {
     workers = await getWorkers(1);
   });
 
-  it("should send message to specific address", async () => {
+  it("send message to specific address", async () => {
     console.log("syncing all");
     await workers.getCreator().client.conversations.syncAll();
     const targetAddress = "0x6461bf53ddb33b525c84bf60d6bb31fa10828474";
