@@ -27,12 +27,12 @@ const enabledOperations = {
   removeMember: true, // removes a random member from the group
   createInstallation: true, // creates a new installation for a random worker
 };
-const targetEpoch = 50n; // The target epoch to stop the test (epochs are when performing commits to the group)
+const targetEpoch = 50n; // The target epoch to stop the test (epochs are when performing forks to the group)
 const network = process.env.XMTP_ENV; // Network environment setting
 const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/remove operations
 const installationCount = 5; // How many installations to use randomly in the createInstallation operations
 
-const testName = "commits";
+const testName = "forks";
 describe(testName, () => {
   setupTestLifecycle({ testName });
 

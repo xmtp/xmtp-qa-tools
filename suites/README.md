@@ -13,7 +13,7 @@ End-to-end test suites for XMTP protocol validation across environments and scen
 | [networkchaos](./networkchaos/) | Network partition testing        | `yarn test networkchaos` |
 | [other](./other/)               | Edge cases and specialized tests | `yarn test other`        |
 | [bugs](./bugs/)                 | Bug reproduction and tracking    | `yarn test bugs`         |
-| [commits](./commits/)           | Git commit-based testing         | `yarn test commits`      |
+| [forks](./forks/)               | Git commit-based testing         | `yarn test forks`        |
 
 ## Core Functionality
 
@@ -154,7 +154,7 @@ yarn test bugs
 Git commit-based validation.
 
 ```bash
-yarn test commits
+yarn test forks
 ```
 
 ## Running Tests

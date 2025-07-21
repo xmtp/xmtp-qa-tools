@@ -1,4 +1,4 @@
-# Commits Test
+# forks Test
 
 Stress test XMTP group to produce forks.
 
@@ -30,7 +30,7 @@ Stress test XMTP group to produce forks.
   - `removeMember`: true, // removes a random member from the group
   - `createInstallation`: true, // creates a new installation for a random worker
 - **workerNames**: Random workers (`random1`, `random2`, ..., `random10`)
-- **targetEpoch**: `100n` - The target epoch to stop the test (epochs are when performing commits to the group)
+- **targetEpoch**: `100n` - The target epoch to stop the test (epochs are when performing forks to the group)
 - **network**: `process.env.XMTP_ENV` - Network environment setting
 - **randomInboxIdsCount**: `30` - How many inboxIds to use randomly in the add/remove operations
 - **installationCount**: `5` - How many installations to use randomly in the createInstallation operations
@@ -54,5 +54,5 @@ yarn install
 yarn local-update
 
 # Process that runs the test 100 times and exports forks logs
-yarn run:commits
+yarn run:forks
 ```

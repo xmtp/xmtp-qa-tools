@@ -176,7 +176,7 @@ yarn test mobile                      # Cross-platform mobile testing
 ```bash
 yarn test networkchaos                # Network partition tolerance
 yarn test other                       # Security, spam detection, rate limiting
-yarn test commits                     # Git commit-based testing
+yarn test forks                     # Git commit-based testing
 yarn test datadog                     # Datadog log analysis and monitoring
 ```
 
