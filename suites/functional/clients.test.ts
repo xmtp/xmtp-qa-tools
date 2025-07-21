@@ -1,5 +1,7 @@
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getVersions } from "@workers/versions";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
@@ -98,5 +100,44 @@ describe(testName, async () => {
       .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
     console.log(inboxState[0].inboxId);
     expect(inboxState[0].inboxId).toBe(bobInboxId);
+  });
+
+  // Regression testing for SDK version compatibility
+  describe("regression", () => {
+    const versions = getVersions().slice(0, 3);
+    const receiverInboxId = getInboxIds(1)[0];
+
+    for (const version of versions) {
+      it(`downgrade to ${version.nodeVersion}`, async () => {
+        const versionWorkers = await getWorkers(
+          ["bob-" + "a" + "-" + version.nodeVersion],
+          {
+            useVersions: false,
+          },
+        );
+
+        const bob = versionWorkers.get("bob");
+        console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
+        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+
+        expect(convo?.id).toBeDefined();
+      });
+    }
+
+    for (const version of versions.reverse()) {
+      it(`upgrade to ${version.nodeVersion}`, async () => {
+        const versionWorkers = await getWorkers(
+          ["alice-" + "a" + "-" + version.nodeVersion],
+          {
+            useVersions: false,
+          },
+        );
+
+        const alice = versionWorkers.get("alice");
+        console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
+        let convo = await alice?.client.conversations.newDm(receiverInboxId);
+        expect(convo?.id).toBeDefined();
+      });
+    }
   });
 });
