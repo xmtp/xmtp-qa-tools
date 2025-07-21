@@ -100,12 +100,51 @@ async function cleanSpecificLogFile(
       console.error(`Failed to clean log file ${logFileName}:`, error);
     }
   } else {
-    // Default: simple ANSI cleaning without pattern detection
+    // Default: simple ANSI cleaning without pattern detection using streaming
     try {
-      const content = await fs.promises.readFile(rawFilePath, "utf8");
       const { stripAnsi } = await import("@helpers/logger");
-      const cleanedContent = stripAnsi(content);
-      await fs.promises.writeFile(rawFilePath, cleanedContent);
+
+      // Use streaming to avoid memory issues with large files
+      const readStream = fs.createReadStream(rawFilePath, {
+        encoding: "utf8",
+        highWaterMark: 64 * 1024, // 64KB chunks
+      });
+
+      const tempPath = `${rawFilePath}.tmp`;
+      const writeStream = fs.createWriteStream(tempPath, { encoding: "utf8" });
+
+      readStream.on("data", (chunk: string | Buffer) => {
+        const chunkStr =
+          typeof chunk === "string" ? chunk : chunk.toString("utf8");
+        const cleanedChunk = stripAnsi(chunkStr);
+        writeStream.write(cleanedChunk);
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        readStream.on("end", () => {
+          writeStream.end();
+          resolve();
+        });
+
+        readStream.on("error", (error) => {
+          writeStream.destroy();
+          reject(error);
+        });
+
+        writeStream.on("error", (error) => {
+          readStream.destroy();
+          reject(error);
+        });
+
+        writeStream.on("finish", () => {
+          resolve();
+        });
+      });
+
+      // Replace the original file with the cleaned version
+      await fs.promises.unlink(rawFilePath);
+      await fs.promises.rename(tempPath, rawFilePath);
+
       console.debug(logFileName);
     } catch (error) {
       console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);

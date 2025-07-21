@@ -136,26 +136,26 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
   }
 
   const files = await fs.promises.readdir(logsDir);
-  // Look for non-raw log files instead
-  const nonRawLogFiles = files.filter(
+  // Look for raw log files
+  const rawLogFiles = files.filter(
     (file) => file.startsWith("raw-") && file.endsWith(".log"),
   );
 
-  if (nonRawLogFiles.length === 0) {
-    console.debug("No non-raw *.log files found to check");
+  if (rawLogFiles.length === 0) {
+    console.debug("No raw *.log files found to check");
     return;
   }
 
-  console.debug(`Found ${nonRawLogFiles.length} non-raw log files to check`);
+  console.debug(`Found ${rawLogFiles.length} raw log files to check`);
 
   let processedCount = 0;
-  for (const file of nonRawLogFiles) {
-    const inputPath = path.join(logsDir, file);
+  for (const file of rawLogFiles) {
+    const rawFilePath = path.join(logsDir, file);
 
     try {
       if (pattern) {
         const containsTargetString = await fileContainsString(
-          inputPath,
+          rawFilePath,
           pattern,
         );
         if (!containsTargetString) {
@@ -164,25 +164,11 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
         }
       }
 
-      // Construct the corresponding raw filename
-      const rawFileName = file;
-      const rawFilePath = path.join(logsDir, rawFileName);
-
-      // Check if the raw file exists
-      if (!fs.existsSync(rawFilePath)) {
-        console.debug(
-          `Skipping ${file} - corresponding raw file ${rawFileName} not found`,
-        );
-        continue;
-      }
-
-      const outputFileName = rawFileName.replace("raw-", "cleaned-");
+      const outputFileName = file.replace("raw-", "cleaned-");
       const outputPath = path.join(outputDir, outputFileName);
 
       await processLogFile(rawFilePath, outputPath);
-      console.debug(
-        `Cleaned: ${rawFileName} -> ${outputFileName} (triggered by ${file})`,
-      );
+      console.debug(`Cleaned: ${file} -> ${outputFileName}`);
       processedCount++;
     } catch (error) {
       console.error(`Failed to process ${file}:`, error);
@@ -190,8 +176,70 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
   }
 
   console.debug(
-    `Processed ${processedCount} raw files based on non-raw files containing "fork"`,
+    `Processed ${processedCount} raw files containing "${pattern}"`,
   );
+}
+
+/**
+ * Clean forks logs and remove non-forks logs
+ */
+export async function cleanForksLogs(): Promise<void> {
+  const logsDir = path.join(process.cwd(), "logs");
+  const outputDir = path.join(logsDir, "cleaned");
+
+  if (!fs.existsSync(logsDir)) {
+    console.debug("No logs directory found");
+    return;
+  }
+
+  if (!fs.existsSync(outputDir)) {
+    await fs.promises.mkdir(outputDir, { recursive: true });
+  }
+
+  const files = await fs.promises.readdir(logsDir);
+  // Look for raw log files that contain "forks" in the name
+  const forksLogFiles = files.filter(
+    (file) =>
+      file.startsWith("raw-") &&
+      file.includes("forks") &&
+      file.endsWith(".log"),
+  );
+
+  if (forksLogFiles.length === 0) {
+    console.debug("No forks log files found to check");
+    return;
+  }
+
+  console.debug(`Found ${forksLogFiles.length} forks log files to check`);
+
+  let processedCount = 0;
+  for (const file of forksLogFiles) {
+    const rawFilePath = path.join(logsDir, file);
+
+    try {
+      // Check if the file contains fork-related content
+      const containsForkContent = await fileContainsString(
+        rawFilePath,
+        "may be fork",
+      );
+
+      if (!containsForkContent) {
+        console.debug(`Skipping ${file} - does not contain fork content`);
+        continue;
+      }
+
+      const outputFileName = file.replace("raw-", "cleaned-");
+      const outputPath = path.join(outputDir, outputFileName);
+
+      await processLogFile(rawFilePath, outputPath);
+      console.debug(`Cleaned forks log: ${file} -> ${outputFileName}`);
+      processedCount++;
+    } catch (error) {
+      console.error(`Failed to process ${file}:`, error);
+    }
+  }
+
+  console.debug(`Processed ${processedCount} forks log files`);
 }
 
 /**

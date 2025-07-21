@@ -3,7 +3,8 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-num_runs=100
+# Default to 100 runs if no parameter provided
+num_runs=${1:-100}
 
 rm -rf logs/
 rm -rf .data/
