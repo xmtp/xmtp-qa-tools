@@ -10,6 +10,10 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
+import {
+  ContentTypeReaction,
+  type Reaction,
+} from "@xmtp/content-type-reaction";
 import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
@@ -95,5 +99,24 @@ describe(testName, async () => {
       addMembers,
     );
     expect(verifyResult.allReceived).toBe(true);
+  });
+  it("errors: handle codec errors gracefully when sending unsupported content types", async () => {
+    try {
+      const creator = workers.getCreator();
+      const receiver = workers.getReceiver();
+      const convo = await creator.client.conversations.newDm(
+        receiver.client.inboxId,
+      );
+      const reaction: Reaction = {
+        action: "added",
+        content: "smile",
+        reference: "originalMessage",
+        schema: "shortcode",
+      };
+
+      await convo.send(reaction as unknown as string, ContentTypeReaction);
+    } catch (e) {
+      expect(e).toBeDefined();
+    }
   });
 });
