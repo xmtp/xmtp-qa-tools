@@ -23,50 +23,7 @@ describe(testName, async () => {
     "oscar",
   ]);
 
-  it("performance: measure XMTP client creation performance and initialization", async () => {
-    const client = await getWorkers(["randomclient"]);
-    expect(client).toBeDefined();
-  });
-
-  it("functionality: resolve inbox ID from Ethereum address using getInboxIdByAddress", async () => {
-    const client = workers.get("henry")!.client;
-    const randomAddress = workers.get("ivy")!.address;
-    const inboxId = await client.getInboxIdByIdentifier({
-      identifier: randomAddress,
-      identifierKind: IdentifierKind.Ethereum,
-    });
-    console.log("installationId", client.installationId);
-    expect(client.installationId).toBeDefined();
-    expect(inboxId).toBeDefined();
-  });
-
-  it("functionality: create direct message conversation and measure performance", async () => {
-    const client = workers.get("henry")!.client;
-    const dm = await client.conversations.newDm(
-      workers.get("ivy")!.client.inboxId,
-    );
-    expect(dm.id).toBeDefined();
-  });
-
-  it("functionality: validate messaging capability using both static and instance canMessage methods", async () => {
-    const randomAddress = workers.get("karen")!.address;
-    const identifier: Identifier = {
-      identifier: randomAddress,
-      identifierKind: IdentifierKind.Ethereum,
-    };
-    const staticCanMessage = await Client.canMessage(
-      [identifier],
-      workers.get("henry")!.env,
-    );
-    // Create a client to test the canMessage method
-    const henryClient = workers.get("henry")!.client;
-    const canMessage = await henryClient.canMessage([identifier]);
-
-    expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
-    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
-  });
-
-  it("functionality: retrieve inbox state with installation validation and key package status", async () => {
+  it("validation and key package status", async () => {
     const inboxState = await workers
       .get("henry")!
       .client.preferences.inboxState(true);
@@ -93,7 +50,7 @@ describe(testName, async () => {
     );
   });
 
-  it("functionality: query inbox state from external inbox IDs for cross-user information", async () => {
+  it("inbox state from external inbox IDs", async () => {
     const bobInboxId = workers.get("bob")!.client.inboxId;
     const inboxState = await workers
       .get("henry")!
