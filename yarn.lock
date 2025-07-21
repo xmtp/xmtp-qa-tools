@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@anthropic-ai/claude-code@npm:^1.0.24":
-  version: 1.0.55
-  resolution: "@anthropic-ai/claude-code@npm:1.0.55"
+"@anthropic-ai/claude-code@npm:latest":
+  version: 1.0.56
+  resolution: "@anthropic-ai/claude-code@npm:1.0.56"
   dependencies:
     "@img/sharp-darwin-arm64": "npm:^0.33.5"
     "@img/sharp-darwin-x64": "npm:^0.33.5"
@@ -37,7 +37,7 @@ __metadata:
       optional: true
   bin:
     claude: cli.js
-  checksum: 10/52b6a1ab3c582ab460953b9bd9c009c1b904af7f106b9340193ed8d5b33f3e6bc887fb9a10a712fadebfc515ba16f642334e63aade0596cdd6da7b38d075e674
+  checksum: 10/da8158bf0bfda060988ff88a0fcd62282c96a0539d8014dcd64f8ae06b77ace495482d4407c24cec5ecbfeb82e2d5bc4cb70a68917cf66388a418898c766819c
   languageName: node
   linkType: hard
 
@@ -4720,7 +4720,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "xmtp-qa-tools@workspace:."
   dependencies:
-    "@anthropic-ai/claude-code": "npm:^1.0.24"
+    "@anthropic-ai/claude-code": "npm:latest"
     "@anthropic-ai/sdk": "npm:^0.54.0"
     "@eslint/compat": "npm:^1.2.6"
     "@eslint/js": "npm:^9.19.0"
