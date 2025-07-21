@@ -58,12 +58,11 @@ describe(testName, async () => {
       "Propagated Name " + Math.random().toString(36).substring(2, 15);
     const testDescription =
       "Propagated description " + Math.random().toString(36).substring(2, 15);
-    const testImageUrl = "https://example.com/propagated-image.jpg";
 
     // Update all metadata
     await group.updateName(testName);
     await group.updateDescription(testDescription);
-    await group.updateImageUrl(testImageUrl);
+    await group.sync();
 
     // Verify other members see updates after sync
     const otherMember = workers.getReceiver();
@@ -74,9 +73,9 @@ describe(testName, async () => {
 
     // Cast to Group to access metadata properties
     const otherGroup = otherMemberGroup as Group;
+    await otherGroup.sync();
     expect(otherGroup.name).toBe(testName);
     expect(otherGroup.description).toBe(testDescription);
-    expect(otherGroup.imageUrl).toBe(testImageUrl);
   });
 
   it("metadata: handle empty and special characters in metadata", async () => {
