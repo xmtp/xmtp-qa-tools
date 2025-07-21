@@ -153,17 +153,6 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
     const rawFilePath = path.join(logsDir, file);
 
     try {
-      if (pattern) {
-        const containsTargetString = await fileContainsString(
-          rawFilePath,
-          pattern,
-        );
-        if (!containsTargetString) {
-          console.debug(`Skipping ${file} - does not contain "${pattern}"`);
-          continue;
-        }
-      }
-
       const outputFileName = file.replace("raw-", "cleaned-");
       const outputPath = path.join(outputDir, outputFileName);
 
@@ -183,7 +172,9 @@ export async function cleanAllRawLogs(pattern: string = ""): Promise<void> {
 /**
  * Clean forks logs and remove non-forks logs
  */
-export async function cleanForksLogs(): Promise<void> {
+export async function cleanForksLogs(
+  removeNonMatching: boolean = true,
+): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
@@ -213,6 +204,7 @@ export async function cleanForksLogs(): Promise<void> {
   console.debug(`Found ${forksLogFiles.length} forks log files to check`);
 
   let processedCount = 0;
+  let removedCount = 0;
   for (const file of forksLogFiles) {
     const rawFilePath = path.join(logsDir, file);
 
@@ -224,7 +216,13 @@ export async function cleanForksLogs(): Promise<void> {
       );
 
       if (!containsForkContent) {
-        console.debug(`Skipping ${file} - does not contain fork content`);
+        if (removeNonMatching) {
+          await fs.promises.unlink(rawFilePath);
+          console.debug(`Removed ${file} - does not contain fork content`);
+          removedCount++;
+        } else {
+          console.debug(`Skipping ${file} - does not contain fork content`);
+        }
         continue;
       }
 
@@ -239,6 +237,11 @@ export async function cleanForksLogs(): Promise<void> {
     }
   }
 
+  if (removeNonMatching && removedCount > 0) {
+    console.debug(
+      `Removed ${removedCount} files that did not contain fork content`,
+    );
+  }
   console.debug(`Processed ${processedCount} forks log files`);
 }
 
