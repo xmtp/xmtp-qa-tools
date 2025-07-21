@@ -2,7 +2,7 @@
 
 Stress test XMTP group to produce forks.
 
-## Test Flow:
+## Test flow:
 
 - Create X groups in parallel
 - Add X workers as super admins to each group

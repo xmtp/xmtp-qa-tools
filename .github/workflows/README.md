@@ -30,7 +30,7 @@ gh workflow run workflow-name.yml
 gh workflow run Agents.yml
 ```
 
-## Agent Health Monitoring
+## Agent health monitoring
 
 The `Agents.yml` workflow monitors the health and responsiveness of XMTP agents in production.
 
@@ -57,7 +57,7 @@ jobs:
 - Test reporting via Datadog metrics
 - Response time tracking
 
-## Deployment Automation
+## Deployment automation
 
 The `Deploy.yml` workflow automates Railway deployments when version bumps are detected.
 
@@ -92,7 +92,7 @@ jobs:
 - Auto-merge capability
 - Deployment metadata tracking
 
-## Installation Data Backup
+## Installation data backup
 
 The `upload-installations.yml` workflow backs up installation data and keys.
 
@@ -130,7 +130,7 @@ Workflows are configured using GitHub repository secrets and variables:
 - `REGION`: Target geographic region
 - `BATCH_SIZE`: Number of participants per batch
 
-## Monitoring and Reporting
+## Monitoring and reporting
 
 Workflow results are accessible through multiple channels:
 
@@ -159,7 +159,7 @@ When working with these workflows, consider the following best practices:
 4. **Concurrency limits**: Avoid excessive parallel executions
 5. **Timeout configuration**: Set appropriate timeouts to prevent hung jobs
 
-## Recent Changes
+## Recent changes
 
 The workflows have been updated to use standardized naming conventions:
 

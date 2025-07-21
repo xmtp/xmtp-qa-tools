@@ -2,7 +2,7 @@
 
 Utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test workers, collecting metrics, and validating test results.
 
-## Quick Reference
+## Quick reference
 
 | Module            | Purpose                          | Key Features                                         |
 | ----------------- | -------------------------------- | ---------------------------------------------------- |
@@ -32,7 +32,7 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 ```
 
-## Client Module
+## Client module
 
 Create and manage XMTP clients across different SDK versions.
 
@@ -57,7 +57,7 @@ await logAgentDetails(client);
 
 Functions: Multi-version SDK support, signer creation, database management, environment configuration, key generation.
 
-## Analyzer Module
+## Analyzer module
 
 Log analysis and error detection capabilities for identifying test failures and patterns.
 
@@ -96,7 +96,7 @@ export const PATTERNS = {
 
 Functions: Error pattern matching, log deduplication, ANSI code handling, test filtering.
 
-## Logger Module
+## Logger module
 
 Logging utilities with file output and formatting.
 
@@ -120,7 +120,7 @@ await cleanAllRawLogs();
 
 Functions: File logging, ANSI code stripping, pretty formatting, log processing, Winston integration.
 
-## Vitest Module
+## Vitest module
 
 Test lifecycle management and performance tracking integration.
 
@@ -145,7 +145,7 @@ Lifecycle hooks:
 
 Functions: Automatic setup, performance tracking, custom duration support, cleanup management.
 
-## Playwright Module
+## Playwright module
 
 Browser automation for testing XMTP web applications.
 
@@ -180,7 +180,7 @@ await browser.takeSnapshot("test-completed");
 
 Functions: Headless browser automation, XMTP web app integration, group management, message testing, screenshot capture.
 
-## Datadog Module
+## Datadog module
 
 Metrics collection and performance tracking integration.
 
@@ -214,7 +214,7 @@ sendDatadogLog(["Error line 1", "Error line 2"], {
 
 Functions: Performance monitoring, network statistics, metric aggregation, geographic tracking.
 
-## Streams Module
+## Streams module
 
 Message streaming utilities for verifying stream functionality and message delivery.
 

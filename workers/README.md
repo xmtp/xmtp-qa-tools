@@ -1,6 +1,6 @@
 # Worker Framework
 
-## Basic Usage
+## Basic usage
 
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";
@@ -20,7 +20,7 @@ describe("test", async () => {
 });
 ```
 
-## Worker Creation
+## Worker creation
 
 ```typescript
 // Basic patterns
@@ -50,7 +50,7 @@ await dm.send("Hello DM");
 await group.send("Hello Group");
 ```
 
-## Group Operations
+## Group operations
 
 ```typescript
 await group.updateName("New Name");
@@ -81,7 +81,7 @@ const result = await verifyMessageStream(
 expect(result.allReceived).toBe(true);
 ```
 
-## Version Testing
+## Version testing
 
 ```typescript
 import { getVersions } from "@workers/versions";
@@ -99,7 +99,7 @@ for (const version of versions) {
 }
 ```
 
-## Worker Access
+## Worker access
 
 ```typescript
 const alice = workers.get("alice");
@@ -110,7 +110,7 @@ workers.getAll(); // All workers array
 workers.getRandomWorkers(2); // Random subset
 ```
 
-## Key Imports
+## Key imports
 
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";

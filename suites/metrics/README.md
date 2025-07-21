@@ -2,7 +2,7 @@
 
 Performance and delivery testing for XMTP protocol.
 
-## Test Types
+## Test types
 
 ### Large Groups
 
@@ -30,13 +30,13 @@ yarn test delivery
 DELIVERY_AMOUNT=100 yarn test delivery
 ```
 
-## CI Schedules
+## CI schedules
 
 - **Large**: Every 2 hours, batched by group sizes
 - **Performance**: Every hour at :30
 - **Delivery**: Twice hourly at :25 and :55
 
-## Environment Variables
+## Environment variables
 
 ```bash
 XMTP_ENV=dev # dev or production

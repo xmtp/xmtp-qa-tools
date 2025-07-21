@@ -8,7 +8,7 @@ Pre-generated XMTP inbox data for testing with multiple device installations.
 - **`gen.ts`** - TypeScript generator script
 - **`gen.sh`** - Bash wrapper for batch generation
 
-## Data Format
+## Data format
 
 Each JSON file contains an array of inbox objects:
 
@@ -22,7 +22,7 @@ Each JSON file contains an array of inbox objects:
 }
 ```
 
-## Usage in Tests
+## Usage in tests
 
 ```typescript
 import inboxData from "./inboxes/10.json";
@@ -35,7 +35,7 @@ const client = await Client.create(signer, {
 });
 ```
 
-## Generation Commands
+## Generation commands
 
 ### Quick Commands (Predefined)
 

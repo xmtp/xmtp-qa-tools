@@ -1,4 +1,4 @@
-## Group Member Addition Bug
+## Group member addition bug
 
 • **Repro**:
 

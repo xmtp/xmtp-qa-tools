@@ -115,7 +115,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ---
 
-## Agent Configuration
+## Agent configuration
 
 ### Agent Properties:
 
@@ -136,7 +136,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ---
 
-## Metrics and Monitoring
+## Metrics and monitoring
 
 ### Response Metrics:
 
@@ -166,7 +166,7 @@ sendMetric("response", metricValue, {
 
 ---
 
-## Test Execution
+## Test execution
 
 ### Environment Setup:
 

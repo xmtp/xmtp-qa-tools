@@ -1,6 +1,6 @@
-# XMTP Test Suite Engineering Report
+# XMTP test suite engineering report
 
-## Test Suite Architecture
+## Test suite architecture
 
 Our test suite is organized into 5 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 

@@ -10,7 +10,7 @@ This test suite validates core XMTP protocol functionality including direct mess
 - Test multi-device installation and cross-device sync
 - Validate consent management and content codec handling
 
-## Environment Setup
+## Environment setup
 
 Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding network.
 
@@ -290,7 +290,7 @@ it("should deliver messages in the correct order", async () => {
 - Timestamp ordering
 - Delivery confirmation
 
-## Regression Testing
+## Regression testing
 
 The `regression.test.ts` module verifies fixes for historical issues.
 
@@ -307,7 +307,7 @@ it("should handle edge case that previously caused issues", async () => {
 - Edge case testing
 - Version compatibility
 
-## Stream Testing
+## Stream testing
 
 The `streams.test.ts` module tests message streaming functionality.
 
@@ -325,7 +325,7 @@ it("receiveGM: should receive a message via stream", async () => {
 - Delivery verification
 - Stream performance
 
-## Sync Comparison
+## Sync comparison
 
 The `sync.test.ts` module compares different synchronization approaches.
 
