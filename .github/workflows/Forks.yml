@@ -1,0 +1,53 @@
+name: Forks
+description: "Daily forks testing on local network"
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 2 * * *" # Runs daily at 2:00 AM UTC
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    env:
+      LOGGING_LEVEL: "off"
+      XMTP_ENV: "local"
+      REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-local
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+        with:
+          test-name: "forks"
+          env: "local"
+          cache-data: "true"
+
+      - name: Start local XMTP network
+        run: ./dev/up
+
+      - name: Wait for network to be ready
+        run: sleep 30
+
+      - name: Run forks test
+        run: yarn run:forks
+
+      - name: Stop local XMTP network
+        if: always()
+        run: ./dev/down
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: "forks"
+          env: "local"
+          save-to-cache: "true"
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn workflow-failure "Forks"
