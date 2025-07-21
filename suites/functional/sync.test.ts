@@ -44,7 +44,7 @@ describe(testName, async () => {
     await sleep(1000);
   });
 
-  it("group sync performance: should send baseline message to group for synchronization performance testing", async () => {
+  it("group sync performance: should send baseline message to group for sync performance testing", async () => {
     // Sync Ivy's conversations first to ensure the group is visible
     const ivyClient = workers.get("ivy")!.client;
     await ivyClient.conversations.sync();
@@ -122,7 +122,7 @@ describe(testName, async () => {
     return { syncTime, messageCount: messages.length };
   });
 
-  it("group sync performance: should measure message retrieval performance without explicit synchronization", async () => {
+  it("group sync performance: should measure message retrieval performance without explicit sync", async () => {
     const larryClient = workers.get("larry")!.client;
 
     // Do an initial sync to ensure we have the conversation

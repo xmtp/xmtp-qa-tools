@@ -1,4 +1,4 @@
-# Performance Benchmarking Suite
+# Performance benchmarking suite
 
 This test suite measures XMTP protocol performance across different group sizes and installation counts, providing detailed metrics for scalability analysis.
 
@@ -6,11 +6,11 @@ This test suite measures XMTP protocol performance across different group sizes 
 
 - Creates groups with varying member counts (10-200 members)
 - Tests different installation counts per member (2-25 installations)
-- Measures member addition timing and synchronization performance
+- Measures member addition timing and sync performance
 - Tracks total installation counts and performance scaling
 - Generates comprehensive performance reports
 
-## Key metrics
+## Key metrics:
 
 - **Add Members Time**: Time to add new members to existing groups
 - **SyncAll Time**: Time for new clients to sync all conversations

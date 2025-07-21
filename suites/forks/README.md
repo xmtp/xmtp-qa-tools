@@ -1,4 +1,4 @@
-# forks Test
+# Forks test
 
 Stress test XMTP group to produce forks.
 

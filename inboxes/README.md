@@ -37,7 +37,7 @@ const client = await Client.create(signer, {
 
 ## Generation commands
 
-### Quick Commands (Predefined)
+### Quick commands (predefined)
 
 ```bash
 # Generate for local environment only
@@ -47,7 +47,7 @@ yarn local-update
 yarn prod-update
 ```
 
-### Direct Generation with yarn gen
+### Direct generation with yarn gen
 
 ```bash
 # Basic usage - generates 200 inboxes with 2 installations each
@@ -60,7 +60,7 @@ yarn gen --count 500 --installations 10 --envs local
 yarn gen --count 200 --installations 5 --envs local,dev,production
 ```
 
-### Batch Generation with gen.sh
+### Batch generation with gen.sh
 
 ```bash
 # Generate multiple installation counts at once

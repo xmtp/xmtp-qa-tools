@@ -1,4 +1,4 @@
-# XMTP Agent Testing Suite Report
+# XMTP agent testing suite report
 
 ## Overview
 
@@ -6,28 +6,28 @@ The Agent Testing Suite validates the health, responsiveness, and behavioral pat
 
 ---
 
-## Test Suite Architecture
+## Test suite architecture
 
 The agent testing is organized into 3 primary test categories that validate different interaction patterns and response behaviors.
 
 ---
 
-## 1. Direct Message Testing (`agents-dms.test.ts`)
+## 1. Direct message testing (`agents-dms.test.ts`)
 
 **Purpose**: Validates agent responsiveness in direct message conversations using their configured test messages.
 
-### Test Pattern:
+### Test pattern:
 
 - **Per Agent Test**: `${testName}: ${agent.name} DM : ${agent.address}`
 
-### Test Flow:
+### Test flow:
 
 1. Create DM conversation with agent using Ethereum address
 2. Send agent's configured `sendMessage`
 3. Verify agent responds within timeout period
 4. Measure response timing and log metrics
 
-### Agent Coverage:
+### Agent coverage:
 
 - **tbachat** - `/help` command testing
 - **elsa** - Basic "hi" message testing
@@ -46,7 +46,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 - **bitte** - "hi" message testing
 - **tokenbot** - "@tokenbot" tag testing
 
-**Metrics Collected**:
+**Metrics collected**:
 
 - Response timing (average event timing)
 - Success/failure rate
@@ -54,15 +54,15 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ---
 
-## 2. Tagged Message Testing (`agents-tagged.test.ts`)
+## 2. Tagged message testing (`agents-tagged.test.ts`)
 
 **Purpose**: Validates that agents respond appropriately to tagged messages or slash commands when they are configured to do so.
 
-### Test Pattern:
+### Test pattern:
 
 - **Per Agent Test**: `${testName}: ${agent.name} should respond to tagged/command message : ${agent.address}`
 
-### Test Flow:
+### Test flow:
 
 1. Create group conversation with agent and random participant
 2. Send tagged message or slash command:
@@ -71,30 +71,30 @@ The agent testing is organized into 3 primary test categories that validate diff
 3. Verify agent responds within timeout
 4. Measure response metrics
 
-### Agent Filtering:
+### Agent filtering:
 
 - Only tests agents where `shouldRespondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
-### Tagged Response Validation:
+### Tagged response validation:
 
 - **Command-based agents**: `/help`, `/kc help` - testing slash command recognition
 - **Tag-based agents**: `@agent.base.eth message` - testing mention recognition
 - **Hybrid agents**: Some agents respond to both patterns
 
-**Expected Behavior**: All filtered agents should respond to their configured tagged messages.
+**Expected behavior**: All filtered agents should respond to their configured tagged messages.
 
 ---
 
-## 3. Untagged Message Testing (`agents-untagged.test.ts`)
+## 3. Untagged message testing (`agents-untagged.test.ts`)
 
 **Purpose**: Validates that agents do NOT respond to generic untagged messages, ensuring proper message filtering.
 
-### Test Pattern:
+### Test pattern:
 
 - **Per Agent Test**: `${testName}: ${agent.name} should not respond to untagged hi : ${agent.address}`
 
-### Test Flow:
+### Test flow:
 
 1. Create group conversation with agent and random participant
 2. Send initial "hi" message (ignore welcome response)
@@ -102,22 +102,22 @@ The agent testing is organized into 3 primary test categories that validate diff
 4. Verify agent does NOT respond to untagged message
 5. Log metrics for unexpected responses
 
-### Agent Filtering:
+### Agent filtering:
 
 - Only tests agents where `shouldRespondOnTagged: true`
 - Filters by network environment
 
-### Negative Testing:
+### Negative testing:
 
-- **Expected Behavior**: Agents should NOT respond to generic "hi" messages
-- **Failure Condition**: If agent responds, test fails and logs warning
+- **Expected behavior**: Agents should NOT respond to generic "hi" messages
+- **Failure condition**: If agent responds, test fails and logs warning
 - **Purpose**: Prevents spam responses and validates message filtering logic
 
 ---
 
 ## Agent configuration
 
-### Agent Properties:
+### Agent properties:
 
 - **name**: Agent identifier
 - **baseName**: ENS or display name
@@ -128,7 +128,7 @@ The agent testing is organized into 3 primary test categories that validate diff
 - **live**: Production status flag
 - **slackChannel**: Alert channel for monitoring
 
-### Environment Handling:
+### Environment handling:
 
 - Tests automatically filter agents by `XMTP_ENV` environment variable
 - Skips testing if no agents are configured for current environment
@@ -138,13 +138,13 @@ The agent testing is organized into 3 primary test categories that validate diff
 
 ## Metrics and monitoring
 
-### Response Metrics:
+### Response metrics:
 
-- **Response Time**: Average timing from message send to agent response
-- **Success Rate**: Percentage of successful agent responses
-- **Timeout Handling**: Uses `streamTimeout` value for non-responsive agents
+- **Response time**: Average timing from message send to agent response
+- **Success rate**: Percentage of successful agent responses
+- **Timeout handling**: Uses `streamTimeout` value for non-responsive agents
 
-### Datadog Integration:
+### Datadog integration:
 
 ```typescript
 sendMetric("response", metricValue, {
@@ -158,7 +158,7 @@ sendMetric("response", metricValue, {
 } as ResponseMetricTags);
 ```
 
-### Failure Detection:
+### Failure detection:
 
 - Logs warnings for failed responses: `console.warn(agent.name, "FAILED")`
 - Tracks both expected failures (untagged tests) and unexpected failures (DM/tagged tests)
@@ -168,7 +168,7 @@ sendMetric("response", metricValue, {
 
 ## Test execution
 
-### Environment Setup:
+### Environment setup:
 
 ```bash
 # Test all agent suites
@@ -180,13 +180,13 @@ yarn test agents-tagged
 yarn test agents-untagged
 ```
 
-### Network Configuration:
+### Network configuration:
 
 - Set `XMTP_ENV=production` for production agent testing
 - Set `XMTP_ENV=dev` for development agent testing
 - Tests automatically skip if no agents configured for environment
 
-### Key Validations:
+### Key validations:
 
 - Agent discovery and connection establishment
 - Message delivery and response verification
