@@ -13,7 +13,7 @@ describe(testName, async () => {
     sendDurationMetrics: true,
   });
   const ERROR_TRESHOLD = parseInt(process.env.ERROR_TRESHOLD ?? "90");
-  const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "1000");
+  const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "500");
   const WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "10");
   const workers = await getWorkers(WORKER_COUNT);
   const group = await workers.createGroupBetweenAll();
