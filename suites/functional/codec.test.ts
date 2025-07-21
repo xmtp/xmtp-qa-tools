@@ -12,7 +12,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(2);
 
-  it("should handle codec errors gracefully when sending unsupported content types", async () => {
+  it("errors: handle codec errors gracefully when sending unsupported content types", async () => {
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();

@@ -1,53 +1,118 @@
-import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { type Group } from "@xmtp/node-sdk";
+import { describe, expect, it } from "vitest";
 
 const testName = "metadata";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
+  let workers = await getWorkers(3);
   let group: Group;
 
-  const workers = await getWorkers([
-    "henry",
-    "ivy",
-    "jack",
-    "karen",
-    "randomguy",
-    "larry",
-    "mary",
-    "nancy",
-    "oscar",
-  ]);
+  it("metadata: update group name and verify persistence", async () => {
+    group = await workers.createGroupBetweenAll();
+    const originalName = group.name;
 
-  beforeAll(async () => {
-    group = (await workers
-      .get("henry")!
-      .client.conversations.newGroup([
-        workers.get("nancy")!.client.inboxId,
-        workers.get("oscar")!.client.inboxId,
-        workers.get("jack")!.client.inboxId,
-      ])) as Group;
-    console.log("group", group.id);
+    // Update name
+    const newName =
+      "Updated Group Name " + Math.random().toString(36).substring(2, 15);
+    await group.updateName(newName);
+
+    // Verify immediate update
+    expect(group.name).toBe(newName);
+
+    // Sync and verify persistence
+    await group.sync();
+    expect(group.name).toBe(newName);
+    expect(group.name).not.toBe(originalName);
   });
 
-  it("should stream group metadata updates when group name or description changes", async () => {
-    const verifyResult = await verifyMetadataStream(group, [
-      workers.get("oscar")!,
-    ]);
-    expect(verifyResult.allReceived).toBe(true);
+  it("metadata: update group description and verify persistence", async () => {
+    const newDescription =
+      "Updated group description " +
+      Math.random().toString(36).substring(2, 15);
+    await group.updateDescription(newDescription);
+
+    // Verify immediate update
+    expect(group.description).toBe(newDescription);
+
+    // Sync and verify persistence
+    await group.sync();
+    expect(group.description).toBe(newDescription);
   });
 
-  it("should successfully add new members to existing group and verify member count", async () => {
-    await group.addMembers([workers.get("randomguy")!.client.inboxId]);
-    const members = await group.members();
-    expect(members.length).toBe(5);
+  it("metadata: update group image URL", async () => {
+    const imageUrl = "https://example.com/group-image.jpg";
+    await group.updateImageUrl(imageUrl);
+
+    // Verify immediate update
+    expect(group.imageUrl).toBe(imageUrl);
+
+    // Sync and verify persistence
+    await group.sync();
+    expect(group.imageUrl).toBe(imageUrl);
   });
 
-  it("should successfully remove members from group and verify updated member count", async () => {
-    await group.removeMembers([workers.get("randomguy")!.client.inboxId]);
-    const members = await group.members();
-    expect(members.length).toBe(4);
+  it("metadata: verify metadata propagation to other members", async () => {
+    const testName =
+      "Propagated Name " + Math.random().toString(36).substring(2, 15);
+    const testDescription =
+      "Propagated description " + Math.random().toString(36).substring(2, 15);
+
+    // Update all metadata
+    await group.updateName(testName);
+    await group.updateDescription(testDescription);
+    await group.sync();
+
+    // Verify other members see updates after sync
+    const otherMember = workers.getReceiver();
+    await otherMember.client.conversations.sync();
+    const otherMemberGroup =
+      await otherMember.client.conversations.getConversationById(group.id);
+    expect(otherMemberGroup).toBeDefined();
+
+    // Cast to Group to access metadata properties
+    const otherGroup = otherMemberGroup as Group;
+    await otherGroup.sync();
+    expect(otherGroup.name).toBe(testName);
+    expect(otherGroup.description).toBe(testDescription);
+  });
+
+  it("metadata: handle empty and special characters in metadata", async () => {
+    // Test empty name
+    await group.updateName("");
+    expect(group.name).toBe("");
+
+    // Test special characters
+    const specialName = "Group with 🚀 emoji & symbols!";
+    await group.updateName(specialName);
+    expect(group.name).toBe(specialName);
+
+    // Test long description
+    const longDescription = "A".repeat(1000);
+    await group.updateDescription(longDescription);
+    expect(group.description).toBe(longDescription);
+  });
+
+  it("metadata: verify metadata state after group operations", async () => {
+    const finalName = "Final Test Name";
+    const finalDescription = "Final test description";
+
+    // Update metadata
+    await group.updateName(finalName);
+    await group.updateDescription(finalDescription);
+
+    // Perform group operations
+    const newMember = workers.getAll()[2];
+    await group.addMembers([newMember.client.inboxId]);
+
+    // Verify metadata persists after operations
+    expect(group.name).toBe(finalName);
+    expect(group.description).toBe(finalDescription);
+
+    // Sync and verify
+    await group.sync();
+    expect(group.name).toBe(finalName);
+    expect(group.description).toBe(finalDescription);
   });
 });

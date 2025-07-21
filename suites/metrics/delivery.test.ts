@@ -25,10 +25,6 @@ describe(testName, async () => {
   const group = await workers.createGroupBetweenAll();
 
   it("stream: should verify message delivery and order accuracy using streams", async () => {
-    workers.getAllButCreator().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
-    await sleep(2000);
     const stats = await verifyMessageStream(
       group,
       workers.getAllButCreator(),
