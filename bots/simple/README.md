@@ -2,7 +2,7 @@
 
 This is a simple bot that replies `gm` to any message.
 
-## Quick Setup
+## Quick setup
 
 ```bash
 # Dependencies

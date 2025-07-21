@@ -1,4 +1,4 @@
-# Functional Testing Suite
+# Functional testing suite
 
 This test suite validates core XMTP protocol functionality including direct messages, group conversations, consent management, and message delivery systems.
 
@@ -10,7 +10,7 @@ This test suite validates core XMTP protocol functionality including direct mess
 - Test multi-device installation and cross-device sync
 - Validate consent management and content codec handling
 
-## Environment Setup
+## Environment setup
 
 Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding network.
 
@@ -18,18 +18,12 @@ Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding
 
 | Module                    | Purpose                                 | Key Features                               |
 | ------------------------- | --------------------------------------- | ------------------------------------------ |
-| **browser.test.ts**       | Browser environment testing             | Web integration, UI interactions           |
 | **clients.test.ts**       | Client initialization and configuration | Client creation, version testing           |
-| **codec-error.test.ts**   | Content codec error handling            | Error recovery, malformed messages         |
-| **consent.test.ts**       | User consent management                 | Allow/deny mechanisms, preferences         |
-| **conversations.test.ts** | Conversation functionality              | Creation, listing, metadata                |
-| **dms.test.ts**           | Direct message functionality            | DM creation, messaging, delivery           |
-| **groups.test.ts**        | Group conversation functionality        | Group creation, updates, member management |
+| **convos.test.ts**        | Conversation creation and management    | DM creation, group creation, messaging     |
+| **debug.test.ts**         | Group debug information and state       | Epoch tracking, fork detection             |
 | **installations.test.ts** | Multi-device installation testing       | Cross-device sync, installation management |
 | **metadata.test.ts**      | Conversation metadata handling          | Metadata updates, retrieval                |
-| **offline.test.ts**       | Offline messaging capabilities          | Message queuing, synchronization           |
-| **order.test.ts**         | Message ordering verification           | Sequencing, timestamps, delivery order     |
-| **regression.test.ts**    | Regression issue prevention             | Historical bug verification, edge cases    |
+| **permissions.test.ts**   | Group permission management             | Admin roles, super admin, member control   |
 | **streams.test.ts**       | Message streaming verification          | Stream performance, delivery confirmation  |
 | **sync.test.ts**          | Synchronization methods comparison      | Performance benchmarking, sync strategies  |
 
@@ -49,25 +43,7 @@ yarn test functional/groups.test.ts
 yarn test functional/streams.test.ts
 ```
 
-## 🌐 Browser Testing
-
-The `browser.test.ts` module tests XMTP in browser environments.
-
-```typescript
-// Create a new Playwright instance for browser testing
-const xmtpPlaywright = new playwright(headless, env);
-
-// Test group creation and messaging in browser
-await xmtpPlaywright.sendGm(addresses);
-```
-
-**Key features:**
-
-- Browser environment simulation
-- Web UI interaction testing
-- Cross-platform verification
-
-## 👤 Client Management
+## Client management
 
 The `clients.test.ts` module tests XMTP client initialization and configuration.
 
@@ -88,109 +64,42 @@ it("should create clients with different SDK versions", async () => {
 - Configuration options verification
 - Environment-specific behavior
 
-## 🛡️ Codec Error Handling
+## Conversation basics
 
-The `codec-error.test.ts` module tests handling of content codec errors.
-
-```typescript
-// Test handling of malformed messages
-it("should handle malformed content gracefully", async () => {
-  // Test error recovery mechanisms
-});
-```
-
-**Key features:**
-
-- Error recovery testing
-- Malformed message handling
-- Content type validation
-
-## 🔐 Consent Management
-
-The `consent.test.ts` module tests user consent mechanisms.
+The `convos.test.ts` module tests conversation creation and management functionality.
 
 ```typescript
-// Test consent management for conversations
-it("should require consent for new conversations", async () => {
-  const preferences = await client.preferences.inboxState();
-  expect(preferences.consentState).toBeDefined();
-});
-```
-
-**Key features:**
-
-- Allow/deny mechanisms
-- Consent preference persistence
-- Contact blocking functionality
-
-## 💬 Conversation Basics
-
-The `conversations.test.ts` module tests basic conversation functionality.
-
-```typescript
-// Test conversation retrieval
-it("should retrieve existing conversations", async () => {
-  await client.conversations.sync();
-  const conversations = await client.conversations.list();
-  expect(conversations.length).toBeGreaterThan(0);
-});
-```
-
-**Key features:**
-
-- Conversation creation
-- Conversation listing
-- Metadata handling
-
-## 📨 Direct Messaging
-
-The `dms.test.ts` module tests direct messaging capabilities.
-
-```typescript
-// Test DM creation and sending
-it("newDm: should create a direct message conversation", async () => {
-  const convo = await client.conversations.newDm(recipientInboxId);
+// Test DM creation using inbox ID
+it("newDm: should create a new DM conversation using inbox ID", async () => {
+  const convo = await workers
+    .get("henry")!
+    .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
   expect(convo).toBeDefined();
+  expect(convo.id).toBeDefined();
+});
 
-  const message = "Hello XMTP!";
-  const msgId = await convo.send(message);
-  expect(msgId).toBeDefined();
+// Test DM creation using Ethereum address
+it("newDmByAddress: should create a new DM conversation using Ethereum address", async () => {
+  const dm2 = await workers
+    .get("henry")!
+    .client.conversations.newDmWithIdentifier({
+      identifier: workers.get("randomguy2")!.address,
+      identifierKind: IdentifierKind.Ethereum,
+    });
+  expect(dm2).toBeDefined();
+  expect(dm2.id).toBeDefined();
 });
 ```
 
 **Key features:**
 
-- DM conversation creation
-- Message sending/receiving
-- Delivery confirmation
+- DM conversation creation by inbox ID
+- DM conversation creation by Ethereum address
+- Message sending and delivery verification
+- Group creation with variable participant counts
+- Group synchronization and member verification
 
-## 👥 Group Conversations
-
-The `groups.test.ts` module tests group conversation functionality.
-
-```typescript
-// Test group creation with multiple participants
-it("createGroup: should create a group with participants", async () => {
-  const group = await client.conversations.newGroup(participantInboxIds, {
-    groupName: "Test Group",
-  });
-  expect(group.id).toBeDefined();
-
-  // Test member management
-  await group.addMembers([newMemberInboxId]);
-  const members = await group.members();
-  expect(members.length).toBe(participantInboxIds.length + 2); // +1 for creator, +1 for new member
-});
-```
-
-**Key features:**
-
-- Group creation and configuration
-- Member management
-- Admin privileges
-- Group metadata updates
-
-## 📱 Multi-device Installations
+## Multi-device installations
 
 The `installations.test.ts` module tests multi-device synchronization.
 
@@ -219,7 +128,7 @@ it("should sync conversations across installations", async () => {
 - Installation management
 - Authentication across devices
 
-## 📋 Metadata Handling
+## Metadata handling
 
 The `metadata.test.ts` module tests conversation metadata handling.
 
@@ -238,76 +147,51 @@ it("should update and retrieve conversation metadata", async () => {
 - Retrieval mechanisms
 - Change propagation
 
-## 📵 Offline Capability
+## Permission management
 
-The `offline.test.ts` module tests offline message handling.
+The `permissions.test.ts` module tests group permission and role management.
 
 ```typescript
-// Test offline message handling
-it("should sync messages received while offline", async () => {
-  // Simulate offline by not syncing initially
-  const message = "Offline test message";
-  await senderClient.conversations.newDm(recipientInboxId).send(message);
+// Test admin permission management
+it("permissions: add and remove admin permissions", async () => {
+  const member = workers.getReceiver();
 
-  // Now sync to receive messages sent while "offline"
-  await recipientClient.conversations.sync();
-  const conversations = await recipientClient.conversations.list();
-  const msgs = await conversations[0].messages();
-  expect(msgs[0].content).toBe(message);
+  // Initially should not be admin
+  expect(group.isAdmin(member.client.inboxId)).toBe(false);
+  expect(group.isSuperAdmin(member.client.inboxId)).toBe(false);
+
+  // Add as admin
+  await group.addAdmin(member.client.inboxId);
+  expect(group.isAdmin(member.client.inboxId)).toBe(true);
+  expect(group.isSuperAdmin(member.client.inboxId)).toBe(false);
+
+  // Remove admin
+  await group.removeAdmin(member.client.inboxId);
+  expect(group.isAdmin(member.client.inboxId)).toBe(false);
+});
+
+// Test super admin permissions
+it("permissions: add and remove super admin permissions", async () => {
+  const member = workers.getReceiver();
+
+  await group.addSuperAdmin(member.client.inboxId);
+  expect(group.isSuperAdmin(member.client.inboxId)).toBe(true);
+  expect(group.isAdmin(member.client.inboxId)).toBe(false);
+
+  await group.removeSuperAdmin(member.client.inboxId);
+  expect(group.isSuperAdmin(member.client.inboxId)).toBe(false);
 });
 ```
 
 **Key features:**
 
-- Offline message queuing
-- Synchronization after reconnect
-- Historical message retrieval
+- Admin role assignment and removal
+- Super admin permission management
+- Admin list verification and management
+- Member removal permissions
+- Hierarchical permission structure
 
-## 🔢 Message Ordering
-
-The `order.test.ts` module tests message ordering and sequence verification.
-
-```typescript
-// Test message ordering
-it("should deliver messages in the correct order", async () => {
-  // Send multiple messages in sequence
-  for (let i = 0; i < 10; i++) {
-    await convo.send(`Message ${i}`);
-  }
-
-  // Verify messages are received in order
-  await recipientClient.conversations.sync();
-  const msgs = await recipientConvo.messages();
-  for (let i = 0; i < 10; i++) {
-    expect(msgs[i].content).toBe(`Message ${i}`);
-  }
-});
-```
-
-**Key features:**
-
-- Sequence verification
-- Timestamp ordering
-- Delivery confirmation
-
-## Regression Testing
-
-The `regression.test.ts` module verifies fixes for historical issues.
-
-```typescript
-// Test regression issues
-it("should handle edge case that previously caused issues", async () => {
-  // Test specific edge cases that were problematic in previous versions
-});
-```
-
-**Key features:**
-
-- Historical bug verification
-- Edge case testing
-- Version compatibility
-
-## Stream Testing
+## Stream testing
 
 The `streams.test.ts` module tests message streaming functionality.
 
@@ -325,7 +209,43 @@ it("receiveGM: should receive a message via stream", async () => {
 - Delivery verification
 - Stream performance
 
-## Sync Comparison
+## Debug information
+
+The `debug.test.ts` module tests group debug information and state tracking.
+
+```typescript
+// Test debug info retrieval
+it("debug: retrieve group debug information", async () => {
+  const debugInfo = await group.debugInfo();
+  expect(debugInfo).toBeDefined();
+  expect(debugInfo.epoch).toBeDefined();
+  expect(typeof debugInfo.epoch).toBe("bigint");
+  expect(debugInfo.epoch).toBeGreaterThan(0n);
+  expect(debugInfo.maybeForked).toBeDefined();
+  expect(typeof debugInfo.maybeForked).toBe("boolean");
+});
+
+// Test epoch tracking during operations
+it("debug: track epoch changes during group operations", async () => {
+  const initialDebugInfo = await group.debugInfo();
+  const initialEpoch = initialDebugInfo.epoch;
+
+  await group.addMembers([newMember]);
+  const updatedDebugInfo = await group.debugInfo();
+  const updatedEpoch = updatedDebugInfo.epoch;
+
+  expect(updatedEpoch).toBe(initialEpoch + 1n);
+});
+```
+
+**Key features:**
+
+- Group debug information retrieval
+- Epoch tracking and consistency verification
+- Fork detection and state validation
+- Debug info structure completeness validation
+
+## Sync comparison
 
 The `sync.test.ts` module compares different synchronization approaches.
 
@@ -352,7 +272,7 @@ it("should measure performance of sync methods", async () => {
 - Sync strategy comparison
 - Optimization guidance
 
-## 📝 Best practices
+## Best practices
 
 When working with these functional tests, consider the following best practices:
 

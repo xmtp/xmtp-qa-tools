@@ -1,4 +1,4 @@
-# Performance Benchmarking Suite
+# Performance benchmarking suite
 
 This test suite measures XMTP protocol performance across different group sizes and installation counts, providing detailed metrics for scalability analysis.
 
@@ -6,18 +6,18 @@ This test suite measures XMTP protocol performance across different group sizes 
 
 - Creates groups with varying member counts (10-200 members)
 - Tests different installation counts per member (2-25 installations)
-- Measures member addition timing and synchronization performance
+- Measures member addition timing and sync performance
 - Tracks total installation counts and performance scaling
 - Generates comprehensive performance reports
 
-## Key Metrics
+## Key metrics:
 
 - **Add Members Time**: Time to add new members to existing groups
 - **SyncAll Time**: Time for new clients to sync all conversations
 - **Time per Installation**: Performance efficiency metric (ms per installation)
 - **Installation Count Accuracy**: Verification of expected vs actual installation counts
 
-## Environment Setup
+## Environment setup
 
 Set `XMTP_ENV` to `dev` or `production` to test performance on the corresponding network.
 
@@ -37,7 +37,7 @@ The test suite uses these configurable parameters:
 - `CHECK_INSTALLATIONS`: Installation counts to test per member ([2, 5, 10, 15, 20, 25])
 - `MIN_MAX_INSTALLATIONS`: Installation count boundaries ([1000, 2000])
 
-## Test Results
+## Test results
 
 Performance results are automatically saved to:
 
@@ -53,7 +53,7 @@ Performance results are automatically saved to:
 | 100        | 5           | 491         | 181.00           | 272.49       | 0.37                  |
 | 200        | 10          | 1976        | 342.00           | 1260.17      | 0.17                  |
 
-## Performance Insights
+## Performance insights
 
 ### Scalability Patterns
 
@@ -67,13 +67,13 @@ Performance results are automatically saved to:
 - Network connectivity issues may occur during large-scale testing
 - Performance varies significantly between `dev` and `production` environments
 
-## Key Files
+## Key files
 
 - **[bench.test.ts](./bench.test.ts)** - Main performance testing implementation
 - **[all.csv](./all.csv)** - Historical performance data
 - **[README.md](./README.md)** - This documentation
 
-## Large Groups Performance Results
+## Large groups performance results
 
 | Group Size | Inst/Member | Actual Inst | Diff | Est. Inst | B receives member (ms) | Z gets added (ms) | Time per Install (ms) |
 | ---------- | ----------- | ----------- | ---- | --------- | ---------------------- | ----------------- | --------------------- |
@@ -119,7 +119,7 @@ Performance results are automatically saved to:
 | 140        | 20          | 2746        | -54  | 2800      | 536.00                 | 1244.64           | 0.20                  |
 | 160        | 20          | 3146        | -54  | 3200      | 541.00                 | 1449.46           | 0.17                  |
 
-## ~2000 Large Groups Performance Results
+## ~2000 large groups performance results
 
 | Group Size | Inst/Member | Actual Inst | Diff | Est. Inst | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |
 | ---------- | ----------- | ----------- | ---- | --------- | ---------------- | ------------ | --------------------- |
@@ -134,7 +134,7 @@ Performance results are automatically saved to:
 | 140        | 15          | 2058        | -42  | 2100      | 429.00           | 1241.45      | 0.21                  |
 | 110        | 20          | 2144        | -56  | 2200      | 444.00           | 1270.69      | 0.21                  |
 
-## Large Groups Performance Results
+## Large groups performance results
 
 | Group Size | Inst/Member | Actual Inst | Diff | Est. Inst | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |
 | ---------- | ----------- | ----------- | ---- | --------- | ---------------- | ------------ | --------------------- |

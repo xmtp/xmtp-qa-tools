@@ -22,17 +22,14 @@
             ],
             "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+              { "comparator": ">=", "value": 99, "palette": "white_on_green" },
+              { "comparator": ">=", "value": 95, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 95, "palette": "white_on_red" }
             ]
           }
         ],
-        "autoscale": true
+        "autoscale": true,
+        "precision": 0
       },
       "layout": { "x": 0, "y": 0, "width": 2, "height": 1 }
     },
@@ -56,24 +53,21 @@
             ],
             "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+              { "comparator": ">=", "value": 99, "palette": "white_on_green" },
+              { "comparator": ">=", "value": 95, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 95, "palette": "white_on_red" }
             ]
           }
         ],
-        "autoscale": true
+        "autoscale": true,
+        "precision": 0
       },
       "layout": { "x": 2, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 2409904999307821,
       "definition": {
-        "title": "Avg Agent Response Time (ms)",
+        "title": "Avg response time (ms)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -84,14 +78,24 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.response{$env,$region,metric_type:agent}"
+                "query": "avg:xmtp.sdk.response{$env,$region, $sdk}"
               }
             ],
-            "formulas": [{ "formula": "query1" }],
+            "formulas": [
+              {
+                "number_format": {
+                  "unit": {
+                    "type": "canonical_unit",
+                    "unit_name": "millisecond"
+                  }
+                },
+                "formula": "query1"
+              }
+            ],
             "conditional_formats": [
               {
                 "comparator": "<=",
-                "value": 1000,
+                "value": 3000,
                 "palette": "white_on_green"
               },
               {
@@ -103,51 +107,63 @@
             ]
           }
         ],
-        "autoscale": true
+        "autoscale": true,
+        "precision": 0
       },
       "layout": { "x": 4, "y": 0, "width": 2, "height": 1 }
     },
     {
-      "id": 4980151126779186,
+      "id": 4136910938597047,
       "definition": {
-        "title": "Operations performance by network",
-        "show_legend": true,
-        "legend_layout": "vertical",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
+        "title": "",
+        "title_size": "16",
+        "title_align": "left",
         "requests": [
           {
-            "formulas": [{ "alias": "Operations (ms)", "formula": "query1" }],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{$env,$region,$sdk,metric_subtype:core,test:m_performance} by {operation}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
+            "request_type": "slo_list",
+            "query": {
+              "query_string": "slo_creator:\"Fabrizio Guespe\"",
+              "limit": 100
+            }
           }
         ],
-        "markers": [
-          {
-            "label": " Max Threshold (1s) ",
-            "value": "y = 1000",
-            "display_type": "error dashed"
-          }
-        ]
+        "type": "slo_list"
       },
       "layout": { "x": 6, "y": 0, "width": 6, "height": 3 }
     },
     {
+      "id": 5297767210484191,
+      "definition": {
+        "title": "Fail lines",
+        "title_size": "16",
+        "title_align": "left",
+        "requests": [
+          {
+            "response_format": "event_list",
+            "query": {
+              "data_source": "logs_stream",
+              "query_string": "@service:xmtp-qa-tools",
+              "indexes": [],
+              "storage": "hot"
+            },
+            "columns": [
+              { "field": "status_line", "width": "auto" },
+              { "field": "timestamp", "width": "auto" },
+              { "field": "env", "width": "auto" },
+              { "field": "region", "width": "auto" },
+              { "field": "fail_lines", "width": "auto" },
+              { "field": "test", "width": "auto" }
+            ]
+          }
+        ],
+        "type": "list_stream"
+      },
+      "layout": { "x": 0, "y": 1, "width": 6, "height": 2 }
+    },
+    {
       "id": 5871193681027559,
       "definition": {
-        "title": "Delivery Rate & Order",
+        "title": "Streams",
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
@@ -167,7 +183,7 @@
             "response_format": "timeseries",
             "on_right_yaxis": true,
             "style": {
-              "palette": "dog_classic",
+              "palette": "cool",
               "line_type": "solid",
               "line_width": "normal"
             },
@@ -184,8 +200,8 @@
             ],
             "response_format": "timeseries",
             "style": {
-              "palette": "blue",
-              "order_reverse": true,
+              "palette": "datadog16",
+              "order_reverse": false,
               "line_type": "solid",
               "line_width": "thick"
             },
@@ -207,7 +223,38 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 1, "width": 6, "height": 2 }
+      "layout": { "x": 0, "y": 3, "width": 6, "height": 2 }
+    },
+    {
+      "id": 4980151126779186,
+      "definition": {
+        "title": "Operations performance by network",
+        "show_legend": true,
+        "legend_layout": "vertical",
+        "legend_columns": ["avg", "value"],
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "alias": "Operations (ms)", "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, metric_subtype:core} by {operation}"
+              }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ],
+        "markers": [{ "value": "y = 500", "display_type": "error dashed" }]
+      },
+      "layout": { "x": 6, "y": 3, "width": 6, "height": 3 }
     },
     {
       "id": 1933279114458496,
@@ -216,7 +263,7 @@
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
-        "legend_layout": "auto",
+        "legend_layout": "horizontal",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
         "type": "timeseries",
         "requests": [
@@ -226,7 +273,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.response{$env,$region, metric_subtype:dm, metric_type:agent} by {agent}"
+                "query": "avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}"
               }
             ],
             "formulas": [{ "formula": "query1" }],
@@ -237,9 +284,76 @@
             },
             "display_type": "line"
           }
+        ],
+        "yaxis": { "include_zero": true, "max": "auto" }
+      },
+      "layout": { "x": 0, "y": 5, "width": 6, "height": 2 }
+    },
+    {
+      "id": 7792773130762525,
+      "definition": {
+        "title": "Network Performance",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$region,$test,$sdk,$members} by {network_phase}"
+              }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ],
+        "markers": [{ "value": "y = 250", "display_type": "error dashed" }]
+      },
+      "layout": { "x": 6, "y": 6, "width": 6, "height": 2 }
+    },
+    {
+      "id": 3602281815818011,
+      "definition": {
+        "title": "newGroup performance over time",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": { "type": "live", "unit": "week", "value": 1 },
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {members}"
+              }
+            ],
+            "formulas": [{ "alias": "performance", "formula": "query2" }],
+            "style": {
+              "palette": "semantic",
+              "order_by": "tags",
+              "order_reverse": false,
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
         ]
       },
-      "layout": { "x": 0, "y": 3, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 7, "width": 6, "height": 2 }
     },
     {
       "id": 8060176852557109,
@@ -252,7 +366,8 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,installations,members}"
+                "query": "avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,members,region,env}",
+                "aggregator": "max"
               }
             ],
             "response_format": "scalar",
@@ -260,18 +375,109 @@
               "count": 500,
               "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
             },
-            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
+            "formulas": [
+              {
+                "alias": "Duration (ms)",
+                "number_format": {
+                  "precision": 0,
+                  "unit_scale": {
+                    "type": "canonical_unit",
+                    "unit_name": "second"
+                  }
+                },
+                "formula": "query1"
+              }
+            ]
           }
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 6, "y": 3, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 8, "width": 6, "height": 5 }
+    },
+    {
+      "id": 688867209980098,
+      "definition": {
+        "title": "newGroup performance over time",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": { "type": "live", "unit": "week", "value": 1 },
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {operation}"
+              }
+            ],
+            "formulas": [{ "alias": "performance", "formula": "query2" }],
+            "style": {
+              "palette": "semantic",
+              "order_by": "tags",
+              "order_reverse": false,
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 9, "width": 6, "height": 2 }
+    },
+    {
+      "id": 6297751739510491,
+      "definition": {
+        "title": "Group performance over time",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": { "type": "live", "unit": "week", "value": 1 },
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_large, operation:newgroup} by {members,operation}"
+              }
+            ],
+            "formulas": [
+              {
+                "alias": "newGroup",
+                "formula": "query2",
+                "number_format": {
+                  "unit_scale": {
+                    "type": "canonical_unit",
+                    "unit_name": "second"
+                  }
+                }
+              }
+            ],
+            "style": {
+              "palette": "semantic",
+              "order_by": "tags",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 11, "width": 6, "height": 2 }
     },
     {
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
-        "time": {},
         "type": "query_table",
         "requests": [
           {
@@ -295,115 +501,22 @@
               "count": 500
             },
             "formulas": [
-              { "alias": "Production (ms)", "formula": "query1" },
-              { "alias": "Dev (ms)", "formula": "query2" }
+              {
+                "alias": "Production (ms)",
+                "number_format": { "precision": 0 },
+                "formula": "query1"
+              },
+              {
+                "alias": "Dev (ms)",
+                "formula": "query2",
+                "number_format": { "precision": 0 }
+              }
             ]
           }
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 0, "y": 6, "width": 6, "height": 2 }
-    },
-    {
-      "id": 6297751739510491,
-      "definition": {
-        "title": "Group performance over time",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query2",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members,operation:newgroup} by {members,operation}"
-              }
-            ],
-            "formulas": [{ "alias": "newGroup", "formula": "query2" }],
-            "style": {
-              "palette": "semantic",
-              "order_by": "tags",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ]
-      },
-      "layout": { "x": 6, "y": 7, "width": 6, "height": 3 }
-    },
-    {
-      "id": 7792773130762525,
-      "definition": {
-        "title": "Network Performance",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "time": {},
-        "type": "timeseries",
-        "requests": [
-          {
-            "formulas": [{ "formula": "query1" }],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$region,$test,$sdk,$members} by {network_phase}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "markers": [
-          {
-            "label": " Max Threshold (300ms) ",
-            "value": "y = 300",
-            "display_type": "error dashed"
-          }
-        ]
-      },
-      "layout": { "x": 0, "y": 8, "width": 6, "height": 2 }
-    },
-    {
-      "id": 5297767210484191,
-      "definition": {
-        "title": "Fail lines",
-        "title_size": "16",
-        "title_align": "left",
-        "requests": [
-          {
-            "response_format": "event_list",
-            "query": {
-              "data_source": "logs_stream",
-              "query_string": "@service:xmtp-qa-tools",
-              "indexes": [],
-              "storage": "hot"
-            },
-            "columns": [
-              { "field": "status_line", "width": "auto" },
-              { "field": "timestamp", "width": "auto" },
-              { "field": "env", "width": "auto" },
-              { "field": "region", "width": "auto" },
-              { "field": "fail_lines", "width": "auto" },
-              { "field": "test", "width": "auto" },
-              { "field": "content", "width": "auto" }
-            ]
-          }
-        ],
-        "type": "list_stream"
-      },
-      "layout": { "x": 0, "y": 10, "width": 6, "height": 4 }
+      "layout": { "x": 0, "y": 13, "width": 6, "height": 2 }
     },
     {
       "id": 403905557672626,
@@ -418,7 +531,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call} by {country_iso_code}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call, $sdk, $env} by {country_iso_code}"
               }
             ],
             "response_format": "scalar",
@@ -430,7 +543,7 @@
         "style": { "palette": "green_to_orange", "palette_flip": false },
         "view": { "focus": "WORLD" }
       },
-      "layout": { "x": 6, "y": 10, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 13, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
