@@ -43,15 +43,16 @@ describe(testName, async () => {
   });
 
   it("permissions: verify admin list management", async () => {
+    const newGroup = await workers.createGroupBetweenAll();
     const member1 = workers.getReceiver();
     const member2 = workers.getAll()[3];
 
     // Add multiple admins
-    await group.addAdmin(member1.client.inboxId);
-    await group.addSuperAdmin(member2.client.inboxId);
+    await newGroup.addAdmin(member1.client.inboxId);
+    await newGroup.addSuperAdmin(member2.client.inboxId);
 
-    const admins = group.admins;
-    const superAdmins = group.superAdmins;
+    const admins = newGroup.admins;
+    const superAdmins = newGroup.superAdmins;
 
     expect(admins).toContain(member1.client.inboxId);
     expect(superAdmins).not.toContain(member1.client.inboxId);

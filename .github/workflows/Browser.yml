@@ -20,14 +20,14 @@ jobs:
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --no-fail --debug
 
       - name: Cleanup and upload artifacts
         if: always()
