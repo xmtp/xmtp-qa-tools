@@ -11,7 +11,7 @@ rm -rf .data/
 echo "Starting test cycle at $(date)"
 for ((i=1; i<=num_runs; i++)); do
     echo "Running test iteration $i of $num_runs"
-    yarn test suites/commits/commits.test.ts  --no-fail --debug
+    yarn test suites/forks/forks.test.ts  --no-fail --debug
     exit_code=$?
     
     # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop

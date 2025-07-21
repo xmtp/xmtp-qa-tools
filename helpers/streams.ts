@@ -139,11 +139,13 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     count,
     messageTemplate,
   } = options;
+
   // Sync conversations for all receiving workers to ensure they have local group instances
   await Promise.all(
     receivers.map((worker) => worker.client.conversations.syncAll()),
   );
 
+  // Start collectors FIRST - before any messages are sent
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
   >[] = receivers.map((r) =>
@@ -156,10 +158,16 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
-  await sleep(streamColdStartTimeout); // wait for stream to start
 
+  // Wait for streams to be ready and collectors to be active
+  await sleep(streamColdStartTimeout);
+
+  // NOW send the messages - after collectors are listening
   const sentEvents = await options.triggerEvents();
+
+  // Wait for all collectors to finish
   const allReceived = await Promise.all(collectPromises);
+
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
   let timingCount = 0;
@@ -243,7 +251,8 @@ export async function verifyMessageStream(
 
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, count),
+    startCollectors: (r) =>
+      r.worker.collectMessages(group.id, count, ["text"], 60000), // 60s timeout
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
@@ -253,6 +262,11 @@ export async function verifyMessageStream(
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
+
+        // Add small delay between messages to prevent overwhelming
+        if (i < count - 1) {
+          await sleep(50); // 50ms delay between messages
+        }
       }
       return sent;
     },
