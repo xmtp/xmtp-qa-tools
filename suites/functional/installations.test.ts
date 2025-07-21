@@ -7,7 +7,7 @@ const testName = "installations";
 describe(testName, () => {
   setupTestLifecycle({ testName });
 
-  it("installation management: should manage multiple device installations with shared identity and separate storage", async () => {
+  it("installations: manage multiple device installations with shared identity and separate storage", async () => {
     const names = ["random1", "random2", "random3", "random4", "random5"];
     let initialWorkers = await getWorkers(names);
     // Start message streams for installation tests
@@ -69,7 +69,7 @@ describe(testName, () => {
     expect(backupConvs?.length).toBe(0);
   });
 
-  it("installation management: should track installation count and validate installation revocation functionality", async () => {
+  it("installations: track installation count and validate installation revocation functionality", async () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
     // Create initial workers
     const randomString = Math.random().toString(36).substring(2, 15);

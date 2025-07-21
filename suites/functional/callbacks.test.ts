@@ -8,7 +8,7 @@ describe(testName, async () => {
   setupTestLifecycle({ testName });
   const workers = await getWorkers(5);
 
-  it("message streaming: should receive messages using await async", async () => {
+  it("streaming: receive messages using await async", async () => {
     const sender = workers.get(0)!;
     const receiver = workers.get(1)!;
 
@@ -47,7 +47,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("message streaming: should receive messages using callback", async () => {
+  it("streaming: receive messages using callback", async () => {
     const sender = workers.get(2)!;
     const receiver = workers.get(1)!;
 
@@ -82,7 +82,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("conversation streaming: should receive conversation with async", async () => {
+  it("streaming: receive conversation with async", async () => {
     const receiver = workers.get(1)!;
 
     // Set up stream first
@@ -115,7 +115,7 @@ describe(testName, async () => {
     expect(conversation.id).toBe(convo.id);
   });
 
-  it("conversation streaming: should receive conversation with callback", async () => {
+  it("streaming: receive conversation with callback", async () => {
     const receiver = workers.get(1)!;
 
     // Set up stream first
