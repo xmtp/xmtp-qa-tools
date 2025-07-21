@@ -102,42 +102,64 @@ describe(testName, async () => {
     expect(inboxState[0].inboxId).toBe(bobInboxId);
   });
 
-  // Regression testing for SDK version compatibility
-  describe("regression", () => {
+  it(`downgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
     const receiverInboxId = getInboxIds(1)[0];
 
     for (const version of versions) {
-      it(`downgrade to ${version.nodeVersion}`, async () => {
-        const versionWorkers = await getWorkers(
-          ["bob-" + "a" + "-" + version.nodeVersion],
-          {
-            useVersions: false,
-          },
-        );
+      const versionWorkers = await getWorkers(
+        ["bob-" + "a" + "-" + version.nodeVersion],
+        {
+          useVersions: false,
+        },
+      );
 
-        const bob = versionWorkers.get("bob");
-        console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
-        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+      const bob = versionWorkers.get("bob");
+      console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
+      let convo = await bob?.client.conversations.newDm(receiverInboxId);
 
-        expect(convo?.id).toBeDefined();
-      });
+      expect(convo?.id).toBeDefined();
     }
+  });
+
+  it(`upgrade last versions`, async () => {
+    const versions = getVersions().slice(0, 3);
+    const receiverInboxId = getInboxIds(1)[0];
 
     for (const version of versions.reverse()) {
-      it(`upgrade to ${version.nodeVersion}`, async () => {
-        const versionWorkers = await getWorkers(
-          ["alice-" + "a" + "-" + version.nodeVersion],
-          {
-            useVersions: false,
-          },
-        );
+      const versionWorkers = await getWorkers(
+        ["alice-" + "a" + "-" + version.nodeVersion],
+        {
+          useVersions: false,
+        },
+      );
 
-        const alice = versionWorkers.get("alice");
-        console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
-        let convo = await alice?.client.conversations.newDm(receiverInboxId);
-        expect(convo?.id).toBeDefined();
-      });
+      const alice = versionWorkers.get("alice");
+      console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
+      let convo = await alice?.client.conversations.newDm(receiverInboxId);
+      expect(convo?.id).toBeDefined();
     }
+  });
+
+  it("shared identity and separate storage", async () => {
+    const baseName = "randomguy";
+
+    // Create primary installation
+    const primary = await getWorkers([baseName]);
+
+    // Create secondary installation with different folder
+    const secondary = await getWorkers([baseName + "-desktop"]);
+
+    // Get workers with correct base name and installation IDs
+    const primaryWorker = primary.get(baseName);
+    const secondaryWorker = secondary.get(baseName, "desktop");
+
+    // Ensure workers exist
+    expect(primaryWorker).toBeDefined();
+    expect(secondaryWorker).toBeDefined();
+
+    // Verify shared identity but separate storage
+    expect(primaryWorker?.client.inboxId).toBe(secondaryWorker?.client.inboxId);
+    expect(primaryWorker?.dbPath).not.toBe(secondaryWorker?.dbPath);
   });
 });
