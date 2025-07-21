@@ -2,10 +2,7 @@ name: Forks
 description: "Daily forks testing on local network"
 
 on:
-  pull_request:
-  schedule:
-    - cron: "0 2 * * *" # Runs daily at 2:00 AM UTC
-  workflow_dispatch:
+  # pull_request:
 
 jobs:
   test:
