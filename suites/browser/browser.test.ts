@@ -41,7 +41,7 @@ describe(testName, () => {
     await xmtpTester.startPage();
   });
 
-  it("automation: conversation stream with message", async () => {
+  it("conversation stream with message", async () => {
     const newGroup = await creator.client.conversations.newGroup(
       getRandomInboxIds(4),
       {
@@ -55,7 +55,7 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it("automation: conversation stream without message", async () => {
+  it("conversation stream without message", async () => {
     const newGroup = await creator.client.conversations.newGroup(
       getRandomInboxIds(4),
       {
@@ -68,14 +68,14 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it("automation: newDm and message stream", async () => {
+  it("newDm and message stream", async () => {
     await xmtpTester.newDmFromUI(receiver.address);
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     const result = await xmtpTester.waitForResponse(["gm"]);
     expect(result).toBe(true);
   });
 
-  it("automation: newGroup and message stream", async () => {
+  it("newGroup and message stream", async () => {
     groupId = await xmtpTester.newGroupFromUI([
       ...getInboxIds(4),
       receiver.inboxId,
@@ -86,7 +86,7 @@ describe(testName, () => {
   });
 
   it(
-    "automation: conversation stream when creating the group",
+    "conversation stream when creating the group",
     async () => {
       await xmtpTester.newGroupFromUI(
         [...getInboxIds(4), creator.inboxId],
@@ -103,7 +103,7 @@ describe(testName, () => {
   );
 
   it(
-    "automation: conversation stream for new member",
+    "conversation stream for new member",
     async () => {
       groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
@@ -119,7 +119,7 @@ describe(testName, () => {
     streamTimeout,
   );
 
-  it("automation: new installation and message stream", async () => {
+  it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
       headless,
     });
