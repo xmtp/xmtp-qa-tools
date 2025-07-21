@@ -45,7 +45,7 @@ describe(testName, async () => {
   it("permissions: verify admin list management", async () => {
     const newGroup = await workers.createGroupBetweenAll();
     const member1 = workers.getReceiver();
-    const member2 = workers.getAll()[3];
+    const member2 = workers.getCreator();
 
     // Add multiple admins
     await newGroup.addAdmin(member1.client.inboxId);

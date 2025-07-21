@@ -491,17 +491,9 @@ export class WorkerClient extends Worker {
               }),
           });
           for await (const message of stream) {
-            const content =
-              (message?.content as any)?.content ??
-              message?.content ??
-              message?.contentType?.typeId;
-            const contentType = message?.contentType?.typeId;
-            // console.debug(
-            //   `[${this.nameId}] Received message: ${content} , ${contentType}`,
-            // );
             if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
               break;
-
+            //this.logMessage(message);
             if (
               !message ||
               message?.senderInboxId.toLowerCase() ===
@@ -591,7 +583,16 @@ export class WorkerClient extends Worker {
       }
     })();
   }
-
+  logMessage(message: DecodedMessage) {
+    const content =
+      (message?.content as any)?.content ??
+      message?.content ??
+      message?.contentType?.typeId;
+    const contentType = message?.contentType?.typeId;
+    console.debug(
+      `[${this.nameId}] Received message: ${content} , ${contentType}`,
+    );
+  }
   /**
    * Handle generating and sending GPT responses
    */
