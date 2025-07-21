@@ -24,9 +24,6 @@ describe(testName, async () => {
     console.log(`Expected messages: ${MESSAGE_COUNT}`);
     console.log(`Workers: ${WORKER_COUNT}`);
     console.log(`Receivers: ${workers.getAllButCreator().length}`);
-
-    await sleep(2000);
-
     // Use the working verifyMessageStream function instead of manual implementation
     console.log("=== USING VERIFY MESSAGE STREAM ===");
     const stats = await verifyMessageStream(

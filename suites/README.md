@@ -1,6 +1,6 @@
-# XMTP Test Suite Engineering Report
+# XMTP test suite engineering report
 
-## Test Suite Architecture
+## Test suite architecture
 
 Our test suite is organized into 5 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
@@ -42,7 +42,7 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 - `debug: retrieve group debug information` - Debug info structure validation
 - `debug: track epoch changes during group operations` - Epoch tracking
-- `debug: verify epoch consistency across members` - Cross-member synchronization
+- `debug: verify epoch consistency across members` - Cross-member sync
 - `debug: detect potential forks in group state` - Fork detection
 - `debug: verify debug info after metadata changes` - Metadata change tracking
 - `debug: verify debug info structure completeness` - Complete debug validation
@@ -79,13 +79,13 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 - `conversations: verify new conversation notifications` - Conversation streams
 - `members: verify member addition to existing group` - Member addition streams
 
-### Synchronization (`sync.test.ts`)
+### sync (`sync.test.ts`)
 
 - `group sync performance: should establish test environment by creating group with all participants` - Environment setup
-- `group sync performance: should send baseline message to group for synchronization performance testing` - Baseline establishment
+- `group sync performance: should send baseline message to group for sync performance testing` - Baseline establishment
 - `group sync performance: should measure performance impact of client-level conversations.sync() operation` - Client-level sync
 - `group sync performance: should measure performance impact of individual conversation.sync() operation` - Individual sync
-- `group sync performance: should measure message retrieval performance without explicit synchronization` - No-sync retrieval
+- `group sync performance: should measure message retrieval performance without explicit sync` - No-sync retrieval
 
 ---
 
@@ -151,5 +151,5 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 **Key Measurements**:
 
 - Stream notification latency across large participant counts
-- Synchronization performance with high member counts
+- sync performance with high member counts
 - Cold start performance for new clients joining large groups

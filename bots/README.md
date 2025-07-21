@@ -1,8 +1,8 @@
-# Test Bots
+# Test bots
 
 Test bots for the XMTP protocol that validate functionality, automate testing scenarios, and provide interactive agents for development.
 
-## Quick Reference
+## Quick reference
 
 | Bot         | Purpose             | Key Features                            |
 | ----------- | ------------------- | --------------------------------------- |
@@ -23,7 +23,7 @@ yarn bot stress 5
 yarn bot simple
 ```
 
-## GM Bot
+## GM bot
 
 Simple bot that responds with "gm" to any message.
 
@@ -42,7 +42,7 @@ for await (const message of stream) {
 
 Functions: Simple greeting response, deployable to custom ENS domains, minimal configuration, standalone operation.
 
-## Simple Bot
+## Simple bot
 
 Diagnostic information about the XMTP protocol.
 
@@ -62,7 +62,7 @@ for await (const message of stream) {
 
 Functions: Identity information, conversation details, protocol diagnostics, connection testing.
 
-## Stress Test Bot
+## Stress test bot
 
 Load testing for XMTP groups and DMs.
 
@@ -96,7 +96,7 @@ SLACK_BOT_TOKEN=xoxb-...       # Optional: Slack notifications
 SLACK_CHANNEL=C...             # Optional: Slack channel
 ```
 
-## Best Practices
+## Best practices
 
 1. Set proper environment variables for network and logging
 2. Add error reporting to catch and log failures
