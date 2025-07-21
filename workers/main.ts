@@ -496,9 +496,9 @@ export class WorkerClient extends Worker {
               message?.content ??
               message?.contentType?.typeId;
             const contentType = message?.contentType?.typeId;
-            console.debug(
-              `[${this.nameId}] Received message: ${content} , ${contentType}`,
-            );
+            // console.debug(
+            //   `[${this.nameId}] Received message: ${content} , ${contentType}`,
+            // );
             if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
               break;
 

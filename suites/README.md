@@ -1,200 +1,155 @@
-# Test Suites
+# XMTP Test Suite Engineering Report
 
-End-to-end test suites for XMTP protocol validation across environments and scenarios.
+## Test Suite Architecture
 
-## Quick Reference
+Our test suite is organized into 5 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
-| Suite                           | Purpose                          | Command                  |
-| ------------------------------- | -------------------------------- | ------------------------ |
-| [functional](./functional/)     | Core protocol functionality      | `yarn test functional`   |
-| [metrics](./metrics/)           | Performance and delivery testing | `yarn test metrics`      |
-| [agents](./agents/)             | Production agent monitoring      | `yarn test agents`       |
-| [bench](./bench/)               | Performance benchmarking         | `yarn test bench`        |
-| [networkchaos](./networkchaos/) | Network partition testing        | `yarn test networkchaos` |
-| [other](./other/)               | Edge cases and specialized tests | `yarn test other`        |
-| [bugs](./bugs/)                 | Bug reproduction and tracking    | `yarn test bugs`         |
-| [forks](./forks/)               | Git commit-based testing         | `yarn test forks`        |
+---
 
-## Core Functionality
+## 1. Browser Testing (`browser.test.ts`)
 
-### Functional Tests
+**Purpose**: Validates XMTP functionality in browser environments using Playwright automation.
 
-Complete protocol feature validation.
+### Test Coverage:
 
-```bash
-yarn test functional
-yarn test functional --versions 3  # Multi-version testing
-```
+- `conversation stream with message` - Real-time conversation detection with content
+- `conversation stream without message` - Conversation detection without messages
+- `newDm and message stream` - Browser DM creation and messaging flow
+- `newGroup and message stream` - Browser group creation and messaging
+- `conversation stream when creating the group` - Stream notifications during group creation
+- `conversation stream for new member` - Member addition stream detection
+- `new installation and message stream` - Multi-installation browser validation
 
-**Individual Tests:**
+---
 
-```bash
-yarn test suites/functional/dms.test.ts          # Direct messaging
-yarn test suites/functional/groups.test.ts       # Group conversations
-yarn test suites/functional/streams.test.ts      # Message streaming
-yarn test suites/functional/sync.test.ts         # Data synchronization
-yarn test suites/functional/consent.test.ts      # Permission management
-yarn test suites/functional/clients.test.ts      # Client lifecycle
-yarn test suites/functional/installations.test.ts # Multi-device support
-yarn test suites/functional/callbacks.test.ts    # Event handling
-yarn test suites/functional/metadata.test.ts     # Conversation metadata
-yarn test suites/functional/offline.test.ts      # Offline handling
-yarn test suites/functional/order.test.ts        # Message ordering
-yarn test suites/functional/codec.test.ts        # Content encoding
-yarn test suites/functional/browser.test.ts      # Browser integration
-yarn test suites/functional/regression.test.ts   # Regression prevention
-```
+## 2. Functional + Regression Testing
 
-## Performance Testing
+**Purpose**: Core protocol validation including backward compatibility and edge case handling.
 
-### Metrics Suite
+### Client Management (`clients.test.ts`)
 
-Performance measurement and delivery validation.
+- `validation and key package status` - Key package validation
+- `inbox state from external inbox IDs` - External inbox queries
+- `downgrade last versions` - Backward compatibility across SDK versions
+- `upgrade last versions` - Forward compatibility testing
+- `shared identity and separate storage` - Multi-installation identity management
 
-```bash
-yarn test metrics
-```
+### Content Handling (`codec.test.ts`)
 
-**Individual Tests:**
+- `errors: handle codec errors gracefully when sending unsupported content types` - Codec error resilience
 
-```bash
-yarn test suites/metrics/performance.test.ts     # Performance metrics
-yarn test suites/metrics/delivery.test.ts        # Message delivery
-yarn test suites/metrics/large.test.ts          # Large-scale testing
-```
+### Debug Operations (`debug.test.ts`)
 
-### Benchmarking
+- `debug: retrieve group debug information` - Debug info structure validation
+- `debug: track epoch changes during group operations` - Epoch tracking
+- `debug: verify epoch consistency across members` - Cross-member synchronization
+- `debug: detect potential forks in group state` - Fork detection
+- `debug: verify debug info after metadata changes` - Metadata change tracking
+- `debug: verify debug info structure completeness` - Complete debug validation
 
-Throughput and latency measurement.
+### Installation Management (`installations.test.ts`)
 
-```bash
-yarn test bench
-```
+- `shared identity and separate storage` - Cross-device identity with isolated storage
 
-## Production Monitoring
+### Metadata Operations (`metadata.test.ts`)
 
-### Agent Health
+- `metadata: update group name and verify persistence` - Name updates
+- `metadata: update group description and verify persistence` - Description updates
+- `metadata: update group image URL` - Image URL management
+- `metadata: verify metadata propagation to other members` - Cross-member propagation
+- `metadata: handle empty and special characters in metadata` - Edge case handling
+- `metadata: verify metadata state after group operations` - State persistence
 
-Live production agent validation.
+### Permission System (`permissions.test.ts`)
 
-```bash
-yarn test agents
-XMTP_ENV=production yarn test agents --no-fail --debug
-```
+- `permissions: add and remove admin permissions` - Admin role management
+- `permissions: add and remove super admin permissions` - Super admin management
+- `permissions: verify admin list management` - Admin list operations
+- `permissions: admin can remove other members` - Admin privilege validation
+- `permissions: super admin can manage other admins` - Super admin privileges
 
-**Individual Tests:**
+### Stream Validation (`streams.test.ts`)
 
-```bash
-yarn test suites/agents/agents-dms.test.ts       # DM functionality
-yarn test suites/agents/agents-tagged.test.ts    # Tagged agents
-yarn test suites/agents/agents-untagged.test.ts  # Untagged agents
-```
+- `membership: verify member addition notifications` - Member addition streams
+- `consent: verify consent state changes for direct messages` - DM consent streams
+- `consent: verify consent state changes in groups` - Group consent streams
+- `messages: verify direct message delivery` - DM message streams
+- `messages: verify group message delivery` - Group message streams
+- `metadata: verify group metadata updates` - Metadata streams
+- `conversations: verify new conversation notifications` - Conversation streams
+- `members: verify member addition to existing group` - Member addition streams
 
-## Network Testing
+### Synchronization (`sync.test.ts`)
 
-### Network Chaos
+- `group sync performance: should establish test environment by creating group with all participants` - Environment setup
+- `group sync performance: should send baseline message to group for synchronization performance testing` - Baseline establishment
+- `group sync performance: should measure performance impact of client-level conversations.sync() operation` - Client-level sync
+- `group sync performance: should measure performance impact of individual conversation.sync() operation` - Individual sync
+- `group sync performance: should measure message retrieval performance without explicit synchronization` - No-sync retrieval
 
-Network partition and failure scenarios.
+---
 
-```bash
-yarn test networkchaos
-```
+## 3. Delivery, Order & Recovery Testing (`delivery.test.ts`)
 
-**Individual Tests:**
+**Purpose**: Validates message delivery reliability, ordering accuracy, and recovery mechanisms.
 
-```bash
-yarn test suites/networkchaos/group-reconciliation.test.ts
-yarn test suites/networkchaos/dm-duplicate-prevention.test.ts
-yarn test suites/networkchaos/group-client-partition.test.ts
-yarn test suites/networkchaos/keyrotation.test.ts
-yarn test suites/networkchaos/node-blackhole.test.ts
-yarn test suites/networkchaos/smoketests.test.ts
-```
+### Core Tests:
 
-## Specialized Testing
+- `stream: should verify message delivery and order accuracy using streams` - Stream-based delivery validation
+- `poll: should verify message delivery and order accuracy using polling` - Poll-based delivery validation
+- `recovery: should verify message recovery after stream interruption` - Offline recovery testing
 
-### Edge Cases
+**Metrics Validated**:
 
-Rate limiting, storage, and specialized scenarios.
+- Reception percentage (successful message delivery)
+- Order percentage (correct message sequencing)
+- Recovery capability after network interruption
 
-```bash
-yarn test other
-```
+---
 
-**Individual Tests:**
+## 4. Performance Testing (`performance.test.ts`)
 
-```bash
-yarn test suites/other/mobile.test.ts           # Mobile performance
-yarn test suites/other/storage.test.ts          # Storage efficiency
-yarn test suites/other/spam.test.ts             # Spam detection
-yarn test suites/other/notifications.test.ts    # Push notifications
-yarn test suites/other/rate-limited.test.ts     # Rate limiting
-yarn test suites/other/fullinbox.test.ts        # Full inbox scenarios
-yarn test suites/other/chaos.test.ts            # Chaos testing
-yarn test suites/other/nodetest.test.ts         # Node testing
-```
+**Purpose**: Measures operation timing and throughput for standard group sizes (5-10 participants).
 
-### Bug Reproduction
+### Individual Operations:
 
-Historical bug tracking and regression testing.
+- `create: should measure creating a client` - Client creation timing
+- `canMessage: should measure canMessage` - Message capability checks
+- `inboxState: should measure inboxState` - Inbox state retrieval
+- `newDm: should measure creating a DM` - DM creation performance
+- `send: should measure sending a gm` - Message sending timing
+- `stream: should measure receiving a gm` - Message reception timing
+- `newDmByAddress: should measure creating a DM` - Address-based DM creation
 
-```bash
-yarn test bugs
-```
+### Scaled Operations (per group size):
 
-**Bug Categories:**
+- `newGroup-{i}: should create a large group of {i} participants` - Group creation scaling
+- `newGroupByAddress-{i}: should create a large group of {i} participants` - Address-based group creation
+- `groupsync-{i}: should sync a large group of {i} participants` - Group sync performance
+- `updateName-{i}: should update the group name` - Metadata update timing
+- `send-{i}: should measure sending a gm in a group of {i} participants` - Group messaging
+- `stream-{i}: should verify group message` - Group message streaming
+- `addMember-{i}: should add members to a group` - Member addition performance
+- `removeMembers-{i}: should remove a participant from a group` - Member removal performance
 
-- `addmember/` - Group membership issues
-- `kpke/` - Key package encryption errors
-- `panic/` - System crash conditions
-- `stitch/` - Message continuity problems
+---
 
-### Commit Testing
+## 5. Large Group Testing (`large.test.ts`)
 
-Git commit-based validation.
+**Purpose**: Validates scalability and performance at scale (10-50+ participants).
 
-```bash
-yarn test forks
-```
+### Scalability Tests (per group size):
 
-## Running Tests
+- `newGroup-{groupSize}: should create a large group of {groupSize} participants` - Large group creation
+- `groupsync-{groupSize}: should sync a large group of {groupSize} participants` - Large group sync
+- `addMember-{groupSize}: should notify all members of additions in {groupSize} member group` - Large group notifications
+- `stream-{groupSize}: should notify all members of message changes in {groupSize} member group` - Large group messaging
+- `updateName-{groupSize}: should notify all members of metadata changes in {groupSize} member group` - Large group metadata
+- `sync-{groupSize}: should perform cold start sync operations on {groupSize} member group` - Cold start sync
+- `syncAll-{groupSize}: should perform cold start sync operations on {groupSize} member group` - Cold start syncAll
 
-### Basic Execution
+**Key Measurements**:
 
-```bash
-# Run test suites
-yarn test functional
-yarn test metrics
-yarn test agents
-yarn bench
-
-# Run individual files
-yarn test suites/functional/dms.test.ts
-yarn test suites/metrics/performance.test.ts
-```
-
-### Advanced Options
-
-```bash
-# Multi-version testing
-yarn test functional --versions 3
-
-# Debug mode with logging
-yarn test functional --debug --no-fail
-
-# Environment-specific
-XMTP_ENV=production yarn test agents --debug
-XMTP_ENV=dev yarn test functional
-
-# Parallel execution
-yarn test functional --parallel
-```
-
-### Environment Variables
-
-```bash
-export XMTP_ENV=dev          # Development network
-export XMTP_ENV=production   # Production network
-export XMTP_ENV=local        # Local testing
-export LOGGING_LEVEL=debug   # Logging level
-```
+- Stream notification latency across large participant counts
+- Synchronization performance with high member counts
+- Cold start performance for new clients joining large groups
