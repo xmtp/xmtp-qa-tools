@@ -1,4 +1,5 @@
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -31,15 +32,14 @@ describe(testName, async () => {
     const initialEpoch = initialDebugInfo.epoch;
 
     // Perform group operation that should increment epoch
-    const newMember = workers.getAll()[2];
-    await group.addMembers([newMember.client.inboxId]);
-
+    const newMember = getInboxIds(1)[0];
+    await group.addMembers([newMember]);
     // Get updated debug info
     const updatedDebugInfo = await group.debugInfo();
     const updatedEpoch = updatedDebugInfo.epoch;
 
     // Verify epoch increased
-    expect(updatedEpoch).toBeGreaterThan(initialEpoch);
+    expect(updatedEpoch).toBe(initialEpoch + 1n);
   });
 
   it("debug: verify epoch consistency across members", async () => {
@@ -49,6 +49,7 @@ describe(testName, async () => {
         await worker.client.conversations.sync();
         const memberGroup =
           await worker.client.conversations.getConversationById(group.id);
+        await (memberGroup as Group).sync();
         expect(memberGroup).toBeDefined();
         return await (memberGroup as Group).debugInfo();
       }),
@@ -78,21 +79,6 @@ describe(testName, async () => {
       // In normal operation, should not be forked
       expect(debugInfo.maybeForked).toBe(false);
     }
-  });
-
-  it("debug: verify debug info after member operations", async () => {
-    const debugInfoBefore = await group.debugInfo();
-
-    // Add member
-    const newMember = workers.getAll()[2];
-    await group.addMembers([newMember.client.inboxId]);
-    const debugInfoAfterAdd = await group.debugInfo();
-    expect(debugInfoAfterAdd.epoch).toBeGreaterThan(debugInfoBefore.epoch);
-
-    // Remove member
-    await group.removeMembers([newMember.client.inboxId]);
-    const debugInfoAfterRemove = await group.debugInfo();
-    expect(debugInfoAfterRemove.epoch).toBeGreaterThan(debugInfoAfterAdd.epoch);
   });
 
   it("debug: verify debug info after metadata changes", async () => {

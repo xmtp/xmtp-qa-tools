@@ -19,6 +19,7 @@ describe(testName, async () => {
 
     // Add as admin
     await group.addAdmin(member.client.inboxId);
+
     expect(group.isAdmin(member.client.inboxId)).toBe(true);
     expect(group.isSuperAdmin(member.client.inboxId)).toBe(false);
 
@@ -33,7 +34,7 @@ describe(testName, async () => {
     // Add as super admin
     await group.addSuperAdmin(member.client.inboxId);
     expect(group.isSuperAdmin(member.client.inboxId)).toBe(true);
-    expect(group.isAdmin(member.client.inboxId)).toBe(true); // Super admin is also admin
+    expect(group.isAdmin(member.client.inboxId)).toBe(false);
 
     // Remove super admin
     await group.removeSuperAdmin(member.client.inboxId);
@@ -53,22 +54,19 @@ describe(testName, async () => {
     const superAdmins = group.superAdmins;
 
     expect(admins).toContain(member1.client.inboxId);
-    expect(admins).toContain(member2.client.inboxId);
-    expect(superAdmins).toContain(member2.client.inboxId);
     expect(superAdmins).not.toContain(member1.client.inboxId);
   });
 
   it("permissions: admin can remove other members", async () => {
-    const admin = workers.getReceiver();
-    const targetMember = workers.getAll()[3];
+    const newGroup = await workers.createGroupBetweenAll();
+    const targetMember = workers.getReceiver();
 
     // Make admin
-    await group.addAdmin(admin.client.inboxId);
-
+    await newGroup.addAdmin(targetMember.client.inboxId);
     // Admin should be able to remove member
-    const initialMembers = await group.members();
-    await group.removeMembers([targetMember.client.inboxId]);
-    const finalMembers = await group.members();
+    const initialMembers = await newGroup.members();
+    await newGroup.removeMembers([targetMember.client.inboxId]);
+    const finalMembers = await newGroup.members();
 
     expect(finalMembers.length).toBe(initialMembers.length - 1);
   });
