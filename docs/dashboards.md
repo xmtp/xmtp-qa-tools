@@ -4,7 +4,7 @@ This is the main dashboard we look at every day to understand how XMTP is perfor
 
 ## Dashboard overview
 
-- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- **URL**: [Datadog XMTP Dashboard](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
 - **What you'll see**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing). See [monitoring system](./monitoring.md#monitoring-system) for related alerts.
 
 The dashboard is organized into sections covering performance metrics, infrastructure health, test execution, and regional monitoring.
@@ -32,7 +32,7 @@ The dashboard is organized into sections covering performance metrics, infrastru
 
 **Purpose**: Measures message sequence integrity across different SDK bindings.
 
-```
+```bash
 Query: avg:xmtp.sdk.order{$env,$region,$test,$sdk,$members}
 ```
 
@@ -40,7 +40,7 @@ Query: avg:xmtp.sdk.order{$env,$region,$test,$sdk,$members}
 
 **Purpose**: Response time measurements across environments.
 
-```
+```bash
 Query: avg:xmtp.sdk.response{$env,$region, $sdk}
 ```
 
@@ -54,7 +54,7 @@ Query: avg:xmtp.sdk.response{$env,$region, $sdk}
 
 **Purpose**: Displays service level objectives created by the team.
 
-```
+```bash
 Query: slo_creator:"Fabrizio Guespe"
 ```
 
@@ -100,7 +100,7 @@ Shows delivery and order rates over time:
 
 Network-level operation performance:
 
-```
+```bash
 Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, metric_subtype:core} by {operation}
 ```
 
@@ -108,7 +108,7 @@ Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, m
 
 Bot response time monitoring:
 
-```
+```bash
 Query: avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}
 ```
 
@@ -118,7 +118,7 @@ Query: avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}
 
 Network-level timing by phase:
 
-```json
+```bash
 {
   "title": "Network Performance",
   "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$region,$test,$sdk,$members} by {network_phase}"
@@ -131,19 +131,19 @@ Multiple widgets tracking group-related operations:
 
 **newGroup performance over time (by members)**:
 
-```
+```bash
 Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {members}
 ```
 
 **newGroup performance over time (by operation)**:
 
-```
+```bash
 Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {operation}
 ```
 
 **Group performance over time**:
 
-```
+```bash
 Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_large, operation:newgroup} by {members,operation}
 ```
 
@@ -151,7 +151,7 @@ Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_
 
 Comprehensive operation timing table:
 
-```
+```bash
 Query: avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,members,region,env}
 ```
 
@@ -182,3 +182,24 @@ Geographic visualization of server call performance:
   "visualization": "geomap"
 }
 ```
+
+## Monitors
+
+The dashboard is complemented by several monitors that alert on various conditions:
+
+### Agent monitoring
+
+- **Agent timeout [production]**: Alerts when agents stop responding
+- **Agent answering without mention in groups**: Monitors bot behavior in group conversations
+- **Agent timeout**: General agent responsiveness monitoring
+
+### Test execution monitoring
+
+- **Test failed**: Alerts when test suites fail across environments
+- **Duration not logging**: Monitors when performance metrics stop being collected
+
+### Network performance monitoring
+
+- **Network slow requests**: Alerts on network performance degradation across environments
+
+These monitors provide proactive alerting to complement the visual monitoring provided by the dashboard widgets.

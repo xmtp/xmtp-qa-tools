@@ -111,6 +111,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 ## Tools & utilities
 
 - Status: XMTP network status - [see section](https://status.xmtp.org/)
+- Dashboard: Monitoring datadog dashboard - [see section](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
 - Workflows: Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
 - Logging: Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - Schedule: Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
