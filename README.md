@@ -92,13 +92,6 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
 - Infrastructure: Multi-region testing across US, Europe, Asia, South America
 
-**Key metrics**
-
-- Delivery: 100% success rate (target: 99.9%)
-- Performance: <350ms core operations, <200ms messaging, <150ms TLS
-- Scale: Groups up to 400 members, high-volume message testing
-- Network: DNS, TCP, TLS timing across 5 global regions
-
 ### Documentation
 
 - Measurments: Benchmakrs recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
