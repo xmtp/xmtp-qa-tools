@@ -6,11 +6,11 @@ When things break (and they will), here's how we handle it. We've tried to set t
 
 ### Primary contacts
 
-| Role | Responsibility | Contact method |
-|------|---------------|----------------|
-| QA engineer | Test failures, SLO violations | #xmtp-qa-alerts |
-| DevOps engineer | Infrastructure issues | #xmtp-devops |
-| On-call engineer | Critical system failures | PagerDuty |
+| Role             | Responsibility                | Contact method  |
+| ---------------- | ----------------------------- | --------------- |
+| QA engineer      | Test failures, SLO violations | #xmtp-qa-alerts |
+| DevOps engineer  | Infrastructure issues         | #xmtp-devops    |
+| On-call engineer | Critical system failures      | PagerDuty       |
 
 ## Alerting channels
 
@@ -32,21 +32,23 @@ alert:
 
 ### PagerDuty escalation
 
-| Severity | Response time | Escalation path |
-|----------|---------------|-----------------|
-| Critical | 5 minutes | QA → DevOps → Engineering manager |
-| High | 15 minutes | QA → DevOps |
-| Medium | 1 hour | QA team |
-| Low | Next business day | QA team |
+| Severity | Response time     | Escalation path                   |
+| -------- | ----------------- | --------------------------------- |
+| Critical | 5 minutes         | QA → DevOps → Engineering manager |
+| High     | 15 minutes        | QA → DevOps                       |
+| Medium   | 1 hour            | QA team                           |
+| Low      | Next business day | QA team                           |
 
 ### Slack notifications
 
 **#xmtp-qa-alerts**
+
 - Test suite failures
 - SLO violations
 - Performance degradation
 
 **#xmtp-devops**
+
 - Infrastructure issues
 - Deployment failures
 - Resource constraints
@@ -56,21 +58,25 @@ alert:
 ### Severity levels
 
 **Critical (P0)**
+
 - Production services down >99% failure rate
 - Multiple test suites failing simultaneously
 - Security incidents
 
 **High (P1)**
+
 - SLO violations affecting user experience
 - Single test suite complete failure
 - Infrastructure degradation
 
 **Medium (P2)**
+
 - Intermittent test failures
 - Performance regression
 - Non-critical service issues
 
 **Low (P3)**
+
 - Documentation issues
 - Minor configuration problems
 - Enhancement requests
@@ -117,12 +123,12 @@ alert:
 
 ### Key metrics during incidents
 
-| Metric | Critical threshold | Dashboard widget |
-|--------|-------------------|------------------|
-| Delivery rate | <95% | Main performance |
-| Response time | >5000ms | Response times |
-| Agent uptime | <99% | Agent status |
-| Test success rate | <90% | Test execution |
+| Metric            | Critical threshold | Dashboard widget |
+| ----------------- | ------------------ | ---------------- |
+| Delivery rate     | <95%               | Main performance |
+| Response time     | >5000ms            | Response times   |
+| Agent uptime      | <99%               | Agent status     |
+| Test success rate | <90%               | Test execution   |
 
 ## Escalation matrix
 
@@ -132,10 +138,10 @@ alert:
 escalation_rules:
   - condition: "delivery_rate < 90% for 10 minutes"
     action: "page_engineering_manager"
-  
+
   - condition: "test_failures > 5 consecutive"
     action: "escalate_to_devops"
-  
+
   - condition: "infrastructure_down for 15 minutes"
     action: "page_director_engineering"
 ```
@@ -143,6 +149,7 @@ escalation_rules:
 ### Manual escalation
 
 **When to escalate**
+
 - Unable to resolve within SLA timeframe
 - Issue affects multiple systems
 - Requires architectural changes
@@ -153,7 +160,7 @@ escalation_rules:
 ### Incident review process
 
 1. **Timeline creation** - Document incident progression
-2. **Root cause analysis** - Identify underlying issues  
+2. **Root cause analysis** - Identify underlying issues
 3. **Action items** - Define preventive measures
 4. **Documentation update** - Update runbooks and procedures
 
@@ -163,18 +170,22 @@ escalation_rules:
 # Incident Postmortem: [Date] - [Title]
 
 ## Summary
+
 Brief description of incident impact and resolution
 
 ## Timeline
+
 - HH:MM - Issue detected
 - HH:MM - Investigation started
 - HH:MM - Root cause identified
 - HH:MM - Resolution implemented
 
 ## Root Cause
+
 Technical explanation of underlying issue
 
 ## Action Items
+
 - [ ] Immediate fixes
 - [ ] Process updates
 ```
@@ -184,6 +195,7 @@ Technical explanation of underlying issue
 ### Common scenarios
 
 **Test suite failure**
+
 ```bash
 # Check recent deployments
 git log --oneline -10
@@ -196,6 +208,7 @@ railway status --all
 ```
 
 **Performance degradation**
+
 ```bash
 # Check Datadog metrics
 # Review dashboard for anomalies
@@ -208,6 +221,7 @@ top -p $(pgrep node)
 ```
 
 **Agent downtime**
+
 ```bash
 # Test agent responsiveness
 yarn test agents:health-check --all
@@ -224,20 +238,22 @@ railway redeploy --service=agent-name
 ### Status updates
 
 **Internal updates**
+
 - Slack channels for technical details
 - Incident.io for formal tracking
 - Email for extended outages
 
 **External communication**
+
 - status.xmtp.org for public incidents
 - Documentation updates for resolved issues
 - Partner notifications for breaking changes
 
 ### Stakeholder notification
 
-| Stakeholder | Notification method | Update frequency |
-|-------------|-------------------|------------------|
-| Engineering team | Slack | Real-time |
-| Product team | Email | Hourly during incidents |
-| Leadership | Email/Slack | Major incidents only |
-| External partners | Email | Service affecting only |
+| Stakeholder       | Notification method | Update frequency        |
+| ----------------- | ------------------- | ----------------------- |
+| Engineering team  | Slack               | Real-time               |
+| Product team      | Email               | Hourly during incidents |
+| Leadership        | Email/Slack         | Major incidents only    |
+| External partners | Email               | Service affecting only  |
