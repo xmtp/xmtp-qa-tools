@@ -1,4 +1,4 @@
-# QA Tools CLI Usage Guide
+# Testing CLI
 
 This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
 
