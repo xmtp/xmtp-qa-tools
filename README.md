@@ -102,7 +102,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 ## Tools & utilities
 
 - Status: XMTP network status - [see section](https://status.xmtp.org/)
-- Dashboard: Monitoring datadog dashboard - [see section](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
+- Dashboard: Performance and monitoring datadog dashboard - [see section](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
 - Logging: Datadog error logging - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - Schedule: Scheduled workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - Railway: Multi-region services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
