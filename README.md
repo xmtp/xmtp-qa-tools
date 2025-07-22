@@ -151,12 +151,12 @@ yarn test performance
 #### Debug mode
 
 ```bash
-yarn test functional --debug
+yarn test functional --no-fail --debug
 ```
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-#### Resources
+### Resources
 
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Local: Work in local network - [see section](/dev/)
