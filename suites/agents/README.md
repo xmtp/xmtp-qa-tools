@@ -30,7 +30,7 @@
 2. Send agent's configured `sendMessage`
 3. Verify agent responds within timeout period
 
-### Agent examples:
+### Live agents:
 
 - **tbachat**: `/help` command testing
 - **elsa**: "hi" message testing

@@ -40,7 +40,7 @@ flowchart LR
     webApps["xmtp.chat"]
     mobileApps["Native Apps"]
     crossPlatformApps["Cross-platform Apps"]
-    messagingApps["Convos"]
+    messagingApps["Convos, Base"]
     botAgents["Bots & Agents"]
     backendServices["Backend Services"]
   end
