@@ -95,7 +95,6 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 - Monitoring: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
 - Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
-- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Agents: Agent QA & monitoring - see [section](./suites/agents/README.md)
 - Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
 - Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
@@ -158,10 +157,11 @@ yarn test functional --no-fail --debug
 
 ### Resources
 
+- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
-- Local: Work in local network - [see section](/dev/)
-- Workers: Worker for testing - [see section](/workers/)
+- Networks: Work in [local](/dev/) or [multinode](/dev/multinode) network
+- Workers: Worker for testing with CLI - [see section](/workers/)
 - Helpers: Coding helpers - [see section](/helpers/)
 - Scripts: Monorepo scripts - [see section](/scripts/)
 - Introduction: Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
