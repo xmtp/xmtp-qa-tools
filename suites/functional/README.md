@@ -6,7 +6,7 @@ This test suite validates core XMTP protocol functionality including direct mess
 
 - Test DM conversation creation and message delivery
 - Validate group conversation functionality and member management
-- Verify message streaming and synchronization performance
+- Verify message streaming and syncs performance
 - Test multi-device installation and cross-device sync
 - Validate consent management and content codec handling
 
@@ -25,7 +25,7 @@ Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding
 | **metadata.test.ts**      | Conversation metadata handling          | Metadata updates, retrieval                |
 | **permissions.test.ts**   | Group permission management             | Admin roles, super admin, member control   |
 | **streams.test.ts**       | Message streaming verification          | Stream performance, delivery confirmation  |
-| **sync.test.ts**          | Synchronization methods comparison      | Performance benchmarking, sync strategies  |
+| **sync.test.ts**          | syncs methods comparison                | Performance benchmarking, sync strategies  |
 
 ## How to run
 
@@ -97,14 +97,14 @@ it("newDmByAddress:create a new DM conversation using Ethereum address", async (
 - DM conversation creation by Ethereum address
 - Message sending and delivery verification
 - Group creation with variable participant counts
-- Group synchronization and member verification
+- Group syncs and member verification
 
 ## Multi-device installations
 
-The `installations.test.ts` module tests multi-device synchronization.
+The `installations.test.ts` module tests multi-device syncs.
 
 ```typescript
-// Test installation synchronization
+// Test installation syncs
 it("sync conversations across installations", async () => {
   // Create a second installation for the same account
   const installation2 = await Client.create(signer, {
@@ -124,7 +124,7 @@ it("sync conversations across installations", async () => {
 
 **Key features:**
 
-- Cross-device synchronization
+- Cross-device syncs
 - Installation management
 - Authentication across devices
 
@@ -247,7 +247,7 @@ it("debug: track epoch changes during group operations", async () => {
 
 ## Sync comparison
 
-The `sync.test.ts` module compares different synchronization approaches.
+The `sync.test.ts` module compares different syncs approaches.
 
 ```typescript
 // Compare different sync methods

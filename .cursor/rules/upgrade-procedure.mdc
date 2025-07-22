@@ -36,8 +36,9 @@ yarn build
 
 ## Testing
 
-- PR triggers Wildcard workflow automatically
-- Dont run any other test manually. Just trigger the Wildcard workflow.
+```bash
+yarn functional
+```
 
 ## Notes
 
