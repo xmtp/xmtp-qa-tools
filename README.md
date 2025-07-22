@@ -94,10 +94,24 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- Measurments: Benchmakrs recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
-- Monitoring: Monitoring system [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1011)
-- Datadog: Datadog dashboard [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1016)
-- SLOs: Expected metrics and targets [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
+#### Core systems
+
+- [Monitoring system](./docs/monitoring.md) - Metrics tracking, Slack integration, and alerting
+- [Dashboards](./docs/dashboards.md) - Datadog dashboards and visualization guides
+- [Test suites](./docs/test-suites.md) - Comprehensive overview of all automated test suites
+- [Workflows](./docs/workflows.md) - GitHub Actions CI/CD automation and deployment
+
+#### Performance and reliability
+
+- [SLOs and SLIs](./docs/slos-slis.md) - Service Level Objectives and performance targets
+- [Scaling limitations](./docs/scaling-limitations.md) - Current constraints and optimization opportunities
+- [Streams](./docs/streams.md) - Message streaming reliability, order validation, and response time testing
+
+#### Specialized testing
+
+- [Agents QA](./docs/agents-qa.md) - Agent and bot testing framework
+- [Forks](./docs/forks.md) - Protocol fork testing and version compatibility
+- [Incident response](./docs/incident-response.md) - Incident management and escalation procedures
 
 ## Tools & utilities
 
