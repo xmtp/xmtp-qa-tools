@@ -95,7 +95,6 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 - Monitoring: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
 - Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
-- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Agents: Agent QA & monitoring - see [section](./suites/agents/README.md)
 - Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
 - Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
@@ -158,6 +157,7 @@ yarn test functional --no-fail --debug
 
 ### Resources
 
+- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Local: Work in local network - [see section](/dev/)
