@@ -45,21 +45,21 @@ yarn test streams:throughput --messages-per-second=100
 
 ### Delivery rate targets
 
-| Group Size | Target Delivery Rate | Current Performance | Status |
+| Group size | Target delivery rate | Current performance | Status |
 |------------|---------------------|-------------------|--------|
-| 2-10 members | 99.9% | 100% | On Target |
-| 11-50 members | 99.5% | 99.8% | On Target |
-| 51-100 members | 99% | 99.2% | On Target |
+| 2-10 members | 99.9% | 100% | On target |
+| 11-50 members | 99.5% | 99.8% | On target |
+| 51-100 members | 99% | 99.2% | On target |
 | 101-250 members | 98% | 97.5% | Concern |
 | 251-400 members | 95% | 93.2% | Failed |
 
 ### Order accuracy metrics
 
-| Test Scenario | Target Order Rate | Current Performance | Status |
+| Test scenario | Target order rate | Current performance | Status |
 |---------------|------------------|-------------------|--------|
-| Single sender | 100% | 100% | On Target |
-| Multiple senders | 99.9% | 99.7% | On Target |
-| Burst messages | 99% | 98.9% | On Target |
+| Single sender | 100% | 100% | On target |
+| Multiple senders | 99.9% | 99.7% | On target |
+| Burst messages | 99% | 98.9% | On target |
 | Large groups | 98% | 96.8% | Concern |
 
 ## Stream performance characteristics
@@ -93,7 +93,7 @@ describe('Stream response times', () => {
 
 ### Throughput benchmarks
 
-| Group Size | Messages/Second | P95 Latency | P99 Latency |
+| Group size | Messages/second | P95 latency | P99 latency |
 |------------|----------------|-------------|-------------|
 | 10 members | 45 | 131ms | 245ms |
 | 50 members | 38 | 234ms | 456ms |

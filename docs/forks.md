@@ -32,7 +32,7 @@ yarn test forks:split-brain
 
 ### SDK version compatibility
 
-| Client Version | 2.0.x | 2.1.x | 2.2.x | 3.0.x |
+| Client version | 2.0.x | 2.1.x | 2.2.x | 3.0.x |
 |----------------|-------|-------|-------|-------|
 | 2.0.x | Full | Limited | Limited | None |
 | 2.1.x | Limited | Full | Full | Limited |
@@ -140,7 +140,7 @@ const statePreservationTest = {
 
 ### Migration benchmarks
 
-| Migration Path | Duration | Data Loss | Success Rate |
+| Migration path | Duration | Data loss | Success rate |
 |----------------|----------|-----------|--------------|
 | 2.0.x → 2.1.x | 1.2s | 0% | 100% |
 | 2.1.x → 2.2.x | 2.1s | 0% | 100% |

@@ -6,11 +6,11 @@ Incident management procedures and escalation protocols for XMTP QA infrastructu
 
 ### Primary contacts
 
-| Role | Responsibility | Contact Method |
+| Role | Responsibility | Contact method |
 |------|---------------|----------------|
-| QA Engineer | Test failures, SLO violations | #xmtp-qa-alerts |
-| DevOps Engineer | Infrastructure issues | #xmtp-devops |
-| On-call Engineer | Critical system failures | PagerDuty |
+| QA engineer | Test failures, SLO violations | #xmtp-qa-alerts |
+| DevOps engineer | Infrastructure issues | #xmtp-devops |
+| On-call engineer | Critical system failures | PagerDuty |
 
 ## Alerting channels
 
@@ -32,9 +32,9 @@ alert:
 
 ### PagerDuty escalation
 
-| Severity | Response Time | Escalation Path |
+| Severity | Response time | Escalation path |
 |----------|---------------|-----------------|
-| Critical | 5 minutes | QA → DevOps → Engineering Manager |
+| Critical | 5 minutes | QA → DevOps → Engineering manager |
 | High | 15 minutes | QA → DevOps |
 | Medium | 1 hour | QA team |
 | Low | Next business day | QA team |
@@ -111,18 +111,18 @@ alert:
 
 ### Real-time status
 
-- **Datadog Dashboard**: [XMTP SDK Performance](https://app.datadoghq.com/dashboard/your-dashboard-id)
-- **Network Status**: [status.xmtp.org](https://status.xmtp.org/)
-- **Railway Services**: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- Datadog dashboard: [XMTP SDK Performance](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- Network status: [status.xmtp.org](https://status.xmtp.org/)
+- Railway services: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 
 ### Key metrics during incidents
 
-| Metric | Critical Threshold | Dashboard Widget |
+| Metric | Critical threshold | Dashboard widget |
 |--------|-------------------|------------------|
-| Delivery Rate | <95% | Main performance |
-| Response Time | >5000ms | Response times |
-| Agent Uptime | <99% | Agent status |
-| Test Success Rate | <90% | Test execution |
+| Delivery rate | <95% | Main performance |
+| Response time | >5000ms | Response times |
+| Agent uptime | <99% | Agent status |
+| Test success rate | <90% | Test execution |
 
 ## Escalation matrix
 
@@ -236,9 +236,9 @@ railway redeploy --service=agent-name
 
 ### Stakeholder notification
 
-| Stakeholder | Notification Method | Update Frequency |
+| Stakeholder | Notification method | Update frequency |
 |-------------|-------------------|------------------|
-| Engineering Team | Slack | Real-time |
-| Product Team | Email | Hourly during incidents |
+| Engineering team | Slack | Real-time |
+| Product team | Email | Hourly during incidents |
 | Leadership | Email/Slack | Major incidents only |
-| External Partners | Email | Service affecting only |
+| External partners | Email | Service affecting only |

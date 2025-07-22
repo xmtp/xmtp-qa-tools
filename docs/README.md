@@ -2,81 +2,81 @@
 
 Hey everyone, this is our comprehensive testing setup for XMTP. We've built a pretty robust suite of automated tools that validate network performance, message delivery, and protocol correctness across all our environments.
 
-## Quick Navigation
+## Quick navigation
 
-### Core Systems
-- [Monitoring System](./monitoring.md) - Metrics tracking, Slack integration, and alerting
+### Core systems
+- [Monitoring system](./monitoring.md) - Metrics tracking, Slack integration, and alerting
 - [Dashboards](./dashboards.md) - Datadog dashboards and visualization guides
-- [Test Suites](./test-suites.md) - Comprehensive overview of all automated test suites
+- [Test suites](./test-suites.md) - Comprehensive overview of all automated test suites
 - [Workflows](./workflows.md) - GitHub Actions CI/CD automation and deployment
 
-### Performance & Reliability
+### Performance and reliability
 - [SLOs and SLIs](./slos-slis.md) - Service Level Objectives and performance targets
-- [Scaling Limitations](./scaling-limitations.md) - Current constraints and optimization opportunities
+- [Scaling limitations](./scaling-limitations.md) - Current constraints and optimization opportunities
 - [Streams](./streams.md) - Message streaming reliability, order validation, and response time testing
 
-### Specialized Testing
+### Specialized testing
 - [Agents QA](./agents-qa.md) - Agent and bot testing framework
 - [Forks](./forks.md) - Protocol fork testing and version compatibility
-- [Incident Response](./incident-response.md) - Incident management and escalation procedures
+- [Incident response](./incident-response.md) - Incident management and escalation procedures
 
-### Future Planning
-- [Future Enhancements](./future-enhancements.md) - Roadmap and planned improvements
+### Future planning
+- [Future enhancements](./future-enhancements.md) - Roadmap and planned improvements
 
 ## What we're testing
 
 We run automated workflows every 30 minutes that cover the core areas that matter:
 
-### Testing Framework
+### Testing framework
 We've got 8 automated test suites running continuously. These hit all the critical paths - Browser SDK, Node SDK, React Native, Swift, and Kotlin bindings. We can scale test up to 400-member groups and use Playwright for real browser testing. Plus we monitor all our deployed bots to make sure they're responding.
 
-### Monitoring & Observability  
+### Monitoring and observability  
 Everything feeds into Datadog with custom dashboards. Slack gets automated alerts when things break. We track a 99.9% delivery rate target and have error budgets that tell us when we're burning through our reliability allowance too fast. We test across multiple regions so we catch geographic issues.
 
-### Infrastructure & Automation
+### Infrastructure and automation
 GitHub Actions runs everything on a schedule that doesn't overwhelm our systems. Railway hosts our bots. We test against dev, production, and local environments. The benchmarking is automated so we catch performance regressions before they become problems.
 
-## Getting Started
+## Getting started
 
-### For New Team Members
-1. Review [Test Suites](./test-suites.md) for testing approach
-2. Study [Monitoring System](./monitoring.md) for observability concepts
+### For new team members
+1. Review [Test suites](./test-suites.md) for testing approach
+2. Study [Monitoring system](./monitoring.md) for observability concepts
 3. Explore [Dashboards](./dashboards.md) for metrics visualization
 4. Check [Workflows](./workflows.md) for CI/CD automation
 
-### For Contributors
+### For contributors
 1. Understand [SLOs and SLIs](./slos-slis.md) performance standards
-2. Review [Scaling Limitations](./scaling-limitations.md) current constraints
-3. Check [Future Enhancements](./future-enhancements.md) planned improvements
+2. Review [Scaling limitations](./scaling-limitations.md) current constraints
+3. Check [Future enhancements](./future-enhancements.md) planned improvements
 4. Follow [Workflows](./workflows.md) guidelines
 
-### For Operators
-1. Master [Monitoring System](./monitoring.md) for daily operations
+### For operators
+1. Master [Monitoring system](./monitoring.md) for daily operations
 2. Use [Dashboards](./dashboards.md) for real-time system health
 3. Reference [SLOs and SLIs](./slos-slis.md) for incident response
-4. Review [Incident Response](./incident-response.md) for escalation procedures
+4. Review [Incident response](./incident-response.md) for escalation procedures
 
-## Key Metrics & Targets
+## Key metrics and targets
 
 These are the numbers we actually care about hitting:
 
 ### Core SLOs
 | Metric | Target | Environment |
 |--------|--------|-------------|
-| Message Delivery Rate | 99.9% | Production |
-| Message Latency (P95) | <3 seconds | Production |
-| Service Availability | 99.95% | Production |
-| Cross-Platform Compatibility | 99.5% | All environments |
-| Large Group Performance | 95% delivery for 400 members | All environments |
+| Message delivery rate | 99.9% | Production |
+| Message latency (P95) | <3 seconds | Production |
+| Service availability | 99.95% | Production |
+| Cross-platform compatibility | 99.5% | All environments |
+| Large group performance | 95% delivery for 400 members | All environments |
 
-### Test Suite Coverage
+### Test suite coverage
 The automated workflows run on these schedules:
-- Functional Tests: Core protocol validation every 3 hours
-- Performance Tests: Benchmarking every 30 minutes  
-- Delivery Tests: Cross-environment reliability every 30 minutes
-- Browser Tests: Web environment validation every 30 minutes
-- Agent Tests: Bot health monitoring every 15 minutes
-- Large Group Tests: Scale testing every 2 hours
+- Functional tests: Core protocol validation every 3 hours
+- Performance tests: Benchmarking every 30 minutes  
+- Delivery tests: Cross-environment reliability every 30 minutes
+- Browser tests: Web environment validation every 30 minutes
+- Agent tests: Bot health monitoring every 15 minutes
+- Large group tests: Scale testing every 2 hours
 
 ## How this all fits together
 
@@ -98,25 +98,25 @@ What we're validating:
 - Performance holds up at enterprise scale
 - Real browsers and mobile apps actually work
 
-## Support & Contact
+## Support and contact
 
-### For Issues
-- Immediate Support: #xmtp-qa-alerts Slack channel
-- Bug Reports: GitHub issues in [xmtp-qa-tools repository](https://github.com/xmtp/xmtp-qa-tools)
-- Documentation Updates: Create pull requests with improvements
+### For issues
+- Immediate support: #xmtp-qa-alerts Slack channel
+- Bug reports: GitHub issues in [xmtp-qa-tools repository](https://github.com/xmtp/xmtp-qa-tools)
+- Documentation updates: Create pull requests with improvements
 
-### For Questions
-- Technical Questions: Engineering team via Slack
-- Process Questions: QA team via Slack  
-- Monitoring Issues: DevOps team or Datadog support
+### For questions
+- Technical questions: Engineering team via Slack
+- Process questions: QA team via Slack  
+- Monitoring issues: DevOps team or Datadog support
 
-### External Resources
-- Network Status: [status.xmtp.org](https://status.xmtp.org/)
-- Performance Dashboard: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
-- Railway Services: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- GitHub Actions: [Scheduled Workflows](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
+### External resources
+- Network status: [status.xmtp.org](https://status.xmtp.org/)
+- Performance dashboard: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- Railway services: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- GitHub Actions: [Scheduled workflows](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 
-## Documentation Maintenance
+## Documentation maintenance
 
 This documentation is actively maintained by the QA team. Updates are made:
 - **Weekly**: Performance metrics and SLO status updates
