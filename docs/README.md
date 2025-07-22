@@ -4,7 +4,6 @@
 | ----------------------------------------------- | --------------------------------------- |
 | [Monitoring system](./monitoring.md)            | System monitoring and alerting          |
 | [Dashboards](./dashboards.md)                   | Performance and metrics dashboards      |
-| [Test suites](./test-suites.md)                 | Test suite documentation                |
 | [Workflows](./workflows.md)                     | CI/CD workflow documentation            |
 | [CLI usage](./cli-usage.md)                     | Command line interface guide            |
 | [SLOs and SLIs](./slos-slis.md)                 | Service level objectives and indicators |

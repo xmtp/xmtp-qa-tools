@@ -104,14 +104,6 @@ Network-level operation performance:
 Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, metric_subtype:core} by {operation}
 ```
 
-### Agents response times widget
-
-Bot response time monitoring:
-
-```bash
-Query: avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}
-```
-
 ## Performance analysis
 
 ### Network performance widget
@@ -186,12 +178,6 @@ Geographic visualization of server call performance:
 ## Monitors
 
 The dashboard is complemented by several monitors that alert on various conditions:
-
-### Agent monitoring
-
-- **Agent timeout [production]**: Alerts when agents stop responding
-- **Agent answering without mention in groups**: Monitors bot behavior in group conversations
-- **Agent timeout**: General agent responsiveness monitoring
 
 ### Test execution monitoring
 

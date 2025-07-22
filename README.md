@@ -94,7 +94,6 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 ## Documentation
 
 - [Monitoring system](./docs/monitoring.md) - Metrics tracking, Slack integration, and alerting
-- [Test suites](./docs/test-suites.md) - Comprehensive overview of all automated test suites
 - [Workflows](./docs/workflows.md) - GitHub Actions CI/CD automation and deployment
 
 #### Performance and reliability
