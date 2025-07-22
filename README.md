@@ -82,15 +82,14 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Test coverage
 
-- Protocol: DMs, groups, streams, sync, consent, codecs, installations
-- Performance: Benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- Compatibility: Backward compatibility across last 3 SDK versions (0.0.47 → 2.2.0+)
-- Cross-platform: Browser automation, mobile testing, multi-region performance
-- Production: Live agent monitoring, security, spam detection, rate limiting
-- Automation: CI workflows with Datadog metrics, Slack alerting, log analysis
-- Verification: Stream delivery, conversation state, metadata propagation
-- Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
-- Infrastructure: Multi-region testing across US, Europe, Asia, South America
+- Protocol: DMs, groups, streams, sync, consent, client, codecs, installations, agents
+- Performance: Benchmarking, reliability, mid-scale testing
+- Compatibility: Backward compatibility across last +5 `node-sdk` versions.
+- Production: Agent monitoring, security, concurrency, spam detection, rate limiting
+- Automation: CI workflows with Datadog metrics, Slack alerting, browser log analysis
+- Delivery: Delivery and overall rate, response times.
+- Network: Multi-region testing across US, Europe, Asia, South America.
+- Infrastructure: Multi-region testing across US, Europe, Asia, South America.
 
 ## Documentation
 
