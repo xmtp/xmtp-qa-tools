@@ -1,4 +1,4 @@
-# Agents monitoring [../suites/agents](../suites/agents)
+# Agents monitoring
 
 ## Automated workflows
 
