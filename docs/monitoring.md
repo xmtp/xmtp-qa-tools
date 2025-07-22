@@ -66,10 +66,6 @@ All metrics are prefixed with `xmtp.sdk.` and include tags for:
 - `sdk`: SDK version being tested
 - `members`: Group size for scaling tests
 
-## Slack integration
-
-See [Incident response](./incident-response.md) for alerting.
-
 ## Configuration
 
 ### Environment variables

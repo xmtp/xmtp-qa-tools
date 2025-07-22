@@ -105,12 +105,8 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - [SLOs and SLIs](./docs/slos-slis.md) - Service Level Objectives and performance targets
 - [Scaling limitations](./docs/scaling-limitations.md) - Current constraints and optimization opportunities
 - [Streams](./docs/streams.md) - Message streaming reliability, order validation, and response time testing
-
-#### Specialized testing
-
 - [Agents QA](./docs/agents-qa.md) - Agent and bot testing framework
 - [Forks](./docs/forks.md) - Protocol fork testing and version compatibility
-- [Incident response](./docs/incident-response.md) - Incident management and escalation procedures
 
 ## Tools & utilities
 
