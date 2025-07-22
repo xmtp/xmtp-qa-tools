@@ -93,25 +93,23 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- Monitoring system: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
+- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
 - Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
 - CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
-- Agents: Agent and bot testing framework - see [section](./suites/agents/README.md)
+- Agents: Agent QA & monitoring - see [section](./suites/agents/README.md)
 - Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
-- Forks: Protocol fork testing and version compatibility - see [section](./suites/forks/README.md)
+- Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
 
 ## Tools & utilities
 
 - Status: XMTP network status - [see section](https://status.xmtp.org/)
 - Dashboard: Monitoring datadog dashboard - [see section](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
-- Workflows: Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
-- Logging: Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
-- Schedule: Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
-- Railway: Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- Logging: Datadog error logging - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
+- Schedule: Scheduled workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
+- Railway: Multi-region services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - Bots: Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
   - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
-- Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
 ## Development
 
@@ -160,6 +158,7 @@ yarn test functional --no-fail --debug
 
 ### Resources
 
+- Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Local: Work in local network - [see section](/dev/)
 - Workers: Worker for testing - [see section](/workers/)
