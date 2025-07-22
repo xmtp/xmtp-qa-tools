@@ -93,7 +93,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- Monitoring system: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
+- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
 - Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
 - CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Agents: Agent and bot testing framework - see [section](./suites/agents/README.md)
