@@ -167,4 +167,26 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 
 - Operation performance per group size
 
-## 7. Network chaos test suite
+## 6. Network chaos test suite [../suites/networkchaos](../suites/networkchaos)
+
+**Purpose**: Validates XMTP protocol resilience under adverse network conditions using local 4-node XMTP-go cluster with simulated network partitions, delays, and failures.
+
+### Core resilience tests:
+
+- `smoketests: basic connectivity and functionality validation`
+- `dm-duplicate-prevention: verify duplicate message prevention in unreliable networks`
+- `group-partition-delayedreceive: test message delivery after network partition recovery`
+- `node-blackhole: validate behavior when nodes become unreachable`
+- `networkchaos: comprehensive network disruption scenarios`
+- `group-reconciliation: verify group state consistency after network issues`
+- `group-client-partition: test client behavior during network partitions`
+- `keyrotation: validate key rotation under network stress`
+
+**Environment**: Local 4-node cluster with simulated network conditions
+
+**Measurements**:
+
+- Message delivery resilience
+- Group state consistency
+- Recovery time after network disruption
+- Duplicate prevention effectiveness

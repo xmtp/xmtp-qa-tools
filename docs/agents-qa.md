@@ -2,6 +2,20 @@
 
 We run a bunch of bots and automated agents on the XMTP network, and we need to make sure they're actually working and responding to users properly. This is how we keep track of them and test that they're doing their job.
 
+### Agents response times widget
+
+Bot response time monitoring:
+
+```bash
+Query: avg:xmtp.sdk.response{$env,$region, test:agents-dms, $sdk} by {agent}
+```
+
+### Agent monitoring
+
+- **Agent timeout [production]**: Alerts when agents stop responding
+- **Agent answering without mention in groups**: Monitors bot behavior in group conversations
+- **Agent timeout**: General agent responsiveness monitoring
+
 ## Monitored agents
 
 ### Production agents
