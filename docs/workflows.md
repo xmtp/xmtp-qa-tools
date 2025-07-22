@@ -1,10 +1,10 @@
 # Workflows
 
-The XMTP QA Tools monorepo leverages comprehensive GitHub Actions workflows to provide continuous testing, monitoring, and deployment automation. These workflows ensure protocol reliability, performance validation, and rapid feedback on code changes.
+This is how we automate all our testing and make sure nothing breaks without us knowing about it immediately. We've got GitHub Actions running pretty much constantly, testing everything from basic functionality to large-scale performance under different conditions.
 
-## Overview
+## How our automation works
 
-Our workflow ecosystem provides:
+Our workflow setup gives us:
 - **Continuous Testing**: Automated test execution across multiple environments
 - **Performance Monitoring**: Regular benchmarking and metric collection
 - **Deployment Automation**: Streamlined deployment and rollback processes
@@ -47,7 +47,7 @@ graph TB
 ### 1. Functional Test Workflow
 
 **File**: `.github/workflows/Functional.yml`
-**Purpose**: Validates core XMTP protocol functionality
+**What it does**: Makes sure the basic XMTP protocol stuff actually works
 
 ```yaml
 name: Functional

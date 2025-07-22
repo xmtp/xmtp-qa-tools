@@ -1,10 +1,10 @@
 # Agents QA
 
-Quality assurance framework for XMTP agents, bots, and automated services deployed across the network.
+We run a bunch of bots and automated agents on the XMTP network, and we need to make sure they're actually working and responding to users properly. This is how we keep track of them and test that they're doing their job.
 
-## Agent monitoring overview
+## How we monitor our agents
 
-Continuous testing validates agent responsiveness, reliability, and functionality across multiple deployment environments.
+We're constantly checking that our deployed agents are responsive and working correctly across different environments.
 
 ## Monitored agents
 

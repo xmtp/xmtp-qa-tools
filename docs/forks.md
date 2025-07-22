@@ -1,10 +1,10 @@
 # Forks
 
-Testing and validation framework for XMTP protocol forks, version compatibility, and backward compatibility scenarios.
+We need to make sure XMTP works properly when there are different versions of the protocol running at the same time, or when clients are using different SDK versions. This is how we test compatibility and make sure users don't get left behind when we ship updates.
 
-## Fork testing strategy
+## How we test protocol forks
 
-Validates protocol behavior during version transitions, network splits, and client compatibility scenarios.
+We validate that everything still works during version transitions, network splits, and when clients are running different versions.
 
 ## Test categories
 
@@ -31,6 +31,8 @@ yarn test forks:split-brain
 ## Compatibility matrix
 
 ### SDK version compatibility
+
+Here's what works with what (Full = everything works, Limited = basic features, None = don't even try):
 
 | Client version | 2.0.x | 2.1.x | 2.2.x | 3.0.x |
 |----------------|-------|-------|-------|-------|

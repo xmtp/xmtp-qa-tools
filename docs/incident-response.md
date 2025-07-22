@@ -1,6 +1,6 @@
 # Incident response
 
-Incident management procedures and escalation protocols for XMTP QA infrastructure and testing systems.
+When things break (and they will), here's how we handle it. We've tried to set this up so the right people get notified immediately and know what to do, whether it's a minor test failure or something that's actually affecting users.
 
 ## Response team structure
 
@@ -16,7 +16,7 @@ Incident management procedures and escalation protocols for XMTP QA infrastructu
 
 ### Datadog integration
 
-Automated monitoring triggers alerts based on metric thresholds:
+Our monitoring automatically triggers alerts when metrics cross thresholds we care about:
 
 ```yaml
 # Critical alert configuration

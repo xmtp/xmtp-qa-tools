@@ -1,10 +1,10 @@
-# Future Enhancements
+# Future enhancements
 
-This document outlines the strategic roadmap for the XMTP QA Tools monorepo, identifying key improvement areas, planned features, and long-term vision based on identified needs and GitHub issues. The roadmap balances immediate reliability improvements with forward-looking innovations.
+Here's what we're thinking about building next. Some of this stuff is already in progress, some is on our wishlist for when we have more time and resources. We try to balance the immediate stuff that'll make testing more reliable with the bigger picture improvements that'll help us scale.
 
-## Overview
+## Where we're headed
 
-Our enhancement strategy focuses on:
+Our roadmap focuses on:
 - **Performance Optimization**: Scaling testing capabilities and improving efficiency
 - **Infrastructure Modernization**: Upgrading tools and platforms for better reliability
 - **Testing Innovation**: Advanced testing methodologies and automation
@@ -15,8 +15,8 @@ Our enhancement strategy focuses on:
 
 ### Theme 1: Scale and Performance
 
-**Current State**: Testing groups up to 400 members with some limitations
-**Vision**: Support enterprise-scale testing with 1000+ member groups and multi-region performance validation
+**Where we are now**: We can test groups up to 400 members, but we start hitting some limits there
+**Where we want to be**: Enterprise-scale testing with 1000+ member groups and proper multi-region performance validation
 
 #### Key Enhancement Areas
 

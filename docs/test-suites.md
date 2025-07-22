@@ -1,10 +1,10 @@
-# Test Suites
+# Test suites
 
-The XMTP QA Tools monorepo contains comprehensive automated test suites that validate XMTP protocol functionality, performance, and reliability across multiple environments, SDKs, and deployment scenarios. These suites ensure protocol integrity and cross-platform compatibility.
+We run a bunch of automated tests pretty much all the time to make sure XMTP works reliably. These aren't just basic smoke tests - we're talking about comprehensive validation across every SDK, environment, and use case that matters to real users.
 
-## Overview
+## What we're testing
 
-Our test suite architecture consists of 8 primary test categories that run continuously to validate the XMTP protocol:
+We've got 8 main categories of tests running continuously:
 
 | Test Suite | Purpose | Frequency | Environments | Coverage |
 |------------|---------|-----------|--------------|----------|
@@ -17,20 +17,20 @@ Our test suite architecture consists of 8 primary test categories that run conti
 | **Network Chaos** | Resilience testing | On-demand | `dev` | Network partition, latency injection |
 | **Compatibility** | Cross-version testing | Daily | `dev`, `production` | SDK version compatibility |
 
-## 1. Functional Test Suite
+## 1. Functional test suite
 
-### Purpose
-Validates core XMTP protocol functionality including direct messages, group conversations, streaming, synchronization, and consent mechanisms.
+### What it does
+Makes sure the core XMTP protocol actually works - DMs, group chats, streaming, sync, consent, all the stuff users expect to just work.
 
-### Test Coverage
+### What we cover
 
-#### Core Protocol Features
-- **Direct Messages**: 1:1 conversation creation and messaging
-- **Group Conversations**: Multi-member group creation, messaging, and management
-- **Message Streaming**: Real-time message delivery and stream handling
-- **Conversation Sync**: State synchronization across multiple clients
-- **Consent Framework**: Privacy and consent preference management
-- **Content Codecs**: Support for different message content types
+#### Core protocol features
+- **Direct messages**: 1:1 conversation creation and messaging
+- **Group conversations**: Multi-member group creation, messaging, and management  
+- **Message streaming**: Real-time message delivery and stream handling
+- **Conversation sync**: State synchronization across multiple clients
+- **Consent framework**: Privacy and consent preference management
+- **Content codecs**: Support for different message content types
 
 #### Cross-Platform Compatibility
 ```typescript

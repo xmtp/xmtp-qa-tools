@@ -1,8 +1,8 @@
-# Scaling Limitations
+# Scaling limitations
 
-This document outlines the current scaling constraints and performance limitations identified in the XMTP QA Tools testing framework. These limitations impact our ability to test the XMTP protocol at maximum scale and identify areas for infrastructure improvements.
+Let's be honest about where we hit walls when testing XMTP at scale. These are the real constraints we're working with right now, and while we're always pushing to improve them, it's important to know what our current limits are.
 
-## Current Scale Testing Capabilities
+## What we can test today
 
 ### Group Size Limitations
 
@@ -19,11 +19,11 @@ const SCALE_TEST_CONFIG = {
 };
 ```
 
-**Observed Limitations**:
-- **Memory Usage**: Linear growth in memory consumption per member
-- **Connection Overhead**: Each member requires persistent connection
-- **Message Fan-out**: Delivery time increases with group size
-- **Network Congestion**: Higher failure rates in large groups
+**Where we hit walls**:
+- **Memory usage**: Each new member adds more memory overhead, and it adds up fast
+- **Connection overhead**: Every member needs their own persistent connection
+- **Message fan-out**: The bigger the group, the longer it takes to deliver to everyone
+- **Network congestion**: Large groups just create more opportunities for things to fail
 
 ### Infrastructure Constraints
 

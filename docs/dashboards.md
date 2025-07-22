@@ -1,34 +1,34 @@
 # Dashboards
 
-The XMTP QA Tools monitoring system provides comprehensive dashboards that visualize protocol performance, reliability metrics, and service health in real-time. These dashboards serve as the primary interface for monitoring XMTP network status and troubleshooting issues.
+These are the dashboards we actually look at every day to understand how XMTP is performing. Think of them as our mission control - they show us everything we need to know about network health, delivery rates, and whether our users are having a good experience.
 
-## Overview
+## What we've got set up
 
-Our dashboard ecosystem consists of:
+Our main dashboards cover:
 - **Main Performance Dashboard**: Core XMTP SDK metrics and SLO tracking
 - **Infrastructure Dashboard**: Service health and resource utilization
 - **Test Execution Dashboard**: CI/CD pipeline and test suite performance
 - **Regional Performance Dashboard**: Multi-region latency and delivery metrics
 
-## Main Performance Dashboard
+## Main performance dashboard
 
-### Access
-- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
-- **Description**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing)
+### How to get there
+- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)  
+- **What you'll see**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing)
 
 ### Key Widgets
 
-#### 1. Delivery Rate (%)
-**Purpose**: Tracks message delivery success across all environments and regions.
+#### 1. Delivery rate (%)
+**What it shows**: How many messages are actually making it to their destination across all our environments and regions.
 
 ```
 Query: avg:xmtp.sdk.delivery{$env,$region,$test,$sdk,$members}
 ```
 
-**Color Coding**:
-- 🟢 Green (≥99%): Excellent performance, meeting SLO targets
-- 🟡 Yellow (≥95%): Acceptable performance, monitor closely
-- 🔴 Red (<95%): Below SLO threshold, immediate attention required
+**Color coding**:
+- Green (≥99%): Excellent performance, meeting SLO targets
+- Yellow (≥95%): Acceptable performance, monitor closely
+- Red (<95%): Below SLO threshold, immediate attention required
 
 #### 2. Order Rate (%)
 **Purpose**: Measures message sequence integrity across different SDK bindings.

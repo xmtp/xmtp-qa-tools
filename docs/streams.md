@@ -1,10 +1,10 @@
 # Streams
 
-Message streaming reliability, order validation, and response time testing for XMTP protocol streams functionality.
+Real-time message streams are a big part of what makes XMTP feel responsive to users. We test these pretty heavily to make sure messages arrive reliably, in the right order, and fast enough that conversations feel natural.
 
-## Stream testing overview
+## What we test with streams
 
-Validates real-time message delivery, ordering accuracy, and performance characteristics of XMTP streams across different environments and scales.
+We validate that real-time message delivery works properly, messages show up in the right order, and performance is good enough for real users across different environments and group sizes.
 
 ## Test categories
 
@@ -44,6 +44,8 @@ yarn test streams:throughput --messages-per-second=100
 ## Stream reliability metrics
 
 ### Delivery rate targets
+
+Here's how we're doing on getting messages delivered reliably based on group size:
 
 | Group size | Target delivery rate | Current performance | Status |
 |------------|---------------------|-------------------|--------|

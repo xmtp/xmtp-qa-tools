@@ -1,10 +1,10 @@
-# Monitoring System
+# Monitoring system
 
-The XMTP QA Tools monorepo employs a sophisticated monitoring system that tracks protocol performance, reliability metrics, and service health across multiple environments and regions.
+Hey, this is how we keep an eye on everything that's happening with XMTP. We've built a pretty solid monitoring setup that tells us when things are working well and alerts us immediately when they're not.
 
-## Overview
+## What we're watching
 
-Our monitoring infrastructure provides real-time visibility into:
+Our monitoring gives us real-time visibility into:
 - **Message delivery rates** across development and production networks
 - **Performance benchmarks** for SDK operations and protocol functions
 - **Service health** for bots, agents, and infrastructure components
@@ -31,30 +31,30 @@ graph TB
     end
 ```
 
-## Key Metrics Tracked
+## Key metrics we track
 
-### Delivery Metrics
-- **Delivery Rate**: Percentage of messages successfully delivered across environments
-- **Order Rate**: Percentage of messages delivered in correct sequence
-- **Latency**: End-to-end message delivery time
-- **Cross-Platform Compatibility**: Success rates between different SDK bindings
+### Delivery stuff
+- **Delivery rate**: What percentage of messages actually make it where they're supposed to go
+- **Order rate**: Are messages showing up in the right sequence (this matters more than you'd think)
+- **Latency**: How long it takes for a message to get from A to B
+- **Cross-platform compatibility**: Making sure all our different SDKs can actually talk to each other
 
-### Performance Metrics
-- **SDK Operation Timing**: Benchmarks for client creation, conversation setup, message sending
-- **Large Group Performance**: Scalability metrics for groups up to 400 members
-- **Browser Automation**: Playwright test execution times and success rates
-- **Agent Response Times**: Bot and automation agent performance metrics
+### Performance numbers
+- **SDK operation timing**: How long it takes to create clients, set up conversations, send messages
+- **Large group performance**: Can we handle 400-person groups without everything falling apart
+- **Browser automation**: Playwright test execution and whether our WASM builds are working
+- **Agent response times**: Are our bots responding fast enough to not annoy users
 
-### Infrastructure Health
-- **Service Uptime**: Monitoring for deployed bots and services on Railway
-- **Error Rates**: Tracking failures across test suites and workflows
+### Infrastructure health
+- **Service uptime**: Keeping track of our deployed bots and Railway services
+- **Error rates**: When things break, we want to know about it immediately
 - **Resource Usage**: Memory and CPU utilization for long-running tests
 
-## Datadog Integration
+## Datadog integration
 
-### Dashboard Configuration
+### Dashboard setup
 
-The main dashboard (`dashboard.json`) provides visualizations for:
+The main dashboard (`dashboard.json`) shows us:
 
 ```json
 {

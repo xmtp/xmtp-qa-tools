@@ -1,10 +1,10 @@
 # SLOs and SLIs
 
-Service Level Objectives (SLOs) and Service Level Indicators (SLIs) define the reliability and performance standards for the XMTP protocol. These metrics provide clear targets for system performance and trigger alerts when service quality degrades below acceptable thresholds.
+These are the performance targets we actually commit to hitting and the metrics we use to track whether we're delivering a good experience to users. Think of SLOs as promises we make about how reliable XMTP will be, and SLIs as the measurements that tell us if we're keeping those promises.
 
-## Overview
+## What we're measuring
 
-Our SLO framework ensures XMTP protocol reliability through:
+Our reliability framework gives us:
 - **Quantitative targets** for protocol performance and reliability
 - **Measurable indicators** that track real user experience
 - **Automated monitoring** with alert escalation
@@ -12,11 +12,11 @@ Our SLO framework ensures XMTP protocol reliability through:
 
 ## Core SLIs (Service Level Indicators)
 
-### 1. Message Delivery Rate
+### 1. Message delivery rate
 
-**Definition**: Percentage of messages successfully delivered within expected timeframes.
+**What it means**: What percentage of messages actually make it from sender to recipient without getting lost.
 
-**Measurement**:
+**How we calculate it**:
 ```sql
 delivery_rate = (messages_delivered / messages_sent) * 100
 ```
