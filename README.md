@@ -94,11 +94,11 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 ## Documentation
 
 - Monitoring system: E2E tests, metrics tracking, and alerting -- see [section](./docs/monitoring.md)
-- SLOs and SLIs: Service Level Objectives and performance targets -- see [section](./docs/slos-slis.md)
+- Measurements: Performance metrics and targets -- see [section](./docs/measurements.md)
 - CLI: Command line interface for testing -- see [section](./docs/cli-usage.md)
-- Scaling limitations: Current constraints and optimization opportunities -- see [section](./docs/scaling-limitations.md)
-- Streams: Message streaming reliability, order validation, and response time testing -- see [section](./docs/streams.md)
 - Agents: Agent and bot testing framework -- see [section](./docs/agents-qa.md)
+- SLOs and SLIs: Service Level Objectives and performance targets -- see [section](./docs/slos-slis.md)
+- Streams: Message streaming reliability, order validation, and response time testing -- see [section](./docs/streams.md)
 - Forks: Protocol fork testing and version compatibility -- see [section](./docs/forks.md)
 
 ## Tools & utilities
