@@ -80,37 +80,24 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Testing summary
-
-**Test coverage**
+## Test coverage
 
 - Protocol: DMs, groups, streams, sync, consent, codecs, installations
 - Performance: Benchmarking, delivery reliability, large-scale testing (up to 400 members)
 - Compatibility: Backward compatibility across last 3 SDK versions (0.0.47 → 2.2.0+)
 - Cross-platform: Browser automation, mobile testing, multi-region performance
 - Production: Live agent monitoring, security, spam detection, rate limiting
-
-**Testing framework**
-
 - Automation: CI workflows with Datadog metrics, Slack alerting, log analysis
 - Verification: Stream delivery, conversation state, metadata propagation
 - Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
 - Infrastructure: Multi-region testing across US, Europe, Asia, South America
 
-**Key metrics**
-
-- Delivery: 100% success rate (target: 99.9%)
-- Performance: <350ms core operations, <200ms messaging, <150ms TLS
-- Scale: Groups up to 400 members, high-volume message testing
-- Network: DNS, TCP, TLS timing across 5 global regions
-
 ## Documentation
 
-- Measurments: Benchmakrs and measures recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
+- Measurments: Benchmakrs recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
 - Monitoring: Monitoring system [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1011)
 - Datadog: Datadog dashboard [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1016)
 - SLOs: Expected metrics and targets [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
-
 
 ## Tools & utilities
 
@@ -164,12 +151,12 @@ yarn test performance
 #### Debug mode
 
 ```bash
-yarn test functional --debug
+yarn test functional --no-fail --debug
 ```
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-#### Resources
+### Resources
 
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Local: Work in local network - [see section](/dev/)
