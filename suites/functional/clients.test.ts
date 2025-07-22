@@ -22,6 +22,49 @@ describe(testName, async () => {
     "oscar",
   ]);
 
+  it(`downgrade last versions`, async () => {
+    const versions = getVersions().slice(0, 3);
+    const receiverInboxId = getInboxIds(1)[0];
+
+    for (const version of versions) {
+      const versionWorkers = await getWorkers(
+        ["downgrade-" + "a" + "-" + version.nodeVersion],
+        {
+          useVersions: false,
+        },
+      );
+
+      const downgrade = versionWorkers.get("downgrade");
+      console.log("Downgraded to ", "sdk:" + String(downgrade?.sdk));
+      let convo = await downgrade?.client.conversations.newDm(receiverInboxId);
+
+      expect(convo?.id).toBeDefined();
+      if (!convo?.id)
+        console.error("Dowgrading from version", version.nodeVersion);
+    }
+  });
+
+  it(`upgrade last versions`, async () => {
+    const versions = getVersions().slice(0, 3);
+    const receiverInboxId = getInboxIds(1)[0];
+
+    for (const version of versions.reverse()) {
+      const versionWorkers = await getWorkers(
+        ["upgrade-" + "a" + "-" + version.nodeVersion],
+        {
+          useVersions: false,
+        },
+      );
+
+      const upgrade = versionWorkers.get("upgrade");
+      console.log("Upgraded to ", "sdk:" + String(upgrade?.sdk));
+      let convo = await upgrade?.client.conversations.newDm(receiverInboxId);
+      expect(convo?.id).toBeDefined();
+      if (!convo?.id)
+        console.error("Upgrading to version", version.nodeVersion);
+    }
+  });
+
   it("validation and key package status", async () => {
     const inboxState = await workers
       .get("henry")!
@@ -56,49 +99,6 @@ describe(testName, async () => {
       .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
     console.log(inboxState[0].inboxId);
     expect(inboxState[0].inboxId).toBe(bobInboxId);
-  });
-
-  it(`downgrade last versions`, async () => {
-    const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getInboxIds(1)[0];
-
-    for (const version of versions) {
-      const versionWorkers = await getWorkers(
-        ["bob-" + "a" + "-" + version.nodeVersion],
-        {
-          useVersions: false,
-        },
-      );
-
-      const bob = versionWorkers.get("bob");
-      console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
-      let convo = await bob?.client.conversations.newDm(receiverInboxId);
-
-      expect(convo?.id).toBeDefined();
-      if (!convo?.id)
-        console.error("Dowgrading from version", version.nodeVersion);
-    }
-  });
-
-  it(`upgrade last versions`, async () => {
-    const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getInboxIds(1)[0];
-
-    for (const version of versions.reverse()) {
-      const versionWorkers = await getWorkers(
-        ["alice-" + "a" + "-" + version.nodeVersion],
-        {
-          useVersions: false,
-        },
-      );
-
-      const alice = versionWorkers.get("alice");
-      console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
-      let convo = await alice?.client.conversations.newDm(receiverInboxId);
-      expect(convo?.id).toBeDefined();
-      if (!convo?.id)
-        console.error("Upgrading to version", version.nodeVersion);
-    }
   });
 
   it("shared identity and separate storage", async () => {
