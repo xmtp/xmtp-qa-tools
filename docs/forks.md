@@ -248,7 +248,7 @@ yarn test forks:negotiation --debug
 
 ### Deprecation timeline
 
-| Version | Deprecation Date | End of Life | Migration Required |
+| Version | Deprecation date | End of life | Migration required |
 |---------|-----------------|-------------|-------------------|
 | 2.0.x | Q2 2024 | Q4 2024 | Yes |
 | 2.1.x | Q4 2024 | Q2 2025 | Yes |
