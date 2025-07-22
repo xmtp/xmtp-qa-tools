@@ -36,49 +36,49 @@ Makes sure the core XMTP protocol actually works - DMs, group chats, streaming, 
 
 #### Cross-platform compatibility
 
-````typescript
-// Example test structure
-describe('Cross-platform messaging', () => {
-  test('Browser SDK to Node SDK message delivery', async () => {
-    const browserClient = await createBrowserClient();
-    const nodeClient = await createNodeClient();
+```tsx
+test("Browser SDK to Node SDK message delivery", async () => {
+  const browserClient = await createBrowserClient();
+  const nodeClient = await createNodeClient();
 
-    const conversation = await browserClient.conversations.newConversation(
-      nodeClient.address
-    );
+  const conversation = await browserClient.conversations.newConversation(
+    nodeClient.address,
+  );
 
-    await conversation.send('Hello from browser');
+  await conversation.send("Hello from browser");
 
-    // Verify delivery on Node SDK
-    const messages = await nodeClient.conversations
-      .getConversation(browserClient.address)
-      .messages();
+  // Verify delivery on Node SDK
+  const messages = await nodeClient.conversations
+    .getConversation(browserClient.address)
+    .messages();
 
-    expect(messages).toContainMessage('Hello from browser');
-  });
-
-  test('React Native to Swift message delivery', async () => {
-    const rnClient = await createReactNativeClient();
-    const swiftClient = await createSwiftClient();
-
-    const conversation = await rnClient.conversations.newConversation(
-      swiftClient.address
-    );
-
-    await conversation.send('Hello from React Native');
-
-    // Verify delivery on Swift client
-    const messages = await swiftClient.inbox.messages(conversation.id);
-    expect(messages.last().text).toBe('Hello from React Native');
-  });
+  expect(messages).toContainMessage("Hello from browser");
 });
 
+test("React Native to Swift message delivery", async () => {
+  const rnClient = await createReactNativeClient();
+  const swiftClient = await createSwiftClient();
+
+  const conversation = await rnClient.conversations.newConversation(
+    swiftClient.address,
+  );
+
+  await conversation.send("Hello from React Native");
+
+  // Verify delivery on Swift client
+  const messages = await swiftClient.inbox.messages(conversation.id);
+  expect(messages.last().text).toBe("Hello from React Native");
+});
+```
+
 #### Backward compatibility
+
 - **SDK Version Testing**: Validates compatibility across last 3 SDK versions (0.0.47 → 2.2.0+)
 - **Protocol Upgrades**: Tests seamless protocol version transitions
 - **Client Downgrades**: Ensures older clients can still communicate
 
 ### Automation details
+
 - **Framework**: Vitest with custom XMTP helpers
 - **Execution**: GitHub Actions with matrix strategy for multiple environments
 - **Artifacts**: Test reports, performance metrics, failure screenshots
@@ -87,42 +87,44 @@ describe('Cross-platform messaging', () => {
 ## 2. Performance test suite
 
 ### Purpose
+
 Benchmarks XMTP SDK operations, measures latency, and validates performance under various conditions.
 
 ### Key metrics
 
 #### SDK operation timing
+
 ```typescript
-test('Client creation performance', async () => {
+test("Client creation performance", async () => {
   const startTime = performance.now();
 
-  const client = await Client.create(wallet, { env: 'dev' });
+  const client = await Client.create(wallet, { env: "dev" });
 
   const duration = performance.now() - startTime;
 
   // Submit metric to Datadog
-  await submitMetric('xmtp.sdk.client_creation_time', duration, {
-    env: 'dev',
-    sdk_version: client.version
+  await submitMetric("xmtp.sdk.client_creation_time", duration, {
+    env: "dev",
+    sdk_version: client.version,
   });
 
   expect(duration).toBeLessThan(5000); // 5 second SLO
 });
 
-test('Group message send performance', async () => {
+test("Group message send performance", async () => {
   const group = await createGroup(50);
   const start = performance.now();
 
-  await group.send('Benchmark message');
+  await group.send("Benchmark message");
 
   const duration = performance.now() - start;
-  await submitMetric('xmtp.group.send_time', duration, {
-    group_size: 50
+  await submitMetric("xmtp.group.send_time", duration, {
+    group_size: 50,
   });
 
   expect(duration).toBeLessThan(2000);
 });
-````
+```
 
 #### Throughput Testing
 
