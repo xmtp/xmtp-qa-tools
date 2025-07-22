@@ -80,7 +80,7 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Test coverage
+#### Test coverage summary
 
 - Protocol: DMs, groups, streams, sync, consent, client, codecs, installations, agents
 - Performance: Benchmarking, reliability, mid-scale testing
