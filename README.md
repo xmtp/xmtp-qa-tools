@@ -94,16 +94,11 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-📚 **[Complete Documentation](./docs/)** - Comprehensive guides for testing infrastructure, monitoring, and operations
-
-### Quick Links
-- **[Monitoring System](./docs/monitoring.md)** - Metrics tracking, Slack integration, and alerting
-- **[Dashboards](./docs/dashboards.md)** - Datadog dashboards and visualization guides  
-- **[Test Suites](./docs/test-suites.md)** - Overview of all automated test suites
-- **[SLOs & SLIs](./docs/slos-slis.md)** - Service Level Objectives and performance targets
-- **[Workflows](./docs/workflows.md)** - GitHub Actions CI/CD automation
-- **[Scaling Limitations](./docs/scaling-limitations.md)** - Current constraints and optimization opportunities
-- **[Future Enhancements](./docs/future-enhancements.md)** - Roadmap and planned improvements
+- Measurments: Benchmarks recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
+- Monitoring: Monitoring system [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1011)
+- Datadog: Datadog dashboard [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1016)
+- SLOs: Expected metrics and targets [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1013)
+- Complete Documentation: [docs/](./docs/) - Testing infrastructure guides
 
 ## Tools & utilities
 
