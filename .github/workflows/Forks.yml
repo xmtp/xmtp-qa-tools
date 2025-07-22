@@ -1,8 +1,8 @@
 name: Forks
 description: "Daily forks testing on local network"
 
-on:
-  # pull_request:
+# on:
+#   # pull_request:
 
 jobs:
   test:
