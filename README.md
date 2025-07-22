@@ -1,8 +1,8 @@
-## QA tools
+# QA tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
-### Automated workflows
+## Automated workflows
 
 | Test suite  | Performance                                                                                                                                                                  | Resources                                                                                                                                                                             | Run frequency | Networks           |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
@@ -13,7 +13,7 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                           | Every 15 min  | `dev` `production` |
 | Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts)      | Every 30 min  | `dev` `production` |
 
-### Architecture
+## Architecture
 
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
@@ -80,7 +80,7 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-### Test coverage
+## Test coverage
 
 - Protocol: DMs, groups, streams, sync, consent, codecs, installations
 - Performance: Benchmarking, delivery reliability, large-scale testing (up to 400 members)
@@ -92,14 +92,14 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
 - Infrastructure: Multi-region testing across US, Europe, Asia, South America
 
-### Documentation
+## Documentation
 
 - Measurments: Benchmakrs recorded periodically [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
 - Monitoring: Monitoring system [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1011)
 - Datadog: Datadog dashboard [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1016)
 - SLOs: Expected metrics and targets [see section](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
 
-### Tools & utilities
+## Tools & utilities
 
 - Status: XMTP network status - [see section](https://status.xmtp.org/)
 - Workflows: Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
@@ -111,14 +111,14 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
-### Development
+## Development
 
-##### Prerequisites
+#### Prerequisites
 
 - Node.js (>20.18.0)
 - Yarn 4.6.0
 
-##### Installation
+#### Installation
 
 ```bash
 # Installation For a faster download with just the latest code
@@ -127,7 +127,7 @@ cd xmtp-qa-tools
 yarn install
 ```
 
-##### Environment variables
+#### Environment variables
 
 ```bash
 XMTP_ENV="dev" #  environment (dev, production, local, multinode)
@@ -135,7 +135,7 @@ LOGGING_LEVEL="error" # Rust library logs
 LOG_LEVEL="debug" # JS logs level
 ```
 
-#### Running tests
+### Running tests
 
 To get started set up the environment in [variables](./.env.example) and run the tests with:
 
@@ -148,7 +148,7 @@ yarn test functional
 yarn test performance
 ```
 
-##### Debug mode
+#### Debug mode
 
 ```bash
 yarn test functional --debug
@@ -156,7 +156,7 @@ yarn test functional --debug
 
 > This will save logs to `logs/` directory and will not print to the terminal.
 
-##### Resources
+#### Resources
 
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Local: Work in local network - [see section](/dev/)
@@ -165,12 +165,12 @@ yarn test functional --debug
 - Scripts: Monorepo scripts - [see section](/scripts/)
 - Introduction: Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
 
-###### Rate limits
+##### Rate limits
 
 - Read operations: 20,000 requests per 5-minute window
 - Write operations: 3,000 messages published per 5-minute window
 
-###### Endpoints
+##### Endpoints
 
 - `local`: `http://localhost:5556`
 - `dev`: `https://grpc.dev.xmtp.network:443`
