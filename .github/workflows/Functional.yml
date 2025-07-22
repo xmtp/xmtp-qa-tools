@@ -37,6 +37,6 @@ jobs:
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "Regression"
+      # - name: Send Slack notification on failure
+      #   if: failure() || cancelled()
+      #   run: yarn workflow-failure "Regression"
