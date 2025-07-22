@@ -99,7 +99,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Agents: Agent and bot testing framework -- see [section](./docs/agents-qa.md)
 - SLOs and SLIs: Service Level Objectives and performance targets -- see [section](./docs/slos-slis.md)
 - Streams: Message streaming reliability, order validation, and response time testing -- see [section](./docs/streams.md)
-- Forks: Protocol fork testing and version compatibility -- see [section](./docs/forks.md)
+- Forks: Protocol fork testing and version compatibility -- see [section](./suites/forks/README.md)
 
 ## Tools & utilities
 
