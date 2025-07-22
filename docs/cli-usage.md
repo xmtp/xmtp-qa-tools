@@ -1,22 +1,13 @@
-# CLI usage guide
+# CLI usage
 
-This covers the core CLI commands for running XMTP QA tests, bots, and scripts. For test suite details, see [test suites](./test-suites.md).
-
-## Setup
-
-Create a `.env` file:
+Create .env:
 
 ```bash
 XMTP_ENV=dev
 LOGGING_LEVEL=debug
-# Optional: SLACK_BOT_TOKEN, DATADOG_API_KEY, etc.
 ```
 
-Install dependencies:
-
-```bash
 yarn install
-```
 
 ## Core commands
 
@@ -65,16 +56,11 @@ Environment-specific:
 XMTP_ENV=production yarn test agents --no-fail --debug
 ```
 
-## Shortcuts
-
-From package.json:
+See workspace rules for full command details.
 
 ```bash
-yarn functional  # = yarn test suites/functional
-yarn regression  # = yarn test functional --versions 3
-yarn datadog     # Datadog log analysis
-yarn gen         # Generate inboxes
-yarn clean       # Clear data and logs
+yarn test functional
+yarn bot gm-bot
+yarn script gen
+yarn test functional --debug --versions 3
 ```
-
-For full details, see the root README.md or workspace rules.

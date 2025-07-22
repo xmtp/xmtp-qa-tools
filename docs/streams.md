@@ -11,14 +11,8 @@ We validate that real-time message delivery works properly, messages show up in 
 ### Reliability testing
 
 ```bash
-# Stream delivery reliability
-yarn test streams:delivery --duration=300s --message-count=100
-
-# Stream recovery after interruption
-yarn test streams:recovery --interruption-type=network
-
-# Cross-environment stream testing
-yarn test streams:cross-env --source=dev --target=production
+yarn test streams:delivery --duration=300s
+yarn test streams:performance --group-sizes=10,50,100
 ```
 
 ### Order validation
@@ -47,27 +41,14 @@ yarn test streams:throughput --messages-per-second=100
 test("Stream throughput under sustained load", async () => {
   const conversation = await createConversation();
   const stream = conversation.streamMessages();
-
-  const messagesSent = 100;
-  const start = performance.now();
-
-  // Send messages in rapid succession
-  for (let i = 0; i < messagesSent; i++) {
-    await conversation.send(`Message ${i}`);
-  }
-
-  // Collect streamed messages
+  for (let i = 0; i < 100; i++) await conversation.send(`Message ${i}`);
   const received = [];
   for await (const msg of stream) {
     received.push(msg);
-    if (received.length === messagesSent) break;
+    if (received.length === 100) break;
   }
-
-  const duration = performance.now() - start;
-  const throughput = messagesSent / (duration / 1000); // messages per second
-
-  await submitMetric("xmtp.stream.throughput", throughput);
-  expect(throughput).toBeGreaterThan(50); // Minimum 50 msgs/sec
+  const throughput = 100 / ((performance.now() - start) / 1000);
+  expect(throughput).toBeGreaterThan(50);
 });
 ```
 
@@ -77,13 +58,13 @@ test("Stream throughput under sustained load", async () => {
 
 Here's how we're doing on getting messages delivered reliably based on group size:
 
-| Group size      | Target delivery rate | Current performance | Status    |
-| --------------- | -------------------- | ------------------- | --------- |
-| 2-10 members    | 99.9%                | 100%                | On target |
-| 11-50 members   | 99.5%                | 99.8%               | On target |
-| 51-100 members  | 99%                  | 99.2%               | On target |
-| 101-250 members | 98%                  | 97.5%               | Concern   |
-| 251-400 members | 95%                  | 93.2%               | Failed    |
+| Group size      | Target delivery rate |
+| --------------- | -------------------- |
+| 2-10 members    | 99.9%                |
+| 11-50 members   | 99.5%                |
+| 51-100 members  | 99%                  |
+| 101-250 members | 98%                  |
+| 251-400 members | 95%                  |
 
 ### Order accuracy metrics
 

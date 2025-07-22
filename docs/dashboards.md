@@ -24,8 +24,11 @@ Our main dashboards cover:
 
 **What it shows**: How many messages are actually making it to their destination across all our environments and regions.
 
-```
-Query: avg:xmtp.sdk.delivery{$env,$region,$test,$sdk,$members}
+```json
+{
+  "title": "Delivery Rate (%)",
+  "query": "avg:xmtp.sdk.delivery{$env,$region,$test,$sdk,$members}"
+}
 ```
 
 **Color coding**:
@@ -58,17 +61,7 @@ Query: avg:xmtp.sdk.latency{$env,$region,$test,$sdk}
 Query: avg:xmtp.sdk.compatibility{sdk_from:*,sdk_to:*}
 ```
 
-### Dashboard variables
-
-The dashboard supports filtering via template variables:
-
-| Variable   | Description        | Example Values                           |
-| ---------- | ------------------ | ---------------------------------------- |
-| `$env`     | Environment filter | `dev`, `production`                      |
-| `$region`  | Geographic region  | `us-east-1`, `eu-west-1`, `asia-pacific` |
-| `$test`    | Test suite name    | `functional`, `performance`, `delivery`  |
-| `$sdk`     | SDK version        | `2.0.0`, `2.1.0`, `2.2.0`                |
-| `$members` | Group size         | `2`, `10`, `50`, `400`                   |
+See [Monitoring system](./monitoring.md) for configuration.
 
 ### Time range controls
 
@@ -219,102 +212,6 @@ The dashboards include automatic anomaly detection:
 
 Alerts are configured to trigger notifications in Slack channels:
 
-```json
-{
-  "alert_conditions": [
-    {
-      "metric": "xmtp.sdk.delivery",
-      "threshold": 95,
-      "comparison": "below",
-      "duration": "5m",
-      "channel": "#xmtp-qa-alerts"
-    }
-  ]
-}
 ```
 
-### Alert escalation
-
-1. **Immediate Slack Notification**: First threshold breach
-2. **Escalated Alert**: Continued degradation for >15 minutes
-3. **On-Call Page**: Critical service impact lasting >30 minutes
-
-## Custom dashboard creation
-
-### Creating new widgets
-
-To add custom monitoring for new features:
-
-1. **Define Metrics**: Use consistent naming convention (`xmtp.component.metric`)
-2. **Set Thresholds**: Align with existing SLO framework
-3. **Configure Alerts**: Follow escalation patterns
-4. **Document**: Update this documentation
-
-### Widget templates
-
-#### Basic metric widget
-
-```json
-{
-  "id": "custom_widget_id",
-  "definition": {
-    "title": "Custom Metric",
-    "type": "query_value",
-    "requests": [
-      {
-        "queries": [
-          {
-            "query": "avg:xmtp.custom.metric{$env}",
-            "data_source": "metrics"
-          }
-        ]
-      }
-    ],
-    "conditional_formats": [
-      { "comparator": ">=", "value": 95, "palette": "white_on_green" },
-      { "comparator": "<", "value": 95, "palette": "white_on_red" }
-    ]
-  }
-}
 ```
-
-## Dashboard maintenance
-
-### Regular reviews
-
-**Weekly Dashboard Review**:
-
-- Verify all widgets are displaying data correctly
-- Check for outdated or unused widgets
-- Update thresholds based on performance trends
-- Review and adjust alert configurations
-
-**Monthly Dashboard Optimization**:
-
-- Analyze dashboard usage patterns
-- Remove or consolidate underutilized widgets
-- Update color schemes and thresholds
-- Gather team feedback for improvements
-
-### Best practices
-
-1. **Keep It Simple**: Focus on actionable metrics
-2. **Consistent Layout**: Follow established visual patterns
-3. **Meaningful Names**: Use descriptive widget titles
-4. **Proper Scaling**: Ensure Y-axis scales are appropriate
-5. **Color Consistency**: Use standard color palette for status
-
-## Access and permissions
-
-### Team access
-
-- **QA Team**: Full dashboard access and edit permissions
-- **Engineering Team**: Read access to performance dashboards
-- **DevOps Team**: Full access to infrastructure dashboards
-- **Management**: Read access to summary dashboards
-
-### External access
-
-- **Public Status**: Limited metrics available at [status.xmtp.org](https://status.xmtp.org/)
-- **Partner Access**: Restricted dashboard views for integration partners
-- **Incident Response**: Temporary elevated access during outages

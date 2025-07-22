@@ -2,14 +2,6 @@
 
 These are the performance targets we actually commit to hitting and the metrics we use to track whether we're delivering a good experience to users. Think of SLOs as promises we make about how reliable XMTP will be, and SLIs as the measurements that tell us if we're keeping those promises.
 
-## What we're measuring
-
-Our reliability framework gives us:
-
-- **Quantitative targets** for protocol performance and reliability
-- **Measurable indicators** that track real user experience
-- **Automated monitoring** with alert escalation
-
 ## Core SLIs (service level indicators)
 
 ### 1. Message delivery rate
@@ -107,31 +99,14 @@ avg:xmtp.agent.response_time{agent:*}
 
 ## SLO targets
 
-### Tier 1: Critical production services
-
-| SLI                              | SLO Target  | Measurement Period | Alert Threshold           |
-| -------------------------------- | ----------- | ------------------ | ------------------------- |
-| **Message Delivery Rate**        | 99.9%       | 24 hours           | < 99.5% for 5 minutes     |
-| **Message Latency (P95)**        | < 3 seconds | 1 hour             | > 5 seconds for 5 minutes |
-| **Service Availability**         | 99.95%      | 30 days            | < 99.9% for 5 minutes     |
-| **Cross-Platform Compatibility** | 99.5%       | 7 days             | < 99% for 10 minutes      |
-
-### Tier 2: Development and testing services
-
-| SLI                         | SLO Target  | Measurement Period | Alert Threshold              |
-| --------------------------- | ----------- | ------------------ | ---------------------------- |
-| **Message Delivery Rate**   | 99.5%       | 24 hours           | < 99% for 10 minutes         |
-| **Message Latency (P95)**   | < 5 seconds | 1 hour             | > 10 seconds for 10 minutes  |
-| **Service Availability**    | 99.5%       | 30 days            | < 99% for 10 minutes         |
-| **Test Suite Success Rate** | 98%         | 24 hours           | < 95% for 2 consecutive runs |
-
-### Tier 3: Experimental and agent services
-
-| SLI                         | SLO Target                   | Measurement Period | Alert Threshold           |
-| --------------------------- | ---------------------------- | ------------------ | ------------------------- |
-| **Agent Response Time**     | < 2 seconds                  | 1 hour             | > 5 seconds for 3 minutes |
-| **Bot Availability**        | 99%                          | 24 hours           | < 95% for 15 minutes      |
-| **Large Group Performance** | 95% delivery for 400 members | Per test           | < 90% for single test     |
+| SLI                          | SLO Target  | Measurement Period | Alert Threshold              |
+| ---------------------------- | ----------- | ------------------ | ---------------------------- |
+| Message Delivery Rate        | 99.9%       | 24 hours           | < 99.5% for 5 minutes        |
+| Message Latency (P95)        | < 3 seconds | 1 hour             | > 5 seconds for 5 minutes    |
+| Service Availability         | 99.95%      | 30 days            | < 99.9% for 5 minutes        |
+| Cross-Platform Compatibility | 99.5%       | 7 days             | < 99% for 10 minutes         |
+| Agent Response Time          | < 2 seconds | 1 hour             | > 5 seconds for 3 minutes    |
+| Test Suite Success Rate      | 98%         | 24 hours           | < 95% for 2 consecutive runs |
 
 ## Detailed SLO specifications
 
@@ -300,46 +275,7 @@ const errorBudgetMinutes = (monthlyMinutes * (100 - availabilityTarget)) / 100;
 
 ## Monitoring and alerting
 
-### Real-time monitoring
-
-#### Dashboard widgets
-
-**SLO Status Overview**:
-
-```json
-{
-  "widget_type": "slo_status",
-  "slos": [
-    {
-      "name": "Message Delivery Rate",
-      "current_performance": "99.94%",
-      "target": "99.9%",
-      "status": "healthy",
-      "error_budget_remaining": "60%"
-    }
-  ]
-}
-```
-
-**Burn Rate Alerts**:
-
-```json
-{
-  "alert_name": "High Error Budget Burn Rate",
-  "conditions": [
-    {
-      "window": "1h",
-      "burn_rate": "> 14.4x", // 1% error budget in 1 hour
-      "severity": "critical"
-    },
-    {
-      "window": "6h",
-      "burn_rate": "> 6x", // 2.5% error budget in 6 hours
-      "severity": "warning"
-    }
-  ]
-}
-```
+See [Monitoring system](./monitoring.md) for details.
 
 ### Alerting configuration
 
@@ -388,53 +324,6 @@ alerts:
    - Page director of engineering
    - Incident commander assignment
 
-## SLO review process
-
-### Weekly SLO review
-
-**Agenda**:
-
-1. **SLO Performance Review**: Current week vs. targets
-2. **Error Budget Status**: Consumption rate and remaining budget
-3. **Incident Impact**: How incidents affected SLO performance
-4. **Trend Analysis**: Performance patterns and anomalies
-5. **Action Items**: Reliability improvements needed
-
-**Metrics Reviewed**:
-
-```typescript
-const weeklyMetrics = {
-  sloPerformance: {
-    deliveryRate: "99.96%", // vs 99.9% target
-    latencyP95: "2.1s", // vs 3s target
-    availability: "99.98%", // vs 99.95% target
-  },
-  errorBudget: {
-    consumed: "15%", // 85% remaining
-    burnRate: "normal", // within expected range
-    projectedMonthlyConsumption: "60%",
-  },
-};
-```
-
-### Monthly SLO retrospective
-
-**Deep Dive Analysis**:
-
-- **Root Cause Analysis**: Why SLOs were missed
-- **Improvement Opportunities**: Infrastructure, code, process
-- **SLO Adjustments**: Are targets realistic and business-aligned?
-- **Investment Priorities**: Where to focus reliability efforts
-
-### Quarterly SLO planning
-
-**Strategic Review**:
-
-- **Business Impact**: How SLO performance affects user experience
-- **Competitive Benchmarking**: Industry standard comparisons
-- **Technology Evolution**: Impact of new features on reliability
-- **Resource Allocation**: Engineering investment in reliability
-
 ## SLO implementation examples
 
 ### Custom SLI implementation
@@ -443,27 +332,9 @@ const weeklyMetrics = {
 // Example: Custom group message delivery SLI
 export class GroupDeliverySLI {
   async calculateSLI(timeWindow: TimeWindow): Promise<number> {
-    const query = `
-      sum:xmtp.group.messages.delivered{group_size:>10}
-      /
-      sum:xmtp.group.messages.sent{group_size:>10}
-      * 100
-    `;
-
+    const query = `sum:xmtp.group.messages.delivered{group_size:>10} / sum:xmtp.group.messages.sent{group_size:>10} * 100`;
     const result = await this.datadogClient.query(query, timeWindow);
     return result.value;
-  }
-
-  async checkSLO(sli: number): Promise<SLOStatus> {
-    const target = 95.0; // 95% for large groups
-    const status = sli >= target ? "healthy" : "violated";
-
-    return {
-      sli,
-      target,
-      status,
-      errorBudgetRemaining: this.calculateErrorBudget(sli, target),
-    };
   }
 }
 ```

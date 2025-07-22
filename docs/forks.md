@@ -55,23 +55,16 @@ Here's what works with what (Full = everything works, Limited = basic features, 
 ### Protocol upgrade testing
 
 ```typescript
-describe("Protocol upgrade scenarios", () => {
-  test("client upgrade maintains conversation history", async () => {
-    // Create conversation with old client
-    const oldClient = await createClientWithVersion("2.1.0");
-    const conversation =
-      await oldClient.conversations.newConversation(peerAddress);
-    await conversation.send("Message from old client");
-
-    // Upgrade client
-    const newClient = await upgradeClient(oldClient, "2.2.0");
-
-    // Verify message history preserved
-    const messages = await newClient.conversations
-      .getConversation(peerAddress)
-      .messages();
-    expect(messages).toContainMessage("Message from old client");
-  });
+test("client upgrade maintains conversation history", async () => {
+  const oldClient = await createClientWithVersion("2.1.0");
+  const conversation =
+    await oldClient.conversations.newConversation(peerAddress);
+  await conversation.send("Message from old client");
+  const newClient = await upgradeClient(oldClient, "2.2.0");
+  const messages = await newClient.conversations
+    .getConversation(peerAddress)
+    .messages();
+  expect(messages).toContainMessage("Message from old client");
 });
 ```
 

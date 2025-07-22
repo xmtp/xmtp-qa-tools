@@ -18,26 +18,14 @@ When things break (and they will), here's how we handle it. We've tried to set t
 
 Our monitoring automatically triggers alerts when metrics cross thresholds we care about:
 
-```yaml
-# Critical alert configuration
-alert:
-  name: "Message Delivery Rate Critical"
-  query: "avg:xmtp.sdk.delivery{env:production} < 95"
-  threshold: 95
-  evaluation_window: "5m"
-  escalation:
-    - slack: "#xmtp-qa-alerts"
-    - pagerduty: "xmtp-critical"
-```
+See [Monitoring system](./monitoring.md) for alerts.
 
 ### PagerDuty escalation
 
-| Severity | Response time     | Escalation path                   |
-| -------- | ----------------- | --------------------------------- |
-| Critical | 5 minutes         | QA → DevOps → Engineering manager |
-| High     | 15 minutes        | QA → DevOps                       |
-| Medium   | 1 hour            | QA team                           |
-| Low      | Next business day | QA team                           |
+| Severity | Response time |
+| -------- | ------------- |
+| Critical | 5 minutes     |
+| High     | 15 minutes    |
 
 ### Slack notifications
 

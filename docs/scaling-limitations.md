@@ -14,8 +14,6 @@ Let's be honest about where we hit walls when testing XMTP at scale. These are t
 const SCALE_TEST_CONFIG = {
   maxGroupSize: 400,
   targetDeliveryRate: 0.95,
-  maxCreationTime: 60000, // 1 minute
-  maxMessageDeliveryTime: 45000, // 45 seconds
 };
 ```
 
