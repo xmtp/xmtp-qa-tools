@@ -439,16 +439,3 @@ await submitMetric('xmtp.test.execution_time', testDuration, {
 - **Artifact Collection**: Screenshots, logs, and network traces
 - **Local Reproduction**: Tools for running tests locally
 
-## Continuous Improvement
-
-### Test Suite Evolution
-
-#### Regular Reviews
-- **Weekly Performance Analysis**: Review metrics and identify trends
-- **Monthly Test Coverage Review**: Ensure comprehensive protocol coverage
-- **Quarterly Architecture Review**: Optimize test execution and reliability
-
-#### Metrics-Driven Improvements
-- **Success Rate Tracking**: Monitor and improve test reliability
-- **Execution Time Optimization**: Reduce test suite runtime
-- **Coverage Gap Analysis**: Identify and address testing gaps

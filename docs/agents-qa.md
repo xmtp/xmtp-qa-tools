@@ -59,15 +59,4 @@ yarn test agents:stress --concurrency=50 --duration=300s
 | Response rate | 99% | 24 hours |
 | Error rate | <1% | 24 hours |
 
-## Troubleshooting
 
-### Common issues
-
-**Agent not responding**
-```bash
-# Check agent health endpoint
-curl -f https://agent.railway.app/health
-
-# Test agent manually
-yarn test agents:manual --agent=hi.xmtp.eth
-```

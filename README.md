@@ -20,8 +20,7 @@ Hey everyone, this is our comprehensive testing setup for XMTP. We've built a pr
 - [Forks](./docs/forks.md) - Protocol fork testing and version compatibility
 - [Incident response](./docs/incident-response.md) - Incident management and escalation procedures
 
-### Future planning
-- [Future enhancements](./docs/future-enhancements.md) - Roadmap and planned improvements
+
 
 ## Automated workflows
 
@@ -213,60 +212,11 @@ The automated workflows run on these schedules:
 - Agent tests: Bot health monitoring every 15 minutes
 - Large group tests: Scale testing every 2 hours
 
-## To-do and documentation improvements
-
-### Image placeholders needed
-
-We should add visual documentation to make this easier to understand:
-
-**README.md sections that need images:**
-- [ ] Architecture diagram placeholder: `![XMTP Architecture Overview](./docs/images/architecture-overview.png)` 
-  - Replace the current mermaid flowchart with a cleaner visual showing the full stack
-- [ ] Test suite workflow visualization: `![Test Suite Workflows](./docs/images/test-workflows.png)`
-  - Visual timeline showing when each test suite runs and dependencies
-
-**docs/monitoring.md:**
-- [ ] Datadog dashboard screenshot: `![Main Monitoring Dashboard](./docs/images/datadog-main-dashboard.png)`
-- [ ] Slack alert examples: `![Slack Alert Examples](./docs/images/slack-alerts.png)`
-- [ ] Metrics visualization: `![Key Metrics Trends](./docs/images/metrics-trends.png)`
-
-**docs/dashboards.md:**
-- [ ] Dashboard widget examples: `![Dashboard Widget Gallery](./docs/images/dashboard-widgets.png)`
-- [ ] Performance correlation charts: `![Performance Correlations](./docs/images/performance-correlations.png)`
-
-**docs/test-suites.md:**
-- [ ] Test execution flow: `![Test Execution Flow](./docs/images/test-execution-flow.png)`
-- [ ] Cross-platform compatibility matrix: `![Compatibility Matrix](./docs/images/compatibility-matrix.png)`
-
-**docs/agents-qa.md:**
-- [ ] Agent monitoring interface: `![Agent Monitoring Interface](./docs/images/agent-monitoring.png)`
-- [ ] Bot response time graphs: `![Bot Response Times](./docs/images/bot-response-times.png)`
-
-**docs/incident-response.md:**
-- [ ] Incident escalation flowchart: `![Incident Escalation Flow](./docs/images/incident-escalation.png)`
-- [ ] PagerDuty integration: `![PagerDuty Setup](./docs/images/pagerduty-setup.png)`
-
-### Documentation tasks
-- [ ] Create `docs/images/` directory for all visual assets
-- [ ] Take actual screenshots of Datadog dashboards for monitoring.md
-- [ ] Record short demo videos of test suite executions
-- [ ] Add performance trend graphs from recent test runs
-- [ ] Document Railway bot deployment process with screenshots
-- [ ] Create visual guides for new team member onboarding
-
-### Content improvements
-- [ ] Add troubleshooting runbooks with common failure scenarios
-- [ ] Document environment-specific configuration differences
-- [ ] Create quick-start guide for new QA engineers
-- [ ] Add performance regression detection procedures
-- [ ] Document disaster recovery procedures for test infrastructure
-
 ## Support and contact
 
 ### For issues
 - Immediate support: #xmtp-qa-alerts Slack channel
 - Bug reports: GitHub issues in [xmtp-qa-tools repository](https://github.com/xmtp/xmtp-qa-tools)
-- Documentation updates: Create pull requests with improvements
 
 ### For questions
 - Technical questions: Engineering team via Slack
@@ -278,15 +228,6 @@ We should add visual documentation to make this easier to understand:
 - Performance dashboard: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
 - Railway services: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - GitHub Actions: [Scheduled workflows](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
-
-## Documentation maintenance
-
-This documentation is actively maintained by the QA team. Updates are made:
-- **Weekly**: Performance metrics and SLO status updates
-- **Monthly**: Architecture and process improvements
-- **Quarterly**: Strategic roadmap and enhancement planning
-
-Last updated: January 2024
 
 ### Resources
 

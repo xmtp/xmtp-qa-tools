@@ -1,6 +1,6 @@
 # Scaling limitations
 
-Let's be honest about where we hit walls when testing XMTP at scale. These are the real constraints we're working with right now, and while we're always pushing to improve them, it's important to know what our current limits are.
+Let's be honest about where we hit walls when testing XMTP at scale. These are the real constraints we're working with right now.
 
 ## What we can test today
 
@@ -246,91 +246,11 @@ const clientPool = new ClientPool({ maxSize: MAX_CONCURRENT_CLIENTS });
 - [Issue #1027: CI resource optimization](https://github.com/xmtp/xmtp-qa-tools/issues/1027)
 - [Issue #1028: Client pool management](https://github.com/xmtp/xmtp-qa-tools/issues/1028)
 
-## Performance Optimization Opportunities
+## Current monitoring
 
-### Short-Term Improvements
+### Scale test metrics
 
-#### 1. Client Pool Management
-```typescript
-// Implement client reuse to reduce resource consumption
-class OptimizedClientPool {
-  private clients: Map<string, Client> = new Map();
-  
-  async getClient(config: ClientConfig): Promise<Client> {
-    const key = this.generateKey(config);
-    if (!this.clients.has(key)) {
-      this.clients.set(key, await this.createClient(config));
-    }
-    return this.clients.get(key)!;
-  }
-}
-```
-
-#### 2. Batched Operations
-```typescript
-// Batch message sending to reduce network overhead
-async function sendBatchedMessages(
-  conversation: Conversation,
-  messages: string[],
-  batchSize: number = 10
-): Promise<void> {
-  for (let i = 0; i < messages.length; i += batchSize) {
-    const batch = messages.slice(i, i + batchSize);
-    await Promise.all(batch.map(msg => conversation.send(msg)));
-    await new Promise(resolve => setTimeout(resolve, 100)); // Rate limiting
-  }
-}
-```
-
-#### 3. Memory Management
-- Implement message history limits for long-running tests
-- Add garbage collection hints for large group operations
-- Optimize serialization/deserialization for better memory usage
-
-### Long-Term Scaling Solutions
-
-#### 1. Distributed Testing Infrastructure
-
-**Proposed Architecture**:
-```typescript
-interface DistributedTestConfig {
-  regions: string[];
-  clientsPerRegion: number;
-  coordinationService: string;
-  sharedState: boolean;
-}
-
-// Coordinate tests across multiple regions
-class DistributedTestCoordinator {
-  async executeScaleTest(config: DistributedTestConfig): Promise<TestResults> {
-    const regionResults = await Promise.all(
-      config.regions.map(region => this.executeRegionalTest(region))
-    );
-    return this.aggregateResults(regionResults);
-  }
-}
-```
-
-#### 2. Load Testing Infrastructure
-
-**Dedicated Load Testing Environment**:
-- Separate infrastructure for large-scale tests
-- Dedicated network bandwidth and compute resources
-- Realistic simulation of production conditions
-
-#### 3. Protocol Optimization
-
-**Areas for Investigation**:
-- Message batching for group communications
-- Optimized key distribution mechanisms
-- Lazy loading of group member information
-- Compressed message formats for large groups
-
-## Monitoring and Metrics
-
-### Scale Test Metrics
-
-**Key Performance Indicators**:
+**Key performance indicators**:
 ```typescript
 interface ScaleTestMetrics {
   maxGroupSize: number;
@@ -342,70 +262,6 @@ interface ScaleTestMetrics {
   errorRate: number;
 }
 ```
-
-**Automated Scaling Reports**:
-- Daily scaling capacity reports
-- Trend analysis for performance degradation
-- Resource utilization forecasting
-
-### Performance Regression Detection
-
-**Automated Alerts**:
-```typescript
-// Alert when scaling performance degrades
-const scalingAlerts = {
-  groupSizeRegression: {
-    threshold: 0.95, // 5% degradation
-    metric: 'max_successful_group_size',
-    window: '7d'
-  },
-  deliveryRateRegression: {
-    threshold: 0.02, // 2% degradation
-    metric: 'large_group_delivery_rate',
-    window: '24h'
-  }
-};
-```
-
-## Future Roadmap
-
-### Planned Improvements
-
-#### Q1 2024: Infrastructure Scaling
-- [ ] Implement distributed testing across 3 regions
-- [ ] Upgrade CI resources for larger scale tests
-- [ ] Deploy dedicated load testing environment
-
-#### Q2 2024: Protocol Optimization
-- [ ] Implement message batching for groups >100 members
-- [ ] Optimize cryptographic operations for large groups
-- [ ] Add lazy loading for group member management
-
-#### Q3 2024: Advanced Scaling
-- [ ] Test groups with 1000+ members
-- [ ] Implement horizontal scaling for test infrastructure
-- [ ] Add realistic network condition simulation
-
-#### Q4 2024: Production Readiness
-- [ ] Validate scaling improvements in production
-- [ ] Implement auto-scaling for test infrastructure
-- [ ] Complete multi-region testing coverage
-
-### Research Areas
-
-**Investigation Priorities**:
-1. **Alternative Group Architectures**: Research group structures that scale better
-2. **Network Optimization**: Investigate P2P message routing optimizations
-3. **Resource Efficiency**: Study memory and CPU optimization techniques
-4. **Real-World Testing**: Validate scaling in production environments
-
-### Success Metrics
-
-**Scaling Targets for 2024**:
-- **Group Size**: Support 1000+ member groups with 98% delivery rate
-- **Regional Coverage**: Test across 5+ geographic regions
-- **Resource Efficiency**: 50% reduction in memory usage per client
-- **Test Execution**: Complete large-scale tests in <30 minutes
 
 ## References
 

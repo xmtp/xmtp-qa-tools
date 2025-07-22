@@ -8,7 +8,6 @@ Our reliability framework gives us:
 - **Quantitative targets** for protocol performance and reliability
 - **Measurable indicators** that track real user experience
 - **Automated monitoring** with alert escalation
-- **Continuous improvement** based on performance data
 
 ## Core SLIs (Service Level Indicators)
 
@@ -461,30 +460,3 @@ alerts:
       - "pagerduty:xmtp-oncall"
 ```
 
-## Continuous Improvement
-
-### SLO Evolution
-
-**Quarterly SLO Review Process**:
-1. **Performance Analysis**: Review actual performance vs. targets
-2. **User Impact Assessment**: How SLO violations affected users
-3. **Target Adjustment**: Make SLOs more realistic or ambitious
-4. **New SLI Introduction**: Add metrics for new features
-5. **Retirement of Outdated SLIs**: Remove metrics no longer relevant
-
-### Best Practices
-
-1. **Start Conservative**: Begin with achievable targets and tighten over time
-2. **User-Centric Metrics**: Focus on metrics that reflect user experience
-3. **Actionable Alerts**: Ensure alerts indicate when action is needed
-4. **Error Budget Discipline**: Respect error budget policies consistently
-5. **Regular Review**: Weekly team reviews and monthly deep dives
-
-### Future SLO Roadmap
-
-**Planned SLI Additions**:
-- **Message Ordering**: Ensure messages arrive in correct sequence
-- **Content Type Support**: Reliability for different message types
-- **Mobile Network Performance**: Specific targets for mobile connections
-- **Battery Usage**: Efficiency metrics for mobile implementations
-- **Memory Usage**: Resource consumption tracking for different SDKs

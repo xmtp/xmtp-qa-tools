@@ -187,30 +187,3 @@ await submitMetric('xmtp.test.custom_metric', value, {
 });
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Missing Metrics**: Verify Datadog API credentials and network connectivity
-2. **Slack Alerts Not Firing**: Check webhook URL and channel permissions
-3. **High False Positive Rate**: Adjust alert thresholds based on baseline performance
-
-### Debug Commands
-
-```bash
-# Test Datadog connectivity
-yarn test helpers/datadog --verbose
-
-# Validate dashboard configuration
-node scripts/validate-dashboard.js
-
-# Send test Slack notification
-node scripts/test-slack-alert.js
-```
-
-### Support
-
-For monitoring-related issues:
-- Review logs in Datadog dashboard
-- Check #xmtp-qa-alerts for recent notifications
-- Contact the QA team via Slack or GitHub issues

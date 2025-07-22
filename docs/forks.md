@@ -209,37 +209,6 @@ await submitMetric('xmtp.fork.migration_time', migrationDuration, {
 | Data loss | >0% | >1% |
 | Upgrade failure rate | >5% | >10% |
 
-## Troubleshooting
-
-### Common fork issues
-
-**Version mismatch errors**
-```bash
-# Check client version compatibility
-yarn test forks:version-check --client-version=2.2.0
-
-# Validate protocol support
-yarn test forks:protocol-check --feature=groups
-```
-
-**Migration failures**
-```bash
-# Debug migration process
-yarn test forks:migrate --debug --verbose
-
-# Validate database state
-yarn test forks:db-check --before-after
-```
-
-**Message delivery issues**
-```bash
-# Test cross-version messaging
-yarn test forks:cross-message --v1=2.1.0 --v2=2.2.0
-
-# Check protocol negotiation
-yarn test forks:negotiation --debug
-```
-
 ## Future fork planning
 
 ### Upcoming protocol changes

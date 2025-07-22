@@ -176,7 +176,6 @@ Technical explanation of underlying issue
 
 ## Action Items
 - [ ] Immediate fixes
-- [ ] Long-term improvements
 - [ ] Process updates
 ```
 

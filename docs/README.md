@@ -20,8 +20,7 @@ Hey everyone, this is our comprehensive testing setup for XMTP. We've built a pr
 - [Forks](./forks.md) - Protocol fork testing and version compatibility
 - [Incident response](./incident-response.md) - Incident management and escalation procedures
 
-### Future planning
-- [Future enhancements](./future-enhancements.md) - Roadmap and planned improvements
+
 
 ## What we're testing
 
@@ -47,8 +46,7 @@ GitHub Actions runs everything on a schedule that doesn't overwhelm our systems.
 ### For contributors
 1. Understand [SLOs and SLIs](./slos-slis.md) performance standards
 2. Review [Scaling limitations](./scaling-limitations.md) current constraints
-3. Check [Future enhancements](./future-enhancements.md) planned improvements
-4. Follow [Workflows](./workflows.md) guidelines
+3. Follow [Workflows](./workflows.md) guidelines
 
 ### For operators
 1. Master [Monitoring system](./monitoring.md) for daily operations
