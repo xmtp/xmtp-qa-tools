@@ -87,8 +87,8 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Compatibility: Backward compatibility across last +5 `node-sdk` versions.
 - Production: Agent monitoring, security, concurrency, spam detection, rate limiting
 - Automation: CI workflows with Datadog metrics, Slack alerting, browser log analysis
-- Delivery: Delivery and overall rate, response times.
-- Network: Multi-region testing across US, Europe, Asia, South America.
+- Delivery: Delivery and order rate, response times.
+- Network: Chaos network, latency, black hole, etc.
 - Infrastructure: Multi-region testing across US, Europe, Asia, South America.
 
 ## Documentation
