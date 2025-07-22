@@ -1,4 +1,4 @@
-# QA tools
+# XMTP qa tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
@@ -93,16 +93,12 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- [Monitoring system](./docs/monitoring.md) - Metrics tracking, Slack integration, and alerting
-- [Workflows](./docs/workflows.md) - GitHub Actions CI/CD automation and deployment
-
-#### Performance and reliability
-
-- [SLOs and SLIs](./docs/slos-slis.md) - Service Level Objectives and performance targets
-- [Scaling limitations](./docs/scaling-limitations.md) - Current constraints and optimization opportunities
-- [Streams](./docs/streams.md) - Message streaming reliability, order validation, and response time testing
-- [Agents QA](./docs/agents-qa.md) - Agent and bot testing framework
-- [Forks](./docs/forks.md) - Protocol fork testing and version compatibility
+- Monitoring system - Metrics tracking, Slack integration, and alerting -- see [section](./docs/monitoring.md)
+- SLOs and SLIs - Service Level Objectives and performance targets -- see [section](./docs/slos-slis.md)
+- Scaling limitations - Current constraints and optimization opportunities -- see [section](./docs/scaling-limitations.md)
+- Streams - Message streaming reliability, order validation, and response time testing -- see [section](./docs/streams.md)
+- Agents - Agent and bot testing framework -- see [section](./docs/agents-qa.md)
+- Forks - Protocol fork testing and version compatibility -- see [section](./docs/forks.md)
 
 ## Tools & utilities
 
