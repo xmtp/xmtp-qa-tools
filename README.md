@@ -106,10 +106,10 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- [SLOs](./docs/slos.md)
-- [Monitoring](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
-- [Measuring](./docs/measuring.md)
-- [Datadog](./docs/datadog.md)
+- [Measurment](https://github.com/xmtp/xmtp-qa-tools/issues/1012)
+- [SLOs](https://github.com/xmtp/xmtp-qa-tools/issues/1010)
+- [Monitoring](https://github.com/xmtp/xmtp-qa-tools/issues/1011)
+- [Datadog](https://github.com/xmtp/xmtp-qa-tools/issues/1016)
 
 ## Tools & utilities
 
