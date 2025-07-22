@@ -98,7 +98,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Agents: Agent and bot testing framework - see [section](./suites/agents/README.md)
 - Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
-- Forks: Protocol fork testing and version compatibility - see [section](./suites/forks/README.md)
+- Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
 
 ## Tools & utilities
 
