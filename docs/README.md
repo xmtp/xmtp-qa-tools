@@ -1,21 +1,27 @@
 # XMTP QA Tools Documentation
 
-Welcome to the comprehensive documentation for the XMTP QA Tools monorepo. This documentation provides detailed information about our testing infrastructure, monitoring systems, workflows, and operational procedures.
+Comprehensive documentation for the XMTP QA Tools monorepo covering testing infrastructure, monitoring systems, workflows, and operational procedures.
 
 ## Quick Navigation
 
-### 🏗️ Core Systems
-- **[Monitoring System](./monitoring.md)** - Metrics tracking, Slack integration, and alerting
-- **[Dashboards](./dashboards.md)** - Datadog dashboards and visualization guides
-- **[Test Suites](./test-suites.md)** - Comprehensive overview of all automated test suites
-- **[Workflows](./workflows.md)** - GitHub Actions CI/CD automation and deployment
+### Core Systems
+- [Monitoring System](./monitoring.md) - Metrics tracking, Slack integration, and alerting
+- [Dashboards](./dashboards.md) - Datadog dashboards and visualization guides
+- [Test Suites](./test-suites.md) - Comprehensive overview of all automated test suites
+- [Workflows](./workflows.md) - GitHub Actions CI/CD automation and deployment
 
-### 📊 Performance & Reliability
-- **[SLOs and SLIs](./slos-slis.md)** - Service Level Objectives and performance targets
-- **[Scaling Limitations](./scaling-limitations.md)** - Current constraints and optimization opportunities
+### Performance & Reliability
+- [SLOs and SLIs](./slos-slis.md) - Service Level Objectives and performance targets
+- [Scaling Limitations](./scaling-limitations.md) - Current constraints and optimization opportunities
+- [Streams](./streams.md) - Message streaming reliability, order validation, and response time testing
 
-### 🚀 Future Planning
-- **[Future Enhancements](./future-enhancements.md)** - Roadmap and planned improvements
+### Specialized Testing
+- [Agents QA](./agents-qa.md) - Agent and bot testing framework
+- [Forks](./forks.md) - Protocol fork testing and version compatibility
+- [Incident Response](./incident-response.md) - Incident management and escalation procedures
+
+### Future Planning
+- [Future Enhancements](./future-enhancements.md) - Roadmap and planned improvements
 
 ## Documentation Overview
 
@@ -43,22 +49,22 @@ This documentation covers the comprehensive testing and monitoring infrastructur
 ## Getting Started
 
 ### For New Team Members
-1. Start with [Test Suites](./test-suites.md) to understand our testing approach
-2. Review [Monitoring System](./monitoring.md) for observability concepts
-3. Explore [Dashboards](./dashboards.md) to learn about our metrics visualization
-4. Check [Workflows](./workflows.md) for CI/CD automation details
+1. Review [Test Suites](./test-suites.md) for testing approach
+2. Study [Monitoring System](./monitoring.md) for observability concepts
+3. Explore [Dashboards](./dashboards.md) for metrics visualization
+4. Check [Workflows](./workflows.md) for CI/CD automation
 
 ### For Contributors
-1. Understand our [SLOs and SLIs](./slos-slis.md) for performance standards
-2. Review [Scaling Limitations](./scaling-limitations.md) for current constraints
-3. Check [Future Enhancements](./future-enhancements.md) for planned improvements
-4. Follow workflow guidelines in [Workflows](./workflows.md)
+1. Understand [SLOs and SLIs](./slos-slis.md) performance standards
+2. Review [Scaling Limitations](./scaling-limitations.md) current constraints
+3. Check [Future Enhancements](./future-enhancements.md) planned improvements
+4. Follow [Workflows](./workflows.md) guidelines
 
 ### For Operators
-1. Master the [Monitoring System](./monitoring.md) for daily operations
+1. Master [Monitoring System](./monitoring.md) for daily operations
 2. Use [Dashboards](./dashboards.md) for real-time system health
 3. Reference [SLOs and SLIs](./slos-slis.md) for incident response
-4. Check [Scaling Limitations](./scaling-limitations.md) for capacity planning
+4. Review [Incident Response](./incident-response.md) for escalation procedures
 
 ## Key Metrics & Targets
 
@@ -84,38 +90,38 @@ This documentation covers the comprehensive testing and monitoring infrastructur
 The XMTP QA Tools testing framework validates the entire XMTP protocol stack:
 
 ```
-📱 Applications (xmtp.chat, Convos, Agents)
-    ↕️
-🔧 SDKs (Browser WASM, Node Napi, React Native, Swift FFI, Kotlin FFI)
-    ↕️
-⚡ LibXMTP (Rust core with openmls and diesel)
-    ↕️
-🌐 Decentralized Nodes (XMTP Network)
+Applications (xmtp.chat, Convos, Agents)
+    ↕
+SDKs (Browser WASM, Node Napi, React Native, Swift FFI, Kotlin FFI)
+    ↕
+LibXMTP (Rust core with openmls and diesel)
+    ↕
+Decentralized Nodes (XMTP Network)
 ```
 
-Our testing ensures:
-- **Cross-Platform Compatibility** between all SDK bindings
-- **Protocol Reliability** across different environments
-- **Performance Standards** for enterprise-scale usage
-- **Real-World Validation** through browser and mobile testing
+Testing coverage:
+- Cross-Platform Compatibility between all SDK bindings
+- Protocol Reliability across different environments  
+- Performance Standards for enterprise-scale usage
+- Real-World Validation through browser and mobile testing
 
 ## Support & Contact
 
 ### For Issues
-- **Immediate Support**: #xmtp-qa-alerts Slack channel
-- **Bug Reports**: GitHub issues in [xmtp-qa-tools repository](https://github.com/xmtp/xmtp-qa-tools)
-- **Documentation Updates**: Create pull requests with improvements
+- Immediate Support: #xmtp-qa-alerts Slack channel
+- Bug Reports: GitHub issues in [xmtp-qa-tools repository](https://github.com/xmtp/xmtp-qa-tools)
+- Documentation Updates: Create pull requests with improvements
 
 ### For Questions
-- **Technical Questions**: Engineering team via Slack
-- **Process Questions**: QA team via Slack  
-- **Monitoring Issues**: DevOps team or Datadog support
+- Technical Questions: Engineering team via Slack
+- Process Questions: QA team via Slack  
+- Monitoring Issues: DevOps team or Datadog support
 
 ### External Resources
-- **Network Status**: [status.xmtp.org](https://status.xmtp.org/)
-- **Performance Dashboard**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
-- **Railway Services**: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **GitHub Actions**: [Scheduled Workflows](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
+- Network Status: [status.xmtp.org](https://status.xmtp.org/)
+- Performance Dashboard: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- Railway Services: [Railway Project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- GitHub Actions: [Scheduled Workflows](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 
 ## Documentation Maintenance
 
