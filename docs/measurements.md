@@ -1,10 +1,16 @@
-# Mesuruments (supported by datadog)
+# Measurements (supported by datadog)
+
+Performance metrics and benchmarks for XMTP SDK operations tracked in our monitoring dashboard.
 
 Here are the average measurements that are supported by the [datadog dashboard](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d).
 
 ## Operations
 
+Core XMTP SDK functionality performance measurements across different operations and group sizes.
+
 ### Core SDK operations
+
+Individual SDK operation performance metrics including client creation, messaging, and group management.
 
 | Operation         | Description                            | Avg | Target | Performance |
 | ----------------- | -------------------------------------- | --- | ------ | ----------- |
@@ -22,7 +28,11 @@ Here are the average measurements that are supported by the [datadog dashboard](
 
 ### Group operations
 
+Performance measurements for group-specific operations broken down by group size and operation type.
+
 #### Sender-side average
+
+Average performance metrics measured from the message sender's perspective after group creation.
 
 | Size | Send message | Update name | Remove members | Create | Performance |
 | ---- | ------------ | ----------- | -------------- | ------ | ----------- |
@@ -39,6 +49,8 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 #### Receiver-side stream
 
+Stream performance metrics measured from message receivers when processing real-time updates.
+
 | Group Size | New conversation | Metadata | Messages | Add Members | Performance |
 | ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
 | 50         | 687              | 141      | 131      | 401         | On Target   |
@@ -53,6 +65,8 @@ _Note: This measurments are taken only from the sender side and after the group 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
 #### Receiver-side sync
+
+Sync operation performance for receivers during cold starts and cumulative syncs.
 
 | Size | syncAll |      | sync |      | Performance |
 | ---- | ------- | ---- | ---- | ---- | ----------- |
@@ -69,7 +83,11 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ## Networks
 
+Network-level performance metrics including connection times and regional variations.
+
 ### Network performance
+
+Core network operation timings from DNS lookup through server response processing.
 
 | Performance Metric | Average | Target | Performance |
 | ------------------ | ------- | ------ | ----------- |
@@ -80,6 +98,8 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 | Server Call        | 159     | <250   | On Target   |
 
 ### Regional network performance
+
+Comparative network performance across different global regions relative to US East baseline.
 
 | Region        | Server Call | TLS | ~ us-east | Performance |
 | ------------- | ----------- | --- | --------- | ----------- |
@@ -95,7 +115,11 @@ _Note: `Production` network consistently shows better network performance across
 
 ## Message reliability
 
+Message delivery and ordering reliability metrics across different testing scenarios.
+
 ### Message delivery testing
+
+Comprehensive delivery rate and message ordering accuracy across stream, poll, and recovery methods.
 
 | Test Area            | Average         | Target         | Performance |
 | -------------------- | --------------- | -------------- | ----------- |
@@ -110,7 +134,11 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Storage
 
+Database storage efficiency and performance metrics for different group sizes and inbox configurations.
+
 ### Storage by group size
+
+Storage utilization comparison between sender and receiver across varying group member counts.
 
 | Group Size  | Groups | Sender storage | Avg Group Size | Receiver storage | Efficiency Gain |
 | ----------- | ------ | -------------- | -------------- | ---------------- | --------------- |
@@ -122,6 +150,8 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
 ### Large inbox syncs
+
+Sync performance and storage requirements for inboxes with varying numbers of existing groups.
 
 | Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
 | ---------- | -------------- | ------------ | --------------- | ------------------ |
