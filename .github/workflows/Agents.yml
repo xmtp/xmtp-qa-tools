@@ -4,8 +4,8 @@ description: "verify performance of the library in the production network"
 on:
   schedule:
     - cron: "*/10 * * * *" # Runs every 5 minutes for agents-dms
-    - cron: "*/30 * * * *" # Runs every 30 minutes for agents-tagged
-    - cron: "0 * * * *" # Runs every hour for agents-untagged
+    - cron: "0 */4 * * *" # Runs every 4 hours for agents-tagged
+    - cron: "0 */4 * * *" # Runs every 4 hours for agents-untagged
   workflow_dispatch:
 
 jobs:
