@@ -5,6 +5,7 @@ Hey, this is how we keep an eye on everything that's happening with XMTP. We've 
 ## What we're watching
 
 Our monitoring gives us real-time visibility into:
+
 - **Message delivery rates** across development and production networks
 - **Performance benchmarks** for SDK operations and protocol functions
 - **Service health** for bots, agents, and infrastructure components
@@ -18,13 +19,13 @@ graph TB
         A[GitHub Actions] --> B[Test Suites]
         B --> C[Metrics Collection]
     end
-    
+
     subgraph "Monitoring Stack"
         C --> D[Datadog]
         D --> E[Dashboard]
         D --> F[Alerts]
     end
-    
+
     subgraph "Notification"
         F --> G[Slack Channels]
         G --> H[Team Response]
@@ -34,18 +35,21 @@ graph TB
 ## Key metrics we track
 
 ### Delivery stuff
+
 - **Delivery rate**: What percentage of messages actually make it where they're supposed to go
 - **Order rate**: Are messages showing up in the right sequence (this matters more than you'd think)
 - **Latency**: How long it takes for a message to get from A to B
 - **Cross-platform compatibility**: Making sure all our different SDKs can actually talk to each other
 
 ### Performance numbers
+
 - **SDK operation timing**: How long it takes to create clients, set up conversations, send messages
 - **Large group performance**: Can we handle 400-person groups without everything falling apart
 - **Browser automation**: Playwright test execution and whether our WASM builds are working
 - **Agent response times**: Are our bots responding fast enough to not annoy users
 
 ### Infrastructure health
+
 - **Service uptime**: Keeping track of our deployed bots and Railway services
 - **Error rates**: When things break, we want to know about it immediately
 - **Resource Usage**: Memory and CPU utilization for long-running tests
@@ -75,27 +79,32 @@ The main dashboard (`dashboard.json`) shows us:
 }
 ```
 
-### Custom Metrics
+See the full [dashboards documentation](./dashboards.md#dashboards) for more details.
+
+### Custom metrics
 
 All metrics are prefixed with `xmtp.sdk.` and include tags for:
+
 - `env`: Environment (dev, production)
 - `region`: Geographic region for multi-region testing
 - `test`: Test suite name
 - `sdk`: SDK version being tested
 - `members`: Group size for scaling tests
 
-## Slack Integration
+## Slack integration
 
-### Alert Channels
+### Alert channels
 
 Automated notifications are sent to dedicated Slack channels:
+
 - **#xmtp-qa-alerts**: Critical failures and SLO violations
 - **#xmtp-qa-metrics**: Daily performance summaries
 - **#xmtp-qa-deploys**: Deployment status and Railway updates
 
-### Alert Configuration
+### Alert configuration
 
 Alerts trigger when:
+
 - Delivery rate drops below 95% for more than 5 minutes
 - Any test suite fails consecutively for 3 runs
 - Critical infrastructure services become unavailable
@@ -103,9 +112,10 @@ Alerts trigger when:
 
 ## Logging
 
-### Datadog Logs
+### Datadog logs
 
 All test execution logs are centralized in Datadog with:
+
 - **Structured logging** with consistent format across all test suites
 - **Error aggregation** and pattern detection
 - **Log correlation** with metrics and traces
@@ -113,7 +123,7 @@ All test execution logs are centralized in Datadog with:
 
 View logs: [Datadog Error Logs](https://app.datadoghq.com/logs?saved-view-id=3577190)
 
-### Local Development
+### Local development
 
 For debugging during development:
 
@@ -124,20 +134,24 @@ export LOGGING_LEVEL="debug"
 
 # Run tests with detailed logs saved to file
 yarn test functional --no-fail --debug
+
+# Analyze logs locally
+yarn ansi logs/raw-functional-dev-*.log > cleaned.log
+cat cleaned.log | grep 'ERROR'
 ```
 
 Logs are saved to the `logs/` directory when using `--debug` mode.
 
-## SLOs and Alerting
+## SLOs and alerting
 
-### Service Level Objectives
+### Service level objectives
 
-| Metric | Target | Measurement Period | Alert Threshold |
-|--------|--------|-------------------|------------------|
-| Message Delivery Rate | 99.9% | 24 hours | < 95% for 5 minutes |
-| Cross-SDK Compatibility | 99.5% | 7 days | < 98% for 15 minutes |
-| Agent Response Time | < 2 seconds | 1 hour | > 5 seconds for 3 minutes |
-| Test Suite Success Rate | 98% | 24 hours | < 95% for 2 consecutive runs |
+| Metric                  | Target      | Measurement Period | Alert Threshold              |
+| ----------------------- | ----------- | ------------------ | ---------------------------- |
+| Message Delivery Rate   | 99.9%       | 24 hours           | < 95% for 5 minutes          |
+| Cross-SDK Compatibility | 99.5%       | 7 days             | < 98% for 15 minutes         |
+| Agent Response Time     | < 2 seconds | 1 hour             | > 5 seconds for 3 minutes    |
+| Test Suite Success Rate | 98%         | 24 hours           | < 95% for 2 consecutive runs |
 
 ### Escalation
 
@@ -145,11 +159,12 @@ Logs are saved to the `logs/` directory when using `--debug` mode.
 2. **Level 2**: Page on-call engineer for critical failures lasting > 15 minutes
 3. **Level 3**: Escalate to engineering leadership for systematic issues
 
-## Network Status
+## Network status
 
 Real-time network status is available at: [status.xmtp.org](https://status.xmtp.org/)
 
 This provides public visibility into:
+
 - XMTP network health across all environments
 - Historical uptime and performance data
 - Planned maintenance windows
@@ -157,7 +172,7 @@ This provides public visibility into:
 
 ## Configuration
 
-### Environment Variables
+### Environment variables
 
 ```bash
 # Datadog configuration
@@ -172,18 +187,24 @@ MONITORING_ENABLED="true"
 METRICS_INTERVAL="30000"  # 30 seconds
 ```
 
-### Custom Metrics Submission
+### Custom metrics submission
 
 Test suites can submit custom metrics using the helper utilities:
 
 ```typescript
-import { submitMetric } from '../helpers/datadog';
+import { submitMetric } from "../helpers/datadog";
 
 // Submit a custom performance metric
-await submitMetric('xmtp.test.custom_metric', value, {
+await submitMetric("xmtp.test.custom_metric", value, {
   env: process.env.XMTP_ENV,
-  test_name: 'my_test',
-  region: 'us-east-1'
+  test_name: "my_test",
+  region: "us-east-1",
+});
+
+// Example with tags
+await submitMetric("xmtp.sdk.delivery", 99.8, {
+  env: "production",
+  sdk_version: "2.2.0",
+  group_size: 50,
 });
 ```
-

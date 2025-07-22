@@ -5,128 +5,142 @@ These are the performance targets we actually commit to hitting and the metrics 
 ## What we're measuring
 
 Our reliability framework gives us:
+
 - **Quantitative targets** for protocol performance and reliability
 - **Measurable indicators** that track real user experience
 - **Automated monitoring** with alert escalation
 
-## Core SLIs (Service Level Indicators)
+## Core SLIs (service level indicators)
 
 ### 1. Message delivery rate
 
 **What it means**: What percentage of messages actually make it from sender to recipient without getting lost.
 
 **How we calculate it**:
+
 ```sql
 delivery_rate = (messages_delivered / messages_sent) * 100
 ```
 
 **SLI Query**:
+
 ```
 sum:xmtp.sdk.messages.delivered{env:*} / sum:xmtp.sdk.messages.sent{env:*} * 100
 ```
 
 **Tracking Windows**:
+
 - Real-time: 5-minute rolling window
 - SLO calculation: 24-hour window
 - Historical analysis: 7-day and 30-day windows
 
-### 2. Message Latency
+### 2. Message latency
 
 **Definition**: Time from message send to delivery confirmation.
 
 **Measurement**:
+
 ```sql
 latency = message_delivery_timestamp - message_send_timestamp
 ```
 
 **SLI Query**:
+
 ```
 avg:xmtp.sdk.latency{env:*}
 ```
 
 **Percentiles Tracked**:
+
 - P50 (median): Typical user experience
 - P95: Good user experience threshold
 - P99: Exceptional user experience
 - P99.9: Critical edge cases
 
-### 3. Cross-Platform Compatibility Rate
+### 3. Cross-platform compatibility rate
 
 **Definition**: Success rate of message delivery between different SDK implementations.
 
 **Measurement**:
+
 ```sql
 compatibility_rate = (successful_cross_platform_messages / total_cross_platform_messages) * 100
 ```
 
 **SLI Query**:
+
 ```
 sum:xmtp.sdk.cross_platform.success{*} / sum:xmtp.sdk.cross_platform.attempts{*} * 100
 ```
 
-### 4. Service Availability
+### 4. Service availability
 
 **Definition**: Percentage of time XMTP network services are operational.
 
 **Measurement**:
+
 ```sql
 availability = (uptime_seconds / total_seconds) * 100
 ```
 
 **SLI Query**:
+
 ```
 avg:xmtp.network.uptime{service:*}
 ```
 
-### 5. Agent Response Time
+### 5. Agent response time
 
 **Definition**: Time for automated agents to respond to incoming messages.
 
 **Measurement**:
+
 ```sql
 response_time = agent_response_timestamp - message_received_timestamp
 ```
 
 **SLI Query**:
+
 ```
 avg:xmtp.agent.response_time{agent:*}
 ```
 
-## SLO Targets
+## SLO targets
 
-### Tier 1: Critical Production Services
+### Tier 1: Critical production services
 
-| SLI | SLO Target | Measurement Period | Alert Threshold |
-|-----|------------|-------------------|------------------|
-| **Message Delivery Rate** | 99.9% | 24 hours | < 99.5% for 5 minutes |
-| **Message Latency (P95)** | < 3 seconds | 1 hour | > 5 seconds for 5 minutes |
-| **Service Availability** | 99.95% | 30 days | < 99.9% for 5 minutes |
-| **Cross-Platform Compatibility** | 99.5% | 7 days | < 99% for 10 minutes |
+| SLI                              | SLO Target  | Measurement Period | Alert Threshold           |
+| -------------------------------- | ----------- | ------------------ | ------------------------- |
+| **Message Delivery Rate**        | 99.9%       | 24 hours           | < 99.5% for 5 minutes     |
+| **Message Latency (P95)**        | < 3 seconds | 1 hour             | > 5 seconds for 5 minutes |
+| **Service Availability**         | 99.95%      | 30 days            | < 99.9% for 5 minutes     |
+| **Cross-Platform Compatibility** | 99.5%       | 7 days             | < 99% for 10 minutes      |
 
-### Tier 2: Development and Testing Services
+### Tier 2: Development and testing services
 
-| SLI | SLO Target | Measurement Period | Alert Threshold |
-|-----|------------|-------------------|------------------|
-| **Message Delivery Rate** | 99.5% | 24 hours | < 99% for 10 minutes |
-| **Message Latency (P95)** | < 5 seconds | 1 hour | > 10 seconds for 10 minutes |
-| **Service Availability** | 99.5% | 30 days | < 99% for 10 minutes |
-| **Test Suite Success Rate** | 98% | 24 hours | < 95% for 2 consecutive runs |
+| SLI                         | SLO Target  | Measurement Period | Alert Threshold              |
+| --------------------------- | ----------- | ------------------ | ---------------------------- |
+| **Message Delivery Rate**   | 99.5%       | 24 hours           | < 99% for 10 minutes         |
+| **Message Latency (P95)**   | < 5 seconds | 1 hour             | > 10 seconds for 10 minutes  |
+| **Service Availability**    | 99.5%       | 30 days            | < 99% for 10 minutes         |
+| **Test Suite Success Rate** | 98%         | 24 hours           | < 95% for 2 consecutive runs |
 
-### Tier 3: Experimental and Agent Services
+### Tier 3: Experimental and agent services
 
-| SLI | SLO Target | Measurement Period | Alert Threshold |
-|-----|------------|-------------------|------------------|
-| **Agent Response Time** | < 2 seconds | 1 hour | > 5 seconds for 3 minutes |
-| **Bot Availability** | 99% | 24 hours | < 95% for 15 minutes |
-| **Large Group Performance** | 95% delivery for 400 members | Per test | < 90% for single test |
+| SLI                         | SLO Target                   | Measurement Period | Alert Threshold           |
+| --------------------------- | ---------------------------- | ------------------ | ------------------------- |
+| **Agent Response Time**     | < 2 seconds                  | 1 hour             | > 5 seconds for 3 minutes |
+| **Bot Availability**        | 99%                          | 24 hours           | < 95% for 15 minutes      |
+| **Large Group Performance** | 95% delivery for 400 members | Per test           | < 90% for single test     |
 
-## Detailed SLO Specifications
+## Detailed SLO specifications
 
-### Message Delivery Rate SLO
+### Message delivery rate SLO
 
 **Target**: 99.9% delivery rate over 24 hours
 
 **Calculation**:
+
 ```typescript
 const deliveryRate = (deliveredMessages / sentMessages) * 100;
 const sloTarget = 99.9;
@@ -134,11 +148,13 @@ const isWithinSLO = deliveryRate >= sloTarget;
 ```
 
 **Error Budget**:
+
 - **Daily**: 0.1% of messages (approximately 144 failed messages per day at 100K messages/day)
 - **Monthly**: 0.1% of messages over 30 days
 - **Quarterly**: Annual error budget divided by 4
 
 **Monitoring**:
+
 ```json
 {
   "alert_name": "Message Delivery Rate SLO Violation",
@@ -149,11 +165,12 @@ const isWithinSLO = deliveryRate >= sloTarget;
 }
 ```
 
-### Message Latency SLO
+### Message latency SLO
 
 **Target**: 95th percentile < 3 seconds
 
 **Latency Buckets**:
+
 - **Excellent**: < 1 second (target for 50% of messages)
 - **Good**: 1-3 seconds (acceptable for 45% of messages)
 - **Acceptable**: 3-10 seconds (maximum for 4.9% of messages)
@@ -167,17 +184,18 @@ const isWithinSLO = deliveryRate >= sloTarget;
 | Cross-Region (US-APAC) | < 5 seconds | < 12 seconds |
 | Cross-Region (EU-APAC) | < 4 seconds | < 10 seconds |
 
-### Cross-Platform Compatibility SLO
+### Cross-platform compatibility SLO
 
 **Target**: 99.5% compatibility rate over 7 days
 
 **SDK Combinations Monitored**:
+
 ```typescript
 const sdkPairs = [
-  { from: 'browser-wasm', to: 'node-napi' },
-  { from: 'node-napi', to: 'react-native' },
-  { from: 'react-native', to: 'browser-wasm' },
-  { from: 'swift-ffi', to: 'kotlin-ffi' },
+  { from: "browser-wasm", to: "node-napi" },
+  { from: "node-napi", to: "react-native" },
+  { from: "react-native", to: "browser-wasm" },
+  { from: "swift-ffi", to: "kotlin-ffi" },
   // All possible combinations tracked
 ];
 ```
@@ -190,15 +208,15 @@ const sdkPairs = [
 | **2.2.x** | 99.5% | 99.9% | 100% | 99.5% |
 | **3.0.x** | 95.0% | 99.0% | 99.5% | 100% |
 
-### Service Availability SLO
+### Service availability SLO
 
 **Target**: 99.95% availability (maximum 21.6 minutes downtime per month)
 
 **Availability Calculation**:
+
 ```typescript
-const availability = (
-  (totalTimeSeconds - downtimeSeconds) / totalTimeSeconds
-) * 100;
+const availability =
+  ((totalTimeSeconds - downtimeSeconds) / totalTimeSeconds) * 100;
 
 // Monthly availability target
 const monthlyTarget = 99.95; // 21.6 minutes downtime allowed
@@ -207,50 +225,56 @@ const annualTarget = 99.9; // 8.76 hours downtime allowed
 ```
 
 **Downtime Categories**:
+
 - **Planned Maintenance**: Scheduled, announced downtime (excluded from SLO)
 - **Emergency Maintenance**: Unplanned but necessary downtime (counted)
 - **Service Outage**: Unexpected service failures (counted)
 - **Degraded Performance**: Service running but below performance SLOs (counted)
 
-## Error Budget Management
+## Error budget management
 
-### Error Budget Calculation
+### Error budget calculation
 
 **Monthly Error Budget Example**:
+
 ```typescript
 // For 99.9% availability SLO
 const monthlyMinutes = 30 * 24 * 60; // 43,200 minutes
 const availabilityTarget = 99.9; // 99.9%
-const errorBudgetMinutes = monthlyMinutes * (100 - availabilityTarget) / 100;
+const errorBudgetMinutes = (monthlyMinutes * (100 - availabilityTarget)) / 100;
 // Error budget: 43.2 minutes per month
 ```
 
-### Error Budget Policies
+### Error budget policies
 
-#### Budget Consumption Levels
+#### Budget consumption levels
 
 **Level 1: Green (0-25% consumed)**
+
 - Normal operations
 - All feature releases allowed
 - Standard monitoring
 
 **Level 2: Yellow (25-50% consumed)**
+
 - Increased monitoring
 - Review release velocity
 - Focus on reliability improvements
 
 **Level 3: Orange (50-75% consumed)**
+
 - Feature release freeze for affected services
 - Mandatory reliability reviews
 - Enhanced monitoring and alerting
 
 **Level 4: Red (75-100% consumed)**
+
 - Complete release freeze
 - Emergency reliability focus
 - Daily leadership review
 - Postmortem required
 
-### Error Budget Alerting
+### Error budget alerting
 
 ```json
 {
@@ -274,13 +298,14 @@ const errorBudgetMinutes = monthlyMinutes * (100 - availabilityTarget) / 100;
 }
 ```
 
-## Monitoring and Alerting
+## Monitoring and alerting
 
-### Real-Time Monitoring
+### Real-time monitoring
 
-#### Dashboard Widgets
+#### Dashboard widgets
 
 **SLO Status Overview**:
+
 ```json
 {
   "widget_type": "slo_status",
@@ -297,6 +322,7 @@ const errorBudgetMinutes = monthlyMinutes * (100 - availabilityTarget) / 100;
 ```
 
 **Burn Rate Alerts**:
+
 ```json
 {
   "alert_name": "High Error Budget Burn Rate",
@@ -307,7 +333,7 @@ const errorBudgetMinutes = monthlyMinutes * (100 - availabilityTarget) / 100;
       "severity": "critical"
     },
     {
-      "window": "6h", 
+      "window": "6h",
       "burn_rate": "> 6x", // 2.5% error budget in 6 hours
       "severity": "warning"
     }
@@ -315,9 +341,9 @@ const errorBudgetMinutes = monthlyMinutes * (100 - availabilityTarget) / 100;
 }
 ```
 
-### Alerting Configuration
+### Alerting configuration
 
-#### Multi-Window Alerts
+#### Multi-window alerts
 
 ```yaml
 alerts:
@@ -331,7 +357,7 @@ alerts:
         duration: "30m"
         threshold: "< 99.7%"
         severity: "critical"
-    
+
   - name: "Latency SLO Violation"
     conditions:
       short_window:
@@ -344,7 +370,7 @@ alerts:
         severity: "critical"
 ```
 
-#### Escalation Policy
+#### Escalation policy
 
 1. **Initial Alert** (0-5 minutes):
    - Slack notification to #xmtp-qa-alerts
@@ -362,11 +388,12 @@ alerts:
    - Page director of engineering
    - Incident commander assignment
 
-## SLO Review Process
+## SLO review process
 
-### Weekly SLO Review
+### Weekly SLO review
 
 **Agenda**:
+
 1. **SLO Performance Review**: Current week vs. targets
 2. **Error Budget Status**: Consumption rate and remaining budget
 3. **Incident Impact**: How incidents affected SLO performance
@@ -374,40 +401,43 @@ alerts:
 5. **Action Items**: Reliability improvements needed
 
 **Metrics Reviewed**:
+
 ```typescript
 const weeklyMetrics = {
   sloPerformance: {
     deliveryRate: "99.96%", // vs 99.9% target
-    latencyP95: "2.1s",     // vs 3s target
-    availability: "99.98%"   // vs 99.95% target
+    latencyP95: "2.1s", // vs 3s target
+    availability: "99.98%", // vs 99.95% target
   },
   errorBudget: {
-    consumed: "15%",         // 85% remaining
-    burnRate: "normal",      // within expected range
-    projectedMonthlyConsumption: "60%"
-  }
+    consumed: "15%", // 85% remaining
+    burnRate: "normal", // within expected range
+    projectedMonthlyConsumption: "60%",
+  },
 };
 ```
 
-### Monthly SLO Retrospective
+### Monthly SLO retrospective
 
 **Deep Dive Analysis**:
+
 - **Root Cause Analysis**: Why SLOs were missed
 - **Improvement Opportunities**: Infrastructure, code, process
 - **SLO Adjustments**: Are targets realistic and business-aligned?
 - **Investment Priorities**: Where to focus reliability efforts
 
-### Quarterly SLO Planning
+### Quarterly SLO planning
 
 **Strategic Review**:
+
 - **Business Impact**: How SLO performance affects user experience
 - **Competitive Benchmarking**: Industry standard comparisons
 - **Technology Evolution**: Impact of new features on reliability
 - **Resource Allocation**: Engineering investment in reliability
 
-## SLO Implementation Examples
+## SLO implementation examples
 
-### Custom SLI Implementation
+### Custom SLI implementation
 
 ```typescript
 // Example: Custom group message delivery SLI
@@ -419,26 +449,26 @@ export class GroupDeliverySLI {
       sum:xmtp.group.messages.sent{group_size:>10}
       * 100
     `;
-    
+
     const result = await this.datadogClient.query(query, timeWindow);
     return result.value;
   }
-  
+
   async checkSLO(sli: number): Promise<SLOStatus> {
     const target = 95.0; // 95% for large groups
-    const status = sli >= target ? 'healthy' : 'violated';
-    
+    const status = sli >= target ? "healthy" : "violated";
+
     return {
       sli,
       target,
       status,
-      errorBudgetRemaining: this.calculateErrorBudget(sli, target)
+      errorBudgetRemaining: this.calculateErrorBudget(sli, target),
     };
   }
 }
 ```
 
-### Alert Definition
+### Alert definition
 
 ```yaml
 # alerts/message-delivery-slo.yml
@@ -446,17 +476,16 @@ alerts:
   - name: "Message Delivery SLO Multi-Window"
     type: "slo_alert"
     slo_id: "message_delivery_rate"
-    
+
     short_window:
       duration: "5m"
-      burn_rate_threshold: 14.4  # 1% error budget in 1 hour
-      
+      burn_rate_threshold: 14.4 # 1% error budget in 1 hour
+
     long_window:
       duration: "1h"
-      burn_rate_threshold: 2     # 5% error budget in 1 day
-      
+      burn_rate_threshold: 2 # 5% error budget in 1 day
+
     notifications:
       - "#xmtp-qa-alerts"
       - "pagerduty:xmtp-oncall"
 ```
-

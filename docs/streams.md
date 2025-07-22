@@ -41,28 +41,58 @@ yarn test streams:performance --group-sizes=10,50,100,200
 yarn test streams:throughput --messages-per-second=100
 ```
 
+#### Throughput testing example
+
+```typescript
+test("Stream throughput under sustained load", async () => {
+  const conversation = await createConversation();
+  const stream = conversation.streamMessages();
+
+  const messagesSent = 100;
+  const start = performance.now();
+
+  // Send messages in rapid succession
+  for (let i = 0; i < messagesSent; i++) {
+    await conversation.send(`Message ${i}`);
+  }
+
+  // Collect streamed messages
+  const received = [];
+  for await (const msg of stream) {
+    received.push(msg);
+    if (received.length === messagesSent) break;
+  }
+
+  const duration = performance.now() - start;
+  const throughput = messagesSent / (duration / 1000); // messages per second
+
+  await submitMetric("xmtp.stream.throughput", throughput);
+  expect(throughput).toBeGreaterThan(50); // Minimum 50 msgs/sec
+});
+```
+
 ## Stream reliability metrics
 
 ### Delivery rate targets
 
 Here's how we're doing on getting messages delivered reliably based on group size:
 
-| Group size | Target delivery rate | Current performance | Status |
-|------------|---------------------|-------------------|--------|
-| 2-10 members | 99.9% | 100% | On target |
-| 11-50 members | 99.5% | 99.8% | On target |
-| 51-100 members | 99% | 99.2% | On target |
-| 101-250 members | 98% | 97.5% | Concern |
-| 251-400 members | 95% | 93.2% | Failed |
+| Group size      | Target delivery rate | Current performance | Status    |
+| --------------- | -------------------- | ------------------- | --------- |
+| 2-10 members    | 99.9%                | 100%                | On target |
+| 11-50 members   | 99.5%                | 99.8%               | On target |
+| 51-100 members  | 99%                  | 99.2%               | On target |
+| 101-250 members | 98%                  | 97.5%               | Concern   |
+| 251-400 members | 95%                  | 93.2%               | Failed    |
 
 ### Order accuracy metrics
 
-| Test scenario | Target order rate | Current performance | Status |
-|---------------|------------------|-------------------|--------|
-| Single sender | 100% | 100% | On target |
-| Multiple senders | 99.9% | 99.7% | On target |
-| Burst messages | 99% | 98.9% | On target |
-| Large groups | 98% | 96.8% | Concern |
+| Test scenario    | Target order rate | Current performance | Status    |
+| ---------------- | ----------------- | ------------------- | --------- |
+| Single sender    | 100%              | 100%                | On target |
+| Multiple senders | 99.9%             | 99.7%               | On target |
+| Burst messages   | 99%               | 98.9%               | On target |
+| Large groups     | 98%               | 96.8%               | Concern   |
 
 ## Stream performance characteristics
 
@@ -70,24 +100,24 @@ Here's how we're doing on getting messages delivered reliably based on group siz
 
 ```typescript
 // Stream response time measurement
-describe('Stream response times', () => {
-  test('message stream latency under load', async () => {
+describe("Stream response times", () => {
+  test("message stream latency under load", async () => {
     const group = await createGroup(50);
     const startTime = Date.now();
-    
+
     // Send message and measure stream delivery time
-    await group.send('Performance test message');
-    
+    await group.send("Performance test message");
+
     const streamResponses = await Promise.all(
-      group.members.map(member => 
-        waitForStreamMessage(member, 'Performance test message')
-      )
+      group.members.map((member) =>
+        waitForStreamMessage(member, "Performance test message"),
+      ),
     );
-    
+
     const responseTime = Date.now() - startTime;
-    await submitMetric('xmtp.stream.response_time', responseTime, {
+    await submitMetric("xmtp.stream.response_time", responseTime, {
       group_size: 50,
-      test_type: 'performance'
+      test_type: "performance",
     });
   });
 });
@@ -95,33 +125,35 @@ describe('Stream response times', () => {
 
 ### Throughput benchmarks
 
-| Group size | Messages/second | P95 latency | P99 latency |
-|------------|----------------|-------------|-------------|
-| 10 members | 45 | 131ms | 245ms |
-| 50 members | 38 | 234ms | 456ms |
-| 100 members | 31 | 387ms | 672ms |
-| 200 members | 22 | 589ms | 934ms |
-| 400 members | 15 | 823ms | 1247ms |
+| Group size  | Messages/second | P95 latency | P99 latency |
+| ----------- | --------------- | ----------- | ----------- |
+| 10 members  | 45              | 131ms       | 245ms       |
+| 50 members  | 38              | 234ms       | 456ms       |
+| 100 members | 31              | 387ms       | 672ms       |
+| 200 members | 22              | 589ms       | 934ms       |
+| 400 members | 15              | 823ms       | 1247ms      |
 
 ## Stream testing scenarios
 
 ### Basic stream functionality
 
 ```typescript
-describe('Basic stream functionality', () => {
-  test('conversation stream delivers messages', async () => {
+describe("Basic stream functionality", () => {
+  test("conversation stream delivers messages", async () => {
     const [sender, receiver] = await createClients(2);
-    const conversation = await sender.conversations.newConversation(receiver.address);
-    
+    const conversation = await sender.conversations.newConversation(
+      receiver.address,
+    );
+
     // Start message stream
-    const messagePromise = waitForStreamMessage(receiver, 'Test message');
-    
+    const messagePromise = waitForStreamMessage(receiver, "Test message");
+
     // Send message
-    await conversation.send('Test message');
-    
+    await conversation.send("Test message");
+
     // Verify stream delivery
     const streamedMessage = await messagePromise;
-    expect(streamedMessage.content).toBe('Test message');
+    expect(streamedMessage.content).toBe("Test message");
   });
 });
 ```
@@ -129,29 +161,29 @@ describe('Basic stream functionality', () => {
 ### Group stream testing
 
 ```typescript
-describe('Group stream functionality', () => {
-  test('group message streams to all members', async () => {
+describe("Group stream functionality", () => {
+  test("group message streams to all members", async () => {
     const groupSize = 20;
     const admin = await createClient();
     const members = await createClients(groupSize - 1);
-    
+
     const group = await admin.conversations.newGroup(
-      members.map(m => m.address)
+      members.map((m) => m.address),
     );
-    
+
     // Setup stream listeners for all members
-    const streamPromises = members.map(member =>
-      waitForGroupMessage(member, group.id, 'Group stream test')
+    const streamPromises = members.map((member) =>
+      waitForGroupMessage(member, group.id, "Group stream test"),
     );
-    
+
     // Send message to group
-    await group.send('Group stream test');
-    
+    await group.send("Group stream test");
+
     // Verify all members receive via stream
     const results = await Promise.allSettled(streamPromises);
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
+    const successCount = results.filter((r) => r.status === "fulfilled").length;
     const deliveryRate = successCount / members.length;
-    
+
     expect(deliveryRate).toBeGreaterThan(0.99);
   });
 });
@@ -160,22 +192,27 @@ describe('Group stream functionality', () => {
 ### Stream recovery testing
 
 ```typescript
-describe('Stream recovery', () => {
-  test('stream recovery after network interruption', async () => {
+describe("Stream recovery", () => {
+  test("stream recovery after network interruption", async () => {
     const [sender, receiver] = await createClients(2);
-    const conversation = await sender.conversations.newConversation(receiver.address);
-    
+    const conversation = await sender.conversations.newConversation(
+      receiver.address,
+    );
+
     // Start stream
     const stream = receiver.conversations.stream();
-    
+
     // Simulate network interruption
     await simulateNetworkInterruption(receiver, 5000);
-    
+
     // Send message during interruption
-    await conversation.send('Message during interruption');
-    
+    await conversation.send("Message during interruption");
+
     // Verify message received after recovery
-    const recoveredMessage = await waitForStreamRecovery(stream, 'Message during interruption');
+    const recoveredMessage = await waitForStreamRecovery(
+      stream,
+      "Message during interruption",
+    );
     expect(recoveredMessage).toBeDefined();
   });
 });
@@ -191,36 +228,38 @@ const streamMetrics = {
   delivery_rate: deliveredMessages / sentMessages,
   order_accuracy: correctlyOrderedMessages / totalMessages,
   response_time: streamDeliveryTime,
-  recovery_time: networkRecoveryTime
+  recovery_time: networkRecoveryTime,
 };
 
 // Submit to monitoring system
 await submitStreamMetrics(streamMetrics, {
   group_size: groupSize,
-  environment: 'production',
-  test_type: 'reliability'
+  environment: "production",
+  test_type: "reliability",
 });
 ```
 
 ### Performance dashboards
 
 **Stream delivery tracking**
+
 - Real-time delivery rate visualization
 - Order accuracy trending
 - Response time percentiles
 - Recovery time analysis
 
 **Alert thresholds**
+
 ```yaml
 stream_alerts:
   delivery_rate:
     warning: < 99%
     critical: < 98%
-  
+
   order_accuracy:
     warning: < 99.5%
     critical: < 99%
-  
+
   response_time:
     warning: > 1000ms
     critical: > 2000ms
@@ -231,27 +270,26 @@ stream_alerts:
 ### Performance tuning
 
 **Connection pooling**
+
 ```typescript
 // Optimize stream connections
 const streamConfig = {
   maxConnections: 100,
   keepAlive: true,
   heartbeatInterval: 30000,
-  reconnectBackoff: 'exponential'
+  reconnectBackoff: "exponential",
 };
 ```
 
 **Message batching**
+
 ```typescript
 // Batch messages for better throughput
 const batchConfig = {
   maxBatchSize: 10,
   batchTimeout: 100, // ms
-  prioritizeOrder: true
+  prioritizeOrder: true,
 };
 ```
-
-
-
 
 - Server-side stream optimization

@@ -5,6 +5,7 @@ These are the dashboards we actually look at every day to understand how XMTP is
 ## What we've got set up
 
 Our main dashboards cover:
+
 - **Main Performance Dashboard**: Core XMTP SDK metrics and SLO tracking
 - **Infrastructure Dashboard**: Service health and resource utilization
 - **Test Execution Dashboard**: CI/CD pipeline and test suite performance
@@ -13,12 +14,14 @@ Our main dashboards cover:
 ## Main performance dashboard
 
 ### How to get there
-- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)  
-- **What you'll see**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing)
 
-### Key Widgets
+- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- **What you'll see**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing). See [monitoring system](./monitoring.md#monitoring-system) for related alerts.
+
+### Key widgets
 
 #### 1. Delivery rate (%)
+
 **What it shows**: How many messages are actually making it to their destination across all our environments and regions.
 
 ```
@@ -26,56 +29,61 @@ Query: avg:xmtp.sdk.delivery{$env,$region,$test,$sdk,$members}
 ```
 
 **Color coding**:
+
 - Green (≥99%): Excellent performance, meeting SLO targets
 - Yellow (≥95%): Acceptable performance, monitor closely
 - Red (<95%): Below SLO threshold, immediate attention required
 
-#### 2. Order Rate (%)
+#### 2. Order rate (%)
+
 **Purpose**: Measures message sequence integrity across different SDK bindings.
 
 ```
 Query: avg:xmtp.sdk.order{$env,$region,$test,$sdk,$members}
 ```
 
-#### 3. Latency Metrics
+#### 3. Latency metrics
+
 **Purpose**: End-to-end message delivery timing across environments.
 
 ```
 Query: avg:xmtp.sdk.latency{$env,$region,$test,$sdk}
 ```
 
-#### 4. Cross-Platform Compatibility
+#### 4. Cross-platform compatibility
+
 **Purpose**: Success rates between different SDK implementations.
 
 ```
 Query: avg:xmtp.sdk.compatibility{sdk_from:*,sdk_to:*}
 ```
 
-### Dashboard Variables
+### Dashboard variables
 
 The dashboard supports filtering via template variables:
 
-| Variable | Description | Example Values |
-|----------|-------------|----------------|
-| `$env` | Environment filter | `dev`, `production` |
-| `$region` | Geographic region | `us-east-1`, `eu-west-1`, `asia-pacific` |
-| `$test` | Test suite name | `functional`, `performance`, `delivery` |
-| `$sdk` | SDK version | `2.0.0`, `2.1.0`, `2.2.0` |
-| `$members` | Group size | `2`, `10`, `50`, `400` |
+| Variable   | Description        | Example Values                           |
+| ---------- | ------------------ | ---------------------------------------- |
+| `$env`     | Environment filter | `dev`, `production`                      |
+| `$region`  | Geographic region  | `us-east-1`, `eu-west-1`, `asia-pacific` |
+| `$test`    | Test suite name    | `functional`, `performance`, `delivery`  |
+| `$sdk`     | SDK version        | `2.0.0`, `2.1.0`, `2.2.0`                |
+| `$members` | Group size         | `2`, `10`, `50`, `400`                   |
 
-### Time Range Controls
+### Time range controls
 
 - **Default**: Last 4 hours
-- **Recommended**: 
+- **Recommended**:
   - **Real-time monitoring**: Last 1 hour with auto-refresh (30s)
   - **Trend analysis**: Last 24 hours
   - **Weekly reviews**: Last 7 days
 
-## Infrastructure Dashboard
+## Infrastructure dashboard
 
-### Service Health Monitoring
+### Service health monitoring
 
-#### Bot Status Widget
+#### Bot status widget
+
 Tracks health of deployed testing bots:
 
 ```json
@@ -86,7 +94,8 @@ Tracks health of deployed testing bots:
 }
 ```
 
-#### Railway Services
+#### Railway services
+
 Monitors deployed services on Railway platform:
 
 ```json
@@ -100,23 +109,26 @@ Monitors deployed services on Railway platform:
 }
 ```
 
-### Resource Utilization
+### Resource utilization
 
-#### Memory Usage
+#### Memory usage
+
 ```
 Query: avg:system.mem.pct_usable{service:xmtp-*}
 ```
 
-#### CPU Utilization
+#### CPU utilization
+
 ```
 Query: avg:system.cpu.user{service:xmtp-*}
 ```
 
-## Test Execution Dashboard
+## Test execution dashboard
 
-### CI/CD Pipeline Health
+### CI/CD pipeline health
 
-#### Workflow Success Rates
+#### Workflow success rates
+
 Tracks GitHub Actions workflow performance:
 
 ```json
@@ -127,23 +139,25 @@ Tracks GitHub Actions workflow performance:
 }
 ```
 
-#### Test Suite Performance
+#### Test suite performance
+
 Individual test suite execution metrics:
 
-| Suite | Frequency | SLO Target | Alert Threshold |
-|-------|-----------|------------|-----------------|
-| Functional | Every 3 hours | 98% success | <95% for 2 runs |
-| Performance | Every 30 min | 95% success | <90% for 3 runs |
-| Delivery | Every 30 min | 99% success | <95% for 2 runs |
+| Suite        | Frequency     | SLO Target  | Alert Threshold |
+| ------------ | ------------- | ----------- | --------------- |
+| Functional   | Every 3 hours | 98% success | <95% for 2 runs |
+| Performance  | Every 30 min  | 95% success | <90% for 3 runs |
+| Delivery     | Every 30 min  | 99% success | <95% for 2 runs |
 | Large Groups | Every 2 hours | 90% success | <85% for 2 runs |
-| Browser | Every 30 min | 95% success | <90% for 3 runs |
-| Agents | Every 15 min | 99% success | <95% for 3 runs |
+| Browser      | Every 30 min  | 95% success | <90% for 3 runs |
+| Agents       | Every 15 min  | 99% success | <95% for 3 runs |
 
-## Regional Performance Dashboard
+## Regional performance dashboard
 
-### Multi-Region Latency
+### Multi-region latency
 
-#### Geographic Performance Matrix
+#### Geographic performance matrix
+
 ```json
 {
   "title": "Cross-Region Latency",
@@ -152,7 +166,8 @@ Individual test suite execution metrics:
 }
 ```
 
-#### Regional Load Distribution
+#### Regional load distribution
+
 ```json
 {
   "title": "Message Volume by Region",
@@ -161,9 +176,9 @@ Individual test suite execution metrics:
 }
 ```
 
-## How to Read the Dashboards
+## How to read the dashboards
 
-### Understanding SLO Correlation
+### Understanding SLO correlation
 
 Each dashboard widget directly correlates to our defined SLOs:
 
@@ -182,22 +197,25 @@ Each dashboard widget directly correlates to our defined SLOs:
    - Response Time >5 seconds
    - Error Rate >1%
 
-### Trend Analysis
+### Trend analysis
 
-#### Identifying Performance Patterns
+#### Identifying performance patterns
+
 - **Daily Patterns**: Look for consistent dips during specific hours
 - **Weekly Patterns**: Monitor weekend vs. weekday performance
 - **Release Correlation**: Compare metrics before/after deployments
 
-#### Anomaly Detection
+#### Anomaly detection
+
 The dashboards include automatic anomaly detection:
+
 - **Outlier Detection**: Flags unusual spikes or drops
 - **Trend Deviation**: Alerts when metrics deviate from historical trends
 - **Seasonal Adjustments**: Accounts for expected variations
 
-## Dashboard Alerts
+## Dashboard alerts
 
-### Alert Configuration
+### Alert configuration
 
 Alerts are configured to trigger notifications in Slack channels:
 
@@ -215,15 +233,15 @@ Alerts are configured to trigger notifications in Slack channels:
 }
 ```
 
-### Alert Escalation
+### Alert escalation
 
 1. **Immediate Slack Notification**: First threshold breach
 2. **Escalated Alert**: Continued degradation for >15 minutes
 3. **On-Call Page**: Critical service impact lasting >30 minutes
 
-## Custom Dashboard Creation
+## Custom dashboard creation
 
-### Creating New Widgets
+### Creating new widgets
 
 To add custom monitoring for new features:
 
@@ -232,21 +250,26 @@ To add custom monitoring for new features:
 3. **Configure Alerts**: Follow escalation patterns
 4. **Document**: Update this documentation
 
-### Widget Templates
+### Widget templates
 
-#### Basic Metric Widget
+#### Basic metric widget
+
 ```json
 {
   "id": "custom_widget_id",
   "definition": {
     "title": "Custom Metric",
     "type": "query_value",
-    "requests": [{
-      "queries": [{
-        "query": "avg:xmtp.custom.metric{$env}",
-        "data_source": "metrics"
-      }]
-    }],
+    "requests": [
+      {
+        "queries": [
+          {
+            "query": "avg:xmtp.custom.metric{$env}",
+            "data_source": "metrics"
+          }
+        ]
+      }
+    ],
     "conditional_formats": [
       { "comparator": ">=", "value": 95, "palette": "white_on_green" },
       { "comparator": "<", "value": 95, "palette": "white_on_red" }
@@ -255,23 +278,25 @@ To add custom monitoring for new features:
 }
 ```
 
-## Dashboard Maintenance
+## Dashboard maintenance
 
-### Regular Reviews
+### Regular reviews
 
 **Weekly Dashboard Review**:
+
 - Verify all widgets are displaying data correctly
 - Check for outdated or unused widgets
 - Update thresholds based on performance trends
 - Review and adjust alert configurations
 
 **Monthly Dashboard Optimization**:
+
 - Analyze dashboard usage patterns
 - Remove or consolidate underutilized widgets
 - Update color schemes and thresholds
 - Gather team feedback for improvements
 
-### Best Practices
+### Best practices
 
 1. **Keep It Simple**: Focus on actionable metrics
 2. **Consistent Layout**: Follow established visual patterns
@@ -279,16 +304,17 @@ To add custom monitoring for new features:
 4. **Proper Scaling**: Ensure Y-axis scales are appropriate
 5. **Color Consistency**: Use standard color palette for status
 
-## Access and Permissions
+## Access and permissions
 
-### Team Access
+### Team access
+
 - **QA Team**: Full dashboard access and edit permissions
 - **Engineering Team**: Read access to performance dashboards
 - **DevOps Team**: Full access to infrastructure dashboards
 - **Management**: Read access to summary dashboards
 
-### External Access
+### External access
+
 - **Public Status**: Limited metrics available at [status.xmtp.org](https://status.xmtp.org/)
 - **Partner Access**: Restricted dashboard views for integration partners
 - **Incident Response**: Temporary elevated access during outages
-
