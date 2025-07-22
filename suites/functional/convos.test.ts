@@ -69,16 +69,16 @@ describe(testName, async () => {
   });
 
   for (const i of BATCH_SIZE) {
-    it(`create a group with ${i} participants`, async () => {
+    it(`create a group with ${i} members`, async () => {
       const sliced = getInboxIds(i);
-      console.log("Creating group with", sliced.length, "participants");
+      console.log("Creating group with", sliced.length, "members");
       newGroup = (await workers
         .getCreator()
         .client.conversations.newGroup(sliced)) as Group;
       console.log("Group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     });
-    it(`sync group with ${i} participants and verify member count`, async () => {
+    it(`sync group with ${i} members and verify member count`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(i + 1);

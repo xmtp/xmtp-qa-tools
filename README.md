@@ -93,10 +93,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-#### Core systems
-
 - [Monitoring system](./docs/monitoring.md) - Metrics tracking, Slack integration, and alerting
-- [Dashboards](./docs/dashboards.md) - Datadog dashboards and visualization guides
 - [Test suites](./docs/test-suites.md) - Comprehensive overview of all automated test suites
 - [Workflows](./docs/workflows.md) - GitHub Actions CI/CD automation and deployment
 

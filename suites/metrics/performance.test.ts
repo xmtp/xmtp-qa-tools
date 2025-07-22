@@ -111,7 +111,7 @@ describe(testName, async () => {
 
   for (const i of BATCH_SIZE) {
     const creatorClient = workers.getCreator().client;
-    it(`newGroup-${i}:create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
       const sliced = getInboxIds(i);
       newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
@@ -119,7 +119,7 @@ describe(testName, async () => {
       ])) as Group;
       expect(newGroup.id).toBeDefined();
     });
-    it(`newGroupByAddress-${i}:create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
       const sliced = getAddresses(i);
       const newGroupByIdentifier =
         await creatorClient.conversations.newGroupWithIdentifiers(
@@ -130,7 +130,7 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     });
-    it(`groupsync-${i}:sync a large group of ${i} participants ${i}`, async () => {
+    it(`groupsync-${i}:sync a large group of ${i} members ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
@@ -142,7 +142,7 @@ describe(testName, async () => {
       const name = newGroup.name;
       expect(name).toBe(newName);
     });
-    it(`send-${i}:measure sending a gm in a group of ${i} participants`, async () => {
+    it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await newGroup.send(groupMessage);

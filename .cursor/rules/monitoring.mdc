@@ -94,7 +94,7 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### sync (`sync.test.ts`)
 
-- `group sync performance: establish test environment by creating group with all participants`
+- `group sync performance: establish test environment by creating group with all members`
 - `group sync performance: send baseline message to group for sync performance testing`
 - `group sync performance: measure performance impact of client-level conversations.sync() operation`
 - `group sync performance: measure performance impact of individual conversation.sync() operation`
@@ -122,7 +122,7 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ## 4. Performance Testing (`performance.test.ts`)
 
-**Purpose**: Measures operation timing and throughput for standard group sizes (5-10 participants).
+**Purpose**: Measures operation timing and throughput for standard group sizes (5-10 members).
 
 ### Individual Operations:
 
@@ -136,11 +136,11 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ### Scaled Operations (per group size):
 
-- `newGroup-{i}: create a large group of {i} participants`
-- `newGroupByAddress-{i}: create a large group of {i} participants`
-- `groupsync-{i}: sync a large group of {i} participants`
+- `newGroup-{i}: create a large group of {i} members`
+- `newGroupByAddress-{i}: create a large group of {i} members`
+- `groupsync-{i}: sync a large group of {i} members`
 - `updateName-{i}: update the group name`
-- `send-{i}: measure sending a gm in a group of {i} participants`
+- `send-{i}: measure sending a gm in a group of {i} members`
 - `stream-{i}: verify group message`
 - `addMember-{i}: add members to a group`
 - `removeMembers-{i}: remove a participant from a group`
@@ -149,12 +149,12 @@ Our test suite is organized into 5 primary categories that validate XMTP protoco
 
 ## 5. Large Group Testing (`large.test.ts`)
 
-**Purpose**: Validates scalability and performance at scale (10-50+ participants).
+**Purpose**: Validates scalability and performance at scale (10-50+ members).
 
 ### Scalability Tests (per group size):
 
-- `newGroup-{groupSize}: create a large group of {groupSize} participants`
-- `groupsync-{groupSize}: sync a large group of {groupSize} participants`
+- `newGroup-{groupSize}: create a large group of {groupSize} members`
+- `groupsync-{groupSize}: sync a large group of {groupSize} members`
 - `addMember-{groupSize}: notify all members of additions in {groupSize} member group`
 - `stream-{groupSize}: notify all members of message changes in {groupSize} member group`
 - `updateName-{groupSize}: notify all members of metadata changes in {groupSize} member group`
