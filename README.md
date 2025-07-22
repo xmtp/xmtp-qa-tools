@@ -98,6 +98,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
 - Agents: Agent and bot testing framework - see [section](./suites/agents/README.md)
 - SLOs and SLIs: Service Level Objectives and performance targets - see [section](./docs/slos-slis.md)
+- Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
 - Streams: Message streaming reliability, order validation, and response time testing - see [section](./docs/streams.md)
 - Forks: Protocol fork testing and version compatibility - see [section](./suites/forks/README.md)
 
