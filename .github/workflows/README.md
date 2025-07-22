@@ -128,7 +128,7 @@ Workflows are configured using GitHub repository secrets and variables:
 - `LOGGING_LEVEL`: Controls log verbosity
 - `XMTP_ENV`: Target XMTP environment (dev/production)
 - `REGION`: Target geographic region
-- `BATCH_SIZE`: Number of participants per batch
+- `BATCH_SIZE`: Number of members per batch
 
 ## Monitoring and reporting
 

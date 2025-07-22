@@ -1,4 +1,4 @@
-# QA tools
+# XMTP qa tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
@@ -80,42 +80,30 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Test coverage
+#### Test coverage summary
 
-- Protocol: DMs, groups, streams, sync, consent, codecs, installations
-- Performance: Benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- Compatibility: Backward compatibility across last 3 SDK versions (0.0.47 → 2.2.0+)
-- Cross-platform: Browser automation, mobile testing, multi-region performance
-- Production: Live agent monitoring, security, spam detection, rate limiting
-- Automation: CI workflows with Datadog metrics, Slack alerting, log analysis
-- Verification: Stream delivery, conversation state, metadata propagation
-- Tools: Playwright browser testing, CLI utilities, AI-powered Slack bot
-- Infrastructure: Multi-region testing across US, Europe, Asia, South America
+- Protocol: DMs, groups, streams, sync, consent, client, codecs, installations, agents
+- Performance: Benchmarking, reliability, mid-scale testing
+- Compatibility: Backward compatibility across last +5 `node-sdk` versions.
+- Production: Agent monitoring, security, concurrency, spam detection, rate limiting
+- Automation: CI workflows with Datadog metrics, Slack alerting, browser log analysis
+- Delivery: Delivery and order rate, response times.
+- Network: Chaos network, latency, black hole, etc.
+- Infrastructure: Multi-region testing across US, Europe, Asia, South America.
 
 ## Documentation
 
-#### Core systems
-
-- [Monitoring system](./docs/monitoring.md) - Metrics tracking, Slack integration, and alerting
-- [Dashboards](./docs/dashboards.md) - Datadog dashboards and visualization guides
-- [Test suites](./docs/test-suites.md) - Comprehensive overview of all automated test suites
-- [Workflows](./docs/workflows.md) - GitHub Actions CI/CD automation and deployment
-
-#### Performance and reliability
-
-- [SLOs and SLIs](./docs/slos-slis.md) - Service Level Objectives and performance targets
-- [Scaling limitations](./docs/scaling-limitations.md) - Current constraints and optimization opportunities
-- [Streams](./docs/streams.md) - Message streaming reliability, order validation, and response time testing
-
-#### Specialized testing
-
-- [Agents QA](./docs/agents-qa.md) - Agent and bot testing framework
-- [Forks](./docs/forks.md) - Protocol fork testing and version compatibility
-- [Incident response](./docs/incident-response.md) - Incident management and escalation procedures
+- Monitoring system: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
+- Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
+- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
+- Agents: Agent and bot testing framework - see [section](./suites/agents/README.md)
+- Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
+- Forks: Protocol fork testing and version compatibility - see [section](./suites/forks/README.md)
 
 ## Tools & utilities
 
 - Status: XMTP network status - [see section](https://status.xmtp.org/)
+- Dashboard: Monitoring datadog dashboard - [see section](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
 - Workflows: Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
 - Logging: Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - Schedule: Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)

@@ -38,7 +38,7 @@ describe(testName, async () => {
   });
 
   for (const groupSize of BATCH_SIZE) {
-    it(`newGroup-${groupSize}:create a large group of ${groupSize} participants`, async () => {
+    it(`newGroup-${groupSize}:create a large group of ${groupSize} members`, async () => {
       allMembersWithExtra = getInboxIds(groupSize + 1);
       allMembers = allMembersWithExtra.slice(0, groupSize);
 
@@ -48,7 +48,7 @@ describe(testName, async () => {
       );
     });
 
-    it(`groupsync-${groupSize}:sync a large group of ${groupSize} participants ${groupSize}`, async () => {
+    it(`groupsync-${groupSize}:sync a large group of ${groupSize} members ${groupSize}`, async () => {
       await newGroupBetweenAll.sync();
     });
     it(`addMember-${groupSize}:notify all members of additions in ${groupSize} member group`, async () => {

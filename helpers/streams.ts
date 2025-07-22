@@ -128,7 +128,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   statsLabel: string;
   count?: number;
   messageTemplate?: string;
-  participantsForStats: Worker[];
+  membersForStats: Worker[];
 }) {
   const {
     receivers,
@@ -275,7 +275,7 @@ export async function verifyMessageStream(
     statsLabel: "gm-",
     count,
     messageTemplate: randomSuffix,
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 
@@ -312,7 +312,7 @@ export async function verifyMetadataStream(
     statsLabel: "New name-",
     count,
     messageTemplate,
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 
@@ -343,7 +343,7 @@ export async function verifyMembershipStream(
     getMessage: extractAddedInboxes,
     statsLabel: "member-add:",
     count: 1,
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 
@@ -372,7 +372,7 @@ export async function verifyGroupConsentStream(
     statsLabel: "consent:",
     count: 1,
     messageTemplate: "",
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 /**
@@ -411,7 +411,7 @@ export async function verifyConsentStream(
     statsLabel: "consent:",
     count: 1,
     messageTemplate: "",
-    participantsForStats: [initiator],
+    membersForStats: [initiator],
   });
 }
 
@@ -448,7 +448,7 @@ export async function verifyConversationStream(
     statsLabel: "conversation:",
     count: 1,
     messageTemplate: "",
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 
@@ -478,7 +478,7 @@ export async function verifyAddMemberStream(
     statsLabel: "member-add:",
     count: 1,
     messageTemplate: "",
-    participantsForStats: receivers,
+    membersForStats: receivers,
   });
 }
 
@@ -578,7 +578,7 @@ export async function verifyAgentMessageStream(
       statsLabel: "bot-response:",
       count: 1,
       messageTemplate: "",
-      participantsForStats: receivers,
+      membersForStats: receivers,
     });
 
     if (result.allReceived) {

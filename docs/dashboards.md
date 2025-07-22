@@ -1,26 +1,17 @@
-# Dashboards
+# Main dashboard
 
-These are the dashboards we actually look at every day to understand how XMTP is performing. Think of them as our mission control - they show us everything we need to know about network health, delivery rates, and whether our users are having a good experience.
+This is the main dashboard we look at every day to understand how XMTP is performing. Think of it as our mission control - it shows us everything we need to know about network health, delivery rates, and whether our users are having a good experience.
 
-## What we've got set up
+## Dashboard overview
 
-Our main dashboards cover:
-
-- **Main Performance Dashboard**: Core XMTP SDK metrics and SLO tracking
-- **Infrastructure Dashboard**: Service health and resource utilization
-- **Test Execution Dashboard**: CI/CD pipeline and test suite performance
-- **Regional Performance Dashboard**: Multi-region latency and delivery metrics
-
-## Main performance dashboard
-
-### How to get there
-
-- **URL**: [Datadog XMTP Dashboard](https://app.datadoghq.com/dashboard/your-dashboard-id)
+- **URL**: [Datadog XMTP Dashboard](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d)
 - **What you'll see**: XMTP SDK Performance - Metrics for SDK operations (DNS, TLS, Server Processing). See [monitoring system](./monitoring.md#monitoring-system) for related alerts.
 
-### Key widgets
+The dashboard is organized into sections covering performance metrics, infrastructure health, test execution, and regional monitoring.
 
-#### 1. Delivery rate (%)
+## Performance metrics
+
+### Delivery rate widget
 
 **What it shows**: How many messages are actually making it to their destination across all our environments and regions.
 
@@ -37,28 +28,34 @@ Our main dashboards cover:
 - Yellow (≥95%): Acceptable performance, monitor closely
 - Red (<95%): Below SLO threshold, immediate attention required
 
-#### 2. Order rate (%)
+### Order rate widget
 
 **Purpose**: Measures message sequence integrity across different SDK bindings.
 
-```
+```bash
 Query: avg:xmtp.sdk.order{$env,$region,$test,$sdk,$members}
 ```
 
-#### 3. Latency metrics
+### Average response time widget
 
-**Purpose**: End-to-end message delivery timing across environments.
+**Purpose**: Response time measurements across environments.
 
+```bash
+Query: avg:xmtp.sdk.response{$env,$region, $sdk}
 ```
-Query: avg:xmtp.sdk.latency{$env,$region,$test,$sdk}
-```
 
-#### 4. Cross-platform compatibility
+**Color coding**:
 
-**Purpose**: Success rates between different SDK implementations.
+- Green (≤3000ms): Excellent performance
+- Yellow (≤5000ms): Acceptable performance
+- Red (>5000ms): Poor performance
 
-```
-Query: avg:xmtp.sdk.compatibility{sdk_from:*,sdk_to:*}
+### SLO list widget
+
+**Purpose**: Displays service level objectives created by the team.
+
+```bash
+Query: slo_creator:"Fabrizio Guespe"
 ```
 
 See [Monitoring system](./monitoring.md) for configuration.
@@ -71,147 +68,124 @@ See [Monitoring system](./monitoring.md) for configuration.
   - **Trend analysis**: Last 24 hours
   - **Weekly reviews**: Last 7 days
 
-## Infrastructure dashboard
+## Operations monitoring
 
-### Service health monitoring
+### Fail lines widget
 
-#### Bot status widget
-
-Tracks health of deployed testing bots:
+Displays recent test failures and error logs:
 
 ```json
 {
-  "title": "Bot Response Times",
-  "query": "avg:xmtp.bot.response_time{bot:*} by {bot}",
-  "visualization": "timeseries"
+  "title": "Fail lines",
+  "query": "@service:xmtp-qa-tools",
+  "columns": ["status_line", "timestamp", "env", "region", "fail_lines", "test"]
 }
 ```
 
-#### Railway services
+### Streams widget
 
-Monitors deployed services on Railway platform:
+Shows delivery and order rates over time:
 
 ```json
 {
-  "title": "Railway Service Uptime",
-  "query": "avg:railway.service.uptime{service:*} by {service}",
-  "thresholds": {
-    "critical": 95,
-    "warning": 98
-  }
+  "title": "Streams",
+  "queries": [
+    "avg:xmtp.sdk.delivery{$env,$test,$sdk,$region}",
+    "avg:xmtp.sdk.order{$env,$region,$test,$sdk}"
+  ]
 }
 ```
 
-### Resource utilization
+### Operations performance by network widget
 
-#### Memory usage
+Network-level operation performance:
 
-```
-Query: avg:system.mem.pct_usable{service:xmtp-*}
-```
-
-#### CPU utilization
-
-```
-Query: avg:system.cpu.user{service:xmtp-*}
+```bash
+Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, metric_subtype:core} by {operation}
 ```
 
-## Test execution dashboard
+## Performance analysis
 
-### CI/CD pipeline health
+### Network performance widget
 
-#### Workflow success rates
+Network-level timing by phase:
 
-Tracks GitHub Actions workflow performance:
+```bash
+{
+  "title": "Network Performance",
+  "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$region,$test,$sdk,$members} by {network_phase}"
+}
+```
+
+### Group operation performance widgets
+
+Multiple widgets tracking group-related operations:
+
+**newGroup performance over time (by members)**:
+
+```bash
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {members}
+```
+
+**newGroup performance over time (by operation)**:
+
+```bash
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {operation}
+```
+
+**Group performance over time**:
+
+```bash
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_large, operation:newgroup} by {members,operation}
+```
+
+### Operation performance table
+
+Comprehensive operation timing table:
+
+```bash
+Query: avg:xmtp.sdk.duration{$env,$region,$test,$sdk,$members} by {operation,test,members,region,env}
+```
+
+## Regional monitoring
+
+### Network performance table
+
+Compares network performance between production and dev environments by region:
 
 ```json
 {
-  "title": "Workflow Success Rate",
-  "query": "sum:github.workflow.runs{status:success}/sum:github.workflow.runs{*}*100",
-  "type": "query_value"
+  "title": "Network performance",
+  "queries": [
+    "avg:xmtp.sdk.duration{metric_type:network,env:production,$region,$test,$sdk,$members} by {region,network_phase}",
+    "avg:xmtp.sdk.duration{metric_type:network,env:dev,$region,$test,$sdk,$members} by {region,network_phase}"
+  ]
 }
 ```
 
-#### Test suite performance
+### Performance by region geomap
 
-Individual test suite execution metrics:
-
-| Suite        | Frequency     | SLO Target  | Alert Threshold |
-| ------------ | ------------- | ----------- | --------------- |
-| Functional   | Every 3 hours | 98% success | <95% for 2 runs |
-| Performance  | Every 30 min  | 95% success | <90% for 3 runs |
-| Delivery     | Every 30 min  | 99% success | <95% for 2 runs |
-| Large Groups | Every 2 hours | 90% success | <85% for 2 runs |
-| Browser      | Every 30 min  | 95% success | <90% for 3 runs |
-| Agents       | Every 15 min  | 99% success | <95% for 3 runs |
-
-## Regional performance dashboard
-
-### Multi-region latency
-
-#### Geographic performance matrix
+Geographic visualization of server call performance:
 
 ```json
 {
-  "title": "Cross-Region Latency",
-  "query": "avg:xmtp.sdk.latency{*} by {region_from,region_to}",
-  "visualization": "heatmap"
+  "title": "Performance by region",
+  "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call, $sdk, $env} by {country_iso_code}",
+  "visualization": "geomap"
 }
 ```
 
-#### Regional load distribution
+## Monitors
 
-```json
-{
-  "title": "Message Volume by Region",
-  "query": "sum:xmtp.sdk.messages.count{*} by {region}",
-  "visualization": "pie_chart"
-}
-```
+The dashboard is complemented by several monitors that alert on various conditions:
 
-## How to read the dashboards
+### Test execution monitoring
 
-### Understanding SLO correlation
+- **Test failed**: Alerts when test suites fail across environments
+- **Duration not logging**: Monitors when performance metrics stop being collected
 
-Each dashboard widget directly correlates to our defined SLOs:
+### Network performance monitoring
 
-1. **Green Status**: Performance exceeds SLO targets
-   - Delivery Rate >99.9%
-   - Response Time <2 seconds
-   - Error Rate <0.1%
+- **Network slow requests**: Alerts on network performance degradation across environments
 
-2. **Yellow Status**: Performance within acceptable range
-   - Delivery Rate 95-99.8%
-   - Response Time 2-5 seconds
-   - Error Rate 0.1-1%
-
-3. **Red Status**: Performance below SLO thresholds
-   - Delivery Rate <95%
-   - Response Time >5 seconds
-   - Error Rate >1%
-
-### Trend analysis
-
-#### Identifying performance patterns
-
-- **Daily Patterns**: Look for consistent dips during specific hours
-- **Weekly Patterns**: Monitor weekend vs. weekday performance
-- **Release Correlation**: Compare metrics before/after deployments
-
-#### Anomaly detection
-
-The dashboards include automatic anomaly detection:
-
-- **Outlier Detection**: Flags unusual spikes or drops
-- **Trend Deviation**: Alerts when metrics deviate from historical trends
-- **Seasonal Adjustments**: Accounts for expected variations
-
-## Dashboard alerts
-
-### Alert configuration
-
-Alerts are configured to trigger notifications in Slack channels:
-
-```
-
-```
+These monitors provide proactive alerting to complement the visual monitoring provided by the dashboard widgets.

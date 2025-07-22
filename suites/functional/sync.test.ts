@@ -14,17 +14,13 @@ describe(testName, async () => {
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
   workers = await getWorkers(testWorkers);
 
-  it("group sync performance:establish test environment by creating group with all participants", async () => {
+  it("group sync performance:establish test environment by creating group with all members", async () => {
     // Create a group with all test workers
     const memberInboxIds = testWorkers
       .filter((name) => name !== "henry") // Exclude creator from the members list
       .map((name) => workers.get(name)!.client.inboxId);
 
-    console.log(
-      "Creating test group with",
-      memberInboxIds.length,
-      "participants",
-    );
+    console.log("Creating test group with", memberInboxIds.length, "members");
     testGroup = (await workers
       .get("henry")!
       .client.conversations.newGroup(memberInboxIds, {

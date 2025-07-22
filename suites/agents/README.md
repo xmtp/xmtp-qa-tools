@@ -1,66 +1,44 @@
-# XMTP agent testing suite report
+# Agents monitoring
 
-## Overview
+## Automated workflows
 
-The Agent Testing Suite validates the health, responsiveness, and behavioral patterns of live XMTP agents deployed across production and development environments. These tests ensure agents respond appropriately to different message types and interaction patterns.
+| Test suite | Performance                                                                                                                                                        | Resources                                                                                                                                                   | Run frequency | Networks           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
+| Agents     | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents) | Every 15 min  | `dev` `production` |
+
+**Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
+
+### Core tests:
+
+- `agents-dms: direct message responsiveness validation`
+- `agents-tagged: tagged message and slash command response verification`
+- `agents-untagged: negative testing ensuring proper message filtering`
+
+**Measurements**:
+
+- Agent response time in milliseconds
+- Success/failure rate per agent
+- Behavioral compliance (respond/don't respond as configured)
 
 ---
 
-## Test suite architecture
-
-The agent testing is organized into 3 primary test categories that validate different interaction patterns and response behaviors.
-
----
-
-## 1. Direct message testing (`agents-dms.test.ts`)
-
-**Purpose**: Validates agent responsiveness in direct message conversations using their configured test messages.
-
-### Test pattern:
-
-- **Per Agent Test**: `${testName}: ${agent.name} DM : ${agent.address}`
+## 1. Direct message testing [../suites/agents/agents-dms.test.ts](../suites/agents/agents-dms.test.ts)
 
 ### Test flow:
 
 1. Create DM conversation with agent using Ethereum address
 2. Send agent's configured `sendMessage`
 3. Verify agent responds within timeout period
-4. Measure response timing and log metrics
 
-### Agent coverage:
+### Agent examples:
 
-- **tbachat** - `/help` command testing
-- **elsa** - Basic "hi" message testing
-- **csx** - "hola" message testing
-- **gang** - "hola" message testing
-- **flaunchy** - "hi" message testing
-- **mamo** - "hi" message testing
-- **squabble** - "@squabble.base.eth" tag testing
-- **arma** - "hi" message testing
-- **onit** - "hi" message testing
-- **byte** - "hi" message testing
-- **gm** - "hola" message testing
-- **local** - "hola" message testing
-- **bankr** - "hey there how are you?" extended message testing
-- **key-check** - "/kc help" command testing
-- **bitte** - "hi" message testing
-- **tokenbot** - "@tokenbot" tag testing
-
-**Metrics collected**:
-
-- Response timing (average event timing)
-- Success/failure rate
-- Agent availability by environment
+- **tbachat**: `/help` command testing
+- **elsa**: "hi" message testing
+- **key-check**: "/kc help" command testing
 
 ---
 
-## 2. Tagged message testing (`agents-tagged.test.ts`)
-
-**Purpose**: Validates that agents respond appropriately to tagged messages or slash commands when they are configured to do so.
-
-### Test pattern:
-
-- **Per Agent Test**: `${testName}: ${agent.name} should respond to tagged/command message : ${agent.address}`
+## 2. Tagged message testing [../suites/agents/agents-tagged.test.ts](../suites/agents/agents-tagged.test.ts)
 
 ### Test flow:
 
@@ -69,127 +47,67 @@ The agent testing is organized into 3 primary test categories that validate diff
    - Slash commands: sent as-is (e.g., `/help`)
    - Regular messages: prefixed with agent tag (e.g., `@agent.base.eth message`)
 3. Verify agent responds within timeout
-4. Measure response metrics
 
 ### Agent filtering:
 
 - Only tests agents where `respondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
-### Tagged response validation:
-
-- **Command-based agents**: `/help`, `/kc help` - testing slash command recognition
-- **Tag-based agents**: `@agent.base.eth message` - testing mention recognition
-- **Hybrid agents**: Some agents respond to both patterns
-
-**Expected behavior**: All filtered agents should respond to their configured tagged messages.
-
 ---
 
-## 3. Untagged message testing (`agents-untagged.test.ts`)
-
-**Purpose**: Validates that agents do NOT respond to generic untagged messages, ensuring proper message filtering.
-
-### Test pattern:
-
-- **Per Agent Test**: `${testName}: ${agent.name} should not respond to untagged hi : ${agent.address}`
+## 3. Untagged message testing [../suites/agents/agents-untagged.test.ts](../suites/agents/agents-untagged.test.ts)
 
 ### Test flow:
 
 1. Create group conversation with agent and random participant
 2. Send initial "hi" message (ignore welcome response)
 3. Send second "hi" message
-4. Verify agent does NOT respond to untagged message
-5. Log metrics for unexpected responses
+4. Verify agent does NOT respond
 
-### Agent filtering:
-
-- Only tests agents where `respondOnTagged: true`
-- Filters by network environment
-
-### Negative testing:
-
-- **Expected behavior**: Agents should NOT respond to generic "hi" messages
-- **Failure condition**: If agent responds, test fails and logs warning
-- **Purpose**: Prevents spam responses and validates message filtering logic
+**Expected behavior**: Agents should NOT respond to generic "hi" messages to prevent spam.
 
 ---
 
 ## Agent configuration
 
-### Agent properties:
+### Properties:
 
 - **name**: Agent identifier
-- **baseName**: ENS or display name
 - **address**: Ethereum address
 - **sendMessage**: Test message to send
 - **networks**: Supported networks (`["dev", "production"]`)
 - **respondOnTagged**: Whether agent responds to tagged messages
 - **live**: Production status flag
-- **slackChannel**: Alert channel for monitoring
 
-### Environment handling:
+- See agents [configuration](../suites/agents/agents.json)
 
-- Tests automatically filter agents by `XMTP_ENV` environment variable
-- Skips testing if no agents are configured for current environment
-- Supports both development and production agent validation
+## Concurrency testing
 
----
+### Concurrent messages on production
 
-## Metrics and monitoring
+| Metric              |   local    |     gm     |   bankr    |
+| ------------------- | :--------: | :--------: | :--------: |
+| Environment         |   local    |  railway   |  railway   |
+| Timeout             |    120s    |    120s    |    120s    |
+| Network             | production | production | production |
+| Total Messages      |    500     |    500     |    500     |
+| Messages per Second |    100     |    100     |    100     |
+| Success Rate        |    100%    |  99.8% ✅  |  58.8% ❌  |
+| Total Time          |   366.7s   |   636.0s   |   121.6s   |
+| Avg Response        | 16.78s ⚠️  | 21.60s ⚠️  | 74.38s ❌  |
+| Median Response     |   1.19s    |   14.32s   |   76.62s   |
+| 95th Percentile     |   57.44s   |   57.81s   |  113.05s   |
 
-### Response metrics:
+> This measurments were taking over 10 runs of 500 parallel messages each totaling 5000 messages.
 
-- **Response time**: Average timing from message send to agent response
-- **Success rate**: Percentage of successful agent responses
-- **Timeout handling**: Uses `streamTimeout` value for non-responsive agents
+### First run comparison
 
-### Datadog integration:
-
-```typescript
-sendMetric("response", metricValue, {
-  test: testName,
-  metric_type: "agent",
-  metric_subtype: "dm", // or "group"
-  live: agent.live,
-  agent: agent.name,
-  address: agent.address,
-  sdk: workers.getCreator().sdk,
-} as ResponseMetricTags);
-```
-
-### Failure detection:
-
-- Logs warnings for failed responses: `console.warn(agent.name, "FAILED")`
-- Tracks both expected failures (untagged tests) and unexpected failures (DM/tagged tests)
-- Timeout values logged instead of zero for non-responsive agents
-
----
-
-## Test execution
-
-### Environment setup:
-
-```bash
-# Test all agent suites
-yarn test agents
-
-# Test specific agent interaction type
-yarn test agents-dms
-yarn test agents-tagged
-yarn test agents-untagged
-```
-
-### Network configuration:
-
-- Set `XMTP_ENV=production` for production agent testing
-- Set `XMTP_ENV=dev` for development agent testing
-- Tests automatically skip if no agents configured for environment
-
-### Key validations:
-
-- Agent discovery and connection establishment
-- Message delivery and response verification
-- Behavioral pattern validation (respond/don't respond)
-- Cross-environment agent health monitoring
-- Performance benchmarking for agent response times
+| Metric                        | First Run         | Second Run        |
+| ----------------------------- | ----------------- | ----------------- |
+| Success Rate                  | 237/500 (47.4%)   | 500/500 (100.0%)  |
+| Total Execution Time          | 122.0s            | 5.0s              |
+| Average Response Time         | 55.53s            | 1.92s             |
+| Median Response Time          | 56.72s            | 2.16s             |
+| 95th Percentile Response Time | 107.88s           | 2.65s             |
+| Messages per Second           | 4.1               | 100.3             |
+| Threshold Status              | ❌ FAILURE (<99%) | ✅ SUCCESS (≥99%) |

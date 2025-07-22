@@ -127,3 +127,5 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | Medium     | 364            | 107          | 17              | 53                 |
 | Large      | 365            | 208          | 31              | 95                 |
 | XL         | 376            | 410          | 59              | 179                |
+
+- For large groups measurments see [bench](./suites/bench/README.md)
