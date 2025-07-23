@@ -4,8 +4,7 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
-} from "@xmtp/node-sdk";
-import type { ClientOptions } from "./xmtp-handler";
+} from "@helpers/client";
 
 /**
  * Skill-related options for message processing
@@ -30,11 +29,6 @@ export interface SkillOptions {
   /** Whether to send a welcome message to the conversation */
   codecs?: any[];
 }
-
-/**
- * Combined agent options
- */
-export interface AgentOptions extends ClientOptions, SkillOptions {}
 
 /**
  * Message context with analysis results
