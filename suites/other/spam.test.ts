@@ -31,8 +31,7 @@ describe("spam", () => {
         installationSize?.dbFile &&
         installationSize.dbFile < targetSizeMB * 1024 * 1024
       ) {
-        const allInboxIds =
-Link to test code [...memberInboxIds, ...spamInboxIds];
+        const allInboxIds = [...memberInboxIds, ...spamInboxIds];
         const group = await creator?.client.conversations.newGroup(allInboxIds);
         await group?.send("hi");
         groupCount++;

@@ -91,8 +91,7 @@ describe(testName, () => {
     "conversation stream when creating the group",
     async () => {
       await xmtpTester.newGroupFromUI(
-       
-Link to test code [...getInboxIds(4), creator.inboxId],
+        [...getInboxIds(4), creator.inboxId],
         false,
       );
       const conversationStream = creator.client.conversations.stream();

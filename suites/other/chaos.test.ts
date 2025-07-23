@@ -63,8 +63,7 @@ describe(testName, () => {
       testConfig.randomInboxIds,
     )) as Group;
 
-    allGroups =
-Link to test code [...existingGroups, group.id];
+    allGroups = [...existingGroups, group.id];
     appendToEnv("CREATED_GROUPS", allGroups.join(","));
     console.log(`Created new group: ${group.id}`);
 
