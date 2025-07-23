@@ -176,19 +176,15 @@ function showUsageAndExit(): never {
   console.error(
     "      yarn cli test ./path/to/test.ts  - Runs specific test file",
   );
-  console.error("    Retry mode (when retry options are present):");
+  console.error("    Retry and logging options:");
   console.error(
-    "      --max-attempts <N>  Max number of attempts for tests (default: 3)",
-  );
-  console.error(
-    "      --retry-delay <S>   Delay in seconds between retries (default: 10)",
+    "      --attempts <N>  Max number of attempts for tests (default: 1, works in both simple and retry modes)",
   );
   console.error(
     "      --parallel          Run tests in parallel (default: consecutive)",
   );
-  console.error(
-    "      --debug / --no-log    Enable/disable logging to file (default: enabled)",
-  );
+  console.error("    Logging mode (enables file logging and retry mode):");
+  console.error("      --debug / --no-log    Enable/disable logging to file");
   console.error(
     "      --debug-verbose     Enable logging to both file AND terminal output",
   );
@@ -231,13 +227,17 @@ function showUsageAndExit(): never {
   console.error("  yarn cli stress --users 400 --msgs 1");
   console.error("  yarn cli stress --users 200 --msgs 2 --env production");
   console.error("  yarn cli test functional");
-  console.error("  yarn cli test dms --max-attempts 2");
+  console.error("  yarn cli test dms --attempts 2");
   console.error("  yarn cli test dms --parallel");
   console.error(
     "  yarn cli test dms --debug-verbose   # Shows output in terminal AND logs to file",
   );
-  console.error("  yarn cli test dms --no-fail        # Uses retry mode");
-  console.error("  yarn cli test dms --debug        # Uses retry mode");
+  console.error(
+    "  yarn cli test dms --no-fail        # Exit 0 even on failure",
+  );
+  console.error(
+    "  yarn cli test dms --debug        # Uses logging mode with file output",
+  );
   console.error(
     "  yarn cli test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
@@ -324,24 +324,13 @@ function parseTestArgs(args: string[]): {
     const nextArg = currentArgs[i + 1];
 
     switch (arg) {
-      case "--max-attempts":
+      case "--attempts":
         if (nextArg) {
           const val = parseInt(nextArg, 10);
           if (!isNaN(val) && val > 0) {
             options.maxAttempts = val;
           } else {
-            console.warn(`Invalid value for --max-attempts: ${nextArg}`);
-          }
-          i++;
-        }
-        break;
-      case "--retry-delay":
-        if (nextArg) {
-          const val = parseInt(nextArg, 10);
-          if (!isNaN(val) && val >= 0) {
-            options.retryDelay = val;
-          } else {
-            console.warn(`Invalid value for --retry-delay: ${nextArg}`);
+            console.warn(`Invalid value for --attempts: ${nextArg}`);
           }
           i++;
         }
@@ -722,9 +711,8 @@ async function main(): Promise<void> {
 
         const { testName, options } = parseTestArgs(allArgs);
 
-        // Check if this is a simple test run (no retry options)
-        const isSimpleRun =
-          options.maxAttempts === 1 && !options.explicitLogFlag;
+        // Check if this is a simple test run (no explicit logging flags)
+        const isSimpleRun = !options.explicitLogFlag;
 
         if (isSimpleRun) {
           // Process environment variables for simple runs too
@@ -801,24 +789,53 @@ async function main(): Promise<void> {
             );
           }
 
-          // Run test directly without logger for native terminal output
+          // Run test with retry logic if --attempts is specified
           const command = buildTestCommand(
             testName,
             options.vitestArgs,
             options.parallel,
           );
           console.debug(`Running test: ${testName}`);
-          console.debug(`Executing: ${command}`);
-          try {
-            execSync(command, { stdio: "inherit", env });
-          } catch (error) {
-            if (options.noFail) {
-              console.debug(
-                "Test failed but --no-fail was specified, exiting with code 0",
-              );
-              process.exit(0);
-            } else {
-              throw error;
+
+          for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
+            console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);
+            console.debug(`Executing: ${command}`);
+
+            try {
+              execSync(command, { stdio: "inherit", env });
+              console.debug("Tests passed successfully!");
+              return; // Exit on success
+            } catch (error) {
+              console.debug(`Attempt ${attempt} failed`);
+
+              if (attempt === options.maxAttempts) {
+                console.error(
+                  `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
+                );
+
+                if (options.noFail) {
+                  console.debug(
+                    "Test failed but --no-fail was specified, exiting with code 0",
+                  );
+                  process.exit(0);
+                } else {
+                  throw error;
+                }
+              }
+
+              if (options.retryDelay > 0) {
+                console.debug(
+                  `\n⏳ Retrying in ${options.retryDelay} seconds...`,
+                );
+                Atomics.wait(
+                  new Int32Array(new SharedArrayBuffer(4)),
+                  0,
+                  0,
+                  options.retryDelay * 1000,
+                );
+              } else {
+                console.debug("\n🔄 Retrying immediately...");
+              }
             }
           }
         } else {

@@ -94,8 +94,7 @@ yarn script versions                   # Setup SDK version testing
 yarn test functional --no-fail --debug
 
 # Available options:
---max-attempts <N>      # Max retry attempts (default: 3)
---retry-delay <S>       # Delay between retries in seconds (default: 10)
+--attempts <N>      # Max retry attempts (default: 3)
 --debug                 # Enable file logging (logs saved to logs/ directory)
 --debug-verbose         # Enable both file logging AND terminal output
 --debug-file <name>     # Custom log filename
@@ -253,7 +252,7 @@ TEST_VERSIONS=3 yarn test functional
 ### Combining Options
 
 ```bash
-yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
 ```
 
 ## Best Practices
@@ -267,5 +266,5 @@ yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verb
 
 ```bash
 # Advanced example with multiple options
-yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5  --debug-verbose --parallel
 ```

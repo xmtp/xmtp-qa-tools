@@ -26,8 +26,7 @@ yarn cli <type> <name> [options]
 --debug                 # File logging
 --debug-verbose         # File + terminal logging
 --no-fail              # Exit 0 on failure
---max-attempts 3       # Retry limit
---retry-delay 10       # Retry delay (seconds)
+--attempts 3       # Retry limit
 --parallel             # Parallel execution
 --versions 3           # Use 3 SDK versions
 --env production       # Set XMTP_ENV

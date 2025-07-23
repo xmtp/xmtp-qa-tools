@@ -82,6 +82,7 @@ describe(testName, () => {
       ...getInboxIds(4),
       receiver.inboxId,
     ]);
+    await sleep(1000); // Give time for group creation to sync
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     const result = await xmtpTester.waitForResponse(["gm"]);
     expect(result).toBe(true);
@@ -94,6 +95,7 @@ describe(testName, () => {
         [...getInboxIds(4), creator.inboxId],
         false,
       );
+      await sleep(2000); // Give time for group creation to sync
       const conversationStream = creator.client.conversations.stream();
       for await (const conversation of conversationStream) {
         console.log("conversation found", conversation?.id);
@@ -108,7 +110,9 @@ describe(testName, () => {
     "conversation stream for new member",
     async () => {
       groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+      await sleep(2000); // Give time for group creation to sync
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+      await sleep(2000); // Give time for member addition to sync
       const conversationStream = creator.client.conversations.stream();
       for await (const conversation of conversationStream) {
         console.log("conversation found", conversation?.id);
