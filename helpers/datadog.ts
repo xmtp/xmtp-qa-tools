@@ -131,7 +131,6 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
     : metricName;
 }
 
-// DataDog initialization
 export function initDataDog(): boolean {
   if (!process.env.DATADOG_API_KEY) {
     console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
