@@ -28,7 +28,7 @@ import { addFileLogging, setupPrettyLogs } from "./logger";
 export {
   Dm,
   Group,
-  type Client,
+  Client,
   type Conversation,
   type DecodedMessage,
   type LogLevel,

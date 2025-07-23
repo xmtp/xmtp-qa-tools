@@ -1,5 +1,5 @@
 import {
-  type Client,
+  Client,
   type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
