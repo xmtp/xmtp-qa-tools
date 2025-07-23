@@ -158,7 +158,7 @@ export function sendMetric(
 ): void {
   try {
     if (metricValue <= 0) {
-      console.warn(`❌ Metric value is 0 or negative: ${metricName}`);
+      console.error(`❌ Metric value is 0 or negative: ${metricName}`);
       return;
     }
     const enrichedTags = enrichTags(tags);
