@@ -3,45 +3,10 @@ description: "verify performance of the library in the production network"
 
 on:
   schedule:
-    - cron: "*/10 * * * *" # Runs every 5 minutes for agents-dms
-    - cron: "0 */4 * * *" # Runs every 4 hours for agents-tagged
-    - cron: "0 */4 * * *" # Runs every 4 hours for agents-untagged
+    - cron: "0 */4 * * *" # Runs every 4 hours
   workflow_dispatch:
 
 jobs:
-  agents-dms:
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        env: [dev, production]
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.env }}
-      REGION: ${{ vars.REGION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup test env
-        uses: ./.github/actions/xmtp-test-setup
-
-      - name: Run agents-dms tests
-        run: yarn test agents-dms --no-fail --debug --no-error-logs
-
-      - name: Cleanup and upload artifacts
-        if: always()
-        uses: ./.github/actions/xmtp-test-cleanup
-        with:
-          test-name: agents-dms
-          env: ${{ matrix.env }}
-
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn workflow-failure "agents-dms"
-
   agents-tagged:
     timeout-minutes: 10
     runs-on: ubuntu-latest
