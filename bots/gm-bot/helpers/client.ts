@@ -115,15 +115,22 @@ export const logAgentDetails = async (
         installationId,
       ]);
 
+    let createdDate = new Date();
+    let expiryDate = new Date();
+    if (keyPackageStatuses?.createdAt) {
+      createdDate = new Date(Number(keyPackageStatuses.createdAt) * 1000);
+      expiryDate = new Date(Number(keyPackageStatuses.validUntil) * 1000);
+    }
     console.log(`
     ✓ XMTP Client:
     • InboxId: ${inboxId}
     • Bindings: ${Client.version}
     • Address: ${address}
-      • Key Package Status: ${JSON.stringify(keyPackageStatuses, null, 2)}
     • Conversations: ${conversations.length}
     • Installations: ${inboxState.installations.length}
     • InstallationId: ${installationId}
+    • Key Package created: ${createdDate.toLocaleString()}
+    • Key Package valid until: ${expiryDate.toLocaleString()}
     • Networks: ${environments}
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
