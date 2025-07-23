@@ -1,8 +1,8 @@
-# Monitoring system
+# Monitoring system s
 
-We've built a monitoring setup that tells us when things are working well and alerts us immediately when they're not.
+Monitoring setup that tells us when things are working well and alerts us immediately when they're not.
 
-## Automated workflows
+## Automated workflows 1
 
 | Test suite   | Performance | Resources                                                                                                                                                                             | Run frequency | Networks           |
 | ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
