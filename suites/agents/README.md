@@ -20,8 +20,6 @@
 - Success/failure rate per agent
 - Behavioral compliance (respond/don't respond as configured)
 
----
-
 ## 1. Direct message testing
 
 Link to test code [../suites/agents/agents-dms.test.ts](../suites/agents/agents-dms.test.ts)
@@ -37,8 +35,6 @@ Link to test code [../suites/agents/agents-dms.test.ts](../suites/agents/agents-
 - **tbachat**: `/help` command testing
 - **elsa**: "hi" message testing
 - **key-check**: "/kc help" command testing
-
----
 
 ## 2. Tagged message testing
 
@@ -57,8 +53,6 @@ Link to test code [../suites/agents/agents-tagged.test.ts](../suites/agents/agen
 - Only tests agents where `respondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
----
-
 ## 3. Untagged message testing
 
 Link to test code [../suites/agents/agents-untagged.test.ts](../suites/agents/agents-untagged.test.ts)
@@ -71,8 +65,6 @@ Link to test code [../suites/agents/agents-untagged.test.ts](../suites/agents/ag
 4. Verify agent does NOT respond
 
 **Expected behavior**: Agents should NOT respond to generic "hi" messages to prevent spam.
-
----
 
 ## Agent configuration
 

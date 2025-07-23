@@ -15,8 +15,6 @@ Monitoring setup that tells us when things are working well and alerts us immedi
 
 Our test suite is organized into 6 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
----
-
 ## 1. Performance testing
 
 Link to test code:
@@ -49,8 +47,6 @@ Link to test code [../suites/metrics/performance.test.ts](../suites/metrics/perf
 
 - Operation performance in milliseconds
 
----
-
 ## 2. Delivery testing
 
 Link to test code [../suites/metrics/delivery.test.ts](../suites/metrics/delivery.test.ts)
@@ -68,8 +64,6 @@ Link to test code [../suites/metrics/delivery.test.ts](../suites/metrics/deliver
 - Reception percentage (successful message delivery)
 - Order percentage (correct message sequencing)
 - Recovery capability after network interruption
-
----
 
 ## 3. Functional + regression testing
 
@@ -152,8 +146,6 @@ Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.
 - `group sync performance: measure performance impact of individual conversation.sync() operation`
 - `group sync performance: measure message retrieval performance without explicit sync`
 
----
-
 ## 4. Browser testing
 
 Link to test code [../suites/functional/browser.test.ts](../suites/functional/browser.test.ts)
@@ -169,8 +161,6 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 - `conversation stream when creating the group`
 - `conversation stream for new member`
 - `new installation and message stream`
-
----
 
 ## 5. Large group testing (`large.test.ts`)
 
