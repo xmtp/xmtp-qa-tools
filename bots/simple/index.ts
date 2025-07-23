@@ -1,10 +1,10 @@
-import { getSenderAddress } from "@bots/xmtp-skills";
 import {
   type Client,
   type Conversation,
   type DecodedMessage,
-} from "@xmtp/node-sdk";
+} from "@helpers/client";
 import { initializeClient } from "../helpers/xmtp-handler";
+import { getSenderAddress } from "../helpers/xmtp-skills";
 
 const processMessage = async (
   client: Client,
@@ -24,7 +24,7 @@ const processMessage = async (
   await conversation.send(conversation.id);
   const members = await conversation.members();
   for (const member of members) {
-    const memberAddress = await getSenderAddress(client, member.inboxId);
+    const memberAddress = await getSenderAddress(client, member.inboxId ?? "");
     console.log("member", memberAddress);
     await conversation.send(memberAddress);
   }
@@ -34,8 +34,6 @@ const processMessage = async (
 // Initialize the client with the message processor
 await initializeClient(processMessage, [
   {
-    walletKey: process.env.WALLET_KEY as `0x${string}`,
-    dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
     networks: ["production"],
     acceptGroups: true,
   },

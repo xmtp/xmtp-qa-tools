@@ -1640,7 +1640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-3.2.0@npm:@xmtp/node-sdk@3.2.0, @xmtp/node-sdk@npm:3.2.0":
+"@xmtp/node-sdk-3.2.0@npm:@xmtp/node-sdk@3.2.0, @xmtp/node-sdk-3.2.1@npm:@xmtp/node-sdk@3.2.0, @xmtp/node-sdk@npm:3.2.0":
   version: 3.2.0
   resolution: "@xmtp/node-sdk@npm:3.2.0"
   dependencies:
@@ -4762,6 +4762,7 @@ __metadata:
     "@xmtp/node-sdk-3.1.1": "npm:@xmtp/node-sdk@3.1.1"
     "@xmtp/node-sdk-3.1.2": "npm:@xmtp/node-sdk@3.1.2"
     "@xmtp/node-sdk-3.2.0": "npm:@xmtp/node-sdk@3.2.0"
+    "@xmtp/node-sdk-3.2.1": "npm:@xmtp/node-sdk@3.2.0"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.5.0"

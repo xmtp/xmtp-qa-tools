@@ -52,7 +52,7 @@ export const VersionList = [
     Conversation: Conversation320,
     Dm: Dm320,
     Group: Group320,
-    nodeVersion: "3.2.0",
+    nodeVersion: "3.2.1",
     bindingsPackage: "1.3.1",
     auto: true,
   },

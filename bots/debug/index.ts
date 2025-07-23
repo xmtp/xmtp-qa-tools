@@ -25,7 +25,6 @@ const processMessage = async (
   // Basic conversation info
   console.log("=== CONVERSATION INFO ===");
   console.log(`Conversation ID: ${conversation.id}`);
-  console.log(`Conversation Kind: ${conversation.kind}`);
   console.log(`Created at: ${conversation.createdAt.toISOString()}`);
 
   // Get debug info

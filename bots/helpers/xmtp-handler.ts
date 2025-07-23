@@ -1,9 +1,9 @@
 import {
-  Client,
+  type Client,
   type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+} from "@helpers/client";
 import "dotenv/config";
 import {
   createSigner,
