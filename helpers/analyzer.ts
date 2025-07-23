@@ -394,7 +394,7 @@ export async function workflowFailed(workflowName: string): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: process.env.SLACK_CHANNEL,
+      channel: process.env.SLACK_CHANNEL + "-test",
       text: message,
       mrkdwn: true,
     }),
