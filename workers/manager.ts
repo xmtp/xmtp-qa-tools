@@ -15,12 +15,14 @@ import {
 
 // Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
-  return [...defaultNames].slice(0, count);
+  return
+Link to test code [...defaultNames].slice(0, count);
 };
 
 // Deprecated: Use getWorkers with count and options instead
 export const getRandomNames = (count: number): string[] => {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+  return
+Link to test code [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
 
 // Deprecated: Use getWorkers with useVersions option instead

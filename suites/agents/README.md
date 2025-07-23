@@ -22,7 +22,9 @@
 
 ---
 
-## 1. Direct message testing [../suites/agents/agents-dms.test.ts](../suites/agents/agents-dms.test.ts)
+## 1. Direct message testing
+
+Link to test code [../suites/agents/agents-dms.test.ts](../suites/agents/agents-dms.test.ts)
 
 ### Test flow:
 
@@ -38,7 +40,9 @@
 
 ---
 
-## 2. Tagged message testing [../suites/agents/agents-tagged.test.ts](../suites/agents/agents-tagged.test.ts)
+## 2. Tagged message testing
+
+Link to test code [../suites/agents/agents-tagged.test.ts](../suites/agents/agents-tagged.test.ts)
 
 ### Test flow:
 
@@ -55,7 +59,9 @@
 
 ---
 
-## 3. Untagged message testing [../suites/agents/agents-untagged.test.ts](../suites/agents/agents-untagged.test.ts)
+## 3. Untagged message testing
+
+Link to test code [../suites/agents/agents-untagged.test.ts](../suites/agents/agents-untagged.test.ts)
 
 ### Test flow:
 
