@@ -11,7 +11,6 @@
   "scripts": {
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
-    "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
     "build": "tsc",
     "claude": "npx @anthropic-ai/claude-code",
