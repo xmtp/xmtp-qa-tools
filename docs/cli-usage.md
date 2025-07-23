@@ -188,7 +188,7 @@ yarn test functional --versions 3 --debug                # Version compatibility
 # Test Shortcuts
 yarn functional                        # yarn test suites/functional
 yarn bench                            # yarn test suites/bench/bench.test.ts
-yarn large                            # yarn test suites/metrics/large
+yarn large                            # yarn test suites/large
 yarn regression                       # yarn test suites/functional --versions 3
 
 # Utility Shortcuts
