@@ -2,7 +2,7 @@
 
 ## Automated workflows
 
-| Test suite | Performance                                                                                                                                                        | Resources                                                                                                                                                   | Run frequency | Networks           |
+| Test suite | Status                                                                                                                                                             | Resources                                                                                                                                                   | Run frequency | Networks           |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
 | Agents     | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents) | Every 15 min  | `dev` `production` |
 
