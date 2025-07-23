@@ -1,6 +1,6 @@
 # Monitoring system
 
-We've built a monitoring setup that tells us when things are working well and alerts us immediately when they're not.
+Monitoring setup that tells us when things are working well and alerts us immediately when they're not.
 
 ## Automated workflows
 
