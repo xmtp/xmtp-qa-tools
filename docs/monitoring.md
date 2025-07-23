@@ -4,21 +4,21 @@ Monitoring setup that tells us when things are working well and alerts us immedi
 
 ## Automated workflows 1
 
-| Test suite   | Performance | Resources                                                                                                                                                                             | Run frequency | Networks           |
-| ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Performance  |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/performance.test.ts) | Every 30 min  | `dev` `production` |
-| Delivery     |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/delivery.test.ts)       | Every 30 min  | `dev` `production` |
-| Functional   |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)                   | Every 3 hours | `dev` `production` |
-| Browser      |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts)      | Every 30 min  | `dev` `production` |
-| Groups       |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/large.test.ts)             | Every 2 hours | `dev` `production` |
-| NetworkChaos |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/NetworkChaos.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/networkchaos)               | Daily         | `local`            |
+| Test suite   | Performance | Resources                                                                                                                                                                        | Run frequency | Networks           |
+| ------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
+| Performance  |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/performance.test.ts)    | Every 30 min  | `dev` `production` |
+| Delivery     |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/delivery.test.ts)          | Every 30 min  | `dev` `production` |
+| Functional   |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)              | Every 3 hours | `dev` `production` |
+| Browser      |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
+| Groups       |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/large.test.ts)                | Every 2 hours | `dev` `production` |
+| NetworkChaos |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/NetworkChaos.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/networkchaos)          | Daily         | `local`            |
 
 Our test suite is organized into 6 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
 ## 1. Performance testing
 
 Link to test code:
-Link to test code [../suites/metrics/performance.test.ts](../suites/metrics/performance.test.ts)
+Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
 
 **Purpose**: Measures operation timing and throughput for dms and small groups (5-10 members).
 
@@ -49,7 +49,7 @@ Link to test code [../suites/metrics/performance.test.ts](../suites/metrics/perf
 
 ## 2. Delivery testing
 
-Link to test code [../suites/metrics/delivery.test.ts](../suites/metrics/delivery.test.ts)
+Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 
 **Purpose**: Validates message delivery reliability, ordering accuracy, and recovery mechanisms.
 
