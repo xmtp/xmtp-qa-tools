@@ -110,12 +110,17 @@ export const logAgentDetails = async (
 
     const conversations = await firstClient.conversations.list();
     const inboxState = await firstClient.preferences.inboxState();
+    const keyPackageStatuses =
+      await firstClient.getKeyPackageStatusesForInstallationIds([
+        installationId,
+      ]);
 
     console.log(`
     ✓ XMTP Client:
     • InboxId: ${inboxId}
     • Bindings: ${Client.version}
     • Address: ${address}
+      • Key Package Status: ${JSON.stringify(keyPackageStatuses, null, 2)}
     • Conversations: ${conversations.length}
     • Installations: ${inboxState.installations.length}
     • InstallationId: ${installationId}
