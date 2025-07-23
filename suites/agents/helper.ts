@@ -20,7 +20,7 @@ export interface AgentConfig {
   disabled?: boolean;
   /** Slack channel for notifications */
   slackChannel?: string;
-  /** Whether the agent is production */
+  /**  the agent is production */
   live: boolean;
 }
 
