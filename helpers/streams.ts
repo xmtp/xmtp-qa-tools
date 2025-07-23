@@ -116,6 +116,40 @@ function extractContent(ev: unknown): string {
   return "";
 }
 
+function extractTimestamp(ev: unknown): number | null {
+  if (typeof ev === "object" && ev !== null) {
+    // Try different timestamp fields that might exist in message events
+    const possibleFields = ["receivedAt", "timestamp", "sentAt", "createdAt"];
+
+    for (const field of possibleFields) {
+      if (
+        Object.prototype.hasOwnProperty.call(ev, field) &&
+        typeof (ev as Record<string, unknown>)[field] === "number"
+      ) {
+        return (ev as Record<string, number>)[field];
+      }
+    }
+
+    // Try nested in message object
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "message") &&
+      typeof (ev as Record<string, unknown>).message === "object" &&
+      (ev as Record<string, unknown>).message !== null
+    ) {
+      const message = (ev as { message: Record<string, unknown> }).message;
+      for (const field of possibleFields) {
+        if (
+          Object.prototype.hasOwnProperty.call(message, field) &&
+          typeof message[field] === "number"
+        ) {
+          return message[field];
+        }
+      }
+    }
+  }
+  return null;
+}
+
 /**
  * Generic helper to collect, time, and compute stats for any stream event.
  */
@@ -150,12 +184,16 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     { key: string; receivedAt: number; message: string; event: unknown }[]
   >[] = receivers.map((r) =>
     startCollectors(r).then((events) =>
-      events.map((ev) => ({
-        key: getKey(ev),
-        receivedAt: Date.now(),
-        message: getMessage(ev),
-        event: ev,
-      })),
+      events.map((ev) => {
+        // Try to extract the actual received timestamp from the event
+        const eventTimestamp = extractTimestamp(ev);
+        return {
+          key: getKey(ev),
+          receivedAt: eventTimestamp || Date.now(),
+          message: getMessage(ev),
+          event: ev,
+        };
+      }),
     ),
   );
 
@@ -571,9 +609,9 @@ export async function verifyAgentMessageStream(
         const sentAt = Date.now();
         group.send(triggerMessage).catch(console.error);
 
-        return [{ sessionId, sentAt }];
+        return [{ conversationId: group.id, sentAt }];
       },
-      getKey: () => sessionId, // Use consistent sessionId for both sent and received
+      getKey: () => group.id, // Use conversation ID as consistent key for both sent and received
       getMessage: extractContent,
       statsLabel: "bot-response:",
       count: 1,
