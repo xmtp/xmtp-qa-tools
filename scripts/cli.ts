@@ -36,6 +36,33 @@ interface RetryOptions {
   cleanLogs: boolean; // Auto-clean logs after completion
   logLevel: string; // Log level (debug, info, error)
   noErrorLogs: boolean; // Disable sending error logs to Datadog
+  runAnsiForks: boolean; // Run ansi:forks after test completion
+  reportForkCount: boolean; // Report fork count after ansi:forks
+}
+
+/**
+ * Runs ansi:forks and optionally reports fork count
+ */
+function runAnsiForksAndReport(options: RetryOptions): void {
+  if (options.runAnsiForks) {
+    console.debug("Running ansi:forks...");
+    try {
+      execSync("yarn ansi:forks", { stdio: "inherit" });
+      console.debug("Finished cleaning up");
+
+      if (options.reportForkCount) {
+        const logsDir = path.join(process.cwd(), "logs", "cleaned");
+        if (fs.existsSync(logsDir)) {
+          const forkCount = fs.readdirSync(logsDir).length;
+          console.debug(`Found ${forkCount} forks in logs/cleaned`);
+        } else {
+          console.debug("No logs/cleaned directory found");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to run ansi:forks:", error);
+    }
+  }
 }
 
 /**
@@ -198,6 +225,10 @@ function showUsageAndExit(): never {
     "      --no-error-logs     Disable sending error logs to Datadog (default: enabled)",
   );
   console.error(
+    "      --ansi-forks        Run ansi:forks after test completion",
+  );
+  console.error("      --report-forks      Report fork count after ansi:forks");
+  console.error(
     "      --env <environment> Set XMTP_ENV (options: local, dev, production)",
   );
   console.error(
@@ -252,6 +283,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test dms --log-level error  # Set logging level to error",
+  );
+  console.error(
+    "  yarn cli test dms --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
   );
   process.exit(1);
 }
@@ -311,6 +345,8 @@ function parseTestArgs(args: string[]): {
     logLevel: "debug", // Default log level
     jsLoggingLevel: "silly",
     noErrorLogs: false,
+    runAnsiForks: false, // Run ansi:forks after test completion
+    reportForkCount: false, // Report fork count after ansi:forks
   };
 
   let currentArgs = [...args];
@@ -419,6 +455,12 @@ function parseTestArgs(args: string[]): {
         break;
       case "--no-error-logs":
         options.noErrorLogs = true;
+        break;
+      case "--ansi-forks":
+        options.runAnsiForks = true;
+        break;
+      case "--report-forks":
+        options.reportForkCount = true;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -622,6 +664,9 @@ async function runVitestTest(
           await cleanSpecificLogFile(logger.logFileName);
         }
 
+        // Run ansi:forks after successful test completion
+        runAnsiForksAndReport(options);
+
         return;
       } else {
         console.debug("Tests failed!");
@@ -804,6 +849,10 @@ async function main(): Promise<void> {
             try {
               execSync(command, { stdio: "inherit", env });
               console.debug("Tests passed successfully!");
+
+              // Run ansi:forks after successful test completion
+              runAnsiForksAndReport(options);
+
               return; // Exit on success
             } catch (error) {
               console.debug(`Attempt ${attempt} failed`);
