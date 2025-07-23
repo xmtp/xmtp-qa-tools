@@ -1,8 +1,6 @@
----
 description: "When upgrading XMTP node-sdk versions, update these 3 files"
 globs:
 alwaysApply: true
----
 
 # SDK Upgrade Procedure
 

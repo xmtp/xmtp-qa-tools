@@ -1,7 +1,5 @@
----
-globs: *.test.ts
+globs: \*.test.ts
 alwaysApply: false
----
 
 # Testing Worker Framework Rules
 

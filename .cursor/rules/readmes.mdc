@@ -1,7 +1,5 @@
----
-globs: *.md
+globs: \*.md
 alwaysApply: false
----
 
 # README Style Guide
 

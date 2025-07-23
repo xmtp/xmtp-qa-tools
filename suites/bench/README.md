@@ -151,8 +151,6 @@ Performance results are automatically saved to:
 | 140        | 15          | 2058        | -42  | 2100      | 435.00           | 1009.45      | 0.21                  |
 | 110        | 20          | 2143        | -57  | 2200      | 416.00           | 1257.02      | 0.19                  |
 
----
-
 ## Insights
 
 A 3200 installations group gives:

@@ -15,9 +15,10 @@ Monitoring setup that tells us when things are working well and alerts us immedi
 
 Our test suite is organized into 6 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
----
+## 1. Performance testing
 
-## 1. Performance testing [../suites/metrics/performance.test.ts](../suites/metrics/performance.test.ts)
+Link to test code:
+Link to test code [../suites/metrics/performance.test.ts](../suites/metrics/performance.test.ts)
 
 **Purpose**: Measures operation timing and throughput for dms and small groups (5-10 members).
 
@@ -46,9 +47,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 
 - Operation performance in milliseconds
 
----
+## 2. Delivery testing
 
-## 2. Delivery testing [../suites/metrics/delivery.test.ts](../suites/metrics/delivery.test.ts)
+Link to test code [../suites/metrics/delivery.test.ts](../suites/metrics/delivery.test.ts)
 
 **Purpose**: Validates message delivery reliability, ordering accuracy, and recovery mechanisms.
 
@@ -64,13 +65,13 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - Order percentage (correct message sequencing)
 - Recovery capability after network interruption
 
----
-
 ## 3. Functional + regression testing
 
 **Purpose**: Core protocol validation including regression testing.
 
-### Client management [../suites/functional/clients.test.ts](../suites/functional/clients.test.ts)
+### Client management
+
+Link to test code [../suites/functional/clients.test.ts](../suites/functional/clients.test.ts)
 
 - `validation and key package status`
 - `inbox state from external inbox IDs`
@@ -78,11 +79,15 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `upgrade last versions`
 - `shared identity and separate storage`
 
-### Content handling [../suites/functional/codec.test.ts](../suites/functional/codec.test.ts)
+### Content handling
+
+Link to test code [../suites/functional/codec.test.ts](../suites/functional/codec.test.ts)
 
 - `errors:  handle codec errors gracefully when sending unsupported content types`
 
-### Debug operations [../suites/functional/debug.test.ts](../suites/functional/debug.test.ts)
+### Debug operations
+
+Link to test code [../suites/functional/debug.test.ts](../suites/functional/debug.test.ts)
 
 - `debug:  retrieve group debug information`
 - `debug:  track epoch changes during group operations`
@@ -91,11 +96,15 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `debug:  verify debug info after metadata changes`
 - `debug:  verify debug info structure completeness`
 
-### Installation management [../suites/functional/installations.test.ts](../suites/functional/installations.test.ts)
+### Installation management
+
+Link to test code [../suites/functional/installations.test.ts](../suites/functional/installations.test.ts)
 
 - `shared identity and separate storage`
 
-### Metadata operations [../suites/functional/metadata.test.ts](../suites/functional/metadata.test.ts)
+### Metadata operations
+
+Link to test code [../suites/functional/metadata.test.ts](../suites/functional/metadata.test.ts)
 
 - `metadata:  update group name and verify persistence`
 - `metadata:  update group description and verify persistence`
@@ -104,7 +113,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `metadata:  handle empty and special characters in metadata`
 - `metadata:  verify metadata state after group operations`
 
-### Permission system [../suites/functional/permissions.test.ts](../suites/functional/permissions.test.ts)
+### Permission system
+
+Link to test code [../suites/functional/permissions.test.ts](../suites/functional/permissions.test.ts)
 
 - `permissions:  add and remove admin permissions`
 - `permissions:  add and remove super admin permissions`
@@ -112,7 +123,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `permissions:  admin can remove other members`
 - `permissions:  super admin can manage other admins`
 
-### Stream validation [../suites/functional/streams.test.ts](../suites/functional/streams.test.ts)
+### Stream validation
+
+Link to test code [../suites/functional/streams.test.ts](../suites/functional/streams.test.ts)
 
 - `membership:  verify member addition notifications`
 - `consent:  verify consent state changes for direct messages`
@@ -123,7 +136,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `conversations:  verify new conversation notifications`
 - `members:  verify member addition to existing group`
 
-### Sync [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
+### Sync
+
+Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
 
 - `group sync performance: establish test environment by creating group with all members`
 - `group sync performance: send baseline message to group for sync performance testing`
@@ -131,9 +146,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `group sync performance: measure performance impact of individual conversation.sync() operation`
 - `group sync performance: measure message retrieval performance without explicit sync`
 
----
+## 4. Browser testing
 
-## 4. Browser testing [../suites/functional/browser.test.ts](../suites/functional/browser.test.ts)
+Link to test code [../suites/functional/browser.test.ts](../suites/functional/browser.test.ts)
 
 **Purpose**: Validates XMTP functionality in the browser SDK using Playwright automation.
 
@@ -146,8 +161,6 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 - `conversation stream when creating the group`
 - `conversation stream for new member`
 - `new installation and message stream`
-
----
 
 ## 5. Large group testing (`large.test.ts`)
 
@@ -167,7 +180,9 @@ Our test suite is organized into 6 primary categories that validate XMTP protoco
 
 - Operation performance per group size
 
-## 6. Network chaos test suite [../suites/networkchaos](../suites/networkchaos)
+## 6. Network chaos test suite
+
+Link to test code [../suites/networkchaos](../suites/networkchaos)
 
 **Purpose**: Validates XMTP protocol resilience under adverse network conditions using local 4-node XMTP-go cluster with simulated network partitions, delays, and failures.
 
