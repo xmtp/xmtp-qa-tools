@@ -42,6 +42,7 @@ const processMessage = async (
     const member = members[i];
     console.log(`--- Member ${i + 1} ---`);
     console.log(`InboxId: ${member.inboxId}`);
+
     console.log(`Installation IDs:`, member.installationIds);
     console.log(`Permission level:`, member.permissionLevel);
 
