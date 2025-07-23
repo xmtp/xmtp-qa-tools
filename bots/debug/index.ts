@@ -30,11 +30,8 @@ const processMessage = async (
   // Get debug info
   console.log("=== DEBUG INFO ===");
   const debugInfo = await conversation.debugInfo();
-  console.log("Raw debug info:", JSON.stringify(debugInfo, null, 2));
   console.log(`Debug epoch: ${debugInfo.epoch}`);
-  console.log(`Debug epoch type: ${typeof debugInfo.epoch}`);
   console.log(`Maybe forked: ${debugInfo.maybeForked}`);
-  console.log(`Maybe forked type: ${typeof debugInfo.maybeForked}`);
 
   // Members info
   console.log("=== MEMBERS INFO ===");
@@ -110,6 +107,9 @@ const processMessage = async (
 // Initialize the client with the message processor
 await initializeClient(processMessage, [
   {
+    walletKey: process.env.WALLET_KEY_ALICE as `0x${string}`,
+    dbEncryptionKey: process.env.ENCRYPTION_KEY_ALICE as `0x${string}`,
+    logLevel: "debug",
     networks: ["production"],
     acceptGroups: true,
   },
