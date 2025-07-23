@@ -109,7 +109,6 @@ await initializeClient(processMessage, [
   {
     walletKey: process.env.WALLET_KEY_ALICE as `0x${string}`,
     dbEncryptionKey: process.env.ENCRYPTION_KEY_ALICE as `0x${string}`,
-    logLevel: "debug",
     networks: ["production"],
     acceptGroups: true,
   },
