@@ -2,7 +2,7 @@
 
 We've built a monitoring setup that tells us when things are working well and alerts us immediately when they're not.
 
-## Automated workflows
+## Automated workflowsa
 
 | Test suite   | Performance | Resources                                                                                                                                                                             | Run frequency | Networks           |
 | ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
