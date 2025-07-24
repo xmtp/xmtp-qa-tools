@@ -239,24 +239,11 @@ export const createTestLogger = (options: TestLogOptions) => {
 
     const logPath = path.join(logsDir, logFileName);
     logStream = fs.createWriteStream(logPath, { flags: "w" });
-
-    console.debug(`Logging to: ${logPath}`);
-    console.debug(
-      options.verboseLogging
-        ? "Verbose logging enabled: output will be shown in terminal AND logged to file."
-        : "Test output will be hidden from terminal and logged to file only.",
-    );
-
-    // Set logging level if provided
-    if (options.logLevel) {
-      process.env.LOGGING_LEVEL = options.logLevel;
-      console.debug(`Log level set to: ${options.logLevel}`);
-    }
   } else {
-    console.debug(
+    console.info(
       "Warning: Logging is disabled. Test output will not be visible anywhere.",
     );
-    console.debug("Consider using --debug to enable file logging.");
+    console.info("Consider using --debug to enable file logging.");
   }
 
   const processOutput = (data: Buffer) => {
