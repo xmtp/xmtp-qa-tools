@@ -4,29 +4,6 @@ This repository provides a comprehensive CLI interface for testing XMTP protocol
 
 ## Environment Setup
 
-### Required Environment Variables
-
-Before running any tests, you must set up a `.env` file with the following variables:
-
-```bash
-# Required for all operations
-XMTP_ENV=dev                    # Options: local, dev, production
-LOGGING_LEVEL=off               # Options: off, debug, info, warn, error
-LOG_LEVEL=debug                 # specific to this repo
-
-# Optional - for Slack notifications and monitoring
-SLACK_BOT_TOKEN=xoxb-...        # Slack bot token for notifications
-SLACK_CHANNEL=C...              # Slack channel ID for alerts
-
-# Optional - for Datadog log analysis
-DATADOG_API_KEY=...             # Datadog API key for log retrieval
-DATADOG_APP_KEY=...             # Datadog app key for log retrieval
-ANTHROPIC_API_KEY=...           # Claude AI API key for log analysis
-
-# Optional - for REGION testing
-REGION=us-east-1           # AWS region for testing
-```
-
 ### Environment Options
 
 - **`local`**: Local XMTP network for development
@@ -117,10 +94,10 @@ yarn regression                        # Shortcut for version testing
 
 ```bash
 # Local development
-XMTP_ENV=local yarn test functional
+yarn test functional --env local
 
 # Development network (most common)
-XMTP_ENV=dev yarn test functional
+yarn test functional --env dev
 
 # Production network (use carefully)
  yarn test functional
@@ -184,10 +161,10 @@ yarn test functional --versions 3 --debug                # Version compatibility
 
 ```bash
 # Test Shortcuts
-yarn functional                        # yarn test suites/functional
-yarn bench                            # yarn test suites/bench/bench.test.ts
-yarn large                            # yarn test suites/large
-yarn regression                       # yarn test suites/functional --versions 3
+yarn test functional                        # yarn test suites/functional
+yarn test bench                            # yarn test suites/bench/bench.test.ts
+yarn test large                            # yarn test suites/large
+yarn test regression                       # yarn test suites/functional --versions 3
 
 # Utility Shortcuts
 yarn datadog                         # yarn test suites/datadog
@@ -243,8 +220,8 @@ yarn test ./suites/functional/groups.test.ts ./suites/functional/consent.test.ts
 ### Environment Variables in Commands
 
 ```bash
- LOGGING_LEVEL=debug yarn test functional --debug
-TEST_VERSIONS=3 yarn test functional
+yarn test functional --debug
+yarn test functional
 ```
 
 ### Combining Options
@@ -255,7 +232,6 @@ yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
 
 ## Best Practices
 
-1. **Always set XMTP_ENV** before running tests
 2. **Use --debug for CI/CD** to get proper logging and notifications
 3. **Use --no-fail for monitoring** to prevent CI failures on expected issues
 4. **Test locally first** before running against dev/production

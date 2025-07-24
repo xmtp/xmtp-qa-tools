@@ -35,7 +35,7 @@ yarn build
 ## Testing
 
 ```bash
-yarn functional
+yarn test functional
 ```
 
 ## Notes

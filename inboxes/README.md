@@ -91,5 +91,5 @@ rm -rf .data/ logs/
 yarn local-update
 
 # Run tests to verify
-yarn functional
+yarn test functional --env local
 ```
