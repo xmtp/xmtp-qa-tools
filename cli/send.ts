@@ -15,10 +15,12 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
+import { getRandomAddress } from "../inboxes/utils";
 
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --wait
+// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --groups
 
 interface Config {
   userCount: number;
@@ -29,6 +31,7 @@ interface Config {
   keepDb: boolean;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
+  useGroups: boolean;
 }
 
 function parseArgs(): Config {
@@ -42,6 +45,7 @@ function parseArgs(): Config {
     keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
+    useGroups: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -69,6 +73,9 @@ function parseArgs(): Config {
     }
     if (arg === "--wait") {
       config.waitForResponse = true;
+    }
+    if (arg === "--groups") {
+      config.useGroups = true;
     }
   }
 
@@ -175,14 +182,34 @@ async function runsendTest(config: Config): Promise<void> {
 
       const process = async () => {
         try {
-          // 1. Time NewDM creation
+          // 1. Time conversation creation
           const newDmStart = Date.now();
-          const conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: config.address,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
+          let conversation: Conversation;
+
+          if (config.useGroups) {
+            // Create group with 5 people (including the target address)
+            const groupMembers = [config.address];
+            // Add 4 random addresses
+            for (let j = 0; j < 4; j++) {
+              groupMembers.push(getRandomAddress());
+            }
+
+            conversation = (await worker.conversations.newGroup(groupMembers, {
+              groupName: `test-group-${i}-${Date.now()}`,
+            })) as Conversation;
+            console.log(
+              `💬 ${i}: Group created in ${Date.now() - newDmStart}ms with ${groupMembers.length} members`,
+            );
+                    } else {
+            // Create DM
+            conversation = (await worker.conversations.newDmWithIdentifier({
+              identifier: config.address,
+              identifierKind: IdentifierKind.Ethereum,
+            })) as Conversation;
+            console.log(`💬 ${i}: DM created in ${Date.now() - newDmStart}ms`);
+          }
+
           const newDmTime = Date.now() - newDmStart;
-          console.log(`💬 ${i}: DM created in ${newDmTime}ms`);
 
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);
