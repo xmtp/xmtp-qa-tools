@@ -212,7 +212,7 @@ describe(testName, async () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       });
-      it(`streamMembership-${i}:notify all members of additions in ${i} member group`, async () => {
+      it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
         const extraMember = allMembersWithExtra.slice(i, i + 1);
         console.log("extraMember", extraMember);
         const verifyResult = await verifyMembershipStream(
@@ -225,7 +225,7 @@ describe(testName, async () => {
         expect(verifyResult.almostAllReceived).toBe(true);
       });
 
-      it(`streamMessage-${i}:notify all members of message changes in ${i} member group`, async () => {
+      it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
         const verifyResult = await verifyMessageStream(
           newGroup,
           workers.getAllButCreator(),
@@ -242,7 +242,7 @@ describe(testName, async () => {
         expect(verifyResult.almostAllReceived).toBe(true);
       });
 
-      it(`streamMetadata-${i}:notify all members of metadata changes in ${i} member group`, async () => {
+      it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
         const verifyResult = await verifyMetadataStream(
           newGroup,
           workers.getAllButCreator(),

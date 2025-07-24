@@ -170,9 +170,9 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 
 - `newGroup-{groupSize}: create a large group of {groupSize} members`
 - `groupsync-{groupSize}: sync a large group of {groupSize} members`
-- `addMember-{groupSize}: notify all members of additions in {groupSize} member group`
-- `stream-{groupSize}: notify all members of message changes in {groupSize} member group`
-- `updateName-{groupSize}: notify all members of metadata changes in {groupSize} member group`
+- `addMember-{groupSize}:  stream members of additions in {groupSize} member group`
+- `stream-{groupSize}:  stream members of message changes in {groupSize} member group`
+- `updateName-{groupSize}:  stream members of metadata changes in {groupSize} member group`
 - `sync-{groupSize}: perform cold start sync operations on {groupSize} member group`
 - `syncAll-{groupSize}: perform cold start sync operations on {groupSize} member group`
 
