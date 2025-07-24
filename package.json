@@ -21,8 +21,11 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs production --installations 2",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
+    "revoke": "tsx scripts/revoke.ts",
+    "stress": "tsx scripts/stress.ts",
     "test": "tsx scripts/test.ts",
     "ui": "vitest --ui --standalone --watch",
+    "versions": "tsx scripts/versions.ts",
     "workflow-failure": "tsx -e \"import { workflowFailed } from './helpers/analyzer'; (async () => { await workflowFailed(process.argv[1] || 'Unknown'); })();\""
   },
   "dependencies": {
