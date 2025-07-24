@@ -20,7 +20,6 @@ interface RetryOptions {
   cleanLogs: boolean; // Auto-clean logs after completion
   logLevel: string; // Log level (info, info, error)
   noErrorLogs: boolean; // Disable sending error logs to Datadog
-  runAnsiForks: boolean; // Run ansi:forks after test completion
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
 
@@ -28,20 +27,18 @@ interface RetryOptions {
  * Runs ansi:forks and optionally reports fork count
  */
 function runAnsiForksAndReport(options: RetryOptions): void {
-  if (options.runAnsiForks) {
+  if (options.reportForkCount) {
     console.info("Running ansi:forks...");
     try {
       execSync("yarn ansi:forks", { stdio: "inherit" });
       console.info("Finished cleaning up");
 
-      if (options.reportForkCount) {
-        const logsDir = path.join(process.cwd(), "logs", "cleaned");
-        if (fs.existsSync(logsDir)) {
-          const forkCount = fs.readdirSync(logsDir).length;
-          console.info(`Found ${forkCount} forks in logs/cleaned`);
-        } else {
-          console.info("No logs/cleaned directory found");
-        }
+      const logsDir = path.join(process.cwd(), "logs", "cleaned");
+      if (fs.existsSync(logsDir)) {
+        const forkCount = fs.readdirSync(logsDir).length;
+        console.info(`Found ${forkCount} forks in logs/cleaned`);
+      } else {
+        console.info("No logs/cleaned directory found");
       }
     } catch (error) {
       console.error("Failed to run ansi:forks:", error);
@@ -284,7 +281,6 @@ function parseTestArgs(args: string[]): {
     cleanLogs: true,
     logLevel: "off", // Default log level
     noErrorLogs: false,
-    runAnsiForks: false, // Run ansi:forks after test completion
     reportForkCount: false, // Report fork count after ansi:forks
   };
 
@@ -390,9 +386,6 @@ function parseTestArgs(args: string[]): {
       case "--no-error-logs":
         options.noErrorLogs = true;
         break;
-      case "--ansi-forks":
-        options.runAnsiForks = true;
-        break;
       case "--size":
         if (nextArg) {
           // Store batch size in vitestArgs to be passed as environment variable
@@ -402,7 +395,7 @@ function parseTestArgs(args: string[]): {
           console.warn("--size flag requires a value (e.g., --size 5-10)");
         }
         break;
-      case "--report-forks":
+      case "--forks":
         options.reportForkCount = true;
         break;
       default:
@@ -498,7 +491,6 @@ function collectTestParameters(
     logLevel: options.logLevel,
     noFail: options.noFail,
     noErrorLogs: options.noErrorLogs,
-    runAnsiForks: options.runAnsiForks,
     reportForkCount: options.reportForkCount,
     customLogFile: options.customLogFile,
     vitestArgs: options.vitestArgs,

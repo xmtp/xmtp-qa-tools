@@ -76,7 +76,7 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
 
-      if (result?.allReceived) console.error(agent.name, "FAIL");
+      if (result?.allReceived) console.error(agent.name, "no response");
       expect(result?.allReceived).toBe(false);
     });
   }
