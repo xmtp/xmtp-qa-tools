@@ -14,7 +14,7 @@ import {
   type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "@xmtp/node-sdk-3.2.1";
+} from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
