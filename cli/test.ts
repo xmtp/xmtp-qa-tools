@@ -282,7 +282,7 @@ function parseTestArgs(args: string[]): {
     verboseLogging: true, // Show terminal output by default
     parallel: false,
     cleanLogs: true,
-    logLevel: "info", // Default log level
+    logLevel: "off", // Default log level
     noErrorLogs: false,
     runAnsiForks: false, // Run ansi:forks after test completion
     reportForkCount: false, // Report fork count after ansi:forks
@@ -411,59 +411,6 @@ function parseTestArgs(args: string[]): {
   }
 
   return { testName, options };
-}
-
-function buildTestCommand(
-  testName: string,
-  vitestArgs: string[],
-  parallel: boolean = false,
-): string {
-  const vitestArgsString = vitestArgs.join(" ");
-
-  // Base threading options for consecutive execution
-  const threadingOptions = parallel
-    ? ""
-    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
-
-  if (testName === "functional") {
-    const expandedFiles = expandGlobPattern("./suites/functional/*.test.ts");
-    if (expandedFiles.length === 0) {
-      throw new Error("No dmstest files found");
-    }
-    return `npx vitest run ${expandedFiles.join(" ")} ${threadingOptions} ${vitestArgsString}`.trim();
-  }
-
-  // Check for npm script
-  const packageJsonPath = path.join(process.cwd(), "package.json");
-  try {
-    const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
-    const packageJson = JSON.parse(packageJsonContent) as {
-      scripts?: Record<string, string>;
-    };
-    if (packageJson.scripts?.[testName]) {
-      const script = packageJson.scripts[testName];
-
-      // Handle glob patterns in scripts
-      if (script.includes("*.test.ts")) {
-        const globMatch = script.match(/([^\s]+\*\.test\.ts)/);
-        if (globMatch) {
-          const expandedFiles = expandGlobPattern(globMatch[1]);
-          if (expandedFiles.length === 0) {
-            throw new Error(`No test files found for pattern: ${globMatch[1]}`);
-          }
-          return `${script.replace(globMatch[1], expandedFiles.join(" "))} ${vitestArgsString}`.trim();
-        }
-      }
-      return `yarn ${testName} ${vitestArgsString}`.trim();
-    }
-  } catch (error: unknown) {
-    console.error("Error reading package.json:", error);
-  }
-
-  const defaultThreadingOptions = parallel
-    ? "--pool=forks"
-    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
-  return `npx vitest run ${testName} ${defaultThreadingOptions} ${vitestArgsString}`.trim();
 }
 
 /**
@@ -641,11 +588,12 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
     console.info(`Attempt ${attempt} of ${options.attempts}...`);
 
     try {
-      const command = buildTestCommand(
-        testName,
-        options.vitestArgs,
-        options.parallel,
-      );
+      const defaultThreadingOptions = options.parallel
+        ? "--pool=forks"
+        : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+      const command =
+        `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
+
       console.info(`Executing: ${command}`);
 
       const { exitCode } = await runCommand(command, env, logger);
