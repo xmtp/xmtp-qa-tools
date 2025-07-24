@@ -11,11 +11,9 @@
   "scripts": {
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
-    "bot": "yarn cli bot",
     "build": "tsc",
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
-    "cli": "tsx scripts/cli.ts",
     "format": "prettier -w .",
     "gen": "tsx inboxes/gen.ts",
     "lint": "eslint .",
@@ -23,9 +21,7 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs production --installations 2",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "script": "yarn cli script",
-    "stress": "yarn cli stress",
-    "test": "yarn cli test",
+    "test": "tsx scripts/test.ts",
     "ui": "vitest --ui --standalone --watch",
     "workflow-failure": "tsx -e \"import { workflowFailed } from './helpers/analyzer'; (async () => { await workflowFailed(process.argv[1] || 'Unknown'); })();\""
   },

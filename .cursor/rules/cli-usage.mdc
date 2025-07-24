@@ -38,7 +38,6 @@ REGION=us-east-1           # AWS region for testing
 ### Basic Command Structure
 
 ```bash
-yarn cli <command_type> <name_or_path> [options...]
 yarn test <test_suite> [options...]              # Direct vitest execution
 yarn bot <bot_name> [args...]                    # Interactive bots
 yarn script <script_name> [args...]              # Utility scripts
@@ -191,7 +190,6 @@ yarn large                            # yarn test suites/large
 yarn regression                       # yarn test suites/functional --versions 3
 
 # Utility Shortcuts
-yarn bot                             # yarn cli bot
 yarn datadog                         # yarn test suites/datadog
 yarn gen                             # tsx inboxes/gen.ts
 yarn clean                           # rimraf .data/ logs/

@@ -2,11 +2,11 @@
 
 ## Overview
 
-| Script        | Purpose        | Use Case                                  |
-| ------------- | -------------- | ----------------------------------------- |
-| `cli.ts`      | Command router | Run tests, bots, scripts with retry logic |
-| `versions.ts` | SDK manager    | Setup multiple SDK versions for testing   |
-| `stress.ts`   | Stress test    | Run stress tests with retry logic         |
+| Script        | Purpose     | Use Case                                |
+| ------------- | ----------- | --------------------------------------- |
+| `test.ts`     | Test runner | Run tests with retry logic              |
+| `versions.ts` | SDK manager | Setup multiple SDK versions for testing |
+| `stress.ts`   | Stress test | Run stress tests with retry logic       |
 
 ## CLI Command Structure
 
@@ -57,10 +57,10 @@ Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
 ```bash
 # Multi-version testing
-yarn cli test functional --versions 3 --no-fail --debug
+yarn test functional --versions 3 --no-fail --debug
 
 # Specific version
-yarn cli test regression --nodeVersion 3.1.1 --debug
+yarn test regression --nodeVersion 3.1.1 --debug
 ```
 
 ## Stress Testing

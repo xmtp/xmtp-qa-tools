@@ -1,17 +1,3 @@
-/**
- * XMTP QA Tools CLI
- *
- * Universal command router for running tests, bots, and scripts.
- * Provides advanced retry mechanisms, logging, and version management.
- *
- * Usage: yarn cli <command_type> <name> [options]
- *
- * Command Types:
- *   bot     - Run interactive bots (gm-bot, stress)
- *   script  - Execute utility scripts (gen, versions)
- *   test    - Run test suites with retry logic
- */
-
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
@@ -180,29 +166,18 @@ async function cleanSpecificLogFile(
 }
 
 function showUsageAndExit(): never {
-  console.error("Usage: yarn cli <command_type> <name_or_path> [args...]");
+  console.error("Usage: yarn test <name_or_path> [args...]");
   console.error(
-    "   or (if alias 'cli' is set up): cli <command_type> <name_or_path> [args...]",
+    "   or (if alias 'cli' is set up): cli test <name_or_path> [args...]",
   );
   console.error("");
-  console.error("Command Types:");
-  console.error(
-    "  bot <bot_name> [bot_args...]        - Runs a bot (e.g., gm-bot)",
-  );
-  console.error(
-    "  script <script_name> [script_args...] - Runs a script (e.g., gen)",
-  );
-  console.error(
-    "  stress [options...]                 - Runs stress testing (e.g., --users 400 --msgs 1)",
-  );
+  console.error("Test Command:");
   console.error(
     "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Simple vitest execution (default):");
-  console.error("      yarn cli test dms        - Runs vitest directly");
-  console.error(
-    "      yarn cli test ./path/to/test.ts  - Runs specific test file",
-  );
+  console.error("      yarn test dms        - Runs vitest directly");
+  console.error("      yarn test ./path/to/test.ts  - Runs specific test file");
   console.error("    Retry and logging options:");
   console.error(
     "      --attempts <N>  Max number of attempts for tests (default: 1, works in both simple and retry modes)",
@@ -251,73 +226,35 @@ function showUsageAndExit(): never {
   );
   console.error("");
   console.error("Examples:");
-  console.error("  yarn cli bot gm-bot");
-  console.error("  yarn cli bot stress 5");
-  console.error("  yarn cli script gen");
-  console.error("  yarn script versions");
-  console.error("  yarn cli stress --users 400 --msgs 1");
-  console.error("  yarn cli stress --users 200 --msgs 2 --env production");
-  console.error("  yarn cli test functional");
-  console.error("  yarn cli test dms --attempts 2");
-  console.error("  yarn cli test dms --parallel");
+  console.error("  yarn test functional");
+  console.error("  yarn test dms --attempts 2");
+  console.error("  yarn test dms --parallel");
   console.error(
-    "  yarn cli test dms --debug-verbose   # Shows output in terminal AND logs to file",
+    "  yarn test dms --debug-verbose   # Shows output in terminal AND logs to file",
+  );
+  console.error("  yarn test dms --no-fail        # Exit 0 even on failure");
+  console.error(
+    "  yarn test dms --debug        # Uses logging mode with file output",
   );
   console.error(
-    "  yarn cli test dms --no-fail        # Exit 0 even on failure",
+    "  yarn test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   console.error(
-    "  yarn cli test dms --debug        # Uses logging mode with file output",
+    "  yarn test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
   );
   console.error(
-    "  yarn cli test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
+    "  yarn test dms --env production # Sets XMTP_ENV to production",
   );
   console.error(
-    "  yarn cli test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
+    "  yarn test dms --no-clean-logs  # Disable automatic log cleaning",
   );
   console.error(
-    "  yarn cli test dms --env production # Sets XMTP_ENV to production",
+    "  yarn test dms --log-level error  # Set logging level to error",
   );
   console.error(
-    "  yarn cli test dms --no-clean-logs  # Disable automatic log cleaning",
-  );
-  console.error(
-    "  yarn cli test dms --log-level error  # Set logging level to error",
-  );
-  console.error(
-    "  yarn cli test dms --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
+    "  yarn test dms --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
   );
   process.exit(1);
-}
-
-/**
- * Runs an interactive bot with watch mode
- * Bots are located in bots/<bot_name>/index.ts
- */
-function runBot(botName: string, args: string[]): void {
-  const botFilePath = path.join("bots", botName, "index.ts");
-  const botArgs = args.join(" ");
-  console.debug(
-    `Starting bot: ${botName}${botArgs ? ` with args: ${botArgs}` : ""}`,
-  );
-  execSync(`tsx --watch ${botFilePath} ${botArgs}`, {
-    stdio: "inherit",
-  });
-}
-
-/**
- * Executes a utility script once
- * Scripts are located in scripts/<script_name>.ts
- */
-function runScript(scriptName: string, args: string[]): void {
-  const scriptFilePath = path.join("scripts", `${scriptName}.ts`);
-  const scriptArgs = args.join(" ");
-  console.debug(
-    `Running script: ${scriptName}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`,
-  );
-  execSync(`tsx ${scriptFilePath} ${scriptArgs}`, {
-    stdio: "inherit",
-  });
 }
 
 /**
@@ -721,34 +658,6 @@ async function main(): Promise<void> {
 
   try {
     switch (commandType) {
-      case "bot": {
-        if (!nameOrPath) {
-          console.error("bot name is required for 'bot' command type.");
-          showUsageAndExit();
-        }
-        runBot(nameOrPath, additionalArgs);
-        break;
-      }
-
-      case "script": {
-        if (!nameOrPath) {
-          console.error("Script name is required for 'script' command type.");
-          showUsageAndExit();
-        }
-        runScript(nameOrPath, additionalArgs);
-        break;
-      }
-
-      case "stress": {
-        // Handle stress command - run stress script directly
-        const allArgs = nameOrPath
-          ? [nameOrPath, ...additionalArgs]
-          : additionalArgs;
-        console.debug("Running stress test with args:", allArgs);
-        runScript("stress", allArgs);
-        break;
-      }
-
       case "test": {
         const allArgs = nameOrPath
           ? [nameOrPath, ...additionalArgs]
@@ -897,6 +806,7 @@ async function main(): Promise<void> {
 
       default: {
         console.error(`Unknown command type: ${commandType}`);
+        console.error("This CLI only supports 'test' command type.");
         showUsageAndExit();
       }
     }
