@@ -650,20 +650,32 @@ async function runVitestTest(
 }
 
 async function main(): Promise<void> {
-  const [commandType, nameOrPath, ...additionalArgs] = process.argv.slice(2);
-
-  if (!commandType) {
+  const args = process.argv.slice(2);
+  
+  if (args.length === 0) {
     showUsageAndExit();
+  }
+
+  // Handle both formats:
+  // 1. yarn test test performance --env local (with command type)
+  // 2. yarn test performance --env local (direct call)
+  let commandType: string;
+  let testArgs: string[];
+  
+  if (args[0] === "test") {
+    // Format 1: yarn test test performance --env local
+    commandType = args[0];
+    testArgs = args.slice(1);
+  } else {
+    // Format 2: yarn test performance --env local (direct call)
+    commandType = "test";
+    testArgs = args;
   }
 
   try {
     switch (commandType) {
       case "test": {
-        const allArgs = nameOrPath
-          ? [nameOrPath, ...additionalArgs]
-          : additionalArgs;
-
-        const { testName, options } = parseTestArgs(allArgs);
+        const { testName, options } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no explicit logging flags)
         const isSimpleRun = !options.explicitLogFlag;
