@@ -8,7 +8,7 @@ import "dotenv/config";
 /**
  * Configuration for test retry behavior and logging
  */
-interface RetryOptions {
+interface TestOptions {
   attempts: number; // Maximum retry attempts (default: 1)
   retryDelay: number; // Delay between retries (seconds)
   enableLogging: boolean; // Enable file logging
@@ -26,7 +26,7 @@ interface RetryOptions {
 /**
  * Runs ansi:forks and optionally reports fork count
  */
-function runAnsiForksAndReport(options: RetryOptions): void {
+function runAnsiForksAndReport(options: TestOptions): void {
   if (options.reportForkCount) {
     console.info("Running ansi:forks...");
     try {
@@ -144,10 +144,10 @@ async function cleanSpecificLogFile(
  */
 function parseTestArgs(args: string[]): {
   testName: string;
-  options: RetryOptions;
+  options: TestOptions;
 } {
   let testName = "functional";
-  const options: RetryOptions = {
+  const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
     retryDelay: 10,
     enableLogging: false, // Default to no file logging
@@ -258,7 +258,7 @@ function parseTestArgs(args: string[]): {
  * Process environment variables from vitestArgs
  */
 function processEnvironmentVariables(
-  options: RetryOptions,
+  options: TestOptions,
 ): Record<string, string> {
   const env: Record<string, string> = {
     ...process.env,
@@ -325,7 +325,7 @@ function processEnvironmentVariables(
  */
 function collectTestParameters(
   testName: string,
-  options: RetryOptions,
+  options: TestOptions,
   env: Record<string, string>,
 ): Record<string, any> {
   const parameters: Record<string, any> = {
@@ -340,7 +340,6 @@ function collectTestParameters(
     noFail: options.noFail,
     noErrorLogs: options.noErrorLogs,
     reportForkCount: options.reportForkCount,
-    customLogFile: options.customLogFile,
     vitestArgs: options.vitestArgs,
   };
 
@@ -409,16 +408,13 @@ async function runCommand(
   });
 }
 
-async function runTest(testName: string, options: RetryOptions): Promise<void> {
-  const logger = options.enableLogging
-    ? createTestLogger({
-        enableLogging: options.enableLogging,
-        customLogFile: options.customLogFile,
-        testName,
-        verboseLogging: options.verboseLogging,
-        logLevel: options.logLevel,
-      })
-    : undefined;
+async function runTest(testName: string, options: TestOptions): Promise<void> {
+  const logger = createTestLogger({
+    enableLogging: options.enableLogging,
+    testName,
+    verboseLogging: options.verboseLogging,
+    logLevel: options.logLevel,
+  });
 
   const env = processEnvironmentVariables(options);
   const parameters = collectTestParameters(testName, options, env);
