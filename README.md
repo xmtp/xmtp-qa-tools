@@ -163,7 +163,7 @@ yarn test functional --no-fail --debug
 - Networks: Work in [local](/dev/) or [multinode](/dev/multinode) network
 - Workers: Worker for testing with CLI - [see section](/workers/)
 - Helpers: Coding helpers - [see section](/helpers/)
-- Scripts: Monorepo scripts - [see section](/scripts/)
+- Scripts: Monorepo scripts & cli's - [see section](/cli/)
 - Introduction: Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
 
 ##### Rate limits
