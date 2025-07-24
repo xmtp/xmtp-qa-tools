@@ -11,7 +11,6 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
-      LOGGING_LEVEL: "off"
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
@@ -31,7 +30,7 @@ jobs:
         run: sleep 30
 
       - name: Run forks test
-        run: yarn test forks --attempts 5 --env local --debug --ansi-forks --report-forks
+        run: yarn test forks --attempts 5 --env local --debug --forks
 
       - name: Stop local XMTP network
         if: always()

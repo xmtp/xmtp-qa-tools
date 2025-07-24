@@ -27,7 +27,6 @@ yarn cli <type> <name> [options]
 
 ```bash
 --debug                 # File logging
---debug-verbose         # File + terminal logging
 --no-fail              # Exit 0 on failure
 --attempts 3       # Retry limit
 --parallel             # Parallel execution
@@ -51,9 +50,6 @@ Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
 ```bash
 --debug                # File only
---debug-verbose        # File + terminal
---debug-file custom    # Custom filename
---no-clean-logs        # Keep logs after test
 ```
 
 ## Functional Testing

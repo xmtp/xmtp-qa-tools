@@ -71,8 +71,6 @@ yarn test functional --no-fail --debug
 # Available options:
 --attempts <N>      # Max retry attempts (default: 3)
 --debug                 # Enable file logging (logs saved to logs/ directory)
---debug-verbose         # Enable both file logging AND terminal output
---debug-file <name>     # Custom log filename
 --no-fail              # Exit with success code even on failures
 --parallel             # Run tests in parallel (default: consecutive)
 ```
@@ -178,7 +176,6 @@ yarn record                         # npx playwright codegen 'https://xmtp.chat/
 ### Debug Output
 
 - `--debug`: Saves logs to files, minimal terminal output
-- `--debug-verbose`: Saves logs to files AND shows full terminal output
 - Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
 ### Notification Systems
@@ -195,13 +192,6 @@ When using `--debug` flag, test failures can be analyzed through:
 - Default: Exits with code 1 on test failures
 
 ## Advanced Examples
-
-### Custom Log Files
-
-```bash
-yarn test functional --debug-file my-custom-log
-# Saves to: logs/my-custom-log-<env>-<timestamp>.log
-```
 
 ### Multiple Test Files
 
@@ -220,7 +210,7 @@ yarn test functional
 ### Combining Options
 
 ```bash
-yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5
 ```
 
 ## Best Practices
@@ -233,5 +223,5 @@ yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
 
 ```bash
 # Advanced example with multiple options
-yarn test functional --versions 3 --attempts 5  --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5
 ```

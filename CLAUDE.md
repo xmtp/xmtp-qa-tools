@@ -20,12 +20,15 @@ You may ONLY execute the following CLI commands:
 ### Common Options
 
 - `--debug` - File logging
-- `--debug-verbose` - File + terminal logging
 - `--no-fail` - Exit 0 on failure
-- `--attempts <number>` - Retry limit
+- `--attempts <number>` - Retry limit (default: 1)
 - `--parallel` - Parallel execution
 - `--versions <number>` - Use multiple SDK versions
 - `--env <environment>` - Set XMTP_ENV (dev, production, local)
+- `--nodeVersion <version>` - Use specific Node.js version
+- `--sync <strategy>` - Sync strategy (all, conversations, all,conversations)
+- `--size <range>` - Batch size range (e.g., 5-10)
+- `--forks` - Report fork count after test completion
 
 ## Strict Restrictions
 
@@ -44,7 +47,19 @@ You may ONLY execute the following CLI commands:
 yarn test functional --versions 3 --no-fail --debug
 
 # Run specific test with retry
-yarn test delivery --attempts 3 --debug-verbose
+yarn test delivery --attempts 3 --debug
+
+# Test with specific Node.js version
+yarn test functional --nodeVersion 3.1.1 --debug
+
+# Test with sync strategy configuration
+yarn test functional --sync all,conversations --debug
+
+# Test with batch size configuration
+yarn test functional --size 5-10 --debug
+
+# Test with fork monitoring
+yarn test functional --forks --debug
 ```
 
 ### Send Testing
@@ -84,8 +99,21 @@ yarn revoke <inbox-id> [installations-to-save]
 yarn versions
 
 # do a vibe check on everything
-yarn test functional --sync all --versions 3 --no-fail --debug size 5-10-50-100
+yarn test functional --sync all --versions 3 --no-fail --debug --size 5-10-50-100
 # also can be called using 'yarn regression'
+```
+
+### Advanced Testing Combinations
+
+```bash
+# Comprehensive testing with multiple options
+yarn test functional --versions 3 --attempts 5 --debug --parallel --forks
+
+# Node.js version testing with environment configuration
+yarn test functional --nodeVersion 3.1.1 --env local --sync all
+
+# Batch testing with size configuration
+yarn test functional --size 5-10 --parallel --forks
 ```
 
 ## Error Handling
@@ -98,7 +126,6 @@ yarn test functional --sync all --versions 3 --no-fail --debug size 5-10-50-100
 
 - Logs are saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 - Use `--debug` for file logging only
-- Use `--debug-verbose` for file + terminal logging
 
 ## Safety First
 

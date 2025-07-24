@@ -17,7 +17,6 @@ jobs:
         test: [functional]
         env: [dev, production]
     env:
-      LOGGING_LEVEL: "off"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}

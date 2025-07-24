@@ -69,23 +69,44 @@ yarn versions                   # Setup SDK version testing
 yarn test functional --no-fail --debug
 
 # Available options:
---attempts <N>      # Max retry attempts (default: 3)
+--attempts <N>      # Max retry attempts (default: 1)
 --debug                 # Enable file logging (logs saved to logs/ directory)
---debug-verbose         # Enable both file logging AND terminal output
---debug-file <name>     # Custom log filename
 --no-fail              # Exit with success code even on failures
 --parallel             # Run tests in parallel (default: consecutive)
 ```
 
-### Version Testing
+### Version and Node Testing
 
 ```bash
 yarn test functional --versions 3      # Uses 3 random SDK versions
+yarn test functional --nodeVersion 3.1.1  # Use specific Node.js version
 
 # Available SDK versions:
 # - 0.0.47 (Legacy)
 # - 1.0.5, 2.0.9, 2.1.0, 2.2.1 (Stable)
 # - 3.0.1 (Latest)
+```
+
+### Environment and Configuration
+
+```bash
+yarn test functional --env local       # Local development environment
+yarn test functional --env dev         # Development network (default)
+yarn test functional --env production  # Production network (use carefully)
+
+# Sync strategy configuration
+yarn test functional --sync all        # Sync all data
+yarn test functional --sync conversations  # Sync only conversations
+yarn test functional --sync all,conversations  # Multiple sync strategies
+
+# Batch size configuration
+yarn test functional --size 5-10       # Set batch size range
+```
+
+### Fork Management
+
+```bash
+yarn test functional --forks           # Report fork count after test completion
 ```
 
 ## Environment-Specific Testing
@@ -153,6 +174,7 @@ yarn test functional --no-fail --debug # Full functional suite with debugging
 
 ```bash
 yarn test functional --versions 3 --debug                # Version compatibility testing
+yarn test functional --nodeVersion 3.1.1 --debug         # Node.js version testing
 ```
 
 ## Shortcut Commands (from package.json)
@@ -181,7 +203,6 @@ yarn record                         # npx playwright codegen 'https://xmtp.chat/
 ### Debug Output
 
 - `--debug`: Saves logs to files, minimal terminal output
-- `--debug-verbose`: Saves logs to files AND shows full terminal output
 - Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
 ### Notification Systems
@@ -199,13 +220,6 @@ When using `--debug` flag, test failures can be analyzed through:
 
 ## Advanced Examples
 
-### Custom Log Files
-
-```bash
-yarn test functional --debug-file my-custom-log
-# Saves to: logs/my-custom-log-<env>-<timestamp>.log
-```
-
 ### Multiple Test Files
 
 ```bash
@@ -218,12 +232,17 @@ yarn test ./suites/functional/groups.test.ts ./suites/functional/consent.test.ts
 ```bash
 yarn test functional --debug --env dev
 yarn test functional --versions 3
+yarn test functional --nodeVersion 3.1.1
+yarn test functional --sync all,conversations
+yarn test functional --size 5-10
 ```
 
 ### Combining Options
 
 ```bash
-yarn test functional --versions 3 --attempts 5  --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5  --debug
+yarn test functional --nodeVersion 3.1.1 --env local --sync all
+yarn test functional --size 5-10 --parallel --forks
 ```
 
 ## Best Practices
@@ -233,8 +252,11 @@ yarn test functional --versions 3 --attempts 5  --debug-verbose --parallel
 4. **Test locally first** before running against dev/production
 5. **Use version testing** to catch compatibility issues early
 6. **Monitor logs** in the logs/ directory for detailed analysis
+7. **Use --forks** to monitor fork count after test completion
+8. **Configure sync strategies** based on your testing needs
 
 ```bash
 # Advanced example with multiple options
-yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5 --debug --parallel --forks
+yarn test functional --nodeVersion 3.1.1 --env local --sync all,conversations --size 5-10
 ```
