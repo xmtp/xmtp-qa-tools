@@ -112,7 +112,7 @@ function cleanupStressDatabases(env: string): void {
 
 async function runStressTest(config: Config): Promise<void> {
   const startTime = Date.now();
-  console.log(`🚀 Testing ${config.userCount} users against `);
+  console.log(`🚀 Testing ${config.userCount} users on ${config.env} `);
 
   // Clean up previous stress test database files
   if (!config.keepDb) {
