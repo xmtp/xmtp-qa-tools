@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
+  validate:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
