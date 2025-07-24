@@ -20,7 +20,7 @@
     "types": ["node", "vitest"],
     "paths": {
       "@helpers/*": ["./helpers/*"],
-      "@scripts/*": ["./scripts/*"],
+      "@cli*": ["./cli*"],
       "@workers/*": ["./workers/*"],
       "@inboxes/*": ["./inboxes/*"],
       "@bots/*": ["./bots/helpers/*"]

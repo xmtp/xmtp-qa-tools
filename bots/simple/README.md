@@ -21,4 +21,4 @@ XMTP_ENV="dev"         # Network selection
 - **Local:** Work in local network with [dev section](/dev/)
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
-- **Scripts:** Automation scripts in the [scripts section](/scripts/)
+- **Scripts:** Automation scripts in the [scripts section](/cli)

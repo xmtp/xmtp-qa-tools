@@ -9,8 +9,8 @@ node_modules
 # testing
 coverage
 .data/
-scripts/db/
-scripts/db/*
+clidb/
+clidb/*
 bugs/**/.data/
 bugs/**/.env
 bugs/**/.data/.env
