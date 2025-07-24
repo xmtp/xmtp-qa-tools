@@ -31,7 +31,6 @@ describe(testName, async () => {
       );
     }
   });
-  let randomWorker: Worker;
 
   it("inboxState:measure inboxState", async () => {
     const inboxState = await creatorClient.preferences.inboxState(true);
@@ -53,7 +52,7 @@ describe(testName, async () => {
     expect(dm2).toBeDefined();
     expect(dm2.id).toBeDefined();
   });
-  it("getConersationById:measure getting a conversation by id", async () => {
+  it("getConversationById:measure getting a conversation by id", async () => {
     const conversation = await creatorClient.conversations.getConversationById(
       dm!.id,
     );
