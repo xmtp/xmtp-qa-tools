@@ -15,7 +15,7 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
-import { getRandomAddress } from "../inboxes/utils";
+import { getRandomAddress, getRandomInboxIds } from "../inboxes/utils";
 
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
@@ -187,18 +187,12 @@ async function runsendTest(config: Config): Promise<void> {
           let conversation: Conversation;
 
           if (config.useGroups) {
-            // Create group with 5 people (including the target address)
-            const groupMembers = [config.address];
-            // Add 4 random addresses
-            for (let j = 0; j < 4; j++) {
-              groupMembers.push(getRandomAddress());
-            }
-
-            conversation = (await worker.conversations.newGroup(groupMembers, {
-              groupName: `test-group-${i}-${Date.now()}`,
-            })) as Conversation;
+            const groupMembers = getRandomInboxIds(4);
+            conversation = (await worker.conversations.newGroup(
+              groupMembers,
+            )) as Conversation;
             console.log(
-              `💬 ${i}: Group created in ${Date.now() - newDmStart}ms with ${groupMembers.length} members`,
+              `💬 ${i}: Group created in ${Date.now() - newDmStart}ms`,
             );
           } else {
             // Create DM
