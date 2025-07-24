@@ -38,6 +38,8 @@ describe(testName, async () => {
   };
   let allMembers: string[] = [];
   let allMembersWithExtra: string[] = [];
+  // Cumulative tracking variables
+  let cumulativeGroups: Group[] = [];
 
   setupTestLifecycle({
     testName,
@@ -152,6 +154,8 @@ describe(testName, async () => {
         ...workers.getAllButCreator().map((w) => w.client.inboxId),
       ])) as Group;
       expect(newGroup.id).toBeDefined();
+      // Add current group to cumulative tracking
+      cumulativeGroups.push(newGroup);
     });
     it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
       const callMembersWithExtraWithAddress = getAddresses(i + 1);
@@ -267,6 +271,29 @@ describe(testName, async () => {
       const singleSyncWorkers = await getWorkers(["randomB"]);
       const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
+      const start = performance.now();
+      await clientSingleSync.conversations.syncAll();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+
+    it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomC"]);
+      const clientSingleSync = singleSyncWorkers.get("randomC")!.client;
+      for (const group of cumulativeGroups) {
+        await group.addMembers([clientSingleSync.inboxId]);
+      }
+      const start = performance.now();
+      await clientSingleSync.conversations.sync();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+    it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomD"]);
+      const clientSingleSync = singleSyncWorkers.get("randomD")!.client;
+      for (const group of cumulativeGroups) {
+        await group.addMembers([clientSingleSync.inboxId]);
+      }
       const start = performance.now();
       await clientSingleSync.conversations.syncAll();
       const end = performance.now();
