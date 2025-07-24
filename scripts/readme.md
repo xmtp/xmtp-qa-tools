@@ -37,10 +37,10 @@ yarn cli <type> <name> [options]
 
 ```bash
 # Full setup
-yarn script versions
+yarn versions
 
 # Clean first
-yarn script versions
+yarn versions
 ```
 
 ## Log Files
