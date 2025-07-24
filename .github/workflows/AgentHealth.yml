@@ -26,7 +26,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-dms tests
-        run: yarn test agents-dms --no-fail --debug --no-error-logs --env ${{ matrix.env }}
+        run: yarn test agents-dms --no-fail --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
