@@ -47,7 +47,7 @@ describe(testName, async () => {
       console.log(
         worker.name,
         "has",
-        worker.client.conversations.list().length,
+        (await worker.client.conversations.list()).length,
         "conversations",
       );
     }
