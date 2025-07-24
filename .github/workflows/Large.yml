@@ -25,7 +25,6 @@ jobs:
             delay_minutes: 15
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       BATCH_SIZE: ${{ matrix.BATCH_SIZE }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -40,7 +39,7 @@ jobs:
         run: sleep $((${{ matrix.delay_minutes }} * 60))
 
       - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()

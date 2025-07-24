@@ -123,8 +123,8 @@ XMTP_ENV=local yarn test functional
 XMTP_ENV=dev yarn test functional
 
 # Production network (use carefully)
-XMTP_ENV=production yarn test functional
-XMTP_ENV=production yarn test agents
+ yarn test functional
+ yarn test agents
 ```
 
 ## Key Generation and Setup
@@ -169,9 +169,9 @@ yarn test functional --no-fail --debug # Full functional suite with debugging
 ### Production Monitoring
 
 ```bash
-XMTP_ENV=production yarn test agents --no-fail --debug    # Live monitoring
-XMTP_ENV=production yarn test performance --debug         # Performance benchmarking
-XMTP_ENV=production yarn test large --no-fail --debug     # Large group testing
+ yarn test agents --no-fail --debug    # Live monitoring
+ yarn test performance --debug         # Performance benchmarking
+ yarn test large --no-fail --debug     # Large group testing
 ```
 
 ### Multi-Version Compatibility
@@ -243,7 +243,7 @@ yarn test ./suites/functional/groups.test.ts ./suites/functional/consent.test.ts
 ### Environment Variables in Commands
 
 ```bash
-XMTP_ENV=production LOGGING_LEVEL=debug yarn test functional --debug
+ LOGGING_LEVEL=debug yarn test functional --debug
 TEST_VERSIONS=3 yarn test functional
 ```
 

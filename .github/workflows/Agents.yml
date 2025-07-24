@@ -16,7 +16,6 @@ jobs:
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
@@ -27,7 +26,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-tagged tests
-        run: yarn test agents-tagged --no-fail --debug --no-error-logs
+        run: yarn test agents-tagged --no-fail --debug --no-error-logs --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -49,7 +48,6 @@ jobs:
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
@@ -60,7 +58,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-untagged tests
-        run: yarn test agents-untagged --no-fail --debug
+        run: yarn test agents-untagged --no-fail --debug --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()

@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
       LOGGING_LEVEL: "error"
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -39,7 +38,7 @@ jobs:
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          timeout 300s yarn dms
+          yarn test convos --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
