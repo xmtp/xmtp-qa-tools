@@ -11,7 +11,6 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
-      LOGGING_LEVEL: "off"
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:

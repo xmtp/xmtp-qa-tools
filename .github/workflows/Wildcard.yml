@@ -20,8 +20,6 @@ jobs:
         # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: error
-      LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       REGION: ${{ vars.REGION }}
     steps:
