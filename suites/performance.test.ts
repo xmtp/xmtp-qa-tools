@@ -44,6 +44,12 @@ describe(testName, async () => {
   beforeAll(async () => {
     for (const worker of workers.getAll()) {
       await worker.client.conversations.syncAll();
+      console.log(
+        worker.name,
+        "has",
+        worker.client.conversations.list().length,
+        "conversations",
+      );
     }
   });
   setupTestLifecycle({
