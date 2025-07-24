@@ -1,5 +1,3 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { verifyMessageStream } from "@helpers/streams";
 import { typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { ConsentEntityType, ConsentState, type Dm } from "@xmtp/node-sdk";
@@ -65,10 +63,12 @@ describe(testName, async () => {
             randomConversation?.id ?? "",
           );
         console.log("Found conversation", Date.now() - start);
+        const members = await conversation?.members();
+        console.log("Members", members?.length);
         await creator?.client.preferences.setConsentStates([
           {
-            entity: conversation!id,
-            entityType: ConsentEntityType.GroupId,
+            entity: members?.[0]?.inboxId ?? "",
+            entityType: ConsentEntityType.InboxId,
             state: ConsentState.Allowed,
           },
         ]);
