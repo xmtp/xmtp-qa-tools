@@ -122,12 +122,6 @@ Workflows are configured using GitHub repository secrets and variables:
 - `WALLET_KEY`: XMTP wallet private key for testing
 - `ENCRYPTION_KEY`: XMTP encryption key for database
 
-### Variables
-
-- `LOGGING_LEVEL`: Controls log verbosity
-- `REGION`: Target geographic region
-- `BATCH_SIZE`: Number of members per batch
-
 ## Monitoring and reporting
 
 Workflow results are accessible through multiple channels:

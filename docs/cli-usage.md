@@ -36,7 +36,6 @@ yarn test bench                        # Benchmarking suite
 
 # Cross-Platform & Compatibility
 yarn test browser                      # Playwright browser automation
-yarn test regression                  # Multi-version compatibility
 yarn test agents                      # Live bot monitoring
 yarn test mobile                      # Cross-platform mobile testing
 
@@ -82,12 +81,7 @@ yarn test functional --no-fail --debug
 
 ```bash
 yarn test functional --versions 3      # Uses 3 random SDK versions
-yarn regression                        # Shortcut for version testing
 
-# Available SDK versions:
-# - 0.0.47 (Legacy)
-# - 1.0.5, 2.0.9, 2.1.0, 2.2.1 (Stable)
-# - 3.0.1 (Latest)
 ```
 
 ## Environment-Specific Testing
@@ -100,8 +94,8 @@ yarn test functional --env local
 yarn test functional --env dev
 
 # Production network (use carefully)
- yarn test functional
- yarn test agents
+yarn test functional
+yarn test agents
 ```
 
 ## Key Generation and Setup
@@ -164,7 +158,6 @@ yarn test functional --versions 3 --debug                # Version compatibility
 yarn test functional                        # yarn test suites/functional
 yarn test bench                            # yarn test suites/bench/bench.test.ts
 yarn test large                            # yarn test suites/large
-yarn test regression                       # yarn test suites/functional --versions 3
 
 # Utility Shortcuts
 yarn datadog                         # yarn test suites/datadog

@@ -16,7 +16,7 @@ import {
   type Dm,
   type Group,
 } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, async () => {
