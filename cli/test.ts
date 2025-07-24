@@ -18,7 +18,7 @@ interface RetryOptions {
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
   cleanLogs: boolean; // Auto-clean logs after completion
-  logLevel: string; // Log level (debug, info, error)
+  logLevel: string; // Log level (info, info, error)
   noErrorLogs: boolean; // Disable sending error logs to Datadog
   runAnsiForks: boolean; // Run ansi:forks after test completion
   reportForkCount: boolean; // Report fork count after ansi:forks
@@ -29,18 +29,18 @@ interface RetryOptions {
  */
 function runAnsiForksAndReport(options: RetryOptions): void {
   if (options.runAnsiForks) {
-    console.debug("Running ansi:forks...");
+    console.info("Running ansi:forks...");
     try {
       execSync("yarn ansi:forks", { stdio: "inherit" });
-      console.debug("Finished cleaning up");
+      console.info("Finished cleaning up");
 
       if (options.reportForkCount) {
         const logsDir = path.join(process.cwd(), "logs", "cleaned");
         if (fs.existsSync(logsDir)) {
           const forkCount = fs.readdirSync(logsDir).length;
-          console.debug(`Found ${forkCount} forks in logs/cleaned`);
+          console.info(`Found ${forkCount} forks in logs/cleaned`);
         } else {
-          console.debug("No logs/cleaned directory found");
+          console.info("No logs/cleaned directory found");
         }
       }
     } catch (error) {
@@ -79,7 +79,7 @@ async function cleanSpecificLogFile(
   pattern?: string,
 ): Promise<void> {
   if (!logFileName) {
-    console.debug("No log file name provided for cleaning");
+    console.info("No log file name provided for cleaning");
     return;
   }
 
@@ -89,7 +89,7 @@ async function cleanSpecificLogFile(
 
   // Check if the raw file exists
   if (!fs.existsSync(rawFilePath)) {
-    console.debug(`Raw log file not found: ${rawFilePath}`);
+    console.info(`Raw log file not found: ${rawFilePath}`);
     return;
   }
 
@@ -106,7 +106,7 @@ async function cleanSpecificLogFile(
       // Import processLogFile dynamically to avoid circular dependencies
       const { processLogFile } = await import("@helpers/logger");
       await processLogFile(rawFilePath, outputPath);
-      console.debug(`Cleaned log file: ${logFileName} -> ${outputPath}`);
+      console.info(`Cleaned log file: ${logFileName} -> ${outputPath}`);
     } catch (error) {
       console.error(`Failed to clean log file ${logFileName}:`, error);
     }
@@ -156,7 +156,7 @@ async function cleanSpecificLogFile(
       await fs.promises.unlink(rawFilePath);
       await fs.promises.rename(tempPath, rawFilePath);
 
-      console.debug(logFileName);
+      console.info(logFileName);
     } catch (error) {
       console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
     }
@@ -184,12 +184,12 @@ function showUsageAndExit(): never {
     "      --parallel          Run tests in parallel (default: consecutive)",
   );
   console.error("    Logging mode (enables file logging):");
-  console.error("      --debug / --no-log    Enable/disable logging to file");
+  console.error("      --info / --no-log    Enable/disable logging to file");
   console.error(
-    "      --debug-verbose     Enable logging to both file AND terminal output",
+    "      --info-verbose     Enable logging to both file AND terminal output",
   );
   console.error(
-    "      --debug-file <n>   Custom log file name (default: auto-generated)",
+    "      --info-file <n>   Custom log file name (default: auto-generated)",
   );
   console.error(
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
@@ -214,7 +214,7 @@ function showUsageAndExit(): never {
     "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
   );
   console.error(
-    "      --log-level <level> Set logging level (debug, info, error) (default: debug)",
+    "      --log-level <level> Set logging level (info, info, error) (default: info)",
   );
   console.error(
     "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
@@ -231,11 +231,11 @@ function showUsageAndExit(): never {
   console.error("  yarn test convos --attempts 2");
   console.error("  yarn test convos --parallel");
   console.error(
-    "  yarn test convos --debug-verbose   # Shows output in terminal AND logs to file",
+    "  yarn test convos --info-verbose   # Shows output in terminal AND logs to file",
   );
   console.error("  yarn test convos --no-fail        # Exit 0 even on failure");
   console.error(
-    "  yarn test convos --debug        # Uses logging mode with file output",
+    "  yarn test convos --info        # Uses logging mode with file output",
   );
   console.error(
     "  yarn test convos --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
@@ -256,7 +256,7 @@ function showUsageAndExit(): never {
     "  yarn test convos --size 5-10        # Set batch size range to 5-10",
   );
   console.error(
-    "  yarn test convos --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
+    "  yarn test convos --attempts 100 --info --ansi-forks --report-forks  # Replicate run.sh behavior",
   );
   process.exit(1);
 }
@@ -282,7 +282,7 @@ function parseTestArgs(args: string[]): {
     verboseLogging: true, // Show terminal output by default
     parallel: false,
     cleanLogs: true,
-    logLevel: "debug", // Default log level
+    logLevel: "info", // Default log level
     noErrorLogs: false,
     runAnsiForks: false, // Run ansi:forks after test completion
     reportForkCount: false, // Report fork count after ansi:forks
@@ -330,18 +330,18 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
-      case "--debug":
+      case "--info":
         options.enableLogging = true;
         options.verboseLogging = false;
         break;
-      case "--debug-verbose":
+      case "--info-verbose":
         options.enableLogging = true;
         options.verboseLogging = true;
         break;
       case "--no-log":
         options.enableLogging = false;
         break;
-      case "--debug-file":
+      case "--info-file":
         if (nextArg) {
           options.customLogFile = nextArg;
           i++;
@@ -373,7 +373,7 @@ function parseTestArgs(args: string[]): {
           i++;
         } else {
           console.warn(
-            "--log-level flag requires a value (e.g., --log-level debug)",
+            "--log-level flag requires a value (e.g., --log-level info)",
           );
         }
         break;
@@ -484,7 +484,6 @@ function processEnvironmentVariables(
   if (versionsArg) {
     const versions = versionsArg.split("=")[1];
     env.TEST_VERSIONS = versions;
-    console.debug(`Setting TEST_VERSIONS environment variable to: ${versions}`);
   }
 
   // Extract --nodeVersion parameter and set as environment variable
@@ -494,9 +493,6 @@ function processEnvironmentVariables(
   if (nodeVersionArg) {
     const nodeVersion = nodeVersionArg.split("=")[1];
     env.NODE_VERSION = nodeVersion;
-    console.debug(
-      `Setting NODE_VERSION environment variable to: ${nodeVersion}`,
-    );
   }
 
   // Extract --env parameter and set as environment variable
@@ -504,7 +500,6 @@ function processEnvironmentVariables(
   if (envArg) {
     const envValue = envArg.split("=")[1];
     env.XMTP_ENV = envValue;
-    console.debug(`Setting XMTP_ENV environment variable to: ${envValue}`);
   }
 
   // Extract --sync parameter and set as environment variable
@@ -512,9 +507,6 @@ function processEnvironmentVariables(
   if (syncArg) {
     const syncValue = syncArg.split("=")[1];
     env.SYNC_STRATEGY = syncValue;
-    console.debug(
-      `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
-    );
   }
 
   // Extract --size parameter and set as environment variable
@@ -522,7 +514,7 @@ function processEnvironmentVariables(
   if (sizeArg) {
     const sizeValue = sizeArg.split("=")[1];
     env.BATCH_SIZE = sizeValue;
-    console.debug(`Setting BATCH_SIZE environment variable to: ${sizeValue}`);
+    console.info(`Setting BATCH_SIZE environment variable to: ${sizeValue}`);
   }
 
   // Set logging level
@@ -539,6 +531,53 @@ function processEnvironmentVariables(
   );
 
   return env;
+}
+
+/**
+ * Collects all test parameters into a single object for comprehensive logging
+ */
+function collectTestParameters(
+  testName: string,
+  options: RetryOptions,
+  env: Record<string, string>,
+): Record<string, any> {
+  const parameters: Record<string, any> = {
+    testName,
+    attempts: options.attempts,
+    retryDelay: options.retryDelay,
+    enableLogging: options.enableLogging,
+    verboseLogging: options.verboseLogging,
+    parallel: options.parallel,
+    cleanLogs: options.cleanLogs,
+    logLevel: options.logLevel,
+    noFail: options.noFail,
+    noErrorLogs: options.noErrorLogs,
+    runAnsiForks: options.runAnsiForks,
+    reportForkCount: options.reportForkCount,
+    customLogFile: options.customLogFile,
+    vitestArgs: options.vitestArgs,
+  };
+
+  // Add environment variables that were set
+  if (env.TEST_VERSIONS) parameters.testVersions = env.TEST_VERSIONS;
+  if (env.NODE_VERSION) parameters.nodeVersion = env.NODE_VERSION;
+  if (env.XMTP_ENV) parameters.xmtpEnv = env.XMTP_ENV;
+  if (env.SYNC_STRATEGY) parameters.syncStrategy = env.SYNC_STRATEGY;
+  if (env.BATCH_SIZE) parameters.batchSize = env.BATCH_SIZE;
+  if (env.LOGGING_LEVEL) parameters.loggingLevel = env.LOGGING_LEVEL;
+
+  return parameters;
+}
+
+/**
+ * Logs all test parameters in a comprehensive format
+ */
+function logTestParameters(parameters: Record<string, any>): void {
+  console.info("=== TEST PARAMETERS ===");
+  Object.entries(parameters).forEach(([key, value]) => {
+    console.info(`${key}: ${JSON.stringify(value)}`);
+  });
+  console.info("=======================");
 }
 
 async function runCommand(
@@ -595,14 +634,16 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
       })
     : undefined;
 
-  console.debug(
+  console.info(
     `Starting test suite: "${testName}" with up to ${options.attempts} attempts, delay ${options.retryDelay}s.`,
   );
 
   const env = processEnvironmentVariables(options);
+  const parameters = collectTestParameters(testName, options, env);
+  logTestParameters(parameters);
 
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
-    console.debug(`Attempt ${attempt} of ${options.attempts}...`);
+    console.info(`Attempt ${attempt} of ${options.attempts}...`);
 
     try {
       const command = buildTestCommand(
@@ -610,12 +651,12 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
         options.vitestArgs,
         options.parallel,
       );
-      console.debug(`Executing: ${command}`);
+      console.info(`Executing: ${command}`);
 
       const { exitCode } = await runCommand(command, env, logger);
 
       if (exitCode === 0) {
-        console.debug("Tests passed successfully!");
+        console.info("Tests passed successfully!");
         logger?.close();
 
         // Clean the log file if enabled
@@ -628,7 +669,7 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
 
         return;
       } else {
-        console.debug("Tests failed!");
+        console.info("Tests failed!");
       }
 
       if (attempt === options.attempts) {
@@ -659,7 +700,7 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
       }
 
       if (options.retryDelay > 0) {
-        console.debug(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
+        console.info(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
         Atomics.wait(
           new Int32Array(new SharedArrayBuffer(4)),
           0,
@@ -667,7 +708,7 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
           options.retryDelay * 1000,
         );
       } else {
-        console.debug("\n🔄 Retrying immediately...");
+        console.info("\n🔄 Retrying immediately...");
       }
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`);
