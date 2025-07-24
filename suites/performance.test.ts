@@ -58,26 +58,29 @@ describe(testName, async () => {
   });
 
   let randomWorker: Worker;
-  it("create:measure creating a client", async () => {
+  it("create: measure creating a client", async () => {
     let workers = await getWorkers(["randomclient"]);
     randomWorker = workers.get("randomclient")!;
     expect(randomWorker.inboxId).toBeDefined();
   });
   it("canMessage:measure canMessage", async () => {
+    const randomAddress = randomWorker.address;
+    if (!randomAddress) {
+      throw new Error("Random client not found");
+    }
     const start = Date.now();
     const canMessage = await Client.canMessage(
       [
         {
-          identifier: randomWorker.address,
+          identifier: randomAddress,
           identifierKind: IdentifierKind.Ethereum,
         },
       ],
       randomWorker.env,
     );
     setCustomDuration(Date.now() - start);
-    expect(canMessage.get(randomWorker.inboxId)).toBe(true);
+    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
   });
-
   it("inboxState:measure inboxState", async () => {
     const inboxState = await creatorClient.preferences.inboxState(true);
     expect(inboxState.installations.length).toBeGreaterThan(0);
