@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
