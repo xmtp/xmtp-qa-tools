@@ -207,6 +207,9 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
+      case "--no-error-logs":
+        options.noErrorLogs = true;
+        break;
       case "--no-fail":
         options.noFail = true;
         break;
