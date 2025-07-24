@@ -23,7 +23,6 @@ jobs:
       GH_CACHE: true
       BATCH_SIZE: 5-10-50-100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
 

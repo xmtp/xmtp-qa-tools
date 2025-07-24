@@ -28,7 +28,6 @@ jobs:
       REGION: ${{ vars.REGION }}
       BATCH_SIZE: ${{ matrix.BATCH_SIZE }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env

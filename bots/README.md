@@ -166,7 +166,6 @@ Environment variables:
 XMTP_ENV=dev                    # Network: local, dev, production
 LOGGING_LEVEL=off              # Logging: off, debug, info, warn, error
 SLACK_BOT_TOKEN=xoxb-...       # Optional: Slack notifications
-SLACK_CHANNEL=C...             # Optional: Slack channel
 ```
 
 ## Best practices

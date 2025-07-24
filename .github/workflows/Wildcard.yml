@@ -24,7 +24,6 @@ jobs:
       LOGGING_LEVEL: error
       LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
       REGION: ${{ vars.REGION }}
       BATCH_SIZE: 5-10
     steps:

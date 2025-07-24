@@ -15,7 +15,6 @@ jobs:
       LOGGING_LEVEL: "error"
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
 
     steps:

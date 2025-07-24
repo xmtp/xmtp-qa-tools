@@ -364,10 +364,7 @@ export function sanitizeLogs(logs: string): string {
 }
 
 export async function workflowFailed(workflowName: string): Promise<void> {
-  if (!process.env.SLACK_CHANNEL) {
-    console.warn("No Slack channel found, skipping");
-    return;
-  }
+  const slackChannel = process.env.SLACK_CHANNEL ?? "notify-qa-tools-test";
   const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
   if (jobStatus === "success") {
     console.warn(`Slack notification skipped (status: ${jobStatus})`);
@@ -394,7 +391,7 @@ export async function workflowFailed(workflowName: string): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: process.env.SLACK_CHANNEL + "-test",
+      channel: slackChannel,
       text: message,
       mrkdwn: true,
     }),
