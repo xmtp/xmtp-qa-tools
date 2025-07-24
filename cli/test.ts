@@ -514,7 +514,6 @@ function processEnvironmentVariables(
   if (sizeArg) {
     const sizeValue = sizeArg.split("=")[1];
     env.BATCH_SIZE = sizeValue;
-    console.info(`Setting BATCH_SIZE environment variable to: ${sizeValue}`);
   }
 
   // Set logging level
@@ -633,10 +632,6 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
         logLevel: options.logLevel,
       })
     : undefined;
-
-  console.info(
-    `Starting test suite: "${testName}" with up to ${options.attempts} attempts, delay ${options.retryDelay}s.`,
-  );
 
   const env = processEnvironmentVariables(options);
   const parameters = collectTestParameters(testName, options, env);
