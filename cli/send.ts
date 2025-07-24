@@ -15,10 +15,12 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
+import { getRandomAddress, getRandomInboxIds } from "../inboxes/utils";
 
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --wait
+// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --groups
 
 interface Config {
   userCount: number;
@@ -29,6 +31,7 @@ interface Config {
   keepDb: boolean;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
+  useGroups: boolean;
 }
 
 function parseArgs(): Config {
@@ -42,6 +45,7 @@ function parseArgs(): Config {
     keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
+    useGroups: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -69,6 +73,9 @@ function parseArgs(): Config {
     }
     if (arg === "--wait") {
       config.waitForResponse = true;
+    }
+    if (arg === "--groups") {
+      config.useGroups = true;
     }
   }
 
@@ -122,6 +129,17 @@ async function runsendTest(config: Config): Promise<void> {
   // Initialize workers concurrently
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
 
+  let initializedCount = 0;
+  const updateProgress = () => {
+    const percentage = Math.round((initializedCount / config.userCount) * 100);
+    const filled = Math.round((percentage / 100) * 20);
+    const empty = 20 - filled;
+    const bar = "█".repeat(filled) + "░".repeat(empty);
+    process.stdout.write(
+      `\r📋 [${bar}] ${percentage}% (${initializedCount}/${config.userCount} workers)`,
+    );
+  };
+
   const workerPromises = Array.from(
     { length: config.userCount },
     async (_, i) => {
@@ -141,13 +159,14 @@ async function runsendTest(config: Config): Promise<void> {
         loggingLevel: config.loggingLevel,
       });
 
-      console.log(`✅ ${i} initialized successfully`);
+      initializedCount++;
+      updateProgress();
       return client;
     },
   );
 
   const workers = await Promise.all(workerPromises);
-  console.log(`✅ All ${config.userCount} workers initialized successfully`);
+  console.log(`\n✅ All ${config.userCount} workers initialized successfully`);
 
   // Run all workers in parallel
   console.log(`🔄 Starting parallel execution...`);
@@ -175,14 +194,28 @@ async function runsendTest(config: Config): Promise<void> {
 
       const process = async () => {
         try {
-          // 1. Time NewDM creation
+          // 1. Time conversation creation
           const newDmStart = Date.now();
-          const conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: config.address,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
+          let conversation: Conversation;
+
+          if (config.useGroups) {
+            const groupMembers = getRandomInboxIds(4);
+            conversation = (await worker.conversations.newGroup(
+              groupMembers,
+            )) as Conversation;
+            console.log(
+              `💬 ${i}: Group created in ${Date.now() - newDmStart}ms`,
+            );
+          } else {
+            // Create DM
+            conversation = (await worker.conversations.newDmWithIdentifier({
+              identifier: config.address,
+              identifierKind: IdentifierKind.Ethereum,
+            })) as Conversation;
+            console.log(`💬 ${i}: DM created in ${Date.now() - newDmStart}ms`);
+          }
+
           const newDmTime = Date.now() - newDmStart;
-          console.log(`💬 ${i}: DM created in ${newDmTime}ms`);
 
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);

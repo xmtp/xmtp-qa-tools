@@ -89,7 +89,7 @@ describe(testName, async () => {
   });
   it("newDmByAddress:measure creating a DM", async () => {
     const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
-      identifier: getRandomAddress(),
+      identifier: getRandomAddress(1)[0],
       identifierKind: IdentifierKind.Ethereum,
     });
 
