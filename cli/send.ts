@@ -200,7 +200,7 @@ async function runsendTest(config: Config): Promise<void> {
             console.log(
               `💬 ${i}: Group created in ${Date.now() - newDmStart}ms with ${groupMembers.length} members`,
             );
-                    } else {
+          } else {
             // Create DM
             conversation = (await worker.conversations.newDmWithIdentifier({
               identifier: config.address,
