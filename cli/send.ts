@@ -129,6 +129,17 @@ async function runsendTest(config: Config): Promise<void> {
   // Initialize workers concurrently
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
 
+  let initializedCount = 0;
+  const updateProgress = () => {
+    const percentage = Math.round((initializedCount / config.userCount) * 100);
+    const filled = Math.round((percentage / 100) * 20);
+    const empty = 20 - filled;
+    const bar = "█".repeat(filled) + "░".repeat(empty);
+    process.stdout.write(
+      `\r📋 [${bar}] ${percentage}% (${initializedCount}/${config.userCount} workers)`,
+    );
+  };
+
   const workerPromises = Array.from(
     { length: config.userCount },
     async (_, i) => {
@@ -148,13 +159,14 @@ async function runsendTest(config: Config): Promise<void> {
         loggingLevel: config.loggingLevel,
       });
 
-      console.log(`✅ ${i} initialized successfully`);
+      initializedCount++;
+      updateProgress();
       return client;
     },
   );
 
   const workers = await Promise.all(workerPromises);
-  console.log(`✅ All ${config.userCount} workers initialized successfully`);
+  console.log(`\n✅ All ${config.userCount} workers initialized successfully`);
 
   // Run all workers in parallel
   console.log(`🔄 Starting parallel execution...`);

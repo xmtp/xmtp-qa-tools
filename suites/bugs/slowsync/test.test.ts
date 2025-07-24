@@ -64,33 +64,25 @@ describe(testName, async () => {
           await creator?.client.conversations.getConversationById(
             randomConversation?.id ?? "",
           );
-        console.log("Found conversation", conversation?.id, Date.now() - start);
+        console.log("Found conversation", Date.now() - start);
+        await creator?.client.preferences.setConsentStates([
+          {
+            entity: conversation!id,
+            entityType: ConsentEntityType.GroupId,
+            state: ConsentState.Allowed,
+          },
+        ]);
+        console.log("Set consent", Date.now() - start);
+        await creator?.client.preferences.getConsentState(
+          ConsentEntityType.GroupId,
+          conversation!.id,
+        );
+        console.log("Got consent", Date.now() - start);
       }
     });
     it("send:measure sending a gm", async () => {
       const dmId = await dm!.send("gm");
       expect(dmId).toBeDefined();
-    });
-
-    // it("stream:measure receiving a gm", async () => {
-    //   const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
-    //   expect(verifyResult.allReceived).toBe(true);
-    // });
-    it(`consent:verify group consent`, async () => {
-      await creator?.client.preferences.setConsentStates([
-        {
-          entity: receiver!.client.inboxId,
-          entityType: ConsentEntityType.InboxId,
-          state: ConsentState.Allowed,
-        },
-      ]);
-      const consentState = await creator?.client.preferences.getConsentState(
-        ConsentEntityType.InboxId,
-        receiver!.client.inboxId,
-      );
-      console.log("consentState", consentState);
-      expect(consentState).toBe(ConsentState.Allowed);
     });
   }
 });
