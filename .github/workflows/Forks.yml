@@ -30,7 +30,7 @@ jobs:
         run: sleep 30
 
       - name: Run forks test
-        run: yarn test forks --attempts 5 --env local --debug --ansi-forks --report-forks
+        run: yarn test forks --attempts 5 --env local --debug --forks
 
       - name: Stop local XMTP network
         if: always()

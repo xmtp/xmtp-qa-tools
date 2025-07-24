@@ -56,7 +56,7 @@ yarn install
 yarn local-update
 
 # Process that runs the test 100 times and exports forks logs
-yarn test forks --attempts 100 --env local --debug --ansi-forks --report-forks
+yarn test forks --attempts 100 --env local --debug --forks
 ```
 
 ### Log processing features
