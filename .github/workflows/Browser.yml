@@ -18,6 +18,8 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
+      LOGGING_LEVEL: "off"
+      LOG_LEVEL: "info"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +27,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }}
+        run: yarn test ${{ matrix.test }} --no-fail --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
