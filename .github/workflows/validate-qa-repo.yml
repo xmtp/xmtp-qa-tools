@@ -1,6 +1,7 @@
 name: Validate QA repo
 
 on:
+  pull_request:
   schedule:
     - cron: "25 */5 * * *" # every 5 hours at 25 minutes past
   workflow_dispatch:
