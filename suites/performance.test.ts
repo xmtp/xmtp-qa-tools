@@ -16,7 +16,7 @@ import {
   type Dm,
   type Group,
 } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, async () => {
@@ -41,6 +41,11 @@ describe(testName, async () => {
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
 
+  beforeAll(async () => {
+    for (const worker of workers.getAll()) {
+      await worker.client.conversations.syncAll();
+    }
+  });
   setupTestLifecycle({
     testName,
     getCustomDuration: () => customDuration,
@@ -51,27 +56,26 @@ describe(testName, async () => {
     sendDurationMetrics: true,
     networkStats: true,
   });
-  it("setup accounts", async () => {
-    for (const worker of workers.getAll()) {
-      await worker.client.conversations.syncAll();
-    }
-  });
+
   let randomWorker: Worker;
   it("create:measure creating a client", async () => {
     let workers = await getWorkers(["randomclient"]);
     randomWorker = workers.get("randomclient")!;
-    expect(randomWorker.client.inboxId).toBeDefined();
+    expect(randomWorker.inboxId).toBeDefined();
   });
   it("canMessage:measure canMessage", async () => {
     const start = Date.now();
-    const canMessage = await Client.canMessage([
-      {
-        identifier: randomWorker!.address,
-        identifierKind: IdentifierKind.Ethereum,
-      },
-    ]);
+    const canMessage = await Client.canMessage(
+      [
+        {
+          identifier: randomWorker.address,
+          identifierKind: IdentifierKind.Ethereum,
+        },
+      ],
+      randomWorker.env,
+    );
     setCustomDuration(Date.now() - start);
-    expect(canMessage.get(randomWorker!.inboxId)).toBe(true);
+    expect(canMessage.get(randomWorker.inboxId)).toBe(true);
   });
 
   it("inboxState:measure inboxState", async () => {
