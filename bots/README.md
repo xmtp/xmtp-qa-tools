@@ -4,11 +4,10 @@ Test bots for the XMTP protocol that validate functionality, automate testing sc
 
 ## Quick reference
 
-| Bot         | Purpose             | Key Features                            |
-| ----------- | ------------------- | --------------------------------------- |
-| **gm-bot/** | Simple greeting bot | Basic response, standalone deployment   |
-| **simple/** | Diagnostics bot     | Identity info, conversation details     |
-| **stress/** | Load testing bot    | Group scaling, performance benchmarking |
+| Bot         | Purpose             | Key Features                          |
+| ----------- | ------------------- | ------------------------------------- |
+| **gm-bot/** | Simple greeting bot | Basic response, standalone deployment |
+| **simple/** | Diagnostics bot     | Identity info, conversation details   |
 
 ## Usage
 
@@ -16,8 +15,8 @@ Test bots for the XMTP protocol that validate functionality, automate testing sc
 # Run the GM bot
 yarn bot gm-bot
 
-# Run the stress test bot with 5 workers
-yarn bot stress 5
+# Run the send test bot with 5 workers
+yarn bot send 5
 
 # Run the simple diagnostics bot
 yarn bot simple
@@ -62,13 +61,13 @@ for await (const message of stream) {
 
 Functions: Identity information, conversation details, protocol diagnostics, connection testing.
 
-## Stress test bot
+## send test bot
 
 Load testing for XMTP groups and DMs.
 
 ```typescript
-// Run stress test with specified number of workers
-const stressTest = async (count) => {
+// Run send test with specified number of workers
+const sendTest = async (count) => {
   const workers = await getWorkers(count);
 
   // Create group with all workers

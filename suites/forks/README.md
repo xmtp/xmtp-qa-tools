@@ -2,7 +2,7 @@
 
 XMTP forks occur when different clients create conflicting states in group conversations.
 
-## Fork generation through stress testing
+## Fork generation through send testing
 
 The main approach creates intentional conflicts by running parallel operations on shared groups:
 

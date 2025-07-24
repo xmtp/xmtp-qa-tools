@@ -23,13 +23,11 @@ describe(testName, async () => {
   }
 
   const workers = await getWorkers(userDescriptors);
-  // Start message and response streams for the stress testing
+  // Start message and response streams for the send testing
   workers.startStream(typeofStream.MessageandResponse);
 
   it("handle staggered key rotations and network chaos under load", async () => {
-    const group = await workers.createGroupBetweenAll(
-      "Key Rotation Stress Test",
-    );
+    const group = await workers.createGroupBetweenAll("Key Rotation send Test");
     await group.sync();
 
     const chaosDuration = 60 * 1000;

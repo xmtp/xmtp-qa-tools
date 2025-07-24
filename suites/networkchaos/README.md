@@ -48,12 +48,12 @@ const loss = Math.random() * 5; // 0-5%
 
 - `verify group messaging during and after client-side blackhole partition`
 
-### Network chaos stress [networkchaos.test.ts](networkchaos.test.ts)
+### Network chaos send [networkchaos.test.ts](networkchaos.test.ts)
 
 - `survive sustained latency + jitter + packet loss under group message load`
 - 20 users, 60 seconds sustained chaos
 
-### Key rotation stress [keyrotation.test.ts](keyrotation.test.ts)
+### Key rotation send [keyrotation.test.ts](keyrotation.test.ts)
 
 - `handle staggered key rotations and network chaos under load`
 - 20 users, concurrent operations: message traffic, key rotation, network chaos

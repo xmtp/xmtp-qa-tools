@@ -13,7 +13,7 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **Delivery.yml**              | Test message delivery reliability | Every 30 minutes, manual     | Verify cross-environment message delivery      |
 | **Large.yml**                 | Test large scale operations       | Every 2 hours, manual        | Test large group operations and scalability    |
 | **Performance.yml**           | Measure protocol performance      | Every 30 minutes, manual     | Benchmark operation timing and scalability     |
-| **GroupStress.yml**           | Group stress testing              | PR to main, manual           | Test group membership changes under stress     |
+| **Groupsend.yml**             | Group send testing                | PR to main, manual           | Test group membership changes under send       |
 | **PackageCompatibility.yml**  | Verify package compatibility      | On main branch push, manual  | Test with different Node versions and managers |
 | **upload-installations.yml**  | Backup installation data          | Daily, manual                | Upload keys and installation data as artifacts |
 | **validate-code-quality.yml** | Check code quality                | On non-main branch pushes    | Enforce code quality standards                 |
@@ -146,7 +146,7 @@ The workflows are organized into logical categories:
 
 - **Automated Tests**: `Agents.yml`, `Gm.yml` - Continuous monitoring
 - **Metrics Tests**: `Delivery.yml`, `Large.yml`, `Performance.yml` - Performance measurement
-- **Stress Tests**: `GroupStress.yml` - High-load scenario testing
+- **send Tests**: `Groupsend.yml` - High-load scenario testing
 - **Infrastructure**: `Deploy.yml`, `PackageCompatibility.yml` - Deployment and compatibility
 
 ## Best practices
@@ -170,6 +170,6 @@ The workflows have been updated to use standardized naming conventions:
 | `m_delivery.yml`    | `Delivery.yml`    | `yarn test delivery`    |
 | `m_performance.yml` | `Performance.yml` | `yarn test performance` |
 | `m_large.yml`       | `Large.yml`       | `yarn test large`       |
-| `StressGroup.yml`   | `GroupStress.yml` | `yarn test group`       |
+| `sendGroup.yml`     | `Groupsend.yml`   | `yarn test group`       |
 
 All test suites now follow consistent kebab-case naming conventions for better organization and maintainability.

@@ -74,7 +74,7 @@ yarn test datadog                     # Datadog log analysis and monitoring
 
 ```bash
 yarn bot gm-bot                        # GM greeting bot
-yarn bot stress 5                      # Stress testing with 5 concurrent users
+yarn bot send 5                      # send testing with 5 concurrent users
 ```
 
 ### Scripts

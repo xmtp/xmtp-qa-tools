@@ -23,7 +23,7 @@
     "prod-update": "./inboxes/gen.sh --envs production --installations 2",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "revoke": "tsx scripts/revoke.ts",
-    "stress": "tsx scripts/stress.ts",
+    "send": "tsx scripts/send.ts",
     "test": "tsx scripts/test.ts",
     "ui": "vitest --ui --standalone --watch",
     "versions": "tsx scripts/versions.ts",
