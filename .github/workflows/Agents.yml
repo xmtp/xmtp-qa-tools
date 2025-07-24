@@ -24,7 +24,7 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run agents-tagged tests
+      - name: Run agents-tagged ${{ matrix.env }}
         run: yarn test agents-tagged --no-fail --debug --no-error-logs --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts

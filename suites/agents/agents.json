@@ -20,7 +20,6 @@
     "slackChannel": "#csx-alerts",
     "respondOnTagged": false
   },
-
   {
     "name": "gang",
     "baseName": "gang.base.eth",
@@ -63,16 +62,6 @@
     "respondOnTagged": true
   },
   {
-    "name": "onit",
-    "baseName": "onit.base.eth",
-    "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
-    "sendMessage": "hey",
-    "live": true,
-    "networks": ["production"],
-    "slackChannel": "#onit-alerts",
-    "respondOnTagged": true
-  },
-  {
     "name": "arma",
     "baseName": "arma.base.eth",
     "address": "0x1456350CD79c51814567b0c1E767d3032dBD1647",
@@ -81,6 +70,16 @@
     "networks": ["production"],
     "slackChannel": "#arma-alerts",
     "respondOnTagged": false
+  },
+  {
+    "name": "onit",
+    "baseName": "onit.base.eth",
+    "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
+    "sendMessage": "hey",
+    "live": true,
+    "networks": ["production"],
+    "slackChannel": "#onit-alerts",
+    "respondOnTagged": true
   },
   {
     "name": "byte",
