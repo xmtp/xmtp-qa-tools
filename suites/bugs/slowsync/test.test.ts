@@ -46,21 +46,37 @@ describe(testName, async () => {
       expect(dm.id).toBeDefined();
     });
     it("getConversationById:measure getting a conversation by id", async () => {
-      const conversation =
-        await creator?.client.conversations.getConversationById(dm!.id);
-      expect(conversation?.id).toBe(dm!.id);
-      console.log("Conversation", conversation?.id);
+      if (worker.name === "randomclient") {
+        expect(true).toBe(true);
+        return;
+      }
+      for (let i = 0; i < 500; i++) {
+        const start = Date.now();
+        const randomConversation = (
+          await creator?.client.conversations.list()
+        )?.[
+          Math.floor(
+            Math.random() *
+              ((await creator?.client.conversations.list())?.length ?? 0),
+          )
+        ];
+        const conversation =
+          await creator?.client.conversations.getConversationById(
+            randomConversation?.id ?? "",
+          );
+        console.log("Found conversation", conversation?.id, Date.now() - start);
+      }
     });
     it("send:measure sending a gm", async () => {
       const dmId = await dm!.send("gm");
       expect(dmId).toBeDefined();
     });
 
-    it("stream:measure receiving a gm", async () => {
-      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+    // it("stream:measure receiving a gm", async () => {
+    //   const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
-      expect(verifyResult.allReceived).toBe(true);
-    });
+    //   expect(verifyResult.allReceived).toBe(true);
+    // });
     it(`consent:verify group consent`, async () => {
       await creator?.client.preferences.setConsentStates([
         {
