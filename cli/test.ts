@@ -192,7 +192,7 @@ function parseTestArgs(args: string[]): {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
         }
         break;
-      case "--d":
+      case "--debug":
         options.enableLogging = true;
         options.verboseLogging = false;
         break;
@@ -207,28 +207,8 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
-      case "--info":
-        options.enableLogging = true;
-        options.verboseLogging = false;
-        break;
-      case "--info-verbose":
-        options.enableLogging = true;
-        options.verboseLogging = true;
-        break;
-      case "--no-log":
-        options.enableLogging = false;
-        break;
-      case "--info-file":
-        if (nextArg) {
-          options.customLogFile = nextArg;
-          i++;
-        }
-        break;
       case "--no-fail":
         options.noFail = true;
-        break;
-      case "--verbose-logging":
-        options.verboseLogging = true;
         break;
       case "--parallel":
         options.parallel = true;
@@ -241,19 +221,6 @@ function parseTestArgs(args: string[]): {
           console.warn("--env flag requires a value (e.g., --env local)");
         }
         break;
-      case "--no-clean-logs":
-        options.cleanLogs = false;
-        break;
-      case "--log-level":
-        if (nextArg) {
-          options.logLevel = nextArg;
-          i++;
-        } else {
-          console.warn(
-            "--log-level flag requires a value (e.g., --log-level info)",
-          );
-        }
-        break;
       case "--sync":
         if (nextArg) {
           options.vitestArgs.push(`--sync=${nextArg}`);
@@ -263,9 +230,6 @@ function parseTestArgs(args: string[]): {
             "--sync flag requires a value (e.g., --sync all,conversations)",
           );
         }
-        break;
-      case "--no-error-logs":
-        options.noErrorLogs = true;
         break;
       case "--size":
         if (nextArg) {
