@@ -18,6 +18,7 @@ import {
 
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
+// yarn stress --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --wait
 
 interface Config {
   userCount: number;
@@ -27,6 +28,7 @@ interface Config {
   tresshold: number;
   keepDb: boolean;
   loggingLevel: LogLevel;
+  waitForResponse: boolean;
 }
 
 function parseArgs(): Config {
@@ -39,6 +41,7 @@ function parseArgs(): Config {
     tresshold: 95,
     keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
+    waitForResponse: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -61,8 +64,11 @@ function parseArgs(): Config {
       config.tresshold = parseInt(nextArg, 10);
       i++;
     }
-    if (arg === "--keep-db") {
+    if (arg === "--keep") {
       config.keepDb = true;
+    }
+    if (arg === "--wait") {
+      config.waitForResponse = true;
     }
   }
 
@@ -124,10 +130,15 @@ async function runStressTest(config: Config): Promise<void> {
       const workerKey = generatePrivateKey();
       const signer = createSigner(workerKey);
       const signerIdentifier = (await signer.getIdentifier()).identifier;
-
+      // Create stress directory in data path if it doesn't exist
+      const dbPath = getDbPath(`stress/${config.env}-${i}-${signerIdentifier}`);
+      const stressDir = path.dirname(dbPath);
+      if (!fs.existsSync(stressDir)) {
+        fs.mkdirSync(stressDir, { recursive: true });
+      }
       const client = await Client.create(signer, {
         env: config.env as XmtpEnv,
-        dbPath: getDbPath(`stress-${config.env}-${i}-${signerIdentifier}`),
+        dbPath: getDbPath(`stress/${config.env}-${i}-${signerIdentifier}`),
         dbEncryptionKey,
         loggingLevel: config.loggingLevel,
       });
@@ -175,44 +186,47 @@ async function runStressTest(config: Config): Promise<void> {
           const newDmTime = Date.now() - newDmStart;
           console.log(`💬 ${i}: DM created in ${newDmTime}ms`);
 
-          console.log(`📡 ${i}: Setting up message stream...`);
-          // Set up stream
-          void worker.conversations.streamAllMessages(
-            (error: any, message: any) => {
-              if (error) return;
+          if (config.waitForResponse) {
+            console.log(`📡 ${i}: Setting up message stream...`);
+            // Set up stream
+            void worker.conversations.streamAllMessages(
+              (error: any, message: any) => {
+                if (error) return;
 
-              // Check for bot response
-              if (
-                message.senderInboxId.toLowerCase() !==
-                  worker.inboxId.toLowerCase() &&
-                !responseReceived
-              ) {
-                responseReceived = true;
+                // Check for bot response
+                if (
+                  message.senderInboxId.toLowerCase() !==
+                    worker.inboxId.toLowerCase() &&
+                  !responseReceived
+                ) {
+                  responseReceived = true;
 
-                // 3. Calculate response time
-                const responseTime = Date.now() - sendCompleteTime;
+                  // 3. Calculate response time
+                  const responseTime = Date.now() - sendCompleteTime;
 
-                const result = {
-                  success: true,
-                  newDmTime,
-                  sendTime,
-                  responseTime,
-                };
-                results.push(result);
-                completedWorkers++;
+                  const result = {
+                    success: true,
+                    newDmTime,
+                    sendTime,
+                    responseTime,
+                  };
+                  results.push(result);
+                  completedWorkers++;
 
-                const successRate =
-                  (results.filter((r) => r.success).length / config.userCount) *
-                  100;
-                console.log(
-                  `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
-                );
+                  const successRate =
+                    (results.filter((r) => r.success).length /
+                      config.userCount) *
+                    100;
+                  console.log(
+                    `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
+                  );
 
-                resolve(result);
-              }
-            },
-          );
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+                  resolve(result);
+                }
+              },
+            );
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
 
           console.log(`📤 ${i}: Sending test message...`);
           // 2. Time message send
@@ -224,6 +238,27 @@ async function runStressTest(config: Config): Promise<void> {
           console.log(
             `📩 ${i}: Message sent in ${sendTime}ms (Total sent: ${totalMessagesSent})`,
           );
+
+          // If not waiting for response, resolve immediately
+          if (!config.waitForResponse) {
+            const result = {
+              success: true,
+              newDmTime,
+              sendTime,
+              responseTime: 0, // No response time when not waiting
+            };
+            results.push(result);
+            completedWorkers++;
+
+            const successRate =
+              (results.filter((r) => r.success).length / config.userCount) *
+              100;
+            console.log(
+              `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
+            );
+
+            resolve(result);
+          }
         } catch (error) {
           console.error(error);
         }
@@ -267,13 +302,16 @@ async function runStressTest(config: Config): Promise<void> {
       successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
     const avgSend =
       successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
-    const avgResponse =
-      successful.reduce((sum, r) => sum + r.responseTime, 0) /
-      successful.length;
 
     console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
     console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
-    console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+
+    if (config.waitForResponse) {
+      const avgResponse =
+        successful.reduce((sum, r) => sum + r.responseTime, 0) /
+        successful.length;
+      console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+    }
   }
 
   process.exit(0);

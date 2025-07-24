@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -11,6 +11,7 @@
   "scripts": {
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
+    "bot": "tsx scripts/bot.ts",
     "build": "tsc",
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
