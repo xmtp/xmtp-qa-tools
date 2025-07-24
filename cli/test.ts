@@ -46,31 +46,6 @@ function runAnsiForksAndReport(options: RetryOptions): void {
   }
 }
 
-/**
- * Expands glob patterns to actual file paths
- * Used for test file discovery (e.g., *.test.ts)
- */
-function expandGlobPattern(pattern: string): string[] {
-  // Simple glob expansion for *.test.ts patterns
-  if (pattern.includes("*")) {
-    const dir = path.dirname(pattern);
-    const baseName = path.basename(pattern);
-
-    if (!fs.existsSync(dir)) {
-      return [];
-    }
-
-    const files = fs.readdirSync(dir);
-    const regex = new RegExp(baseName.replace(/\*/g, ".*"));
-
-    return files
-      .filter((file) => regex.test(file))
-      .map((file) => path.join(dir, file));
-  }
-
-  return [pattern];
-}
-
 async function cleanSpecificLogFile(
   logFileName: string,
   pattern?: string,
@@ -160,104 +135,6 @@ async function cleanSpecificLogFile(
   }
 }
 
-function showUsageAndExit(): never {
-  console.error("Usage: yarn test <name_or_path> [args...]");
-  console.error(
-    "   or (if alias 'cli' is set up): cli test <name_or_path> [args...]",
-  );
-  console.error("");
-  console.error("Test Command:");
-  console.error(
-    "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
-  );
-  console.error("    Simple vitest execution (default):");
-  console.error("      yarn test convos        - Runs vitest directly");
-  console.error("      yarn test ./path/to/test.ts  - Runs specific test file");
-  console.error("    Retry and logging options:");
-  console.error(
-    "      --attempts <N>  Max number of attempts for tests (default: 1)",
-  );
-  console.error(
-    "      --parallel          Run tests in parallel (default: consecutive)",
-  );
-  console.error("    Logging mode (enables file logging):");
-  console.error("      --info / --no-log    Enable/disable logging to file");
-  console.error(
-    "      --info-verbose     Enable logging to both file AND terminal output",
-  );
-  console.error(
-    "      --info-file <n>   Custom log file name (default: auto-generated)",
-  );
-  console.error(
-    "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
-  );
-  console.error(
-    "      --no-error-logs     Disable sending error logs to Datadog (default: enabled)",
-  );
-  console.error(
-    "      --ansi-forks        Run ansi:forks after test completion",
-  );
-  console.error("      --report-forks      Report fork count after ansi:forks");
-  console.error(
-    "      --env <environment> Set XMTP_ENV (options: local, dev, production)",
-  );
-  console.error(
-    "      --versions count   Number of SDK versions to use (e.g., 3)",
-  );
-  console.error(
-    "      --nodeVersion ver  Specific Node SDK version to use (e.g., 3.1.1)",
-  );
-  console.error(
-    "      --no-clean-logs    Disable automatic log cleaning after test completion (enabled by default)",
-  );
-  console.error(
-    "      --log-level <level> Set logging level (info, info, error) (default: info)",
-  );
-  console.error(
-    "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
-  );
-  console.error(
-    "      --size <range>      Set batch size range (e.g., --size 5-10)",
-  );
-  console.error(
-    "      [vitest_options...] Other options passed directly to vitest",
-  );
-  console.error("");
-  console.error("Examples:");
-  console.error("  yarn test functional");
-  console.error("  yarn test convos --attempts 2");
-  console.error("  yarn test convos --parallel");
-  console.error(
-    "  yarn test convos --info-verbose   # Shows output in terminal AND logs to file",
-  );
-  console.error("  yarn test convos --no-fail        # Exit 0 even on failure");
-  console.error(
-    "  yarn test convos --info        # Uses logging mode with file output",
-  );
-  console.error(
-    "  yarn test convos --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
-  );
-  console.error(
-    "  yarn test convos --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
-  );
-  console.error(
-    "  yarn test convos --env production # Sets XMTP_ENV to production",
-  );
-  console.error(
-    "  yarn test convos --no-clean-logs  # Disable automatic log cleaning",
-  );
-  console.error(
-    "  yarn test convos --log-level error  # Set logging level to error",
-  );
-  console.error(
-    "  yarn test convos --size 5-10        # Set batch size range to 5-10",
-  );
-  console.error(
-    "  yarn test convos --attempts 100 --info --ansi-forks --report-forks  # Replicate run.sh behavior",
-  );
-  process.exit(1);
-}
-
 /**
  * Parses test command arguments and options
  * Handles both simple test runs and advanced retry mode
@@ -314,6 +191,10 @@ function parseTestArgs(args: string[]): {
         } else {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
         }
+        break;
+      case "--d":
+        options.enableLogging = true;
+        options.verboseLogging = false;
         break;
       case "--nodeVersion":
         if (nextArg) {
@@ -655,10 +536,6 @@ async function runTest(testName: string, options: RetryOptions): Promise<void> {
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
-  if (args.length === 0) {
-    showUsageAndExit();
-  }
-
   // Handle both formats:
   // 1. yarn test test performance --env local (with command type)
   // 2. yarn test performance --env local (direct call)
@@ -686,7 +563,7 @@ async function main(): Promise<void> {
       default: {
         console.error(`Unknown command type: ${commandType}`);
         console.error("This CLI only supports 'test' command type.");
-        showUsageAndExit();
+        process.exit(1);
       }
     }
   } catch (error: unknown) {
