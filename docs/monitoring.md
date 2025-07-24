@@ -195,7 +195,7 @@ Link to test code [../suites/networkchaos](../suites/networkchaos)
 - `networkchaos: comprehensive network disruption scenarios`
 - `group-reconciliation: verify group state consistency after network issues`
 - `group-client-partition: test client behavior during network partitions`
-- `keyrotation: validate key rotation under network stress`
+- `keyrotation: validate key rotation under network send`
 
 **Environment**: Local 4-node cluster with simulated network conditions
 

@@ -58,6 +58,10 @@ export function getRandomInbox() {
   const pool = getInboxByInstallationCount(2);
   return pool[Math.floor(Math.random() * pool.length)];
 }
+export function getRandomAddress() {
+  const pool = getInboxByInstallationCount(2);
+  return pool[Math.floor(Math.random() * pool.length)].accountAddress;
+}
 export function getRandomInboxIdsWithRandomInstallations(count: number) {
   let totalInboxes = [];
   const possibleInstallations = [2, 5, 10, 15, 20, 25, 30];

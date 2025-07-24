@@ -2,12 +2,14 @@
 
 ## Overview
 
-| Script        | Purpose        | Use Case                                  |
-| ------------- | -------------- | ----------------------------------------- |
-| `test.ts`     | Test runner    | Run tests with retry logic                |
-| `versions.ts` | SDK manager    | Setup multiple SDK versions for testing   |
-| `stress.ts`   | Stress test    | Run stress tests with retry logic         |
-| `revoke.ts`   | Command router | Run tests, bots, scripts with retry logic |
+| Script        | Purpose              | Use Case                                     |
+| ------------- | -------------------- | -------------------------------------------- |
+| `test.ts`     | Test runner          | Run tests with retry logic                   |
+| `versions.ts` | SDK manager          | Setup multiple SDK versions for testing      |
+| `send.ts`     | send test            | Run send tests with retry logic              |
+| `revoke.ts`   | Installation manager | Revoke XMTP installations for inboxes        |
+| `gen.ts`      | Data generator       | Generate test data and inboxes               |
+| `bot.ts`      | Bot launcher         | Launch interactive bots from bots/ directory |
 
 ## CLI Command Structure
 
@@ -64,12 +66,37 @@ yarn test functional --versions 3 --no-fail --debug
 yarn test regression --nodeVersion 3.1.1 --debug
 ```
 
-## Stress Testing
+## send Testing
 
 ```bash
+# Local env
+yarn send --address 0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b --env dev --users 200
 
-Local env
-yarn stress --address 0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b --env dev --users 200
+yarn send --agent gm --env dev --users 200
+```
 
-yarn stress --agent gm --env dev --users 200
+## Bot Management
+
+```bash
+# Launch available bots
+yarn bot simple
+yarn bot gm-bot
+yarn bot send
+yarn bot echo
+yarn bot debug
+yarn bot key-check
+```
+
+## Data Generation
+
+```bash
+# Generate test data and inboxes
+yarn gen
+```
+
+## Installation Management
+
+```bash
+# Revoke installations for an inbox
+yarn revoke-installations <inbox-id> [installations-to-save]
 ```

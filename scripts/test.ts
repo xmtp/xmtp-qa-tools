@@ -651,7 +651,7 @@ async function runVitestTest(
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
-  
+
   if (args.length === 0) {
     showUsageAndExit();
   }
@@ -661,7 +661,7 @@ async function main(): Promise<void> {
   // 2. yarn test performance --env local (direct call)
   let commandType: string;
   let testArgs: string[];
-  
+
   if (args[0] === "test") {
     // Format 1: yarn test test performance --env local
     commandType = args[0];

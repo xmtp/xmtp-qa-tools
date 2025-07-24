@@ -12,7 +12,7 @@ async function main() {
   if (!botName) {
     console.error("Usage: yarn bot <bot-name>");
     console.error(
-      "Available bots: simple, gm-bot, stress, echo, debug, key-check",
+      "Available bots: simple, gm-bot, send, echo, debug, key-check",
     );
     process.exit(1);
   }
@@ -26,7 +26,7 @@ async function main() {
 
     if (!fs.existsSync(botDir)) {
       console.error(
-        `Bot '${botName}' not found. Available bots: simple, gm-bot, stress, echo, debug, key-check`,
+        `Bot '${botName}' not found. Available bots: simple, gm-bot, send, echo, debug, key-check`,
       );
       process.exit(1);
     }

@@ -3,6 +3,8 @@ description: "Manual PR verification workflow - supports functional and performa
 
 on:
   # pull_request:
+  schedule:
+    - cron: "0 0 * * *"
 
 jobs:
   test:
