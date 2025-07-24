@@ -73,10 +73,6 @@ yarn test functional --no-fail --debug
 --debug                 # Enable file logging (logs saved to logs/ directory)
 --no-fail              # Exit with success code even on failures
 --parallel             # Run tests in parallel (default: consecutive)
---verbose-logging      # Show terminal output (default: true)
---clean-logs           # Auto-clean logs after completion (default: true)
---log-level <level>    # Log level (info, error, off) (default: off)
---no-error-logs        # Disable sending error logs to Datadog
 ```
 
 ### Version and Node Testing
