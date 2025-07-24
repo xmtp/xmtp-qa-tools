@@ -26,7 +26,7 @@ When upgrading XMTP node-sdk versions, update these 3 files:
 ### 3. Run commands
 
 ```bash
-yarn script versions
+yarn versions
 yarn format
 yarn lint
 yarn build

@@ -40,7 +40,7 @@ REGION=us-east-1           # AWS region for testing
 ```bash
 yarn test <test_suite> [options...]              # Direct vitest execution
 yarn bot <bot_name> [args...]                    # Interactive bots
-yarn script <script_name> [args...]              # Utility scripts
+yarn <script_name> [args...]              # Utility scripts
 ```
 
 ### Test Suites
@@ -80,8 +80,8 @@ yarn bot stress 5                      # Stress testing with 5 concurrent users
 ### Scripts
 
 ```bash
-yarn script gen                        # Generate test inboxes
-yarn script versions                   # Setup SDK version testing
+yarn gen                        # Generate test inboxes
+yarn versions                   # Setup SDK version testing
 ```
 
 ## Advanced Test Options

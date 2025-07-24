@@ -43,7 +43,7 @@ jobs:
           cache-data: true
 
       # - name: Run script version
-      #   run: yarn script versions
+      #   run: yarn versions
 
       - name: Run tests
         run: yarn test ${{ matrix.test }}
