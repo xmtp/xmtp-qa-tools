@@ -13,7 +13,6 @@
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
-
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "format": "prettier -w .",
     "gen": "tsx inboxes/gen.ts",
