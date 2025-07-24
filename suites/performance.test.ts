@@ -24,7 +24,7 @@ describe(testName, async () => {
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10];
   let dm: Dm | undefined;
-  let workers = await getWorkers(["edward", "bob"], {
+  let workers = await getWorkers(10, {
     randomNames: false,
   });
 

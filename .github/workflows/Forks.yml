@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LOGGING_LEVEL: "off"
-      XMTP_ENV: "local"
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-local

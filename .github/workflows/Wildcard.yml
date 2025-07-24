@@ -2,9 +2,9 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  # pull_request:
+  #pull_request:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 1 1 *"
 
 jobs:
   test:
@@ -21,7 +21,6 @@ jobs:
         # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.env }}
       LOGGING_LEVEL: error
       LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -48,7 +47,7 @@ jobs:
       #   run: yarn versions
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
