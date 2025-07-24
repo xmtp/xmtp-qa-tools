@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  # pull_request:
+  pull_request:
   schedule:
     - cron: "0 0 * * *"
 
