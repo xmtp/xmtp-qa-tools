@@ -13,6 +13,7 @@ interface TestOptions {
   retryDelay: number; // Delay between retries (seconds)
   enableLogging: boolean; // Enable file logging
   customLogFile?: string; // Custom log filename
+  env: string; // Environment to run the test in
   vitestArgs: string[]; // Additional vitest arguments
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
@@ -151,6 +152,7 @@ function parseTestArgs(args: string[]): {
     attempts: 1, // Default to 1 attempt (no retry)
     retryDelay: 10,
     enableLogging: false, // Default to no file logging
+    env: "local",
     vitestArgs: [],
     noFail: false,
     verboseLogging: true, // Show terminal output by default
@@ -218,6 +220,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--env":
         if (nextArg) {
+          options.env = nextArg;
           options.vitestArgs.push(`--env=${nextArg}`);
           i++;
         } else {
