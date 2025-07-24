@@ -1120,12 +1120,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.0.0, @types/node@npm:^20.14.2":
+"@types/node@npm:^20.0.0":
   version: 20.19.8
   resolution: "@types/node@npm:20.19.8"
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10/f80d8f41597b91fa8a86d4e77fc02aa999412617107bf42b9a99b3bd5509fb354a936608d8ea9ea6110d4ca28ffa23f18f7c1ad0aefa4275b400877028270e9c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^20.14.2":
+  version: 20.19.9
+  resolution: "@types/node@npm:20.19.9"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10/7631e541fb3cdef57d73b626cbcf4365ae5979345ee920429f0de0acceff69dbf843d4815404b58eb3957bace3f825d0ea38889051d2d218301c5dc48ada6cff
   languageName: node
   linkType: hard
 
@@ -4463,7 +4472,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2, viem@npm:^2.22.17":
+"viem@npm:^2":
   version: 2.32.0
   resolution: "viem@npm:2.32.0"
   dependencies:
@@ -4481,6 +4490,27 @@ __metadata:
     typescript:
       optional: true
   checksum: 10/8c3fddf669b891c85428433385b41ab736d5cae05be1e31e64a2943a465ec939a27598559112e1f248c6eebc9cc3beeb3ef1b49bd4d12da5af69f7169f6d9944
+  languageName: node
+  linkType: hard
+
+"viem@npm:^2.22.17":
+  version: 2.33.0
+  resolution: "viem@npm:2.33.0"
+  dependencies:
+    "@noble/curves": "npm:1.9.2"
+    "@noble/hashes": "npm:1.8.0"
+    "@scure/bip32": "npm:1.7.0"
+    "@scure/bip39": "npm:1.6.0"
+    abitype: "npm:1.0.8"
+    isows: "npm:1.0.7"
+    ox: "npm:0.8.1"
+    ws: "npm:8.18.2"
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10/65929290e9fd07a60d5fe7f515a68369e1650352b86fb2df5443283787a2062a95a4669b51af5f77f7f865318c65d44140525b217c75dc19de68c6ff71fe8657
   languageName: node
   linkType: hard
 
