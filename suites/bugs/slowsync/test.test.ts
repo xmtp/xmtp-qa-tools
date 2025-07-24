@@ -1,8 +1,6 @@
-import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { verifyMembershipStream, verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
+import { verifyMessageStream } from "@helpers/streams";
+import { getRandomAddress } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import {
   Client,
@@ -13,20 +11,14 @@ import {
 } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "performance";
+const testName = "slowsync";
 describe(testName, async () => {
   let dm: Dm | undefined;
-  let workers = await getWorkers(10, {
-    randomNames: false,
-  });
+  let workers = await getWorkers(["bob", "edward"]);
 
   const creator = workers.get("edward");
   const receiver = workers.get("bob");
   const creatorClient = creator!.client;
-  let customDuration: number | undefined = undefined;
-  const setCustomDuration = (duration: number | undefined) => {
-    customDuration = duration;
-  };
 
   beforeAll(async () => {
     for (const worker of workers.getAll()) {
@@ -39,41 +31,8 @@ describe(testName, async () => {
       );
     }
   });
-  setupTestLifecycle({
-    testName,
-    getCustomDuration: () => customDuration,
-    setCustomDuration: (v) => {
-      customDuration = v;
-    },
-    sendMetrics: true,
-    sendDurationMetrics: true,
-    networkStats: true,
-  });
-
   let randomWorker: Worker;
-  it("create: measure creating a client", async () => {
-    let workers = await getWorkers(["randomclient"]);
-    randomWorker = workers.get("randomclient")!;
-    expect(randomWorker.inboxId).toBeDefined();
-  });
-  it("canMessage:measure canMessage", async () => {
-    const randomAddress = randomWorker.address;
-    if (!randomAddress) {
-      throw new Error("Random client not found");
-    }
-    const start = Date.now();
-    const canMessage = await Client.canMessage(
-      [
-        {
-          identifier: randomAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        },
-      ],
-      randomWorker.env,
-    );
-    setCustomDuration(Date.now() - start);
-    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
-  });
+
   it("inboxState:measure inboxState", async () => {
     const inboxState = await creatorClient.preferences.inboxState(true);
     expect(inboxState.installations.length).toBeGreaterThan(0);
@@ -130,7 +89,6 @@ describe(testName, async () => {
       sdk: receiver!.sdk,
     } as ResponseMetricTags);
 
-    setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
     expect(verifyResult.allReceived).toBe(true);
   });
 });
