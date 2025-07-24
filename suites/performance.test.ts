@@ -41,17 +41,6 @@ describe(testName, async () => {
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
 
-  beforeAll(async () => {
-    for (const worker of workers.getAll()) {
-      await worker.client.conversations.syncAll();
-      console.log(
-        worker.name,
-        "has",
-        (await worker.client.conversations.list()).length,
-        "conversations",
-      );
-    }
-  });
   setupTestLifecycle({
     testName,
     getCustomDuration: () => customDuration,
@@ -107,7 +96,7 @@ describe(testName, async () => {
     expect(dm2).toBeDefined();
     expect(dm2.id).toBeDefined();
   });
-  it("getConersationById:measure getting a conversation by id", async () => {
+  it("getConversationById:measure getting a conversation by id", async () => {
     const conversation = await creatorClient.conversations.getConversationById(
       dm!.id,
     );
