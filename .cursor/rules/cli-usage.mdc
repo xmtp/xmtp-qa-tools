@@ -25,7 +25,7 @@ yarn <script_name> [args...]              # Utility scripts
 ```bash
 # Core Functionality
 yarn test functional                     # Complete functional suite
-yarn test dms                           # Direct message tests
+yarn test convos                           # Direct message tests
 yarn test groups                        # Group conversation tests
 
 # Performance & Scale
@@ -138,7 +138,7 @@ yarn monitor:yarn                     # Monitor XMTP network health
 ### Development Testing
 
 ```bash
-yarn test dms                         # Quick DM functionality test
+yarn test convos                         # Quick DM functionality test
 yarn test groups                      # Quick group functionality test
 yarn test functional --no-fail --debug # Full functional suite with debugging
 ```

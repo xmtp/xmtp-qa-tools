@@ -140,7 +140,7 @@ To get started set up the environment in [variables](./.env.example) and run the
 
 ```bash
 # Simple dms test
-yarn test dms
+yarn test convos
 # Full functional test
 yarn test functional
 # Performance test example

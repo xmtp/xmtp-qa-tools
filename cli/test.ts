@@ -176,7 +176,7 @@ function showUsageAndExit(): never {
     "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Simple vitest execution (default):");
-  console.error("      yarn test dms        - Runs vitest directly");
+  console.error("      yarn test convos        - Runs vitest directly");
   console.error("      yarn test ./path/to/test.ts  - Runs specific test file");
   console.error("    Retry and logging options:");
   console.error(
@@ -222,37 +222,43 @@ function showUsageAndExit(): never {
     "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
   );
   console.error(
+    "      --size <range>      Set batch size range (e.g., --size 5-10)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
   console.error("Examples:");
   console.error("  yarn test functional");
-  console.error("  yarn test dms --attempts 2");
-  console.error("  yarn test dms --parallel");
+  console.error("  yarn test convos --attempts 2");
+  console.error("  yarn test convos --parallel");
   console.error(
-    "  yarn test dms --debug-verbose   # Shows output in terminal AND logs to file",
+    "  yarn test convos --debug-verbose   # Shows output in terminal AND logs to file",
   );
-  console.error("  yarn test dms --no-fail        # Exit 0 even on failure");
+  console.error("  yarn test convos --no-fail        # Exit 0 even on failure");
   console.error(
-    "  yarn test dms --debug        # Uses logging mode with file output",
-  );
-  console.error(
-    "  yarn test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
+    "  yarn test convos --debug        # Uses logging mode with file output",
   );
   console.error(
-    "  yarn test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
+    "  yarn test convos --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   console.error(
-    "  yarn test dms --env production # Sets XMTP_ENV to production",
+    "  yarn test convos --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
   );
   console.error(
-    "  yarn test dms --no-clean-logs  # Disable automatic log cleaning",
+    "  yarn test convos --env production # Sets XMTP_ENV to production",
   );
   console.error(
-    "  yarn test dms --log-level error  # Set logging level to error",
+    "  yarn test convos --no-clean-logs  # Disable automatic log cleaning",
   );
   console.error(
-    "  yarn test dms --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
+    "  yarn test convos --log-level error  # Set logging level to error",
+  );
+  console.error(
+    "  yarn test convos --size 5-10        # Set batch size range to 5-10",
+  );
+  console.error(
+    "  yarn test convos --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
   );
   process.exit(1);
 }
@@ -395,6 +401,15 @@ function parseTestArgs(args: string[]): {
         break;
       case "--ansi-forks":
         options.runAnsiForks = true;
+        break;
+      case "--size":
+        if (nextArg) {
+          // Store batch size in vitestArgs to be passed as environment variable
+          options.vitestArgs.push(`--size=${nextArg}`);
+          i++;
+        } else {
+          console.warn("--size flag requires a value (e.g., --size 5-10)");
+        }
         break;
       case "--report-forks":
         options.reportForkCount = true;
@@ -576,6 +591,19 @@ async function runVitestTest(
     );
   }
 
+  // Extract --size parameter and set as environment variable
+  const sizeArg = options.vitestArgs.find((arg) => arg.startsWith("--size="));
+  if (sizeArg) {
+    const sizeValue = sizeArg.split("=")[1];
+    env.BATCH_SIZE = sizeValue;
+    console.debug(`Setting BATCH_SIZE environment variable to: ${sizeValue}`);
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--size="),
+    );
+  }
+
   // Set logging level
   env.LOGGING_LEVEL = options.logLevel || "error";
 
@@ -752,6 +780,23 @@ async function main(): Promise<void> {
             // Remove from vitestArgs since it's not a vitest parameter
             options.vitestArgs = options.vitestArgs.filter(
               (arg) => !arg.startsWith("--sync="),
+            );
+          }
+
+          // Extract --size parameter and set as environment variable
+          const sizeArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--size="),
+          );
+          if (sizeArg) {
+            const sizeValue = sizeArg.split("=")[1];
+            env.BATCH_SIZE = sizeValue;
+            console.debug(
+              `Setting BATCH_SIZE environment variable to: ${sizeValue}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--size="),
             );
           }
 
