@@ -1,8 +1,8 @@
-# Monitoring system s
+# Monitoring system
 
 Monitoring setup that tells us when things are working well and alerts us immediately when they're not.
 
-## Automated workflows 1
+## Automated workflows
 
 | Test suite   | Performance | Resources                                                                                                                                                                        | Run frequency | Networks           |
 | ------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
