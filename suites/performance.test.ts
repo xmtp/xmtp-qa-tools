@@ -7,7 +7,7 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -51,37 +51,27 @@ describe(testName, async () => {
     sendDurationMetrics: true,
     networkStats: true,
   });
-  it("setupup accounts", async () => {
-    const client = await getWorkers(["randomclient"]);
-    expect(client).toBeDefined();
+  it("setup accounts", async () => {
+    for (const worker of workers.getAll()) {
+      await worker.client.conversations.syncAll();
+    }
   });
-
+  let randomWorker: Worker;
   it("create:measure creating a client", async () => {
-    const client = await getWorkers(["randomclient"]);
-    expect(client).toBeDefined();
+    let workers = await getWorkers(["randomclient"]);
+    randomWorker = workers.get("randomclient")!;
+    expect(randomWorker.client.inboxId).toBeDefined();
   });
   it("canMessage:measure canMessage", async () => {
-    const client = await getWorkers(["randomclient"]);
-    if (!client) {
-      throw new Error("Client not found");
-    }
-
-    const randomAddress = client.get("randomclient")!.address;
-    if (!randomAddress) {
-      throw new Error("Random client not found");
-    }
     const start = Date.now();
-    const canMessage = await Client.canMessage(
-      [
-        {
-          identifier: randomAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        },
-      ],
-      client.get("randomclient")!.env,
-    );
+    const canMessage = await Client.canMessage([
+      {
+        identifier: randomWorker!.address,
+        identifierKind: IdentifierKind.Ethereum,
+      },
+    ]);
     setCustomDuration(Date.now() - start);
-    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
+    expect(canMessage.get(randomWorker!.inboxId)).toBe(true);
   });
 
   it("inboxState:measure inboxState", async () => {
