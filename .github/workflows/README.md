@@ -121,13 +121,6 @@ Workflows are configured using GitHub repository secrets and variables:
 - `SLACK_BOT_TOKEN`: Slack bot token for notifications
 - `WALLET_KEY`: XMTP wallet private key for testing
 - `ENCRYPTION_KEY`: XMTP encryption key for database
-- `SLACK_CHANNEL`: Slack channel for notifications (optional, defaults to 'xmtp-qa')
-
-### Variables
-
-- `LOGGING_LEVEL`: Controls log verbosity
-- `REGION`: Target geographic region
-- `BATCH_SIZE`: Number of members per batch
 
 ## Monitoring and reporting
 

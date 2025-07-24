@@ -21,7 +21,6 @@ jobs:
       DELIVERY_AMOUNT: 100
       ERROR_TRESHOLD: 90
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env

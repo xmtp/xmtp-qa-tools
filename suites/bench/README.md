@@ -33,7 +33,6 @@ yarn test bench
 
 The test suite uses these configurable parameters:
 
-- `BATCH_SIZE`: Group size increment for testing (default: [10, 20, 50, 100, 150])
 - `CHECK_INSTALLATIONS`: Installation counts to test per member ([2, 5, 10, 15, 20, 25])
 - `MIN_MAX_INSTALLATIONS`: Installation count boundaries ([1000, 2000])
 

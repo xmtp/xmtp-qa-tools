@@ -9,15 +9,13 @@ import "dotenv/config";
  * Configuration for test retry behavior and logging
  */
 interface RetryOptions {
-  maxAttempts: number; // Maximum retry attempts
+  attempts: number; // Maximum retry attempts (default: 1)
   retryDelay: number; // Delay between retries (seconds)
   enableLogging: boolean; // Enable file logging
   customLogFile?: string; // Custom log filename
   vitestArgs: string[]; // Additional vitest arguments
   noFail: boolean; // Exit 0 even on failure
-  explicitLogFlag: boolean; // User explicitly set logging
   verboseLogging: boolean; // Show terminal output
-  jsLoggingLevel: string; // JavaScript logging level
   parallel: boolean; // Run tests in parallel
   cleanLogs: boolean; // Auto-clean logs after completion
   logLevel: string; // Log level (debug, info, error)
@@ -176,16 +174,16 @@ function showUsageAndExit(): never {
     "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Simple vitest execution (default):");
-  console.error("      yarn test dms        - Runs vitest directly");
+  console.error("      yarn test convos        - Runs vitest directly");
   console.error("      yarn test ./path/to/test.ts  - Runs specific test file");
   console.error("    Retry and logging options:");
   console.error(
-    "      --attempts <N>  Max number of attempts for tests (default: 1, works in both simple and retry modes)",
+    "      --attempts <N>  Max number of attempts for tests (default: 1)",
   );
   console.error(
     "      --parallel          Run tests in parallel (default: consecutive)",
   );
-  console.error("    Logging mode (enables file logging and retry mode):");
+  console.error("    Logging mode (enables file logging):");
   console.error("      --debug / --no-log    Enable/disable logging to file");
   console.error(
     "      --debug-verbose     Enable logging to both file AND terminal output",
@@ -222,37 +220,43 @@ function showUsageAndExit(): never {
     "      --sync <strategy>   Set sync strategy (e.g., --sync all,conversations)",
   );
   console.error(
+    "      --size <range>      Set batch size range (e.g., --size 5-10)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
   console.error("Examples:");
   console.error("  yarn test functional");
-  console.error("  yarn test dms --attempts 2");
-  console.error("  yarn test dms --parallel");
+  console.error("  yarn test convos --attempts 2");
+  console.error("  yarn test convos --parallel");
   console.error(
-    "  yarn test dms --debug-verbose   # Shows output in terminal AND logs to file",
+    "  yarn test convos --debug-verbose   # Shows output in terminal AND logs to file",
   );
-  console.error("  yarn test dms --no-fail        # Exit 0 even on failure");
+  console.error("  yarn test convos --no-fail        # Exit 0 even on failure");
   console.error(
-    "  yarn test dms --debug        # Uses logging mode with file output",
-  );
-  console.error(
-    "  yarn test dms --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
+    "  yarn test convos --debug        # Uses logging mode with file output",
   );
   console.error(
-    "  yarn test dms --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
+    "  yarn test convos --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   console.error(
-    "  yarn test dms --env production # Sets XMTP_ENV to production",
+    "  yarn test convos --nodeVersion 3.1.1 # Uses workers with SDK version 3.1.1",
   );
   console.error(
-    "  yarn test dms --no-clean-logs  # Disable automatic log cleaning",
+    "  yarn test convos --env production # Sets XMTP_ENV to production",
   );
   console.error(
-    "  yarn test dms --log-level error  # Set logging level to error",
+    "  yarn test convos --no-clean-logs  # Disable automatic log cleaning",
   );
   console.error(
-    "  yarn test dms --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
+    "  yarn test convos --log-level error  # Set logging level to error",
+  );
+  console.error(
+    "  yarn test convos --size 5-10        # Set batch size range to 5-10",
+  );
+  console.error(
+    "  yarn test convos --attempts 100 --debug --ansi-forks --report-forks  # Replicate run.sh behavior",
   );
   process.exit(1);
 }
@@ -270,17 +274,15 @@ function parseTestArgs(args: string[]): {
 } {
   let testName = "functional";
   const options: RetryOptions = {
-    maxAttempts: 1,
+    attempts: 1, // Default to 1 attempt (no retry)
     retryDelay: 10,
-    enableLogging: true,
+    enableLogging: false, // Default to no file logging
     vitestArgs: [],
     noFail: false,
-    explicitLogFlag: false,
     verboseLogging: true, // Show terminal output by default
     parallel: false,
     cleanLogs: true,
     logLevel: "debug", // Default log level
-    jsLoggingLevel: "silly",
     noErrorLogs: false,
     runAnsiForks: false, // Run ansi:forks after test completion
     reportForkCount: false, // Report fork count after ansi:forks
@@ -301,7 +303,7 @@ function parseTestArgs(args: string[]): {
         if (nextArg) {
           const val = parseInt(nextArg, 10);
           if (!isNaN(val) && val > 0) {
-            options.maxAttempts = val;
+            options.attempts = val;
           } else {
             console.warn(`Invalid value for --attempts: ${nextArg}`);
           }
@@ -330,19 +332,14 @@ function parseTestArgs(args: string[]): {
         break;
       case "--debug":
         options.enableLogging = true;
-        options.explicitLogFlag = true;
         options.verboseLogging = false;
-        options.jsLoggingLevel = "silly";
         break;
       case "--debug-verbose":
         options.enableLogging = true;
-        options.explicitLogFlag = true;
         options.verboseLogging = true;
-        options.jsLoggingLevel = "silly";
         break;
       case "--no-log":
         options.enableLogging = false;
-        options.explicitLogFlag = false;
         break;
       case "--debug-file":
         if (nextArg) {
@@ -395,6 +392,15 @@ function parseTestArgs(args: string[]): {
         break;
       case "--ansi-forks":
         options.runAnsiForks = true;
+        break;
+      case "--size":
+        if (nextArg) {
+          // Store batch size in vitestArgs to be passed as environment variable
+          options.vitestArgs.push(`--size=${nextArg}`);
+          i++;
+        } else {
+          console.warn("--size flag requires a value (e.g., --size 5-10)");
+        }
         break;
       case "--report-forks":
         options.reportForkCount = true;
@@ -460,57 +466,12 @@ function buildTestCommand(
   return `npx vitest run ${testName} ${defaultThreadingOptions} ${vitestArgsString}`.trim();
 }
 
-async function runCommand(
-  command: string,
-  env: Record<string, string>,
-  logger: ReturnType<typeof createTestLogger>,
-): Promise<{ exitCode: number; errorOutput: string }> {
-  return new Promise((resolve) => {
-    const child = spawn(command, {
-      env,
-      stdio: ["pipe", "pipe", "pipe"],
-      shell: true,
-    });
-
-    let errorOutput = "";
-
-    child.stdout?.on("data", (data: Buffer) => {
-      logger.processOutput(data);
-    });
-
-    child.stderr?.on("data", (data: Buffer) => {
-      const errorText = data.toString();
-      errorOutput += errorText;
-      logger.processOutput(data);
-    });
-
-    child.on("close", (code) => {
-      resolve({ exitCode: code || 0, errorOutput });
-    });
-
-    child.on("error", (error) => {
-      console.error(`Failed to start command: ${error.message}`);
-      resolve({ exitCode: 1, errorOutput: error.message });
-    });
-  });
-}
-
-async function runVitestTest(
-  testName: string,
+/**
+ * Process environment variables from vitestArgs
+ */
+function processEnvironmentVariables(
   options: RetryOptions,
-): Promise<void> {
-  const logger = createTestLogger({
-    enableLogging: options.enableLogging,
-    customLogFile: options.customLogFile,
-    testName,
-    verboseLogging: options.verboseLogging,
-    logLevel: options.logLevel, // Pass the logLevel option
-  });
-
-  console.debug(
-    `Starting test suite: "${testName}" with up to ${options.maxAttempts} attempts, delay ${options.retryDelay}s.`,
-  );
-
+): Record<string, string> {
   const env: Record<string, string> = {
     ...process.env,
     RUST_BACKTRACE: "1",
@@ -524,11 +485,6 @@ async function runVitestTest(
     const versions = versionsArg.split("=")[1];
     env.TEST_VERSIONS = versions;
     console.debug(`Setting TEST_VERSIONS environment variable to: ${versions}`);
-
-    // Remove from vitestArgs since it's not a vitest parameter
-    options.vitestArgs = options.vitestArgs.filter(
-      (arg) => !arg.startsWith("--versions="),
-    );
   }
 
   // Extract --nodeVersion parameter and set as environment variable
@@ -541,11 +497,6 @@ async function runVitestTest(
     console.debug(
       `Setting NODE_VERSION environment variable to: ${nodeVersion}`,
     );
-
-    // Remove from vitestArgs since it's not a vitest parameter
-    options.vitestArgs = options.vitestArgs.filter(
-      (arg) => !arg.startsWith("--nodeVersion="),
-    );
   }
 
   // Extract --env parameter and set as environment variable
@@ -554,11 +505,6 @@ async function runVitestTest(
     const envValue = envArg.split("=")[1];
     env.XMTP_ENV = envValue;
     console.debug(`Setting XMTP_ENV environment variable to: ${envValue}`);
-
-    // Remove from vitestArgs since it's not a vitest parameter
-    options.vitestArgs = options.vitestArgs.filter(
-      (arg) => !arg.startsWith("--env="),
-    );
   }
 
   // Extract --sync parameter and set as environment variable
@@ -569,18 +515,94 @@ async function runVitestTest(
     console.debug(
       `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
     );
+  }
 
-    // Remove from vitestArgs since it's not a vitest parameter
-    options.vitestArgs = options.vitestArgs.filter(
-      (arg) => !arg.startsWith("--sync="),
-    );
+  // Extract --size parameter and set as environment variable
+  const sizeArg = options.vitestArgs.find((arg) => arg.startsWith("--size="));
+  if (sizeArg) {
+    const sizeValue = sizeArg.split("=")[1];
+    env.BATCH_SIZE = sizeValue;
+    console.debug(`Setting BATCH_SIZE environment variable to: ${sizeValue}`);
   }
 
   // Set logging level
   env.LOGGING_LEVEL = options.logLevel || "error";
 
-  for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
-    console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);
+  // Remove custom args from vitestArgs since they're not vitest parameters
+  options.vitestArgs = options.vitestArgs.filter(
+    (arg) =>
+      !arg.startsWith("--versions=") &&
+      !arg.startsWith("--nodeVersion=") &&
+      !arg.startsWith("--env=") &&
+      !arg.startsWith("--sync=") &&
+      !arg.startsWith("--size="),
+  );
+
+  return env;
+}
+
+async function runCommand(
+  command: string,
+  env: Record<string, string>,
+  logger?: ReturnType<typeof createTestLogger>,
+): Promise<{ exitCode: number; errorOutput: string }> {
+  return new Promise((resolve) => {
+    const child = spawn(command, {
+      env,
+      stdio: ["pipe", "pipe", "pipe"],
+      shell: true,
+    });
+
+    let errorOutput = "";
+
+    child.stdout?.on("data", (data: Buffer) => {
+      if (logger) {
+        logger.processOutput(data);
+      } else {
+        process.stdout.write(data);
+      }
+    });
+
+    child.stderr?.on("data", (data: Buffer) => {
+      const errorText = data.toString();
+      errorOutput += errorText;
+      if (logger) {
+        logger.processOutput(data);
+      } else {
+        process.stderr.write(data);
+      }
+    });
+
+    child.on("close", (code) => {
+      resolve({ exitCode: code || 0, errorOutput });
+    });
+
+    child.on("error", (error) => {
+      console.error(`Failed to start command: ${error.message}`);
+      resolve({ exitCode: 1, errorOutput: error.message });
+    });
+  });
+}
+
+async function runTest(testName: string, options: RetryOptions): Promise<void> {
+  const logger = options.enableLogging
+    ? createTestLogger({
+        enableLogging: options.enableLogging,
+        customLogFile: options.customLogFile,
+        testName,
+        verboseLogging: options.verboseLogging,
+        logLevel: options.logLevel,
+      })
+    : undefined;
+
+  console.debug(
+    `Starting test suite: "${testName}" with up to ${options.attempts} attempts, delay ${options.retryDelay}s.`,
+  );
+
+  const env = processEnvironmentVariables(options);
+
+  for (let attempt = 1; attempt <= options.attempts; attempt++) {
+    console.debug(`Attempt ${attempt} of ${options.attempts}...`);
 
     try {
       const command = buildTestCommand(
@@ -594,10 +616,10 @@ async function runVitestTest(
 
       if (exitCode === 0) {
         console.debug("Tests passed successfully!");
-        logger.close();
+        logger?.close();
 
         // Clean the log file if enabled
-        if (options.cleanLogs) {
+        if (options.cleanLogs && logger?.logFileName) {
           await cleanSpecificLogFile(logger.logFileName);
         }
 
@@ -609,18 +631,23 @@ async function runVitestTest(
         console.debug("Tests failed!");
       }
 
-      if (attempt === options.maxAttempts) {
+      if (attempt === options.attempts) {
         console.error(
-          `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
+          `\n❌ Test suite "${testName}" failed after ${options.attempts} attempts.`,
         );
 
-        if (options.explicitLogFlag && !options.noErrorLogs)
+        if (
+          options.enableLogging &&
+          !options.noErrorLogs &&
+          logger?.logFileName
+        ) {
           await sendDatadogLog(logger.logFileName, testName);
+        }
 
-        logger.close();
+        logger?.close();
 
         // Clean the log file if enabled (even for failed tests)
-        if (options.cleanLogs) {
+        if (options.cleanLogs && logger?.logFileName) {
           await cleanSpecificLogFile(logger.logFileName);
         }
 
@@ -676,143 +703,7 @@ async function main(): Promise<void> {
     switch (commandType) {
       case "test": {
         const { testName, options } = parseTestArgs(testArgs);
-
-        // Check if this is a simple test run (no explicit logging flags)
-        const isSimpleRun = !options.explicitLogFlag;
-
-        if (isSimpleRun) {
-          // Process environment variables for simple runs too
-          const env: Record<string, string> = {
-            ...process.env,
-            RUST_BACKTRACE: "1",
-          };
-
-          // Extract --versions parameter and set as environment variable
-          const versionsArg = options.vitestArgs.find((arg) =>
-            arg.startsWith("--versions="),
-          );
-          if (versionsArg) {
-            const versions = versionsArg.split("=")[1];
-            env.TEST_VERSIONS = versions;
-            console.debug(
-              `Setting TEST_VERSIONS environment variable to: ${versions}`,
-            );
-
-            // Remove from vitestArgs since it's not a vitest parameter
-            options.vitestArgs = options.vitestArgs.filter(
-              (arg) => !arg.startsWith("--versions="),
-            );
-          }
-
-          // Extract --nodeVersion parameter and set as environment variable
-          const nodeVersionArg = options.vitestArgs.find((arg) =>
-            arg.startsWith("--nodeVersion="),
-          );
-          if (nodeVersionArg) {
-            const nodeVersion = nodeVersionArg.split("=")[1];
-            env.NODE_VERSION = nodeVersion;
-            console.debug(
-              `Setting NODE_VERSION environment variable to: ${nodeVersion}`,
-            );
-
-            // Remove from vitestArgs since it's not a vitest parameter
-            options.vitestArgs = options.vitestArgs.filter(
-              (arg) => !arg.startsWith("--nodeVersion="),
-            );
-          }
-
-          // Extract --env parameter and set as environment variable
-          const envArg = options.vitestArgs.find((arg) =>
-            arg.startsWith("--env="),
-          );
-          if (envArg) {
-            const envValue = envArg.split("=")[1];
-            env.XMTP_ENV = envValue;
-            console.debug(
-              `Setting XMTP_ENV environment variable to: ${envValue}`,
-            );
-
-            // Remove from vitestArgs since it's not a vitest parameter
-            options.vitestArgs = options.vitestArgs.filter(
-              (arg) => !arg.startsWith("--env="),
-            );
-          }
-
-          // Extract --sync parameter and set as environment variable
-          const syncArg = options.vitestArgs.find((arg) =>
-            arg.startsWith("--sync="),
-          );
-          if (syncArg) {
-            const syncValue = syncArg.split("=")[1];
-            env.SYNC_STRATEGY = syncValue;
-            console.debug(
-              `Setting SYNC_STRATEGY environment variable to: ${syncValue}`,
-            );
-
-            // Remove from vitestArgs since it's not a vitest parameter
-            options.vitestArgs = options.vitestArgs.filter(
-              (arg) => !arg.startsWith("--sync="),
-            );
-          }
-
-          // Run test with retry logic if --attempts is specified
-          const command = buildTestCommand(
-            testName,
-            options.vitestArgs,
-            options.parallel,
-          );
-          console.debug(`Running test: ${testName}`);
-
-          for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
-            console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);
-            console.debug(`Executing: ${command}`);
-
-            try {
-              execSync(command, { stdio: "inherit", env });
-              console.debug("Tests passed successfully!");
-
-              // Run ansi:forks after successful test completion
-              runAnsiForksAndReport(options);
-
-              return; // Exit on success
-            } catch (error) {
-              console.debug(`Attempt ${attempt} failed`);
-
-              if (attempt === options.maxAttempts) {
-                console.error(
-                  `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
-                );
-
-                if (options.noFail) {
-                  console.debug(
-                    "Test failed but --no-fail was specified, exiting with code 0",
-                  );
-                  process.exit(0);
-                } else {
-                  throw error;
-                }
-              }
-
-              if (options.retryDelay > 0) {
-                console.debug(
-                  `\n⏳ Retrying in ${options.retryDelay} seconds...`,
-                );
-                Atomics.wait(
-                  new Int32Array(new SharedArrayBuffer(4)),
-                  0,
-                  0,
-                  options.retryDelay * 1000,
-                );
-              } else {
-                console.debug("\n🔄 Retrying immediately...");
-              }
-            }
-          }
-        } else {
-          // Use retry mechanism with logger
-          await runVitestTest(testName, options);
-        }
-
+        await runTest(testName, options);
         break;
       }
 

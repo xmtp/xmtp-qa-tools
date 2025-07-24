@@ -61,9 +61,6 @@ Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 ```bash
 # Multi-version testing
 yarn test functional --versions 3 --no-fail --debug
-
-# Specific version
-yarn test regression --nodeVersion 3.1.1 --debug
 ```
 
 ## send Testing

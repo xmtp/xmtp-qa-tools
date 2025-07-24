@@ -15,7 +15,7 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
-import { getRandomAddress, getRandomInboxIds } from "../inboxes/utils";
+import { getRandomInboxIds } from "../inboxes/utils";
 
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
 // yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production

@@ -82,6 +82,10 @@ yarn revoke <inbox-id> [installations-to-save]
 ```bash
 # Setup multiple SDK versions
 yarn versions
+
+# do a vibe check on everything
+yarn test functional --sync all --versions 3 --no-fail --debug size 5-10-50-100
+# also can be called using 'yarn regression'
 ```
 
 ## Error Handling

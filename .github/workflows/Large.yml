@@ -15,20 +15,18 @@ jobs:
       matrix:
         test: [large]
         env: [dev, production]
-        BATCH_SIZE: [10-50, 100-150, 200-250]
+        size: [10-50, 100-150, 200-250]
         include:
-          - BATCH_SIZE: 10-50
+          - size: 10-50
             delay_minutes: 0
-          - BATCH_SIZE: 100-150
+          - size: 100-150
             delay_minutes: 5
-          - BATCH_SIZE: 200-250
+          - size: 200-250
             delay_minutes: 15
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: ${{ matrix.BATCH_SIZE }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
@@ -38,8 +36,8 @@ jobs:
         if: ${{ matrix.delay_minutes > 0 }}
         run: sleep $((${{ matrix.delay_minutes }} * 60))
 
-      - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }}
+      - name: Run tests ${{ matrix.size }}
+        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
 
       - name: Cleanup and upload artifacts
         if: always()

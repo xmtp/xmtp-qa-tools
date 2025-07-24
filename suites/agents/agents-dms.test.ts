@@ -62,6 +62,7 @@ describe(testName, async () => {
       const metricValue = result?.allReceived
         ? result.averageEventTiming
         : streamTimeout;
+
       sendMetric("response", metricValue, {
         test: testName,
         metric_type: "agent",
@@ -72,7 +73,7 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
 
-      if (!result?.allReceived) console.warn(agent.name, "FAILED");
+      if (!result?.allReceived) console.error(agent.name, "FAIL");
       expect(result?.allReceived).toBe(true);
     });
   }

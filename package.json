@@ -21,6 +21,7 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs production --installations 2",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
+    "regression": "yarn test functional --sync all --versions 3 --no-fail --debug size 5-10-50-100",
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",

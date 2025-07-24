@@ -17,16 +17,13 @@ jobs:
         test: [delivery] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
-        # test: [regression] # regression test with more large groups
         # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: error
       LOG_LEVEL: info
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
       REGION: ${{ vars.REGION }}
-      BATCH_SIZE: 5-10
     steps:
       - uses: actions/checkout@v4
 

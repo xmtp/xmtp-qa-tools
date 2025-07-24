@@ -15,15 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
+        size: [5-10, 50-100]
         env: [dev, production]
         cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       GH_CACHE: true
-      BATCH_SIZE: 5-10-50-100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}-${{ matrix.env }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,8 +33,8 @@ jobs:
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
-      - name: Run tests ${{ matrix.BATCH_SIZE }}
-        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }}
+      - name: Run tests ${{ matrix.size }}
+        run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
 
       - name: Cleanup and upload artifacts
         if: always()
