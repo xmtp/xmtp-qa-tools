@@ -519,7 +519,28 @@ async function main(): Promise<void> {
     switch (commandType) {
       case "test": {
         const { testName, options } = parseTestArgs(testArgs);
-        await runTest(testName, options);
+
+        // Check if this is a simple test run (no retry options)
+        const isSimpleRun =
+          options.attempts === 1 && !options.enableLogging && !options.noFail;
+
+        if (isSimpleRun) {
+          // Process environment variables for simple runs
+          const env = processEnvironmentVariables(options);
+
+          // Run test directly without logger for native terminal output
+          const defaultThreadingOptions = options.parallel
+            ? "--pool=forks"
+            : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+          const command =
+            `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
+
+          console.info(`Executing: ${command}`);
+          execSync(command, { stdio: "inherit", env });
+        } else {
+          // Use retry mechanism with logger
+          await runTest(testName, options);
+        }
         break;
       }
 
