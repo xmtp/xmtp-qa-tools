@@ -4,9 +4,10 @@
 
 | Script        | Purpose        | Use Case                                  |
 | ------------- | -------------- | ----------------------------------------- |
-| `cli.ts`      | Command router | Run tests, bots, scripts with retry logic |
+| `test.ts`     | Test runner    | Run tests with retry logic                |
 | `versions.ts` | SDK manager    | Setup multiple SDK versions for testing   |
 | `stress.ts`   | Stress test    | Run stress tests with retry logic         |
+| `revoke.ts`   | Command router | Run tests, bots, scripts with retry logic |
 
 ## CLI Command Structure
 
@@ -26,8 +27,7 @@ yarn cli <type> <name> [options]
 --debug                 # File logging
 --debug-verbose         # File + terminal logging
 --no-fail              # Exit 0 on failure
---max-attempts 3       # Retry limit
---retry-delay 10       # Retry delay (seconds)
+--attempts 3       # Retry limit
 --parallel             # Parallel execution
 --versions 3           # Use 3 SDK versions
 --env production       # Set XMTP_ENV
@@ -58,10 +58,10 @@ Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
 ```bash
 # Multi-version testing
-yarn cli test functional --versions 3 --no-fail --debug
+yarn test functional --versions 3 --no-fail --debug
 
 # Specific version
-yarn cli test regression --nodeVersion 3.1.1 --debug
+yarn test regression --nodeVersion 3.1.1 --debug
 ```
 
 ## Stress Testing

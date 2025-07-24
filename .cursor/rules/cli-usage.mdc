@@ -38,7 +38,6 @@ REGION=us-east-1           # AWS region for testing
 ### Basic Command Structure
 
 ```bash
-yarn cli <command_type> <name_or_path> [options...]
 yarn test <test_suite> [options...]              # Direct vitest execution
 yarn bot <bot_name> [args...]                    # Interactive bots
 yarn script <script_name> [args...]              # Utility scripts
@@ -94,8 +93,7 @@ yarn script versions                   # Setup SDK version testing
 yarn test functional --no-fail --debug
 
 # Available options:
---max-attempts <N>      # Max retry attempts (default: 3)
---retry-delay <S>       # Delay between retries in seconds (default: 10)
+--attempts <N>      # Max retry attempts (default: 3)
 --debug                 # Enable file logging (logs saved to logs/ directory)
 --debug-verbose         # Enable both file logging AND terminal output
 --debug-file <name>     # Custom log filename
@@ -192,7 +190,6 @@ yarn large                            # yarn test suites/large
 yarn regression                       # yarn test suites/functional --versions 3
 
 # Utility Shortcuts
-yarn bot                             # yarn cli bot
 yarn datadog                         # yarn test suites/datadog
 yarn gen                             # tsx inboxes/gen.ts
 yarn clean                           # rimraf .data/ logs/
@@ -253,7 +250,7 @@ TEST_VERSIONS=3 yarn test functional
 ### Combining Options
 
 ```bash
-yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5  --debug-verbose --parallel
 ```
 
 ## Best Practices
@@ -267,5 +264,5 @@ yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verb
 
 ```bash
 # Advanced example with multiple options
-yarn test functional --versions 3 --max-attempts 5 --retry-delay 30 --debug-verbose --parallel
+yarn test functional --versions 3 --attempts 5 --debug-verbose --parallel
 ```

@@ -38,9 +38,13 @@ Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
 - `groupsync-{i}: sync a large group of {i} members`
 - `updateName-{i}: update the group name`
 - `send-{i}: measure sending a gm in a group of {i} members`
-- `stream-{i}: verify group message`
-- `addMember-{i}: add members to a group`
-- `removeMembers-{i}: remove a participant from a group`
+- `streamMessage-{i}: verify group message`
+- `streamMembership-{i}: verify group membership`
+- `streamMetadata-{i}: verify group metadata`
+- `sync-{i}: perform cold start sync operations on {i} member group`
+- `syncAll-{i}: perform cold start syncAll operations on {i} member group`
+- `cumulativeSync-{i}: perform cumulative sync operations on {i} member group`
+- `cumulativeSyncAll-{i}: perform cumulative syncAll operations on {i} member group`
 
 **Measurements**:
 
@@ -170,8 +174,9 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 - `newGroup-{groupSize}: create a large group of {groupSize} members`
 - `groupsync-{groupSize}: sync a large group of {groupSize} members`
 - `addMember-{groupSize}: notify all members of additions in {groupSize} member group`
-- `stream-{groupSize}: notify all members of message changes in {groupSize} member group`
-- `updateName-{groupSize}: notify all members of metadata changes in {groupSize} member group`
+- `streamMessage-{groupSize}: notify all members of message changes in {groupSize} member group`
+- `streamMembership-{groupSize}: notify all members of membership changes in {groupSize} member group`
+- `streamMetadata-{groupSize}: notify all members of metadata changes in {groupSize} member group`
 - `sync-{groupSize}: perform cold start sync operations on {groupSize} member group`
 - `syncAll-{groupSize}: perform cold start sync operations on {groupSize} member group`
 

@@ -56,41 +56,7 @@ yarn install
 yarn local-update
 
 # Process that runs the test 100 times and exports forks logs
-yarn run:forks
-```
-
-## Log capture automation
-
-### The run.sh tool
-
-The `suites/forks/run.sh` script provides automated testing with clean log processing:
-
-```bash
-#!/bin/bash
-# Handle Ctrl+C to exit cleanly
-trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
-
-# Default to 100 runs if no parameter provided
-num_runs=${1:-100}
-
-# Clean start
-rm -rf logs/
-rm -rf .data/
-
-# Run test iterations
-for ((i=1; i<=num_runs; i++)); do
-    echo "Running test iteration $i of $num_runs"
-    yarn test suites/forks/forks.test.ts --no-fail --debug
-    exit_code=$?
-    echo "Test iteration $i completed with exit code $exit_code"
-done
-
-# Process and clean logs
-yarn ansi:forks
-
-# Count detected forks
-fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
-echo "Found $fork_count forks in logs/cleaned"
+yarn test forks --attempts 100 --env local --debug --ansi-forks --report-forks
 ```
 
 ### Log processing features
