@@ -41,17 +41,6 @@ describe(testName, async () => {
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
 
-  beforeAll(async () => {
-    for (const worker of workers.getAll()) {
-      await worker.client.conversations.syncAll();
-      console.log(
-        worker.name,
-        "has",
-        (await worker.client.conversations.list()).length,
-        "conversations",
-      );
-    }
-  });
   setupTestLifecycle({
     testName,
     getCustomDuration: () => customDuration,
