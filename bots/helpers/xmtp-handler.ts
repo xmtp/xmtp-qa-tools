@@ -3,7 +3,7 @@ import {
   type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
-} from "@helpers/client";
+} from "@xmtp/node-sdk";
 import "dotenv/config";
 import {
   createSigner,
@@ -42,7 +42,7 @@ export interface ClientOptions extends SkillOptions {
 export const DEFAULT_CORE_OPTIONS: ClientOptions = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
-  loggingLevel: (process.env.LOGGING_LEVEL || "off") as LogLevel,
+  loggingLevel: (process.env.LOGGING_LEVEL || "error") as LogLevel,
   networks: ["dev"],
   ...DEFAULT_SKILL_OPTIONS,
 };
@@ -62,24 +62,35 @@ const handleStream = async (
   let retries = MAX_RETRIES; // Per-stream retry counter
   const env = client.options?.env;
 
-  const retry = () => {
-    console.log(
-      `[${env}] Retrying in ${RETRY_INTERVAL / 1000}s, ${retries} retries left`,
-    );
+  const retry = async (): Promise<void> => {
     if (retries > 0) {
       retries--;
-      setTimeout(() => {
-        void handleStream(client, callBack, skillOpts);
-      }, RETRY_INTERVAL);
+      console.log(
+        `[${env}] Retrying in ${RETRY_INTERVAL / 1000}s, ${retries} retries left`,
+      );
+      await sleep(RETRY_INTERVAL);
+      try {
+        await handleStream(client, callBack, skillOpts);
+      } catch (error: unknown) {
+        console.error(`[${env}] Retry attempt failed:`, error);
+        await retry();
+      }
     } else {
       console.log(`[${env}] Max retries reached, ending process`);
       process.exit(1);
     }
   };
 
-  const onFail = () => {
+  const onFail = (): void => {
     console.log(`[${env}] Stream failed`);
-    retry();
+    void (async () => {
+      try {
+        await retry();
+      } catch (error: unknown) {
+        console.error(`[${env}] Failed to retry after stream failure:`, error);
+        process.exit(1);
+      }
+    })();
   };
 
   const onMessage = (err: Error | null, message?: DecodedMessage) => {
@@ -111,17 +122,26 @@ const handleStream = async (
     })();
   };
 
-  console.log(`[${env}] Syncing conversations...`);
-  await client.conversations.sync();
+  try {
+    console.log(`[${env}] Syncing conversations...`);
+    await client.conversations.sync();
 
-  await client.conversations.streamAllMessages(
-    onMessage,
-    undefined,
-    undefined,
-    onFail,
-  );
-
-  console.log(`[${env}] Waiting for messages...`);
+    console.log(`[${env}] Waiting for messages...`);
+    await client.conversations.streamAllMessages(
+      onMessage,
+      undefined,
+      undefined,
+      onFail,
+    );
+  } catch (err: unknown) {
+    console.error(`[${env}] Error streaming messages:`, err);
+    try {
+      await retry();
+    } catch (error: unknown) {
+      console.error(`[${env}] Failed to retry after streaming error:`, error);
+      process.exit(1);
+    }
+  }
 };
 
 /**
