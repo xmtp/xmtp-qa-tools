@@ -69,9 +69,6 @@ async function cleanSpecificLogFile(
   if (pattern) {
     // If a pattern is provided, use logs/cleaned/cleaned-<original>.log with pattern detection
     const outputDir = path.join(logsDir, "cleaned");
-    if (!fs.existsSync(outputDir)) {
-      await fs.promises.mkdir(outputDir, { recursive: true });
-    }
     const outputFileName = `cleaned-${logFileName}`;
     outputPath = path.join(outputDir, outputFileName);
 
@@ -82,6 +79,10 @@ async function cleanSpecificLogFile(
       console.info(`Cleaned log file: ${logFileName} -> ${outputPath}`);
     } catch (error) {
       console.error(`Failed to clean log file ${logFileName}:`, error);
+      // If processing failed, remove the cleaned folder if it's empty
+      if (fs.existsSync(outputDir) && fs.readdirSync(outputDir).length === 0) {
+        await fs.promises.rmdir(outputDir);
+      }
     }
   } else {
     // Default: simple ANSI cleaning without pattern detection using streaming
