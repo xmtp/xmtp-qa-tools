@@ -217,9 +217,9 @@ export const logAgentDetails = async (
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
 };
-export const getDbPath = (description: string = "xmtp") => {
+export const getDbPathQA = (description: string = "xmtp") => {
   //Checks if the environment is a Railway deployment
-  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
+  const volumePath = ".data/";
   // Create database directory if it doesn't exist
   if (!fs.existsSync(volumePath)) {
     fs.mkdirSync(volumePath, { recursive: true });

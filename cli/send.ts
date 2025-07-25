@@ -12,7 +12,7 @@ import { generatePrivateKey } from "viem/accounts";
 import {
   createSigner,
   generateEncryptionKeyHex,
-  getDbPath,
+  getDbPathQA,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
 import { getRandomInboxIds } from "../inboxes/utils";
@@ -209,14 +209,14 @@ async function runsendTest(config: Config): Promise<void> {
       const signer = createSigner(workerKey);
       const signerIdentifier = (await signer.getIdentifier()).identifier;
       // Create send directory in data path if it doesn't exist
-      const dbPath = getDbPath(`send/${config.env}-${i}-${signerIdentifier}`);
+      const dbPath = getDbPathQA(`send/${config.env}-${i}-${signerIdentifier}`);
       const sendDir = path.dirname(dbPath);
       if (!fs.existsSync(sendDir)) {
         fs.mkdirSync(sendDir, { recursive: true });
       }
       const client = await Client.create(signer, {
         env: config.env as XmtpEnv,
-        dbPath: getDbPath(`send/${config.env}-${i}-${signerIdentifier}`),
+        dbPath,
         dbEncryptionKey,
         loggingLevel: config.loggingLevel,
       });
@@ -325,7 +325,6 @@ async function runsendTest(config: Config): Promise<void> {
                       totalMessagesSent,
                       startTime,
                     );
-                    process.exit(0);
                   }
 
                   resolve(result);
@@ -375,7 +374,6 @@ async function runsendTest(config: Config): Promise<void> {
                 totalMessagesSent,
                 startTime,
               );
-              process.exit(0);
             }
 
             resolve(result);
