@@ -5,7 +5,7 @@ import {
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
   loadEnv,
-} from "@helpers/client";
+} from "../helpers/client";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
@@ -16,6 +16,7 @@ let debugMode = false;
 const DEFAULT_COUNT = 200;
 const DEFAULT_ENVS: XmtpEnv[] = ["local"];
 const DEFAULT_INSTALLATIONS = 2;
+const MAX_RETRIES = 3;
 // =========================
 
 interface InboxData {
@@ -29,6 +30,50 @@ interface InboxData {
 const debugLog = (...args: unknown[]) => {
   if (debugMode) console.log(...args);
 };
+
+// Cleanup function
+function cleanup() {
+  console.log("🧹 Cleaning up logs/ and .data/ directories...");
+  if (fs.existsSync("./logs")) {
+    fs.rmSync("./logs", { recursive: true, force: true });
+    console.log("✅ Removed logs/");
+  }
+  if (fs.existsSync("./.data")) {
+    fs.rmSync("./.data", { recursive: true, force: true });
+    console.log("✅ Removed .data/");
+  }
+}
+
+// Retry function
+async function runWithRetry<T>(
+  operation: () => Promise<T>,
+  operationName: string = "operation",
+): Promise<T> {
+  let lastError: Error | undefined;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(
+        `🔄 Running ${operationName} (attempt ${attempt}/${MAX_RETRIES})`,
+      );
+      const result = await operation();
+      console.log(`✅ Successfully completed ${operationName}`);
+      return result;
+    } catch (error) {
+      lastError = error as Error;
+      console.log(`❌ ${operationName} failed with error: ${error}`);
+
+      if (attempt < MAX_RETRIES) {
+        console.log("⏳ Retrying in 2 seconds to avoid rate limits...");
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+  }
+
+  throw new Error(
+    `Failed all ${MAX_RETRIES} attempts for ${operationName}: ${lastError?.message}`,
+  );
+}
 
 class ProgressBar {
   private total: number;
@@ -171,7 +216,7 @@ function showFileStats(
 
 function showHelp() {
   console.log(
-    `\nXMTP Generator Utility\n\nUsage:\n  yarn gen [options]\n\nOptions:\n  --count <number>                Total number of accounts to ensure exist\n  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)\n  --installations <number>        Number of installations per account per network (default: 1)\n  --debug                         Enable debug logging\n  --help                          Show this help message\n`,
+    `\nXMTP Generator Utility\n\nUsage:\n  yarn gen [options]\n\nOptions:\n  --count <number>                Total number of accounts to ensure exist\n  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)\n  --installations <number>        Number of installations per account per network (default: 2)\n  --installations <numbers>       Comma-separated installations (e.g., "1,2,5")\n  --no-cleanup                    Skip cleanup of logs/ and .data/ directories\n  --debug                         Enable debug logging\n  --help                          Show this help message\n\nExamples:\n  yarn gen --count 100 --envs local,production --installations 2\n  yarn gen --installations 1,2,5 --envs local\n  yarn gen --no-cleanup --debug\n`,
   );
 }
 
@@ -376,22 +421,62 @@ async function main() {
     showHelp();
     return;
   }
+
+  // Parse arguments
   let count: number | undefined = undefined,
     envs: XmtpEnv[] | undefined = undefined,
-    installations: number | undefined = undefined;
+    installations: string | undefined = undefined;
+
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
     if (arg === "--envs")
       envs = args[i + 1]
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
-    if (arg === "--installations") installations = parseInt(args[i + 1], 10);
+    if (arg === "--installations") installations = args[i + 1];
     if (arg === "--debug") debugMode = true;
   });
+
   if (count === undefined) count = DEFAULT_COUNT;
   if (envs === undefined) envs = DEFAULT_ENVS;
-  if (installations === undefined) installations = DEFAULT_INSTALLATIONS;
-  await smartUpdate({ count, envs, installations });
+
+  // Handle cleanup
+  if (!args.includes("--no-cleanup")) {
+    cleanup();
+  }
+
+  // Handle comma-separated installations
+  if (installations && installations.includes(",")) {
+    const installationList = installations
+      .split(",")
+      .map((i) => parseInt(i.trim(), 10));
+    console.log(
+      `🔄 Running for multiple installations: ${installationList.join(", ")}`,
+    );
+
+    for (const inst of installationList) {
+      console.log(`\n--- Running for --installations ${inst} ---`);
+      try {
+        await runWithRetry(
+          () => smartUpdate({ count, envs, installations: inst }),
+          `installation ${inst}`,
+        );
+      } catch (error) {
+        console.error(`❌ Failed for --installations ${inst}. Exiting.`);
+        process.exit(1);
+      }
+    }
+    console.log("✅ Completed all installation tests");
+  } else {
+    // Single installation value
+    const installationCount = installations
+      ? parseInt(installations, 10)
+      : DEFAULT_INSTALLATIONS;
+    await runWithRetry(
+      () => smartUpdate({ count, envs, installations: installationCount }),
+      "smart update",
+    );
+  }
 }
 
 main().catch(console.error);
