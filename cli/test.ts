@@ -291,6 +291,7 @@ function processEnvironmentVariables(
   if (envArg) {
     const envValue = envArg.split("=")[1];
     env.XMTP_ENV = envValue;
+    process.env.XMTP_ENV = envValue;
   }
 
   // Extract --sync parameter and set as environment variable
