@@ -23,7 +23,7 @@ describe(testName, async () => {
   let group: Group;
   let workers = await getWorkers(5);
 
-  it("membership: verify member addition notifications", async () => {
+  it("membership: verify member addition stream", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMembershipStream(
       group,
@@ -79,7 +79,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("conversations: verify new conversation notifications", async () => {
+  it("conversations: verify new conversation stream", async () => {
     const verifyResult = await verifyConversationStream(workers.getCreator(), [
       workers.getReceiver(),
     ]);
