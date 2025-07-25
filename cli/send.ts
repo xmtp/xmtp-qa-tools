@@ -192,11 +192,13 @@ async function runsendTest(config: Config): Promise<void> {
 
         // Calculate and log percentiles for response times
         const responseTimes = successful.map((r) => r.responseTime);
+        const median = calculatePercentile(responseTimes, 50);
         const p80 = calculatePercentile(responseTimes, 80);
         const p95 = calculatePercentile(responseTimes, 95);
         const p99 = calculatePercentile(responseTimes, 99);
 
         console.log(`   Response Time Percentiles:`);
+        console.log(`     Median: ${Math.round(median / 1000).toFixed(2)}s`);
         console.log(`     P80: ${Math.round(p80 / 1000).toFixed(2)}s`);
         console.log(`     P95: ${Math.round(p95 / 1000).toFixed(2)}s`);
         console.log(`     P99: ${Math.round(p99 / 1000).toFixed(2)}s`);
