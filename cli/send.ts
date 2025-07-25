@@ -226,6 +226,7 @@ async function runsendTest(config: Config): Promise<void> {
   // Shared counters
   let totalMessagesSent = 0;
   let completedWorkers = 0;
+  let summaryPrinted = false;
   const results: Array<{
     success: boolean;
     sendTime: number;
@@ -294,10 +295,11 @@ async function runsendTest(config: Config): Promise<void> {
                   );
 
                   // Check if we've reached the success threshold
-                  if (successRate >= config.tresshold) {
+                  if (successRate >= config.tresshold && !summaryPrinted) {
                     console.log(
                       `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
                     );
+                    summaryPrinted = true;
                     logSummary(
                       results,
                       completedWorkers,
@@ -342,10 +344,11 @@ async function runsendTest(config: Config): Promise<void> {
             );
 
             // Check if we've reached the success threshold
-            if (successRate >= config.tresshold) {
+            if (successRate >= config.tresshold && !summaryPrinted) {
               console.log(
                 `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
               );
+              summaryPrinted = true;
               logSummary(
                 results,
                 completedWorkers,
@@ -406,7 +409,14 @@ async function runsendTest(config: Config): Promise<void> {
         timeoutPromise,
       ]);
 
-      logSummary(finalResults, completedWorkers, totalMessagesSent, startTime);
+      if (!summaryPrinted) {
+        logSummary(
+          finalResults,
+          completedWorkers,
+          totalMessagesSent,
+          startTime,
+        );
+      }
     } catch (error) {
       console.error(
         `\n⏰ ${error instanceof Error ? error.message : "Test timed out"}`,
@@ -418,7 +428,9 @@ async function runsendTest(config: Config): Promise<void> {
     }
   } else {
     // For non-wait mode, all promises have already resolved after sending
-    logSummary(results, completedWorkers, totalMessagesSent, startTime);
+    if (!summaryPrinted) {
+      logSummary(results, completedWorkers, totalMessagesSent, startTime);
+    }
   }
 
   process.exit(0);
