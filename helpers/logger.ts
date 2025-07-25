@@ -213,7 +213,6 @@ export interface TestLogOptions {
   logFileName?: string;
   verboseLogging?: boolean;
   logLevel?: string;
-  attempt?: number; // Optional attempt number for multi-attempt runs
 }
 
 /**
@@ -235,8 +234,7 @@ export const createTestLogger = (options: TestLogOptions) => {
       const cleanTestName = path
         .basename(options.testName)
         .replace(/\.test\.ts$/, "");
-      const attemptSuffix = options.attempt ? `-attempt${options.attempt}` : "";
-      logFileName = `raw-${cleanTestName}-${process.env.XMTP_ENV}${attemptSuffix}-${getTime()}.log`;
+      logFileName = `raw-${cleanTestName}-${getTime()}.log`;
     }
 
     const logPath = path.join(logsDir, logFileName);

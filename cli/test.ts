@@ -370,7 +370,6 @@ async function runTest(
       testName,
       verboseLogging: options.verboseLogging,
       logLevel: options.logLevel,
-      attempt: attempt,
     });
 
     try {
