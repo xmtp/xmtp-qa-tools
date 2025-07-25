@@ -28,7 +28,6 @@ interface Config {
   env: string;
   address: string;
   tresshold: number;
-  keepDb: boolean;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
   useGroups: boolean;
@@ -42,7 +41,6 @@ function parseArgs(): Config {
     env: process.env.XMTP_ENV ?? "local",
     address: process.env.ADDRESS ?? "",
     tresshold: 99,
-    keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
     useGroups: false,
@@ -68,9 +66,6 @@ function parseArgs(): Config {
       config.tresshold = parseInt(nextArg, 10);
       i++;
     }
-    if (arg === "--keep") {
-      config.keepDb = true;
-    }
     if (arg === "--wait") {
       config.waitForResponse = true;
     }
@@ -83,8 +78,7 @@ function parseArgs(): Config {
 }
 
 function cleanupsendDatabases(env: string): void {
-  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  const dataDir = path.resolve(volumePath);
+  const dataDir = path.resolve(".data/send");
 
   if (!fs.existsSync(dataDir)) {
     console.log(`🧹 No data directory found at ${dataDir}, skipping cleanup`);
@@ -128,10 +122,7 @@ async function runsendTest(config: Config): Promise<void> {
   const startTime = Date.now();
   console.log(`🚀 Testing ${config.userCount} users on ${config.env} `);
 
-  // Clean up previous send test database files
-  if (!config.keepDb) {
-    cleanupsendDatabases(config.env);
-  }
+  cleanupsendDatabases(config.env);
 
   const dbEncryptionKey = getEncryptionKeyFromHex(generateEncryptionKeyHex());
 
