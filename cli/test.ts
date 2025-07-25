@@ -256,17 +256,6 @@ function parseTestArgs(args: string[]): {
   return { testName, options, env };
 }
 
-/**
- * Logs all test parameters in a comprehensive format
- */
-function logTestParameters(parameters: Record<string, any>): void {
-  console.info("=== TEST PARAMETERS ===");
-  Object.entries(parameters).forEach(([key, value]) => {
-    console.info(`${key}: ${JSON.stringify(value)}`);
-  });
-  console.info("=======================");
-}
-
 async function runCommand(
   command: string,
   env: Record<string, string>,
