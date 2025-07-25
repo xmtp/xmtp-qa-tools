@@ -1,12 +1,12 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
   loadEnv,
 } from "../helpers/client";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes";
@@ -61,7 +61,7 @@ async function runWithRetry<T>(
       return result;
     } catch (error) {
       lastError = error as Error;
-      console.log(`❌ ${operationName} failed with error: ${error}`);
+      console.log(`❌ ${operationName} failed with error: ${String(error)}`);
 
       if (attempt < MAX_RETRIES) {
         console.log("⏳ Retrying in 2 seconds to avoid rate limits...");
@@ -446,10 +446,10 @@ async function main() {
   }
 
   // Handle comma-separated installations
-  if (installations && installations.includes(",")) {
-    const installationList = installations
+  if (installations && (installations as string).includes(",")) {
+    const installationList = (installations as string)
       .split(",")
-      .map((i) => parseInt(i.trim(), 10));
+      .map((i: string) => parseInt(i.trim(), 10));
     console.log(
       `🔄 Running for multiple installations: ${installationList.join(", ")}`,
     );
