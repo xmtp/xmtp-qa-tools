@@ -159,7 +159,7 @@ yarn test large                            # yarn test suites/large
 
 # Utility Shortcuts
 yarn datadog                         # yarn test suites/datadog
-yarn gen                             # tsx inboxes/gen.ts
+yarn gen                             # tsx scripts/gen.ts
 yarn clean                           # rimraf .data/ logs/
 yarn format                          # prettier -w .
 yarn lint                            # eslint .

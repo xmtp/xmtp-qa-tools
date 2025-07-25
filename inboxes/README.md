@@ -6,7 +6,6 @@ Pre-generated XMTP inbox data for testing with multiple device installations.
 
 - **`{number}.json`** - Inbox data files (e.g., `2.json`, `5.json`, `10.json`)
 - **`gen.ts`** - TypeScript generator script
-- **`gen.sh`** - Bash wrapper for batch generation
 
 ## Data format
 
@@ -58,16 +57,6 @@ yarn gen --count 500 --installations 10 --envs local
 
 # Multiple environments
 yarn gen --count 200 --installations 5 --envs local,dev,production
-```
-
-### Batch generation with gen.sh
-
-```bash
-# Generate multiple installation counts at once
-./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500
-
-# Creates: 2.json, 5.json, 10.json, 15.json, 20.json, 25.json
-# Each file contains 500 accounts with respective installation counts
 ```
 
 ## Parameters

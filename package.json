@@ -15,7 +15,7 @@
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "format": "prettier -w .",
-    "gen": "tsx inboxes/gen.ts",
+    "gen": "tsx cli/gen.ts",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",

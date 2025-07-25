@@ -186,7 +186,6 @@ yarn test bench                            # yarn test suites/bench/bench.test.t
 yarn test large                            # yarn test suites/large
 
 # Utility Shortcuts
-yarn gen                             # tsx inboxes/gen.ts
 yarn clean                           # rimraf .data/ logs/
 yarn format                          # prettier -w .
 yarn lint                            # eslint .

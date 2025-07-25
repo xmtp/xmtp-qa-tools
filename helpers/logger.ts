@@ -213,12 +213,10 @@ export const getTime = (): string => {
 };
 
 export interface TestLogOptions {
-  enableLogging: boolean;
-  customLogFile?: string;
+  fileLogging: boolean;
   testName: string;
-  logFileName?: string;
-  verboseLogging?: boolean;
-  logLevel?: string;
+  verboseLogging: boolean;
+  logLevel: string;
 }
 
 /**
@@ -228,20 +226,16 @@ export const createTestLogger = (options: TestLogOptions) => {
   let logStream: fs.WriteStream | undefined;
   let logFileName = "";
 
-  if (options.enableLogging) {
+  if (options.fileLogging) {
     const logsDir = "logs";
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }
 
-    if (options.customLogFile) {
-      logFileName = options.customLogFile;
-    } else {
-      const cleanTestName = path
-        .basename(options.testName)
-        .replace(/\.test\.ts$/, "");
-      logFileName = `raw-${cleanTestName}-${getTime()}.log`;
-    }
+    const cleanTestName = path
+      .basename(options.testName)
+      .replace(/\.test\.ts$/, "");
+    logFileName = `raw-${cleanTestName}-${getTime()}.log`;
 
     const logPath = path.join(logsDir, logFileName);
     logStream = fs.createWriteStream(logPath, { flags: "w" });

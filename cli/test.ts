@@ -11,7 +11,7 @@ import "dotenv/config";
 interface TestOptions {
   attempts: number; // Maximum retry attempts (default: 1)
   retryDelay: number; // Delay between retries (seconds)
-  enableLogging: boolean; // Enable file logging
+  fileLogging: boolean; // Enable file logging
   vitestArgs: string[]; // Additional vitest arguments
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
@@ -53,11 +53,6 @@ async function cleanSpecificLogFile(
   logFileName: string,
   pattern?: string,
 ): Promise<void> {
-  if (!logFileName) {
-    console.info("No log file name provided for cleaning");
-    return;
-  }
-
   const logsDir = path.join(process.cwd(), "logs");
   let outputPath: string;
   const rawFilePath = path.join(logsDir, logFileName);
@@ -154,8 +149,8 @@ function parseTestArgs(args: string[]): {
   let testName = "functional";
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
-    retryDelay: 2,
-    enableLogging: false,
+    retryDelay: 1,
+    fileLogging: false,
     vitestArgs: [],
     noFail: false,
     verboseLogging: true, // Show terminal output by default
@@ -201,7 +196,7 @@ function parseTestArgs(args: string[]): {
         }
         break;
       case "--debug":
-        options.enableLogging = true;
+        options.fileLogging = true;
         options.verboseLogging = false;
         env.LOGGING_LEVEL = "debug";
         break;
@@ -261,17 +256,6 @@ function parseTestArgs(args: string[]): {
   return { testName, options, env };
 }
 
-/**
- * Logs all test parameters in a comprehensive format
- */
-function logTestParameters(parameters: Record<string, any>): void {
-  console.info("=== TEST PARAMETERS ===");
-  Object.entries(parameters).forEach(([key, value]) => {
-    console.info(`${key}: ${JSON.stringify(value)}`);
-  });
-  console.info("=======================");
-}
-
 async function runCommand(
   command: string,
   env: Record<string, string>,
@@ -325,7 +309,7 @@ async function runTest(
 
     // Create a new logger for each attempt
     const logger = createTestLogger({
-      enableLogging: options.enableLogging,
+      fileLogging: options.fileLogging,
       testName,
       verboseLogging: options.verboseLogging,
       logLevel: env.LOGGING_LEVEL,
@@ -377,9 +361,9 @@ async function runTest(
         );
 
         if (
-          options.enableLogging &&
+          options.fileLogging &&
           !options.noErrorLogs &&
-          logger?.logFileName
+          env.XMTP_ENV !== "local"
         ) {
           await sendDatadogLog(logger.logFileName, testName);
         }
@@ -432,7 +416,7 @@ async function main(): Promise<void> {
 
         // Check if this is a simple test run (no retry options)
         const isSimpleRun =
-          options.attempts === 1 && !options.enableLogging && !options.noFail;
+          options.attempts === 1 && !options.fileLogging && !options.noFail;
 
         if (isSimpleRun) {
           // Run test directly without logger for native terminal output
