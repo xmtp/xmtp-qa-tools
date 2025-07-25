@@ -12,14 +12,10 @@ interface TestOptions {
   attempts: number; // Maximum retry attempts (default: 1)
   retryDelay: number; // Delay between retries (seconds)
   enableLogging: boolean; // Enable file logging
-  customLogFile?: string; // Custom log filename
-  env: string; // Environment to run the test in
   vitestArgs: string[]; // Additional vitest arguments
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
-  cleanLogs: boolean; // Auto-clean logs after completion
-  logLevel: string; // Log level (info, info, error)
   noErrorLogs: boolean; // Disable sending error logs to Datadog
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
@@ -38,6 +34,12 @@ function runAnsiForksAndReport(options: TestOptions): void {
       if (fs.existsSync(logsDir)) {
         const forkCount = fs.readdirSync(logsDir).length;
         console.info(`Found ${forkCount} forks in logs/cleaned`);
+
+        // Remove the cleaned folder if it's empty
+        if (forkCount === 0) {
+          fs.rmdirSync(logsDir);
+          console.info("Removed empty logs/cleaned directory");
+        }
       } else {
         console.info("No logs/cleaned directory found");
       }
@@ -69,9 +71,6 @@ async function cleanSpecificLogFile(
   if (pattern) {
     // If a pattern is provided, use logs/cleaned/cleaned-<original>.log with pattern detection
     const outputDir = path.join(logsDir, "cleaned");
-    if (!fs.existsSync(outputDir)) {
-      await fs.promises.mkdir(outputDir, { recursive: true });
-    }
     const outputFileName = `cleaned-${logFileName}`;
     outputPath = path.join(outputDir, outputFileName);
 
@@ -82,6 +81,10 @@ async function cleanSpecificLogFile(
       console.info(`Cleaned log file: ${logFileName} -> ${outputPath}`);
     } catch (error) {
       console.error(`Failed to clean log file ${logFileName}:`, error);
+      // If processing failed, remove the cleaned folder if it's empty
+      if (fs.existsSync(outputDir) && fs.readdirSync(outputDir).length === 0) {
+        await fs.promises.rmdir(outputDir);
+      }
     }
   } else {
     // Default: simple ANSI cleaning without pattern detection using streaming
@@ -137,30 +140,34 @@ async function cleanSpecificLogFile(
 }
 
 /**
- * Parses test command arguments and options
+ * Parses test command arguments and options, setting environment variables directly
  * Handles both simple test runs and advanced retry mode
  *
  * @param args - Command line arguments
- * @returns Parsed test name and retry options
+ * @returns Parsed test name, options, and environment variables
  */
 function parseTestArgs(args: string[]): {
   testName: string;
   options: TestOptions;
+  env: Record<string, string>;
 } {
   let testName = "functional";
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
-    retryDelay: 10,
-    enableLogging: false, // Default to no file logging
-    env: "local",
+    retryDelay: 2,
+    enableLogging: false,
     vitestArgs: [],
     noFail: false,
     verboseLogging: true, // Show terminal output by default
     parallel: false,
-    cleanLogs: true,
-    logLevel: "off", // Default log level
     noErrorLogs: false,
     reportForkCount: false, // Report fork count after ansi:forks
+  };
+
+  // Initialize environment variables
+  const env: Record<string, string> = {
+    ...process.env,
+    RUST_BACKTRACE: "1",
   };
 
   let currentArgs = [...args];
@@ -187,8 +194,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--versions":
         if (nextArg) {
-          // Store versions in vitestArgs to be passed as environment variable
-          options.vitestArgs.push(`--versions=${nextArg}`);
+          env.TEST_VERSIONS = nextArg;
           i++;
         } else {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
@@ -197,11 +203,11 @@ function parseTestArgs(args: string[]): {
       case "--debug":
         options.enableLogging = true;
         options.verboseLogging = false;
+        env.LOGGING_LEVEL = "debug";
         break;
       case "--nodeVersion":
         if (nextArg) {
-          // Store node version in vitestArgs to be passed as environment variable
-          options.vitestArgs.push(`--nodeVersion=${nextArg}`);
+          env.NODE_VERSION = nextArg;
           i++;
         } else {
           console.warn(
@@ -220,8 +226,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--env":
         if (nextArg) {
-          options.env = nextArg;
-          options.vitestArgs.push(`--env=${nextArg}`);
+          env.XMTP_ENV = nextArg;
           i++;
         } else {
           console.warn("--env flag requires a value (e.g., --env local)");
@@ -229,7 +234,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--sync":
         if (nextArg) {
-          options.vitestArgs.push(`--sync=${nextArg}`);
+          env.SYNC_STRATEGY = nextArg;
           i++;
         } else {
           console.warn(
@@ -239,8 +244,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--size":
         if (nextArg) {
-          // Store batch size in vitestArgs to be passed as environment variable
-          options.vitestArgs.push(`--size=${nextArg}`);
+          env.BATCH_SIZE = nextArg;
           i++;
         } else {
           console.warn("--size flag requires a value (e.g., --size 5-10)");
@@ -254,108 +258,7 @@ function parseTestArgs(args: string[]): {
     }
   }
 
-  return { testName, options };
-}
-
-/**
- * Process environment variables from vitestArgs
- */
-function processEnvironmentVariables(
-  options: TestOptions,
-): Record<string, string> {
-  const env: Record<string, string> = {
-    ...process.env,
-    RUST_BACKTRACE: "1",
-  };
-
-  // Extract --versions parameter and set as environment variable
-  const versionsArg = options.vitestArgs.find((arg) =>
-    arg.startsWith("--versions="),
-  );
-  if (versionsArg) {
-    const versions = versionsArg.split("=")[1];
-    env.TEST_VERSIONS = versions;
-  }
-
-  // Extract --nodeVersion parameter and set as environment variable
-  const nodeVersionArg = options.vitestArgs.find((arg) =>
-    arg.startsWith("--nodeVersion="),
-  );
-  if (nodeVersionArg) {
-    const nodeVersion = nodeVersionArg.split("=")[1];
-    env.NODE_VERSION = nodeVersion;
-  }
-
-  // Extract --env parameter and set as environment variable
-  const envArg = options.vitestArgs.find((arg) => arg.startsWith("--env="));
-  if (envArg) {
-    const envValue = envArg.split("=")[1];
-    env.XMTP_ENV = envValue;
-    process.env.XMTP_ENV = envValue;
-  }
-
-  // Extract --sync parameter and set as environment variable
-  const syncArg = options.vitestArgs.find((arg) => arg.startsWith("--sync="));
-  if (syncArg) {
-    const syncValue = syncArg.split("=")[1];
-    env.SYNC_STRATEGY = syncValue;
-  }
-
-  // Extract --size parameter and set as environment variable
-  const sizeArg = options.vitestArgs.find((arg) => arg.startsWith("--size="));
-  if (sizeArg) {
-    const sizeValue = sizeArg.split("=")[1];
-    env.BATCH_SIZE = sizeValue;
-  }
-
-  // Set logging level
-  env.LOGGING_LEVEL = options.logLevel || "error";
-
-  // Remove custom args from vitestArgs since they're not vitest parameters
-  options.vitestArgs = options.vitestArgs.filter(
-    (arg) =>
-      !arg.startsWith("--versions=") &&
-      !arg.startsWith("--nodeVersion=") &&
-      !arg.startsWith("--env=") &&
-      !arg.startsWith("--sync=") &&
-      !arg.startsWith("--size="),
-  );
-
-  return env;
-}
-
-/**
- * Collects all test parameters into a single object for comprehensive logging
- */
-function collectTestParameters(
-  testName: string,
-  options: TestOptions,
-  env: Record<string, string>,
-): Record<string, any> {
-  const parameters: Record<string, any> = {
-    testName,
-    attempts: options.attempts,
-    retryDelay: options.retryDelay,
-    enableLogging: options.enableLogging,
-    verboseLogging: options.verboseLogging,
-    parallel: options.parallel,
-    cleanLogs: options.cleanLogs,
-    logLevel: options.logLevel,
-    noFail: options.noFail,
-    noErrorLogs: options.noErrorLogs,
-    reportForkCount: options.reportForkCount,
-    vitestArgs: options.vitestArgs,
-  };
-
-  // Add environment variables that were set
-  if (env.TEST_VERSIONS) parameters.testVersions = env.TEST_VERSIONS;
-  if (env.NODE_VERSION) parameters.nodeVersion = env.NODE_VERSION;
-  if (env.XMTP_ENV) parameters.xmtpEnv = env.XMTP_ENV;
-  if (env.SYNC_STRATEGY) parameters.syncStrategy = env.SYNC_STRATEGY;
-  if (env.BATCH_SIZE) parameters.batchSize = env.BATCH_SIZE;
-  if (env.LOGGING_LEVEL) parameters.loggingLevel = env.LOGGING_LEVEL;
-
-  return parameters;
+  return { testName, options, env };
 }
 
 /**
@@ -412,20 +315,21 @@ async function runCommand(
   });
 }
 
-async function runTest(testName: string, options: TestOptions): Promise<void> {
-  const logger = createTestLogger({
-    enableLogging: options.enableLogging,
-    testName,
-    verboseLogging: options.verboseLogging,
-    logLevel: options.logLevel,
-  });
-
-  const env = processEnvironmentVariables(options);
-  const parameters = collectTestParameters(testName, options, env);
-  logTestParameters(parameters);
-
+async function runTest(
+  testName: string,
+  options: TestOptions,
+  env: Record<string, string>,
+): Promise<void> {
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
     console.info(`Attempt ${attempt} of ${options.attempts}...`);
+
+    // Create a new logger for each attempt
+    const logger = createTestLogger({
+      enableLogging: options.enableLogging,
+      testName,
+      verboseLogging: options.verboseLogging,
+      logLevel: env.LOGGING_LEVEL,
+    });
 
     try {
       const defaultThreadingOptions = options.parallel
@@ -440,24 +344,36 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
 
       if (exitCode === 0) {
         console.info("Tests passed successfully!");
-        logger?.close();
-
-        // Clean the log file if enabled
-        if (options.cleanLogs && logger?.logFileName) {
-          await cleanSpecificLogFile(logger.logFileName);
-        }
-
-        // Run ansi:forks after successful test completion
-        runAnsiForksAndReport(options);
-
-        return;
       } else {
         console.info("Tests failed!");
       }
 
+      // Close logger for this attempt
+      logger?.close();
+
+      await cleanSpecificLogFile(logger.logFileName);
+
+      // Check if this was the last attempt
       if (attempt === options.attempts) {
+        console.info(
+          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
+        );
+
+        // Run ansi:forks after all attempts completion
+        runAnsiForksAndReport(options);
+
+        // Exit based on the last attempt's result
+        if (exitCode === 0 || options.noFail) {
+          process.exit(0);
+        } else {
+          process.exit(1);
+        }
+      }
+
+      // Handle failed attempt (only for non-final attempts)
+      if (attempt < options.attempts && exitCode !== 0) {
         console.error(
-          `\n❌ Test suite "${testName}" failed after ${options.attempts} attempts.`,
+          `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
         );
 
         if (
@@ -466,19 +382,6 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
           logger?.logFileName
         ) {
           await sendDatadogLog(logger.logFileName, testName);
-        }
-
-        logger?.close();
-
-        // Clean the log file if enabled (even for failed tests)
-        if (options.cleanLogs && logger?.logFileName) {
-          await cleanSpecificLogFile(logger.logFileName);
-        }
-
-        if (options.noFail) {
-          process.exit(0);
-        } else {
-          process.exit(1);
         }
       }
 
@@ -496,6 +399,9 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`);
       console.error(error);
+
+      // Close logger for this attempt
+      logger?.close();
     }
   }
 }
@@ -522,16 +428,13 @@ async function main(): Promise<void> {
   try {
     switch (commandType) {
       case "test": {
-        const { testName, options } = parseTestArgs(testArgs);
+        const { testName, options, env } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
         const isSimpleRun =
           options.attempts === 1 && !options.enableLogging && !options.noFail;
 
         if (isSimpleRun) {
-          // Process environment variables for simple runs
-          const env = processEnvironmentVariables(options);
-
           // Run test directly without logger for native terminal output
           const defaultThreadingOptions = options.parallel
             ? "--pool=forks"
@@ -543,7 +446,7 @@ async function main(): Promise<void> {
           execSync(command, { stdio: "inherit", env });
         } else {
           // Use retry mechanism with logger
-          await runTest(testName, options);
+          await runTest(testName, options, env);
         }
         break;
       }

@@ -30,6 +30,12 @@ export async function processLogFile(
   outputPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    // Create output directory if it doesn't exist
+    const outputDir = path.dirname(outputPath);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
     const readStream = fs.createReadStream(inputPath, {
       encoding: "utf8",
       highWaterMark: 64 * 1024,
@@ -234,7 +240,7 @@ export const createTestLogger = (options: TestLogOptions) => {
       const cleanTestName = path
         .basename(options.testName)
         .replace(/\.test\.ts$/, "");
-      logFileName = `raw-${cleanTestName}-${process.env.XMTP_ENV}-${getTime()}.log`;
+      logFileName = `raw-${cleanTestName}-${getTime()}.log`;
     }
 
     const logPath = path.join(logsDir, logFileName);
