@@ -20,12 +20,14 @@ const workerNames = [
 ] as string[];
 
 // Operations configuration - enable/disable specific operations
-const enabledOperations = {
+const epochRotationOperations = {
   updateName: true, // updates the name of the group
-  sendMessage: true, // sends a message to the group
   addMember: false, // adds a random member to the group
   removeMember: false, // removes a random member from the group
+};
+const otherOperations = {
   createInstallation: true, // creates a new installation for a random worker
+  sendMessage: true, // sends a message to the group
 };
 const targetEpoch = 50n; // The target epoch to stop the test (epochs are when performing forks to the group)
 const network = process.env.XMTP_ENV; // Network environment setting
@@ -106,22 +108,32 @@ describe(testName, () => {
 
                 const ops = await createOperations(randomWorker, group);
                 const operationList = [
-                  ...(enabledOperations.updateName ? [ops.updateName] : []),
-                  ...(enabledOperations.sendMessage ? [ops.sendMessage] : []),
-                  ...(enabledOperations.addMember ? [ops.addMember] : []),
-                  ...(enabledOperations.removeMember ? [ops.removeMember] : []),
-                  ...(enabledOperations.createInstallation
+                  ...(epochRotationOperations.updateName
+                    ? [ops.updateName]
+                    : []),
+                  ...(epochRotationOperations.addMember ? [ops.addMember] : []),
+                  ...(epochRotationOperations.removeMember
+                    ? [ops.removeMember]
+                    : []),
+                ];
+                const otherOperationList = [
+                  ...(otherOperations.createInstallation
                     ? [ops.createInstallation]
                     : []),
+                  ...(otherOperations.sendMessage ? [ops.sendMessage] : []),
                 ];
 
                 const randomOperation =
                   operationList[
                     Math.floor(Math.random() * operationList.length)
                   ];
-
+                const otherRandomOperation =
+                  otherOperationList[
+                    Math.floor(Math.random() * otherOperationList.length)
+                  ];
                 try {
                   await randomOperation();
+                  await otherRandomOperation();
                 } catch (e) {
                   console.log(`Group ${groupIndex + 1} operation failed:`, e);
                 }

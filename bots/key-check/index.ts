@@ -218,7 +218,6 @@ const processMessage = async (
         summaryText += `- validationError: '${installationStatus.validationError}'\n\n`;
       }
     }
-
     await conversation.send(summaryText);
     console.log(`Sent key status for ${targetInboxId}`);
   } catch (error) {
