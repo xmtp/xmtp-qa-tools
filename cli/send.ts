@@ -170,7 +170,7 @@ async function runsendTest(config: Config): Promise<void> {
     console.log(`   Successful: ${successful.length}`);
     console.log(`   Failed: ${failed}`);
     console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
-    console.log(`   Duration: ${duration}ms`);
+    console.log(`   Duration: ${(duration / 1000).toFixed(2)}s`);
     console.log(`   Total: ${totalMessagesSent}`);
 
     if (successful.length > 0) {
@@ -186,7 +186,9 @@ async function runsendTest(config: Config): Promise<void> {
         const avgResponse =
           successful.reduce((sum, r) => sum + r.responseTime, 0) /
           successful.length;
-        console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+        console.log(
+          `   Avg Response: ${Math.round(avgResponse / 1000).toFixed(2)}s`,
+        );
 
         // Calculate and log percentiles for response times
         const responseTimes = successful.map((r) => r.responseTime);
@@ -195,9 +197,9 @@ async function runsendTest(config: Config): Promise<void> {
         const p99 = calculatePercentile(responseTimes, 99);
 
         console.log(`   Response Time Percentiles:`);
-        console.log(`     P80: ${Math.round(p80)}ms`);
-        console.log(`     P95: ${Math.round(p95)}ms`);
-        console.log(`     P99: ${Math.round(p99)}ms`);
+        console.log(`     P80: ${Math.round(p80 / 1000).toFixed(2)}s`);
+        console.log(`     P95: ${Math.round(p95 / 1000).toFixed(2)}s`);
+        console.log(`     P99: ${Math.round(p99 / 1000).toFixed(2)}s`);
       }
     }
   };
