@@ -358,18 +358,20 @@ async function runTest(
   options: TestOptions,
   env: Record<string, string>,
 ): Promise<void> {
-  const logger = createTestLogger({
-    enableLogging: options.enableLogging,
-    testName,
-    verboseLogging: options.verboseLogging,
-    logLevel: options.logLevel,
-  });
-
   const parameters = collectTestParameters(testName, options, env);
   logTestParameters(parameters);
 
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
     console.info(`Attempt ${attempt} of ${options.attempts}...`);
+
+    // Create a new logger for each attempt
+    const logger = createTestLogger({
+      enableLogging: options.enableLogging,
+      testName,
+      verboseLogging: options.verboseLogging,
+      logLevel: options.logLevel,
+      attempt: attempt,
+    });
 
     try {
       const defaultThreadingOptions = options.parallel
@@ -384,16 +386,8 @@ async function runTest(
 
       if (exitCode === 0) {
         console.info("Tests passed successfully!");
-      } else {
-        console.info("Tests failed!");
-      }
 
-      // Continue to next attempt regardless of success/failure
-      if (attempt === options.attempts) {
-        console.info(
-          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
-        );
-
+        // Close logger for this attempt
         logger?.close();
 
         // Clean the log file if enabled
@@ -401,12 +395,22 @@ async function runTest(
           await cleanSpecificLogFile(logger.logFileName);
         }
 
+        console.info(
+          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
+        );
+
         // Run ansi:forks after all attempts completion
         runAnsiForksAndReport(options);
 
         return;
+      } else {
+        console.info("Tests failed!");
       }
 
+      // Close logger for this attempt
+      logger?.close();
+
+      // Handle failed attempt
       if (attempt === options.attempts) {
         console.error(
           `\n❌ Test suite "${testName}" failed after ${options.attempts} attempts.`,
@@ -419,8 +423,6 @@ async function runTest(
         ) {
           await sendDatadogLog(logger.logFileName, testName);
         }
-
-        logger?.close();
 
         // Clean the log file if enabled (even for failed tests)
         if (options.cleanLogs && logger?.logFileName) {
@@ -448,6 +450,9 @@ async function runTest(
     } catch (error) {
       console.error(`Attempt ${attempt} failed:`);
       console.error(error);
+
+      // Close logger for this attempt
+      logger?.close();
     }
   }
 }
@@ -474,7 +479,7 @@ async function main(): Promise<void> {
   try {
     switch (commandType) {
       case "test": {
-        const { testName, options } = parseTestArgs(testArgs);
+        const { testName, options, env } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
         const isSimpleRun =
