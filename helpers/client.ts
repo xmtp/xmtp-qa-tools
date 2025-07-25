@@ -53,6 +53,12 @@ import {
   Dm as Dm300,
   Group as Group300,
 } from "@xmtp/node-sdk-3.0.1";
+import {
+  Client as Client321,
+  Conversation as Conversation321,
+  Dm as Dm321,
+  Group as Group321,
+} from "@xmtp/node-sdk-3.2.1";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -131,6 +137,15 @@ export const VersionList = [
     Group: Group300,
     nodeVersion: "3.0.1",
     bindingsPackage: "1.2.5",
+    libXmtpVersion: "dc3e8c8",
+  },
+  {
+    Client: Client321,
+    Conversation: Conversation321,
+    Dm: Dm321,
+    Group: Group321,
+    nodeVersion: "3.2.1",
+    bindingsPackage: "1.3.2",
     libXmtpVersion: "dc3e8c8",
   },
 ];
