@@ -42,6 +42,7 @@ function parseArgs(): Config {
     env: process.env.XMTP_ENV ?? "local",
     address: process.env.ADDRESS ?? "",
     tresshold: 95,
+
     keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
@@ -147,6 +148,58 @@ async function runsendTest(config: Config): Promise<void> {
     process.stdout.write(
       `\r📋 [${bar}] ${percentage}% (${initializedCount}/${config.userCount} workers)`,
     );
+  };
+
+  const logSummary = (
+    results: Array<{
+      success: boolean;
+      newDmTime: number;
+      sendTime: number;
+      responseTime: number;
+    }>,
+    completedWorkers: number,
+    totalMessagesSent: number,
+    startTime: number,
+  ) => {
+    const successful = results.filter((r) => r.success);
+    const successRate = (successful.length / config.userCount) * 100;
+    const failed = config.userCount - successful.length;
+    const duration = Date.now() - startTime;
+
+    console.log(`\n📊 Summary:`);
+    console.log(`   Successful: ${successful.length}`);
+    console.log(`   Failed: ${failed}`);
+    console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
+    console.log(`   Duration: ${duration}ms`);
+    console.log(`   Total: ${totalMessagesSent}`);
+
+    if (successful.length > 0) {
+      const avgNewDm =
+        successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
+      const avgSend =
+        successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
+
+      console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
+      console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
+
+      if (config.waitForResponse) {
+        const avgResponse =
+          successful.reduce((sum, r) => sum + r.responseTime, 0) /
+          successful.length;
+        console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+
+        // Calculate and log percentiles for response times
+        const responseTimes = successful.map((r) => r.responseTime);
+        const p80 = calculatePercentile(responseTimes, 80);
+        const p95 = calculatePercentile(responseTimes, 95);
+        const p99 = calculatePercentile(responseTimes, 99);
+
+        console.log(`   Response Time Percentiles:`);
+        console.log(`     P80: ${Math.round(p80)}ms`);
+        console.log(`     P95: ${Math.round(p95)}ms`);
+        console.log(`     P99: ${Math.round(p99)}ms`);
+      }
+    }
   };
 
   const workerPromises = Array.from(
@@ -261,6 +314,20 @@ async function runsendTest(config: Config): Promise<void> {
                     `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
                   );
 
+                  // Check if we've reached the success threshold
+                  if (successRate >= config.tresshold) {
+                    console.log(
+                      `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
+                    );
+                    logSummary(
+                      results,
+                      completedWorkers,
+                      totalMessagesSent,
+                      startTime,
+                    );
+                    process.exit(0);
+                  }
+
                   resolve(result);
                 }
               },
@@ -296,6 +363,20 @@ async function runsendTest(config: Config): Promise<void> {
             console.log(
               `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
             );
+
+            // Check if we've reached the success threshold
+            if (successRate >= config.tresshold) {
+              console.log(
+                `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
+              );
+              logSummary(
+                results,
+                completedWorkers,
+                totalMessagesSent,
+                startTime,
+              );
+              process.exit(0);
+            }
 
             resolve(result);
           }
@@ -350,47 +431,7 @@ async function runsendTest(config: Config): Promise<void> {
         timeoutPromise,
       ]);
 
-      const successful = finalResults.filter((r) => r.success);
-      const successRate = (successful.length / config.userCount) * 100;
-      const failed = config.userCount - successful.length;
-      const duration = Date.now() - startTime;
-
-      console.log(`\n📊 Summary:`);
-      console.log(`   Successful: ${successful.length}`);
-      console.log(`   Failed: ${failed}`);
-      console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
-      console.log(`   Duration: ${duration}ms`);
-      console.log(`   Total: ${totalMessagesSent}`);
-
-      if (successful.length > 0) {
-        const avgNewDm =
-          successful.reduce((sum, r) => sum + r.newDmTime, 0) /
-          successful.length;
-        const avgSend =
-          successful.reduce((sum, r) => sum + r.sendTime, 0) /
-          successful.length;
-
-        console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
-        console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
-
-        if (config.waitForResponse) {
-          const avgResponse =
-            successful.reduce((sum, r) => sum + r.responseTime, 0) /
-            successful.length;
-          console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
-
-          // Calculate and log percentiles for response times
-          const responseTimes = successful.map((r) => r.responseTime);
-          const p80 = calculatePercentile(responseTimes, 80);
-          const p95 = calculatePercentile(responseTimes, 95);
-          const p99 = calculatePercentile(responseTimes, 99);
-
-          console.log(`   Response Time Percentiles:`);
-          console.log(`     P80: ${Math.round(p80)}ms`);
-          console.log(`     P95: ${Math.round(p95)}ms`);
-          console.log(`     P99: ${Math.round(p99)}ms`);
-        }
-      }
+      logSummary(finalResults, completedWorkers, totalMessagesSent, startTime);
     } catch (error) {
       console.error(
         `\n⏰ ${error instanceof Error ? error.message : "Test timed out"}`,
@@ -402,27 +443,7 @@ async function runsendTest(config: Config): Promise<void> {
     }
   } else {
     // For non-wait mode, all promises have already resolved after sending
-    const successful = results.filter((r) => r.success);
-    const successRate = (successful.length / config.userCount) * 100;
-    const failed = config.userCount - successful.length;
-    const duration = Date.now() - startTime;
-
-    console.log(`\n📊 Summary:`);
-    console.log(`   Successful: ${successful.length}`);
-    console.log(`   Failed: ${failed}`);
-    console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
-    console.log(`   Duration: ${duration}ms`);
-    console.log(`   Total: ${totalMessagesSent}`);
-
-    if (successful.length > 0) {
-      const avgNewDm =
-        successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
-      const avgSend =
-        successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
-
-      console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
-      console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
-    }
+    logSummary(results, completedWorkers, totalMessagesSent, startTime);
   }
 
   process.exit(0);
