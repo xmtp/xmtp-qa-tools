@@ -154,7 +154,7 @@ function parseTestArgs(args: string[]): {
   let testName = "functional";
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
-    retryDelay: 2,
+    retryDelay: 1,
     enableLogging: false,
     vitestArgs: [],
     noFail: false,
