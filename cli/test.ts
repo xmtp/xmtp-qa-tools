@@ -154,7 +154,7 @@ function parseTestArgs(args: string[]): {
   let testName = "functional";
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
-    retryDelay: 10,
+    retryDelay: 2,
     enableLogging: false,
     vitestArgs: [],
     noFail: false,
@@ -344,20 +344,6 @@ async function runTest(
 
       if (exitCode === 0) {
         console.info("Tests passed successfully!");
-
-        // Close logger for this attempt
-        logger?.close();
-
-        await cleanSpecificLogFile(logger.logFileName);
-
-        console.info(
-          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
-        );
-
-        // Run ansi:forks after all attempts completion
-        runAnsiForksAndReport(options);
-
-        return;
       } else {
         console.info("Tests failed!");
       }
@@ -365,10 +351,29 @@ async function runTest(
       // Close logger for this attempt
       logger?.close();
 
-      // Handle failed attempt
+      await cleanSpecificLogFile(logger.logFileName);
+
+      // Check if this was the last attempt
       if (attempt === options.attempts) {
+        console.info(
+          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
+        );
+
+        // Run ansi:forks after all attempts completion
+        runAnsiForksAndReport(options);
+
+        // Exit based on the last attempt's result
+        if (exitCode === 0 || options.noFail) {
+          process.exit(0);
+        } else {
+          process.exit(1);
+        }
+      }
+
+      // Handle failed attempt (only for non-final attempts)
+      if (attempt < options.attempts && exitCode !== 0) {
         console.error(
-          `\n❌ Test suite "${testName}" failed after ${options.attempts} attempts.`,
+          `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
         );
 
         if (
@@ -377,17 +382,6 @@ async function runTest(
           logger?.logFileName
         ) {
           await sendDatadogLog(logger.logFileName, testName);
-        }
-
-        await cleanSpecificLogFile(logger.logFileName);
-
-        // Run ansi:forks after all attempts completion (even on failure)
-        runAnsiForksAndReport(options);
-
-        if (options.noFail) {
-          process.exit(0);
-        } else {
-          process.exit(1);
         }
       }
 
