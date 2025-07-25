@@ -12,14 +12,10 @@ interface TestOptions {
   attempts: number; // Maximum retry attempts (default: 1)
   retryDelay: number; // Delay between retries (seconds)
   enableLogging: boolean; // Enable file logging
-  customLogFile?: string; // Custom log filename
-  env: string; // Environment to run the test in
   vitestArgs: string[]; // Additional vitest arguments
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
-  cleanLogs: boolean; // Auto-clean logs after completion
-  logLevel: string; // Log level (info, info, error)
   noErrorLogs: boolean; // Disable sending error logs to Datadog
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
@@ -38,6 +34,12 @@ function runAnsiForksAndReport(options: TestOptions): void {
       if (fs.existsSync(logsDir)) {
         const forkCount = fs.readdirSync(logsDir).length;
         console.info(`Found ${forkCount} forks in logs/cleaned`);
+
+        // Remove the cleaned folder if it's empty
+        if (forkCount === 0) {
+          fs.rmdirSync(logsDir);
+          console.info("Removed empty logs/cleaned directory");
+        }
       } else {
         console.info("No logs/cleaned directory found");
       }
@@ -153,14 +155,11 @@ function parseTestArgs(args: string[]): {
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
     retryDelay: 10,
-    enableLogging: false, // Default to no file logging
-    env: "local",
+    enableLogging: false,
     vitestArgs: [],
     noFail: false,
     verboseLogging: true, // Show terminal output by default
     parallel: false,
-    cleanLogs: true,
-    logLevel: "off", // Default log level
     noErrorLogs: false,
     reportForkCount: false, // Report fork count after ansi:forks
   };
@@ -204,6 +203,7 @@ function parseTestArgs(args: string[]): {
       case "--debug":
         options.enableLogging = true;
         options.verboseLogging = false;
+        env.LOGGING_LEVEL = "debug";
         break;
       case "--nodeVersion":
         if (nextArg) {
@@ -226,9 +226,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--env":
         if (nextArg) {
-          options.env = nextArg;
           env.XMTP_ENV = nextArg;
-          process.env.XMTP_ENV = nextArg;
           i++;
         } else {
           console.warn("--env flag requires a value (e.g., --env local)");
@@ -260,44 +258,7 @@ function parseTestArgs(args: string[]): {
     }
   }
 
-  // Set logging level
-  env.LOGGING_LEVEL = options.logLevel || "error";
-
   return { testName, options, env };
-}
-
-/**
- * Collects all test parameters into a single object for comprehensive logging
- */
-function collectTestParameters(
-  testName: string,
-  options: TestOptions,
-  env: Record<string, string>,
-): Record<string, any> {
-  const parameters: Record<string, any> = {
-    testName,
-    attempts: options.attempts,
-    retryDelay: options.retryDelay,
-    enableLogging: options.enableLogging,
-    verboseLogging: options.verboseLogging,
-    parallel: options.parallel,
-    cleanLogs: options.cleanLogs,
-    logLevel: options.logLevel,
-    noFail: options.noFail,
-    noErrorLogs: options.noErrorLogs,
-    reportForkCount: options.reportForkCount,
-    vitestArgs: options.vitestArgs,
-  };
-
-  // Add environment variables that were set
-  if (env.TEST_VERSIONS) parameters.testVersions = env.TEST_VERSIONS;
-  if (env.NODE_VERSION) parameters.nodeVersion = env.NODE_VERSION;
-  if (env.XMTP_ENV) parameters.xmtpEnv = env.XMTP_ENV;
-  if (env.SYNC_STRATEGY) parameters.syncStrategy = env.SYNC_STRATEGY;
-  if (env.BATCH_SIZE) parameters.batchSize = env.BATCH_SIZE;
-  if (env.LOGGING_LEVEL) parameters.loggingLevel = env.LOGGING_LEVEL;
-
-  return parameters;
 }
 
 /**
@@ -359,9 +320,6 @@ async function runTest(
   options: TestOptions,
   env: Record<string, string>,
 ): Promise<void> {
-  const parameters = collectTestParameters(testName, options, env);
-  logTestParameters(parameters);
-
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
     console.info(`Attempt ${attempt} of ${options.attempts}...`);
 
@@ -370,7 +328,7 @@ async function runTest(
       enableLogging: options.enableLogging,
       testName,
       verboseLogging: options.verboseLogging,
-      logLevel: options.logLevel,
+      logLevel: env.LOGGING_LEVEL,
     });
 
     try {
@@ -390,10 +348,7 @@ async function runTest(
         // Close logger for this attempt
         logger?.close();
 
-        // Clean the log file if enabled
-        if (options.cleanLogs && logger?.logFileName) {
-          await cleanSpecificLogFile(logger.logFileName);
-        }
+        await cleanSpecificLogFile(logger.logFileName);
 
         console.info(
           `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
@@ -424,10 +379,10 @@ async function runTest(
           await sendDatadogLog(logger.logFileName, testName);
         }
 
-        // Clean the log file if enabled (even for failed tests)
-        if (options.cleanLogs && logger?.logFileName) {
-          await cleanSpecificLogFile(logger.logFileName);
-        }
+        await cleanSpecificLogFile(logger.logFileName);
+
+        // Run ansi:forks after all attempts completion (even on failure)
+        runAnsiForksAndReport(options);
 
         if (options.noFail) {
           process.exit(0);

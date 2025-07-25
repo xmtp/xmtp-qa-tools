@@ -30,6 +30,12 @@ export async function processLogFile(
   outputPath: string,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
+    // Create output directory if it doesn't exist
+    const outputDir = path.dirname(outputPath);
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
     const readStream = fs.createReadStream(inputPath, {
       encoding: "utf8",
       highWaterMark: 64 * 1024,
