@@ -41,8 +41,7 @@ function parseArgs(): Config {
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
     env: process.env.XMTP_ENV ?? "local",
     address: process.env.ADDRESS ?? "",
-    tresshold: 95,
-
+    tresshold: 99,
     keepDb: false,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
@@ -153,7 +152,6 @@ async function runsendTest(config: Config): Promise<void> {
   const logSummary = (
     results: Array<{
       success: boolean;
-      newDmTime: number;
       sendTime: number;
       responseTime: number;
     }>,
@@ -174,13 +172,10 @@ async function runsendTest(config: Config): Promise<void> {
     console.log(`   Total: ${totalMessagesSent}`);
 
     if (successful.length > 0) {
-      const avgNewDm =
-        successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
       const avgSend =
         successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
 
-      console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
-      console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
+      console.log(`   Avg Send: ${Math.round(avgSend / 1000).toFixed(2)}s`);
 
       if (config.waitForResponse) {
         const avgResponse =
@@ -242,7 +237,6 @@ async function runsendTest(config: Config): Promise<void> {
   let completedWorkers = 0;
   const results: Array<{
     success: boolean;
-    newDmTime: number;
     sendTime: number;
     responseTime: number;
   }> = [];
@@ -250,7 +244,6 @@ async function runsendTest(config: Config): Promise<void> {
   const promises = workers.map((worker, i) => {
     return new Promise<{
       success: boolean;
-      newDmTime: number;
       sendTime: number;
       responseTime: number;
     }>((resolve) => {
@@ -260,8 +253,6 @@ async function runsendTest(config: Config): Promise<void> {
 
       const process = async () => {
         try {
-          // 1. Time conversation creation
-          const newDmStart = Date.now();
           let conversation: Conversation;
 
           if (config.useGroups) {
@@ -269,19 +260,13 @@ async function runsendTest(config: Config): Promise<void> {
             conversation = (await worker.conversations.newGroup(
               groupMembers,
             )) as Conversation;
-            console.log(
-              `💬 ${i}: Group created in ${Date.now() - newDmStart}ms`,
-            );
           } else {
             // Create DM
             conversation = (await worker.conversations.newDmWithIdentifier({
               identifier: config.address,
               identifierKind: IdentifierKind.Ethereum,
             })) as Conversation;
-            console.log(`💬 ${i}: DM created in ${Date.now() - newDmStart}ms`);
           }
-
-          const newDmTime = Date.now() - newDmStart;
 
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);
@@ -303,7 +288,6 @@ async function runsendTest(config: Config): Promise<void> {
 
                   const result = {
                     success: true,
-                    newDmTime,
                     sendTime,
                     responseTime,
                   };
@@ -315,7 +299,7 @@ async function runsendTest(config: Config): Promise<void> {
                       config.userCount) *
                     100;
                   console.log(
-                    `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
+                    `✅ ${i}: Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
                   );
 
                   // Check if we've reached the success threshold
@@ -341,7 +325,7 @@ async function runsendTest(config: Config): Promise<void> {
           console.log(`📤 ${i}: Sending test message...`);
           // 2. Time message send
           const sendStart = Date.now();
-          await conversation.send(`test-${i}-${Date.now()}`);
+          void conversation.send(`test-${i}-${Date.now()}`);
           totalMessagesSent++;
           sendTime = Date.now() - sendStart;
           sendCompleteTime = Date.now();
@@ -353,7 +337,6 @@ async function runsendTest(config: Config): Promise<void> {
           if (!config.waitForResponse) {
             const result = {
               success: true,
-              newDmTime,
               sendTime,
               responseTime: 0, // No response time when not waiting
             };
@@ -364,7 +347,7 @@ async function runsendTest(config: Config): Promise<void> {
               (results.filter((r) => r.success).length / config.userCount) *
               100;
             console.log(
-              `✅ ${i}: NewDM=${newDmTime}ms, Send=${sendTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
+              `✅ ${i}: Send=${sendTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
             );
 
             // Check if we've reached the success threshold
@@ -390,7 +373,6 @@ async function runsendTest(config: Config): Promise<void> {
       process().catch(() => {
         const result = {
           success: false,
-          newDmTime: 0,
           sendTime: 0,
           responseTime: 0,
         };
