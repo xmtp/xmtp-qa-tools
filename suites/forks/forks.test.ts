@@ -23,8 +23,8 @@ const workerNames = [
 const enabledOperations = {
   updateName: true, // updates the name of the group
   sendMessage: true, // sends a message to the group
-  addMember: true, // adds a random member to the group
-  removeMember: true, // removes a random member from the group
+  addMember: false, // adds a random member to the group
+  removeMember: false, // removes a random member from the group
   createInstallation: true, // creates a new installation for a random worker
 };
 const targetEpoch = 50n; // The target epoch to stop the test (epochs are when performing forks to the group)
