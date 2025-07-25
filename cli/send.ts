@@ -38,7 +38,7 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     userCount: 5,
-    timeout: 30 * 1000, // 120 seconds - increased for XMTP operations
+    timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
     env: process.env.XMTP_ENV ?? "local",
     address: process.env.ADDRESS ?? "",
     tresshold: 95,
@@ -113,6 +113,15 @@ function cleanupsendDatabases(env: string): void {
   } catch (error) {
     console.error(`❌ Error during cleanup:`, error);
   }
+}
+
+// Helper function to calculate percentiles
+function calculatePercentile(values: number[], percentile: number): number {
+  if (values.length === 0) return 0;
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.ceil((percentile / 100) * sorted.length) - 1;
+  return sorted[Math.max(0, index)];
 }
 
 async function runsendTest(config: Config): Promise<void> {
@@ -312,36 +321,107 @@ async function runsendTest(config: Config): Promise<void> {
     });
   });
 
-  // Wait for all workers to complete
-  console.log(`⏳ Waiting for all workers to complete...`);
+  // First, wait for all messages to be sent (no timeout for sending)
+  console.log(`📤 Waiting for all messages to be sent...`);
 
-  const finalResults = await Promise.all(promises);
-  const successful = finalResults.filter((r) => r.success);
-  const successRate = (successful.length / config.userCount) * 100;
-  const failed = config.userCount - successful.length;
-  const duration = Date.now() - startTime;
+  // For non-wait mode, promises resolve immediately after sending
+  // For wait mode, promises resolve after receiving responses
+  const sendPromises = promises.map((promise) =>
+    promise.then((result) => result),
+  );
 
-  console.log(`\n📊 Summary:`);
-  console.log(`   Successful: ${successful.length}`);
-  console.log(`   Failed: ${failed}`);
-  console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
-  console.log(`   Duration: ${duration}ms`);
-  console.log(`   Total: ${totalMessagesSent}`);
+  // Wait for all messages to be sent first (no timeout)
+  await Promise.all(sendPromises);
+  console.log(`✅ All messages sent successfully`);
 
-  if (successful.length > 0) {
-    const avgNewDm =
-      successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
-    const avgSend =
-      successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
+  // Now start the timeout for waiting for responses (only relevant for wait mode)
+  if (config.waitForResponse) {
+    console.log(`⏳ Waiting for responses (timeout: ${config.timeout}ms)...`);
 
-    console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
-    console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Test timed out after ${config.timeout}ms`));
+      }, config.timeout);
+    });
 
-    if (config.waitForResponse) {
-      const avgResponse =
-        successful.reduce((sum, r) => sum + r.responseTime, 0) /
-        successful.length;
-      console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+    try {
+      const finalResults = await Promise.race([
+        Promise.all(promises),
+        timeoutPromise,
+      ]);
+
+      const successful = finalResults.filter((r) => r.success);
+      const successRate = (successful.length / config.userCount) * 100;
+      const failed = config.userCount - successful.length;
+      const duration = Date.now() - startTime;
+
+      console.log(`\n📊 Summary:`);
+      console.log(`   Successful: ${successful.length}`);
+      console.log(`   Failed: ${failed}`);
+      console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
+      console.log(`   Duration: ${duration}ms`);
+      console.log(`   Total: ${totalMessagesSent}`);
+
+      if (successful.length > 0) {
+        const avgNewDm =
+          successful.reduce((sum, r) => sum + r.newDmTime, 0) /
+          successful.length;
+        const avgSend =
+          successful.reduce((sum, r) => sum + r.sendTime, 0) /
+          successful.length;
+
+        console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
+        console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
+
+        if (config.waitForResponse) {
+          const avgResponse =
+            successful.reduce((sum, r) => sum + r.responseTime, 0) /
+            successful.length;
+          console.log(`   Avg Response: ${Math.round(avgResponse)}ms`);
+
+          // Calculate and log percentiles for response times
+          const responseTimes = successful.map((r) => r.responseTime);
+          const p80 = calculatePercentile(responseTimes, 80);
+          const p95 = calculatePercentile(responseTimes, 95);
+          const p99 = calculatePercentile(responseTimes, 99);
+
+          console.log(`   Response Time Percentiles:`);
+          console.log(`     P80: ${Math.round(p80)}ms`);
+          console.log(`     P95: ${Math.round(p95)}ms`);
+          console.log(`     P99: ${Math.round(p99)}ms`);
+        }
+      }
+    } catch (error) {
+      console.error(
+        `\n⏰ ${error instanceof Error ? error.message : "Test timed out"}`,
+      );
+      console.log(`📊 Partial Summary:`);
+      console.log(`   Completed: ${completedWorkers}/${config.userCount}`);
+      console.log(`   Duration: ${Date.now() - startTime}ms`);
+      console.log(`   Total Sent: ${totalMessagesSent}`);
+    }
+  } else {
+    // For non-wait mode, all promises have already resolved after sending
+    const successful = results.filter((r) => r.success);
+    const successRate = (successful.length / config.userCount) * 100;
+    const failed = config.userCount - successful.length;
+    const duration = Date.now() - startTime;
+
+    console.log(`\n📊 Summary:`);
+    console.log(`   Successful: ${successful.length}`);
+    console.log(`   Failed: ${failed}`);
+    console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
+    console.log(`   Duration: ${duration}ms`);
+    console.log(`   Total: ${totalMessagesSent}`);
+
+    if (successful.length > 0) {
+      const avgNewDm =
+        successful.reduce((sum, r) => sum + r.newDmTime, 0) / successful.length;
+      const avgSend =
+        successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
+
+      console.log(`   Avg NewDM: ${Math.round(avgNewDm)}ms`);
+      console.log(`   Avg Send: ${Math.round(avgSend)}ms`);
     }
   }
 
