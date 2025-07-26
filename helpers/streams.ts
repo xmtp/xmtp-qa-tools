@@ -250,7 +250,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
         }
 
         // Ensure we don't have negative durations due to clock skew or processing delays
-        const positiveDuration = Math.max(0, duration);
+        // Use a minimum of 1ms instead of 0 to avoid metric validation errors
+        const positiveDuration = Math.max(1, duration);
 
         eventTimings[r.name][sentIdx] = positiveDuration;
         timingSum += positiveDuration;
