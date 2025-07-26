@@ -54,11 +54,14 @@ jobs:
 
       - name: Install dependencies with npm
         if: matrix.package-manager == 'npm'
-        run: npm install
+        run: |
+          cd gm-bot
+          npm install
 
       - name: Install dependencies with yarn
         if: matrix.package-manager == 'yarn'
         run: |
+          cd gm-bot
           touch yarn.lock
           yarn install --no-immutable
 
