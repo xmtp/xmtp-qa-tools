@@ -4,8 +4,6 @@
 
 How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
 
-## Architecture: [NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions) → [Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions) → [libxmtp](https://github.com/xmtp/libxmtp)
-
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
 
@@ -20,9 +18,9 @@ flowchart TD
   classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
-- **SDKs**: Thin TypeScript wrappers providing developer-friendly API
-- **Bindings**: Compiled Rust code and native bindings
-- **libxmtp**: Core cryptographic and networking logic
+- **[NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
+- **[Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions)**: Compiled Rust code and native bindings
+- **[libxmtp](https://github.com/xmtp/libxmtp)**: Core cryptographic and networking logic
 
 ### Version mapping system
 
