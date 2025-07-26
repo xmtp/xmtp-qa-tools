@@ -429,7 +429,7 @@ Use predefined names from the 61 available:
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind } from "@workers/versions";
 ```
 
 ## Quick Snippets
@@ -496,13 +496,13 @@ const workers = await getWorkers(["alice", "bob"], { useVersions: true });
 ### Stream Setup
 
 ```typescript
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkerNames, getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@workers/versions";
+
 // Start message streaming
 workers.getReceiver().worker.startStream(typeofStream.Message);
 ```
-
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
 
 # Testing Worker Framework Rules
 
@@ -932,7 +932,7 @@ Use predefined names from the 61 available:
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind } from "@workers/versions";
 ```
 
 ## Quick Snippets
@@ -1002,7 +1002,3 @@ const workers = await getWorkers(["alice", "bob"], { useVersions: true });
 // Start message streaming
 workers.getReceiver().worker.startStream(typeofStream.Message);
 ```
-
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
