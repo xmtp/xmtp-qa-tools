@@ -94,6 +94,7 @@ interface StreamTextMessage extends BaseStreamMessage {
     contentType?: {
       typeId: string;
     };
+    receivedAt?: number; // Add timestamp for when message was received
   };
 }
 
@@ -556,6 +557,7 @@ export class WorkerClient extends Worker {
                     senderInboxId: message.senderInboxId,
                     content: message.content as string,
                     contentType: message.contentType,
+                    receivedAt: Date.now(), // Capture timestamp when message is received from stream
                   },
                 });
               } else {

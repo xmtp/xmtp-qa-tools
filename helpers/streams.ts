@@ -147,7 +147,7 @@ function extractTimestamp(ev: unknown): number | null {
       }
     }
 
-    // Try nested in message object
+    // Try nested in message object (for StreamTextMessage structure)
     if (
       Object.prototype.hasOwnProperty.call(ev, "message") &&
       typeof (ev as Record<string, unknown>).message === "object" &&
