@@ -3,8 +3,8 @@ description: "Daily forks testing on local network"
 
 on:
   schedule:
-    # Run once a day at 2 AM UTC
-    - cron: "0 2 * * *"
+    # Run every 12 hours at 2 AM and 2 PM UTC
+    - cron: "0 2,14 * * *"
 
 jobs:
   test:
@@ -30,7 +30,7 @@ jobs:
         run: sleep 30
 
       - name: Run forks test
-        run: yarn test forks --attempts 5 --env local --debug --forks
+        run: yarn test forks --attempts 50 --env local --debug --forks
 
       - name: Stop local XMTP network
         if: always()
