@@ -5,6 +5,7 @@ on:
   schedule:
     # Run every 12 hours at 2 AM and 2 PM UTC
     - cron: "0 2,14 * * *"
+  workflow_dispatch:
 
 jobs:
   test:
