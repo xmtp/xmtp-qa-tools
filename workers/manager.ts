@@ -202,9 +202,6 @@ export class WorkerManager {
     // Apply sync strategy if specified in environment
     const syncStrategyString = process.env.SYNC_STRATEGY;
     if (syncStrategyString) {
-      console.debug(
-        `Found SYNC_STRATEGY environment variable: ${syncStrategyString}`,
-      );
       for (const worker of this.getAll()) {
         let syncType: typeOfSync = typeOfSync.None;
         if (syncStrategyString === "all") {
