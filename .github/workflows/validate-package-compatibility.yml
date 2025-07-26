@@ -17,10 +17,6 @@ jobs:
       - name: Clone XMTP agent examples
         run: |
           git clone https://github.com/xmtp/gm-bot.git
-          cd gm-bot
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
