@@ -120,13 +120,30 @@ function extractTimestamp(ev: unknown): number | null {
   if (typeof ev === "object" && ev !== null) {
     // Try different timestamp fields that might exist in message events
     const possibleFields = ["receivedAt", "timestamp", "sentAt", "createdAt"];
+    const nanosecondFields = [
+      "receivedAtNs",
+      "timestampNs",
+      "sentAtNs",
+      "createdAtNs",
+    ];
 
+    // First try regular timestamp fields (in milliseconds)
     for (const field of possibleFields) {
       if (
         Object.prototype.hasOwnProperty.call(ev, field) &&
         typeof (ev as Record<string, unknown>)[field] === "number"
       ) {
         return (ev as Record<string, number>)[field];
+      }
+    }
+
+    // Then try nanosecond timestamp fields and convert to milliseconds
+    for (const field of nanosecondFields) {
+      if (
+        Object.prototype.hasOwnProperty.call(ev, field) &&
+        typeof (ev as Record<string, unknown>)[field] === "number"
+      ) {
+        return Number((ev as Record<string, number>)[field]) / 1_000_000;
       }
     }
 
@@ -137,12 +154,24 @@ function extractTimestamp(ev: unknown): number | null {
       (ev as Record<string, unknown>).message !== null
     ) {
       const message = (ev as { message: Record<string, unknown> }).message;
+
+      // First try regular timestamp fields
       for (const field of possibleFields) {
         if (
           Object.prototype.hasOwnProperty.call(message, field) &&
           typeof message[field] === "number"
         ) {
           return message[field];
+        }
+      }
+
+      // Then try nanosecond timestamp fields and convert to milliseconds
+      for (const field of nanosecondFields) {
+        if (
+          Object.prototype.hasOwnProperty.call(message, field) &&
+          typeof message[field] === "number"
+        ) {
+          return Number(message[field]) / 1_000_000;
         }
       }
     }
