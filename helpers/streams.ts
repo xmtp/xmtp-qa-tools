@@ -623,6 +623,7 @@ export function calculateMessageStats(
     const inOrder = isOrderedSubsequence(messages, expectedMessages);
     return { inOrder, expectedMessages };
   };
+
   let totalExpectedMessages = amount * messagesByWorker.length;
   let totalReceivedMessages = messagesByWorker.reduce(
     (sum, msgs) => sum + msgs.length,
@@ -630,10 +631,21 @@ export function calculateMessageStats(
   );
   let workersInOrder = 0;
   const workerCount = messagesByWorker.length;
-  for (const messages of messagesByWorker) {
-    const { inOrder } = verifyMessageOrder(messages, prefix, amount);
-    if (inOrder) workersInOrder++;
+
+  // Special case for single message scenarios (like agent responses)
+  // Order percentage is 100% if any messages were received
+  if (amount === 1) {
+    for (const messages of messagesByWorker) {
+      if (messages.length > 0) workersInOrder++;
+    }
+  } else {
+    // Standard ordered message verification for multi-message scenarios
+    for (const messages of messagesByWorker) {
+      const { inOrder } = verifyMessageOrder(messages, prefix, amount);
+      if (inOrder) workersInOrder++;
+    }
   }
+
   const receptionPercentage =
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
