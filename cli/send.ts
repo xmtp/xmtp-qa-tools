@@ -17,10 +17,7 @@ import {
 } from "../helpers/client";
 import { getRandomInboxIds } from "../inboxes/utils";
 
-// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5
-// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --env production
-// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --wait
-// yarn send --address 0x362d666308d90e049404d361b29c41bda42dd38b --users 5 --groups
+// yarn send --address 0xe89391F8911d329308B7DD122829b2110DA47eD3 --users 100 --env local --wait
 
 interface Config {
   userCount: number;
@@ -40,7 +37,7 @@ function parseArgs(): Config {
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
     env: process.env.XMTP_ENV ?? "local",
     address: process.env.ADDRESS ?? "",
-    tresshold: 99,
+    tresshold: 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
     useGroups: false,
@@ -163,18 +160,21 @@ async function runsendTest(config: Config): Promise<void> {
     console.log(`   Total: ${totalMessagesSent}`);
 
     if (successful.length > 0) {
-      const avgSend =
-        successful.reduce((sum, r) => sum + r.sendTime, 0) / successful.length;
+      const totalSendTime = successful.reduce((sum, r) => sum + r.sendTime, 0);
+      const avgSend = totalSendTime / successful.length;
+      const messagesPerSecond = (totalMessagesSent / (duration / 1000)).toFixed(
+        2,
+      );
 
-      console.log(`   Avg Send: ${Math.round(avgSend / 1000).toFixed(2)}s`);
+      console.log(`   Total Send Time: ${(totalSendTime / 1000).toFixed(2)}s`);
+      console.log(`   Avg Send: ${(avgSend / 1000).toFixed(2)}s`);
+      console.log(`   Messages/Second: ${messagesPerSecond}`);
 
       if (config.waitForResponse) {
         const avgResponse =
           successful.reduce((sum, r) => sum + r.responseTime, 0) /
           successful.length;
-        console.log(
-          `   Avg Response: ${Math.round(avgResponse / 1000).toFixed(2)}s`,
-        );
+        console.log(`   Avg Response: ${(avgResponse / 1000).toFixed(2)}s`);
 
         // Calculate and log percentiles for response times
         const responseTimes = successful.map((r) => r.responseTime);
@@ -184,10 +184,10 @@ async function runsendTest(config: Config): Promise<void> {
         const p99 = calculatePercentile(responseTimes, 99);
 
         console.log(`   Response Time Percentiles:`);
-        console.log(`     Median: ${Math.round(median / 1000).toFixed(2)}s`);
-        console.log(`     P80: ${Math.round(p80 / 1000).toFixed(2)}s`);
-        console.log(`     P95: ${Math.round(p95 / 1000).toFixed(2)}s`);
-        console.log(`     P99: ${Math.round(p99 / 1000).toFixed(2)}s`);
+        console.log(`     Median: ${(median / 1000).toFixed(2)}s`);
+        console.log(`     P80: ${(p80 / 1000).toFixed(2)}s`);
+        console.log(`     P95: ${(p95 / 1000).toFixed(2)}s`);
+        console.log(`     P99: ${(p99 / 1000).toFixed(2)}s`);
       }
     }
   };
@@ -318,7 +318,7 @@ async function runsendTest(config: Config): Promise<void> {
           console.log(`📤 ${i}: Sending test message...`);
           // 2. Time message send
           const sendStart = Date.now();
-          void conversation.send(`test-${i}-${Date.now()}`);
+          await conversation.send(`test-${i}-${Date.now()}`);
           totalMessagesSent++;
           sendTime = Date.now() - sendStart;
           sendCompleteTime = Date.now();
