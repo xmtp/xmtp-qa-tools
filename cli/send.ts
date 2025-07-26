@@ -4,7 +4,7 @@ import {
   type Conversation,
   type LogLevel,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";

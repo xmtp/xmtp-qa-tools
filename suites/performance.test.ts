@@ -15,7 +15,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

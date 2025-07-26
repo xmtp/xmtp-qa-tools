@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@workers/versions";
 import {
   createSigner,
   generateEncryptionKeyHex,

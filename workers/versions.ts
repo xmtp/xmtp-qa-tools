@@ -69,6 +69,9 @@ export {
   type Group,
   LogLevel,
   type XmtpEnv,
+  type GroupMember,
+  type KeyPackageStatus,
+  ConsentEntityType,
 } from "@xmtp/node-sdk";
 
 // SDK version mappings

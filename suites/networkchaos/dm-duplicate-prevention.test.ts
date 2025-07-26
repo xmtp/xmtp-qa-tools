@@ -1,7 +1,7 @@
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Dm } from "@xmtp/node-sdk";
+import { type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
