@@ -28,7 +28,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: ${{ matrix.test }} ${{ matrix.env }}
-        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --debug --no-error-logs
+        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --no-error-logs
 
       - name: Cleanup and upload artifacts
         if: always()
