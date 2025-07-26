@@ -19,7 +19,7 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
-      LOG_LEVEL: "info"
+      LOG_LEVEL: "debug"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
