@@ -226,6 +226,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
             fallbackTimestamp,
             finalTimestamp,
             message: getMessage(ev).substring(0, 100) + "...",
+            rawEvent: JSON.stringify(ev, null, 2),
           });
         }
 
@@ -261,22 +262,20 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
           msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
 
         // Debug logging for Onit agent specifically
-        if (msg.message.includes("Onit prediction market agent")) {
-          console.debug(
-            "Onit timing calculation debug:",
-            JSON.stringify(
-              {
-                receivedAt: msg.receivedAt,
-                sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
-                duration,
-                positiveDuration: Math.max(0, duration),
-                message: msg.message.substring(0, 100) + "...",
-              },
-              null,
-              2,
-            ),
-          );
-        }
+        console.debug(
+          "Onit timing calculation debug:",
+          JSON.stringify(
+            {
+              receivedAt: msg.receivedAt,
+              sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
+              duration,
+              positiveDuration: Math.max(0, duration),
+              message: msg.message.substring(0, 100) + "...",
+            },
+            null,
+            2,
+          ),
+        );
 
         // Ensure we don't have negative durations due to clock skew or processing delays
         // Use a minimum of 1ms instead of 0 to avoid metric validation errors
