@@ -233,13 +233,20 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
 
         // Debug logging for Onit agent specifically
         if (msg.message.includes("Onit prediction market agent")) {
-          console.debug("Onit timing calculation debug:", {
-            receivedAt: msg.receivedAt,
-            sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
-            duration,
-            positiveDuration: Math.max(0, duration),
-            message: msg.message.substring(0, 100) + "...",
-          });
+          console.debug(
+            "Onit timing calculation debug:",
+            JSON.stringify(
+              {
+                receivedAt: msg.receivedAt,
+                sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
+                duration,
+                positiveDuration: Math.max(0, duration),
+                message: msg.message.substring(0, 100) + "...",
+              },
+              null,
+              2,
+            ),
+          );
         }
 
         // Ensure we don't have negative durations due to clock skew or processing delays
