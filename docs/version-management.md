@@ -1,17 +1,15 @@
-# SDK Version Management
+# SDK version management
 
-## Overview
+### Overview
 
 How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
-
-## Architecture: [NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions) → [Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions) → [libxmtp](https://github.com/xmtp/libxmtp)
 
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
 
 flowchart TD
-  nodeSDK["Node.js SDK<br/>(e.g., @xmtp/node-sdk@3.2.2)"]
-  nodeBindings["Node Bindings<br/>(e.g., @xmtp/node-bindings@1.3.3)"]
+  nodeSDK["Node.js SDK<br/>(@xmtp/node-sdk@3.2.2)"]
+  nodeBindings["Node Bindings<br/>(@xmtp/node-bindings@1.3.3)"]
   libxmtp["libxmtp Rust Library<br/>(specific commit/version)"]
 
   nodeSDK --> |depends on| nodeBindings
@@ -20,11 +18,11 @@ flowchart TD
   classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
-- **SDKs**: Thin TypeScript wrappers providing developer-friendly API
-- **Bindings**: Compiled Rust code and native bindings
-- **libxmtp**: Core cryptographic and networking logic
+- **[NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
+- **[Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions)**: Compiled Rust code and native bindings
+- **[libxmtp](https://github.com/xmtp/libxmtp)**: Core cryptographic and networking logic
 
-## Version mapping system
+### Version mapping system
 
 Versions are mapped in `workers/versions.ts`:
 
@@ -42,7 +40,7 @@ export const VersionList = [
 ];
 ```
 
-### Package Aliases
+### Package aliases
 
 Multiple versions installed via npm aliases:
 
@@ -55,7 +53,7 @@ Multiple versions installed via npm aliases:
 }
 ```
 
-### Dynamic Linking
+### Dynamic linking
 
 `yarn versions` creates symlinks:
 
@@ -67,7 +65,7 @@ node_modules/@xmtp/
 └── node-bindings-1.3.3/
 ```
 
-### Process
+### Release process
 
 1. Developer creates libxmtp branch
 2. Node bindings CI compiles new libxmtp into `@xmtp/node-bindings`
@@ -75,7 +73,7 @@ node_modules/@xmtp/
 4. QA tools updated with new bindings version
 5. Tests run against new version
 
-### Switch between versions
+### Switch between versions (manual testing)
 
 If your libxmtp version is already compiled:
 
@@ -91,9 +89,7 @@ If your libxmtp version is already compiled:
 }
 ```
 
-## Version discovery
-
-### Finding libxmtp Version
+### Finding libxmtp version
 
 The libxmtp commit hash is in:
 
@@ -101,30 +97,17 @@ The libxmtp commit hash is in:
 node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
 ```
 
-### Using Versions Command
+### Using versions command to see current mappings
 
 ```bash
 yarn versions
+# shows current SDK → bindings mappings.
 ```
 
-Shows current SDK → bindings mappings.
-
-## Testing Different Versions
-
-### Automated Testing
+### Testing specific versions (automated)
 
 ```bash
-yarn test functional --versions 3  # Test 3 auto-enabled versions
-```
-
-### Manual Testing
-
-```bash
-yarn test functional --nodeSDK 3.2.2
-```
-
-### Regression Testing
-
-```bash
+yarn test functional --versions 3  # Test latest 3 auto-enabled versions
+yarn test functional --nodeSDK 3.2.2 # custom version
 yarn regression  # Vibe check on latest version
 ```
