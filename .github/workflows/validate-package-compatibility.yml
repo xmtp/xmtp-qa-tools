@@ -53,6 +53,10 @@ jobs:
           rm -f yarn.lock
           rm -f pnpm-lock.yaml
           rm -f bun.lockb
+          # Remove package manager enforcement files to allow testing with different managers
+          rm -f .npmrc
+          rm -f .yarnrc
+          rm -f .yarnrc.yml
 
       - name: Install dependencies with npm
         if: matrix.package-manager == 'npm'
