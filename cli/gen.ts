@@ -462,6 +462,7 @@ async function main() {
           `installation ${inst}`,
         );
       } catch (error) {
+        console.error(error);
         console.error(`❌ Failed for --installations ${inst}. Exiting.`);
         process.exit(1);
       }

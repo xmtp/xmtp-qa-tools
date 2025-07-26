@@ -3,8 +3,7 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
-  type Group,
-} from "@xmtp/node-sdk";
+} from "@helpers/client";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 const processMessage = async (
@@ -108,8 +107,8 @@ const processMessage = async (
 // Initialize the client with the message processor
 await initializeClient(processMessage, [
   {
-    walletKey: process.env.WALLET_KEY_ALICE as `0x${string}`,
-    dbEncryptionKey: process.env.ENCRYPTION_KEY_ALICE as `0x${string}`,
+    walletKey: process.env.WALLET_KEY as `0x${string}`,
+    dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
     networks: ["production"],
     acceptGroups: true,
   },
