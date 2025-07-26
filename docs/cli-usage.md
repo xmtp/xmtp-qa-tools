@@ -15,9 +15,9 @@ This repository provides a comprehensive CLI interface for testing XMTP protocol
 ### Basic Command Structure
 
 ```bash
-yarn test <test_suite> [options...]              # Direct vitest execution
-yarn bot <bot_name> [args...]                    # Interactive bots
-yarn <script_name> [args...]              # Utility scripts
+yarn test <test_suite> [options...]     --env <environment> # Direct vitest execution
+yarn bot <bot_name> [args...]           --env <environment> # Interactive bots
+yarn send <args...>                     --env <environment> # Send messages
 ```
 
 ### Test Suites

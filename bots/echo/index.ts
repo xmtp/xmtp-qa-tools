@@ -22,7 +22,6 @@ await initializeClient(processMessage, [
   {
     walletKey: process.env.WALLET_KEY as `0x${string}`,
     dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
-    networks: ["production"],
     acceptGroups: true,
   },
 ]);
