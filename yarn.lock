@@ -1687,7 +1687,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-3.2.2@npm:@xmtp/node-sdk@3.2.2":
+"@xmtp/node-sdk-3.2.2@npm:@xmtp/node-sdk@3.2.2, @xmtp/node-sdk@npm:3.2.2":
   version: 3.2.2
   resolution: "@xmtp/node-sdk@npm:3.2.2"
   dependencies:
@@ -2863,7 +2863,7 @@ __metadata:
   resolution: "gm-bot@workspace:bots/gm-bot"
   dependencies:
     "@types/node": "npm:^20.14.2"
-    "@xmtp/node-sdk": "npm:3.2.1"
+    "@xmtp/node-sdk": "npm:3.2.2"
     dotenv: "npm:^16.4.5"
     tsx: "npm:^4.19.2"
     typescript: "npm:^5.8.3"
