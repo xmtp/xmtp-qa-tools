@@ -6,12 +6,18 @@ How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to
 
 ## Architecture: [NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions) → [Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions) → [libxmtp](https://github.com/xmtp/libxmtp)
 
-```
-Node.js SDK (e.g., @xmtp/node-sdk@3.2.2)
-    ↓ depends on
-Node Bindings (e.g., @xmtp/node-bindings@1.3.3)
-    ↓ compiled from
-libxmtp Rust Library (specific commit/version)
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
+
+flowchart TD
+  nodeSDK["Node.js SDK<br/>(e.g., @xmtp/node-sdk@3.2.2)"]
+  nodeBindings["Node Bindings<br/>(e.g., @xmtp/node-bindings@1.3.3)"]
+  libxmtp["libxmtp Rust Library<br/>(specific commit/version)"]
+
+  nodeSDK --> |depends on| nodeBindings
+  nodeBindings --> |compiled from| libxmtp
+
+  classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
 - **SDKs**: Thin TypeScript wrappers providing developer-friendly API
