@@ -28,7 +28,7 @@ await getWorkers(3); // 3 random workers
 await getWorkers(["alice", "bob"]); // specific names
 await getWorkers(5, { env: "production" }); // production env
 await getWorkers(3, { useVersions: true }); // random SDK versions
-await getWorkers(1, { nodeVersion: "3.1.1" }); // specific version
+await getWorkers(1, { nodeSDK: "3.1.1" }); // specific version
 ```
 
 ## Conversations
@@ -92,7 +92,7 @@ const workers = await getWorkers(3, { useVersions: true });
 // Specific versions
 const versions = getVersions().slice(0, 3);
 for (const version of versions) {
-  const workers = await getWorkers([`bob-a-${version.nodeVersion}`], {
+  const workers = await getWorkers([`bob-a-${version.nodeSDK}`], {
     useVersions: false,
   });
   // Test logic

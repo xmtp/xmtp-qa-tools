@@ -20,8 +20,6 @@ libxmtp Rust Library (specific commit/version)
 
 ## Version mapping system
 
-### Version Mapping
-
 Versions are mapped in `workers/versions.ts`:
 
 ```typescript
@@ -31,8 +29,8 @@ export const VersionList = [
     Conversation: Conversation322,
     Dm: Dm322,
     Group: Group322,
-    nodeVersion: "3.2.2", // SDK version
-    bindingsPackage: "1.3.3", // Bindings version
+    nodeSDK: "3.2.2", // SDK version
+    nodeBindings: "1.3.3", // Bindings version
     auto: true, // Include in automated testing
   },
 ];
@@ -81,8 +79,8 @@ If your libxmtp version is already compiled:
 
 ```typescript
 {
-  nodeVersion: "3.2.2",
-  bindingsPackage: "1.3.1",  // Use existing bindings
+  nodeSDK: "3.2.2",
+  nodeBindings: "1.3.1",  // Use existing bindings
   auto: false,               // Manual testing only
 }
 ```
@@ -116,7 +114,7 @@ yarn test functional --versions 3  # Test 3 auto-enabled versions
 ### Manual Testing
 
 ```bash
-yarn test functional --nodeVersion 3.2.2
+yarn test functional --nodeSDK 3.2.2
 ```
 
 ### Regression Testing

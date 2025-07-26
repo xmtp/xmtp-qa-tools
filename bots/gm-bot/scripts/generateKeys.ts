@@ -4,8 +4,8 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../helpers/client";
 
 // Check Node.js version
-const nodeVersion = process.versions.node;
-const [major] = nodeVersion.split(".").map(Number);
+const nodeSDK = process.versions.node;
+const [major] = nodeSDK.split(".").map(Number);
 if (major < 20) {
   console.error("Node.js version 20 or higher is required");
   process.exit(1);

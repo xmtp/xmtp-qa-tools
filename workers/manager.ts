@@ -46,9 +46,9 @@ export function nameWithVersions(workerNames: string[]): string[] {
 
     // If workerName already contains installation ID (has dash), don't add another "-a"
     if (workerName.includes("-")) {
-      descriptors.push(`${workerName}-${randomVersion.nodeVersion}`);
+      descriptors.push(`${workerName}-${randomVersion.nodeSDK}`);
     } else {
-      descriptors.push(`${workerName}-a-${randomVersion.nodeVersion}`);
+      descriptors.push(`${workerName}-a-${randomVersion.nodeSDK}`);
     }
   }
 
@@ -410,12 +410,12 @@ export class WorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = getVersions()[0].nodeVersion;
+    let defaultSdk = getVersions()[0].nodeSDK;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && VersionList.some((v) => v.nodeVersion === lastPart)) {
+      if (lastPart && VersionList.some((v) => v.nodeSDK === lastPart)) {
         defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
@@ -483,14 +483,14 @@ export async function getWorkers(
   workers: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
-    nodeVersion?: string;
+    nodeSDK?: string;
     useVersions?: boolean;
     randomNames?: boolean;
   } = {
     env: undefined,
     useVersions: true,
     randomNames: true,
-    nodeVersion: undefined,
+    nodeSDK: undefined,
   },
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
@@ -507,8 +507,8 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    let descriptors = options.nodeVersion
-      ? names.map((name) => `${name}-${options.nodeVersion}`)
+    let descriptors = options.nodeSDK
+      ? names.map((name) => `${name}-${options.nodeSDK}`)
       : options.useVersions
         ? nameWithVersions(names)
         : names;

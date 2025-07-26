@@ -81,8 +81,8 @@ export const VersionList = [
     Conversation: Conversation322,
     Dm: Dm322,
     Group: Group322,
-    nodeVersion: "3.2.2",
-    bindingsPackage: "1.3.3",
+    nodeSDK: "3.2.2",
+    nodeBindings: "1.3.3",
     auto: true,
   },
   {
@@ -90,8 +90,8 @@ export const VersionList = [
     Conversation: Conversation321,
     Dm: Dm321,
     Group: Group321,
-    nodeVersion: "3.2.1",
-    bindingsPackage: "1.3.1",
+    nodeSDK: "3.2.1",
+    nodeBindings: "1.3.1",
     auto: true,
   },
   {
@@ -99,8 +99,8 @@ export const VersionList = [
     Conversation: Conversation320,
     Dm: Dm320,
     Group: Group320,
-    nodeVersion: "3.2.0",
-    bindingsPackage: "1.3.0",
+    nodeSDK: "3.2.0",
+    nodeBindings: "1.3.0",
     auto: true,
   },
   {
@@ -108,8 +108,8 @@ export const VersionList = [
     Conversation: Conversation312,
     Dm: Dm312,
     Group: Group312,
-    nodeVersion: "3.1.2",
-    bindingsPackage: "1.2.8",
+    nodeSDK: "3.1.2",
+    nodeBindings: "1.2.8",
     auto: true,
   },
   {
@@ -117,8 +117,8 @@ export const VersionList = [
     Conversation: Conversation310,
     Dm: Dm310,
     Group: Group310,
-    nodeVersion: "3.1.1",
-    bindingsPackage: "1.2.7",
+    nodeSDK: "3.1.1",
+    nodeBindings: "1.2.7",
     auto: true,
   },
   {
@@ -126,8 +126,8 @@ export const VersionList = [
     Conversation: Conversation300,
     Dm: Dm300,
     Group: Group300,
-    nodeVersion: "3.0.1",
-    bindingsPackage: "1.2.5",
+    nodeSDK: "3.0.1",
+    nodeBindings: "1.2.5",
     auto: true,
   },
   {
@@ -135,8 +135,8 @@ export const VersionList = [
     Conversation: Conversation220,
     Dm: Dm220,
     Group: Group220,
-    nodeVersion: "2.2.1",
-    bindingsPackage: "1.2.2",
+    nodeSDK: "2.2.1",
+    nodeBindings: "1.2.2",
     auto: true,
   },
   {
@@ -144,8 +144,8 @@ export const VersionList = [
     Conversation: Conversation210,
     Dm: Dm210,
     Group: Group210,
-    nodeVersion: "2.1.0",
-    bindingsPackage: "1.2.0",
+    nodeSDK: "2.1.0",
+    nodeBindings: "1.2.0",
     auto: true,
   },
   {
@@ -153,8 +153,8 @@ export const VersionList = [
     Conversation: Conversation209,
     Dm: Dm209,
     Group: Group209,
-    nodeVersion: "2.0.9",
-    bindingsPackage: "1.1.8",
+    nodeSDK: "2.0.9",
+    nodeBindings: "1.1.8",
     auto: true,
   },
 ];
@@ -167,16 +167,16 @@ export const getVersions = (filterAuto: boolean = true) => {
 export const checkNoNameContains = (versionList: typeof VersionList) => {
   // Versions should no include - because it messes   up with the worker name-installation conversion. FIX
   for (const version of versionList) {
-    if (version.nodeVersion.includes("-")) {
-      throw new Error(`Version ${version.nodeVersion} contains -`);
-    } else if (version.bindingsPackage.includes("-")) {
-      throw new Error(`Bindings package ${version.bindingsPackage} contains -`);
+    if (version.nodeSDK.includes("-")) {
+      throw new Error(`Version ${version.nodeSDK} contains -`);
+    } else if (version.nodeBindings.includes("-")) {
+      throw new Error(`Bindings package ${version.nodeBindings} contains -`);
     }
   }
 };
 
 export const regressionClient = async (
-  nodeVersion: string,
+  nodeSDK: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -187,13 +187,13 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.debug(
-      `Creating API client with: SDK version: ${nodeVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${nodeSDK} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
-  const versionConfig = VersionList.find((v) => v.nodeVersion === nodeVersion);
+  const versionConfig = VersionList.find((v) => v.nodeSDK === nodeSDK);
   if (!versionConfig) {
-    throw new Error(`SDK version ${nodeVersion} not found in VersionList`);
+    throw new Error(`SDK version ${nodeSDK} not found in VersionList`);
   }
   const ClientClass = versionConfig.Client;
   let client = null;
@@ -210,7 +210,7 @@ export const regressionClient = async (
   });
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${nodeVersion}`);
+    throw new Error(`Failed to create client for SDK version ${nodeSDK}`);
   }
 
   return client;

@@ -59,7 +59,7 @@ export const setupTestLifecycle = ({
       operation: operationName,
       test: testNameExtracted,
       GH_CACHE: process.env.GH_CACHE || "false",
-      sdk: sdk || getVersions()[0].nodeVersion,
+      sdk: sdk || getVersions()[0].nodeSDK,
       installations: members,
       members,
     };
@@ -89,7 +89,7 @@ export const setupTestLifecycle = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || getVersions()[0].nodeVersion,
+          sdk: sdk || getVersions()[0].nodeSDK,
           operation: operationName,
           test: testNameExtracted,
         };
