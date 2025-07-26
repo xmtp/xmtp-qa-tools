@@ -261,8 +261,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     received.forEach((msg) => {
       const sentIdx = sentEvents.findIndex((s) => getKey(s) === msg.key);
       if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
-        const duration =
-          msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
+        const sentTime = (sentEvents[sentIdx] as { sentAt: number }).sentAt;
+        const duration = msg.receivedAt - sentTime;
 
         // Debug logging for Onit agent specifically
         console.debug(
@@ -270,7 +270,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
           JSON.stringify(
             {
               receivedAt: msg.receivedAt,
-              sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
+              sentAt: sentTime,
               duration,
               positiveDuration: Math.max(0, duration),
               message: msg.message.substring(0, 100) + "...",
@@ -280,9 +280,25 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
           ),
         );
 
-        // Ensure we don't have negative durations due to clock skew or processing delays
-        // Use a minimum of 1ms instead of 0 to avoid metric validation errors
-        const positiveDuration = Math.max(1, duration);
+        // Handle negative durations (agent auto-responses received before trigger)
+        // For auto-responses, use a minimal positive duration to indicate instant response
+        let positiveDuration: number;
+        if (duration < 0) {
+          console.debug(
+            "Agent auto-response detected (received before trigger):",
+            JSON.stringify({
+              duration,
+              receivedAt: msg.receivedAt,
+              sentAt: sentTime,
+              message: msg.message.substring(0, 50) + "...",
+            }),
+          );
+          positiveDuration = 1; // 1ms to indicate instant auto-response
+        } else {
+          // Ensure we don't have negative durations due to clock skew or processing delays
+          // Use a minimum of 1ms instead of 0 to avoid metric validation errors
+          positiveDuration = Math.max(1, duration);
+        }
 
         eventTimings[r.name][sentIdx] = positiveDuration;
         timingSum += positiveDuration;
