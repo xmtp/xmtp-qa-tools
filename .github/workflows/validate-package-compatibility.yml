@@ -43,6 +43,7 @@ jobs:
 
       - name: Clean previous installations
         run: |
+          cd gm-bot
           rm -rf node_modules
           rm -rf dist
           rm -rf .yarn
