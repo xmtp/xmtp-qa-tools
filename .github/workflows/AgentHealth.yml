@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [agents-dms]
-        env: [dev, production]
+        env: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
