@@ -185,13 +185,24 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   >[] = receivers.map((r) =>
     startCollectors(r).then((events) =>
       events.map((ev) => {
-        // Use the current timestamp when we actually receive the message
-        // This is more accurate than trying to extract from the event
-        const receivedAt = Date.now();
+        // Try to extract the actual received timestamp from the event
+        const eventTimestamp = extractTimestamp(ev);
+        const fallbackTimestamp = Date.now();
+        const finalTimestamp = eventTimestamp || fallbackTimestamp;
+
+        // Debug logging for Onit agent specifically
+        if (getMessage(ev).includes("Onit prediction market agent")) {
+          console.debug("Onit message timestamp debug:", {
+            eventTimestamp,
+            fallbackTimestamp,
+            finalTimestamp,
+            message: getMessage(ev).substring(0, 100) + "...",
+          });
+        }
 
         return {
           key: getKey(ev),
-          receivedAt,
+          receivedAt: finalTimestamp,
           message: getMessage(ev),
           event: ev,
         };
@@ -226,12 +237,16 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
             receivedAt: msg.receivedAt,
             sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
             duration,
+            positiveDuration: Math.max(0, duration),
             message: msg.message.substring(0, 100) + "...",
           });
         }
 
-        eventTimings[r.name][sentIdx] = duration;
-        timingSum += duration;
+        // Ensure we don't have negative durations due to clock skew or processing delays
+        const positiveDuration = Math.max(0, duration);
+
+        eventTimings[r.name][sentIdx] = positiveDuration;
+        timingSum += positiveDuration;
         timingCount++;
       }
     });
@@ -615,10 +630,10 @@ export async function verifyAgentMessageStream(
           ["text", "reply", "reaction", "actions"],
           customTimeout ?? undefined,
         ),
-      // @ts-expect-error - TODO: fix this
-      triggerEvents: () => {
+      triggerEvents: async () => {
         const sentAt = Date.now();
-        group.send(triggerMessage).catch(console.error);
+        console.debug("Onit triggerEvents debug:", { sentAt, triggerMessage });
+        await group.send(triggerMessage);
 
         return [{ conversationId: group.id, sentAt }];
       },
