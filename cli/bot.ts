@@ -69,7 +69,7 @@ async function main() {
     console.log(`Path: ${botPath}`);
 
     // Run the bot using tsx with environment variable
-    const child = spawn("npx", ["tsx", botPath], {
+    const child = spawn("npx", ["tsx", "--watch", botPath], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: {
