@@ -67,7 +67,7 @@ describe(testName, async () => {
     ]);
     expect(verifyResult.allReceived).toBe(true);
   });
-
+  console.warn(BATCH_SIZE);
   for (const i of BATCH_SIZE) {
     it(`create a group with ${i} members`, async () => {
       const sliced = getInboxIds(i);
