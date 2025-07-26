@@ -68,6 +68,7 @@ jobs:
       - name: Install dependencies with yarn 1
         if: matrix.package-manager == 'yarn1'
         run: |
+          cd gm-bot
           touch yarn.lock
           yarn install --no-immutable
 
