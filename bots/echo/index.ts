@@ -13,7 +13,7 @@ const processMessage = async (
 ) => {
   console.log(`${count} Received message`);
 
-  //void conversation.send(`echo: ${message.content as string}`);
+  await conversation.send(`echo: ${message.content as string}`);
   count++;
 };
 
