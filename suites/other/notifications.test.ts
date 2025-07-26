@@ -1,7 +1,7 @@
 import { getManualUsers } from "@helpers/client";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import type { Conversation, Group } from "@xmtp/node-sdk";
+import { type Conversation, type Group } from "@workers/versions";
 import { describe, it } from "vitest";
 
 const receiverObj = getManualUsers(["fabri-convos-dev"])[0];

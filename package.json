@@ -19,7 +19,7 @@
     "lint": "eslint .",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "regression": "yarn test functional --sync all --versions 3 --size 5-10-50-100",
+    "regression": "yarn test functional --env local --sync all --versions 3 --size 5-10-50-100",
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",

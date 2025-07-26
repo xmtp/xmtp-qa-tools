@@ -22,8 +22,8 @@ const workerNames = [
 // Operations configuration - enable/disable specific operations
 const epochRotationOperations = {
   updateName: true, // updates the name of the group
-  addMember: false, // adds a random member to the group
-  removeMember: false, // removes a random member from the group
+  addMember: true, // adds a random member to the group
+  removeMember: true, // removes a random member from the group
 };
 const otherOperations = {
   createInstallation: true, // creates a new installation for a random worker

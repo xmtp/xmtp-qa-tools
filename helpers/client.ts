@@ -3,18 +3,14 @@ import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { regressionClient } from "@workers/versions";
 import {
   Client,
-  Dm,
-  Group,
   IdentifierKind,
+  regressionClient,
   type Conversation,
-  type DecodedMessage,
-  type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -24,16 +20,6 @@ import {
 } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { addFileLogging, setupPrettyLogs } from "./logger";
-
-export {
-  Dm,
-  Group,
-  Client,
-  type Conversation,
-  type DecodedMessage,
-  type LogLevel,
-  type XmtpEnv,
-};
 
 export function validateEnvironment(vars: string[]): Record<string, string> {
   const missing = vars.filter((v) => !process.env[v]);

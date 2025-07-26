@@ -57,6 +57,20 @@ import {
   Group as Group322,
 } from "@xmtp/node-sdk-3.2.2";
 
+export {
+  Client,
+  ConsentState,
+  type Signer,
+  type ClientOptions,
+  type Conversation,
+  IdentifierKind,
+  type DecodedMessage,
+  type Dm,
+  type Group,
+  LogLevel,
+  type XmtpEnv,
+} from "@xmtp/node-sdk";
+
 // SDK version mappings
 export const VersionList = [
   {
@@ -182,7 +196,7 @@ export const regressionClient = async (
   let client = null;
 
   const signer = createSigner(walletKey);
-  // @ts-expect-error: SDK version compatibility - signer interface differs across versions
+  // @ts-expect-error - TODO: fix this
   client = await ClientClass.create(signer, {
     dbEncryptionKey,
     dbPath,

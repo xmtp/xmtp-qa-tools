@@ -14,7 +14,7 @@ import {
   type Worker,
   type WorkerManager,
 } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
+import { type Group } from "@workers/versions";
 import { beforeAll, describe, it } from "vitest";
 
 export const features = [

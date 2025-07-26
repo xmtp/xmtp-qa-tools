@@ -2,7 +2,7 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
-} from "@helpers/client";
+} from "@workers/versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 const processMessage = async (
