@@ -14,6 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        test: [agents-dms]
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
@@ -26,14 +27,14 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: agents-dms ${{ matrix.env }}
-        run: yarn test agents-dms  --env ${{ matrix.env }} --no-fail --debug --no-error-logs
+      - name: ${{ matrix.test }} ${{ matrix.env }}
+        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --debug --no-error-logs
 
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
-          test-name: agents-dms
+          test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
