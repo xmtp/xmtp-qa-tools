@@ -75,14 +75,18 @@ jobs:
       - name: Install dependencies with pnpm
         if: matrix.package-manager == 'pnpm'
         run: |
+          cd gm-bot
           pnpm install
 
       - name: Install dependencies with bun
         if: matrix.package-manager == 'bun'
-        run: bun install
+        run: |
+          cd gm-bot
+          bun install
 
       - name: Build project
         run: |
+          cd gm-bot
           if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
             yarn run build
           else
