@@ -670,13 +670,12 @@ export async function verifyAgentMessageStream(
           customTimeout ?? undefined,
         ),
       triggerEvents: async () => {
+        await group.send(triggerMessage);
         const sentAt = Date.now();
         console.debug(
           "Onit triggerEvents debug:",
           JSON.stringify({ sentAt, triggerMessage }, null, 2),
         );
-        await group.send(triggerMessage);
-
         return [{ conversationId: group.id, sentAt }];
       },
       getKey: () => group.id, // Use conversation ID as consistent key for both sent and received
