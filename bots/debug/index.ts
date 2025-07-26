@@ -4,7 +4,7 @@ import {
   type Conversation,
   type DecodedMessage,
   type Group,
-} from "@helpers/client";
+} from "@workers/versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 const processMessage = async (

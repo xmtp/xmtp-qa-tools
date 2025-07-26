@@ -3,11 +3,10 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
-  Dm,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import "dotenv/config";
 import path from "node:path";
 import type { WorkerBase } from "./manager";
@@ -38,7 +37,6 @@ export enum StreamCollectorType {
 // Worker thread code as a string
 const workerThreadCode = `
 import { parentPort, workerData } from "node:worker_threads";
-import type { Client } from "@xmtp/node-sdk";
 
 // The Worker must be run in a worker thread, so confirm \`parentPort\` is defined
 if (!parentPort) {
@@ -63,10 +61,6 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
       break;
   }
 });
-
-
-// Re-export anything needed in the worker environment (if necessary)
-export type { Client };
 `;
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
@@ -623,7 +617,7 @@ export class WorkerClient extends Worker {
         return;
       }
       const baseName = this.name.split("-")[0].toLowerCase();
-      const isDm = conversation instanceof Dm;
+      const isDm = (await conversation.metadata())?.conversationType === "dm";
       const content = (message.content as string).toLowerCase();
       let shouldRespond = false;
       if (

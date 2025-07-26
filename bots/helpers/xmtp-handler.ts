@@ -3,7 +3,7 @@ import {
   type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
-} from "@helpers/client";
+} from "@workers/versions";
 import "dotenv/config";
 import {
   createSigner,

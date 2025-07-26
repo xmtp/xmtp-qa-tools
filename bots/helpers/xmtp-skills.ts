@@ -1,10 +1,9 @@
 import {
-  Dm,
-  Group,
   type Client,
   type Conversation,
   type DecodedMessage,
-} from "@helpers/client";
+  type Group,
+} from "@workers/versions";
 
 /**
  * Skill-related options for message processing
@@ -331,9 +330,9 @@ export const processMessage = async (
       return;
     }
 
-    const conversation = await client.conversations.getConversationById(
+    const conversation = (await client.conversations.getConversationById(
       message.conversationId,
-    );
+    )) as Conversation;
 
     if (!conversation) {
       console.debug(`[${env}] Unable to find conversation, skipping`);
@@ -343,13 +342,13 @@ export const processMessage = async (
     console.debug(
       `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
     );
-
-    const isDm = conversation instanceof Dm;
-    const isGroup = conversation instanceof Group;
+    const isDm = (await conversation.metadata())?.conversationType === "dm";
+    const isGroup =
+      (await conversation.metadata())?.conversationType === "group";
 
     const preMessageHandlerResult = await preMessageHandler(
       client,
-      conversation as Conversation,
+      conversation,
       message,
       isDm,
       options,
@@ -378,12 +377,7 @@ export const processMessage = async (
           commandData: analysis.commandData || { name: "", args: [] },
         };
 
-        await messageHandler(
-          client,
-          conversation as Conversation,
-          message,
-          messageContext,
-        );
+        await messageHandler(client, conversation, message, messageContext);
       } catch (handlerError) {
         console.error(`[${env}] Error in message handler:`, handlerError);
       }
@@ -431,9 +425,9 @@ export const addToGroupWithCustomCopy = async (
 ): Promise<boolean> => {
   try {
     // Get the group conversation
-    const group = await client.conversations.getConversationById(
+    const group = (await client.conversations.getConversationById(
       config.groupId,
-    );
+    )) as Group;
     if (!group) {
       console.debug(`Group not found in the db: ${config.groupId}`);
       const errorMessage =
@@ -452,7 +446,10 @@ export const addToGroupWithCustomCopy = async (
     console.debug(`Secret code received, processing group addition`);
 
     await group.sync();
-    if (group instanceof Group) {
+    if (
+      (await conversation.metadata())?.conversationType === "dm" ||
+      (await conversation.metadata())?.conversationType === "group"
+    ) {
       const members = await group.members();
       const isMember = members.some(
         (member) =>

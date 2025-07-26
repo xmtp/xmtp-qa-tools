@@ -117,5 +117,4 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { getVersions } from "@workers/versions";
-import { IdentifierKind } from "@xmtp/node-sdk";
 ```
