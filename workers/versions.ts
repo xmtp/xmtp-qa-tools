@@ -72,7 +72,7 @@ export {
   type GroupMember,
   type KeyPackageStatus,
   ConsentEntityType,
-} from "@xmtp/node-sdk";
+} from "@xmtp/node-sdk"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
 
 // SDK version mappings
 export const VersionList = [

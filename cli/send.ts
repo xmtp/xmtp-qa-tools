@@ -146,6 +146,8 @@ async function runsendTest(config: Config): Promise<void> {
     completedWorkers: number,
     totalMessagesSent: number,
     startTime: number,
+    firstMessageTime: number,
+    lastMessageTime: number,
   ) => {
     const successful = results.filter((r) => r.success);
     const successRate = (successful.length / config.userCount) * 100;
@@ -160,24 +162,27 @@ async function runsendTest(config: Config): Promise<void> {
     console.log(`   Total: ${totalMessagesSent}`);
 
     if (successful.length > 0) {
-      const totalSendTime = successful.reduce((sum, r) => sum + r.sendTime, 0);
-      const avgSend = totalSendTime / successful.length;
-      const messagesPerSecond = (totalMessagesSent / (duration / 1000)).toFixed(
-        2,
-      );
+      const sendTimes = successful.map((r) => r.sendTime);
+      const totalSendTime = lastMessageTime - firstMessageTime;
+      const avgSend =
+        sendTimes.reduce((sum, time) => sum + time, 0) / successful.length;
+      const messagesPerSecond = (
+        totalMessagesSent /
+        (totalSendTime / 1000)
+      ).toFixed(2);
 
       console.log(`   Total Send Time: ${(totalSendTime / 1000).toFixed(2)}s`);
       console.log(`   Avg Send: ${(avgSend / 1000).toFixed(2)}s`);
       console.log(`   Messages/Second: ${messagesPerSecond}`);
 
       if (config.waitForResponse) {
+        const responseTimes = successful.map((r) => r.responseTime);
         const avgResponse =
-          successful.reduce((sum, r) => sum + r.responseTime, 0) /
+          responseTimes.reduce((sum, time) => sum + time, 0) /
           successful.length;
         console.log(`   Avg Response: ${(avgResponse / 1000).toFixed(2)}s`);
 
         // Calculate and log percentiles for response times
-        const responseTimes = successful.map((r) => r.responseTime);
         const median = calculatePercentile(responseTimes, 50);
         const p80 = calculatePercentile(responseTimes, 80);
         const p95 = calculatePercentile(responseTimes, 95);
@@ -227,6 +232,8 @@ async function runsendTest(config: Config): Promise<void> {
   let totalMessagesSent = 0;
   let completedWorkers = 0;
   let summaryPrinted = false;
+  let firstMessageTime = 0;
+  let lastMessageTime = 0;
   const results: Array<{
     success: boolean;
     sendTime: number;
@@ -305,6 +312,8 @@ async function runsendTest(config: Config): Promise<void> {
                       completedWorkers,
                       totalMessagesSent,
                       startTime,
+                      firstMessageTime,
+                      lastMessageTime,
                     );
                   }
 
@@ -322,6 +331,13 @@ async function runsendTest(config: Config): Promise<void> {
           totalMessagesSent++;
           sendTime = Date.now() - sendStart;
           sendCompleteTime = Date.now();
+
+          // Track first and last message times
+          if (firstMessageTime === 0) {
+            firstMessageTime = sendCompleteTime;
+          }
+          lastMessageTime = sendCompleteTime;
+
           console.log(
             `📩 ${i}: Message sent in ${sendTime}ms (Total sent: ${totalMessagesSent})`,
           );
@@ -354,6 +370,8 @@ async function runsendTest(config: Config): Promise<void> {
                 completedWorkers,
                 totalMessagesSent,
                 startTime,
+                firstMessageTime,
+                lastMessageTime,
               );
             }
 
@@ -415,6 +433,8 @@ async function runsendTest(config: Config): Promise<void> {
           completedWorkers,
           totalMessagesSent,
           startTime,
+          firstMessageTime,
+          lastMessageTime,
         );
       }
     } catch (error) {
@@ -429,7 +449,14 @@ async function runsendTest(config: Config): Promise<void> {
   } else {
     // For non-wait mode, all promises have already resolved after sending
     if (!summaryPrinted) {
-      logSummary(results, completedWorkers, totalMessagesSent, startTime);
+      logSummary(
+        results,
+        completedWorkers,
+        totalMessagesSent,
+        startTime,
+        firstMessageTime,
+        lastMessageTime,
+      );
     }
   }
 
