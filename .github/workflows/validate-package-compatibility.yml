@@ -57,6 +57,10 @@ jobs:
           rm -f .npmrc
           rm -f .yarnrc
           rm -f .yarnrc.yml
+          # Remove packageManager field from package.json to allow testing with different managers
+          if [ -f package.json ]; then
+            sed -i '/"packageManager":/d' package.json
+          fi
 
       - name: Install dependencies with npm
         if: matrix.package-manager == 'npm'
