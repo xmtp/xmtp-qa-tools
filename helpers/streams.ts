@@ -219,16 +219,19 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
         const fallbackTimestamp = Date.now();
         const finalTimestamp = eventTimestamp || fallbackTimestamp;
 
-        // Debug logging for Onit agent specifically
-        if (getMessage(ev).includes("Onit prediction market agent")) {
-          console.debug("Onit message timestamp debug:", {
-            eventTimestamp,
-            fallbackTimestamp,
-            finalTimestamp,
-            message: getMessage(ev).substring(0, 100) + "...",
-            rawEvent: JSON.stringify(ev, null, 2),
-          });
-        }
+        console.debug(
+          "Onit message timestamp debug:",
+          JSON.stringify(
+            {
+              eventTimestamp,
+              fallbackTimestamp,
+              finalTimestamp,
+              message: getMessage(ev).substring(0, 100) + "...",
+            },
+            null,
+            2,
+          ),
+        );
 
         return {
           key: getKey(ev),
@@ -668,7 +671,10 @@ export async function verifyAgentMessageStream(
         ),
       triggerEvents: async () => {
         const sentAt = Date.now();
-        console.debug("Onit triggerEvents debug:", { sentAt, triggerMessage });
+        console.debug(
+          "Onit triggerEvents debug:",
+          JSON.stringify({ sentAt, triggerMessage }, null, 2),
+        );
         await group.send(triggerMessage);
 
         return [{ conversationId: group.id, sentAt }];
