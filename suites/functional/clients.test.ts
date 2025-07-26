@@ -28,7 +28,7 @@ describe(testName, async () => {
 
     for (const version of versions) {
       const versionWorkers = await getWorkers(
-        ["downgrade-" + "a" + "-" + version.nodeVersion],
+        ["downgrade-" + "a" + "-" + version.nodeSDK],
         {
           useVersions: false,
         },
@@ -39,8 +39,7 @@ describe(testName, async () => {
       let convo = await downgrade?.client.conversations.newDm(receiverInboxId);
 
       expect(convo?.id).toBeDefined();
-      if (!convo?.id)
-        console.error("Dowgrading from version", version.nodeVersion);
+      if (!convo?.id) console.error("Dowgrading from version", version.nodeSDK);
     }
   });
 
@@ -50,7 +49,7 @@ describe(testName, async () => {
 
     for (const version of versions.reverse()) {
       const versionWorkers = await getWorkers(
-        ["upgrade-" + "a" + "-" + version.nodeVersion],
+        ["upgrade-" + "a" + "-" + version.nodeSDK],
         {
           useVersions: false,
         },
@@ -60,8 +59,7 @@ describe(testName, async () => {
       console.log("Upgraded to ", "sdk:" + String(upgrade?.sdk));
       let convo = await upgrade?.client.conversations.newDm(receiverInboxId);
       expect(convo?.id).toBeDefined();
-      if (!convo?.id)
-        console.error("Upgrading to version", version.nodeVersion);
+      if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
     }
   });
 

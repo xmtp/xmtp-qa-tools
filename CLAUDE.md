@@ -25,7 +25,8 @@ You may ONLY execute the following CLI commands:
 - `--parallel` - Parallel execution
 - `--versions <number>` - Use multiple SDK versions
 - `--env <environment>` - Set XMTP_ENV (dev, production, local)
-- `--nodeVersion <version>` - Use specific Node.js version
+- `--nodeSDK <version>` - Use specific Node.js version
+- `--nodeBindings <version>` - Use specific Node.js bindings version
 - `--sync <strategy>` - Sync strategy (all, conversations, all,conversations)
 - `--size <range>` - Batch size range (e.g., 5-10)
 - `--forks` - Report fork count after test completion
@@ -50,7 +51,7 @@ yarn test functional --versions 3 --no-fail --debug
 yarn test delivery --attempts 3 --debug
 
 # Test with specific Node.js version
-yarn test functional --nodeVersion 3.1.1 --debug
+yarn test functional --nodeSDK 3.1.1 --debug
 
 # Test with sync strategy configuration
 yarn test functional --sync all,conversations --debug
@@ -110,7 +111,7 @@ yarn test functional --sync all --versions 3 --no-fail --debug --size 5-10-50-10
 yarn test functional --versions 3 --attempts 5 --debug --parallel --forks
 
 # Node.js version testing with environment configuration
-yarn test functional --nodeVersion 3.1.1 --env local --sync all
+yarn test functional --nodeSDK 3.1.1 --env local --sync all
 
 # Batch testing with size configuration
 yarn test functional --size 5-10 --parallel --forks

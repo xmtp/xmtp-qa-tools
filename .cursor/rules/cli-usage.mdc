@@ -79,7 +79,7 @@ yarn test functional --no-fail --debug
 
 ```bash
 yarn test functional --versions 3      # Uses 3 random SDK versions
-yarn test functional --nodeVersion 3.1.1  # Use specific Node.js version
+yarn test functional --nodeSDK 3.1.1  # Use specific Node.js version
 
 # Available SDK versions:
 # - 0.0.47 (Legacy)
@@ -174,7 +174,7 @@ yarn test functional --no-fail --debug # Full functional suite with debugging
 
 ```bash
 yarn test functional --versions 3 --debug                # Version compatibility testing
-yarn test functional --nodeVersion 3.1.1 --debug         # Node.js version testing
+yarn test functional --nodeSDK 3.1.1 --debug         # Node.js version testing
 ```
 
 ## Shortcut Commands (from package.json)
@@ -231,7 +231,7 @@ yarn test ./suites/functional/groups.test.ts ./suites/functional/consent.test.ts
 ```bash
 yarn test functional --debug --env dev
 yarn test functional --versions 3
-yarn test functional --nodeVersion 3.1.1
+yarn test functional --nodeSDK 3.1.1
 yarn test functional --sync all,conversations
 yarn test functional --size 5-10
 ```
@@ -240,7 +240,7 @@ yarn test functional --size 5-10
 
 ```bash
 yarn test functional --versions 3 --attempts 5  --debug
-yarn test functional --nodeVersion 3.1.1 --env local --sync all
+yarn test functional --nodeSDK 3.1.1 --env local --sync all
 yarn test functional --size 5-10 --parallel --forks
 ```
 
@@ -257,5 +257,5 @@ yarn test functional --size 5-10 --parallel --forks
 ```bash
 # Advanced example with multiple options
 yarn test functional --versions 3 --attempts 5 --debug --parallel --forks
-yarn test functional --nodeVersion 3.1.1 --env local --sync all,conversations --size 5-10
+yarn test functional --nodeSDK 3.1.1 --env local --sync all,conversations --size 5-10
 ```

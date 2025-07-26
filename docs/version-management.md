@@ -4,23 +4,27 @@
 
 How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
 
-## Architecture: SDK → Bindings → libxmtp
+## Architecture: [NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions) → [Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions) → [libxmtp](https://github.com/xmtp/libxmtp)
 
-```
-Node.js SDK (e.g., @xmtp/node-sdk@3.2.2)
-    ↓ depends on
-Node Bindings (e.g., @xmtp/node-bindings@1.3.3)
-    ↓ compiled from
-libxmtp Rust Library (specific commit/version)
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
+
+flowchart TD
+  nodeSDK["Node.js SDK<br/>(e.g., @xmtp/node-sdk@3.2.2)"]
+  nodeBindings["Node Bindings<br/>(e.g., @xmtp/node-bindings@1.3.3)"]
+  libxmtp["libxmtp Rust Library<br/>(specific commit/version)"]
+
+  nodeSDK --> |depends on| nodeBindings
+  nodeBindings --> |compiled from| libxmtp
+
+  classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
 - **SDKs**: Thin TypeScript wrappers providing developer-friendly API
 - **Bindings**: Compiled Rust code and native bindings
 - **libxmtp**: Core cryptographic and networking logic
 
-## Version Mapping System
-
-### Version Mapping
+## Version mapping system
 
 Versions are mapped in `workers/versions.ts`:
 
@@ -31,8 +35,8 @@ export const VersionList = [
     Conversation: Conversation322,
     Dm: Dm322,
     Group: Group322,
-    nodeVersion: "3.2.2", // SDK version
-    bindingsPackage: "1.3.3", // Bindings version
+    nodeSDK: "3.2.2", // SDK version
+    nodeBindings: "1.3.3", // Bindings version
     auto: true, // Include in automated testing
   },
 ];
@@ -63,14 +67,6 @@ node_modules/@xmtp/
 └── node-bindings-1.3.3/
 ```
 
-## Testing with Custom libxmtp Versions
-
-### Scenario: Testing a Feature Branch
-
-**Q**: _"I have a private branch of libxmtp, can you run your E2E tests on it?"_
-
-**A**: Yes, but requires a full release process.
-
 ### Process
 
 1. Developer creates libxmtp branch
@@ -79,7 +75,7 @@ node_modules/@xmtp/
 4. QA tools updated with new bindings version
 5. Tests run against new version
 
-### Alternative: Use Existing Bindings
+### Switch between versions
 
 If your libxmtp version is already compiled:
 
@@ -89,20 +85,20 @@ If your libxmtp version is already compiled:
 
 ```typescript
 {
-  nodeVersion: "3.2.2",
-  bindingsPackage: "1.3.1",  // Use existing bindings
+  nodeSDK: "3.2.2",
+  nodeBindings: "1.3.1",  // Use existing bindings
   auto: false,               // Manual testing only
 }
 ```
 
-## Version Discovery
+## Version discovery
 
 ### Finding libxmtp Version
 
 The libxmtp commit hash is in:
 
-```
-node_modules/@xmtp/node-bindings-X.X.X/version
+```bash
+node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
 ```
 
 ### Using Versions Command
@@ -124,32 +120,11 @@ yarn test functional --versions 3  # Test 3 auto-enabled versions
 ### Manual Testing
 
 ```bash
-yarn test functional --nodeVersion 3.2.2
+yarn test functional --nodeSDK 3.2.2
 ```
 
 ### Regression Testing
 
 ```bash
-yarn regression  # Test multiple versions
+yarn regression  # Vibe check on latest version
 ```
-
-## Best Practices
-
-### Adding New Versions
-
-1. Update package.json with new aliases
-2. Add to workers/versions.ts
-3. Run `yarn versions`
-4. Test before enabling auto-testing
-
-### Removing Buggy Versions
-
-1. Remove from all files
-2. Set previous stable to `auto: true`
-3. Verify bindings version matches
-
-### Version Naming
-
-- Avoid hyphens (breaks worker name conversion)
-- Use semantic versioning
-- Keep mappings consistent

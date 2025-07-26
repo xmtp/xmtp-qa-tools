@@ -200,13 +200,13 @@ function parseTestArgs(args: string[]): {
         options.verboseLogging = false;
         env.LOGGING_LEVEL = "debug";
         break;
-      case "--nodeVersion":
+      case "--nodeSDK":
         if (nextArg) {
           env.NODE_VERSION = nextArg;
           i++;
         } else {
           console.warn(
-            "--nodeVersion flag requires a value (e.g., --nodeVersion 3.1.1)",
+            "--nodeSDK flag requires a value (e.g., --nodeSDK 3.1.1)",
           );
         }
         break;

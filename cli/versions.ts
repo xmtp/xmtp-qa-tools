@@ -14,12 +14,12 @@ function createBindingsSymlinks() {
   console.log("Creating bindings symlinks...");
 
   for (const config of VersionList) {
-    if (!config.bindingsPackage) continue;
+    if (!config.nodeBindings) continue;
 
-    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeVersion}`);
+    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
     const bindingsDir = path.join(
       xmtpDir,
-      `node-bindings-${config.bindingsPackage}`,
+      `node-bindings-${config.nodeBindings}`,
     );
 
     if (!fs.existsSync(sdkDir) || !fs.existsSync(bindingsDir)) continue;
@@ -44,9 +44,9 @@ function createBindingsSymlinks() {
         bindingsDir,
       );
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`${config.nodeVersion} -> ${config.bindingsPackage}`);
+      console.log(`${config.nodeSDK} -> ${config.nodeBindings}`);
     } catch (error) {
-      console.error(`Error linking ${config.nodeVersion}: ${String(error)}`);
+      console.error(`Error linking ${config.nodeSDK}: ${String(error)}`);
     }
   }
 }
