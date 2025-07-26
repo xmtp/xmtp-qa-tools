@@ -16,10 +16,10 @@ Test bots for the XMTP protocol that validate functionality, automate testing sc
 
 ```bash
 # Run the debug bot
-yarn bot debug
+yarn bot debug --env dev
 
 # Run the echo bot
-yarn bot echo
+yarn bot echo --env dev
 
 # Run the GM bot
 yarn bot gm-bot

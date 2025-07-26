@@ -72,10 +72,10 @@ yarn send --agent gm --env dev --users 200
 
 ```bash
 # Launch available bots
-yarn bot simple
-yarn bot gm-bot
-yarn bot send
-yarn bot echo
+yarn bot simple --env dev
+yarn bot gm-bot --env dev
+yarn bot send --env dev
+yarn bot echo --env dev
 yarn bot debug
 yarn bot key-check
 ```

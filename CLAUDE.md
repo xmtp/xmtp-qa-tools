@@ -77,10 +77,10 @@ yarn send --agent gm --env dev --users 200
 
 ```bash
 # Launch available bots
-yarn bot simple
-yarn bot gm-bot
-yarn bot debug
-yarn bot key-check
+yarn bot simple --env dev
+yarn bot gm-bot --env dev
+yarn bot debug --env dev
+yarn bot key-check --env dev
 ```
 
 ### Data Management

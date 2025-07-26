@@ -14,7 +14,7 @@ const processMessage = async (
     `Received message: ${message.content as string} by ${message.senderInboxId}`,
   );
 
-  await conversation.send(`echo: ${message.content as string}`);
+  void conversation.send(`echo: ${message.content as string}`);
 };
 
 // Initialize the client with the message processor
@@ -22,7 +22,6 @@ await initializeClient(processMessage, [
   {
     walletKey: process.env.WALLET_KEY as `0x${string}`,
     dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
-    networks: ["production"],
     acceptGroups: true,
   },
 ]);
