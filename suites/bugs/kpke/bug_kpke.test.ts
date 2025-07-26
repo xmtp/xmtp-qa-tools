@@ -1,6 +1,6 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
+import { IdentifierKind, type Dm } from "@workers/versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testName = "bug_kpke";

@@ -6,7 +6,7 @@ import {
   type DecodedMessage,
   type GroupMember,
   type KeyPackageStatus,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 // Get XMTP SDK version from package.json

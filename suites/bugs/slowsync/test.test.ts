@@ -1,6 +1,6 @@
 import { typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { ConsentEntityType, ConsentState, type Dm } from "@xmtp/node-sdk";
+import { ConsentEntityType, ConsentState, type Dm } from "@workers/versions";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "slowsync";

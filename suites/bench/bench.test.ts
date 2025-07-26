@@ -4,7 +4,7 @@ import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
+import { type Group } from "@workers/versions";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;

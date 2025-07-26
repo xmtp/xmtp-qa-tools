@@ -8,7 +8,7 @@ import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+} from "@workers/versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";

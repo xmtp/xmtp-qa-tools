@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { browserTimeout, streamColdStartTimeout } from "@helpers/client";
-import type { XmtpEnv } from "@xmtp/node-sdk";
+import type { XmtpEnv } from "@workers/versions";
 import {
   chromium,
   type Browser,

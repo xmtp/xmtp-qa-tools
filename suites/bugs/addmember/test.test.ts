@@ -1,7 +1,7 @@
 import { getManualUsers } from "@helpers/client";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
+import { type Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_addmember";

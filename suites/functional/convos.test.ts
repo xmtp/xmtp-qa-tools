@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
+import { IdentifierKind, type Dm, type Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "convos";

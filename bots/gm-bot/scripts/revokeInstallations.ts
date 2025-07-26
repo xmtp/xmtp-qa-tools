@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@workers/versions";
 import { createSigner, getEncryptionKeyFromHex } from "../helpers/client";
 
 // Check Node.js version
