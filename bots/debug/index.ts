@@ -3,6 +3,7 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
+  type Group,
 } from "@helpers/client";
 import { initializeClient } from "../helpers/xmtp-handler";
 
