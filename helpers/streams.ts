@@ -185,11 +185,13 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   >[] = receivers.map((r) =>
     startCollectors(r).then((events) =>
       events.map((ev) => {
-        // Try to extract the actual received timestamp from the event
-        const eventTimestamp = extractTimestamp(ev);
+        // Use the current timestamp when we actually receive the message
+        // This is more accurate than trying to extract from the event
+        const receivedAt = Date.now();
+
         return {
           key: getKey(ev),
-          receivedAt: eventTimestamp || Date.now(),
+          receivedAt,
           message: getMessage(ev),
           event: ev,
         };
@@ -217,6 +219,17 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
         const duration =
           msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
+
+        // Debug logging for Onit agent specifically
+        if (msg.message.includes("Onit prediction market agent")) {
+          console.debug("Onit timing calculation debug:", {
+            receivedAt: msg.receivedAt,
+            sentAt: (sentEvents[sentIdx] as { sentAt: number }).sentAt,
+            duration,
+            message: msg.message.substring(0, 100) + "...",
+          });
+        }
+
         eventTimings[r.name][sentIdx] = duration;
         timingSum += duration;
         timingCount++;
