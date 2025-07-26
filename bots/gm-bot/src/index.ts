@@ -4,7 +4,7 @@ import {
   type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
-} from "@workers/versions";
+} from "@xmtp/node-sdk";
 import {
   createSigner,
   getDbPath,
