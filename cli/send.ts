@@ -15,13 +15,12 @@ import {
   getDbPathQA,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
-import { getRandomInboxIds } from "../inboxes/utils";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
 
 // echo
-// yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env production --users 500 --wait
+// yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
 interface Config {
   userCount: number;

@@ -5,16 +5,16 @@ import {
 } from "@workers/versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
+let count = 0;
 const processMessage = async (
   client: Client,
   conversation: Conversation,
   message: DecodedMessage,
-): Promise<void> => {
-  console.log(
-    `Received message: ${message.content as string} by ${message.senderInboxId}`,
-  );
+) => {
+  console.log(`${count} Received message`);
 
-  void conversation.send(`echo: ${message.content as string}`);
+  //void conversation.send(`echo: ${message.content as string}`);
+  count++;
 };
 
 // Initialize the client with the message processor
