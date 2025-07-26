@@ -8,8 +8,8 @@ How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
 
 flowchart TD
-  nodeSDK["Node.js SDK<br/>(xmtp/node-sdk@3.2.2)"]
-  nodeBindings["Node Bindings<br/>(xmtp/node-bindings@1.3.3)"]
+  nodeSDK["Node.js SDK<br/>@xmtp/node-sdk@3.2.2"]
+  nodeBindings["Node Bindings<br/>@xmtp/node-bindings@1.3.3"]
   libxmtp["libxmtp Rust Library<br/>(specific commit/version)"]
 
   nodeSDK --> |depends on| nodeBindings
