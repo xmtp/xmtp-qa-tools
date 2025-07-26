@@ -4,7 +4,7 @@
 
 How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
 
-## Architecture: SDK → Bindings → libxmtp
+## Architecture: [NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions) → [Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions) → [libxmtp](https://github.com/xmtp/libxmtp)
 
 ```
 Node.js SDK (e.g., @xmtp/node-sdk@3.2.2)
@@ -18,7 +18,7 @@ libxmtp Rust Library (specific commit/version)
 - **Bindings**: Compiled Rust code and native bindings
 - **libxmtp**: Core cryptographic and networking logic
 
-## Version Mapping System
+## Version mapping system
 
 ### Version Mapping
 
@@ -63,14 +63,6 @@ node_modules/@xmtp/
 └── node-bindings-1.3.3/
 ```
 
-## Testing with Custom libxmtp Versions
-
-### Scenario: Testing a Feature Branch
-
-**Q**: _"I have a private branch of libxmtp, can you run your E2E tests on it?"_
-
-**A**: Yes, but requires a full release process.
-
 ### Process
 
 1. Developer creates libxmtp branch
@@ -79,7 +71,7 @@ node_modules/@xmtp/
 4. QA tools updated with new bindings version
 5. Tests run against new version
 
-### Alternative: Use Existing Bindings
+### Switch between versions
 
 If your libxmtp version is already compiled:
 
@@ -95,14 +87,14 @@ If your libxmtp version is already compiled:
 }
 ```
 
-## Version Discovery
+## Version discovery
 
 ### Finding libxmtp Version
 
 The libxmtp commit hash is in:
 
-```
-node_modules/@xmtp/node-bindings-X.X.X/version
+```bash
+node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
 ```
 
 ### Using Versions Command
@@ -130,26 +122,5 @@ yarn test functional --nodeVersion 3.2.2
 ### Regression Testing
 
 ```bash
-yarn regression  # Test multiple versions
+yarn regression  # Vibe check on latest version
 ```
-
-## Best Practices
-
-### Adding New Versions
-
-1. Update package.json with new aliases
-2. Add to workers/versions.ts
-3. Run `yarn versions`
-4. Test before enabling auto-testing
-
-### Removing Buggy Versions
-
-1. Remove from all files
-2. Set previous stable to `auto: true`
-3. Verify bindings version matches
-
-### Version Naming
-
-- Avoid hyphens (breaks worker name conversion)
-- Use semantic versioning
-- Keep mappings consistent
