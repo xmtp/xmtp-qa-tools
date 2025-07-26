@@ -65,7 +65,7 @@ node_modules/@xmtp/
 └── node-bindings-1.3.3/
 ```
 
-### Process for adding a new version
+### Release process
 
 1. Developer creates libxmtp branch
 2. Node bindings CI compiles new libxmtp into `@xmtp/node-bindings`
@@ -89,9 +89,7 @@ If your libxmtp version is already compiled:
 }
 ```
 
-### Version discovery
-
-#### Finding libxmtp version
+### Finding libxmtp version
 
 The libxmtp commit hash is in:
 
@@ -99,14 +97,14 @@ The libxmtp commit hash is in:
 node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
 ```
 
-#### Using versions command to see current mappings
+### Using versions command to see current mappings
 
 ```bash
 yarn versions
 # shows current SDK → bindings mappings.
 ```
 
-### Testing specific versions
+### Testing specific versions (automated)
 
 ```bash
 yarn test functional --versions 3  # Test latest 3 auto-enabled versions
