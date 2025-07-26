@@ -7,7 +7,7 @@ import {
   type Client,
   type Conversation,
   type Group,
-} from "@workers/versions";
+} from "@xmtp/node-sdk";
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
