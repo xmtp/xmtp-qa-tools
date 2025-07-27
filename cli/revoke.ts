@@ -12,19 +12,54 @@ if (major < 20) {
   process.exit(1);
 }
 
+function showHelp() {
+  console.log(`
+XMTP Revoke CLI - Installation revocation management
+
+USAGE:
+  yarn revoke <inbox-id> [installations-to-save]
+
+ARGUMENTS:
+  inbox-id               64-character hexadecimal inbox ID
+  installations-to-save  Comma-separated installation IDs to keep (optional)
+
+OPTIONS:
+  -h, --help            Show this help message
+
+DESCRIPTION:
+  Revokes all installations for a given inbox except those specified
+  in installations-to-save. If no installations are specified, only
+  the current installation is kept.
+
+EXAMPLES:
+  yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+  yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"
+  yarn revoke --help
+
+REQUIREMENTS:
+  - Node.js version 20 or higher
+  - .env file with WALLET_KEY, ENCRYPTION_KEY, and XMTP_ENV
+
+For more information, see: cli/readme.md
+`);
+}
+
 async function main() {
+  const args = process.argv.slice(2);
+
+  if (args.includes("--help") || args.includes("-h")) {
+    showHelp();
+    return;
+  }
+
   // Get inbox ID and installations to save from command line arguments
-  const inboxId = process.argv[2];
-  const installationsToSave = process.argv[3];
+  const inboxId = args[0];
+  const installationsToSave = args[1];
 
   if (!inboxId) {
     console.error("Error: Inbox ID is required as a command line argument");
-    console.error(
-      "Usage: yarn revoke-installations <inbox-id> [installations-to-save]",
-    );
-    console.error(
-      'Example: yarn revoke-installations 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"',
-    );
+    console.error("Usage: yarn revoke <inbox-id> [installations-to-save]");
+    console.error("Run 'yarn revoke --help' for more information");
     process.exit(1);
   }
 
@@ -34,6 +69,7 @@ async function main() {
       "Error: Invalid inbox ID format. Must be 64 hexadecimal characters.",
     );
     console.error(`Provided: ${inboxId}`);
+    console.error("Run 'yarn revoke --help' for more information");
     process.exit(1);
   }
 
@@ -55,12 +91,7 @@ async function main() {
         "Error: Invalid installation ID format(s). Must be 64 hexadecimal characters.",
       );
       console.error("Invalid IDs:", invalidInstallations.join(", "));
-      console.error(
-        "Usage: Provide installation IDs separated by commas, or omit to keep only current installation.",
-      );
-      console.error(
-        'Example: yarn revoke-installations <inbox-id> "installation-id1,installation-id2"',
-      );
+      console.error("Run 'yarn revoke --help' for more information");
       process.exit(1);
     }
   }
@@ -99,7 +130,7 @@ async function main() {
     console.error(
       `Error: Missing required environment variables: ${missingVars.join(", ")}`,
     );
-    console.error("Please run 'yarn gen:keys' first to generate keys.");
+    console.error("Please run 'yarn gen:keys' to generate the required keys.");
     process.exit(1);
   }
 

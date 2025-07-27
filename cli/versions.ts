@@ -3,6 +3,31 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { VersionList } from "@workers/versions";
 
+function showHelp() {
+  console.log(`
+XMTP Versions CLI - SDK version management and setup
+
+USAGE:
+  yarn versions [options]
+
+OPTIONS:
+  --clean               Clean package.json imports and node_modules before setup
+  -h, --help            Show this help message
+
+DESCRIPTION:
+  Sets up SDK version testing by creating bindings symlinks for different
+  XMTP SDK versions. This enables testing across multiple SDK versions
+  simultaneously.
+
+EXAMPLES:
+  yarn versions
+  yarn versions --clean
+  yarn versions --help
+
+For more information, see: cli/readme.md
+`);
+}
+
 function createBindingsSymlinks() {
   const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
 
@@ -73,7 +98,14 @@ function cleanPackageJson() {
 }
 
 function main() {
-  const shouldClean = process.argv.includes("--clean");
+  const args = process.argv.slice(2);
+
+  if (args.includes("--help") || args.includes("-h")) {
+    showHelp();
+    return;
+  }
+
+  const shouldClean = args.includes("--clean");
 
   if (shouldClean) {
     cleanPackageJson();

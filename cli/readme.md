@@ -1,4 +1,6 @@
-# Scripts Quick Reference
+# XMTP QA Tools CLI
+
+This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
 
 ## Overview
 
@@ -11,81 +13,157 @@
 | `gen.ts`      | Data generator       | Generate test data and inboxes               |
 | `bot.ts`      | Bot launcher         | Launch interactive bots from bots/ directory |
 
-## CLI Command Structure
+## Quick start
 
+```bash
+# Test functionality
+yarn test functional --env dev
+
+# Send messages
+yarn send --address 0x1234... --env dev
+
+# Run bots
+yarn bot echo --env dev
+
+# Generate test data
+yarn gen --count 500 --envs local
+
+# Manage versions
+yarn versions --clean
+
+# Revoke installations
+yarn revoke <inbox-id>
 ```
-yarn cli <type> <name> [options]
+
+## CLI Commands
+
+### Core Commands
+
+| Command             | Description                     | Help                   |
+| ------------------- | ------------------------------- | ---------------------- |
+| `yarn test <suite>` | Run test suites                 | `yarn test --help`     |
+| `yarn send`         | Send messages and test delivery | `yarn send --help`     |
+| `yarn bot <name>`   | Run interactive bots            | `yarn bot --help`      |
+| `yarn gen`          | Generate test inboxes and keys  | `yarn gen --help`      |
+| `yarn versions`     | Manage SDK versions             | `yarn versions --help` |
+| `yarn revoke <id>`  | Revoke installations            | `yarn revoke --help`   |
+
+### Test Suites
+
+```bash
+# Core functionality
+yarn test functional     # Complete functional suite
+yarn test convos         # Direct message tests
+yarn test groups         # Group conversation tests
+
+# Performance & scale
+yarn test performance    # Core performance metrics
+yarn test large          # Large group testing
+yarn test delivery       # Message delivery reliability
+yarn test bench          # Benchmarking suite
+
+# Cross-platform & compatibility
+yarn test browser        # Playwright browser automation
+yarn test agents         # Live bot monitoring
+
+# Network & reliability
+yarn test networkchaos   # Network partition tolerance
+yarn test other          # Security, spam detection, rate limiting
+yarn test forks          # Git commit-based testing
 ```
 
-### Types
+### Environment Options
 
-- `bot` - Interactive bots with watch mode
-- `script` - One-time utility scripts
-- `test` - Test suites with retry logic
+- **`local`**: Local XMTP network for development
+- **`dev`**: Development XMTP network (default)
+- **`production`**: Production XMTP network
 
 ### Common Options
 
 ```bash
---debug                 # File logging
---no-fail              # Exit 0 on failure
---attempts 3       # Retry limit
---parallel             # Parallel execution
---versions 3           # Use 3 SDK versions
---env production       # Set XMTP_ENV
+--env <environment>    # Set XMTP environment
+--debug               # Enable file logging
+--no-fail             # Exit with success code even on failures
+--help, -h            # Show help for any command
 ```
 
-## SDK Version Management
+## Examples
+
+### Development Testing
 
 ```bash
-# Full setup
-yarn versions
+# Quick functionality test
+yarn test convos --env dev
 
-# Clean first
-yarn versions
+# Full functional suite with debugging
+yarn test functional --env dev --debug --no-fail
+
+# Send test messages
+yarn send --address 0x1234... --env dev --users 10
 ```
 
-## Log Files
-
-Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
+### Production Monitoring
 
 ```bash
---debug                # File only
+# Live monitoring
+yarn test agents --env production --no-fail --debug
+
+# Performance benchmarking
+yarn test performance --env production --debug
+
+# Large group testing
+yarn test large --env production --no-fail --debug
 ```
 
-## Functional Testing
+### Multi-Version Testing
 
 ```bash
-# Multi-version testing
-yarn test functional --versions 3 --no-fail --debug
+# Version compatibility testing
+yarn test functional --versions 3 --debug
+
+# Setup version testing
+yarn versions --clean
 ```
 
-## send Testing
+## Key Generation and Setup
 
 ```bash
-# Local env
-yarn send --address 0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b --env dev --users 200
+# Generate test data
+yarn gen --count 500 --envs local
 
-yarn send --agent gm --env dev --users 200
+# Preset commands
+yarn update:local      # Generate 500 inboxes for local testing
+yarn update:prod       # Generate inboxes for production testing
 ```
 
-## Bot Management
+## Monitoring and Analysis
 
 ```bash
-# Launch available bots
-yarn bot echo --env dev
-yarn bot key-check
+# Log analysis
+yarn ansi:clean        # Clean raw logs
+yarn ansi:forks        # Clean fork logs
+
+# Interactive testing
+yarn ui                # Vitest UI
 ```
 
-## Data Generation
+## Getting Help
+
+Each CLI command provides detailed help:
 
 ```bash
-# Generate test data and inboxes
-yarn gen
+yarn test --help       # Test command help
+yarn send --help       # Send command help
+yarn bot --help        # Bot command help
+yarn gen --help        # Generator help
+yarn versions --help   # Versions help
+yarn revoke --help     # Revoke help
 ```
 
-## Installation Management
+## Best Practices
 
-```bash
-# Revoke installations for an inbox
-yarn revoke-installations <inbox-id> [installations-to-save]
-```
+1. **Use `--help`** to see all available options for any command
+2. **Use `--debug`** for CI/CD to get proper logging
+3. **Use `--no-fail`** for monitoring to prevent CI failures
+4. **Test locally first** before running against dev/production
+5. **Use version testing** to catch compatibility issues early

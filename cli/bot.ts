@@ -11,6 +11,38 @@ interface Config {
   env: string;
 }
 
+function showHelp() {
+  console.log(`
+XMTP Bot CLI - Interactive bot management
+
+USAGE:
+  yarn bot <bot-name> [options]
+
+ARGUMENTS:
+  bot-name              Name of the bot to run (echo, key-check)
+
+OPTIONS:
+  --env <environment>   XMTP environment (local, dev, production) [default: local]
+  -h, --help           Show this help message
+
+ENVIRONMENTS:
+  local       Local XMTP network for development
+  dev         Development XMTP network (default)
+  production  Production XMTP network
+
+AVAILABLE BOTS:
+  echo        Echo bot - responds to messages
+  key-check   Key validation bot
+
+EXAMPLES:
+  yarn bot echo --env dev
+  yarn bot key-check --env local
+  yarn bot echo --help
+
+For more information, see: cli/readme.md
+`);
+}
+
 function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
@@ -22,7 +54,10 @@ function parseArgs(): Config {
     const arg = args[i];
     const nextArg = args[i + 1];
 
-    if (arg === "--env" && nextArg) {
+    if (arg === "--help" || arg === "-h") {
+      showHelp();
+      process.exit(0);
+    } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
       i++;
     } else if (!config.botName) {
@@ -38,8 +73,9 @@ async function main() {
   const config = parseArgs();
 
   if (!config.botName) {
+    console.error("Error: Bot name is required");
     console.error("Usage: yarn bot <bot-name> [--env <environment>]");
-    console.error("Available bots: echo, debug, key-check");
+    console.error("Run 'yarn bot --help' for more information");
     process.exit(1);
   }
 
@@ -51,14 +87,16 @@ async function main() {
     const botDir = join(__dirname, "..", "bots", config.botName);
 
     if (!fs.existsSync(botDir)) {
-      console.error(
-        `Bot '${config.botName}' not found. Available bots: echo, debug, key-check`,
-      );
+      console.error(`Error: Bot '${config.botName}' not found`);
+      console.error("Available bots: echo, key-check");
+      console.error("Run 'yarn bot --help' for more information");
       process.exit(1);
     }
 
     if (!fs.existsSync(botPath)) {
-      console.error(`Bot '${config.botName}' index.ts not found at ${botPath}`);
+      console.error(
+        `Error: Bot '${config.botName}' index.ts not found at ${botPath}`,
+      );
       process.exit(1);
     }
 
