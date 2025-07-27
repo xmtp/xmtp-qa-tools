@@ -38,4 +38,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Delivery (${{ matrix.test }}, ${{ matrix.env }})'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

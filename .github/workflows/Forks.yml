@@ -14,6 +14,7 @@ jobs:
     env:
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_ENV: local
     steps:
       - uses: actions/checkout@v4
 
@@ -47,4 +48,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "Forks"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Forks'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
