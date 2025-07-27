@@ -235,7 +235,7 @@ export function parseTestName(testName: string): ParsedTestName {
     metricName,
     metricDescription,
     testNameExtracted,
-    operationType: parseInt(members) >= 5 ? "group" : "core",
+    operationType: parseInt(members) > 5 ? "group" : "core",
     operationName,
     members,
   };
