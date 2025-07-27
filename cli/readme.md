@@ -2,17 +2,6 @@
 
 This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
 
-## Overview
-
-| Script        | Purpose              | Use Case                                     |
-| ------------- | -------------------- | -------------------------------------------- |
-| `test.ts`     | Test runner          | Run tests with retry logic                   |
-| `versions.ts` | SDK manager          | Setup multiple SDK versions for testing      |
-| `send.ts`     | send test            | Run send tests with retry logic              |
-| `revoke.ts`   | Installation manager | Revoke XMTP installations for inboxes        |
-| `gen.ts`      | Data generator       | Generate test data and inboxes               |
-| `bot.ts`      | Bot launcher         | Launch interactive bots from bots/ directory |
-
 ## Quick start
 
 ```bash
