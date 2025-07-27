@@ -1,8 +1,8 @@
-name: Performance
-description: "verify performance "
+name: Performance Large
+description: "verify performance of large groups"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "30 * * * *" # Runs every hour at 30 minutes past (30+ min separation from Large at :00)
   workflow_dispatch:
@@ -15,9 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [5-10, 50-100]
+        size: [100-150, 200-250]
         env: [dev, production]
         cache-data: [false]
+        include:
+          - size: 100-150
+            delay_minutes: 5
+          - size: 200-250
+            delay_minutes: 15
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
