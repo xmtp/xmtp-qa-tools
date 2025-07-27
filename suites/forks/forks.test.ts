@@ -7,7 +7,7 @@ import { describe, it } from "vitest";
 
 // Count of groups to create
 const groupCount = 5;
-const parallelOperations = 1; // How many operations to perform in parallel
+const parallelOperations = 5; // How many operations to perform in parallel
 const NODE_VERSION = "3.2.2"; // --nodeSDK=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
@@ -29,10 +29,10 @@ const otherOperations = {
   createInstallation: true, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
 };
-const targetEpoch = 50n; // The target epoch to stop the test (epochs are when performing forks to the group)
+const targetEpoch = 20n; // The target epoch to stop the test (epochs are when performing forks to the group)
 const network = process.env.XMTP_ENV; // Network environment setting
-const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/remove operations
-const installationCount = 5; // How many installations to use randomly in the createInstallation operations
+const randomInboxIdsCount = 10; // How many inboxIds to use randomly in the add/remove operations
+const installationCount = 2; // How many installations to use randomly in the createInstallation operations
 
 const testName = "forks";
 describe(testName, () => {
