@@ -27,7 +27,6 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
     steps:
       - uses: actions/checkout@v4
 

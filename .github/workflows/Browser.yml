@@ -21,7 +21,6 @@ jobs:
       LOGGING_LEVEL: "off"
       LOG_LEVEL: "info"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env

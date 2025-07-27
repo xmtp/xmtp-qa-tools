@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
       REGION: ${{ vars.REGION }}
     strategy:
       fail-fast: false

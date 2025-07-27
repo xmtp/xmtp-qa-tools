@@ -21,7 +21,6 @@ jobs:
       REGION: ${{ vars.REGION }}
       LOG_LEVEL: "info"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
     steps:
       - uses: actions/checkout@v4
 
