@@ -18,7 +18,7 @@ flowchart TD
   classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
-- **[NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin tsx wrappers providing developer-friendly API
+- **[NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
 - **[Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions)**: Compiled Rust code and native bindings
 - **[libxmtp](https://github.com/xmtp/libxmtp)**: Core cryptographic and networking logic
 
@@ -26,16 +26,16 @@ flowchart TD
 
 Versions are mapped in `workers/versions.ts`:
 
-```tsx
+```typescript
 export const VersionList = [
   {
     Client: Client322,
     Conversation: Conversation322,
     Dm: Dm322,
     Group: Group322,
-    nodeSDK: "3.2.2",
-    nodeBindings: "1.3.3",
-    auto: true,
+    nodeSDK: "3.2.2", // SDK version
+    nodeBindings: "1.3.3", // Bindings version
+    auto: true, // Include in automated testing
   },
 ];
 ```
@@ -57,7 +57,7 @@ Multiple versions installed via npm aliases:
 
 `yarn versions` creates symlinks:
 
-```
+```bash
 node_modules/@xmtp/
 ├── node-sdk-3.2.2/
 │   └── node_modules/@xmtp/
@@ -81,11 +81,11 @@ If your libxmtp version is already compiled:
 2. Update mapping in `workers/versions.ts`
 3. Point any SDK to that bindings version
 
-```tsx
+```json
 {
-  nodeSDK: "3.2.2",
-  nodeBindings: "1.3.1",  // Use existing bindings
-  auto: false,               // Manual testing only
+  "nodeSDK": "3.2.2",
+  "nodeBindings": "1.3.1", // Use existing bindings
+  "auto": false // Manual testing only
 }
 ```
 
