@@ -1,5 +1,6 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
+import { createRequire } from "node:module";
 import path from "node:path";
 import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
@@ -152,6 +153,17 @@ export const logAgentDetails = async (
     },
     {},
   );
+  // Get XMTP SDK version from package.json
+  const require = createRequire(import.meta.url);
+  const packageJson = require("../package.json") as {
+    dependencies: Record<string, string>;
+  };
+  const xmtpSdkVersion = packageJson.dependencies["@xmtp/node-sdk"];
+  const bindingVersion = (
+    require("../node_modules/@xmtp/node-bindings/package.json") as {
+      version: string;
+    }
+  ).version;
 
   for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
     const firstClient = clientGroup[0];
@@ -192,7 +204,9 @@ export const logAgentDetails = async (
     console.log(`
     ✓ XMTP Client:
     • InboxId: ${inboxId}
-    • Bindings: ${Client.version}
+    • SDK: ${xmtpSdkVersion}
+    • Bindings: ${bindingVersion}
+    • Version: ${Client.version}
     • Address: ${address}
     • Conversations: ${conversations.length}
     • Installations: ${inboxState.installations.length}
@@ -203,6 +217,7 @@ export const logAgentDetails = async (
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
 };
+
 export const getDbPath = (description: string = "xmtp") => {
   //Checks if the environment is a Railway deployment
   const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";

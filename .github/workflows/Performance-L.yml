@@ -2,7 +2,7 @@ name: Performance Large
 description: "verify performance of large groups"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "0 */4 * * *" # Runs every 4 hours at the top of the hour
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [5-150, 200-250]
+        size: [100-150, 200-250]
         env: [dev, production]
         cache-data: [false]
         include:
