@@ -27,6 +27,7 @@ interface ParsedTestName {
 interface MetricTags {
   metric_type: string;
   metric_subtype: string;
+  branch?: string;
   env?: string;
   region?: string;
   sdk: string;
@@ -70,6 +71,7 @@ interface LogPayload {
   level: "error";
   service: string;
   source: string;
+  branch: string;
   message: string;
   error_count: number;
   fail_lines: number;
@@ -317,6 +319,7 @@ export async function sendDatadogLog(
     metric_subtype: "test",
     level: "error",
     service: "xmtp-qa-tools",
+    branch: branchName,
     source: "xmtp-qa-tools",
     error_count: Array.from(errorLogs).length,
     fail_lines: fail_lines.length,
