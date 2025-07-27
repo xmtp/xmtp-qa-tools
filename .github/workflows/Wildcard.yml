@@ -5,6 +5,7 @@ on:
   #pull_request:
   schedule:
     - cron: "0 0 1 1 *"
+  workflow_dispatch:
 
 jobs:
   test:
@@ -54,4 +55,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Wildcard (${{ matrix.test }}, ${{ matrix.env }})'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

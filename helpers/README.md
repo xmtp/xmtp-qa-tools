@@ -20,7 +20,6 @@ Utility modules that power the XMTP testing framework. These helpers provide the
 import {
   extractErrorLogs,
   shouldFilterOutTest,
-  workflowFailed,
 } from "@helpers/analyzer";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";

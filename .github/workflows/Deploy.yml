@@ -37,6 +37,9 @@ jobs:
     needs: detect-version-bump
     if: needs.detect-version-bump.outputs.version_changed == 'true'
     runs-on: ubuntu-latest
+    env:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -117,4 +120,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "Deploy"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Deploy'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

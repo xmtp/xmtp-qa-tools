@@ -10,6 +10,9 @@ jobs:
   validate:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,3 +36,10 @@ jobs:
         run: yarn build
       - name: Lint
         run: yarn lint
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Validate code quality'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
