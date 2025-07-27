@@ -27,7 +27,6 @@ jobs:
 
     env:
       XMTP_ENV: local
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       REGION: ${{ vars.REGION }}
 
     steps:
@@ -77,13 +76,6 @@ jobs:
         with:
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
-
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        uses: ./.github/actions/slack-notification
-        with:
-          workflow-name: 'Network Chaos Tests (${{ matrix.test_file }})'
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Tear Down Docker
         if: always()
