@@ -1,4 +1,5 @@
 name: Validate code quality
+# 🧪 TESTING: This is a test change to demonstrate workflow testing - $(date)
 
 on:
   pull_request:

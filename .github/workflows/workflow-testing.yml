@@ -57,6 +57,7 @@ jobs:
           echo "✅ Dependencies installed successfully"
           yarn build
           echo "✅ Build completed successfully"
+          echo "🧪 TESTING: Workflow testing is working! - $(date)"
           echo "✅ Ready for testing"
 
   # Conditional test jobs based on input or branch changes
