@@ -49,7 +49,8 @@ yarn test datadog                     # Datadog log analysis and monitoring
 ### Bots
 
 ```bash
-yarn bot send 5                      # send testing with 5 concurrent users
+yarn bot echo 5                      # send testing with 5 concurrent users
+yarn bot key-check --env dev          # debug bot with key-check and echo bot
 ```
 
 ### Scripts
@@ -127,8 +128,8 @@ yarn test agents --env production
 ```bash
 yarn gen:keys                          # Generates wallet and encryption keys
 yarn gen                               # Generate test inboxes
-yarn local-update                      # Generate 500 inboxes for local testing
-yarn prod-update                       # Generate 500 inboxes for dev/production
+yarn update:local                      # Generate 500 inboxes for local testing
+yarn update:dev                        # Generate 500 inboxes for dev/production
 ```
 
 ## Monitoring and Analysis

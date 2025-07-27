@@ -39,9 +39,7 @@ async function main() {
 
   if (!config.botName) {
     console.error("Usage: yarn bot <bot-name> [--env <environment>]");
-    console.error(
-      "Available bots: simple, gm-bot, send, echo, debug, key-check",
-    );
+    console.error("Available bots: echo, debug, key-check");
     process.exit(1);
   }
 
@@ -54,7 +52,7 @@ async function main() {
 
     if (!fs.existsSync(botDir)) {
       console.error(
-        `Bot '${config.botName}' not found. Available bots: simple, gm-bot, send, echo, debug, key-check`,
+        `Bot '${config.botName}' not found. Available bots: echo, debug, key-check`,
       );
       process.exit(1);
     }

@@ -12,7 +12,7 @@ You may ONLY execute the following CLI commands:
 
 - `yarn test` - Run test suites with retry logic
 - `yarn send` - Run send tests with retry logic
-- `yarn bot <bot-name>` - Launch interactive bots (simple, gm-bot, send, echo, debug, key-check)
+- `yarn bot <bot-name>` - Launch interactive bots (simple, echo, debug, key-check)
 - `yarn gen` - Generate test data and inboxes
 - `yarn revoke` - Revoke XMTP installations for inboxes
 - `yarn versions` - Setup multiple SDK versions for testing
