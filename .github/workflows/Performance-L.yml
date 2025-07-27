@@ -2,7 +2,7 @@ name: Performance Large
 description: "verify performance of large groups"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "0 */4 * * *" # Runs every 4 hours at the top of the hour
   workflow_dispatch:
