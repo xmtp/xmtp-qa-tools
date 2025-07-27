@@ -4,7 +4,7 @@ description: "verify health of the agents"
 on:
   #pull_request:
   schedule:
-    - cron: "*/10 * * * *" # Runs every 5 minutes for agents-dms
+    - cron: "*/10 * * * *" # Runs every 10 minutes for agents-dms
   workflow_dispatch:
 
 jobs:
