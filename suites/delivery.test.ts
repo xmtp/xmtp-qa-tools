@@ -28,6 +28,8 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
       MESSAGE_COUNT,
+      undefined,
+      60000, // 60s timeout
     );
 
     sendMetric("response", stats.averageEventTiming, {
