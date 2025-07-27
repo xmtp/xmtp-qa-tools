@@ -48,8 +48,7 @@ TEST SUITES:
   functional     Complete functional test suite
   convos         Direct message tests
   groups         Group conversation tests
-  performance    Core performance metrics
-  large          Large group testing (50-400 members)
+  performance    Core performance metrics and large groups  
   delivery       Message delivery reliability
   bench          Benchmarking suite
   browser        Playwright browser automation

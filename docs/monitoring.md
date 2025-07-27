@@ -10,12 +10,11 @@ Monitoring setup that tells us when things are working well and alerts us immedi
 | Delivery     |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/delivery.test.ts)          | Every 30 min  | `dev` `production` |
 | Functional   |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)              | Every 3 hours | `dev` `production` |
 | Browser      |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
-| Groups       |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/large.test.ts)                | Every 2 hours | `dev` `production` |
 | NetworkChaos |             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/NetworkChaos.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/networkchaos)          | Daily         | `local`            |
 
 Our test suite is organized into 6 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
-## 1. Performance testing
+## 1. Performance
 
 Link to test code:
 Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
@@ -47,7 +46,7 @@ Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
 
 - Operation performance in milliseconds
 
-## 2. Delivery testing
+## 2. Delivery
 
 Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 
@@ -65,9 +64,9 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 - Order percentage (correct message sequencing)
 - Recovery capability after network interruption
 
-## 3. Functional + regression testing
+## 3. Functional + regression
 
-**Purpose**: Core protocol validation including regression testing.
+**Purpose**: Core protocol validation including regression .
 
 ### Client management
 
@@ -141,12 +140,12 @@ Link to test code [../suites/functional/streams.test.ts](../suites/functional/st
 Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
 
 - `group sync performance: establish test environment by creating group with all members`
-- `group sync performance: send baseline message to group for sync performance testing`
+- `group sync performance: send baseline message to group for sync performance `
 - `group sync performance: measure performance impact of client-level conversations.sync() operation`
 - `group sync performance: measure performance impact of individual conversation.sync() operation`
 - `group sync performance: measure message retrieval performance without explicit sync`
 
-## 4. Browser testing
+## 4. Browser
 
 Link to test code [../suites/functional/browser.test.ts](../suites/functional/browser.test.ts)
 
@@ -162,7 +161,7 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 - `conversation stream for new member`
 - `new installation and message stream`
 
-## 5. Large group testing (`large.test.ts`)
+## 5. Large groups (`performance.test.ts`)
 
 **Purpose**: Validates scalability and performance at scale (50-250 members).
 

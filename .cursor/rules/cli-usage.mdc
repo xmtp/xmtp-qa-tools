@@ -47,9 +47,7 @@ yarn test groups         # Group conversation tests
 
 # Performance & scale
 yarn test performance    # Core performance metrics
-yarn test large          # Large group testing
 yarn test delivery       # Message delivery reliability
-yarn test bench          # Benchmarking suite
 
 # Cross-platform & compatibility
 yarn test browser        # Playwright browser automation
@@ -89,19 +87,6 @@ yarn test functional --env dev --debug --no-fail
 
 # Send test messages
 yarn send --address 0x1234... --env dev --users 10
-```
-
-### Production Monitoring
-
-```bash
-# Live monitoring
-yarn test agents --env production --no-fail --debug
-
-# Performance benchmarking
-yarn test performance --env production --debug
-
-# Large group testing
-yarn test large --env production --no-fail --debug
 ```
 
 ### Multi-Version Testing

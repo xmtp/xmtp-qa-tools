@@ -4,164 +4,90 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 
 ## Quick reference
 
-| Workflow                      | Purpose                           | Trigger                      | Key Features                                   |
-| ----------------------------- | --------------------------------- | ---------------------------- | ---------------------------------------------- |
-| **AgentExamplesRepo.yml**     | Validate XMTP agent examples      | Hourly, manual               | Clone, build and verify example agent startup  |
-| **Deploy.yml**                | Handle Railway deployments        | Version bump in package.json | Auto PR creation and merging for deployments   |
-| **Agents.yml**                | Monitor production agent health   | Hourly, manual               | Verify agent responsiveness and uptime         |
-| **Gm.yml**                    | Test GM bot functionality         | Every 30 minutes, manual     | Verify GM bot responses and performance        |
-| **Delivery.yml**              | Test message delivery reliability | Every 30 minutes, manual     | Verify cross-environment message delivery      |
-| **Large.yml**                 | Test large scale operations       | Every 2 hours, manual        | Test large group operations and scalability    |
-| **Performance.yml**           | Measure protocol performance      | Every 30 minutes, manual     | Benchmark operation timing and scalability     |
-| **Groupsend.yml**             | Group send testing                | PR to main, manual           | Test group membership changes under send       |
-| **PackageCompatibility.yml**  | Verify package compatibility      | On main branch push, manual  | Test with different Node versions and managers |
-| **upload-installations.yml**  | Backup installation data          | Daily, manual                | Upload keys and installation data as artifacts |
-| **validate-code-quality.yml** | Check code quality                | On non-main branch pushes    | Enforce code quality standards                 |
+| Workflow                               | Purpose                         | Trigger                      | Key Features                                   |
+| -------------------------------------- | ------------------------------- | ---------------------------- | ---------------------------------------------- |
+| **Performance.yml**                    | Measure protocol performance    | Every 30 minutes, manual     | Benchmark operation timing and scalability     |
+| **Performance-L.yml**                  | Large group performance testing | Every 4 hours, manual        | Test with 100-250 member groups                |
+| **AgentHealth.yml**                    | Monitor agent health            | Every 10 minutes, manual     | Verify agent responsiveness and uptime         |
+| **Agents.yml**                         | Production agent testing        | Every 4 hours, manual        | Test tagged and untagged agents                |
+| **Browser.yml**                        | Browser compatibility testing   | Every 30 minutes, manual     | Verify browser support and functionality       |
+| **Delivery.yml**                       | Message delivery reliability    | Every 30 minutes, manual     | Test message loss with 200 streams             |
+| **Functional.yml**                     | Library version compatibility   | Every 6 hours, manual        | Test last 3 versions of the library            |
+| **Forks.yml**                          | Fork testing on local network   | Every 12 hours, manual       | Daily forks testing with local XMTP network    |
+| **NetworkChaos.yml**                   | Network chaos testing           | Daily, manual                | Test network partitions and failures           |
+| **Wildcard.yml**                       | Manual PR verification          | Yearly, manual               | Flexible testing for PRs and manual runs       |
+| **Deploy.yml**                         | Railway deployment automation   | Version bump in package.json | Auto PR creation and merging for deployments   |
+| **validate-package-compatibility.yml** | Package compatibility testing   | Every 5 hours, manual        | Test with different Node versions and managers |
+| **validate-agents-repo.yml**           | Agent examples validation       | Hourly, manual               | Clone, build and verify example agent startup  |
+| **validate-qa-repo.yml**               | QA tools validation             | Every 5 hours, manual        | Validate QA tools functionality                |
+| **validate-code-quality.yml**          | Code quality enforcement        | On PR to main, manual        | Enforce code quality standards                 |
 
-## Usage
+## Custom Actions
 
-GitHub Actions workflows run automatically based on their triggers, but can also be manually initiated from the "Actions" tab in the GitHub repository.
+### xmtp-test-setup
 
-```bash
-# To trigger a workflow manually via GitHub CLI:
-gh workflow run workflow-name.yml
+Sets up the Node.js environment with caching and installs dependencies for XMTP tests.
 
-# Example - run the agent health check:
-gh workflow run Agents.yml
-```
+**Inputs:**
 
-## Agent health monitoring
+- `cache-data`: Whether to cache .data and .env files (default: false)
+- `test-name`: Name of the test for notifications and artifact naming (required)
+- `env`: Test environment (dev, production, etc.) (default: dev)
 
-The `Agents.yml` workflow monitors the health and responsiveness of XMTP agents in production.
+**Features:**
 
-```yaml
-name: Agents
-on:
-  schedule:
-    - cron: "10 * * * *" # Runs at 10 minutes past each hour
-  workflow_dispatch:
+- Sets up Node.js with version from `.node-version`
+- Caches dependencies using yarn.lock hash
+- Optionally caches test data (.data and .env files)
+- Installs project dependencies
 
-jobs:
-  test:
-    # ...
-    steps:
-      # ...
-      - name: Run tests with retry
-        run: yarn test agents
-```
+### xmtp-test-cleanup
 
-**Key features:**
+Handles notifications and artifact uploads for XMTP tests.
 
-- Regular execution to ensure agent uptime
-- Automatic artifact upload for diagnostics
-- Test reporting via Datadog metrics
-- Response time tracking
+**Inputs:**
 
-## Deployment automation
+- `test-name`: Name of the test for notifications and artifact naming (required)
+- `env`: Test environment (dev, production, etc.) (required)
+- `retention-days`: Number of days to retain artifacts (default: 90)
+- `save-to-cache`: Whether to save .data and .env back to cache (default: false)
 
-The `Deploy.yml` workflow automates Railway deployments when version bumps are detected.
+**Features:**
 
-```yaml
-name: Railway Deploy
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "package.json"
+- Uploads logs and environment files as artifacts
+- Uploads installation databases (.data directory)
+- Optionally saves processed data back to cache
+- Provides detailed cache status information
 
-jobs:
-  detect-version-bump:
-    # ...
-  create-and-merge-pr:
-    # ...
-    steps:
-      # ...
-      - name: Create deployment branch
-        # ...
-      - name: Create PR
-        # ...
-      - name: Auto-merge PR
-        # ...
-```
+## Workflow Details
 
-**Key features:**
+### Performance Testing
 
-- Automatic version detection
-- Deployment PR creation
-- Auto-merge capability
-- Deployment metadata tracking
+- **Performance.yml**: Tests with 5-10 and 50-100 member groups every 30 minutes
+- **Performance-L.yml**: Tests with 100-150 and 200-250 member groups every 4 hours
+- Both use dev and production environments with DataDog monitoring
 
-## Installation data backup
+### Agent Testing
 
-The `upload-installations.yml` workflow backs up installation data and keys.
+- **AgentHealth.yml**: Monitors agent health every 10 minutes using agents-dms tests
+- **Agents.yml**: Tests both tagged and untagged agents every 4 hours
+- All agent tests include Slack notifications on failure
 
-```yaml
-name: Upload Installations & Keys
-on:
-  schedule:
-    - cron: "0 0 * * *" # Run at midnight UTC every day
-  workflow_dispatch:
-```
+### Network and Chaos Testing
 
-**Key features:**
+- **NetworkChaos.yml**: Runs daily chaos tests against 4-node XMTP-go cluster
+- Tests include: smoketests, DM duplicate prevention, group partitions, node blackholes, key rotation
+- **Forks.yml**: Tests fork scenarios on local network every 12 hours
 
-- Daily automated backups
-- Key and installation data preservation
-- Long-term artifact retention (365 days)
-- Environment variable capture
+### Validation Workflows
 
-## Configuration
+- **validate-package-compatibility.yml**: Tests with Node 20-23 and npm/yarn/yarn1/bun
+- **validate-agents-repo.yml**: Validates XMTP agent examples hourly
+- **validate-qa-repo.yml**: Validates QA tools every 5 hours
+- **validate-code-quality.yml**: Enforces code quality on PRs to main
 
-Workflows are configured using GitHub repository secrets and variables:
+### Deployment
 
-### Secrets
+- **Deploy.yml**: Automatically creates and merges PRs for Railway deployments when package.json version changes
 
-- `DATADOG_API_KEY`: API key for metrics reporting
-- `SLACK_BOT_TOKEN`: Slack bot token for notifications
-- `WALLET_KEY`: XMTP wallet private key for testing
-- `ENCRYPTION_KEY`: XMTP encryption key for database
-
-## Monitoring and reporting
-
-Workflow results are accessible through multiple channels:
-
-1. **GitHub Actions UI**: Real-time execution logs and status
-2. **Artifacts**: Uploaded test reports and debug information
-3. **Datadog**: Performance metrics and test results
-4. **Slack Notifications**: Real-time workflow status updates
-5. **Email Notifications**: Configurable for workflow failures
-
-### Test Categories
-
-The workflows are organized into logical categories:
-
-- **Automated Tests**: `Agents.yml`, `Gm.yml` - Continuous monitoring
-- **Metrics Tests**: `Delivery.yml`, `Large.yml`, `Performance.yml` - Performance measurement
-- **send Tests**: `Groupsend.yml` - High-load scenario testing
-- **Infrastructure**: `Deploy.yml`, `PackageCompatibility.yml` - Deployment and compatibility
-
-## Best practices
-
-When working with these workflows, consider the following best practices:
-
-1. **Secrets management**: Never hardcode secrets; use GitHub's secrets store
-2. **Workflow isolation**: Design workflows to run independently
-3. **Artifact cleanup**: Configure appropriate retention policies
-4. **Concurrency limits**: Avoid excessive parallel executions
-5. **Timeout configuration**: Set appropriate timeouts to prevent hung jobs
-
-## Recent changes
-
-The workflows have been updated to use standardized naming conventions:
-
-| Old Name            | New Name          | Test Command            |
-| ------------------- | ----------------- | ----------------------- |
-| `at_agents.yml`     | `Agents.yml`      | `yarn test agents`      |
-| `at_gm.yml`         | `Gm.yml`          | `yarn test gm`          |
-| `m_delivery.yml`    | `Delivery.yml`    | `yarn test delivery`    |
-| `m_performance.yml` | `Performance.yml` | `yarn test performance` |
-| `m_large.yml`       | `Large.yml`       | `yarn test large`       |
-| `sendGroup.yml`     | `Groupsend.yml`   | `yarn test group`       |
-
-All test suites now follow consistent kebab-case naming conventions for better organization and maintainability.
+All workflows include comprehensive error handling, artifact uploads, and Slack notifications for failures.

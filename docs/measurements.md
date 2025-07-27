@@ -160,4 +160,4 @@ Sync performance and storage requirements for inboxes with varying numbers of ex
 | Large      | 365            | 208          | 31              | 95                 |
 | XL         | 376            | 410          | 59              | 179                |
 
-- For large groups measurments see [bench](./suites/bench/README.md)
+> For large groups measurments see [bench](./suites/bench/README.md)
