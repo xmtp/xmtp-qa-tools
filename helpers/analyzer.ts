@@ -3,6 +3,9 @@ import path from "path";
 import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
+// TODO: Test linter error - unused variable for testing Slack notifications
+const unusedTestVariable = "this will trigger a linter error";
+
 // Known test issues for tracking
 export const PATTERNS = {
   KNOWN_ISSUES: [
