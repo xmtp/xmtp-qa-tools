@@ -48,11 +48,6 @@ yarn test datadog                     # Datadog log analysis and monitoring
 
 ### Bots
 
-```bash
-yarn bot gm-bot --env dev                        # GM greeting bot
-yarn bot send 5 --env dev                      # send testing with 5 concurrent users
-```
-
 ### Scripts
 
 ```bash

@@ -8,9 +8,7 @@ Test bots for the XMTP protocol that validate functionality, automate testing sc
 | -------------- | ------------------- | ------------------------------------------------------- |
 | **debug/**     | Debug information   | Detailed conversation analysis, member info, sync state |
 | **echo/**      | Echo bot            | Simple message echo with prefix                         |
-| **gm-bot/**    | Greeting bot        | Responds with "gm" to any message                       |
 | **key-check/** | Key package checker | Check XMTP key package status, commands                 |
-| **simple/**    | Diagnostics bot     | Identity info, conversation details                     |
 
 ## Usage
 
@@ -21,14 +19,8 @@ yarn bot debug --env dev
 # Run the echo bot
 yarn bot echo --env dev
 
-# Run the GM bot
-yarn bot gm-bot
-
 # Run the key-check bot
 yarn bot key-check
-
-# Run the simple diagnostics bot
-yarn bot simple
 
 # Run the send test bot with 5 workers
 yarn bot send 5
