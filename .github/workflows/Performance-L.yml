@@ -1,24 +1,24 @@
-name: Large
-description: "verify performance of the group streams"
+name: Performance Large
+description: "verify performance of large groups"
 
 on:
+  pull_request:
   schedule:
-    - cron: "0 */4 * * *" # Runs every 4 hours at top of hour
+    - cron: "0 */4 * * *" # Runs every 4 hours at the top of the hour
   workflow_dispatch:
 
 jobs:
   test:
-    timeout-minutes: 30
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        test: [large]
+        test: [performance]
+        size: [5-150, 200-250]
         env: [dev, production]
-        size: [10-50, 100-150, 200-250]
+        cache-data: [false]
         include:
-          - size: 10-50
-            delay_minutes: 0
           - size: 100-150
             delay_minutes: 5
           - size: 200-250
@@ -26,15 +26,17 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
+      GH_CACHE: true
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
-
-      - name: Delay execution to spread batch runs
-        if: ${{ matrix.delay_minutes > 0 }}
-        run: sleep $((${{ matrix.delay_minutes }} * 60))
+        with:
+          cache-data: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
         run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
@@ -43,9 +45,10 @@ jobs:
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
+          save-to-cache: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
+        run: yarn workflow-failure "Performance"
