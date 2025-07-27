@@ -16,8 +16,8 @@ describe(testName, () => {
   let dm: Dm; // The DM conversation
 
   it("setup", async () => {
-    workers = await getWorkers(["bob", "alice"]);
-    creator = workers.get("bob")!;
+    workers = await getWorkers(["random1", "alice"]);
+    creator = workers.get("random1")!;
     receiver = workers.get("alice")!;
     dm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
@@ -36,8 +36,8 @@ describe(testName, () => {
 
   it("create fresh random1 client and verify DM accessibility", async () => {
     // Create fresh random1 client
-    const freshbob = await getWorkers(["bob-fresh"]);
-    const random1Fresh = freshbob.get("bob", "fresh")!;
+    const freshrandom1 = await getWorkers(["random1-fresh"]);
+    const random1Fresh = freshrandom1.get("random1", "fresh")!;
 
     const testDm = (await random1Fresh.client.conversations.newDm(
       receiver.client.inboxId,
