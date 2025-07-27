@@ -81,7 +81,7 @@ If your libxmtp version is already compiled:
 2. Update mapping in `workers/versions.ts`
 3. Point any SDK to that bindings version
 
-```json
+```bash
 {
   "nodeSDK": "3.2.2",
   "nodeBindings": "1.3.1", // Use existing bindings
