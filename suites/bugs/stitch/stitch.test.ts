@@ -26,10 +26,13 @@ describe(testName, () => {
   });
 
   it("verify message delivery works after DM stitching", async () => {
-    // Send a test message and verify delivery
-    const verifyResult = await verifyMessageStream(dm, [receiver]);
-
-    // Verify message delivery works after stitching
+    const verifyResult = await verifyMessageStream(
+      dm,
+      [receiver],
+      1,
+      undefined,
+      2000,
+    );
     expect(verifyResult.allReceived).toBe(true);
     expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
   });
@@ -38,14 +41,17 @@ describe(testName, () => {
     // Create fresh random1 client
     const freshrandom1 = await getWorkers(["random1-fresh"]);
     const random1Fresh = freshrandom1.get("random1", "fresh")!;
-
     const testDm = (await random1Fresh.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
     console.log(testDm.id);
-    await receiver.client.conversations.syncAll();
-    await random1Fresh.client.conversations.syncAll();
-    const verifyResult = await verifyMessageStream(testDm, [receiver]);
+    const verifyResult = await verifyMessageStream(
+      testDm,
+      [receiver],
+      1,
+      undefined,
+      2000,
+    );
 
     // Verify message delivery works after stitching
     expect(verifyResult.allReceived).toBe(true);
