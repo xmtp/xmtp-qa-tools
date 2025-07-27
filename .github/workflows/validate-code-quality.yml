@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main
+      - workflow-testing
+  push:
+    branches:
+      - workflow-testing
   workflow_dispatch:
 
 jobs:

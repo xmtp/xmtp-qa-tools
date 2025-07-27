@@ -1,0 +1,139 @@
+name: Workflow Testing
+description: "Safe workflow testing environment - runs on workflow-testing branch"
+
+on:
+  push:
+    branches:
+      - workflow-testing
+  pull_request:
+    branches:
+      - workflow-testing
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of test to run'
+        required: true
+        default: 'functional'
+        type: choice
+        options:
+        - functional
+        - performance
+        - agents
+        - browser
+        - delivery
+        - all
+      environment:
+        description: 'Test environment'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - production
+
+jobs:
+  # Quick validation job that always runs
+  validate:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+          key: deps-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            deps-
+      - name: Install dependencies
+        run: yarn
+      - name: Quick validation
+        run: |
+          echo "✅ Dependencies installed successfully"
+          yarn build
+          echo "✅ Build completed successfully"
+          echo "✅ Ready for testing"
+
+  # Conditional test jobs based on input or branch changes
+  functional-test:
+    if: ${{ github.event.inputs.test_type == 'functional' || github.event.inputs.test_type == 'all' || github.event_name != 'workflow_dispatch' }}
+    needs: validate
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev]
+        test: [functional]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/xmtp-test-setup
+        with:
+          test-name: "workflow-testing-${{ matrix.test }}"
+          env: ${{ matrix.env }}
+      - name: Run test
+        run: yarn test:${{ matrix.test }} --env ${{ matrix.env }}
+      - uses: ./.github/actions/xmtp-test-cleanup
+        if: always()
+        with:
+          test-name: "workflow-testing-${{ matrix.test }}"
+          env: ${{ matrix.env }}
+
+  performance-test:
+    if: ${{ github.event.inputs.test_type == 'performance' || github.event.inputs.test_type == 'all' }}
+    needs: validate
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [dev]
+        test: [performance]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/xmtp-test-setup
+        with:
+          test-name: "workflow-testing-${{ matrix.test }}"
+          env: ${{ matrix.env }}
+      - name: Run test
+        run: yarn test:${{ matrix.test }} --env ${{ matrix.env }}
+      - uses: ./.github/actions/xmtp-test-cleanup
+        if: always()
+        with:
+          test-name: "workflow-testing-${{ matrix.test }}"
+          env: ${{ matrix.env }}
+
+  # Summary job
+  test-summary:
+    if: always()
+    needs: [validate, functional-test, performance-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test Summary
+        run: |
+          echo "## Workflow Testing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validation | ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Functional Test | ${{ needs.functional-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Test | ${{ needs.performance-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.validate.result }}" == "success" ]]; then
+            echo "✅ Workflow testing completed successfully"
+          else
+            echo "❌ Workflow testing failed"
+            exit 1
+          fi
