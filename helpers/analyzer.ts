@@ -4,8 +4,7 @@ import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
 // TODO: Test build error - syntax error for testing Slack notifications
-const syntaxError = "this will cause a build failure"
-// Missing semicolon and this comment will cause a syntax error
+this is not valid javascript syntax!!!
 
 // Known test issues for tracking
 export const PATTERNS = {
