@@ -31,6 +31,40 @@ const debugLog = (...args: unknown[]) => {
   if (debugMode) console.log(...args);
 };
 
+function showHelp() {
+  console.log(`
+XMTP Generator CLI - Test inbox and key generation
+
+USAGE:
+  yarn gen [options]
+
+OPTIONS:
+  --count <number>       Number of inboxes to generate [default: 200]
+  --envs <environments>  Comma-separated environments (local,dev,production) [default: local]
+  --installations <num>  Number of installations per inbox [default: 2]
+  --debug               Enable debug logging
+  --clean               Clean up logs/ and .data/ directories before running
+  -h, --help            Show this help message
+
+ENVIRONMENTS:
+  local       Local XMTP network for development
+  dev         Development XMTP network
+  production  Production XMTP network
+
+EXAMPLES:
+  yarn gen --count 500 --envs local
+  yarn gen --envs local,dev --installations 3
+  yarn gen --clean --debug
+  yarn gen --help
+
+PRESET COMMANDS:
+  yarn update:local      Generate 500 inboxes for local testing
+  yarn update:prod       Generate inboxes for production testing
+
+For more information, see: cli/readme.md
+`);
+}
+
 // Cleanup function
 function cleanup() {
   console.log("🧹 Cleaning up logs/ and .data/ directories...");
@@ -212,12 +246,6 @@ function showFileStats(
     `   🧹 Total records removed: ${results.reduce((a, r) => a + r.removed, 0)}`,
   );
   console.log(`\n🎉 Analysis & deduplication complete!`);
-}
-
-function showHelp() {
-  console.log(
-    `\nXMTP Generator Utility\n\nUsage:\n  yarn gen [options]\n\nOptions:\n  --count <number>                Total number of accounts to ensure exist\n  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)\n  --installations <number>        Number of installations per account per network (default: 2)\n  --installations <numbers>       Comma-separated installations (e.g., "1,2,5")\n  --no-cleanup                    Skip cleanup of logs/ and .data/ directories\n  --debug                         Enable debug logging\n  --help                          Show this help message\n\nExamples:\n  yarn gen --count 100 --envs local,production --installations 2\n  yarn gen --installations 1,2,5 --envs local\n  yarn gen --no-cleanup --debug\n`,
-  );
 }
 
 async function checkInstallations(client: Client, installationCount: number) {

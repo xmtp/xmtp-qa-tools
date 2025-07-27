@@ -158,7 +158,7 @@ yarn test functional --no-fail --debug
 
 ### Resources
 
-- CLI: Command line interface for testing - see [section](./docs/cli-usage.md)
+- CLI: Command line interface for testing - see [section](./cli/readme.md)
 - Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Networks: Work in [local](/dev/) or [multinode](/dev/multinode) network

@@ -20,6 +20,54 @@ interface TestOptions {
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
 
+function showHelp() {
+  console.log(`
+XMTP Test CLI - Test suite execution and management
+
+USAGE:
+  yarn test <test-suite> [options]
+
+ARGUMENTS:
+  test-suite             Test suite name (functional, convos, groups, etc.)
+
+OPTIONS:
+  --env <environment>    XMTP environment (local, dev, production) [default: local]
+  --attempts <number>    Maximum retry attempts [default: 3]
+  --debug               Enable file logging (saves to logs/ directory)
+  --no-fail             Exit with success code even on failures
+  --parallel            Run tests in parallel (default: consecutive)
+  --versions <count>    Use multiple SDK versions for testing
+  -h, --help            Show this help message
+
+ENVIRONMENTS:
+  local       Local XMTP network for development
+  dev         Development XMTP network (default)
+  production  Production XMTP network
+
+TEST SUITES:
+  functional     Complete functional test suite
+  convos         Direct message tests
+  groups         Group conversation tests
+  performance    Core performance metrics
+  large          Large group testing (50-400 members)
+  delivery       Message delivery reliability
+  bench          Benchmarking suite
+  browser        Playwright browser automation
+  agents         Live bot monitoring
+  networkchaos   Network partition tolerance
+  other          Security, spam detection, rate limiting
+  forks          Git commit-based testing
+
+EXAMPLES:
+  yarn test functional --env dev --debug
+  yarn test convos --no-fail --parallel
+  yarn test performance --versions 3
+  yarn test --help
+
+For more information, see: cli/readme.md
+`);
+}
+
 /**
  * Runs ansi:forks and optionally reports fork count
  */
@@ -176,6 +224,11 @@ function parseTestArgs(args: string[]): {
     const nextArg = currentArgs[i + 1];
 
     switch (arg) {
+      case "--help":
+      case "-h":
+        showHelp();
+        process.exit(0);
+        break;
       case "--attempts":
         if (nextArg) {
           const val = parseInt(nextArg, 10);

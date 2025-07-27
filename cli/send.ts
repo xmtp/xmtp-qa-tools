@@ -32,6 +32,40 @@ interface Config {
   waitForResponse: boolean;
 }
 
+function showHelp() {
+  console.log(`
+XMTP Send CLI - Message sending and testing
+
+USAGE:
+  yarn send [options]
+
+OPTIONS:
+  --address <address>     Target wallet address to send messages to
+  --env <environment>     XMTP environment (local, dev, production) [default: local]
+  --users <count>         Number of users to simulate [default: 5]
+  --tresshold <percent>   Success threshold percentage [default: 95]
+  --wait                  Wait for responses from target
+  -h, --help             Show this help message
+
+ENVIRONMENTS:
+  local       Local XMTP network for development
+  dev         Development XMTP network (default)
+  production  Production XMTP network
+
+EXAMPLES:
+  yarn send --address 0x1234... --env dev --users 10
+  yarn send --address 0x1234... --env production --users 500 --wait
+  yarn send --help
+
+ENVIRONMENT VARIABLES:
+  ADDRESS               Default target address
+  XMTP_ENV             Default environment
+  LOGGING_LEVEL        Logging level
+
+For more information, see: cli/readme.md
+`);
+}
+
 function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
@@ -48,23 +82,22 @@ function parseArgs(): Config {
     const arg = args[i];
     const nextArg = args[i + 1];
 
-    if (arg === "--address" && nextArg) {
+    if (arg === "--help" || arg === "-h") {
+      showHelp();
+      process.exit(0);
+    } else if (arg === "--address" && nextArg) {
       config.address = nextArg;
       i++;
-    }
-    if (arg === "--env" && nextArg) {
+    } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
       i++;
-    }
-    if (arg === "--users" && nextArg) {
+    } else if (arg === "--users" && nextArg) {
       config.userCount = parseInt(nextArg, 10);
       i++;
-    }
-    if (arg === "--tresshold" && nextArg) {
+    } else if (arg === "--tresshold" && nextArg) {
       config.tresshold = parseInt(nextArg, 10);
       i++;
-    }
-    if (arg === "--wait") {
+    } else if (arg === "--wait") {
       config.waitForResponse = true;
     }
   }
