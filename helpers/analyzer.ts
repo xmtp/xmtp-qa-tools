@@ -3,8 +3,9 @@ import path from "path";
 import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
-// TODO: Test linter error - unused variable for testing Slack notifications
-const unusedTestVariable = "this will trigger a linter error";
+// TODO: Test build error - syntax error for testing Slack notifications
+const syntaxError = "this will cause a build failure"
+// Missing semicolon and this comment will cause a syntax error
 
 // Known test issues for tracking
 export const PATTERNS = {
