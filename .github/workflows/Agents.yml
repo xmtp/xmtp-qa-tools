@@ -36,7 +36,10 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "agents-tagged"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Agents (tagged, ${{ matrix.env }})'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
   agents-untagged:
     timeout-minutes: 10
@@ -67,4 +70,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "agents-untagged"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Agents (untagged, ${{ matrix.env }})'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

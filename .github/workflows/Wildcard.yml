@@ -22,6 +22,7 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       REGION: ${{ vars.REGION }}
+      XMTP_ENV: ${{ vars.XMTP_ENV }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,4 +55,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn workflow-failure "${{ matrix.test }}"
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Wildcard (${{ matrix.test }}, ${{ matrix.env }})'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

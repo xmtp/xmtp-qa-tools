@@ -9,6 +9,10 @@ jobs:
   validate:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_ENV: ${{ vars.XMTP_ENV }}
+      REGION: ${{ vars.REGION }}
 
     steps:
       - name: Checkout repository
@@ -50,3 +54,10 @@ jobs:
             echo "Error: Agent did not reach 'Waiting for messages...' state"
             exit 1
           fi
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: 'Validate agents repo'
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
