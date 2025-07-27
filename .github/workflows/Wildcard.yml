@@ -5,6 +5,7 @@ on:
   #pull_request:
   schedule:
     - cron: "0 0 1 1 *"
+  workflow_dispatch:
 
 jobs:
   test:
@@ -40,6 +41,12 @@ jobs:
 
       # - name: Run script version
       #   run: yarn versions
+
+      - name: TEST SLACK NOTIFICATION - Force Failure
+        run: |
+          echo "🧪 Testing Slack notification by forcing an error..."
+          echo "This step will intentionally fail to test the notification system."
+          exit 1
 
       - name: Run tests
         run: yarn test ${{ matrix.test }} --env ${{ matrix.env }}
