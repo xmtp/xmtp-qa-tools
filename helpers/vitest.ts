@@ -53,19 +53,16 @@ export const setupTestLifecycle = ({
     const { testNameExtracted, operationType, operationName, members } =
       parseTestName(testName);
 
-    const values: DurationMetricTags = {
-      metric_type: "operation",
-      metric_subtype: operationType,
-      operation: operationName,
-      test: testNameExtracted,
-      GH_CACHE: process.env.GH_CACHE || "false",
-      sdk: sdk || getVersions()[0].nodeSDK,
-      installations: members,
-      members,
-    };
-
     if (sendMetrics && sendDurationMetrics) {
-      sendMetric("duration", duration, values);
+      sendMetric("duration", duration, {
+        metric_type: "operation",
+        metric_subtype: operationType,
+        operation: operationName,
+        test: testNameExtracted,
+        sdk: sdk || getVersions()[0].nodeSDK,
+        installations: members,
+        members,
+      } as DurationMetricTags);
     }
 
     // Network stats handling for performance tests
@@ -102,5 +99,11 @@ export const setupTestLifecycle = ({
 
   afterAll(async () => {
     await flushMetrics();
+    sendMetric("duration", performance.now() - start, {
+      metric_type: "test",
+      metric_subtype: "duration",
+      test: testName,
+      sdk: sdk || getVersions()[0].nodeSDK,
+    });
   });
 };

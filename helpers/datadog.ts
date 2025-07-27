@@ -30,7 +30,6 @@ interface MetricTags {
   env?: string;
   region?: string;
   sdk: string;
-  GH_CACHE?: string;
   operation?: string;
   test?: string;
   country_iso_code?: string;
