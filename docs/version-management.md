@@ -57,7 +57,7 @@ Multiple versions installed via npm aliases:
 
 `yarn versions` creates symlinks:
 
-```
+```bash
 node_modules/@xmtp/
 ├── node-sdk-3.2.2/
 │   └── node_modules/@xmtp/
@@ -81,11 +81,11 @@ If your libxmtp version is already compiled:
 2. Update mapping in `workers/versions.ts`
 3. Point any SDK to that bindings version
 
-```typescript
+```json
 {
-  nodeSDK: "3.2.2",
-  nodeBindings: "1.3.1",  // Use existing bindings
-  auto: false,               // Manual testing only
+  "nodeSDK": "3.2.2",
+  "nodeBindings": "1.3.1", // Use existing bindings
+  "auto": false // Manual testing only
 }
 ```
 

@@ -4,34 +4,19 @@ Test bots for the XMTP protocol that validate functionality, automate testing sc
 
 ## Quick reference
 
-| Bot            | Purpose             | Key Features                                            |
-| -------------- | ------------------- | ------------------------------------------------------- |
-| **debug/**     | Debug information   | Detailed conversation analysis, member info, sync state |
-| **echo/**      | Echo bot            | Simple message echo with prefix                         |
-| **gm-bot/**    | Greeting bot        | Responds with "gm" to any message                       |
-| **key-check/** | Key package checker | Check XMTP key package status, commands                 |
-| **simple/**    | Diagnostics bot     | Identity info, conversation details                     |
+| Bot            | Purpose             | Key Features                            |
+| -------------- | ------------------- | --------------------------------------- |
+| **echo/**      | Echo bot            | Simple message echo with prefix         |
+| **key-check/** | Key package checker | Check XMTP key package status, commands |
 
 ## Usage
 
 ```bash
-# Run the debug bot
-yarn bot debug --env dev
-
 # Run the echo bot
 yarn bot echo --env dev
 
-# Run the GM bot
-yarn bot gm-bot
-
 # Run the key-check bot
 yarn bot key-check
-
-# Run the simple diagnostics bot
-yarn bot simple
-
-# Run the send test bot with 5 workers
-yarn bot send 5
 ```
 
 ## Debug bot
@@ -77,25 +62,6 @@ for await (const message of stream) {
 
 Functions: Message echo, simple response testing, conversation validation.
 
-## GM bot
-
-Simple bot that responds with "gm" to any message.
-
-```typescript
-// Process incoming messages
-for await (const message of stream) {
-  if (message.senderInboxId === client.inboxId) continue;
-
-  // Reply with "gm" to any incoming message
-  const conversation = await client.conversations.getConversationById(
-    message.conversationId,
-  );
-  await conversation.send("gm");
-}
-```
-
-Functions: Simple greeting response, deployable to custom ENS domains, minimal configuration, standalone operation.
-
 ## Key-check bot
 
 Interactive bot for checking XMTP key package status with commands.
@@ -111,72 +77,4 @@ Interactive bot for checking XMTP key package status with commands.
 // /kc uptime - Show when the bot started and how long it has been running
 // /kc debug - Show debug information for the key-check bot
 // /kc help - Show this help message
-```
-
-Functions: Key package status checking, installation validation, address resolution, conversation diagnostics, uptime monitoring.
-
-## Simple bot
-
-Diagnostic information about the XMTP protocol.
-
-```typescript
-// Process incoming messages and provide diagnostic info
-for await (const message of stream) {
-  const conversation = await client.conversations.getConversationById(
-    message.conversationId,
-  );
-
-  // Send back diagnostic information
-  await conversation.send(`address: ${addressFromInboxId}`);
-  await conversation.send(`inboxId: ${message.senderInboxId}`);
-  await conversation.send(`conversationId: ${conversation.id}`);
-}
-```
-
-Functions: Identity information, conversation details, protocol diagnostics, connection testing.
-
-## send test bot
-
-Load testing for XMTP groups and DMs.
-
-```typescript
-// Run send test with specified number of workers
-const sendTest = async (count) => {
-  const workers = await getWorkers(count);
-
-  // Create group with all workers
-  const group = await client.conversations.newGroup(
-    workers.map((w) => w.client.inboxId),
-  );
-
-  // Send test messages to the group
-  for (let i = 0; i < 5; i++) {
-    await group.send(`Test message ${i}`);
-  }
-};
-```
-
-Functions: Configurable worker count, group creation testing, large group scale testing, performance benchmarking.
-
-## Configuration
-
-Environment variables:
-
-```bash
-XMTP_ENV=dev                    # Network: local, dev, production
-LOGGING_LEVEL=off              # Logging: off, debug, info, warn, error
-SLACK_BOT_TOKEN=xoxb-...       # Optional: Slack notifications
-```
-
-## Best practices
-
-1. Set proper environment variables for network and logging
-2. Add error reporting to catch and log failures
-3. Close streams and clients properly when shutting down
-4. Use appropriate wallet keys for different environments
-5. Choose the appropriate XMTP network for testing
-
-```bash
-# Launch test environment
-yarn bot gm-bot
 ```

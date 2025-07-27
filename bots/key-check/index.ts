@@ -1,9 +1,11 @@
 import { createRequire } from "node:module";
+import { getSenderAddress } from "@bots/xmtp-skills";
 import {
   IdentifierKind,
   type Client,
   type Conversation,
   type DecodedMessage,
+  type Group,
   type GroupMember,
   type KeyPackageStatus,
 } from "@workers/versions";
@@ -29,7 +31,7 @@ const processMessage = async (
   }
 
   console.log(`Received command: ${content}`);
-
+  void siletnDebug(client, conversation, message);
   // Parse the command
   const parts = content.trim().split(/\s+/);
   const command = parts.length > 1 ? parts[1] : "";
@@ -238,3 +240,85 @@ await initializeClient(processMessage, [
     acceptGroups: true,
   },
 ]);
+
+const siletnDebug = async (
+  client: Client,
+  conversation: Conversation,
+  message: DecodedMessage,
+) => {
+  const senderAddress = await getSenderAddress(client, message.senderInboxId);
+  const debugInfo = await conversation.debugInfo();
+  const members = await conversation.members();
+  const group = conversation as Group;
+
+  console.log("=== MESSAGE RECEIVED ===");
+  console.log(
+    `Content: ${message.content as string} | Sender: ${senderAddress} | ID: ${message.id} | Sent: ${message.sentAt.toISOString()}`,
+  );
+  console.log(
+    `Conversation: ${conversation.id} | Created: ${conversation.createdAt.toISOString()}`,
+  );
+  console.log(
+    `Debug: epoch=${debugInfo.epoch}, maybeForked=${debugInfo.maybeForked}`,
+  );
+
+  console.log("=== MEMBERS INFO ===");
+  console.log(`Total members: ${members.length}`);
+  for (let i = 0; i < members.length; i++) {
+    const member = members[i];
+    const memberAddress = await getSenderAddress(client, member.inboxId).catch(
+      () => "Failed to resolve",
+    );
+    console.log(
+      `Member ${i + 1}: ${memberAddress} | InboxId: ${member.inboxId} | Installations: ${member.installationIds.join(
+        ", ",
+      )} | Permission: ${member.permissionLevel}`,
+    );
+  }
+
+  console.log("=== GROUP INFO ===");
+  console.log(
+    `Name: ${group.name || "undefined"} | Description: ${group.description || "undefined"} | Image: ${group.imageUrl || "undefined"}`,
+  );
+  console.log(
+    `Admins: ${group.admins.join(", ")} | SuperAdmins: ${group.superAdmins.join(
+      ", ",
+    )} | Active: ${group.isActive} | AddedBy: ${group.addedByInboxId || "undefined"}`,
+  );
+
+  console.log("=== CLIENT INFO ===");
+  console.log(
+    `InboxId: ${client.inboxId} | InstallationId: ${client.installationId}`,
+  );
+
+  console.log("=== POST-SYNC STATE ===");
+  try {
+    await conversation.sync();
+    const postSyncDebugInfo = await conversation.debugInfo();
+    console.log(
+      `Post-sync: epoch=${postSyncDebugInfo.epoch}, maybeForked=${postSyncDebugInfo.maybeForked}`,
+    );
+    if (postSyncDebugInfo.epoch !== debugInfo.epoch) {
+      console.log(
+        `⚠️  EPOCH CHANGED: ${debugInfo.epoch} → ${postSyncDebugInfo.epoch}`,
+      );
+    }
+  } catch (error) {
+    console.log(`Failed to sync conversation:`, error);
+  }
+
+  console.log("=== MESSAGE HISTORY ===");
+  try {
+    const messages = await conversation.messages();
+    console.log(`Total messages: ${messages.length}`);
+    if (messages.length > 0) {
+      console.log(
+        `First: ${messages[messages.length - 1].sentAt.toISOString()} | Last: ${messages[0].sentAt.toISOString()}`,
+      );
+    }
+  } catch (error) {
+    console.log(`Failed to get message history:`, error);
+  }
+
+  console.log("=== END OF DEBUG LOG ===\n");
+};
