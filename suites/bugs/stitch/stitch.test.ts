@@ -43,7 +43,8 @@ describe(testName, () => {
       receiver.client.inboxId,
     )) as Dm;
     console.log(testDm.id);
-
+    await receiver.client.conversations.syncAll();
+    await random1Fresh.client.conversations.syncAll();
     const verifyResult = await verifyMessageStream(testDm, [receiver]);
 
     // Verify message delivery works after stitching

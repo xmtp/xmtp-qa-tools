@@ -281,6 +281,7 @@ export async function verifyMessageStream(
   receivers: Worker[],
   count = 1,
   messageTemplate: string = "gm-{i}-{randomSuffix}",
+  customTimeout?: number,
 ): Promise<VerifyStreamResult> {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
   receivers.forEach((worker) => {
@@ -290,7 +291,7 @@ export async function verifyMessageStream(
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
-      r.worker.collectMessages(group.id, count, ["text"], 60000), // 60s timeout
+      r.worker.collectMessages(group.id, count, ["text"], customTimeout),
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
