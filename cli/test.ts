@@ -404,8 +404,6 @@ async function runTest(
       const command =
         `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-      console.info(`Executing: ${command}`);
-
       const { exitCode } = await runCommand(command, env, logger);
 
       // Close logger for this attempt
@@ -427,8 +425,8 @@ async function runTest(
           return;
         }
 
-        console.info(`Found ${errorLogs.size} unique error patterns:`);
-        console.error(errorLogs);
+        console.info(`Found ${fail_lines.length} failed lines:`);
+        console.error(fail_lines);
 
         if (Array.isArray(fail_lines) && fail_lines.length === 0) {
           console.info(`No fail_lines logs found - skipping analysis`);
@@ -525,7 +523,6 @@ async function main(): Promise<void> {
           const command =
             `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-          console.info(`\nExecuting: ${command}`);
           execSync(command, { stdio: "inherit", env });
         } else {
           // Use retry mechanism with logger
