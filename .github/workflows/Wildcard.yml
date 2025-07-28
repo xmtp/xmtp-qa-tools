@@ -19,10 +19,6 @@ jobs:
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [dms] # health check
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-
-      REGION: ${{ vars.REGION }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +29,11 @@ jobs:
           echo ""
           echo "Full IP info:"
           curl -s https://ipinfo.io/json | jq .
+
+      - name: Force failure for Slack notification test
+        run: |
+          echo "Forcing failure to test Slack notification"
+          exit 1
 
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
