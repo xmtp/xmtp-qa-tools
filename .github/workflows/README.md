@@ -8,9 +8,9 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | -------------------------------------- | ------------------------------- | ---------------------------- | ---------------------------------------------- |
 | **Performance.yml**                    | Measure protocol performance    | Every 30 minutes, manual     | Benchmark operation timing and scalability     |
 | **Performance-L.yml**                  | Large group performance testing | Every 4 hours, manual        | Test with 100-250 member groups                |
-| **AgentHealth.yml**                    | Monitor agent health            | Every 10 minutes, manual     | Verify agent responsiveness and uptime         |
+| **AgentHealth.yml**                    | Monitor agent health            | Every 10 minutes, manual     | agent responsiveness and uptime                |
 | **Agents.yml**                         | Production agent testing        | Every 4 hours, manual        | Test tagged and untagged agents                |
-| **Browser.yml**                        | Browser compatibility testing   | Every 30 minutes, manual     | Verify browser support and functionality       |
+| **Browser.yml**                        | Browser compatibility testing   | Every 30 minutes, manual     | browser support and functionality              |
 | **Delivery.yml**                       | Message delivery reliability    | Every 30 minutes, manual     | Test message loss with 200 streams             |
 | **Functional.yml**                     | Library version compatibility   | Every 6 hours, manual        | Test last 3 versions of the library            |
 | **Forks.yml**                          | Fork testing on local network   | Every 12 hours, manual       | Daily forks testing with local XMTP network    |
@@ -18,7 +18,7 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **Wildcard.yml**                       | Manual PR verification          | Yearly, manual               | Flexible testing for PRs and manual runs       |
 | **Deploy.yml**                         | Railway deployment automation   | Version bump in package.json | Auto PR creation and merging for deployments   |
 | **validate-package-compatibility.yml** | Package compatibility testing   | Every 5 hours, manual        | Test with different Node versions and managers |
-| **validate-agents-repo.yml**           | Agent examples validation       | Hourly, manual               | Clone, build and verify example agent startup  |
+| **validate-agents-repo.yml**           | Agent examples validation       | Hourly, manual               | Clone, build and example agent startup         |
 | **validate-qa-repo.yml**               | QA tools validation             | Every 5 hours, manual        | Validate QA tools functionality                |
 | **validate-code-quality.yml**          | Code quality enforcement        | On PR to main, manual        | Enforce code quality standards                 |
 

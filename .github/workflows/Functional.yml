@@ -1,5 +1,5 @@
 name: Functional
-description: "verify last 3 versions of the library"
+description: "last 3 versions of the library"
 
 on:
   #ull_request:

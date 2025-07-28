@@ -71,7 +71,7 @@ worker.worker.startStream(typeofStream.MessageandResponse);
 worker.worker.endStream();
 worker.worker.endStream(typeofStream.Message);
 
-// Verify delivery
+// delivery
 const result = await verifyMessageStream(
   conversation,
   [workers.get("bob")],

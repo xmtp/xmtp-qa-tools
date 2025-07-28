@@ -107,7 +107,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it(`consent:verify group consent`, async () => {
+  it(`consent:group consent`, async () => {
     await creatorClient.preferences.setConsentStates([
       {
         entity: receiver!.client.inboxId,
@@ -179,7 +179,7 @@ describe(testName, async () => {
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
-    it(`streamMessage-${i}:verify group message`, async () => {
+    it(`streamMessage-${i}:group message`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getAllButCreator(),

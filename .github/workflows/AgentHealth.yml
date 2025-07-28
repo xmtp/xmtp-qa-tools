@@ -1,5 +1,5 @@
 name: Agent health
-description: "verify health of the agents"
+description: "health of the agents"
 
 on:
   #pull_request:
@@ -41,5 +41,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agent health (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Agent health (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

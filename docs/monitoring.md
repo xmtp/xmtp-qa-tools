@@ -37,7 +37,7 @@ Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
 - `groupsync-{i}: sync a large group of {i} members`
 - `updateName-{i}: update the group name`
 - `send-{i}: measure sending a gm in a group of {i} members`
-- `stream-{i}: verify group message`
+- `stream-{i}: group message`
 - `addMember-{i}: add members to a group`
 - `removeMembers-{i}: remove a participant from a group`
 
@@ -53,9 +53,9 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 
 ### Core tests:
 
-- `stream: verify message delivery and order accuracy using streams`
-- `poll: verify message delivery and order accuracy using polling`
-- `recovery: verify message recovery after stream interruption`
+- `stream: message delivery and order accuracy using streams`
+- `poll: message delivery and order accuracy using polling`
+- `recovery: message recovery after stream interruption`
 
 **Measurements**:
 
@@ -87,12 +87,12 @@ Link to test code [../suites/functional/codec.test.ts](../suites/functional/code
 
 Link to test code [../suites/functional/debug.test.ts](../suites/functional/debug.test.ts)
 
-- `debug:  retrieve group debug information`
-- `debug:  track epoch changes during group operations`
-- `debug:  verify epoch consistency across members`
-- `debug:  detect potential forks in group state`
-- `debug:  verify debug info after metadata changes`
-- `debug:  verify debug info structure completeness`
+- `retrieve group debug information`
+- `track epoch changes during group operations`
+- `epoch consistency across members`
+- `detect potential forks in group state`
+- `debug info after metadata changes`
+- `debug info structure completeness`
 
 ### Installation management
 
@@ -104,45 +104,43 @@ Link to test code [../suites/functional/installations.test.ts](../suites/functio
 
 Link to test code [../suites/functional/metadata.test.ts](../suites/functional/metadata.test.ts)
 
-- `metadata:  update group name and verify persistence`
-- `metadata:  update group description and verify persistence`
-- `metadata:  update group image URL`
-- `metadata:  verify metadata propagation to other members`
-- `metadata:  handle empty and special characters in metadata`
-- `metadata:  verify metadata state after group operations`
+- `update group name and persistence`
+- `update group description and persistence`
+- `update group image URL`
+- `metadata propagation to other members`
+- `handle empty and special characters in metadata`
+- `metadata state after group operations`
 
 ### Permission system
 
 Link to test code [../suites/functional/permissions.test.ts](../suites/functional/permissions.test.ts)
 
-- `permissions:  add and remove admin permissions`
-- `permissions:  add and remove super admin permissions`
-- `permissions:  verify admin list management`
-- `permissions:  admin can remove other members`
-- `permissions:  super admin can manage other admins`
+- `add and remove admin permissions`
+- `add and remove super admin permissions`
+- `admin list management`
+- `admin can remove other members`
+- `super admin can manage other admins`
 
 ### Stream validation
 
 Link to test code [../suites/functional/streams.test.ts](../suites/functional/streams.test.ts)
 
-- `membership:  verify member addition notifications`
-- `consent:  verify consent state changes for direct messages`
-- `consent:  verify consent state changes in groups`
-- `messages:  verify direct message delivery`
-- `messages:  verify group message delivery`
-- `metadata:  verify group metadata updates`
-- `conversations:  verify new conversation notifications`
-- `members:  verify member addition to existing group`
+- `member addition notifications`
+- `consent state changes for direct messages`
+- `consent state changes in groups`
+- `direct message delivery`
+- `group message delivery`
+- `group metadata updates`
+- `new conversation notifications`
+- `member addition to existing group`
 
 ### Sync
 
 Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
 
-- `group sync performance: establish test environment by creating group with all members`
-- `group sync performance: send baseline message to group for sync performance `
-- `group sync performance: measure performance impact of client-level conversations.sync() operation`
-- `group sync performance: measure performance impact of individual conversation.sync() operation`
-- `group sync performance: measure message retrieval performance without explicit sync`
+- `sync: client.conversations.sync()`
+- `group sync: individual conversation.sync()`
+- `syncall: client.conversations.sync()`
 
 ## 4. Browser
 
@@ -187,11 +185,11 @@ Link to test code [../suites/networkchaos](../suites/networkchaos)
 ### Core resilience tests:
 
 - `smoketests: basic connectivity and functionality validation`
-- `dm-duplicate-prevention: verify duplicate message prevention in unreliable networks`
+- `dm-duplicate-prevention: duplicate message prevention in unreliable networks`
 - `group-partition-delayedreceive: test message delivery after network partition recovery`
 - `node-blackhole: validate behavior when nodes become unreachable`
 - `networkchaos: comprehensive network disruption scenarios`
-- `group-reconciliation: verify group state consistency after network issues`
+- `group-reconciliation: group state consistency after network issues`
 - `group-client-partition: test client behavior during network partitions`
 - `keyrotation: validate key rotation under network send`
 

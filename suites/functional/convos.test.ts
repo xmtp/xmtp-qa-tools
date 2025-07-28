@@ -61,7 +61,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("stream:receive and verify message delivery in DM conversation", async () => {
+  it("stream:receive and message delivery in DM conversation", async () => {
     const verifyResult = await verifyMessageStream(convo, [
       workers.get("randomguy")!,
     ]);
@@ -78,7 +78,7 @@ describe(testName, async () => {
       console.log("Group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     });
-    it(`sync group with ${i} members and verify member count`, async () => {
+    it(`sync group with ${i} members and member count`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(i + 1);

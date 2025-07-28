@@ -1,5 +1,5 @@
 name: Agents
-description: "verify performance of the library in the production network"
+description: "performance of the library in the production network"
 
 on:
   schedule:
@@ -38,7 +38,7 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agents (tagged, ${{ matrix.env }})'
+          workflow-name: "Agents (tagged, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
   agents-untagged:
@@ -72,5 +72,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agents (untagged, ${{ matrix.env }})'
+          workflow-name: "Agents (untagged, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

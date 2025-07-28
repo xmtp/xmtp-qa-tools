@@ -1,5 +1,5 @@
 name: Browser
-description: "verify browser support"
+description: "browser support"
 
 on:
   schedule:
@@ -40,5 +40,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Browser (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Browser (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

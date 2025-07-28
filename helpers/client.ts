@@ -471,7 +471,7 @@ export const appendToEnv = (key: string, value: string): void => {
     fs.writeFileSync(envPath, envContent);
     console.debug(`[appendToEnv] Successfully wrote to file`);
 
-    // Verify the write
+    // the write
     const verifyContent = fs.readFileSync(envPath, "utf8");
     const hasOurKey = verifyContent.includes(`${key}=`);
     console.debug(

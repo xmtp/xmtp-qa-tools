@@ -201,7 +201,7 @@ workers.getReceiver().worker.endStream(typeofStream.Message);
 #### Message Streams
 
 ```typescript
-// Verify message delivery with custom template
+// message delivery with custom template
 const verifyResult = await verifyMessageStream(
   conversation,
   [workers.get("bob")], // receivers
@@ -218,7 +218,7 @@ expect(verifyResult.averageEventTiming).toBeLessThan(500);
 #### Group Metadata Streams
 
 ```typescript
-// Verify group metadata updates (name changes)
+// group metadata updates (name changes)
 const verifyResult = await verifyMetadataStream(
   group,
   workers.getAllButCreator(), // receivers
@@ -231,7 +231,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Membership Streams
 
 ```typescript
-// Verify member addition notifications
+// member addition notifications
 const verifyResult = await verifyMembershipStream(
   group,
   workers.getAllButCreator(), // receivers
@@ -243,7 +243,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Conversation Streams
 
 ```typescript
-// Verify new conversation creation notifications
+// new conversation creation notifications
 const verifyResult = await verifyConversationStream(
   workers.getCreator(), // initiator
   [workers.getReceiver()], // receivers
@@ -254,7 +254,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Consent Streams
 
 ```typescript
-// Verify consent state change notifications
+// consent state change notifications
 const verifyResult = await verifyConsentStream(
   workers.getCreator(), // initiator
   workers.getReceiver(), // receiver
@@ -265,7 +265,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Bot Response Streams
 
 ```typescript
-// Verify bot response timing
+// bot response timing
 const verifyResult = await verifyAgentMessageStream(
   conversation,
   [workers.getReceiver()], // receivers
@@ -704,7 +704,7 @@ workers.getReceiver().worker.endStream(typeofStream.Message);
 #### Message Streams
 
 ```typescript
-// Verify message delivery with custom template
+// message delivery with custom template
 const verifyResult = await verifyMessageStream(
   conversation,
   [workers.get("bob")], // receivers
@@ -721,7 +721,7 @@ expect(verifyResult.averageEventTiming).toBeLessThan(500);
 #### Group Metadata Streams
 
 ```typescript
-// Verify group metadata updates (name changes)
+// group metadata updates (name changes)
 const verifyResult = await verifyMetadataStream(
   group,
   workers.getAllButCreator(), // receivers
@@ -734,7 +734,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Membership Streams
 
 ```typescript
-// Verify member addition notifications
+// member addition notifications
 const verifyResult = await verifyMembershipStream(
   group,
   workers.getAllButCreator(), // receivers
@@ -746,7 +746,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Conversation Streams
 
 ```typescript
-// Verify new conversation creation notifications
+// new conversation creation notifications
 const verifyResult = await verifyConversationStream(
   workers.getCreator(), // initiator
   [workers.getReceiver()], // receivers
@@ -757,7 +757,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Consent Streams
 
 ```typescript
-// Verify consent state change notifications
+// consent state change notifications
 const verifyResult = await verifyConsentStream(
   workers.getCreator(), // initiator
   workers.getReceiver(), // receiver
@@ -768,7 +768,7 @@ expect(verifyResult.allReceived).toBe(true);
 #### Bot Response Streams
 
 ```typescript
-// Verify bot response timing
+// bot response timing
 const verifyResult = await verifyAgentMessageStream(
   conversation,
   [workers.getReceiver()], // receivers

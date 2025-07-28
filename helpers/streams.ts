@@ -274,7 +274,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
 }
 
 /**
- * Specialized function to verify message streams
+ * Specialized function to message streams
  */
 export async function verifyMessageStream(
   group: Conversation,
@@ -319,7 +319,7 @@ export async function verifyMessageStream(
 }
 
 /**
- * Specialized function to verify group update streams
+ * Specialized function to group update streams
  */
 export async function verifyMetadataStream(
   group: Group,
@@ -356,7 +356,7 @@ export async function verifyMetadataStream(
 }
 
 /**
- * Specialized function to verify group membership streams
+ * Specialized function to group membership streams
  */
 export async function verifyMembershipStream(
   group: Group,
@@ -387,7 +387,7 @@ export async function verifyMembershipStream(
 }
 
 /**
- * Specialized function to verify consent streams
+ * Specialized function to consent streams
  */
 export async function verifyGroupConsentStream(
   group: Group,
@@ -415,7 +415,7 @@ export async function verifyGroupConsentStream(
   });
 }
 /**
- * Specialized function to verify consent streams
+ * Specialized function to consent streams
  */
 export async function verifyConsentStream(
   initiator: Worker,
@@ -575,7 +575,7 @@ export function calculateMessageStats(
 }
 
 /**
- * Specialized function to verify bot response streams
+ * Specialized function to bot response streams
  * Measures the time it takes for a bot to respond to a trigger message
  * Includes retry logic and fallback message count validation
  */

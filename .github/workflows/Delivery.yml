@@ -1,5 +1,5 @@
 name: Delivery
-description: "verify message loss when receiving via 200 streams"
+description: "message loss when receiving via 200 streams"
 
 on:
   schedule:
@@ -40,5 +40,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Delivery (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Delivery (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

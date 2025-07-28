@@ -24,7 +24,7 @@ describe(testName, () => {
     expect(primaryWorker).toBeDefined();
     expect(secondaryWorker).toBeDefined();
 
-    // Verify shared identity but separate storage
+    // shared identity but separate storage
     expect(primaryWorker?.client.inboxId).toBe(secondaryWorker?.client.inboxId);
     expect(primaryWorker?.dbPath).not.toBe(secondaryWorker?.dbPath);
   });
