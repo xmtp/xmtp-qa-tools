@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
