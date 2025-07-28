@@ -362,6 +362,10 @@ async function runTest(
   console.info(`Environment: ${env.XMTP_ENV || "local"}`);
 
   console.info(`Max Attempts: ${options.attempts}`);
+  console.info(`Sync Strategy: ${env.SYNC_STRATEGY}`);
+  console.info(`Batch Size: ${env.BATCH_SIZE}`);
+  console.info(`Node SDK: ${env.NODE_VERSION}`);
+  console.info(`Versions: ${env.TEST_VERSIONS}`);
   console.info(`File Logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
   console.info(
     `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
@@ -407,8 +411,6 @@ async function runTest(
 
       // Check if this was the last attempt
       if (attempt === options.attempts) {
-        console.info(`\nTest Suite Summary:`);
-        console.info(`Test Suite: ${testName}`);
         console.info(`Completed ${options.attempts} attempts`);
         console.info(`Log File: ${logger.logFileName}`);
 
@@ -416,7 +418,6 @@ async function runTest(
         const fail_lines = extractfail_lines(errorLogs);
         checkForCriticalErrors(testName, fail_lines);
 
-        console.info(`\nError Analysis:`);
         if (!errorLogs || errorLogs.size === 0) {
           console.info(`No error logs found - skipping analysis`);
           return;
