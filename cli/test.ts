@@ -352,25 +352,36 @@ async function runCommand(
     });
   });
 }
-
-async function runTest(
+function logDetails(
   testName: string,
   options: TestOptions,
   env: Record<string, string>,
-): Promise<void> {
-  console.info(`\nTest Suite: ${testName}`);
-  console.info(`Environment: ${env.XMTP_ENV || "local"}`);
-
+) {
+  console.info(`Test Suite: ${testName}`);
+  console.info(`Env: ${env.XMTP_ENV || "local"}`);
   console.info(`Max Attempts: ${options.attempts}`);
   console.info(`Sync Strategy: ${env.SYNC_STRATEGY}`);
   console.info(`Batch Size: ${env.BATCH_SIZE}`);
   console.info(`Node SDK: ${env.NODE_VERSION}`);
   console.info(`Versions: ${env.TEST_VERSIONS}`);
-  console.info(`File Logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
+  console.info(`File logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
   console.info(
     `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
   );
-
+  console.info(
+    `Report Fork Count: ${options.reportForkCount ? "Enabled" : "Disabled"}`,
+  );
+  console.info(`Parallel: ${options.parallel ? "Enabled" : "Disabled"}`);
+  console.info(
+    `Verbose Logging: ${options.verboseLogging ? "Enabled" : "Disabled"}`,
+  );
+}
+async function runTest(
+  testName: string,
+  options: TestOptions,
+  env: Record<string, string>,
+): Promise<void> {
+  logDetails(testName, options, env);
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
     console.info(`\nAttempt ${attempt} of ${options.attempts}...`);
 
