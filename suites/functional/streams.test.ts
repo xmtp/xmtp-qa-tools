@@ -22,7 +22,12 @@ describe(testName, async () => {
   setupTestLifecycle({ testName });
   let group: Group;
   let workers = await getWorkers(5);
-
+  it("conversations: new conversation stream", async () => {
+    const verifyResult = await verifyConversationStream(workers.getCreator(), [
+      workers.getReceiver(),
+    ]);
+    expect(verifyResult.allReceived).toBe(true);
+  });
   it("membership: member addition stream", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMembershipStream(
@@ -76,13 +81,6 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyResult.allReceived).toBe(true);
-  });
-
-  it("conversations: new conversation stream", async () => {
-    const verifyResult = await verifyConversationStream(workers.getCreator(), [
-      workers.getReceiver(),
-    ]);
     expect(verifyResult.allReceived).toBe(true);
   });
 
