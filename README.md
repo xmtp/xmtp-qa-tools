@@ -108,7 +108,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Schedule: Scheduled workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - Railway: Multi-region services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - Bots: Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
-  - [`key-check.eth`](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/key-check): Verify key packages
+  - [`key-check.eth`](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/key-check): key packages
   - [`hi.xmtp.eth`](https://github.com/xmtp/gm-bot): A bot that replies "gm" to all messages
 
 ## Development

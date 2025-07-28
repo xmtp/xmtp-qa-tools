@@ -16,13 +16,13 @@ describe(testName, async () => {
     // Get debug info
     const debugInfo = await group.debugInfo();
 
-    // Verify debug info structure
+    // debug info structure
     expect(debugInfo).toBeDefined();
     expect(debugInfo.epoch).toBeDefined();
     expect(typeof debugInfo.epoch).toBe("bigint");
     expect(debugInfo.epoch).toBeGreaterThan(0n);
 
-    // Verify fork detection
+    // fork detection
     expect(debugInfo.maybeForked).toBeDefined();
     expect(typeof debugInfo.maybeForked).toBe("boolean");
   });
@@ -38,11 +38,11 @@ describe(testName, async () => {
     const updatedDebugInfo = await group.debugInfo();
     const updatedEpoch = updatedDebugInfo.epoch;
 
-    // Verify epoch increased
+    // epoch increased
     expect(updatedEpoch).toBe(initialEpoch + 1n);
   });
 
-  it("debug: verify epoch consistency across members", async () => {
+  it("debug: epoch consistency across members", async () => {
     // Get debug info from all members
     const debugInfos = await Promise.all(
       workers.getAll().map(async (worker) => {
@@ -55,7 +55,7 @@ describe(testName, async () => {
       }),
     );
 
-    // Verify all members have the same epoch
+    // all members have the same epoch
     const firstEpoch = debugInfos[0].epoch;
     for (const debugInfo of debugInfos) {
       expect(debugInfo.epoch).toBe(firstEpoch);
@@ -81,7 +81,7 @@ describe(testName, async () => {
     }
   });
 
-  it("debug: verify debug info after metadata changes", async () => {
+  it("debug: debug info after metadata changes", async () => {
     const debugInfoBefore = await group.debugInfo();
 
     // Update metadata
@@ -95,18 +95,18 @@ describe(testName, async () => {
     expect(debugInfoAfterDesc.epoch).toBeGreaterThan(debugInfoAfterName.epoch);
   });
 
-  it("debug: verify debug info structure completeness", async () => {
+  it("debug: debug info structure completeness", async () => {
     const debugInfo = await group.debugInfo();
 
-    // Verify all expected properties exist
+    // all expected properties exist
     expect(debugInfo).toHaveProperty("epoch");
     expect(debugInfo).toHaveProperty("maybeForked");
 
-    // Verify epoch is a positive bigint
+    // epoch is a positive bigint
     expect(debugInfo.epoch).toBeGreaterThan(0n);
     expect(typeof debugInfo.epoch).toBe("bigint");
 
-    // Verify maybeForked is boolean
+    // maybeForked is boolean
     expect(typeof debugInfo.maybeForked).toBe("boolean");
   });
 });

@@ -30,4 +30,4 @@ yarn regression # vibe checks the new version
 
 - Remove buggy versions from all files
 - Set previous stable to `auto: true` for regression testing
-- Verify package extension bindings version matches
+- package extension bindings version matches

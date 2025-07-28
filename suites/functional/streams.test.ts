@@ -23,7 +23,7 @@ describe(testName, async () => {
   let group: Group;
   let workers = await getWorkers(5);
 
-  it("membership: verify member addition stream", async () => {
+  it("membership: member addition stream", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMembershipStream(
       group,
@@ -33,7 +33,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("consent: verify consent state changes for direct messages", async () => {
+  it("consent: consent state changes for direct messages", async () => {
     const verifyResult = await verifyConsentStream(
       workers.getCreator(),
       workers.getReceiver(),
@@ -41,7 +41,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("consent: verify consent state changes in groups", async () => {
+  it("consent: consent state changes in groups", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyGroupConsentStream(
       group,
@@ -50,7 +50,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("messages: verify direct message delivery", async () => {
+  it("messages: direct message delivery", async () => {
     const creator = workers.getCreator();
     const receiver = workers.getReceiver();
     const newDm = await creator.client.conversations.newDm(
@@ -60,7 +60,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("messages: verify group message delivery", async () => {
+  it("messages: group message delivery", async () => {
     const newGroup = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMessageStream(
       newGroup,
@@ -70,7 +70,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("metadata: verify group metadata updates", async () => {
+  it("metadata: group metadata updates", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMetadataStream(
       group,
@@ -79,14 +79,14 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("conversations: verify new conversation stream", async () => {
+  it("conversations: new conversation stream", async () => {
     const verifyResult = await verifyConversationStream(workers.getCreator(), [
       workers.getReceiver(),
     ]);
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("members: verify member addition to existing group", async () => {
+  it("members: member addition to existing group", async () => {
     const creator = workers.getCreator();
     const receiver = workers.getReceiver();
     group = (await creator.client.conversations.newGroup([

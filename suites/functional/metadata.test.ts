@@ -9,7 +9,7 @@ describe(testName, async () => {
   let workers = await getWorkers(3);
   let group: Group;
 
-  it("metadata: update group name and verify persistence", async () => {
+  it("metadata: update group name and persistence", async () => {
     group = await workers.createGroupBetweenAll();
     const originalName = group.name;
 
@@ -18,25 +18,25 @@ describe(testName, async () => {
       "Updated Group Name " + Math.random().toString(36).substring(2, 15);
     await group.updateName(newName);
 
-    // Verify immediate update
+    // immediate update
     expect(group.name).toBe(newName);
 
-    // Sync and verify persistence
+    // Sync and persistence
     await group.sync();
     expect(group.name).toBe(newName);
     expect(group.name).not.toBe(originalName);
   });
 
-  it("metadata: update group description and verify persistence", async () => {
+  it("metadata: update group description and persistence", async () => {
     const newDescription =
       "Updated group description " +
       Math.random().toString(36).substring(2, 15);
     await group.updateDescription(newDescription);
 
-    // Verify immediate update
+    // immediate update
     expect(group.description).toBe(newDescription);
 
-    // Sync and verify persistence
+    // Sync and persistence
     await group.sync();
     expect(group.description).toBe(newDescription);
   });
@@ -45,15 +45,15 @@ describe(testName, async () => {
     const imageUrl = "https://example.com/group-image.jpg";
     await group.updateImageUrl(imageUrl);
 
-    // Verify immediate update
+    // immediate update
     expect(group.imageUrl).toBe(imageUrl);
 
-    // Sync and verify persistence
+    // Sync and persistence
     await group.sync();
     expect(group.imageUrl).toBe(imageUrl);
   });
 
-  it("metadata: verify metadata propagation to other members", async () => {
+  it("metadata: metadata propagation to other members", async () => {
     const testName =
       "Propagated Name " + Math.random().toString(36).substring(2, 15);
     const testDescription =
@@ -64,7 +64,7 @@ describe(testName, async () => {
     await group.updateDescription(testDescription);
     await group.sync();
 
-    // Verify other members see updates after sync
+    // other members see updates after sync
     const otherMember = workers.getReceiver();
     await otherMember.client.conversations.sync();
     const otherMemberGroup =
@@ -94,7 +94,7 @@ describe(testName, async () => {
     expect(group.description).toBe(longDescription);
   });
 
-  it("metadata: verify metadata state after group operations", async () => {
+  it("metadata: metadata state after group operations", async () => {
     const finalName = "Final Test Name";
     const finalDescription = "Final test description";
 
@@ -106,7 +106,7 @@ describe(testName, async () => {
     const newMember = workers.getAll()[2];
     await group.addMembers([newMember.client.inboxId]);
 
-    // Verify metadata persists after operations
+    // metadata persists after operations
     expect(group.name).toBe(finalName);
     expect(group.description).toBe(finalDescription);
 

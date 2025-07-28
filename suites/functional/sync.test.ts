@@ -10,12 +10,12 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let testGroup: Group;
 
-  // Define test workers
+  // Define test workers - need more for DM test
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
   workers = await getWorkers(testWorkers);
 
-  it("group sync performance:establish test environment by creating group with all members", async () => {
-    // Create a group with all test workers
+  it("sync: client.conversations.sync()", async () => {
+    // Create a group with test workers
     const memberInboxIds = testWorkers
       .filter((name) => name !== "henry") // Exclude creator from the members list
       .map((name) => workers.get(name)!.client.inboxId);
@@ -31,118 +31,125 @@ describe(testName, async () => {
     console.log("Group created", testGroup.id);
     expect(testGroup.id).toBeDefined();
 
-    // Verify group creation
-    await testGroup.sync();
-    const members = await testGroup.members();
-    expect(members.length).toBe(testWorkers.length);
-
-    // Allow time for message to propagate to all members
-    await sleep(1000);
-  });
-
-  it("group sync performance:send baseline message to group for sync performance testing", async () => {
-    // Sync Ivy's conversations first to ensure the group is visible
-    const ivyClient = workers.get("ivy")!.client;
-    await ivyClient.conversations.sync();
-
-    const groupForIvy = (await ivyClient.conversations.getConversationById(
-      testGroup.id,
-    )) as Group;
-    expect(groupForIvy).toBeDefined();
-
-    // Ensure the group is properly synced
-    await groupForIvy.sync();
-
+    // Send a test message
     const testMessage = `Test message at ${new Date().toISOString()}`;
-    await groupForIvy.send(testMessage);
+    await testGroup.send(testMessage);
     console.log("Test message sent to group:", testMessage);
 
-    // Allow time for message to propagate to all members
+    // Allow time for message to propagate
     await sleep(1000);
-  });
 
-  it("group sync performance:measure performance impact of client-level conversations.sync() operation", async () => {
+    // Test client-level conversations.sync()
     const jackClient = workers.get("jack")!.client;
-
-    // Measure time to sync all conversations
-    const syncStartTime = performance.now();
     await jackClient.conversations.sync();
-    const syncEndTime = performance.now();
-    const syncTime = syncEndTime - syncStartTime;
 
-    console.log(`Time to sync all conversations: ${syncTime}ms`);
-
-    // Verify we can retrieve the group
+    // we can retrieve the group and messages
     const group = await jackClient.conversations.getConversationById(
       testGroup.id,
     );
     expect(group).toBeDefined();
 
-    // Ensure the group is fully synced
-    await group!.sync();
-
-    // Retrieve messages after sync
     const messages = await group!.messages();
     console.log(
       `Retrieved ${messages.length} messages after client.conversations.sync()`,
     );
     expect(messages.length).toBeGreaterThan(0);
-
-    return { syncTime, messageCount: messages.length };
   });
 
-  it("group sync performance:measure performance impact of individual conversation.sync() operation", async () => {
-    const karenClient = workers.get("karen")!.client;
-
-    // First do a more thorough client sync to make sure we have the conversation
-    await karenClient.conversations.sync();
+  it("group sync: individual conversation.sync()", async () => {
+    // Test individual conversation sync
+    const ivyClient = workers.get("ivy")!.client;
 
     // Get the group conversation
-    const group = await karenClient.conversations.getConversationById(
+    const group = await ivyClient.conversations.getConversationById(
       testGroup.id,
     );
     expect(group).toBeDefined();
 
-    // Measure time to sync just this conversation
-    const syncStartTime = performance.now();
+    // Test individual conversation sync
     await group!.sync();
-    const syncEndTime = performance.now();
-    const syncTime = syncEndTime - syncStartTime;
-
-    console.log(`Time to sync single conversation: ${syncTime}ms`);
 
     // Retrieve messages after sync
     const messages = await group!.messages();
+    console.log(
+      `Retrieved ${messages.length} messages after conversation.sync()`,
+    );
     expect(messages.length).toBeGreaterThan(0);
-
-    return { syncTime, messageCount: messages.length };
   });
 
-  it("group sync performance:measure message retrieval performance without explicit sync", async () => {
-    const larryClient = workers.get("larry")!.client;
+  it("syncall: client.conversations.sync()", async () => {
+    const henryClient = workers.get("henry")!.client;
 
-    // Do an initial sync to ensure we have the conversation
-    await larryClient.conversations.sync();
+    // Measure time to sync all conversations
+    const syncStartTime = performance.now();
+    await henryClient.conversations.sync();
+    const syncEndTime = performance.now();
+    const syncTime = syncEndTime - syncStartTime;
 
-    // Get the group conversation without any additional sync
-    const startTime = performance.now();
-    const group = await larryClient.conversations.getConversationById(
+    console.log(`Time to sync all conversations: ${syncTime}ms`);
+
+    // we can retrieve the group
+    const group = await henryClient.conversations.getConversationById(
       testGroup.id,
     );
     expect(group).toBeDefined();
 
-    // Try to retrieve messages without any sync
+    // Measure time to retrieve messages
+    const messagesStartTime = performance.now();
     const messages = await group!.messages();
-    const endTime = performance.now();
-    const retrievalTime = endTime - startTime;
+    const messagesEndTime = performance.now();
+    const messagesTime = messagesEndTime - messagesStartTime;
 
-    console.log(
-      `Time to retrieve messages without explicit sync: ${retrievalTime}ms`,
+    console.log(`Time to retrieve messages: ${messagesTime}ms`);
+    console.log(`Total sync + messages time: ${syncTime + messagesTime}ms`);
+    console.log(`Retrieved ${messages.length} messages`);
+
+    expect(messages.length).toBeGreaterThan(0);
+  });
+
+  it("dmsync: DM sync with multiple installations", async () => {
+    const senderClient = workers.get("henry")!.client;
+    const receiverClient = workers.get("ivy")!.client;
+
+    // Create first DM from installation A
+    const dm1 = await senderClient.conversations.newDm(receiverClient.inboxId);
+    const message1 = `DM1 message at ${new Date().toISOString()}`;
+    await dm1.send(message1);
+    console.log("Sent DM1:", message1);
+
+    // Create second DM from installation B (same sender, different installation)
+    const dm2 = await senderClient.conversations.newDm(receiverClient.inboxId);
+    const message2 = `DM2 message at ${new Date().toISOString()}`;
+    await dm2.send(message2);
+    console.log("Sent DM2:", message2);
+
+    // Allow time for messages to propagate
+    await sleep(1000);
+
+    // Sync on receiving side
+    const syncStartTime = performance.now();
+    await receiverClient.conversations.sync();
+    const syncEndTime = performance.now();
+    const syncTime = syncEndTime - syncStartTime;
+
+    console.log(`Time to sync DMs: ${syncTime}ms`);
+
+    // Get all conversations for receiver
+    const conversations = await receiverClient.conversations.list();
+    const dmConversations = conversations.filter(
+      (conv) => conv.id !== testGroup.id,
     );
-    console.log(`Retrieved ${messages.length} messages without explicit sync`);
 
-    // We don't expect messages here, but the API call should at least not fail
+    console.log(`Found ${dmConversations.length} DM conversations after sync`);
 
-    return { retrievalTime, messageCount: messages.length };
+    // both DMs are synced
+    expect(dmConversations.length).toBeGreaterThanOrEqual(2);
+
+    // Check messages in each DM
+    for (const dm of dmConversations.slice(0, 2)) {
+      const messages = await dm.messages();
+      console.log(`DM ${dm.id}: ${messages.length} messages`);
+      expect(messages.length).toBeGreaterThan(0);
+    }
   });
 });

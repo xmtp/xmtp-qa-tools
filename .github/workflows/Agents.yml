@@ -1,5 +1,5 @@
 name: Agents
-description: "verify performance of the library in the production network"
+description: "performance of the library in the production network"
 
 on:
   schedule:
@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-tagged ${{ matrix.env }}
-        run: yarn test agents-tagged --no-fail --debug --no-error-logs --env ${{ matrix.env }}
+        run: yarn test agents-tagged --no-fail --debug --no-datadog --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -38,7 +38,7 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agents (tagged, ${{ matrix.env }})'
+          workflow-name: "Agents (tagged, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
 
   agents-untagged:
@@ -72,5 +72,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agents (untagged, ${{ matrix.env }})'
+          workflow-name: "Agents (untagged, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

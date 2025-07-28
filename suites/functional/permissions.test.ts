@@ -42,7 +42,7 @@ describe(testName, async () => {
     expect(group.isAdmin(member.client.inboxId)).toBe(false);
   });
 
-  it("permissions: verify admin list management", async () => {
+  it("permissions: admin list management", async () => {
     const newGroup = await workers.createGroupBetweenAll();
     const member1 = workers.getReceiver();
     const member2 = workers.getCreator();

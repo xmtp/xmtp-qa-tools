@@ -1,5 +1,5 @@
 name: Performance Large
-description: "verify performance of large groups"
+description: "performance of large groups"
 
 on:
   #pull_request:

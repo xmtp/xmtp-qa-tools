@@ -76,7 +76,7 @@ describe(testName, () => {
     );
   });
 
-  it("verify message streams, membership changes, metadata updates, and epoch changes across all groups", async () => {
+  it("message streams, membership changes, metadata updates, and epoch changes across all groups", async () => {
     for (const feature of features) {
       for (const groupId of allGroups) {
         console.warn(feature, groupId);

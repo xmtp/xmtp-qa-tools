@@ -120,7 +120,7 @@ yarn test functional --size 5-10 --parallel --forks
 
 - If a command fails, suggest retry with `--no-fail` or `--attempts`
 - If permission denied, explain the restriction
-- If command not found, verify it's in the allowed list above
+- If command not found, it's in the allowed list above
 
 ## Logging
 

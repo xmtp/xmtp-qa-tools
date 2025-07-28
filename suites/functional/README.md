@@ -6,7 +6,7 @@ This test suite validates core XMTP protocol functionality including direct mess
 
 - Test DM conversation creation and message delivery
 - Validate group conversation functionality and member management
-- Verify message streaming and syncs performance
+- message streaming and syncs performance
 - Test multi-device installation and cross-device sync
 - Validate consent management and content codec handling
 
@@ -112,7 +112,7 @@ it("sync conversations across installations", async () => {
     env: XMTP_ENV,
   });
 
-  // Verify conversations sync between installations
+  // conversations sync between installations
   await client.conversations.sync();
   await installation2.conversations.sync();
 

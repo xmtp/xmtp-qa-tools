@@ -4,6 +4,11 @@ import path from "path";
 import { sendDatadogLog } from "@helpers/datadog";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
+import {
+  checkForCriticalErrors,
+  extractErrorLogs,
+  extractfail_lines,
+} from "@helpers/analyzer";
 
 /**
  * Configuration for test retry behavior and logging
@@ -16,7 +21,7 @@ interface TestOptions {
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
-  noErrorLogs: boolean; // Disable sending error logs to Datadog
+  sendToDatadog: boolean; // Disable sending error logs to Datadog
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
 
@@ -70,31 +75,29 @@ For more information, see: cli/readme.md
 /**
  * Runs ansi:forks and optionally reports fork count
  */
-function runAnsiForksAndReport(options: TestOptions): void {
-  if (options.reportForkCount) {
-    console.info("Running ansi:forks...");
-    try {
-      execSync("yarn ansi:forks", { stdio: "inherit" });
-      console.info("Finished cleaning up");
+function runAnsiForksAndReport(): void {
+  console.info("Running ansi:forks...");
+  try {
+    execSync("yarn ansi:forks", { stdio: "inherit" });
+    console.info("Finished cleaning up");
 
-      const logsDir = path.join(process.cwd(), "logs", "cleaned");
-      if (fs.existsSync(logsDir)) {
-        const forkCount = fs.readdirSync(logsDir).length;
-        console.info(`Found ${forkCount} forks in logs/cleaned`);
-        if (forkCount > 0) {
-          process.exit(1);
-        }
-        // Remove the cleaned folder if it's empty
-        if (forkCount === 0) {
-          fs.rmdirSync(logsDir);
-          console.info("Removed empty logs/cleaned directory");
-        }
-      } else {
-        console.info("No logs/cleaned directory found");
+    const logsDir = path.join(process.cwd(), "logs", "cleaned");
+    if (fs.existsSync(logsDir)) {
+      const forkCount = fs.readdirSync(logsDir).length;
+      console.info(`Found ${forkCount} forks in logs/cleaned`);
+      if (forkCount > 0) {
+        process.exit(1);
       }
-    } catch (error) {
-      console.error("Failed to run ansi:forks:", error);
+      // Remove the cleaned folder if it's empty
+      if (forkCount === 0) {
+        fs.rmdirSync(logsDir);
+        console.info("Removed empty logs/cleaned directory");
+      }
+    } else {
+      console.info("No logs/cleaned directory found");
     }
+  } catch (error) {
+    console.error("Failed to run ansi:forks:", error);
   }
 }
 
@@ -202,9 +205,9 @@ function parseTestArgs(args: string[]): {
     fileLogging: false,
     vitestArgs: [],
     noFail: false,
-    verboseLogging: true, // Show terminal output by default
+    verboseLogging: false, // Show terminal output by default
     parallel: false,
-    noErrorLogs: false,
+    sendToDatadog: true,
     reportForkCount: false, // Report fork count after ansi:forks
   };
 
@@ -251,7 +254,6 @@ function parseTestArgs(args: string[]): {
         break;
       case "--debug":
         options.fileLogging = true;
-        options.verboseLogging = false;
         env.LOGGING_LEVEL = "debug";
         break;
       case "--nodeSDK":
@@ -264,8 +266,8 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
-      case "--no-error-logs":
-        options.noErrorLogs = true;
+      case "--no-datadog":
+        options.sendToDatadog = false;
         break;
       case "--no-fail":
         options.noFail = true;
@@ -394,32 +396,40 @@ async function runTest(
       // Check if this was the last attempt
       if (attempt === options.attempts) {
         console.info(
-          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
+          `\nCompleted ${options.attempts} attempts for test suite "${testName}".`,
         );
 
-        // Run ansi:forks after all attempts completion
-        runAnsiForksAndReport(options);
+        const errorLogs = extractErrorLogs(testName);
+        const fail_lines = extractfail_lines(errorLogs);
+        checkForCriticalErrors(testName, fail_lines);
+        if (!errorLogs || errorLogs.size === 0) {
+          console.warn("No error logs, skipping");
+          return;
+        }
+
+        if (Array.isArray(fail_lines) && fail_lines.length === 0) {
+          console.warn("No fail_lines logs, skipping");
+          return;
+        }
+
+        // Handle failed attempt (only for non-final attempts)
+        if (attempt < options.attempts && exitCode !== 0) {
+          console.error(
+            `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
+          );
+        }
+        if (options.reportForkCount) {
+          runAnsiForksAndReport();
+        }
+        if (options.sendToDatadog) {
+          await sendDatadogLog(Array.from(errorLogs), fail_lines, testName);
+        }
 
         // Exit based on the last attempt's result
         if (exitCode === 0 || options.noFail) {
           process.exit(0);
         } else {
           process.exit(1);
-        }
-      }
-
-      // Handle failed attempt (only for non-final attempts)
-      if (attempt < options.attempts && exitCode !== 0) {
-        console.error(
-          `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
-        );
-
-        if (
-          options.fileLogging &&
-          !options.noErrorLogs &&
-          env.XMTP_ENV !== "local"
-        ) {
-          await sendDatadogLog(logger.logFileName, testName);
         }
       }
 
@@ -469,6 +479,7 @@ async function main(): Promise<void> {
         const { testName, options, env } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
+        // Simple run: single attempt, no file logging, no noFail flag
         const isSimpleRun =
           options.attempts === 1 && !options.fileLogging && !options.noFail;
 

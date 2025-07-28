@@ -17,10 +17,7 @@ Utility modules that power the XMTP testing framework. These helpers provide the
 ## Usage
 
 ```typescript
-import {
-  extractErrorLogs,
-  shouldFilterOutTest,
-} from "@helpers/analyzer";
+import { extractErrorLogs, shouldFilterOutTest } from "@helpers/analyzer";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
 import { setupPrettyLogs } from "@helpers/logger";
@@ -218,10 +215,10 @@ Functions: Performance monitoring, network statistics, metric aggregation, geogr
 Message streaming utilities for verifying stream functionality and message delivery.
 
 ```typescript
-// Verify conversation stream
+// conversation stream
 await verifyConversationStream(worker, expectedCount);
 
-// Verify message stream
+// message stream
 await verifyMessageStream(worker, expectedMessages);
 
 // Stream message verification with timeout

@@ -1,5 +1,5 @@
 name: Performance
-description: "verify performance "
+description: "performance "
 
 on:
   #pull_request:

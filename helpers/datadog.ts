@@ -291,27 +291,18 @@ export function flushMetrics(): Promise<void> {
 
 // Datadog log sending - optimized
 export async function sendDatadogLog(
-  logFileName: string,
+  errorLogs: string[],
+  fail_lines: string[],
   testName: string,
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
-  const errorLogs = extractErrorLogs(logFileName);
-  const fail_lines = extractfail_lines(errorLogs);
-  checkForCriticalErrors(testName, fail_lines);
   const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
   if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
     console.warn(`Slack notification skipped (branch: ${branchName})`);
     return;
   }
-
-  if (!errorLogs || errorLogs.size === 0) {
-    console.warn("No error logs, skipping");
-    return;
-  }
-
-  if (Array.isArray(fail_lines) && fail_lines.length === 0) {
-    console.warn("No fail_lines logs, skipping");
+  if (process.env.REGION === "south-america") {
     return;
   }
   const logPayload: LogPayload = {

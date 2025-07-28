@@ -34,7 +34,7 @@ const loss = Math.random() * 5; // 0-5%
 
 ### Group partition recovery
 
-- `verify group messaging with partitioning`
+- `group messaging with partitioning`
 
 ### Group state reconciliation
 
@@ -46,7 +46,7 @@ const loss = Math.random() * 5; // 0-5%
 
 ### Client partition behavior
 
-- `verify group messaging during and after client-side blackhole partition`
+- `group messaging during and after client-side blackhole partition`
 
 ### Network chaos send
 
