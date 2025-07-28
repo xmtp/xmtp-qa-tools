@@ -76,7 +76,7 @@
     "baseName": "onit.base.eth",
     "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
     "sendMessage": "hey there how are you?",
-    "live": true,
+    "live": false,
     "networks": ["production"],
     "slackChannel": "#onit-alerts",
     "respondOnTagged": true
