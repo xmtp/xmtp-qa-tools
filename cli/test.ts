@@ -81,7 +81,9 @@ function runAnsiForksAndReport(options: TestOptions): void {
       if (fs.existsSync(logsDir)) {
         const forkCount = fs.readdirSync(logsDir).length;
         console.info(`Found ${forkCount} forks in logs/cleaned`);
-
+        if (forkCount > 0) {
+          process.exit(1);
+        }
         // Remove the cleaned folder if it's empty
         if (forkCount === 0) {
           fs.rmdirSync(logsDir);
