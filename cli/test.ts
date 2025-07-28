@@ -4,6 +4,11 @@ import path from "path";
 import { sendDatadogLog } from "@helpers/datadog";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
+import {
+  checkForCriticalErrors,
+  extractErrorLogs,
+  extractfail_lines,
+} from "@helpers/analyzer";
 
 /**
  * Configuration for test retry behavior and logging
@@ -16,7 +21,7 @@ interface TestOptions {
   noFail: boolean; // Exit 0 even on failure
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
-  noErrorLogs: boolean; // Disable sending error logs to Datadog
+  sendToDatadog: boolean; // Disable sending error logs to Datadog
   reportForkCount: boolean; // Report fork count after ansi:forks
 }
 
@@ -200,9 +205,9 @@ function parseTestArgs(args: string[]): {
     fileLogging: false,
     vitestArgs: [],
     noFail: false,
-    verboseLogging: true, // Show terminal output by default
+    verboseLogging: false, // Show terminal output by default
     parallel: false,
-    noErrorLogs: false,
+    sendToDatadog: true,
     reportForkCount: false, // Report fork count after ansi:forks
   };
 
@@ -249,7 +254,6 @@ function parseTestArgs(args: string[]): {
         break;
       case "--debug":
         options.fileLogging = true;
-        options.verboseLogging = false;
         env.LOGGING_LEVEL = "debug";
         break;
       case "--nodeSDK":
@@ -262,8 +266,8 @@ function parseTestArgs(args: string[]): {
           );
         }
         break;
-      case "--no-error-logs":
-        options.noErrorLogs = true;
+      case "--no-datadog":
+        options.sendToDatadog = false;
         break;
       case "--no-fail":
         options.noFail = true;
@@ -395,9 +399,30 @@ async function runTest(
           `\nCompleted ${options.attempts} attempts for test suite "${testName}".`,
         );
 
-        // Run ansi:forks after all attempts completion
+        const errorLogs = extractErrorLogs(testName);
+        const fail_lines = extractfail_lines(errorLogs);
+        checkForCriticalErrors(testName, fail_lines);
+        if (!errorLogs || errorLogs.size === 0) {
+          console.warn("No error logs, skipping");
+          return;
+        }
+
+        if (Array.isArray(fail_lines) && fail_lines.length === 0) {
+          console.warn("No fail_lines logs, skipping");
+          return;
+        }
+
+        // Handle failed attempt (only for non-final attempts)
+        if (attempt < options.attempts && exitCode !== 0) {
+          console.error(
+            `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
+          );
+        }
         if (options.reportForkCount) {
           runAnsiForksAndReport();
+        }
+        if (options.sendToDatadog) {
+          await sendDatadogLog(Array.from(errorLogs), fail_lines, testName);
         }
 
         // Exit based on the last attempt's result
@@ -405,21 +430,6 @@ async function runTest(
           process.exit(0);
         } else {
           process.exit(1);
-        }
-      }
-
-      // Handle failed attempt (only for non-final attempts)
-      if (attempt < options.attempts && exitCode !== 0) {
-        console.error(
-          `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
-        );
-
-        if (
-          options.fileLogging &&
-          !options.noErrorLogs &&
-          env.XMTP_ENV !== "local"
-        ) {
-          await sendDatadogLog(logger.logFileName, testName);
         }
       }
 
@@ -469,6 +479,7 @@ async function main(): Promise<void> {
         const { testName, options, env } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
+        // Simple run: single attempt, no file logging, no noFail flag
         const isSimpleRun =
           options.attempts === 1 && !options.fileLogging && !options.noFail;
 
