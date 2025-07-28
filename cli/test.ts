@@ -70,31 +70,29 @@ For more information, see: cli/readme.md
 /**
  * Runs ansi:forks and optionally reports fork count
  */
-function runAnsiForksAndReport(options: TestOptions): void {
-  if (options.reportForkCount) {
-    console.info("Running ansi:forks...");
-    try {
-      execSync("yarn ansi:forks", { stdio: "inherit" });
-      console.info("Finished cleaning up");
+function runAnsiForksAndReport(): void {
+  console.info("Running ansi:forks...");
+  try {
+    execSync("yarn ansi:forks", { stdio: "inherit" });
+    console.info("Finished cleaning up");
 
-      const logsDir = path.join(process.cwd(), "logs", "cleaned");
-      if (fs.existsSync(logsDir)) {
-        const forkCount = fs.readdirSync(logsDir).length;
-        console.info(`Found ${forkCount} forks in logs/cleaned`);
-        if (forkCount > 0) {
-          process.exit(1);
-        }
-        // Remove the cleaned folder if it's empty
-        if (forkCount === 0) {
-          fs.rmdirSync(logsDir);
-          console.info("Removed empty logs/cleaned directory");
-        }
-      } else {
-        console.info("No logs/cleaned directory found");
+    const logsDir = path.join(process.cwd(), "logs", "cleaned");
+    if (fs.existsSync(logsDir)) {
+      const forkCount = fs.readdirSync(logsDir).length;
+      console.info(`Found ${forkCount} forks in logs/cleaned`);
+      if (forkCount > 0) {
+        process.exit(1);
       }
-    } catch (error) {
-      console.error("Failed to run ansi:forks:", error);
+      // Remove the cleaned folder if it's empty
+      if (forkCount === 0) {
+        fs.rmdirSync(logsDir);
+        console.info("Removed empty logs/cleaned directory");
+      }
+    } else {
+      console.info("No logs/cleaned directory found");
     }
+  } catch (error) {
+    console.error("Failed to run ansi:forks:", error);
   }
 }
 
@@ -394,11 +392,13 @@ async function runTest(
       // Check if this was the last attempt
       if (attempt === options.attempts) {
         console.info(
-          `\n✅ Completed ${options.attempts} attempts for test suite "${testName}".`,
+          `\nCompleted ${options.attempts} attempts for test suite "${testName}".`,
         );
 
         // Run ansi:forks after all attempts completion
-        runAnsiForksAndReport(options);
+        if (options.reportForkCount) {
+          runAnsiForksAndReport();
+        }
 
         // Exit based on the last attempt's result
         if (exitCode === 0 || options.noFail) {
