@@ -1,31 +1,28 @@
-name: 'Slack Notification'
-description: 'Send Slack notification for workflow status'
+name: "Slack Notification"
+description: "Send Slack notification for workflow status"
 inputs:
   workflow-name:
-    description: 'Name of the workflow'
+    description: "Name of the workflow"
     required: true
   status:
-    description: 'Status of the workflow (success, failure, cancelled)'
+    description: "Status of the workflow (success, failure, cancelled)"
     required: false
     default: ${{ job.status }}
-  slack-bot-token:
-    description: 'Slack bot token'
-    required: true
   slack-channel:
-    description: 'Slack channel to send notification to'
+    description: "Slack channel to send notification to"
     required: false
-    default: 'notify-qa-tools-test'
+    default: "notify-qa-tools-test"
   mention-user:
-    description: 'User to mention in the notification'
+    description: "User to mention in the notification"
     required: false
-    default: 'fabri'
+    default: "fabri"
   notify-on-success:
-    description: 'Whether to send notifications for successful workflows'
+    description: "Whether to send notifications for successful workflows"
     required: false
-    default: 'false'
+    default: "false"
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Send Slack notification
       shell: bash
@@ -33,16 +30,16 @@ runs:
         # Set workflow status based on input or job status
         STATUS="${{ inputs.status }}"
         NOTIFY_ON_SUCCESS="${{ inputs.notify-on-success }}"
-        
+
         if [ -z "$STATUS" ]; then
           STATUS="success"
         fi
-        
+
         if [ "$STATUS" = "success" ] && [ "$NOTIFY_ON_SUCCESS" != "true" ]; then
           echo "Skipping notification for successful workflow (notify-on-success=false)"
           exit 0
         fi
-        
+
         # Determine status emoji and message
         if [ "$STATUS" = "failure" ]; then
           EMOJI="❌"
@@ -61,25 +58,25 @@ runs:
           STATUS_TEXT="$STATUS"
           MENTION_USER="<@${{ inputs.mention-user }}>"
         fi
-        
+
         # Build the Slack message
         WORKFLOW_NAME="${{ inputs.workflow-name }}"
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        
+
         MESSAGE="*Workflow*: ${WORKFLOW_NAME} ${STATUS_TEXT} ${EMOJI} ${MENTION_USER}
         *Timestamp*: \`${TIMESTAMP}\`
         *env*: \`${XMTP_ENV:-unknown}\` | *region*: \`${REGION:-unknown}\`
         <${RUN_URL}|View run>"
-        
+
         # Send to Slack
         curl -X POST https://slack.com/api/chat.postMessage \
-          -H "Authorization: Bearer ${{ inputs.slack-bot-token }}" \
+          -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" \
           -H "Content-Type: application/json" \
           -d "{
             \"channel\": \"${{ inputs.slack-channel }}\",
             \"text\": \"${MESSAGE}\",
             \"mrkdwn\": true
           }"
-        
+
         echo "Slack notification sent for workflow: ${WORKFLOW_NAME} (${STATUS_TEXT})"

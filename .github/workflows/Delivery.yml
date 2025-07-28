@@ -20,7 +20,7 @@ jobs:
       REGION: ${{ vars.REGION }}
       DELIVERY_AMOUNT: 100
       ERROR_TRESHOLD: 90
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
@@ -40,5 +40,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Delivery (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Delivery (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

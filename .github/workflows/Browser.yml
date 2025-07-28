@@ -20,7 +20,7 @@ jobs:
       REGION: ${{ vars.REGION }}
       LOGGING_LEVEL: "off"
       LOG_LEVEL: "info"
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
@@ -40,5 +40,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Browser (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Browser (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

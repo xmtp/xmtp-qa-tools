@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "0 0 1 1 *"
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
         # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
       REGION: ${{ vars.REGION }}
     steps:
       - uses: actions/checkout@v4
@@ -57,5 +57,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Wildcard (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Wildcard (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

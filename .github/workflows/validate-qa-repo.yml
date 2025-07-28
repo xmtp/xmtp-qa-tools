@@ -13,7 +13,7 @@ jobs:
 
     env:
       REGION: ${{ vars.REGION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
 
     steps:
@@ -44,5 +44,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Validate QA repo'
+          workflow-name: "Validate QA repo"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

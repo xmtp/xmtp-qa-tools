@@ -20,7 +20,7 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       LOG_LEVEL: "info"
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -41,5 +41,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Agent health (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Agent health (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

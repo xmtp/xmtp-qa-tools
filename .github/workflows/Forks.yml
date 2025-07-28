@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REGION: ${{ vars.REGION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
       XMTP_ENV: local
     steps:
       - uses: actions/checkout@v4
@@ -50,5 +50,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Forks'
+          workflow-name: "Forks"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
