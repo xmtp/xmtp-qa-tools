@@ -23,37 +23,37 @@ const loss = Math.random() * 5; // 0-5%
 
 ## Test categories
 
-### Basic connectivity [smoketests.test.ts](smoketests.test.ts)
+### Basic connectivity
 
 - `add and remove 200ms latency between node1 and node2`
 - `block and restore traffic between node1 and node4`
 
-### DM duplicate prevention [dm-duplicate-prevention.test.ts](dm-duplicate-prevention.test.ts)
+### DM duplicate prevention
 
 - `not deliver duplicate DMs under retry and degraded network conditions`
 
-### Group partition recovery [group-partition-delayedreceive.test.ts](group-partition-delayedreceive.test.ts)
+### Group partition recovery
 
 - `verify group messaging with partitioning`
 
-### Group state reconciliation [group-reconciliation.test.ts](group-reconciliation.test.ts)
+### Group state reconciliation
 
 - `recover and sync group state after node isolation`
 
-### Node blackhole simulation [node-blackhole.test.ts](node-blackhole.test.ts)
+### Node blackhole simulation
 
 - `simulate a node blackhole in a group chat and recover cleanly`
 
-### Client partition behavior [group-client-partition.test.ts](group-client-partition.test.ts)
+### Client partition behavior
 
 - `verify group messaging during and after client-side blackhole partition`
 
-### Network chaos send [networkchaos.test.ts](networkchaos.test.ts)
+### Network chaos send
 
 - `survive sustained latency + jitter + packet loss under group message load`
 - 20 users, 60 seconds sustained chaos
 
-### Key rotation send [keyrotation.test.ts](keyrotation.test.ts)
+### Key rotation send
 
 - `handle staggered key rotations and network chaos under load`
 - 20 users, concurrent operations: message traffic, key rotation, network chaos

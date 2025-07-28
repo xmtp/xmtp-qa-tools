@@ -4,7 +4,7 @@ description: "verify last 3 versions of the library"
 on:
   #ull_request:
   schedule:
-    - cron: "25 */2 * * *" # Runs every 6 hours at 25 minutes past
+    - cron: "25 */2 * * *" # Runs every 2 hours at 25 minutes past
   workflow_dispatch:
 
 jobs:
@@ -40,5 +40,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Functional (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Functional (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
