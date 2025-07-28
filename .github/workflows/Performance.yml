@@ -29,7 +29,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
         with:
           cache-data: ${{ matrix.cache-data }}
-          test-name: ${{ matrix.test }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
@@ -40,12 +40,12 @@ jobs:
         uses: ./.github/actions/xmtp-test-cleanup
         with:
           save-to-cache: ${{ matrix.cache-data }}
-          test-name: ${{ matrix.test }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
           env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Performance (${{ matrix.test }}, ${{ matrix.env }}, ${{ matrix.size }})'
+          workflow-name: "Performance (${{ matrix.test }}, ${{ matrix.env }}, ${{ matrix.size }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
