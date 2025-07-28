@@ -354,9 +354,7 @@ function logDetails(testName: string, options: TestOptions) {
   console.info(
     `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
   );
-  console.info(
-    `Report Fork Count: ${options.reportForkCount ? "Enabled" : "Disabled"}`,
-  );
+
   console.info(`Parallel: ${options.parallel ? "Enabled" : "Disabled"}`);
   console.info(
     `Verbose Logging: ${options.verboseLogging ? "Enabled" : "Disabled"}`,
@@ -404,15 +402,15 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
 
         if (!errorLogs || errorLogs.size === 0) {
           console.info(`No error logs found - skipping analysis`);
+          console.info(`Test suite completed successfully ✅`);
           return;
-        }
-
-        console.info(`Found ${fail_lines.length} failed lines:`);
-        console.error(fail_lines);
-
-        if (Array.isArray(fail_lines) && fail_lines.length === 0) {
+        } else if (Array.isArray(fail_lines) && fail_lines.length === 0) {
           console.info(`No fail_lines logs found - skipping analysis`);
+          console.info(`Test suite completed successfully ✅`);
           return;
+        } else {
+          console.info(`Found ${fail_lines.length} failed lines:`);
+          console.error(fail_lines);
         }
 
         // Handle failed attempt (only for non-final attempts)
