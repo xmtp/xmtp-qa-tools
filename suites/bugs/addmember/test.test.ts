@@ -30,7 +30,7 @@ describe(testName, async () => {
     await group.send(receiver.inboxId);
     console.log(receiver.inboxId);
     const stream = receiver.client.conversations.stream();
-    for await (const conversation of stream) {
+    for await (const conversation of await stream) {
       if (conversation?.id === group.id) {
         console.log("Conversation", conversation.id);
         expect(conversation.id).toBe(group.id);

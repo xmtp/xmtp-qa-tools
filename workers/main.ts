@@ -680,7 +680,7 @@ export class WorkerClient extends Worker {
                 controller.abort();
               }),
           });
-          for await (const conversation of stream) {
+          for await (const conversation of await stream) {
             try {
               console.debug(
                 `Received conversation, conversationId: ${conversation?.id}`,
