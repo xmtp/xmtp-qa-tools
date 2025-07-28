@@ -2,40 +2,16 @@
 
 This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
 
-## Quick start
+## Core commands
 
-```bash
-# Test functionality
-yarn test functional --env dev
-
-# Send messages
-yarn send --address 0x1234... --env dev
-
-# Run bots
-yarn bot echo --env dev
-
-# Generate test data
-yarn gen --count 500 --envs local
-
-# Manage versions
-yarn versions --clean
-
-# Revoke installations
-yarn revoke <inbox-id>
-```
-
-## CLI Commands
-
-### Core Commands
-
-| Command             | Description                     | Help                   |
-| ------------------- | ------------------------------- | ---------------------- |
-| `yarn test <suite>` | Run test suites                 | `yarn test --help`     |
-| `yarn send`         | Send messages and test delivery | `yarn send --help`     |
-| `yarn bot <name>`   | Run interactive bots            | `yarn bot --help`      |
-| `yarn gen`          | Generate test inboxes and keys  | `yarn gen --help`      |
-| `yarn versions`     | Manage SDK versions             | `yarn versions --help` |
-| `yarn revoke <id>`  | Revoke installations            | `yarn revoke --help`   |
+| Command                                         | Description                     | Help                   |
+| ----------------------------------------------- | ------------------------------- | ---------------------- |
+| `yarn test <suite>`                             | Run test suites                 | `yarn test --help`     |
+| `yarn send --address <address> --users <count>` | Send messages and test delivery | `yarn send --help`     |
+| `yarn bot <name>`                               | Run interactive bots            | `yarn bot --help`      |
+| `yarn gen`                                      | Generate test inboxes and keys  | `yarn gen --help`      |
+| `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
+| `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
 
 ### Test Suites
 
@@ -116,9 +92,6 @@ yarn update:prod       # Generate inboxes for production testing
 # Log analysis
 yarn ansi:clean        # Clean raw logs
 yarn ansi:forks        # Clean fork logs
-
-# Interactive testing
-yarn ui                # Vitest UI
 ```
 
 ## Getting Help
@@ -133,11 +106,3 @@ yarn gen --help        # Generator help
 yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
 ```
-
-## Best Practices
-
-1. **Use `--help`** to see all available options for any command
-2. **Use `--debug`** for CI/CD to get proper logging
-3. **Use `--no-fail`** for monitoring to prevent CI failures
-4. **Test locally first** before running against dev/production
-5. **Use version testing** to catch compatibility issues early
