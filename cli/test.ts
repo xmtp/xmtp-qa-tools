@@ -178,8 +178,6 @@ async function cleanSpecificLogFile(
       // Replace the original file with the cleaned version
       await fs.promises.unlink(rawFilePath);
       await fs.promises.rename(tempPath, rawFilePath);
-
-      console.info(logFileName);
     } catch (error) {
       console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
     }
@@ -354,14 +352,42 @@ async function runCommand(
     });
   });
 }
-
+function logDetails(
+  testName: string,
+  options: TestOptions,
+  env: Record<string, string>,
+) {
+  console.info(`Test Suite: ${testName}`);
+  console.info(`Env: ${env.XMTP_ENV || "local"}`);
+  console.info(`Max Attempts: ${options.attempts}`);
+  console.info(`Sync Strategy: ${env.SYNC_STRATEGY}`);
+  console.info(`Batch Size: ${env.BATCH_SIZE}`);
+  console.info(`Node SDK: ${env.NODE_VERSION}`);
+  console.info(`Versions: ${env.TEST_VERSIONS}`);
+  console.info(`File logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
+  console.info(
+    `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
+  );
+  console.info(
+    `Report Fork Count: ${options.reportForkCount ? "Enabled" : "Disabled"}`,
+  );
+  console.info(`Parallel: ${options.parallel ? "Enabled" : "Disabled"}`);
+  console.info(
+    `Verbose Logging: ${options.verboseLogging ? "Enabled" : "Disabled"}`,
+  );
+}
 async function runTest(
   testName: string,
   options: TestOptions,
   env: Record<string, string>,
 ): Promise<void> {
+  logDetails(testName, options, env);
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
-    console.info(`Attempt ${attempt} of ${options.attempts}...`);
+    console.info(`\nAttempt ${attempt} of ${options.attempts}...`);
+
+    if (attempt > 1) {
+      console.info(`Retry delay: ${options.retryDelay} seconds`);
+    }
 
     // Create a new logger for each attempt
     const logger = createTestLogger({
@@ -382,12 +408,6 @@ async function runTest(
 
       const { exitCode } = await runCommand(command, env, logger);
 
-      if (exitCode === 0) {
-        console.info("Tests passed successfully!");
-      } else {
-        console.info("Tests failed!");
-      }
-
       // Close logger for this attempt
       logger?.close();
 
@@ -395,46 +415,56 @@ async function runTest(
 
       // Check if this was the last attempt
       if (attempt === options.attempts) {
-        console.info(
-          `\nCompleted ${options.attempts} attempts for test suite "${testName}".`,
-        );
+        console.info(`Completed ${options.attempts} attempts`);
+        console.info(`Log File: ${logger.logFileName}`);
 
         const errorLogs = extractErrorLogs(testName);
         const fail_lines = extractfail_lines(errorLogs);
         checkForCriticalErrors(testName, fail_lines);
+
         if (!errorLogs || errorLogs.size === 0) {
-          console.warn("No error logs, skipping");
+          console.info(`No error logs found - skipping analysis`);
           return;
         }
 
+        console.info(`Found ${errorLogs.size} unique error patterns:`);
+        console.error(errorLogs);
+
         if (Array.isArray(fail_lines) && fail_lines.length === 0) {
-          console.warn("No fail_lines logs, skipping");
+          console.info(`No fail_lines logs found - skipping analysis`);
           return;
         }
 
         // Handle failed attempt (only for non-final attempts)
         if (attempt < options.attempts && exitCode !== 0) {
           console.error(
-            `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
+            `\nTest suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
           );
         }
+
         if (options.reportForkCount) {
+          console.info(`\nRunning fork analysis...`);
           runAnsiForksAndReport();
         }
+
         if (options.sendToDatadog) {
+          console.info(`\nSending logs to Datadog...`);
           await sendDatadogLog(Array.from(errorLogs), fail_lines, testName);
+          console.info(`Logs sent successfully`);
         }
 
         // Exit based on the last attempt's result
         if (exitCode === 0 || options.noFail) {
+          console.info(`Test suite completed successfully ✅`);
           process.exit(0);
         } else {
+          console.info(`Test suite failed ❌`);
           process.exit(1);
         }
       }
 
       if (options.retryDelay > 0) {
-        console.info(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
+        console.info(`\nRetrying in ${options.retryDelay} seconds...`);
         Atomics.wait(
           new Int32Array(new SharedArrayBuffer(4)),
           0,
@@ -442,11 +472,11 @@ async function runTest(
           options.retryDelay * 1000,
         );
       } else {
-        console.info("\n🔄 Retrying immediately...");
+        console.info("\nRetrying immediately...");
       }
     } catch (error) {
-      console.error(`Attempt ${attempt} failed:`);
-      console.error(error);
+      console.error(`\nAttempt ${attempt} failed with exception:`);
+      console.error(`Error: ${String(error)}`);
 
       // Close logger for this attempt
       logger?.close();
@@ -485,13 +515,17 @@ async function main(): Promise<void> {
 
         if (isSimpleRun) {
           // Run test directly without logger for native terminal output
+          console.info(`\nTest Suite: ${testName}`);
+          console.info(`Environment: ${env.XMTP_ENV || "local"}`);
+          console.info(`Configuration: Simple run (direct execution)`);
+
           const defaultThreadingOptions = options.parallel
             ? "--pool=forks"
             : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
           const command =
             `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-          console.info(`Executing: ${command}`);
+          console.info(`\nExecuting: ${command}`);
           execSync(command, { stdio: "inherit", env });
         } else {
           // Use retry mechanism with logger

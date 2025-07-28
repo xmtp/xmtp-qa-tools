@@ -323,15 +323,12 @@ export function extractErrorLogs(testName: string): Set<string> {
       }
     }
 
-    console.debug(`Found ${errorLines.length} error lines`);
-
     // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
       const hasKnownPattern = PATTERNS.DEDUPE.some((pattern) =>
         errorLines[0]?.includes(pattern),
       );
       if (hasKnownPattern) {
-        console.debug("hasKnownPattern, returning empty string");
         return new Set();
       }
     }
@@ -339,7 +336,6 @@ export function extractErrorLogs(testName: string): Set<string> {
     if (errorLines.length > 0) {
       const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
-      console.debug(resultSet);
       return resultSet;
     }
   } catch (error) {

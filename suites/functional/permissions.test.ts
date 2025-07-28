@@ -9,7 +9,7 @@ describe(testName, async () => {
   let workers = await getWorkers(5);
   let group: Group;
 
-  it("permissions: add and remove admin permissions", async () => {
+  it("add and remove admin permissions", async () => {
     group = await workers.createGroupBetweenAll();
     const member = workers.getReceiver();
 
@@ -28,7 +28,7 @@ describe(testName, async () => {
     expect(group.isAdmin(member.client.inboxId)).toBe(false);
   });
 
-  it("permissions: add and remove super admin permissions", async () => {
+  it("add and remove super admin permissions", async () => {
     const member = workers.getReceiver();
 
     // Add as super admin
@@ -42,7 +42,7 @@ describe(testName, async () => {
     expect(group.isAdmin(member.client.inboxId)).toBe(false);
   });
 
-  it("permissions: admin list management", async () => {
+  it("admin list management", async () => {
     const newGroup = await workers.createGroupBetweenAll();
     const member1 = workers.getReceiver();
     const member2 = workers.getCreator();
@@ -58,7 +58,7 @@ describe(testName, async () => {
     expect(superAdmins).not.toContain(member1.client.inboxId);
   });
 
-  it("permissions: admin can remove other members", async () => {
+  it("admin can remove other members", async () => {
     const newGroup = await workers.createGroupBetweenAll();
     const targetMember = workers.getReceiver();
 
@@ -72,7 +72,7 @@ describe(testName, async () => {
     expect(finalMembers.length).toBe(initialMembers.length - 1);
   });
 
-  it("permissions: super admin can manage other admins", async () => {
+  it("super admin can manage other admins", async () => {
     const superAdmin = workers.getReceiver();
     const regularAdmin = workers.getAll()[3];
 
