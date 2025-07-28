@@ -63,9 +63,9 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 - Order percentage (correct message sequencing)
 - Recovery capability after network interruption
 
-## 3. Functional + regression
+## 3. Regression
 
-**Purpose**: Core protocol validation including regression .
+**Purpose**: Core protocol validation including regression with 3 last versions of the SDK and bindings.
 
 ### Client management
 
