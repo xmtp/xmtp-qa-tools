@@ -136,163 +136,160 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  if (workers.getLength() > BATCH_SIZE[0]) {
-    for (const i of BATCH_SIZE) {
-      const creatorClient = workers.getCreator().client;
-      it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getInboxIds(i + 1);
-        allMembers = allMembersWithExtra.slice(0, i);
+  for (const i of BATCH_SIZE) {
+    const creatorClient = workers.getCreator().client;
+    it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
+      allMembersWithExtra = getInboxIds(i + 1);
+      allMembers = allMembersWithExtra.slice(0, i);
 
-        newGroup = (await creatorClient.conversations.newGroup([
-          ...allMembers,
-          ...workers.getAllButCreator().map((w) => w.client.inboxId),
-        ])) as Group;
-        expect(newGroup.id).toBeDefined();
-        // Add current group to cumulative tracking
-        cumulativeGroups.push(newGroup);
-      });
-      it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-        const callMembersWithExtraWithAddress = getAddresses(i + 1);
-        const newGroupByIdentifier =
-          await creatorClient.conversations.newGroupWithIdentifiers(
-            callMembersWithExtraWithAddress.map((address) => ({
-              identifier: address,
-              identifierKind: IdentifierKind.Ethereum,
-            })),
-          );
-        expect(newGroupByIdentifier.id).toBeDefined();
-      });
-      it(`groupsync-${i}:sync a large group of ${i} members ${i}`, async () => {
-        await newGroup.sync();
-        const members = await newGroup.members();
-        expect(members.length).toBe(members.length);
-      });
-
-      it(`updateName-${i}:update the group name`, async () => {
-        const newName = "Large Group";
-        await newGroup.updateName(newName);
-        const name = newGroup.name;
-        expect(name).toBe(newName);
-      });
-      it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
-        const groupMessage =
-          "gm-" + Math.random().toString(36).substring(2, 15);
-
-        await newGroup.send(groupMessage);
-        expect(groupMessage).toBeDefined();
-      });
-      it(`streamMessage-${i}:verify group message`, async () => {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
+      newGroup = (await creatorClient.conversations.newGroup([
+        ...allMembers,
+        ...workers.getAllButCreator().map((w) => w.client.inboxId),
+      ])) as Group;
+      expect(newGroup.id).toBeDefined();
+      // Add current group to cumulative tracking
+      cumulativeGroups.push(newGroup);
+    });
+    it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
+      const callMembersWithExtraWithAddress = getAddresses(i + 1);
+      const newGroupByIdentifier =
+        await creatorClient.conversations.newGroupWithIdentifiers(
+          callMembersWithExtraWithAddress.map((address) => ({
+            identifier: address,
+            identifierKind: IdentifierKind.Ethereum,
+          })),
         );
-        sendMetric("response", verifyResult.averageEventTiming, {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-          members: i.toString(),
-          installations: i.toString(),
-        } as ResponseMetricTags);
+      expect(newGroupByIdentifier.id).toBeDefined();
+    });
+    it(`groupsync-${i}:sync a large group of ${i} members ${i}`, async () => {
+      await newGroup.sync();
+      const members = await newGroup.members();
+      expect(members.length).toBe(members.length);
+    });
 
-        setCustomDuration(verifyResult?.averageEventTiming ?? 0);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
-      it(`addMember-${i}:add members to a group`, async () => {
-        await newGroup.addMembers([workers.getAll()[2].inboxId]);
-      });
-      it(`removeMembers-${i}:remove a participant from a group`, async () => {
-        const previousMembers = await newGroup.members();
-        await newGroup.removeMembers([
-          previousMembers.filter(
-            (member) => member.inboxId !== newGroup.addedByInboxId,
-          )[0].inboxId,
-        ]);
+    it(`updateName-${i}:update the group name`, async () => {
+      const newName = "Large Group";
+      await newGroup.updateName(newName);
+      const name = newGroup.name;
+      expect(name).toBe(newName);
+    });
+    it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-        const members = await newGroup.members();
-        expect(members.length).toBe(previousMembers.length - 1);
-      });
-      it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-        const extraMember = allMembersWithExtra.slice(i, i + 1);
-        console.log("extraMember", extraMember);
-        const verifyResult = await verifyMembershipStream(
-          newGroup,
-          workers.getAllButCreator(),
-          extraMember,
-        );
+      await newGroup.send(groupMessage);
+      expect(groupMessage).toBeDefined();
+    });
+    it(`streamMessage-${i}:verify group message`, async () => {
+      const verifyResult = await verifyMessageStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
+      sendMetric("response", verifyResult.averageEventTiming, {
+        test: testName,
+        metric_type: "stream",
+        metric_subtype: "message",
+        sdk: workers.getCreator().sdk,
+        members: i.toString(),
+        installations: i.toString(),
+      } as ResponseMetricTags);
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+      setCustomDuration(verifyResult?.averageEventTiming ?? 0);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
+    it(`addMember-${i}:add members to a group`, async () => {
+      await newGroup.addMembers([workers.getAll()[2].inboxId]);
+    });
+    it(`removeMembers-${i}:remove a participant from a group`, async () => {
+      const previousMembers = await newGroup.members();
+      await newGroup.removeMembers([
+        previousMembers.filter(
+          (member) => member.inboxId !== newGroup.addedByInboxId,
+        )[0].inboxId,
+      ]);
 
-      it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+      const members = await newGroup.members();
+      expect(members.length).toBe(previousMembers.length - 1);
+    });
+    it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
+      const extraMember = allMembersWithExtra.slice(i, i + 1);
+      console.log("extraMember", extraMember);
+      const verifyResult = await verifyMembershipStream(
+        newGroup,
+        workers.getAllButCreator(),
+        extraMember,
+      );
 
-        sendMetric("response", verifyResult.averageEventTiming, {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-        } as ResponseMetricTags);
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+    it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
+      const verifyResult = await verifyMessageStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
 
-      it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
-        const verifyResult = await verifyMetadataStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+      sendMetric("response", verifyResult.averageEventTiming, {
+        test: testName,
+        metric_type: "stream",
+        metric_subtype: "message",
+        sdk: workers.getCreator().sdk,
+      } as ResponseMetricTags);
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
 
-      it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomA"]);
-        const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
-        await newGroup.addMembers([clientSingleSync.inboxId]);
-        const start = performance.now();
-        await clientSingleSync.conversations.sync();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
-      it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomB"]);
-        const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
-        await newGroup.addMembers([clientSingleSync.inboxId]);
-        const start = performance.now();
-        await clientSingleSync.conversations.syncAll();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
+    it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
+      const verifyResult = await verifyMetadataStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
 
-      it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomC"]);
-        const clientSingleSync = singleSyncWorkers.get("randomC")!.client;
-        for (const group of cumulativeGroups) {
-          await group.addMembers([clientSingleSync.inboxId]);
-        }
-        const start = performance.now();
-        await clientSingleSync.conversations.sync();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
-      it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomD"]);
-        const clientSingleSync = singleSyncWorkers.get("randomD")!.client;
-        for (const group of cumulativeGroups) {
-          await group.addMembers([clientSingleSync.inboxId]);
-        }
-        const start = performance.now();
-        await clientSingleSync.conversations.syncAll();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
-    }
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
+    });
+
+    it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomA"]);
+      const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
+      await newGroup.addMembers([clientSingleSync.inboxId]);
+      const start = performance.now();
+      await clientSingleSync.conversations.sync();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+    it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomB"]);
+      const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
+      await newGroup.addMembers([clientSingleSync.inboxId]);
+      const start = performance.now();
+      await clientSingleSync.conversations.syncAll();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+
+    it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomC"]);
+      const clientSingleSync = singleSyncWorkers.get("randomC")!.client;
+      for (const group of cumulativeGroups) {
+        await group.addMembers([clientSingleSync.inboxId]);
+      }
+      const start = performance.now();
+      await clientSingleSync.conversations.sync();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
+    it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
+      const singleSyncWorkers = await getWorkers(["randomD"]);
+      const clientSingleSync = singleSyncWorkers.get("randomD")!.client;
+      for (const group of cumulativeGroups) {
+        await group.addMembers([clientSingleSync.inboxId]);
+      }
+      const start = performance.now();
+      await clientSingleSync.conversations.syncAll();
+      const end = performance.now();
+      setCustomDuration(end - start);
+    });
   }
 });
