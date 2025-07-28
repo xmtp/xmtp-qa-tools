@@ -12,7 +12,7 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **Agents.yml**                         | Production agent testing        | Every 4 hours, manual        | Test tagged and untagged agents                |
 | **Browser.yml**                        | Browser compatibility testing   | Every 30 minutes, manual     | browser support and functionality              |
 | **Delivery.yml**                       | Message delivery reliability    | Every 30 minutes, manual     | Test message loss with 200 streams             |
-| **Functional.yml**                     | Library version compatibility   | Every 6 hours, manual        | Test last 3 versions of the library            |
+| **Regression.yml**                     | Library version compatibility   | Every 6 hours, manual        | Test last 3 versions of the library            |
 | **Forks.yml**                          | Fork testing on local network   | Every 12 hours, manual       | Daily forks testing with local XMTP network    |
 | **NetworkChaos.yml**                   | Network chaos testing           | Daily, manual                | Test network partitions and failures           |
 | **Wildcard.yml**                       | Manual PR verification          | Yearly, manual               | Flexible testing for PRs and manual runs       |
