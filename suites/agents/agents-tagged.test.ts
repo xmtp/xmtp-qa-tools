@@ -69,7 +69,7 @@ describe(testName, async () => {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
-        live: agent.live,
+        live: agent.live ? true : false,
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
