@@ -408,13 +408,6 @@ async function runTest(
 
       const { exitCode } = await runCommand(command, env, logger);
 
-      console.info(`Execution Results:`);
-      if (exitCode === 0) {
-        console.info(`   Tests passed successfully!`);
-      } else {
-        console.info(`   Tests failed with exit code: ${exitCode}`);
-      }
-
       // Close logger for this attempt
       logger?.close();
 
@@ -460,13 +453,12 @@ async function runTest(
           console.info(`Logs sent successfully`);
         }
 
-        console.info(`\nFinal Status:`);
         // Exit based on the last attempt's result
         if (exitCode === 0 || options.noFail) {
-          console.info(`Test suite completed successfully`);
+          console.info(`Test suite completed successfully ✅`);
           process.exit(0);
         } else {
-          console.info(`Test suite failed`);
+          console.info(`Test suite failed ❌`);
           process.exit(1);
         }
       }

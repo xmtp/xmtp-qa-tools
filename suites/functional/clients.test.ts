@@ -27,6 +27,7 @@ describe(testName, async () => {
     const receiverInboxId = getInboxIds(1)[0];
 
     for (const version of versions) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const versionWorkers = await getWorkers(
         ["downgrade-" + "a" + "-" + version.nodeSDK],
         {
@@ -48,6 +49,7 @@ describe(testName, async () => {
     const receiverInboxId = getInboxIds(1)[0];
 
     for (const version of versions.reverse()) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const versionWorkers = await getWorkers(
         ["upgrade-" + "a" + "-" + version.nodeSDK],
         {
@@ -90,7 +92,7 @@ describe(testName, async () => {
     );
   });
 
-  it("inbox state from external inbox IDs", async () => {
+  it("inbox state", async () => {
     const bobInboxId = workers.get("bob")!.client.inboxId;
     const inboxState = await workers
       .get("henry")!
@@ -99,28 +101,7 @@ describe(testName, async () => {
     expect(inboxState[0].inboxId).toBe(bobInboxId);
   });
 
-  it("shared identity and separate storage", async () => {
-    const baseName = "randomguy";
-
-    // Create primary installation
-    const primary = await getWorkers([baseName]);
-
-    // Create secondary installation with different folder
-    const secondary = await getWorkers([baseName + "-desktop"]);
-
-    // Get workers with correct base name and installation IDs
-    const primaryWorker = primary.get(baseName);
-    const secondaryWorker = secondary.get(baseName, "desktop");
-
-    // Ensure workers exist
-    expect(primaryWorker).toBeDefined();
-    expect(secondaryWorker).toBeDefined();
-
-    // shared identity but separate storage
-    expect(primaryWorker?.client.inboxId).toBe(secondaryWorker?.client.inboxId);
-    expect(primaryWorker?.dbPath).not.toBe(secondaryWorker?.dbPath);
-  });
-  it("shared identity and separate storage", async () => {
+  it("installations", async () => {
     const baseName = "randomguy";
 
     // Create primary installation
