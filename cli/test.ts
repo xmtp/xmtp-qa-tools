@@ -194,7 +194,6 @@ async function cleanSpecificLogFile(
 function parseTestArgs(args: string[]): {
   testName: string;
   options: TestOptions;
-  env: Record<string, string>;
 } {
   let testName = "functional";
   const options: TestOptions = {
@@ -209,12 +208,6 @@ function parseTestArgs(args: string[]): {
     reportForkCount: false, // Report fork count after ansi:forks
   };
 
-  // Initialize environment variables
-  const env: Record<string, string> = {
-    ...process.env,
-    RUST_BACKTRACE: "1",
-  };
-
   let currentArgs = [...args];
   if (currentArgs.length > 0 && !currentArgs[0].startsWith("--")) {
     const shiftedArg = currentArgs.shift();
@@ -227,9 +220,7 @@ function parseTestArgs(args: string[]): {
 
     switch (arg) {
       case "--help":
-      case "-h":
         showHelp();
-        process.exit(0);
         break;
       case "--attempts":
         if (nextArg) {
@@ -244,7 +235,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--versions":
         if (nextArg) {
-          env.TEST_VERSIONS = nextArg;
+          process.env.TEST_VERSIONS = nextArg;
           i++;
         } else {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
@@ -252,11 +243,11 @@ function parseTestArgs(args: string[]): {
         break;
       case "--debug":
         options.fileLogging = true;
-        env.LOGGING_LEVEL = "debug";
+        process.env.LOGGING_LEVEL = "debug";
         break;
       case "--nodeSDK":
         if (nextArg) {
-          env.NODE_VERSION = nextArg;
+          process.env.NODE_VERSION = nextArg;
           i++;
         } else {
           console.warn(
@@ -275,7 +266,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--env":
         if (nextArg) {
-          env.XMTP_ENV = nextArg;
+          process.env.XMTP_ENV = nextArg;
           i++;
         } else {
           console.warn("--env flag requires a value (e.g., --env local)");
@@ -283,7 +274,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--sync":
         if (nextArg) {
-          env.SYNC_STRATEGY = nextArg;
+          process.env.SYNC_STRATEGY = nextArg;
           i++;
         } else {
           console.warn(
@@ -293,7 +284,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--size":
         if (nextArg) {
-          env.BATCH_SIZE = nextArg;
+          process.env.BATCH_SIZE = nextArg;
           i++;
         } else {
           console.warn("--size flag requires a value (e.g., --size 5-10)");
@@ -307,17 +298,16 @@ function parseTestArgs(args: string[]): {
     }
   }
 
-  return { testName, options, env };
+  return { testName, options };
 }
 
 async function runCommand(
   command: string,
-  env: Record<string, string>,
   logger?: ReturnType<typeof createTestLogger>,
 ): Promise<{ exitCode: number; errorOutput: string }> {
   return new Promise((resolve) => {
     const child = spawn(command, {
-      env,
+      env: process.env,
       stdio: ["pipe", "pipe", "pipe"],
       shell: true,
     });
@@ -352,18 +342,14 @@ async function runCommand(
     });
   });
 }
-function logDetails(
-  testName: string,
-  options: TestOptions,
-  env: Record<string, string>,
-) {
+function logDetails(testName: string, options: TestOptions) {
   console.info(`Test Suite: ${testName}`);
-  console.info(`Env: ${env.XMTP_ENV || "local"}`);
+  console.info(`Env: ${process.env.XMTP_ENV || "local"}`);
   console.info(`Max Attempts: ${options.attempts}`);
-  console.info(`Sync Strategy: ${env.SYNC_STRATEGY}`);
-  console.info(`Batch Size: ${env.BATCH_SIZE}`);
-  console.info(`Node SDK: ${env.NODE_VERSION}`);
-  console.info(`Versions: ${env.TEST_VERSIONS}`);
+  console.info(`Sync Strategy: ${process.env.SYNC_STRATEGY}`);
+  console.info(`Batch Size: ${process.env.BATCH_SIZE}`);
+  console.info(`Node SDK: ${process.env.NODE_VERSION}`);
+  console.info(`Versions: ${process.env.TEST_VERSIONS}`);
   console.info(`File logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
   console.info(
     `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
@@ -376,12 +362,8 @@ function logDetails(
     `Verbose Logging: ${options.verboseLogging ? "Enabled" : "Disabled"}`,
   );
 }
-async function runTest(
-  testName: string,
-  options: TestOptions,
-  env: Record<string, string>,
-): Promise<void> {
-  logDetails(testName, options, env);
+async function runTest(testName: string, options: TestOptions): Promise<void> {
+  logDetails(testName, options);
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
     console.info(`\nAttempt ${attempt} of ${options.attempts}...`);
 
@@ -394,7 +376,7 @@ async function runTest(
       fileLogging: options.fileLogging,
       testName,
       verboseLogging: options.verboseLogging,
-      logLevel: env.LOGGING_LEVEL,
+      logLevel: process.env.LOGGING_LEVEL as string,
     });
 
     try {
@@ -404,7 +386,7 @@ async function runTest(
       const command =
         `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-      const { exitCode } = await runCommand(command, env, logger);
+      const { exitCode } = await runCommand(command, logger);
 
       // Close logger for this attempt
       logger?.close();
@@ -452,10 +434,7 @@ async function runTest(
         }
 
         // Exit based on the last attempt's result
-        if (exitCode === 0 || options.noFail) {
-          console.info(`Test suite completed successfully ✅`);
-          process.exit(0);
-        } else {
+        if (exitCode === 1 && !options.noFail) {
           console.info(`Test suite failed ❌`);
           process.exit(1);
         }
@@ -504,7 +483,7 @@ async function main(): Promise<void> {
   try {
     switch (commandType) {
       case "test": {
-        const { testName, options, env } = parseTestArgs(testArgs);
+        const { testName, options } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
         // Simple run: single attempt, no file logging, no noFail flag
@@ -514,7 +493,7 @@ async function main(): Promise<void> {
         if (isSimpleRun) {
           // Run test directly without logger for native terminal output
           console.info(`\nTest Suite: ${testName}`);
-          console.info(`Environment: ${env.XMTP_ENV || "local"}`);
+          console.info(`Environment: ${process.env.XMTP_ENV || "local"}`);
           console.info(`Configuration: Simple run (direct execution)`);
 
           const defaultThreadingOptions = options.parallel
@@ -523,10 +502,10 @@ async function main(): Promise<void> {
           const command =
             `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-          execSync(command, { stdio: "inherit", env });
+          execSync(command, { stdio: "inherit" });
         } else {
           // Use retry mechanism with logger
-          await runTest(testName, options, env);
+          await runTest(testName, options);
         }
         break;
       }

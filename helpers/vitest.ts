@@ -43,6 +43,7 @@ export const setupTestLifecycle = ({
 
   afterEach(async function () {
     const testName = expect.getState().currentTestName ?? "";
+    console.log(testName);
     let duration = performance.now() - start;
     if (getCustomDuration) {
       const customDuration = getCustomDuration();

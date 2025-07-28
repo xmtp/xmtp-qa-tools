@@ -469,18 +469,12 @@ export async function verifyConversationStream(
     startCollectors: (r) =>
       r.worker.collectConversations(initiator.client.inboxId, 1),
     triggerEvents: async () => {
-      const participantAddresses = receivers.map((p) => {
-        if (!p.client) throw new Error(`Participant ${p.name} has no client`);
-        return p.client.inboxId;
-      });
       const sentAt = Date.now();
-      const conversation =
-        await initiator.client.conversations.newGroup(participantAddresses);
-      const members = await conversation.members();
+      const conversation = await initiator.client.conversations.newGroup(
+        receivers.map((r) => r.client.inboxId),
+      );
       console.debug("conversation created", conversation.id);
-      return [
-        { id: "conversation", sentAt, members: members.map((m) => m.inboxId) },
-      ];
+      return [{ id: "conversation", sentAt, members: receivers }];
     },
     getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
