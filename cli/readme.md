@@ -2,7 +2,9 @@
 
 This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
 
-## Core commands
+## Overview
+
+The CLI consists of several specialized commands for different testing and management tasks:
 
 | Command                                         | Description                     | Help                   |
 | ----------------------------------------------- | ------------------------------- | ---------------------- |
@@ -13,46 +15,57 @@ This repository provides a comprehensive CLI interface for testing XMTP protocol
 | `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
 | `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
 
-### Test Suites
+---
+
+## Test Command
+
+The `test` command runs comprehensive test suites for XMTP functionality across different environments and SDK versions.
+
+### Usage
 
 ```bash
-# Core functionality
-yarn test functional     # Complete functional suite
-yarn test convos         # Direct message tests
-yarn test groups         # Group conversation tests
-
-# Performance & scale
-yarn test performance    # Core performance metrics
-yarn test delivery       # Message delivery reliability
-
-# Cross-platform & compatibility
-yarn test browser        # Playwright browser automation
-yarn test agents         # Live bot monitoring
-
-# Network & reliability
-yarn test networkchaos   # Network partition tolerance
-yarn test other          # Security, spam detection, rate limiting
-yarn test forks          # Git commit-based testing
+yarn test <test-suite> [options]
 ```
 
-### Environment Options
+### Arguments
 
-- **`local`**: Local XMTP network for development
-- **`dev`**: Development XMTP network (default)
-- **`production`**: Production XMTP network
+- `test-suite` - Test suite name (functional, convos, groups, etc.)
 
-### Common Options
+### Options
 
-```bash
---env <environment>    # Set XMTP environment
---debug               # Enable file logging
---no-fail             # Exit with success code even on failures
---help, -h            # Show help for any command
-```
+- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
+- `--attempts <number>` - Maximum retry attempts [default: 3]
+- `--debug` - Enable file logging (saves to logs/ directory)
+- `--no-fail` - Exit with success code even on failures
+- `--parallel` - Run tests in parallel (default: consecutive)
+- `--versions <count>` - Use multiple SDK versions for testing
 
-## Examples
+### Available Test Suites
 
-### Development Testing
+**Core Functionality:**
+
+- `functional` - Complete functional test suite
+- `convos` - Direct message tests
+- `groups` - Group conversation tests
+
+**Performance & Scale:**
+
+- `performance` - Core performance metrics and large groups
+- `delivery` - Message delivery reliability
+- `bench` - Benchmarking suite
+
+**Cross-platform & Compatibility:**
+
+- `browser` - Playwright browser automation
+- `agents` - Live bot monitoring
+
+**Network & Reliability:**
+
+- `networkchaos` - Network partition tolerance
+- `other` - Security, spam detection, rate limiting
+- `forks` - Git commit-based testing
+
+### Examples
 
 ```bash
 # Quick functionality test
@@ -61,37 +74,212 @@ yarn test convos --env dev
 # Full functional suite with debugging
 yarn test functional --env dev --debug --no-fail
 
-# Send test messages
-yarn send --address 0x1234... --env dev --users 10
-```
-
-### Multi-Version Testing
-
-```bash
-# Version compatibility testing
+# Multi-version compatibility testing
 yarn test functional --versions 3 --debug
 
-# Setup version testing
-yarn versions --clean
+# Parallel performance testing
+yarn test performance --parallel --env production
 ```
 
-## Key Generation and Setup
+---
+
+## Send Command
+
+The `send` command simulates multiple users sending messages to test delivery reliability and performance.
+
+### Usage
 
 ```bash
-# Generate test data
-yarn gen --count 500 --envs local
+yarn send [options]
+```
 
-# Preset commands
+### Options
+
+- `--address <address>` - Target wallet address to send messages to
+- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
+- `--users <count>` - Number of users to simulate [default: 5]
+- `--tresshold <percent>` - Success threshold percentage [default: 95]
+- `--wait` - Wait for responses from target
+
+### Environment Variables
+
+- `ADDRESS` - Default target address
+- `XMTP_ENV` - Default environment
+- `LOGGING_LEVEL` - Logging level
+
+### Examples
+
+```bash
+# Basic message sending test
+yarn send --address 0x1234... --env dev --users 10
+
+# Production load testing with response waiting
+yarn send --address 0x1234... --env production --users 500 --wait
+
+# Custom success threshold
+yarn send --address 0x1234... --tresshold 90 --users 100
+```
+
+---
+
+## Bot Command
+
+The `bot` command runs interactive XMTP bots for testing and monitoring purposes.
+
+### Usage
+
+```bash
+yarn bot <bot-name> [options]
+```
+
+### Arguments
+
+- `bot-name` - Name of the bot to run (echo, key-check)
+
+### Options
+
+- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
+
+### Available Bots
+
+- `echo` - Echo bot that responds to messages
+- `key-check` - Key validation bot
+
+### Examples
+
+```bash
+# Run echo bot in development environment
+yarn bot echo --env dev
+
+# Run key validation bot locally
+yarn bot key-check --env local
+```
+
+---
+
+## Generator Command
+
+The `gen` command generates test inboxes and encryption keys for testing across multiple environments.
+
+### Usage
+
+```bash
+yarn gen [options]
+```
+
+### Options
+
+- `--count <number>` - Number of inboxes to generate [default: 200]
+- `--envs <environments>` - Comma-separated environments (local,dev,production) [default: local]
+- `--installations <num>` - Number of installations per inbox [default: 2]
+- `--debug` - Enable debug logging
+- `--clean` - Clean up logs/ and .data/ directories before running
+
+### Preset Commands
+
+```bash
 yarn update:local      # Generate 500 inboxes for local testing
 yarn update:prod       # Generate inboxes for production testing
 ```
 
-## Monitoring and Analysis
+### Examples
 
 ```bash
-# Log analysis
-yarn ansi:clean        # Clean raw logs
-yarn ansi:forks        # Clean fork logs
+# Generate test data for local environment
+yarn gen --count 500 --envs local
+
+# Multi-environment setup
+yarn gen --envs local,dev --installations 3
+
+# Clean setup with debugging
+yarn gen --clean --debug
+```
+
+---
+
+## Versions Command
+
+The `versions` command manages SDK version testing by creating bindings symlinks for different XMTP SDK versions.
+
+### Usage
+
+```bash
+yarn versions [options]
+```
+
+### Options
+
+- `--clean` - Clean package.json imports and node_modules before setup
+
+### Description
+
+Sets up SDK version testing by creating bindings symlinks for different XMTP SDK versions. This enables testing across multiple SDK versions simultaneously.
+
+### Examples
+
+```bash
+# Standard version setup
+yarn versions
+
+# Clean setup
+yarn versions --clean
+```
+
+---
+
+## Revoke Command
+
+The `revoke` command revokes installations for a given inbox, useful for testing installation management.
+
+### Usage
+
+```bash
+yarn revoke <inbox-id> [installations-to-save]
+```
+
+### Arguments
+
+- `inbox-id` - 64-character hexadecimal inbox ID
+- `installations-to-save` - Comma-separated installation IDs to keep (optional)
+
+### Description
+
+Revokes all installations for a given inbox except those specified in installations-to-save. If no installations are specified, only the current installation is kept.
+
+### Requirements
+
+- Node.js version 20 or higher
+- .env file with WALLET_KEY, ENCRYPTION_KEY, and XMTP_ENV
+
+### Examples
+
+```bash
+# Revoke all installations except current
+yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+
+# Keep specific installations
+yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"
+```
+
+---
+
+## Environment Options
+
+All commands support the following environments:
+
+- **`local`**: Local XMTP network for development
+- **`dev`**: Development XMTP network (default)
+- **`production`**: Production XMTP network
+
+## Common Options
+
+Most commands support these common options:
+
+```bash
+--env <environment>    # Set XMTP environment
+--debug               # Enable file logging
+--no-fail             # Exit with success code even on failures
+--help, -h            # Show help for any command
 ```
 
 ## Getting Help
@@ -105,4 +293,12 @@ yarn bot --help        # Bot command help
 yarn gen --help        # Generator help
 yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
+```
+
+## Monitoring and Analysis
+
+```bash
+# Log analysis
+yarn ansi:clean        # Clean raw logs
+yarn ansi:forks        # Clean fork logs
 ```
