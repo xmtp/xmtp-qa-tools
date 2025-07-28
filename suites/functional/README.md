@@ -153,7 +153,7 @@ The `permissions.test.ts` module tests group permission and role management.
 
 ```typescript
 // Test admin permission management
-it("permissions: add and remove admin permissions", async () => {
+it("add and remove admin permissions", async () => {
   const member = workers.getReceiver();
 
   // Initially should not be admin
@@ -171,7 +171,7 @@ it("permissions: add and remove admin permissions", async () => {
 });
 
 // Test super admin permissions
-it("permissions: add and remove super admin permissions", async () => {
+it("add and remove super admin permissions", async () => {
   const member = workers.getReceiver();
 
   await group.addSuperAdmin(member.client.inboxId);

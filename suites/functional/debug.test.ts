@@ -10,7 +10,7 @@ describe(testName, async () => {
   let workers = await getWorkers(3);
   let group: Group;
 
-  it("debug: retrieve group debug information", async () => {
+  it("retrieve group debug information", async () => {
     group = await workers.createGroupBetweenAll();
 
     // Get debug info
@@ -27,7 +27,7 @@ describe(testName, async () => {
     expect(typeof debugInfo.maybeForked).toBe("boolean");
   });
 
-  it("debug: track epoch changes during group operations", async () => {
+  it("track epoch changes during group operations", async () => {
     const initialDebugInfo = await group.debugInfo();
     const initialEpoch = initialDebugInfo.epoch;
 
@@ -42,7 +42,7 @@ describe(testName, async () => {
     expect(updatedEpoch).toBe(initialEpoch + 1n);
   });
 
-  it("debug: epoch consistency across members", async () => {
+  it("epoch consistency across members", async () => {
     // Get debug info from all members
     const debugInfos = await Promise.all(
       workers.getAll().map(async (worker) => {
@@ -62,7 +62,7 @@ describe(testName, async () => {
     }
   });
 
-  it("debug: detect potential forks in group state", async () => {
+  it("detect potential forks in group state", async () => {
     // Get debug info from all members
     const debugInfos = await Promise.all(
       workers.getAll().map(async (worker) => {
@@ -81,7 +81,7 @@ describe(testName, async () => {
     }
   });
 
-  it("debug: debug info after metadata changes", async () => {
+  it("debug info after metadata changes", async () => {
     const debugInfoBefore = await group.debugInfo();
 
     // Update metadata
@@ -95,7 +95,7 @@ describe(testName, async () => {
     expect(debugInfoAfterDesc.epoch).toBeGreaterThan(debugInfoAfterName.epoch);
   });
 
-  it("debug: debug info structure completeness", async () => {
+  it("debug info structure completeness", async () => {
     const debugInfo = await group.debugInfo();
 
     // all expected properties exist

@@ -178,8 +178,6 @@ async function cleanSpecificLogFile(
       // Replace the original file with the cleaned version
       await fs.promises.unlink(rawFilePath);
       await fs.promises.rename(tempPath, rawFilePath);
-
-      console.info(logFileName);
     } catch (error) {
       console.error(`Failed to clean ANSI codes from ${logFileName}:`, error);
     }
@@ -360,21 +358,20 @@ async function runTest(
   options: TestOptions,
   env: Record<string, string>,
 ): Promise<void> {
-  console.info(`\n🧪 Test Suite: ${testName}`);
-  console.info(`   Environment: ${env.XMTP_ENV || "local"}`);
+  console.info(`\nTest Suite: ${testName}`);
+  console.info(`Environment: ${env.XMTP_ENV || "local"}`);
+
+  console.info(`Max Attempts: ${options.attempts}`);
+  console.info(`File Logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);
   console.info(
-    `   Configuration: ${options.parallel ? "Parallel" : "Sequential"} execution`,
-  );
-  console.info(`   Max Attempts: ${options.attempts}`);
-  console.info(
-    `   File Logging: ${options.fileLogging ? "Enabled" : "Disabled"}`,
+    `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
   );
 
   for (let attempt = 1; attempt <= options.attempts; attempt++) {
-    console.info(`\n📋 Attempt ${attempt} of ${options.attempts}...`);
+    console.info(`\nAttempt ${attempt} of ${options.attempts}...`);
 
     if (attempt > 1) {
-      console.info(`   ⏳ Retry delay: ${options.retryDelay} seconds`);
+      console.info(`Retry delay: ${options.retryDelay} seconds`);
     }
 
     // Create a new logger for each attempt
@@ -392,15 +389,15 @@ async function runTest(
       const command =
         `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-      console.info(`   🚀 Executing: ${command}`);
+      console.info(`Executing: ${command}`);
 
       const { exitCode } = await runCommand(command, env, logger);
 
-      console.info(`   📊 Execution Results:`);
+      console.info(`Execution Results:`);
       if (exitCode === 0) {
-        console.info(`      ✅ Tests passed successfully!`);
+        console.info(`   Tests passed successfully!`);
       } else {
-        console.info(`      ❌ Tests failed with exit code: ${exitCode}`);
+        console.info(`   Tests failed with exit code: ${exitCode}`);
       }
 
       // Close logger for this attempt
@@ -410,62 +407,60 @@ async function runTest(
 
       // Check if this was the last attempt
       if (attempt === options.attempts) {
-        console.info(`\n📈 Test Suite Summary:`);
-        console.info(`   🎯 Test Suite: ${testName}`);
-        console.info(`   📝 Completed ${options.attempts} attempts`);
-        console.info(`   📁 Log File: ${logger.logFileName}`);
+        console.info(`\nTest Suite Summary:`);
+        console.info(`Test Suite: ${testName}`);
+        console.info(`Completed ${options.attempts} attempts`);
+        console.info(`Log File: ${logger.logFileName}`);
 
         const errorLogs = extractErrorLogs(testName);
         const fail_lines = extractfail_lines(errorLogs);
         checkForCriticalErrors(testName, fail_lines);
 
-        console.info(`\n🔍 Error Analysis:`);
+        console.info(`\nError Analysis:`);
         if (!errorLogs || errorLogs.size === 0) {
-          console.info(`   ℹ️  No error logs found - skipping analysis`);
+          console.info(`No error logs found - skipping analysis`);
           return;
         }
 
-        console.info(`   📊 Found ${errorLogs.size} unique error patterns:`);
-        Array.from(errorLogs).forEach((error, index) => {
-          console.info(`      ${index + 1}. ${error}`);
-        });
+        console.info(`Found ${errorLogs.size} unique error patterns:`);
+        console.error(errorLogs);
 
         if (Array.isArray(fail_lines) && fail_lines.length === 0) {
-          console.info(`   ℹ️  No fail_lines logs found - skipping analysis`);
+          console.info(`No fail_lines logs found - skipping analysis`);
           return;
         }
 
         // Handle failed attempt (only for non-final attempts)
         if (attempt < options.attempts && exitCode !== 0) {
           console.error(
-            `\n❌ Test suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
+            `\nTest suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
           );
         }
 
         if (options.reportForkCount) {
-          console.info(`\n🔧 Running fork analysis...`);
+          console.info(`\nRunning fork analysis...`);
           runAnsiForksAndReport();
         }
 
         if (options.sendToDatadog) {
-          console.info(`\n📊 Sending logs to Datadog...`);
+          console.info(`\nSending logs to Datadog...`);
           await sendDatadogLog(Array.from(errorLogs), fail_lines, testName);
-          console.info(`   ✅ Logs sent successfully`);
+          console.info(`Logs sent successfully`);
         }
 
-        console.info(`\n🏁 Final Status:`);
+        console.info(`\nFinal Status:`);
         // Exit based on the last attempt's result
         if (exitCode === 0 || options.noFail) {
-          console.info(`   ✅ Test suite completed successfully`);
+          console.info(`Test suite completed successfully`);
           process.exit(0);
         } else {
-          console.info(`   ❌ Test suite failed`);
+          console.info(`Test suite failed`);
           process.exit(1);
         }
       }
 
       if (options.retryDelay > 0) {
-        console.info(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
+        console.info(`\nRetrying in ${options.retryDelay} seconds...`);
         Atomics.wait(
           new Int32Array(new SharedArrayBuffer(4)),
           0,
@@ -473,11 +468,11 @@ async function runTest(
           options.retryDelay * 1000,
         );
       } else {
-        console.info("\n🔄 Retrying immediately...");
+        console.info("\nRetrying immediately...");
       }
     } catch (error) {
-      console.error(`\n💥 Attempt ${attempt} failed with exception:`);
-      console.error(`   Error: ${String(error)}`);
+      console.error(`\nAttempt ${attempt} failed with exception:`);
+      console.error(`Error: ${String(error)}`);
 
       // Close logger for this attempt
       logger?.close();
@@ -516,9 +511,9 @@ async function main(): Promise<void> {
 
         if (isSimpleRun) {
           // Run test directly without logger for native terminal output
-          console.info(`\n🧪 Test Suite: ${testName}`);
-          console.info(`   Environment: ${env.XMTP_ENV || "local"}`);
-          console.info(`   Configuration: Simple run (direct execution)`);
+          console.info(`\nTest Suite: ${testName}`);
+          console.info(`Environment: ${env.XMTP_ENV || "local"}`);
+          console.info(`Configuration: Simple run (direct execution)`);
 
           const defaultThreadingOptions = options.parallel
             ? "--pool=forks"
@@ -526,7 +521,7 @@ async function main(): Promise<void> {
           const command =
             `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
 
-          console.info(`\n🚀 Executing: ${command}`);
+          console.info(`\nExecuting: ${command}`);
           execSync(command, { stdio: "inherit", env });
         } else {
           // Use retry mechanism with logger

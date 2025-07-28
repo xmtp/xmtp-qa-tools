@@ -9,7 +9,7 @@ describe(testName, async () => {
   let workers = await getWorkers(3);
   let group: Group;
 
-  it("metadata: update group name and persistence", async () => {
+  it("update group name and persistence", async () => {
     group = await workers.createGroupBetweenAll();
     const originalName = group.name;
 
@@ -27,7 +27,7 @@ describe(testName, async () => {
     expect(group.name).not.toBe(originalName);
   });
 
-  it("metadata: update group description and persistence", async () => {
+  it("update group description and persistence", async () => {
     const newDescription =
       "Updated group description " +
       Math.random().toString(36).substring(2, 15);
@@ -41,7 +41,7 @@ describe(testName, async () => {
     expect(group.description).toBe(newDescription);
   });
 
-  it("metadata: update group image URL", async () => {
+  it("update group image URL", async () => {
     const imageUrl = "https://example.com/group-image.jpg";
     await group.updateImageUrl(imageUrl);
 
@@ -53,7 +53,7 @@ describe(testName, async () => {
     expect(group.imageUrl).toBe(imageUrl);
   });
 
-  it("metadata: metadata propagation to other members", async () => {
+  it("metadata propagation to other members", async () => {
     const testName =
       "Propagated Name " + Math.random().toString(36).substring(2, 15);
     const testDescription =
@@ -78,7 +78,7 @@ describe(testName, async () => {
     expect(otherGroup.description).toBe(testDescription);
   });
 
-  it("metadata: handle empty and special characters in metadata", async () => {
+  it("handle empty and special characters in metadata", async () => {
     // Test empty name
     await group.updateName("");
     expect(group.name).toBe("");
@@ -94,7 +94,7 @@ describe(testName, async () => {
     expect(group.description).toBe(longDescription);
   });
 
-  it("metadata: metadata state after group operations", async () => {
+  it("metadata state after group operations", async () => {
     const finalName = "Final Test Name";
     const finalDescription = "Final test description";
 
