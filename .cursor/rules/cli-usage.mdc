@@ -15,8 +15,6 @@ The CLI consists of several specialized commands for different testing and manag
 | `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
 | `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
 
----
-
 ## Test Command
 
 The `test` command runs comprehensive test suites for XMTP functionality across different environments and SDK versions.
@@ -81,8 +79,6 @@ yarn test functional --versions 3 --debug
 yarn test performance --parallel --env production
 ```
 
----
-
 ## Send Command
 
 The `send` command simulates multiple users sending messages to test delivery reliability and performance.
@@ -120,8 +116,6 @@ yarn send --address 0x1234... --env production --users 500 --wait
 yarn send --address 0x1234... --tresshold 90 --users 100
 ```
 
----
-
 ## Bot Command
 
 The `bot` command runs interactive XMTP bots for testing and monitoring purposes.
@@ -154,8 +148,6 @@ yarn bot echo --env dev
 # Run key validation bot locally
 yarn bot key-check --env local
 ```
-
----
 
 ## Generator Command
 
@@ -195,8 +187,6 @@ yarn gen --envs local,dev --installations 3
 yarn gen --clean --debug
 ```
 
----
-
 ## Versions Command
 
 The `versions` command manages SDK version testing by creating bindings symlinks for different XMTP SDK versions.
@@ -224,8 +214,6 @@ yarn versions
 # Clean setup
 yarn versions --clean
 ```
-
----
 
 ## Revoke Command
 
@@ -260,8 +248,6 @@ yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 # Keep specific installations
 yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"
 ```
-
----
 
 ## Environment Options
 

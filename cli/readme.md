@@ -15,9 +15,7 @@ The CLI consists of several specialized commands for different testing and manag
 | `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
 | `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
 
----
-
-## Test Command
+## Test command
 
 The `test` command runs comprehensive test suites for XMTP functionality across different environments and SDK versions.
 
@@ -40,26 +38,26 @@ yarn test <test-suite> [options]
 - `--parallel` - Run tests in parallel (default: consecutive)
 - `--versions <count>` - Use multiple SDK versions for testing
 
-### Available Test Suites
+### Available test suites
 
-**Core Functionality:**
+**Core functionality:**
 
 - `functional` - Complete functional test suite
 - `convos` - Direct message tests
 - `groups` - Group conversation tests
 
-**Performance & Scale:**
+**Performance & scale:**
 
 - `performance` - Core performance metrics and large groups
 - `delivery` - Message delivery reliability
 - `bench` - Benchmarking suite
 
-**Cross-platform & Compatibility:**
+**Cross-platform & compatibility:**
 
 - `browser` - Playwright browser automation
 - `agents` - Live bot monitoring
 
-**Network & Reliability:**
+**Network & reliability:**
 
 - `networkchaos` - Network partition tolerance
 - `other` - Security, spam detection, rate limiting
@@ -81,9 +79,7 @@ yarn test functional --versions 3 --debug
 yarn test performance --parallel --env production
 ```
 
----
-
-## Send Command
+## Send command
 
 The `send` command simulates multiple users sending messages to test delivery reliability and performance.
 
@@ -120,9 +116,7 @@ yarn send --address 0x1234... --env production --users 500 --wait
 yarn send --address 0x1234... --tresshold 90 --users 100
 ```
 
----
-
-## Bot Command
+## Bot command
 
 The `bot` command runs interactive XMTP bots for testing and monitoring purposes.
 
@@ -140,7 +134,7 @@ yarn bot <bot-name> [options]
 
 - `--env <environment>` - XMTP environment (local, dev, production) [default: local]
 
-### Available Bots
+### Available bots
 
 - `echo` - Echo bot that responds to messages
 - `key-check` - Key validation bot
@@ -155,9 +149,7 @@ yarn bot echo --env dev
 yarn bot key-check --env local
 ```
 
----
-
-## Generator Command
+## Generator command
 
 The `gen` command generates test inboxes and encryption keys for testing across multiple environments.
 
@@ -175,7 +167,7 @@ yarn gen [options]
 - `--debug` - Enable debug logging
 - `--clean` - Clean up logs/ and .data/ directories before running
 
-### Preset Commands
+### Preset commands
 
 ```bash
 yarn update:local      # Generate 500 inboxes for local testing
@@ -195,9 +187,7 @@ yarn gen --envs local,dev --installations 3
 yarn gen --clean --debug
 ```
 
----
-
-## Versions Command
+## Versions command
 
 The `versions` command manages SDK version testing by creating bindings symlinks for different XMTP SDK versions.
 
@@ -225,9 +215,7 @@ yarn versions
 yarn versions --clean
 ```
 
----
-
-## Revoke Command
+## Revoke command
 
 The `revoke` command revokes installations for a given inbox, useful for testing installation management.
 
@@ -261,9 +249,7 @@ yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"
 ```
 
----
-
-## Environment Options
+## Environment options
 
 All commands support the following environments:
 
@@ -271,7 +257,7 @@ All commands support the following environments:
 - **`dev`**: Development XMTP network (default)
 - **`production`**: Production XMTP network
 
-## Common Options
+## Common options
 
 Most commands support these common options:
 
@@ -282,7 +268,7 @@ Most commands support these common options:
 --help, -h            # Show help for any command
 ```
 
-## Getting Help
+## Getting help
 
 Each CLI command provides detailed help:
 
@@ -295,7 +281,7 @@ yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
 ```
 
-## Monitoring and Analysis
+## Monitoring and analysis
 
 ```bash
 # Log analysis
