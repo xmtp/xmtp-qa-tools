@@ -92,17 +92,13 @@ const handleStream = async (
       }
     })();
   };
-
-  const onMessage = (err: Error | null, message?: DecodedMessage) => {
+  const onError = (err: Error | null) => {
     if (err) {
       console.error(`[${env}] Stream error:`, err);
       return;
     }
-
-    if (!message) {
-      return;
-    }
-
+  };
+  const onValue = (message: DecodedMessage) => {
     // Reset retry counter on successful message processing
     retries = MAX_RETRIES;
 
@@ -127,12 +123,11 @@ const handleStream = async (
     await client.conversations.sync();
 
     console.log(`[${env}] Waiting for messages...`);
-    await client.conversations.streamAllMessages(
-      onMessage,
-      undefined,
-      undefined,
+    await client.conversations.streamAllMessages({
+      onValue,
+      onError,
       onFail,
-    );
+    });
   } catch (err: unknown) {
     console.error(`[${env}] Error streaming messages:`, err);
     try {

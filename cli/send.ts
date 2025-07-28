@@ -2,6 +2,7 @@ import {
   Client,
   IdentifierKind,
   type Conversation,
+  type DecodedMessage,
   type LogLevel,
   type XmtpEnv,
 } from "@workers/versions";
@@ -293,10 +294,8 @@ async function runsendTest(config: Config): Promise<void> {
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);
             // Set up stream
-            void worker.conversations.streamAllMessages(
-              (error: any, message: any) => {
-                if (error) return;
-
+            void worker.conversations.streamAllMessages({
+              onValue: (message: DecodedMessage) => {
                 // Check for bot response
                 if (
                   message.senderInboxId.toLowerCase() !==
@@ -343,7 +342,7 @@ async function runsendTest(config: Config): Promise<void> {
                   resolve(result);
                 }
               },
-            );
+            });
             await new Promise((resolve) => setTimeout(resolve, 1000));
           }
 

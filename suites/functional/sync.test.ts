@@ -1,7 +1,6 @@
-import { sleep } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type Dm, type Group } from "@workers/versions";
+import { type Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";

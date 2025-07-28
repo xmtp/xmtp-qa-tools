@@ -1,4 +1,4 @@
-name: Functional
+name: Regression
 description: "last 3 versions of the library"
 
 on:
@@ -39,5 +39,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: "Functional (${{ matrix.test }}, ${{ matrix.env }})"
+          workflow-name: "Regression (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
