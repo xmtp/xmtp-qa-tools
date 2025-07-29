@@ -158,7 +158,7 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 - `conversation stream for new member`
 - `new installation and message stream`
 
-## 5. Large groups (`performance.test.ts`)
+## 5. Large groups
 
 **Purpose**: Validates scalability and performance at scale (50-250 members).
 
