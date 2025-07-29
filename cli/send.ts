@@ -3,6 +3,7 @@ import {
   IdentifierKind,
   type Conversation,
   type DecodedMessage,
+  type Group,
   type LogLevel,
   type XmtpEnv,
 } from "@workers/versions";
@@ -16,6 +17,7 @@ import {
   getDbPathQA,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
+import { getRandomInboxIds, getInboxByInstallationCount } from "../inboxes/utils";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
@@ -23,11 +25,17 @@ import {
 // echo
 // yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
+// group message
+// yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
+
 interface Config {
   userCount: number;
   timeout: number;
   env: string;
   target: string;
+  groupId?: string;
+  message?: string;
+  senderAddress?: string;
   tresshold: number;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
@@ -42,6 +50,9 @@ USAGE:
 
 OPTIONS:
   --address <address>     Target wallet address to send messages to
+  --group-id <id>         Target group ID to send message to
+  --message <text>        Custom message to send (required for group messages)
+  --sender <address>      Wallet address to use as sender (must be group member)
   --env <environment>     XMTP environment (local, dev, production) [default: local]
   --users <count>         Number of users to simulate [default: 5]
   --tresshold <percent>   Success threshold percentage [default: 95]
@@ -56,6 +67,7 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn send --address 0x1234... --env dev --users 10
   yarn send --address 0x1234... --env production --users 500 --wait
+  yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
 ENVIRONMENT VARIABLES:
@@ -89,6 +101,15 @@ function parseArgs(): Config {
     } else if (arg === "--address" && nextArg) {
       config.target = nextArg;
       i++;
+    } else if (arg === "--group-id" && nextArg) {
+      config.groupId = nextArg;
+      i++;
+    } else if (arg === "--message" && nextArg) {
+      config.message = nextArg;
+      i++;
+    } else if (arg === "--sender" && nextArg) {
+      config.senderAddress = nextArg;
+      i++;
     } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
       i++;
@@ -101,6 +122,22 @@ function parseArgs(): Config {
     } else if (arg === "--wait") {
       config.waitForResponse = true;
     }
+  }
+
+  // Validation
+  if (config.groupId && !config.message) {
+    console.error("❌ Error: --message is required when using --group-id");
+    process.exit(1);
+  }
+
+  if (config.groupId && config.target) {
+    console.error("❌ Error: Cannot use both --group-id and --address. Choose one.");
+    process.exit(1);
+  }
+
+  if (!config.groupId && !config.target) {
+    console.error("❌ Error: Either --group-id or --address is required");
+    process.exit(1);
   }
 
   return config;
@@ -145,6 +182,81 @@ function calculatePercentile(values: number[], percentile: number): number {
   const sorted = [...values].sort((a, b) => a - b);
   const index = Math.ceil((percentile / 100) * sorted.length) - 1;
   return sorted[Math.max(0, index)];
+}
+
+async function sendGroupMessage(config: Config): Promise<void> {
+  if (!config.groupId || !config.message) {
+    console.error("❌ Error: Group ID and message are required for group messaging");
+    return;
+  }
+
+  console.log(`📤 Sending message to group ${config.groupId} on ${config.env}`);
+  
+  // Use an existing inbox that was likely used in group creation
+  const existingInboxes = getInboxByInstallationCount(2);
+  if (existingInboxes.length === 0) {
+    console.error("❌ No existing inboxes available for group messaging");
+    return;
+  }
+  
+  // Try different inboxes if one fails
+  let inboxData = existingInboxes[Math.floor(Math.random() * existingInboxes.length)];
+  console.log(`📋 Using existing inbox: ${inboxData.inboxId}`);
+  
+  const dbEncryptionKey = getEncryptionKeyFromHex(inboxData.dbEncryptionKey);
+  const signer = createSigner(inboxData.walletKey as `0x${string}`);
+  const signerIdentifier = (await signer.getIdentifier()).identifier;
+
+  // Create send directory in data path if it doesn't exist
+  const dbPath = getDbPathQA(`send/${config.env}-group-${signerIdentifier}`);
+  const sendDir = path.dirname(dbPath);
+  if (!fs.existsSync(sendDir)) {
+    fs.mkdirSync(sendDir, { recursive: true });
+  }
+
+  try {
+    const client = await Client.create(signer, {
+      env: config.env as XmtpEnv,
+      dbPath,
+      dbEncryptionKey,
+      loggingLevel: config.loggingLevel,
+    });
+
+    console.log(`✅ Client created: ${client.inboxId}`);
+
+    // Sync conversations to get all available groups
+    console.log(`🔄 Syncing conversations...`);
+    await client.conversations.sync();
+    
+    // Get all conversations and find the group by ID
+    const conversations = await client.conversations.list();
+    console.log(`📋 Found ${conversations.length} conversations`);
+    
+    const group = conversations.find(conv => conv.id === config.groupId) as Group;
+    if (!group) {
+      console.error(`❌ Group with ID ${config.groupId} not found`);
+      console.log(`📋 Available conversation IDs:`);
+      conversations.forEach(conv => console.log(`   - ${conv.id}`));
+      return;
+    }
+
+    console.log(`📋 Found group: ${group.id}`);
+
+    // Send the message
+    const sendStart = Date.now();
+    await group.send(config.message);
+    const sendTime = Date.now() - sendStart;
+
+    console.log(`✅ Message sent successfully in ${sendTime}ms`);
+    console.log(`💬 Message: "${config.message}"`);
+    console.log(`🔗 Group URL: https://xmtp.chat/conversations/${config.groupId}`);
+
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Failed to send group message: ${errorMessage}`);
+  }
+
+  process.exit(0);
 }
 
 async function runsendTest(config: Config): Promise<void> {
@@ -487,7 +599,12 @@ async function runsendTest(config: Config): Promise<void> {
 
 async function main(): Promise<void> {
   const config = parseArgs();
-  await runsendTest(config);
+  
+  if (config.groupId) {
+    await sendGroupMessage(config);
+  } else {
+    await runsendTest(config);
+  }
 }
 
 void main();
