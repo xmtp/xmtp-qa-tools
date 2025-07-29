@@ -76,6 +76,7 @@ interface LogPayload {
   env: string;
   region: string;
   country_iso_code: string;
+  batch_size: string | undefined;
 }
 interface NetworkStats {
   "DNS Lookup": number;
@@ -310,6 +311,7 @@ export async function sendDatadogLog(
     source: "xmtp-qa-tools",
     error_count: Array.from(errorLogs).length,
     fail_lines: fail_lines.length,
+    batch_size: process.env.BATCH_SIZE || undefined,
     message: Array.from(errorLogs).join("\n"),
     test: testName,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
