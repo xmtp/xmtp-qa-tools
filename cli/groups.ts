@@ -110,11 +110,7 @@ function parseArgs(): Config {
 }
 
 // Helper function to create a worker manager with specified number of workers
-async function createWorkerManager(
-  count: number,
-  env: string,
-  loggingLevel?: LogLevel,
-) {
+async function createWorkerManager(count: number, env: string) {
   return await getWorkers(count, {
     env: env as XmtpEnv,
     useVersions: false, // Use latest version for group operations

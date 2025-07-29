@@ -173,10 +173,7 @@ function parseArgs(): Config {
 }
 
 // Helper function to create a worker manager and get client
-async function getClient(
-  env: string,
-  loggingLevel?: LogLevel,
-): Promise<Client> {
+async function getClient(env: string): Promise<Client> {
   const workerManager = await getWorkers(1, {
     env: env as XmtpEnv,
     useVersions: false, // Use latest version for permission operations
@@ -186,12 +183,8 @@ async function getClient(
 }
 
 // Helper function to get a group by ID using SDK
-async function getGroupById(
-  groupId: string,
-  env: string,
-  loggingLevel?: LogLevel,
-): Promise<Group> {
-  const client = await getClient(env, loggingLevel);
+async function getGroupById(groupId: string, env: string): Promise<Group> {
+  const client = await getClient(env);
 
   try {
     const conversation =
@@ -224,11 +217,7 @@ async function runListOperation(config: Config): Promise<void> {
   console.log(`📋 Listing members for group: ${config.groupId}`);
 
   try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
+    const group = await getGroupById(config.groupId, config.env);
     await group.sync();
 
     const members = await group.members();
@@ -292,11 +281,7 @@ async function runInfoOperation(config: Config): Promise<void> {
   console.log(`ℹ️  Getting detailed information for group: ${config.groupId}`);
 
   try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
+    const group = await getGroupById(config.groupId, config.env);
     await group.sync();
 
     const members = await group.members();
@@ -386,15 +371,11 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
   console.log(`🔑 Permission: ${config.permissions}`);
 
   try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
+    const group = await getGroupById(config.groupId, config.env);
     await group.sync();
 
     // Check if current user is super admin (only super admins can change permissions)
-    const client = await getClient(config.env, config.loggingLevel);
+    const client = await getClient(config.env);
     const currentUser = client.inboxId;
     const isSuperAdmin = group.isSuperAdmin(currentUser);
 
