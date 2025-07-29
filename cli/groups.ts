@@ -1,5 +1,4 @@
 import {
-  Client,
   IdentifierKind,
   type Conversation,
   type Group,
@@ -7,15 +6,6 @@ import {
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
-import fs from "node:fs";
-import path from "node:path";
-import { generatePrivateKey } from "viem/accounts";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPathQA,
-  getEncryptionKeyFromHex,
-} from "../helpers/client";
 import { getRandomInboxIds } from "../inboxes/utils";
 import { getWorkers } from "../workers/manager";
 

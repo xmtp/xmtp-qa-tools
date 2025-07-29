@@ -1,5 +1,4 @@
 import {
-  Client,
   IdentifierKind,
   type Conversation,
   type DecodedMessage,
@@ -10,15 +9,7 @@ import {
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { generatePrivateKey } from "viem/accounts";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPathQA,
-  getEncryptionKeyFromHex,
-} from "../helpers/client";
-import { getInboxByInstallationCount } from "../inboxes/utils";
-import { getWorkers, WorkerManager } from "../workers/manager";
+import { getWorkers } from "../workers/manager";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
@@ -255,17 +246,6 @@ async function runsendTest(config: Config): Promise<void> {
 
   // Initialize workers using the workers API
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
-
-  let initializedCount = 0;
-  const updateProgress = () => {
-    const percentage = Math.round((initializedCount / config.userCount) * 100);
-    const filled = Math.round((percentage / 100) * 20);
-    const empty = 20 - filled;
-    const bar = "█".repeat(filled) + "░".repeat(empty);
-    process.stdout.write(
-      `\r📋 [${bar}] ${percentage}% (${initializedCount}/${config.userCount} workers)`,
-    );
-  };
 
   const logSummary = (
     results: Array<{
