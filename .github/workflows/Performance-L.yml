@@ -20,9 +20,9 @@ jobs:
         cache-data: [false]
         include:
           - size: 100-150
-            delay_minutes: 5
+            delay_minutes: 0
           - size: 200-250
-            delay_minutes: 15
+            delay_minutes: 10
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
@@ -36,6 +36,10 @@ jobs:
           cache-data: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}-${{ matrix.size }}
           env: ${{ matrix.env }}
+
+      - name: Sleep for ${{ matrix.delay_minutes }} minutes
+        if: matrix.delay_minutes > 0
+        run: sleep ${{ matrix.delay_minutes * 60 }}
 
       - name: Run tests ${{ matrix.size }}
         run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
