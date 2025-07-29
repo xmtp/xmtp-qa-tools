@@ -24,7 +24,7 @@ interface Config {
 
 function showHelp() {
   console.log(`
-XMTP Create CLI - Create DMs and Groups
+XMTP groups - Create DMs and Groups
 
 USAGE:
   yarn groups <operation> [options]
@@ -159,7 +159,7 @@ async function runDmOperation(config: Config): Promise<void> {
         );
 
         // Send a test message
-        const message = `Hello from user ${i + 1} to user ${j + 1}! DM created by XMTP Create CLI.`;
+        const message = `Hello from user ${i + 1} to user ${j + 1}! DM created by XMTP groups CLI.`;
         await conversation.send(message);
         console.log(`📤 Sent test message in DM ${createdDmCount}`);
       } catch (error) {
@@ -200,7 +200,7 @@ async function runGroupOperation(config: Config): Promise<void> {
   // Set up group options
   const groupName = config.groupName || `Test Group ${Date.now()}`;
   const groupDescription =
-    config.groupDescription || "Group created by XMTP Create CLI";
+    config.groupDescription || "Group created by XMTP groups CLI";
 
   console.log(`👥 Creating group: "${groupName}"`);
   console.log(`📝 Description: "${groupDescription}"`);
@@ -250,7 +250,7 @@ async function runGroupOperation(config: Config): Promise<void> {
     }
 
     // Send welcome message to group
-    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP Create CLI with ${groupMembers.length} members.`;
+    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP groups CLI with ${groupMembers.length} members.`;
     await group.send(welcomeMessage);
     console.log(`💬 Sent welcome message to group`);
 
