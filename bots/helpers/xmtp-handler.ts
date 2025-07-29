@@ -1,9 +1,4 @@
-import {
-  Client,
-  type DecodedMessage,
-  type LogLevel,
-  type XmtpEnv,
-} from "@workers/versions";
+import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import "dotenv/config";
 import {
   createSigner,
@@ -19,11 +14,6 @@ import {
   type MessageHandler,
   type SkillOptions,
 } from "../helpers/xmtp-skills";
-
-// Retry configuration constants
-const MAX_RETRIES = 5;
-// wait 5 seconds before each retry
-const RETRY_INTERVAL = 5000;
 
 /**
  * Core options for XMTP client initialization that includes skill options
@@ -43,104 +33,51 @@ export const DEFAULT_CORE_OPTIONS: ClientOptions = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
   loggingLevel: (process.env.LOGGING_LEVEL || "error") as LogLevel,
-  networks: [process.env.XMTP_ENV ?? "local"],
+  networks: ["dev"],
   ...DEFAULT_SKILL_OPTIONS,
 };
 
-// Helper functions
-export const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
 /**
- * Handle message streaming with retry logic using onMessage callback
+ * Handle message streaming with onMessage callback
  */
 const handleStream = async (
   client: Client,
   callBack: MessageHandler,
   skillOpts: SkillOptions,
 ): Promise<void> => {
-  let retries = MAX_RETRIES; // Per-stream retry counter
   const env = client.options?.env;
-
-  const retry = async (): Promise<void> => {
-    if (retries > 0) {
-      retries--;
-      console.log(
-        `[${env}] Retrying in ${RETRY_INTERVAL / 1000}s, ${retries} retries left`,
-      );
-      await sleep(RETRY_INTERVAL);
-      try {
-        await handleStream(client, callBack, skillOpts);
-      } catch (error: unknown) {
-        console.error(`[${env}] Retry attempt failed:`, error);
-        await retry();
-      }
-    } else {
-      console.log(`[${env}] Max retries reached, ending process`);
-      process.exit(1);
-    }
-  };
-
-  const onFail = (): void => {
-    console.log(`[${env}] Stream failed`);
-    void (async () => {
-      try {
-        await retry();
-      } catch (error: unknown) {
-        console.error(`[${env}] Failed to retry after stream failure:`, error);
-        process.exit(1);
-      }
-    })();
-  };
-  const onError = (err: Error | null) => {
-    if (err) {
-      console.error(`[${env}] Stream error:`, err);
-      return;
-    }
-  };
-  const onValue = (message: DecodedMessage) => {
-    // Reset retry counter on successful message processing
-    retries = MAX_RETRIES;
-
-    // Process message asynchronously without blocking the callback
-    void (async () => {
-      try {
-        await processMessage(
-          client,
-          message,
-          callBack,
-          skillOpts,
-          env || "unknown",
-        );
-      } catch (err: unknown) {
-        console.error(`[${env}] Error processing message:`, err);
-      }
-    })();
-  };
 
   try {
     console.log(`[${env}] Syncing conversations...`);
     await client.conversations.sync();
 
     console.log(`[${env}] Waiting for messages...`);
-    await client.conversations.streamAllMessages({
-      onValue,
-      onError,
-      onFail,
-    });
+    const stream = await client.conversations.streamAllMessages();
+
+    for await (const message of stream) {
+      // Process message asynchronously
+      void (async () => {
+        try {
+          await processMessage(
+            client,
+            message,
+            callBack,
+            skillOpts,
+            env || "unknown",
+          );
+        } catch (err: unknown) {
+          console.error(`[${env}] Error processing message:`, err);
+        }
+      })();
+    }
   } catch (err: unknown) {
     console.error(`[${env}] Error streaming messages:`, err);
-    try {
-      await retry();
-    } catch (error: unknown) {
-      console.error(`[${env}] Failed to retry after streaming error:`, error);
-      process.exit(1);
-    }
+    throw err;
   }
 };
 
 /**
- * Initialize XMTP clients with robust error handling
+ * Initialize XMTP clients with error handling
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
