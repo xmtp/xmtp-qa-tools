@@ -1,120 +1,80 @@
-# Worker Framework
+# Workers
 
-## Basic usage
+The `getWorkers` function has three input modes with optional configuration:
+
+### Input Modes
 
 ```typescript
-import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
+// 1. Number - creates that many workers with random names (default)
+const workers = await getWorkers(5);
 
-describe("test", async () => {
-  const workers = await getWorkers(["alice", "bob"]);
-  setupTestLifecycle({ testName });
-
-  it("work", async () => {
-    const alice = workers.get("alice");
-    const bob = workers.get("bob");
-    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
-    await dm.send("Hello");
-  });
-});
+// 2. Array of specific worker names
+const workers = await getWorkers(["alice", "bob", "charlie"]);
 ```
 
-## Worker creation
+### Options Configuration
 
 ```typescript
-// Basic patterns
-await getWorkers(3); // 3 random workers
-await getWorkers(["alice", "bob"]); // specific names
-await getWorkers(5, { env: "production" }); // production env
-await getWorkers(3, { useVersions: true }); // random SDK versions
-await getWorkers(1, { nodeSDK: "3.1.1" }); // specific version
+type GetWorkersOptions = {
+  env?: XmtpEnv; // XMTP environment (default: from XMTP_ENV)
+  useVersions?: boolean; // Apply version descriptors (default: true)
+  randomNames?: boolean; // Use random names for number input (default: true)
+};
+
+// Examples:
+await getWorkers(3); // 3 workers with random names, versioned
+await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
+await getWorkers(["alice", "bob"]); // Specific names, versioned
+await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
+await getWorkers(5, { env: "production" }); // 5 random workers on production
 ```
 
-## Conversations
+## Worker Access Patterns
 
 ```typescript
-// DMs
-const dm = await alice.client.conversations.newDm(bob.client.inboxId);
-const dm2 = await alice.client.conversations.newDmWithIdentifier({
-  identifier: bob.address,
-  identifierKind: IdentifierKind.Ethereum,
-});
-
-// Groups
-const group = await alice.client.conversations.newGroup([bob.client.inboxId]);
-const testGroup = await workers.createGroupBetweenAll("My Group");
-
-// Messages
-await dm.send("Hello DM");
-await group.send("Hello Group");
-```
-
-## Group operations
-
-```typescript
-await group.updateName("New Name");
-await group.addMembers([newMemberInboxId]);
-await group.removeMembers([memberInboxId]);
-await group.addAdmin(memberInboxId);
-const members = await group.members();
-```
-
-## Streams
-
-```typescript
-// Start streams
-worker.worker.startStream(typeofStream.Message);
-worker.worker.startStream(typeofStream.MessageandResponse);
-
-// Stop streams
-worker.worker.endStream();
-worker.worker.endStream(typeofStream.Message);
-
-// delivery
-const result = await verifyMessageStream(
-  conversation,
-  [workers.get("bob")],
-  1,
-  "gm-{i}-{randomSuffix}",
-);
-expect(result.allReceived).toBe(true);
-```
-
-## Version testing
-
-```typescript
-import { getVersions } from "@workers/versions";
-
-// Random versions
-const workers = await getWorkers(3, { useVersions: true });
-
-// Specific versions
-const versions = getVersions().slice(0, 3);
-for (const version of versions) {
-  const workers = await getWorkers([`bob-a-${version.nodeSDK}`], {
-    useVersions: false,
-  });
-  // Test logic
-}
-```
-
-## Worker access
-
-```typescript
+// Get specific workers
 const alice = workers.get("alice");
 const bob = workers.get("bob");
+
+// Access worker properties
+alice.client; // XMTP client
+alice.worker; // Worker thread
+alice.name; // "alice"
+alice.address; // Ethereum address
+alice.client.inboxId; // Inbox ID
+
+// Utility methods
 workers.getCreator(); // First worker
 workers.getReceiver(); // Random non-creator
 workers.getAll(); // All workers array
+workers.getAllButCreator(); // All except first
 workers.getRandomWorkers(2); // Random subset
+
+// Get worker names array (useful for logging/debugging)
+const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
 ```
 
-## Key imports
+## Common Usage Patterns
+
+### Simple Testing
 
 ```typescript
-import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
-import { getVersions } from "@workers/versions";
+// Most common patterns
+const workers = await getWorkers(5); // 5 random workers
+const workers = await getWorkers(["alice", "bob"]); // Specific workers
+```
+
+### Version Testing
+
+```typescript
+// Versioning is enabled by default
+const workers = await getWorkers(3); // Uses random SDK versions
+const workers = await getWorkers(3, { useVersions: false }); // All latest version
+```
+
+### Environment-Specific Testing
+
+```typescript
+const workers = await getWorkers(5, { env: "production" });
+const workers = await getWorkers(["alice"], { env: "local" });
 ```
