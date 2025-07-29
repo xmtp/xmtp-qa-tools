@@ -130,20 +130,12 @@ All commands support:
 
 ## Common Options
 
-Most commands support:
-
-```bash
---env <environment>    # Set XMTP environment
---debug               # Enable file logging
---no-fail             # Exit with success on failures
---help, -h            # Show help
-```
-
 ## Environment Variables
 
 - `TARGET` - Default target address
-- `XMTP_ENV` - Default environment
-- `LOGGING_LEVEL` - Logging level
+- `XMTP_ENV` - Default environment (local/dev/production)
+- `LOG_LEVEL` - JS logger level (default: info)
+- `LOGGING_LEVEL` - Rust library logger level (default: off)
 - `WALLET_KEY` - Wallet private key (for revoke)
 - `ENCRYPTION_KEY` - Encryption key (for revoke)
 
@@ -184,11 +176,4 @@ yarn gen --help        # Generator help
 yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
 yarn groups --help     # Groups help
-```
-
-## Monitoring
-
-```bash
-yarn ansi:clean        # Clean raw logs
-yarn ansi:forks        # Clean fork logs
 ```
