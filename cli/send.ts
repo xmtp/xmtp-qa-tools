@@ -18,6 +18,7 @@ import {
   getEncryptionKeyFromHex,
 } from "../helpers/client";
 import { getInboxByInstallationCount } from "../inboxes/utils";
+import { getWorkers, WorkerManager } from "../workers/manager";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
@@ -196,45 +197,22 @@ async function sendGroupMessage(config: Config): Promise<void> {
 
   console.log(`📤 Sending message to group ${config.groupId} on ${config.env}`);
 
-  // Use an existing inbox that was likely used in group creation
-  const existingInboxes = getInboxByInstallationCount(2);
-  if (existingInboxes.length === 0) {
-    console.error("❌ No existing inboxes available for group messaging");
-    return;
-  }
+  // Create a single worker for group messaging
+  const workerManager = await getWorkers(1, {
+    env: config.env as XmtpEnv,
+    useVersions: false, // Use latest version for group messaging
+  });
 
-  // Try different inboxes if one fails
-  let inboxData =
-    existingInboxes[Math.floor(Math.random() * existingInboxes.length)];
-  console.log(`📋 Using existing inbox: ${inboxData.inboxId}`);
-
-  const dbEncryptionKey = getEncryptionKeyFromHex(inboxData.dbEncryptionKey);
-  const signer = createSigner(inboxData.walletKey as `0x${string}`);
-  const signerIdentifier = (await signer.getIdentifier()).identifier;
-
-  // Create send directory in data path if it doesn't exist
-  const dbPath = getDbPathQA(`send/${config.env}-group-${signerIdentifier}`);
-  const sendDir = path.dirname(dbPath);
-  if (!fs.existsSync(sendDir)) {
-    fs.mkdirSync(sendDir, { recursive: true });
-  }
+  const worker = workerManager.getAll()[0];
+  console.log(`📋 Using worker: ${worker.inboxId}`);
 
   try {
-    const client = await Client.create(signer, {
-      env: config.env as XmtpEnv,
-      dbPath,
-      dbEncryptionKey,
-      loggingLevel: config.loggingLevel,
-    });
-
-    console.log(`✅ Client created: ${client.inboxId}`);
-
     // Sync conversations to get all available groups
     console.log(`🔄 Syncing conversations...`);
-    await client.conversations.sync();
+    await worker.client.conversations.sync();
 
     // Get all conversations and find the group by ID
-    const conversations = await client.conversations.list();
+    const conversations = await worker.client.conversations.list();
     console.log(`📋 Found ${conversations.length} conversations`);
 
     const group = conversations.find(
@@ -275,9 +253,7 @@ async function runsendTest(config: Config): Promise<void> {
 
   cleanupsendDatabases(config.env);
 
-  const dbEncryptionKey = getEncryptionKeyFromHex(generateEncryptionKeyHex());
-
-  // Initialize workers concurrently
+  // Initialize workers using the workers API
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
 
   let initializedCount = 0;
@@ -351,32 +327,13 @@ async function runsendTest(config: Config): Promise<void> {
     }
   };
 
-  const workerPromises = Array.from(
-    { length: config.userCount },
-    async (_, i) => {
-      const workerKey = generatePrivateKey();
-      const signer = createSigner(workerKey);
-      const signerIdentifier = (await signer.getIdentifier()).identifier;
-      // Create send directory in data path if it doesn't exist
-      const dbPath = getDbPathQA(`send/${config.env}-${i}-${signerIdentifier}`);
-      const sendDir = path.dirname(dbPath);
-      if (!fs.existsSync(sendDir)) {
-        fs.mkdirSync(sendDir, { recursive: true });
-      }
-      const client = await Client.create(signer, {
-        env: config.env as XmtpEnv,
-        dbPath,
-        dbEncryptionKey,
-        loggingLevel: config.loggingLevel,
-      });
+  // Create worker manager and initialize workers
+  const workerManager = await getWorkers(config.userCount, {
+    env: config.env as XmtpEnv,
+    useVersions: false, // Use latest version for send tests
+  });
 
-      initializedCount++;
-      updateProgress();
-      return client;
-    },
-  );
-
-  const workers = await Promise.all(workerPromises);
+  const workers = workerManager.getAll();
   console.log(`\n✅ All ${config.userCount} workers initialized successfully`);
 
   // Run all workers in parallel
@@ -408,15 +365,17 @@ async function runsendTest(config: Config): Promise<void> {
         try {
           let conversation: Conversation;
 
-          conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: config.target,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
+          conversation = (await worker.client.conversations.newDmWithIdentifier(
+            {
+              identifier: config.target,
+              identifierKind: IdentifierKind.Ethereum,
+            },
+          )) as Conversation;
 
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);
             // Set up stream
-            void worker.conversations.streamAllMessages({
+            void worker.client.conversations.streamAllMessages({
               onValue: (message: DecodedMessage) => {
                 // Check for bot response
                 if (

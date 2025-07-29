@@ -17,6 +17,7 @@ import {
   getEncryptionKeyFromHex,
 } from "../helpers/client";
 import { getRandomInboxIds } from "../inboxes/utils";
+import { getWorkers } from "../workers/manager";
 
 interface Config {
   operation: "dm" | "group";
@@ -143,27 +144,15 @@ function parseArgs(): Config {
   return config;
 }
 
-// Helper function to create a client
-async function createClient(
-  index: number,
+// Helper function to create a worker manager with specified number of workers
+async function createWorkerManager(
+  count: number,
   env: string,
   loggingLevel?: LogLevel,
-): Promise<Client> {
-  const workerKey = generatePrivateKey();
-  const signer = createSigner(workerKey);
-  const signerIdentifier = (await signer.getIdentifier()).identifier;
-  const dbPath = getDbPathQA(`create/${env}-${index}-${signerIdentifier}`);
-  const sendDir = path.dirname(dbPath);
-  if (!fs.existsSync(sendDir)) {
-    fs.mkdirSync(sendDir, { recursive: true });
-  }
-  const dbEncryptionKey = getEncryptionKeyFromHex(generateEncryptionKeyHex());
-
-  return await Client.create(signer, {
+) {
+  return await getWorkers(count, {
     env: env as XmtpEnv,
-    dbPath,
-    dbEncryptionKey,
-    loggingLevel,
+    useVersions: false, // Use latest version for group operations
   });
 }
 
@@ -174,25 +163,29 @@ async function runDmOperation(config: Config): Promise<void> {
 
   // Create users for DMs
   const userCount = Math.max(2, dmCount + 1); // Need at least 2 users for DMs
-  const users: Client[] = [];
 
   console.log(`👥 Creating ${userCount} users...`);
-  for (let i = 0; i < userCount; i++) {
-    const client = await createClient(i, config.env, config.loggingLevel);
-    users.push(client);
-    console.log(`✅ Created user ${i + 1}: ${client.inboxId}`);
+  const workerManager = await createWorkerManager(
+    userCount,
+    config.env,
+    config.loggingLevel,
+  );
+  const workers = workerManager.getAll();
+
+  for (let i = 0; i < workers.length; i++) {
+    console.log(`✅ Created user ${i + 1}: ${workers[i].inboxId}`);
   }
 
-  // Create DMs between users
+  // Create DMs between workers
   const conversations: Conversation[] = [];
   let createdDmCount = 0;
 
   console.log(`💬 Creating DMs...`);
-  for (let i = 0; i < users.length && createdDmCount < dmCount; i++) {
-    for (let j = i + 1; j < users.length && createdDmCount < dmCount; j++) {
+  for (let i = 0; i < workers.length && createdDmCount < dmCount; i++) {
+    for (let j = i + 1; j < workers.length && createdDmCount < dmCount; j++) {
       try {
-        const conversation = await users[i].conversations.newDm(
-          users[j].inboxId,
+        const conversation = await workers[i].client.conversations.newDm(
+          workers[j].inboxId,
         );
         conversations.push(conversation);
         createdDmCount++;
@@ -215,7 +208,7 @@ async function runDmOperation(config: Config): Promise<void> {
   }
 
   console.log(`\n📊 DM Summary:`);
-  console.log(`   Users Created: ${users.length}`);
+  console.log(`   Users Created: ${workers.length}`);
   console.log(`   DMs Created: ${conversations.length}`);
   console.log(`   Target DMs: ${dmCount}`);
   console.log(`   Environment: ${config.env}`);
@@ -226,9 +219,14 @@ async function runGroupOperation(config: Config): Promise<void> {
   const members = config.members ?? 5;
   console.log(`🏗️  Creating group with ${members} members`);
 
-  // Create main client
-  const mainClient = await createClient(0, config.env, config.loggingLevel);
-  console.log(`✅ Main client created: ${mainClient.inboxId}`);
+  // Create main worker
+  const workerManager = await createWorkerManager(
+    1,
+    config.env,
+    config.loggingLevel,
+  );
+  const mainWorker = workerManager.getAll()[0];
+  console.log(`✅ Main worker created: ${mainWorker.inboxId}`);
 
   // Get existing inbox IDs for group members
   const memberInboxIds = getRandomInboxIds(members, 2);
@@ -246,11 +244,14 @@ async function runGroupOperation(config: Config): Promise<void> {
 
   try {
     // Create group with existing inbox IDs and permissions
-    const group = (await mainClient.conversations.newGroup(memberInboxIds, {
-      groupName,
-      groupDescription,
-      permissions,
-    })) as Group;
+    const group = (await mainWorker.client.conversations.newGroup(
+      memberInboxIds,
+      {
+        groupName,
+        groupDescription,
+        permissions,
+      },
+    )) as Group;
 
     console.log(`✅ Group created with ID: ${group.id}`);
 
