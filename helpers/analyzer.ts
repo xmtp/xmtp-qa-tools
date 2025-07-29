@@ -11,6 +11,10 @@ export const PATTERNS = {
         "FAIL  suites/functional/dms.test.ts > dms > should fail on purpose",
       ],
     },
+    {
+      testName: "Browser",
+      uniqueErrorLines: ["FAIL browser > conversation stream with message"],
+    },
   ],
   min_fail_lines: 3,
   min_line_length: 40,
