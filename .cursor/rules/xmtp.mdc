@@ -799,6 +799,120 @@ When working with these classes:
    - Check permission level with `member.permissionLevel`
    - consent state with `member.consentState`
 
+## Group Permissions System
+
+XMTP provides a robust group permissions system that allows fine-grained control over who can perform specific actions within a group. This system is essential for creating safe and well-managed group chat experiences.
+
+### Permission Types
+
+There are 5 main permission types that can be configured:
+
+```typescript
+export declare const enum PermissionUpdateType {
+  AddMember = 0, // Who can add new members to the group
+  RemoveMember = 1, // Who can remove members from the group
+  AddAdmin = 2, // Who can grant admin status to members
+  RemoveAdmin = 3, // Who can remove admin status from members
+  UpdateMetadata = 4, // Who can update group name, description, image
+}
+```
+
+### Permission Policies
+
+Each permission can be assigned one of 6 different policies:
+
+```typescript
+export declare const enum PermissionPolicy {
+  Allow = 0, // All members can perform this action
+  Deny = 1, // No one can perform this action
+  Admin = 2, // Only admins can perform this action
+  SuperAdmin = 3, // Only super admins can perform this action
+  DoesNotExist = 4, // Permission doesn't exist (legacy)
+  Other = 5, // Custom policy (reserved for future use)
+}
+```
+
+### Member Roles
+
+Group members can have different roles with varying levels of permissions:
+
+- **Member**: Basic group participant
+- **Admin**: Can perform admin-level actions (depends on group settings)
+- **Super Admin**: Has all permissions and can manage other admins
+
+### Default Permission Set
+
+When a group is created, it uses the `All_Members` policy set by default:
+
+```typescript
+// Default permissions for new groups
+const defaultPermissions = {
+  AddMember: PermissionPolicy.Allow, // All members can add others
+  RemoveMember: PermissionPolicy.Admin, // Only admins can remove members
+  AddAdmin: PermissionPolicy.SuperAdmin, // Only super admins can add admins
+  RemoveAdmin: PermissionPolicy.SuperAdmin, // Only super admins can remove admins
+  UpdateMetadata: PermissionPolicy.Allow, // All members can update metadata
+};
+```
+
+### Managing Group Permissions
+
+```typescript
+// Check if a member is an admin
+const isAdmin = group.isAdmin(inboxId);
+const isSuperAdmin = group.isSuperAdmin(inboxId);
+
+// Get all admins and super admins
+const admins = group.admins;
+const superAdmins = group.superAdmins;
+
+// Manage admin status
+await group.addAdmin(inboxId);
+await group.removeAdmin(inboxId);
+await group.addSuperAdmin(inboxId);
+await group.removeSuperAdmin(inboxId);
+```
+
+### Permission Validation Matrix
+
+The following table shows valid policy combinations for each permission type:
+
+| Permission Type | Allow | Deny | Admin | SuperAdmin |
+| --------------- | ----- | ---- | ----- | ---------- |
+| AddMember       | ✅    | ✅   | ✅    | ✅         |
+| RemoveMember    | ✅    | ✅   | ✅    | ✅         |
+| AddAdmin        | ❌    | ✅   | ✅    | ✅         |
+| RemoveAdmin     | ❌    | ✅   | ✅    | ✅         |
+| UpdateMetadata  | ✅    | ✅   | ✅    | ✅         |
+
+**Note**: `AddAdmin` and `RemoveAdmin` cannot be set to "Allow" for security reasons, as this would allow any member to grant admin privileges.
+
+### Custom Permission Sets
+
+You can create custom permission sets for specific use cases:
+
+```typescript
+// Example: Admin-only group
+const adminOnlyPermissions = {
+  AddMember: PermissionPolicy.Admin,
+  RemoveMember: PermissionPolicy.Admin,
+  AddAdmin: PermissionPolicy.SuperAdmin,
+  RemoveAdmin: PermissionPolicy.SuperAdmin,
+  UpdateMetadata: PermissionPolicy.Admin,
+};
+
+// Read-only group - only super admin can make changes
+const readOnlyGroup = {
+  AddMember: PermissionPolicy.SuperAdmin,
+  RemoveMember: PermissionPolicy.SuperAdmin,
+  AddAdmin: PermissionPolicy.SuperAdmin,
+  RemoveAdmin: PermissionPolicy.SuperAdmin,
+  UpdateMetadata: PermissionPolicy.SuperAdmin,
+};
+```
+
+For more detailed information about XMTP group permissions, see the [official documentation](https://docs.xmtp.org/inboxes/group-permissions).
+
 ## Other Notes
 
 ### Handling local database paths
