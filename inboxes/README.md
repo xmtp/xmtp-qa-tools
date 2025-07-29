@@ -53,17 +53,17 @@ yarn prod-update
 yarn gen
 
 # Custom count and installations
-yarn gen --count 500 --installations 10 --envs local
+yarn gen --count 500 --installations 10 --env local
 
 # Multiple environments
-yarn gen --count 200 --installations 5 --envs local,dev,production
+yarn gen --count 200 --installations 5 --env local,dev,production
 ```
 
 ## Parameters
 
 - **`--count`** - Number of accounts to generate (default: 200)
 - **`--installations`** - Number of installations per account (default: 2)
-- **`--envs`** - Target environments: `local`, `dev`, `production` (default: production)
+- **`--env`** - Target environments: `local`, `dev`, `production` (default: production)
 - **`--debug`** - Enable verbose logging
 
 ## Troubleshooting

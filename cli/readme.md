@@ -82,7 +82,7 @@ yarn gen [options]
 **Options:**
 
 - `--count <n>` - Number of inboxes [default: 200]
-- `--envs <list>` - Environments (local,dev,production) [default: production]
+- `--env <list>` - Environments (local,dev,production) [default: production]
 - `--installations <n>` - Installations per inbox [default: 2]
 - `--debug` - Enable debug logging
 - `--clean` - Clean logs/ and .data/ directories
@@ -208,7 +208,7 @@ yarn send --address 0x1234... --env production --users 500 --wait
 yarn test functional --versions 3 --debug
 
 # Generate test data for multiple environments
-yarn gen --count 500 --envs local,dev --installations 3
+yarn gen --count 500 --env local,dev --installations 3
 
 # Run echo bot in development
 yarn bot echo --env dev

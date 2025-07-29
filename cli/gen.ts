@@ -40,7 +40,7 @@ USAGE:
 
 OPTIONS:
   --count <number>       Number of inboxes to generate [default: 200]
-  --envs <environments>  Comma-separated environments (local,dev,production) [default: production]
+  --env <environments>  Comma-separated environments (local,dev,production) [default: production]
   --installations <num>  Number of installations per inbox [default: 2]
   --debug               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
@@ -52,8 +52,8 @@ ENVIRONMENTS:
   production  Production XMTP network
 
 EXAMPLES:
-  yarn gen --count 500 --envs local
-  yarn gen --envs local,dev --installations 3
+  yarn gen --count 500 --env local
+  yarn gen --env local,dev --installations 3
   yarn gen --clean --debug
   yarn gen --help
 
@@ -457,7 +457,7 @@ async function main() {
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
-    if (arg === "--envs")
+    if (arg === "--env")
       envs = args[i + 1]
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
