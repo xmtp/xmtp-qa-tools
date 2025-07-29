@@ -76,7 +76,7 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
     target: process.env.TARGET ?? "",
     tresshold: 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,

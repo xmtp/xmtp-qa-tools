@@ -47,7 +47,7 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     botName: "",
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
   };
 
   for (let i = 0; i < args.length; i++) {

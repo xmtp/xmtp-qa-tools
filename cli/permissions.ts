@@ -1,10 +1,4 @@
-import {
-  IdentifierKind,
-  type Conversation,
-  type Group,
-  type LogLevel,
-  type XmtpEnv,
-} from "@workers/versions";
+import { type Group, type LogLevel, type XmtpEnv } from "@workers/versions";
 import "dotenv/config";
 import { getWorkers } from "@workers/manager";
 
@@ -81,7 +75,7 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     operation: "list",
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
   };
 
@@ -103,7 +97,11 @@ function parseArgs(): Config {
   // Third argument is policy for set operation, or inbox ID for admin operation
   if (args.length > 0 && !args[0].startsWith("--")) {
     if (config.operation === "set") {
-      config.policy = args[0] as "default" | "admin-only" | "read-only" | "open";
+      config.policy = args[0] as
+        | "default"
+        | "admin-only"
+        | "read-only"
+        | "open";
     } else if (config.operation === "admin") {
       config.inboxId = args[0];
     }
@@ -129,7 +127,11 @@ function parseArgs(): Config {
       config.env = nextArg;
       i++;
     } else if (arg === "--policy" && nextArg) {
-      config.policy = nextArg as "default" | "admin-only" | "read-only" | "open";
+      config.policy = nextArg as
+        | "default"
+        | "admin-only"
+        | "read-only"
+        | "open";
       i++;
     } else if (arg === "--action" && nextArg) {
       config.action = nextArg as "add" | "remove" | "list";
@@ -156,25 +158,32 @@ async function createWorkerManager(
 }
 
 // Helper function to get a group by ID
-async function getGroupById(groupId: string, env: string, loggingLevel?: LogLevel): Promise<Group> {
+async function getGroupById(
+  groupId: string,
+  env: string,
+  loggingLevel?: LogLevel,
+): Promise<Group> {
   const workerManager = await createWorkerManager(1, env, loggingLevel);
   const worker = workerManager.getAll()[0];
-  
+
   try {
-    const conversation = await worker.client.conversations.getConversationById(groupId);
+    const conversation =
+      await worker.client.conversations.getConversationById(groupId);
     if (!conversation) {
       throw new Error(`Group not found: ${groupId}`);
     }
-    
+
     // Verify it's a group
     const metadata = await conversation.metadata();
     if (metadata?.conversationType !== "group") {
       throw new Error(`Conversation is not a group: ${groupId}`);
     }
-    
+
     return conversation as Group;
   } catch (error) {
-    throw new Error(`Failed to access group ${groupId}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to access group ${groupId}: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
@@ -188,9 +197,13 @@ async function runListOperation(config: Config): Promise<void> {
   console.log(`📋 Listing permissions for group: ${config.groupId}`);
 
   try {
-    const group = await getGroupById(config.groupId, config.env, config.loggingLevel);
+    const group = await getGroupById(
+      config.groupId,
+      config.env,
+      config.loggingLevel,
+    );
     await group.sync();
-    
+
     const members = await group.members();
     const admins = group.admins;
     const superAdmins = group.superAdmins;
@@ -221,9 +234,10 @@ async function runListOperation(config: Config): Promise<void> {
     });
 
     console.log(`\n🔐 Permission Status:`);
-    console.log(`   Note: Detailed permission policies are not yet implemented in this CLI`);
+    console.log(
+      `   Note: Detailed permission policies are not yet implemented in this CLI`,
+    );
     console.log(`   Current behavior: Using default XMTP group permissions`);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to list permissions: ${errorMessage}`);
@@ -242,17 +256,24 @@ async function runSetOperation(config: Config): Promise<void> {
   console.log(`📋 Policy: ${config.policy}`);
 
   try {
-    const group = await getGroupById(config.groupId, config.env, config.loggingLevel);
+    const group = await getGroupById(
+      config.groupId,
+      config.env,
+      config.loggingLevel,
+    );
     await group.sync();
 
-    console.log(`⚠️  WARNING: Permission policy setting is not yet fully implemented`);
+    console.log(
+      `⚠️  WARNING: Permission policy setting is not yet fully implemented`,
+    );
     console.log(`   Current behavior: Groups use default XMTP permissions`);
     console.log(`   Requested policy: ${config.policy}`);
-    console.log(`   This CLI will be updated when XMTP SDK supports custom permission policies`);
+    console.log(
+      `   This CLI will be updated when XMTP SDK supports custom permission policies`,
+    );
 
     // TODO: Implement actual permission policy setting when SDK supports it
     console.log(`\n✅ Permission operation completed (no-op for now)`);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to set permissions: ${errorMessage}`);
@@ -263,7 +284,9 @@ async function runSetOperation(config: Config): Promise<void> {
 // Operation: Manage admin roles
 async function runAdminOperation(config: Config): Promise<void> {
   if (!config.groupId || !config.inboxId || !config.action) {
-    console.error("❌ Group ID, inbox ID, and action are required for admin operation");
+    console.error(
+      "❌ Group ID, inbox ID, and action are required for admin operation",
+    );
     process.exit(1);
   }
 
@@ -272,7 +295,11 @@ async function runAdminOperation(config: Config): Promise<void> {
   console.log(`⚡ Action: ${config.action}`);
 
   try {
-    const group = await getGroupById(config.groupId, config.env, config.loggingLevel);
+    const group = await getGroupById(
+      config.groupId,
+      config.env,
+      config.loggingLevel,
+    );
     await group.sync();
 
     const isAdmin = group.isAdmin(config.inboxId);
@@ -307,7 +334,7 @@ async function runAdminOperation(config: Config): Promise<void> {
       case "list":
         const admins = group.admins;
         const superAdmins = group.superAdmins;
-        
+
         console.log(`\n📋 Admin Roles:`);
         console.log(`   Super Admins: ${superAdmins.length}`);
         superAdmins.forEach((admin, index) => {
@@ -320,14 +347,15 @@ async function runAdminOperation(config: Config): Promise<void> {
         });
 
         console.log(`\n👤 Target Status:`);
-        console.log(`   ${config.inboxId}: ${isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Member"}`);
+        console.log(
+          `   ${config.inboxId}: ${isSuperAdmin ? "Super Admin" : isAdmin ? "Admin" : "Member"}`,
+        );
         break;
 
       default:
         console.error(`❌ Unknown action: ${config.action}`);
         process.exit(1);
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to manage admin roles: ${errorMessage}`);
@@ -345,7 +373,11 @@ async function runTestOperation(config: Config): Promise<void> {
   console.log(`🧪 Testing permission enforcement for group: ${config.groupId}`);
 
   try {
-    const group = await getGroupById(config.groupId, config.env, config.loggingLevel);
+    const group = await getGroupById(
+      config.groupId,
+      config.env,
+      config.loggingLevel,
+    );
     await group.sync();
 
     const members = await group.members();
@@ -360,12 +392,14 @@ async function runTestOperation(config: Config): Promise<void> {
 
     // Test basic permission checks
     console.log(`\n🔍 Permission Tests:`);
-    
+
     if (members.length > 0) {
       const testMember = members[0];
       console.log(`   Test Member: ${testMember.inboxId}`);
       console.log(`   Is Admin: ${group.isAdmin(testMember.inboxId)}`);
-      console.log(`   Is Super Admin: ${group.isSuperAdmin(testMember.inboxId)}`);
+      console.log(
+        `   Is Super Admin: ${group.isSuperAdmin(testMember.inboxId)}`,
+      );
     }
 
     if (superAdmins.length > 0) {
@@ -376,7 +410,6 @@ async function runTestOperation(config: Config): Promise<void> {
     }
 
     console.log(`\n✅ Permission test completed`);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to test permissions: ${errorMessage}`);
@@ -394,7 +427,11 @@ async function runInfoOperation(config: Config): Promise<void> {
   console.log(`ℹ️  Getting detailed information for group: ${config.groupId}`);
 
   try {
-    const group = await getGroupById(config.groupId, config.env, config.loggingLevel);
+    const group = await getGroupById(
+      config.groupId,
+      config.env,
+      config.loggingLevel,
+    );
     await group.sync();
 
     const members = await group.members();
@@ -411,14 +448,17 @@ async function runInfoOperation(config: Config): Promise<void> {
     console.log(`   Total Members: ${members.length}`);
     console.log(`   Super Admins: ${superAdmins.length}`);
     console.log(`   Admins: ${admins.length}`);
-    console.log(`   Regular Members: ${members.length - admins.length - superAdmins.length}`);
+    console.log(
+      `   Regular Members: ${members.length - admins.length - superAdmins.length}`,
+    );
 
     console.log(`\n🔗 Group URL:`);
     console.log(`   https://xmtp.chat/conversations/${group.id}`);
 
     console.log(`\n📝 Note: This CLI provides basic group information.`);
-    console.log(`   For advanced permission management, use the XMTP SDK directly.`);
-
+    console.log(
+      `   For advanced permission management, use the XMTP SDK directly.`,
+    );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to get group info: ${errorMessage}`);
@@ -453,4 +493,4 @@ async function main(): Promise<void> {
   process.exit(0);
 }
 
-void main(); 
+void main();
