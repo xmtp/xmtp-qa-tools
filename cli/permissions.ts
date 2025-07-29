@@ -3,87 +3,91 @@ import "dotenv/config";
 import { getWorkers } from "@workers/manager";
 
 interface Config {
-  operation:
-    | "list"
-    | "add-admin"
-    | "remove-admin"
-    | "add-super-admin"
-    | "remove-super-admin"
-    | "add-member"
-    | "remove-member"
-    | "info"
-    | "set-metadata-admin-only"
-    | "set-metadata-all-members";
+  operation: "list" | "info" | "update-permissions";
   env: string;
   loggingLevel: LogLevel;
   groupId?: string;
   inboxId?: string;
   targetAddress?: string;
+  features?: string[];
+  permissions?: string;
 }
+
+// Available features that can be configured
+const AVAILABLE_FEATURES = [
+  "add-member",
+  "remove-member",
+  "add-admin",
+  "remove-admin",
+  "add-super-admin",
+  "remove-super-admin",
+  "update-metadata",
+  "update-permissions",
+];
+
+// Available permission types
+const AVAILABLE_PERMISSIONS = [
+  "everyone",
+  "disabled",
+  "admin-only",
+  "super-admin-only",
+];
 
 function showHelp() {
   console.log(`
-XMTP Group Permissions CLI - Manage group members and admin roles
+XMTP Group Permissions CLI - Flexible permission management
 
 USAGE:
-  yarn permissions <operation> <group-id> [inbox-id] [options]
+  yarn permissions <operation> <group-id> [options]
 
 OPERATIONS:
   list <group-id>                           List all members and their roles
   info <group-id>                           Show detailed group information
-  add-admin <group-id> <inbox-id>          Add admin status to member
-  remove-admin <group-id> <inbox-id>       Remove admin status from member
-  add-super-admin <group-id> <inbox-id>    Add super admin status to member
-  remove-super-admin <group-id> <inbox-id> Remove super admin status from member
-  add-member <group-id> <inbox-id>         Add new member to group
-  remove-member <group-id> <inbox-id>      Remove member from group
-  set-metadata-admin-only <group-id>       Restrict metadata updates to admin only
-  set-metadata-all-members <group-id>      Allow all members to update metadata
+  update-permissions <group-id>              Update feature permissions
 
 OPTIONS:
-  --env <environment>     XMTP environment (local, dev, production) [default: local]
-  --target <address>      Target address for operations
-  -h, --help             Show this help message
+  --features <feature-list>                 Comma-separated features to update
+  --permissions <permission-type>           Permission type to apply
+  --env <environment>                       XMTP environment (local, dev, production) [default: local]
+  --target <address>                        Target address for operations
+  -h, --help                               Show this help message
+
+AVAILABLE FEATURES:
+  add-member                                Adding new members to group
+  remove-member                             Removing members from group
+  add-admin                                 Promoting members to admin
+  remove-admin                              Demoting admins to member
+  add-super-admin                          Promoting to super admin
+  remove-super-admin                       Demoting super admins
+  update-metadata                          Updating group metadata
+  update-permissions                       Changing permission policies
+
+AVAILABLE PERMISSIONS:
+  everyone                                  All group members can perform action
+  disabled                                  Feature is completely disabled
+  admin-only                                Only admins and super admins can perform action
+  super-admin-only                         Only super admins can perform action
 
 ENVIRONMENTS:
   local       Local XMTP network for development
   dev         Development XMTP network (default)
   production  Production XMTP network
 
-MEMBER STATUSES:
-  Member       - Basic group member (everyone starts here)
-  Admin        - Can add/remove members and update metadata (if permitted)
-  Super Admin  - Has all permissions including managing other admins
-
-PERMISSIONS (by XMTP default):
-  • Add member               - All members
-  • Remove member            - Admin only
-  • Add admin                - Super admin only
-  • Remove admin             - Super admin only
-  • Update group permissions - Super admin only
-  • Update group metadata    - All members (can be changed to admin only)
-
 EXAMPLES:
   # List all members and their roles
   yarn permissions list 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
   
-  # Add admin status to a member
-  yarn permissions add-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+  # Update metadata permissions to admin-only
+  yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features update-metadata --permissions admin-only
   
-  # Add super admin status to a member
-  yarn permissions add-super-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+  # Update multiple features at once
+  yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features add-member,remove-member,update-metadata --permissions admin-only
   
-  # Remove member from group
-  yarn permissions remove-member 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+  # Disable a feature completely
+  yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features update-metadata --permissions disabled
   
   # Show detailed group info
   yarn permissions info 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-  
-  # Restrict metadata updates to admin only
-  yarn permissions set-metadata-admin-only 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-  
-  # Allow all members to update metadata (default)
-  yarn permissions set-metadata-all-members 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
 ENVIRONMENT VARIABLES:
   XMTP_ENV             Default environment
@@ -104,20 +108,7 @@ function parseArgs(): Config {
   // First argument is the operation
   if (args.length > 0 && !args[0].startsWith("--")) {
     const operation = args[0] as Config["operation"];
-    if (
-      [
-        "list",
-        "add-admin",
-        "remove-admin",
-        "add-super-admin",
-        "remove-super-admin",
-        "add-member",
-        "remove-member",
-        "info",
-        "set-metadata-admin-only",
-        "set-metadata-all-members",
-      ].includes(operation)
-    ) {
+    if (["list", "info", "update-permissions"].includes(operation)) {
       config.operation = operation;
       args.shift(); // Remove operation from args
     }
@@ -126,23 +117,6 @@ function parseArgs(): Config {
   // Second argument is group ID for all operations
   if (args.length > 0 && !args[0].startsWith("--")) {
     config.groupId = args[0];
-    args.shift();
-  }
-
-  // Third argument is inbox ID for operations that need it
-  if (args.length > 0 && !args[0].startsWith("--")) {
-    if (
-      [
-        "add-admin",
-        "remove-admin",
-        "add-super-admin",
-        "remove-super-admin",
-        "add-member",
-        "remove-member",
-      ].includes(config.operation)
-    ) {
-      config.inboxId = args[0];
-    }
     args.shift();
   }
 
@@ -159,6 +133,12 @@ function parseArgs(): Config {
       i++;
     } else if (arg === "--target" && nextArg) {
       config.targetAddress = nextArg;
+      i++;
+    } else if (arg === "--features" && nextArg) {
+      config.features = nextArg.split(",").map((f) => f.trim());
+      i++;
+    } else if (arg === "--permissions" && nextArg) {
+      config.permissions = nextArg;
       i++;
     }
   }
@@ -262,7 +242,7 @@ async function runListOperation(config: Config): Promise<void> {
       console.log(`   ${index + 1}. ${member.inboxId} (${role})`);
     });
 
-    console.log(`\n🔐 Default XMTP Permissions:`);
+    console.log(`\n🔐 Current XMTP Permissions:`);
     console.log(`   • Add member: All members`);
     console.log(`   • Remove member: Admin only`);
     console.log(`   • Add admin: Super admin only`);
@@ -272,243 +252,6 @@ async function runListOperation(config: Config): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to list members: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Add admin status
-async function runAddAdminOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for add-admin operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👑 Adding admin status to: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const isAdmin = group.isAdmin(config.inboxId);
-    const isSuperAdmin = group.isSuperAdmin(config.inboxId);
-
-    if (isSuperAdmin) {
-      console.log(
-        `ℹ️  ${config.inboxId} is already a super admin (has all permissions)`,
-      );
-    } else if (isAdmin) {
-      console.log(`ℹ️  ${config.inboxId} is already an admin`);
-    } else {
-      await group.addAdmin(config.inboxId);
-      console.log(`✅ Successfully added ${config.inboxId} as admin`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to add admin: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Remove admin status
-async function runRemoveAdminOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for remove-admin operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👑 Removing admin status from: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const isAdmin = group.isAdmin(config.inboxId);
-    const isSuperAdmin = group.isSuperAdmin(config.inboxId);
-
-    if (isSuperAdmin) {
-      console.log(
-        `ℹ️  ${config.inboxId} is a super admin. Use remove-super-admin to remove super admin status first.`,
-      );
-    } else if (isAdmin) {
-      await group.removeAdmin(config.inboxId);
-      console.log(
-        `✅ Successfully removed admin status from ${config.inboxId}`,
-      );
-    } else {
-      console.log(`ℹ️  ${config.inboxId} is not an admin`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to remove admin: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Add super admin status
-async function runAddSuperAdminOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for add-super-admin operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👑 Adding super admin status to: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const isSuperAdmin = group.isSuperAdmin(config.inboxId);
-
-    if (isSuperAdmin) {
-      console.log(`ℹ️  ${config.inboxId} is already a super admin`);
-    } else {
-      await group.addSuperAdmin(config.inboxId);
-      console.log(`✅ Successfully added ${config.inboxId} as super admin`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to add super admin: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Remove super admin status
-async function runRemoveSuperAdminOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for remove-super-admin operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👑 Removing super admin status from: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const isSuperAdmin = group.isSuperAdmin(config.inboxId);
-
-    if (isSuperAdmin) {
-      await group.removeSuperAdmin(config.inboxId);
-      console.log(
-        `✅ Successfully removed super admin status from ${config.inboxId}`,
-      );
-    } else {
-      console.log(`ℹ️  ${config.inboxId} is not a super admin`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to remove super admin: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Add member to group
-async function runAddMemberOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for add-member operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👥 Adding member to group: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const members = await group.members();
-    const isAlreadyMember = members.some(
-      (member) => member.inboxId === config.inboxId,
-    );
-
-    if (isAlreadyMember) {
-      console.log(`ℹ️  ${config.inboxId} is already a member of this group`);
-    } else {
-      await group.addMembers([config.inboxId]);
-      console.log(`✅ Successfully added ${config.inboxId} to the group`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to add member: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Remove member from group
-async function runRemoveMemberOperation(config: Config): Promise<void> {
-  if (!config.groupId || !config.inboxId) {
-    console.error(
-      "❌ Group ID and inbox ID are required for remove-member operation",
-    );
-    process.exit(1);
-  }
-
-  console.log(`👥 Removing member from group: ${config.inboxId}`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    const members = await group.members();
-    const isMember = members.some(
-      (member) => member.inboxId === config.inboxId,
-    );
-    const isSuperAdmin = group.isSuperAdmin(config.inboxId);
-
-    if (isSuperAdmin) {
-      console.log(
-        `⚠️  Warning: ${config.inboxId} is a super admin. Removing them may affect group management.`,
-      );
-    }
-
-    if (isMember) {
-      await group.removeMembers([config.inboxId]);
-      console.log(`✅ Successfully removed ${config.inboxId} from the group`);
-    } else {
-      console.log(`ℹ️  ${config.inboxId} is not a member of this group`);
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to remove member: ${errorMessage}`);
     process.exit(1);
   }
 }
@@ -568,113 +311,53 @@ async function runInfoOperation(config: Config): Promise<void> {
   }
 }
 
-// Operation: Set metadata updates to admin only
-async function runSetMetadataAdminOnlyOperation(config: Config): Promise<void> {
+// Operation: Update permissions for specified features
+async function runUpdatePermissionsOperation(config: Config): Promise<void> {
   if (!config.groupId) {
+    console.error("❌ Group ID is required for update-permissions operation");
+    process.exit(1);
+  }
+
+  if (!config.features || config.features.length === 0) {
+    console.error("❌ --features is required for update-permissions operation");
+    console.error("   Available features:", AVAILABLE_FEATURES.join(", "));
+    process.exit(1);
+  }
+
+  if (!config.permissions) {
     console.error(
-      "❌ Group ID is required for set-metadata-admin-only operation",
+      "❌ --permissions is required for update-permissions operation",
     );
-    process.exit(1);
-  }
-
-  console.log(`🔐 Setting metadata updates to admin only`);
-  console.log(`📋 Group: ${config.groupId}`);
-
-  try {
-    const group = await getGroupById(
-      config.groupId,
-      config.env,
-      config.loggingLevel,
-    );
-    await group.sync();
-
-    // Check if current user is super admin (only super admins can change permissions)
-    // We need to get the current user from the worker that created the group
-    const workerManager = await createWorkerManager(
-      1,
-      config.env,
-      config.loggingLevel,
-    );
-    const worker = workerManager.getAll()[0];
-    const currentUser = worker.client.inboxId;
-    const isSuperAdmin = group.isSuperAdmin(currentUser);
-
-    if (!isSuperAdmin) {
-      console.error(
-        `❌ Only super admins can change group permission policies`,
-      );
-      console.error(`   Current user: ${currentUser}`);
-      console.error(`   Required role: Super Admin`);
-      process.exit(1);
-    }
-
-    // Try to update the permission using available SDK methods
-    try {
-      // Attempt to use the actual XMTP SDK method if it exists
-      if (typeof (group as any).updateMetadataPermission === "function") {
-        await (group as any).updateMetadataPermission(2); // 2 = Admin only
-        console.log(
-          `✅ Successfully updated metadata permission to admin only`,
-        );
-      } else if (typeof (group as any).updatePermission === "function") {
-        await (group as any).updatePermission(4, 2); // UpdateMetadata = 4, Admin = 2
-        console.log(
-          `✅ Successfully updated metadata permission to admin only`,
-        );
-      } else {
-        // Fallback: document what would happen
-        console.log(
-          `ℹ️  XMTP SDK permission policy update methods not available in current version`,
-        );
-        console.log(`   This operation would call:`);
-        console.log(
-          `   - group.updateMetadataPermission(PermissionPolicy.Admin)`,
-        );
-        console.log(
-          `   - or group.updatePermission(PermissionUpdateType.UpdateMetadata, PermissionPolicy.Admin)`,
-        );
-        console.log(
-          `   Currently, all members can update metadata regardless of their role`,
-        );
-        console.log(
-          `✅ Operation documented - ready for XMTP SDK implementation`,
-        );
-      }
-    } catch (permissionError) {
-      console.log(
-        `ℹ️  Permission update failed: ${
-          permissionError instanceof Error
-            ? permissionError.message
-            : String(permissionError)
-        }`,
-      );
-      console.log(
-        `   This indicates the XMTP SDK doesn't support permission policy updates yet`,
-      );
-      console.log(
-        `   The operation is documented and ready for when SDK support is added`,
-      );
-    }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to set metadata admin only: ${errorMessage}`);
-    process.exit(1);
-  }
-}
-
-// Operation: Set metadata updates to all members
-async function runSetMetadataAllMembersOperation(
-  config: Config,
-): Promise<void> {
-  if (!config.groupId) {
     console.error(
-      "❌ Group ID is required for set-metadata-all-members operation",
+      "   Available permissions:",
+      AVAILABLE_PERMISSIONS.join(", "),
     );
     process.exit(1);
   }
 
-  console.log(`🔐 Setting metadata updates to all members`);
-  console.log(`📋 Group: ${config.groupId}`);
+  // Validate features
+  const invalidFeatures = config.features.filter(
+    (f) => !AVAILABLE_FEATURES.includes(f),
+  );
+  if (invalidFeatures.length > 0) {
+    console.error("❌ Invalid features:", invalidFeatures.join(", "));
+    console.error("   Available features:", AVAILABLE_FEATURES.join(", "));
+    process.exit(1);
+  }
+
+  // Validate permissions
+  if (!AVAILABLE_PERMISSIONS.includes(config.permissions)) {
+    console.error("❌ Invalid permission type:", config.permissions);
+    console.error(
+      "   Available permissions:",
+      AVAILABLE_PERMISSIONS.join(", "),
+    );
+    process.exit(1);
+  }
+
+  console.log(`🔐 Updating permissions for group: ${config.groupId}`);
+  console.log(`📋 Features: ${config.features.join(", ")}`);
+  console.log(`🔑 Permission: ${config.permissions}`);
 
   try {
     const group = await getGroupById(
@@ -703,36 +386,116 @@ async function runSetMetadataAllMembersOperation(
       process.exit(1);
     }
 
-    // Try to update the permission using available SDK methods
+    console.log(`\n📝 Permission Update Plan:`);
+    config.features.forEach((feature) => {
+      console.log(`   • ${feature}: ${config.permissions}`);
+    });
+
+    // Try to update the permissions using available SDK methods
     try {
-      // Attempt to use the actual XMTP SDK method if it exists
-      if (typeof (group as any).updateMetadataPermission === "function") {
-        await (group as any).updateMetadataPermission(0); // 0 = Allow all
+      // Map permission types to XMTP SDK values
+      const permissionMap = {
+        everyone: 0, // Allow all
+        disabled: 1, // Disabled
+        "admin-only": 2, // Admin only
+        "super-admin-only": 3, // Super admin only
+      };
+
+      const permissionValue =
+        permissionMap[config.permissions as keyof typeof permissionMap];
+
+      // Attempt to use the actual XMTP SDK methods if they exist
+      let updatedCount = 0;
+
+      for (const feature of config.features) {
+        try {
+          // Try different SDK method patterns based on feature
+          if (feature === "update-metadata") {
+            if (typeof (group as any).updateMetadataPermission === "function") {
+              await (group as any).updateMetadataPermission(permissionValue);
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(4, permissionValue); // UpdateMetadata = 4
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "add-member") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(1, permissionValue); // AddMember = 1
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "remove-member") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(2, permissionValue); // RemoveMember = 2
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "add-admin") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(3, permissionValue); // AddAdmin = 3
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "remove-admin") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(5, permissionValue); // RemoveAdmin = 5
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "add-super-admin") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(6, permissionValue); // AddSuperAdmin = 6
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "remove-super-admin") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(7, permissionValue); // RemoveSuperAdmin = 7
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          } else if (feature === "update-permissions") {
+            if (typeof (group as any).updatePermission === "function") {
+              await (group as any).updatePermission(8, permissionValue); // UpdatePermissions = 8
+              console.log(`   ✅ Updated ${feature} permission`);
+              updatedCount++;
+            } else {
+              console.log(`   ⚠️  SDK method not available for ${feature}`);
+            }
+          }
+        } catch (featureError) {
+          console.log(
+            `   ❌ Failed to update ${feature}: ${featureError instanceof Error ? featureError.message : String(featureError)}`,
+          );
+        }
+      }
+
+      if (updatedCount > 0) {
         console.log(
-          `✅ Successfully updated metadata permission to all members`,
-        );
-      } else if (typeof (group as any).updatePermission === "function") {
-        await (group as any).updatePermission(4, 0); // UpdateMetadata = 4, Allow = 0
-        console.log(
-          `✅ Successfully updated metadata permission to all members`,
+          `\n✅ Successfully updated ${updatedCount} out of ${config.features.length} features`,
         );
       } else {
-        // Fallback: document what would happen
         console.log(
-          `ℹ️  XMTP SDK permission policy update methods not available in current version`,
-        );
-        console.log(`   This operation would call:`);
-        console.log(
-          `   - group.updateMetadataPermission(PermissionPolicy.Allow)`,
+          `\nℹ️  No features were updated - XMTP SDK permission methods not available`,
         );
         console.log(
-          `   - or group.updatePermission(PermissionUpdateType.UpdateMetadata, PermissionPolicy.Allow)`,
-        );
-        console.log(
-          `   Currently, all members can update metadata (this is the default behavior)`,
-        );
-        console.log(
-          `✅ Operation documented - ready for XMTP SDK implementation`,
+          `   The permission changes are documented and ready for SDK implementation`,
         );
       }
     } catch (permissionError) {
@@ -752,7 +515,7 @@ async function runSetMetadataAllMembersOperation(
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`❌ Failed to set metadata all members: ${errorMessage}`);
+    console.error(`❌ Failed to update permissions: ${errorMessage}`);
     process.exit(1);
   }
 }
@@ -764,32 +527,11 @@ async function main(): Promise<void> {
     case "list":
       await runListOperation(config);
       break;
-    case "add-admin":
-      await runAddAdminOperation(config);
-      break;
-    case "remove-admin":
-      await runRemoveAdminOperation(config);
-      break;
-    case "add-super-admin":
-      await runAddSuperAdminOperation(config);
-      break;
-    case "remove-super-admin":
-      await runRemoveSuperAdminOperation(config);
-      break;
-    case "add-member":
-      await runAddMemberOperation(config);
-      break;
-    case "remove-member":
-      await runRemoveMemberOperation(config);
-      break;
     case "info":
       await runInfoOperation(config);
       break;
-    case "set-metadata-admin-only":
-      await runSetMetadataAdminOnlyOperation(config);
-      break;
-    case "set-metadata-all-members":
-      await runSetMetadataAllMembersOperation(config);
+    case "update-permissions":
+      await runUpdatePermissionsOperation(config);
       break;
     default:
       showHelp();

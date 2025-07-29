@@ -131,39 +131,45 @@ yarn groups <operation> [options]
 ### Permissions Command
 
 ```bash
-yarn permissions <operation> <group-id> [inbox-id] [options]
+yarn permissions <operation> <group-id> [options]
 ```
 
 **Operations:**
 
 - `list <group-id>` - List all members and their roles
 - `info <group-id>` - Show detailed group information
-- `add-admin <group-id> <inbox-id>` - Add admin status to member
-- `remove-admin <group-id> <inbox-id>` - Remove admin status from member
-- `add-super-admin <group-id> <inbox-id>` - Add super admin status to member
-- `remove-super-admin <group-id> <inbox-id>` - Remove super admin status from member
-- `add-member <group-id> <inbox-id>` - Add new member to group
-- `remove-member <group-id> <inbox-id>` - Remove member from group
+- `update-permissions <group-id>` - Update feature permissions
 
 **Options:**
 
+- `--features <feature-list>` - Comma-separated features to update
+- `--permissions <permission-type>` - Permission type to apply
 - `--env <env>` - XMTP environment [default: local]
 - `--target <addr>` - Target address for operations
+
+**Available Features:**
+
+- `add-member` - Adding new members to group
+- `remove-member` - Removing members from group
+- `add-admin` - Promoting members to admin
+- `remove-admin` - Demoting admins to member
+- `add-super-admin` - Promoting to super admin
+- `remove-super-admin` - Demoting super admins
+- `update-metadata` - Updating group metadata
+- `update-permissions` - Changing permission policies
+
+**Available Permissions:**
+
+- `everyone` - All group members can perform action
+- `disabled` - Feature is completely disabled
+- `admin-only` - Only admins and super admins can perform action
+- `super-admin-only` - Only super admins can perform action
 
 **Member Statuses:**
 
 - **Member** - Basic group member (everyone starts here)
 - **Admin** - Can add/remove members and update metadata
 - **Super Admin** - Has all permissions including managing other admins
-
-**Default XMTP Permissions:**
-
-- Add member: All members
-- Remove member: Admin only
-- Add admin: Super admin only
-- Remove admin: Super admin only
-- Update group permissions: Super admin only
-- Update group metadata: All members
 
 ## Environment Options
 
@@ -213,14 +219,14 @@ yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 # List all members and their roles
 yarn permissions list 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
-# Add admin status to a member
-yarn permissions add-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+# Update metadata permissions to admin-only
+yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features update-metadata --permissions admin-only
 
-# Add super admin status to a member
-yarn permissions add-super-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+# Update multiple features at once
+yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features add-member,remove-member,update-metadata --permissions admin-only
 
-# Remove member from group
-yarn permissions remove-member 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+# Disable a feature completely
+yarn permissions update-permissions 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --features update-metadata --permissions disabled
 ```
 
 ## Help Commands
