@@ -71,11 +71,11 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 
 Link to test code [../suites/functional/clients.test.ts](../suites/functional/clients.test.ts)
 
-- `validation and key package status`
-- `inbox state from external inbox IDs`
 - `downgrade last versions`
+- `validation and key package status`
+- `inbox state`
+- `installations`
 - `upgrade last versions`
-- `shared identity and separate storage`
 
 ### Content handling
 
@@ -93,12 +93,6 @@ Link to test code [../suites/functional/debug.test.ts](../suites/functional/debu
 - `detect potential forks in group state`
 - `debug info after metadata changes`
 - `debug info structure completeness`
-
-### Installation management
-
-Link to test code [../suites/functional/installations.test.ts](../suites/functional/installations.test.ts)
-
-- `shared identity and separate storage`
 
 ### Metadata operations
 
@@ -121,7 +115,7 @@ Link to test code [../suites/functional/permissions.test.ts](../suites/functiona
 - `admin can remove other members`
 - `super admin can manage other admins`
 
-### Stream validation
+### Streams
 
 Link to test code [../suites/functional/streams.test.ts](../suites/functional/streams.test.ts)
 
