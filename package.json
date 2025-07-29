@@ -9,6 +9,7 @@
     "workers"
   ],
   "scripts": {
+    "ai": "tsx cli/ai.ts",
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
     "bot": "tsx cli/bot.ts",
@@ -16,6 +17,7 @@
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "format": "prettier -w .",
     "gen": "tsx cli/gen.ts",
+    "groups": "tsx cli/groups.ts",
     "lint": "eslint .",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",

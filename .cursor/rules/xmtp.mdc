@@ -801,7 +801,8 @@ When working with these classes:
 
 ## Group Permissions System
 
-XMTP provides a robust group permissions system that allows fine-grained control over who can perform specific actions within a group. This system is essential for creating safe and well-managed group chat experiences.
+XMTP provides a robust group permissions system that allows fine-grained control over who can perform specific actions within a group.
+
 
 ### Permission Types
 

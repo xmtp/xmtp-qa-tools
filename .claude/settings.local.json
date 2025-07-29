@@ -1,6 +1,9 @@
 {
   "permissions": {
-    "allow": ["Bash(yarn *)"],
+    "allow": [
+      "Bash(yarn *)",
+      "Bash(yarn create:*)"
+    ],
     "deny": []
   }
 }
