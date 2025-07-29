@@ -803,6 +803,7 @@ When working with these classes:
 
 XMTP provides a robust group permissions system that allows fine-grained control over who can perform specific actions within a group.
 
+
 ### Permission Types
 
 There are 5 main permission types that can be configured:
