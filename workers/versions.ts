@@ -77,6 +77,7 @@ export {
   type XmtpEnv,
   type GroupMember,
   type KeyPackageStatus,
+  type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
 

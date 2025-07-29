@@ -1,21 +1,15 @@
 import {
-  Client,
   IdentifierKind,
   type Conversation,
   type DecodedMessage,
+  type Group,
   type LogLevel,
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { generatePrivateKey } from "viem/accounts";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPathQA,
-  getEncryptionKeyFromHex,
-} from "../helpers/client";
+import { getWorkers } from "@workers/manager";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
@@ -23,11 +17,17 @@ import {
 // echo
 // yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
+// group message
+// yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
+
 interface Config {
   userCount: number;
   timeout: number;
   env: string;
   target: string;
+  groupId?: string;
+  message?: string;
+  senderAddress?: string;
   tresshold: number;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
@@ -42,7 +42,10 @@ USAGE:
 
 OPTIONS:
   --address <address>     Target wallet address to send messages to
-  --env <environment>     XMTP environment (local, dev, production) [default: local]
+  --group-id <id>         Target group ID to send message to
+  --message <text>        Custom message to send (required for group messages)
+  --sender <address>      Wallet address to use as sender (must be group member)
+  --env <environment>     XMTP environment (local, dev, production) [default: production]
   --users <count>         Number of users to simulate [default: 5]
   --tresshold <percent>   Success threshold percentage [default: 95]
   --wait                  Wait for responses from target
@@ -56,6 +59,7 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn send --address 0x1234... --env dev --users 10
   yarn send --address 0x1234... --env production --users 500 --wait
+  yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
 ENVIRONMENT VARIABLES:
@@ -72,7 +76,7 @@ function parseArgs(): Config {
   const config: Config = {
     userCount: 5,
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
     target: process.env.TARGET ?? "",
     tresshold: 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
@@ -89,6 +93,15 @@ function parseArgs(): Config {
     } else if (arg === "--address" && nextArg) {
       config.target = nextArg;
       i++;
+    } else if (arg === "--group-id" && nextArg) {
+      config.groupId = nextArg;
+      i++;
+    } else if (arg === "--message" && nextArg) {
+      config.message = nextArg;
+      i++;
+    } else if (arg === "--sender" && nextArg) {
+      config.senderAddress = nextArg;
+      i++;
     } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
       i++;
@@ -101,6 +114,24 @@ function parseArgs(): Config {
     } else if (arg === "--wait") {
       config.waitForResponse = true;
     }
+  }
+
+  // Validation
+  if (config.groupId && !config.message) {
+    console.error("❌ Error: --message is required when using --group-id");
+    process.exit(1);
+  }
+
+  if (config.groupId && config.target) {
+    console.error(
+      "❌ Error: Cannot use both --group-id and --address. Choose one.",
+    );
+    process.exit(1);
+  }
+
+  if (!config.groupId && !config.target) {
+    console.error("❌ Error: Either --group-id or --address is required");
+    process.exit(1);
   }
 
   return config;
@@ -147,27 +178,74 @@ function calculatePercentile(values: number[], percentile: number): number {
   return sorted[Math.max(0, index)];
 }
 
+async function sendGroupMessage(config: Config): Promise<void> {
+  if (!config.groupId || !config.message) {
+    console.error(
+      "❌ Error: Group ID and message are required for group messaging",
+    );
+    return;
+  }
+
+  console.log(`📤 Sending message to group ${config.groupId} on ${config.env}`);
+
+  // Create a single worker for group messaging
+  const workerManager = await getWorkers(1, {
+    env: config.env as XmtpEnv,
+    useVersions: false, // Use latest version for group messaging
+  });
+
+  const worker = workerManager.getAll()[0];
+  console.log(`📋 Using worker: ${worker.inboxId}`);
+
+  try {
+    // Sync conversations to get all available groups
+    console.log(`🔄 Syncing conversations...`);
+    await worker.client.conversations.sync();
+
+    // Get all conversations and find the group by ID
+    const conversations = await worker.client.conversations.list();
+    console.log(`📋 Found ${conversations.length} conversations`);
+
+    const group = conversations.find(
+      (conv) => conv.id === config.groupId,
+    ) as Group;
+    if (!group) {
+      console.error(`❌ Group with ID ${config.groupId} not found`);
+      console.log(`📋 Available conversation IDs:`);
+      conversations.forEach((conv) => {
+        console.log(`   - ${conv.id}`);
+      });
+      return;
+    }
+
+    console.log(`📋 Found group: ${group.id}`);
+
+    // Send the message
+    const sendStart = Date.now();
+    await group.send(config.message);
+    const sendTime = Date.now() - sendStart;
+
+    console.log(`✅ Message sent successfully in ${sendTime}ms`);
+    console.log(`💬 Message: "${config.message}"`);
+    console.log(
+      `🔗 Group URL: https://xmtp.chat/conversations/${config.groupId}`,
+    );
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Failed to send group message: ${errorMessage}`);
+  }
+
+  process.exit(0);
+}
+
 async function runsendTest(config: Config): Promise<void> {
   const startTime = Date.now();
   console.log(`🚀 Testing ${config.userCount} users on ${config.env} `);
 
   cleanupsendDatabases(config.env);
 
-  const dbEncryptionKey = getEncryptionKeyFromHex(generateEncryptionKeyHex());
-
-  // Initialize workers concurrently
+  // Initialize workers using the workers API
   console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
-
-  let initializedCount = 0;
-  const updateProgress = () => {
-    const percentage = Math.round((initializedCount / config.userCount) * 100);
-    const filled = Math.round((percentage / 100) * 20);
-    const empty = 20 - filled;
-    const bar = "█".repeat(filled) + "░".repeat(empty);
-    process.stdout.write(
-      `\r📋 [${bar}] ${percentage}% (${initializedCount}/${config.userCount} workers)`,
-    );
-  };
 
   const logSummary = (
     results: Array<{
@@ -229,32 +307,13 @@ async function runsendTest(config: Config): Promise<void> {
     }
   };
 
-  const workerPromises = Array.from(
-    { length: config.userCount },
-    async (_, i) => {
-      const workerKey = generatePrivateKey();
-      const signer = createSigner(workerKey);
-      const signerIdentifier = (await signer.getIdentifier()).identifier;
-      // Create send directory in data path if it doesn't exist
-      const dbPath = getDbPathQA(`send/${config.env}-${i}-${signerIdentifier}`);
-      const sendDir = path.dirname(dbPath);
-      if (!fs.existsSync(sendDir)) {
-        fs.mkdirSync(sendDir, { recursive: true });
-      }
-      const client = await Client.create(signer, {
-        env: config.env as XmtpEnv,
-        dbPath,
-        dbEncryptionKey,
-        loggingLevel: config.loggingLevel,
-      });
+  // Create worker manager and initialize workers
+  const workerManager = await getWorkers(config.userCount, {
+    env: config.env as XmtpEnv,
+    useVersions: false, // Use latest version for send tests
+  });
 
-      initializedCount++;
-      updateProgress();
-      return client;
-    },
-  );
-
-  const workers = await Promise.all(workerPromises);
+  const workers = workerManager.getAll();
   console.log(`\n✅ All ${config.userCount} workers initialized successfully`);
 
   // Run all workers in parallel
@@ -286,15 +345,17 @@ async function runsendTest(config: Config): Promise<void> {
         try {
           let conversation: Conversation;
 
-          conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: config.target,
-            identifierKind: IdentifierKind.Ethereum,
-          })) as Conversation;
+          conversation = (await worker.client.conversations.newDmWithIdentifier(
+            {
+              identifier: config.target,
+              identifierKind: IdentifierKind.Ethereum,
+            },
+          )) as Conversation;
 
           if (config.waitForResponse) {
             console.log(`📡 ${i}: Setting up message stream...`);
             // Set up stream
-            void worker.conversations.streamAllMessages({
+            void worker.client.conversations.streamAllMessages({
               onValue: (message: DecodedMessage) => {
                 // Check for bot response
                 if (
@@ -487,7 +548,12 @@ async function runsendTest(config: Config): Promise<void> {
 
 async function main(): Promise<void> {
   const config = parseArgs();
-  await runsendTest(config);
+
+  if (config.groupId) {
+    await sendGroupMessage(config);
+  } else {
+    await runsendTest(config);
+  }
 }
 
 void main();

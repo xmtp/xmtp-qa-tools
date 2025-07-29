@@ -22,7 +22,7 @@ ARGUMENTS:
   bot-name              Name of the bot to run (echo, key-check)
 
 OPTIONS:
-  --env <environment>   XMTP environment (local, dev, production) [default: local]
+  --env <environment>   XMTP environment (local, dev, production) [default: production]
   -h, --help           Show this help message
 
 ENVIRONMENTS:
@@ -47,7 +47,7 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     botName: "",
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
   };
 
   for (let i = 0; i < args.length; i++) {

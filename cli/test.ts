@@ -36,7 +36,7 @@ ARGUMENTS:
   test-suite             Test suite name (functional, convos, groups, etc.)
 
 OPTIONS:
-  --env <environment>    XMTP environment (local, dev, production) [default: local]
+  --env <environment>    XMTP environment (local, dev, production) [default: production]
   --attempts <number>    Maximum retry attempts [default: 3]
   --debug               Enable file logging (saves to logs/ directory)
   --no-fail             Exit with success code even on failures
