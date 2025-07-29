@@ -2,7 +2,7 @@ name: Performance Large
 description: "performance of large groups"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "0 */4 * * *" # Runs every 4 hours at the top of the hour
   workflow_dispatch:
@@ -39,7 +39,7 @@ jobs:
 
       - name: Sleep for ${{ matrix.delay_minutes }} minutes
         if: matrix.delay_minutes > 0
-        run: sleep ${{ matrix.delay_minutes * 60 }}
+        run: sleep $(( ${{ matrix.delay_minutes }} * 60 ))
 
       - name: Run tests ${{ matrix.size }}
         run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
