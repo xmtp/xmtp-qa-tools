@@ -14,6 +14,7 @@ The CLI consists of several specialized commands for different testing and manag
 | `yarn gen`                                      | Generate test inboxes and keys  | `yarn gen --help`      |
 | `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
 | `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
+| `yarn groups`                                   | Create dms,groups               | `yarn groups --help`   |
 
 ## Test command
 
@@ -288,3 +289,20 @@ yarn revoke --help     # Revoke help
 yarn ansi:clean        # Clean raw logs
 yarn ansi:forks        # Clean fork logs
 ```
+
+## Groups command
+
+The `groups` command creates Direct Messages (DMs) and groups with specified permissions.
+
+### Usage
+
+```bash
+yarn groups [options] --target <address> --members <count> --group-name <name> --permissions <type>
+```
+
+### Options
+
+- `--target <address>` - Target wallet address to invite to group
+- `--members <count>` - Number of members to invite to group
+- `--group-name <name>` - Name of the group to create
+- `--permissions <type>` - Type of permissions to set (default, admin-only, read-only, open)

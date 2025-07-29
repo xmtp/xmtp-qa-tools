@@ -16,7 +16,7 @@ import {
   getDbPathQA,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
-import { getInboxIds, getRandomInboxIds } from "../inboxes/utils";
+import { getRandomInboxIds } from "../inboxes/utils";
 
 interface Config {
   operation: "dm" | "group";
