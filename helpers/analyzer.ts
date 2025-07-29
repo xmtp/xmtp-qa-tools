@@ -6,9 +6,9 @@ import { processLogFile, stripAnsi } from "./logger";
 export const PATTERNS = {
   KNOWN_ISSUES: [
     {
-      testName: "Dms",
+      testName: "convos",
       uniqueErrorLines: [
-        "FAIL  suites/functional/dms.test.ts > dms > should fail on purpose",
+        "FAIL  suites/functional/convos.test.ts > convos > fail on purpose",
       ],
     },
     {
@@ -333,14 +333,32 @@ export function extractErrorLogs(testName: string): Set<string> {
       }
     }
 
-    // Return empty set if only one error and it's a known pattern
+    // Check for known issues - all error lines must exactly match any known pattern
+    const hasKnownIssue = PATTERNS.KNOWN_ISSUES.some((issue) => {
+      // Filter error lines to only include FAIL lines that match this known issue
+      const failLines = errorLines.filter((line) => line.includes("FAIL"));
+      // Deduplicate FAIL lines
+      const uniqueFailLines = [...new Set(failLines)];
+
+      if (uniqueFailLines.length !== issue.uniqueErrorLines.length) {
+        return false;
+      }
+      return uniqueFailLines.every(
+        (line, index) => line === issue.uniqueErrorLines[index],
+      );
+    });
+
+    // Return empty set if it's a known pattern or exact known issue match
     if (errorLines.length === 1) {
       const hasKnownPattern = PATTERNS.DEDUPE.some((pattern) =>
         errorLines[0]?.includes(pattern),
       );
-      if (hasKnownPattern) {
+      if (hasKnownPattern || hasKnownIssue) {
         return new Set();
       }
+    } else if (hasKnownIssue) {
+      // Multiple error lines that exactly match any known issue
+      return new Set();
     }
     const limit = PATTERNS.max_error_logs;
     if (errorLines.length > 0) {

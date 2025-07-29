@@ -24,7 +24,6 @@ describe(testName, async () => {
   });
 
   it("super admin can manage admins", async () => {
-    const creator = workers.getCreator();
     const member = workers.getReceiver();
 
     // Super admin can add admin
@@ -38,7 +37,6 @@ describe(testName, async () => {
   });
 
   it("super admin can manage super admins", async () => {
-    const creator = workers.getCreator();
     const member = workers.getReceiver();
 
     // Super admin can add super admin
@@ -69,7 +67,6 @@ describe(testName, async () => {
   });
 
   it("super admin can update group metadata", async () => {
-    const creator = workers.getCreator();
     const newName = "Super Admin Updated Name";
     const newDescription = "Super Admin Updated Description";
 
@@ -100,7 +97,6 @@ describe(testName, async () => {
   });
 
   it("super admin can manage group membership", async () => {
-    const creator = workers.getCreator();
     const newMember = workers.getAll()[4];
 
     // Check if member is already in the group
@@ -225,10 +221,6 @@ describe(testName, async () => {
     expect(group.isAdmin(regularMember.client.inboxId)).toBe(false);
     expect(group.isSuperAdmin(regularMember.client.inboxId)).toBe(false);
 
-    // Regular member should not be able to remove others
-    // This would typically throw an error, but we'll test the current behavior
-    const initialMembers = await group.members();
-
     try {
       await group.removeMembers([targetMember.client.inboxId]);
       // If no error, check if the member was actually removed
@@ -244,7 +236,6 @@ describe(testName, async () => {
   });
 
   it("admin hierarchy - super admin can do everything admin can do", async () => {
-    const creator = workers.getCreator();
     const member = workers.getReceiver();
     const newMember = workers.getAll()[4];
 
