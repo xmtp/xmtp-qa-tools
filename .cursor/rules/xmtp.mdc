@@ -586,6 +586,23 @@ await group.addSuperAdmin("memberInboxId");
 When creating a new group, use the correct options interface:
 
 ```typescript
+export declare const enum PermissionUpdateType {
+  AddMember = 0,
+  RemoveMember = 1,
+  AddAdmin = 2,
+  RemoveAdmin = 3,
+  UpdateMetadata = 4,
+}
+
+export declare const enum PermissionPolicy {
+  Allow = 0,
+  Deny = 1,
+  Admin = 2,
+  SuperAdmin = 3,
+  DoesNotExist = 4,
+  Other = 5,
+}
+
 export interface CreateGroupOptions {
   permissions?: GroupPermissionsOptions;
   groupName?: string;
@@ -802,7 +819,6 @@ When working with these classes:
 ## Group Permissions System
 
 XMTP provides a robust group permissions system that allows fine-grained control over who can perform specific actions within a group.
-
 
 ### Permission Types
 

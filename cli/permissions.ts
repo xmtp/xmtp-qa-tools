@@ -25,10 +25,7 @@ const AVAILABLE_FEATURES = [
   "remove-member",
   "add-admin",
   "remove-admin",
-  "add-super-admin",
-  "remove-super-admin",
   "update-metadata",
-  "update-permissions",
 ];
 
 // Available permission types
@@ -41,14 +38,11 @@ const AVAILABLE_PERMISSIONS = [
 
 // Permission types mapping to SDK enum values
 const PERMISSION_TYPES = {
-  "add-member": 1, // AddMember
-  "remove-member": 2, // RemoveMember
-  "add-admin": 3, // AddAdmin
-  "remove-admin": 5, // RemoveAdmin
-  "add-super-admin": 6, // AddSuperAdmin
-  "remove-super-admin": 7, // RemoveSuperAdmin
+  "add-member": 0, // AddMember
+  "remove-member": 1, // RemoveMember
+  "add-admin": 2, // AddAdmin
+  "remove-admin": 3, // RemoveAdmin
   "update-metadata": 4, // UpdateMetadata
-  "update-permissions": 8, // UpdatePermissions
 } as const;
 
 // Permission policy mapping
@@ -83,10 +77,7 @@ AVAILABLE FEATURES:
   remove-member                             Removing members from group
   add-admin                                 Promoting members to admin
   remove-admin                              Demoting admins to member
-  add-super-admin                          Promoting to super admin
-  remove-super-admin                       Demoting super admins
   update-metadata                          Updating group metadata
-  update-permissions                       Changing permission policies
 
 AVAILABLE PERMISSIONS:
   everyone                                  All group members can perform action
@@ -406,10 +397,23 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
           ];
 
         // Use the SDK's updatePermission method
-        await group.updatePermission(
-          permissionType as PermissionUpdateType,
-          permissionPolicy,
-        );
+        if (feature === "update-metadata") {
+          // For metadata permissions, we need to specify which metadata field
+          // We'll update all metadata fields (name, description, image) with the same policy
+          const metadataFields = [0, 1, 2]; // GroupName, Description, ImageUrlSquare
+          for (const metadataField of metadataFields) {
+            await group.updatePermission(
+              permissionType as PermissionUpdateType,
+              permissionPolicy,
+              metadataField,
+            );
+          }
+        } else {
+          await group.updatePermission(
+            permissionType as PermissionUpdateType,
+            permissionPolicy,
+          );
+        }
         console.log(
           `   ✅ Updated ${feature} permission to ${config.permissions}`,
         );
