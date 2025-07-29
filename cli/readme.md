@@ -4,15 +4,15 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 
 ## Quick Reference
 
-| Command                                      | Purpose               | Help                   |
-| -------------------------------------------- | --------------------- | ---------------------- |
-| `yarn test <suite>`                          | Run test suites       | `yarn test --help`     |
-| `yarn send --address <addr> --users <count>` | Test message delivery | `yarn send --help`     |
-| `yarn bot <name>`                            | Run interactive bots  | `yarn bot --help`      |
-| `yarn gen`                                   | Generate test data    | `yarn gen --help`      |
-| `yarn versions`                              | Manage SDK versions   | `yarn versions --help` |
-| `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`   |
-| `yarn groups`                                | Create DMs/groups     | `yarn groups --help`   |
+| Command                                      | Purpose               | Help                      |
+| -------------------------------------------- | --------------------- | ------------------------- |
+| `yarn test <suite>`                          | Run test suites       | `yarn test --help`        |
+| `yarn send --address <addr> --users <count>` | Test message delivery | `yarn send --help`        |
+| `yarn bot <name>`                            | Run interactive bots  | `yarn bot --help`         |
+| `yarn gen`                                   | Generate test data    | `yarn gen --help`         |
+| `yarn versions`                              | Manage SDK versions   | `yarn versions --help`    |
+| `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`      |
+| `yarn groups`                                | Create DMs/groups     | `yarn groups --help`      |
 | `yarn permissions`                           | Manage permissions    | `yarn permissions --help` |
 
 ## Core Commands
@@ -131,23 +131,39 @@ yarn groups <operation> [options]
 ### Permissions Command
 
 ```bash
-yarn permissions <operation> [options]
+yarn permissions <operation> <group-id> [inbox-id] [options]
 ```
 
 **Operations:**
 
-- `list <group-id>` - List current permissions and member roles
-- `set <group-id> <policy>` - Set group permission policy
-- `admin <group-id> <inbox-id> <action>` - Manage admin/super admin roles
-- `test <group-id>` - Test permission enforcement
+- `list <group-id>` - List all members and their roles
 - `info <group-id>` - Show detailed group information
+- `add-admin <group-id> <inbox-id>` - Add admin status to member
+- `remove-admin <group-id> <inbox-id>` - Remove admin status from member
+- `add-super-admin <group-id> <inbox-id>` - Add super admin status to member
+- `remove-super-admin <group-id> <inbox-id>` - Remove super admin status from member
+- `add-member <group-id> <inbox-id>` - Add new member to group
+- `remove-member <group-id> <inbox-id>` - Remove member from group
 
 **Options:**
 
 - `--env <env>` - XMTP environment [default: local]
-- `--policy <type>` - Permission policy (default/admin-only/read-only/open)
-- `--action <action>` - Admin action (add/remove/list)
 - `--target <addr>` - Target address for operations
+
+**Member Statuses:**
+
+- **Member** - Basic group member (everyone starts here)
+- **Admin** - Can add/remove members and update metadata
+- **Super Admin** - Has all permissions including managing other admins
+
+**Default XMTP Permissions:**
+
+- Add member: All members
+- Remove member: Admin only
+- Add admin: Super admin only
+- Remove admin: Super admin only
+- Update group permissions: Super admin only
+- Update group metadata: All members
 
 ## Environment Options
 
@@ -194,11 +210,17 @@ yarn bot echo --env dev
 # Revoke all installations except current
 yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
-# List permissions for a group
+# List all members and their roles
 yarn permissions list 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
 
-# Add admin to group
-yarn permissions admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234... add
+# Add admin status to a member
+yarn permissions add-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+
+# Add super admin status to a member
+yarn permissions add-super-admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
+
+# Remove member from group
+yarn permissions remove-member 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234...
 ```
 
 ## Help Commands
