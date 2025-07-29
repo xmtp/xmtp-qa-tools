@@ -126,11 +126,7 @@ async function runDmOperation(config: Config): Promise<void> {
   const userCount = Math.max(2, dmCount + 1); // Need at least 2 users for DMs
 
   console.log(`👥 Creating ${userCount} users...`);
-  const workerManager = await createWorkerManager(
-    userCount,
-    config.env,
-    config.loggingLevel,
-  );
+  const workerManager = await createWorkerManager(userCount, config.env);
   const workers = workerManager.getAll();
 
   for (let i = 0; i < workers.length; i++) {
@@ -181,11 +177,7 @@ async function runGroupOperation(config: Config): Promise<void> {
   console.log(`🏗️  Creating group with ${members} members`);
 
   // Create main worker
-  const workerManager = await createWorkerManager(
-    1,
-    config.env,
-    config.loggingLevel,
-  );
+  const workerManager = await createWorkerManager(1, config.env);
   const mainWorker = workerManager.getAll()[0];
   console.log(`✅ Main worker created: ${mainWorker.inboxId}`);
 
