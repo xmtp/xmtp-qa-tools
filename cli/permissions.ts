@@ -1,4 +1,9 @@
-import { type Group, type LogLevel, type XmtpEnv } from "@workers/versions";
+import {
+  type Client,
+  type Group,
+  type LogLevel,
+  type XmtpEnv,
+} from "@workers/versions";
 import "dotenv/config";
 import { getWorkers } from "@workers/manager";
 
@@ -32,6 +37,26 @@ const AVAILABLE_PERMISSIONS = [
   "admin-only",
   "super-admin-only",
 ];
+
+// Permission types mapping to SDK enum values
+const PERMISSION_TYPES = {
+  "add-member": 1, // AddMember
+  "remove-member": 2, // RemoveMember
+  "add-admin": 3, // AddAdmin
+  "remove-admin": 5, // RemoveAdmin
+  "add-super-admin": 6, // AddSuperAdmin
+  "remove-super-admin": 7, // RemoveSuperAdmin
+  "update-metadata": 4, // UpdateMetadata
+  "update-permissions": 8, // UpdatePermissions
+} as const;
+
+// Permission policy mapping
+const PERMISSION_POLICIES = {
+  everyone: 0, // Everyone
+  disabled: 1, // Disabled
+  "admin-only": 2, // AdminOnly
+  "super-admin-only": 3, // SuperAdminOnly
+} as const;
 
 function showHelp() {
   console.log(`
@@ -146,30 +171,30 @@ function parseArgs(): Config {
   return config;
 }
 
-// Helper function to create a worker manager
-async function createWorkerManager(
-  count: number,
+// Helper function to create a worker manager and get client
+async function getClient(
   env: string,
   loggingLevel?: LogLevel,
-) {
-  return await getWorkers(count, {
+): Promise<Client> {
+  const workerManager = await getWorkers(1, {
     env: env as XmtpEnv,
     useVersions: false, // Use latest version for permission operations
   });
+  const worker = workerManager.getAll()[0];
+  return worker.client;
 }
 
-// Helper function to get a group by ID
+// Helper function to get a group by ID using SDK
 async function getGroupById(
   groupId: string,
   env: string,
   loggingLevel?: LogLevel,
 ): Promise<Group> {
-  const workerManager = await createWorkerManager(1, env, loggingLevel);
-  const worker = workerManager.getAll()[0];
+  const client = await getClient(env, loggingLevel);
 
   try {
     const conversation =
-      await worker.client.conversations.getConversationById(groupId);
+      await client.conversations.getConversationById(groupId);
     if (!conversation) {
       throw new Error(`Group not found: ${groupId}`);
     }
@@ -368,13 +393,8 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
     await group.sync();
 
     // Check if current user is super admin (only super admins can change permissions)
-    const workerManager = await createWorkerManager(
-      1,
-      config.env,
-      config.loggingLevel,
-    );
-    const worker = workerManager.getAll()[0];
-    const currentUser = worker.client.inboxId;
+    const client = await getClient(config.env, config.loggingLevel);
+    const currentUser = client.inboxId;
     const isSuperAdmin = group.isSuperAdmin(currentUser);
 
     if (!isSuperAdmin) {
@@ -391,127 +411,37 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
       console.log(`   • ${feature}: ${config.permissions}`);
     });
 
-    // Try to update the permissions using available SDK methods
-    try {
-      // Map permission types to XMTP SDK values
-      const permissionMap = {
-        everyone: 0, // Allow all
-        disabled: 1, // Disabled
-        "admin-only": 2, // Admin only
-        "super-admin-only": 3, // Super admin only
-      };
+    // Update permissions using SDK methods
+    let updatedCount = 0;
 
-      const permissionValue =
-        permissionMap[config.permissions as keyof typeof permissionMap];
+    for (const feature of config.features) {
+      try {
+        const permissionType =
+          PERMISSION_TYPES[feature as keyof typeof PERMISSION_TYPES];
+        const permissionPolicy =
+          PERMISSION_POLICIES[
+            config.permissions as keyof typeof PERMISSION_POLICIES
+          ];
 
-      // Attempt to use the actual XMTP SDK methods if they exist
-      let updatedCount = 0;
-
-      for (const feature of config.features) {
-        try {
-          // Try different SDK method patterns based on feature
-          if (feature === "update-metadata") {
-            if (typeof (group as any).updateMetadataPermission === "function") {
-              await (group as any).updateMetadataPermission(permissionValue);
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(4, permissionValue); // UpdateMetadata = 4
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "add-member") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(1, permissionValue); // AddMember = 1
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "remove-member") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(2, permissionValue); // RemoveMember = 2
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "add-admin") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(3, permissionValue); // AddAdmin = 3
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "remove-admin") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(5, permissionValue); // RemoveAdmin = 5
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "add-super-admin") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(6, permissionValue); // AddSuperAdmin = 6
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "remove-super-admin") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(7, permissionValue); // RemoveSuperAdmin = 7
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          } else if (feature === "update-permissions") {
-            if (typeof (group as any).updatePermission === "function") {
-              await (group as any).updatePermission(8, permissionValue); // UpdatePermissions = 8
-              console.log(`   ✅ Updated ${feature} permission`);
-              updatedCount++;
-            } else {
-              console.log(`   ⚠️  SDK method not available for ${feature}`);
-            }
-          }
-        } catch (featureError) {
-          console.log(
-            `   ❌ Failed to update ${feature}: ${featureError instanceof Error ? featureError.message : String(featureError)}`,
-          );
-        }
-      }
-
-      if (updatedCount > 0) {
+        // Use the SDK's updatePermission method
+        await group.updatePermission(permissionType, permissionPolicy);
         console.log(
-          `\n✅ Successfully updated ${updatedCount} out of ${config.features.length} features`,
+          `   ✅ Updated ${feature} permission to ${config.permissions}`,
         );
-      } else {
+        updatedCount++;
+      } catch (featureError) {
         console.log(
-          `\nℹ️  No features were updated - XMTP SDK permission methods not available`,
-        );
-        console.log(
-          `   The permission changes are documented and ready for SDK implementation`,
+          `   ❌ Failed to update ${feature}: ${featureError instanceof Error ? featureError.message : String(featureError)}`,
         );
       }
-    } catch (permissionError) {
+    }
+
+    if (updatedCount > 0) {
       console.log(
-        `ℹ️  Permission update failed: ${
-          permissionError instanceof Error
-            ? permissionError.message
-            : String(permissionError)
-        }`,
+        `\n✅ Successfully updated ${updatedCount} out of ${config.features.length} features`,
       );
-      console.log(
-        `   This indicates the XMTP SDK doesn't support permission policy updates yet`,
-      );
-      console.log(
-        `   The operation is documented and ready for when SDK support is added`,
-      );
+    } else {
+      console.log(`\n❌ No features were updated successfully`);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
