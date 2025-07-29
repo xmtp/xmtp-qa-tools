@@ -10,6 +10,7 @@ cd multinode && ./up
 ```
 
 **Cluster nodes**: `multinode-node1-1` through `multinode-node4-1`
+
 **API endpoints**: `localhost:5556`, `localhost:6556`, `localhost:7556`, `localhost:8556`
 
 ## Network chaos parameters
