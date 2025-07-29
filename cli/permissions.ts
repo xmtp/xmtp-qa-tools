@@ -101,7 +101,7 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   const config: Config = {
     operation: "list",
-    env: process.env.XMTP_ENV ?? "local",
+    env: process.env.XMTP_ENV ?? "production",
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
   };
 
