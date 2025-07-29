@@ -27,7 +27,7 @@ interface Config {
   userCount: number;
   timeout: number;
   env: string;
-  address: string;
+  target: string;
   tresshold: number;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
@@ -73,7 +73,7 @@ function parseArgs(): Config {
     userCount: 5,
     timeout: 120 * 1000, // 120 seconds - increased for XMTP operations
     env: process.env.XMTP_ENV ?? "local",
-    address: process.env.ADDRESS ?? "",
+    target: process.env.TARGET ?? "",
     tresshold: 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
@@ -87,7 +87,7 @@ function parseArgs(): Config {
       showHelp();
       process.exit(0);
     } else if (arg === "--address" && nextArg) {
-      config.address = nextArg;
+      config.target = nextArg;
       i++;
     } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
@@ -287,7 +287,7 @@ async function runsendTest(config: Config): Promise<void> {
           let conversation: Conversation;
 
           conversation = (await worker.conversations.newDmWithIdentifier({
-            identifier: config.address,
+            identifier: config.target,
             identifierKind: IdentifierKind.Ethereum,
           })) as Conversation;
 

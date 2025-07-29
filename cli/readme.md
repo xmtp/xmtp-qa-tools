@@ -1,277 +1,180 @@
 # XMTP QA Tools CLI
 
-This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
+A comprehensive CLI for testing XMTP protocol implementations across environments and SDK versions.
 
-## Overview
+## Quick Reference
 
-The CLI consists of several specialized commands for different testing and management tasks:
+| Command                                      | Purpose               | Help                   |
+| -------------------------------------------- | --------------------- | ---------------------- |
+| `yarn test <suite>`                          | Run test suites       | `yarn test --help`     |
+| `yarn send --address <addr> --users <count>` | Test message delivery | `yarn send --help`     |
+| `yarn bot <name>`                            | Run interactive bots  | `yarn bot --help`      |
+| `yarn gen`                                   | Generate test data    | `yarn gen --help`      |
+| `yarn versions`                              | Manage SDK versions   | `yarn versions --help` |
+| `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`   |
+| `yarn groups`                                | Create DMs/groups     | `yarn groups --help`   |
 
-| Command                                         | Description                     | Help                   |
-| ----------------------------------------------- | ------------------------------- | ---------------------- |
-| `yarn test <suite>`                             | Run test suites                 | `yarn test --help`     |
-| `yarn send --address <address> --users <count>` | Send messages and test delivery | `yarn send --help`     |
-| `yarn bot <name>`                               | Run interactive bots            | `yarn bot --help`      |
-| `yarn gen`                                      | Generate test inboxes and keys  | `yarn gen --help`      |
-| `yarn versions`                                 | Manage SDK versions             | `yarn versions --help` |
-| `yarn revoke <inbox-id> <installation-id>`      | Revoke installations            | `yarn revoke --help`   |
-| `yarn groups`                                   | Create dms,groups               | `yarn groups --help`   |
+## Core Commands
 
-## Test command
-
-The `test` command runs comprehensive test suites for XMTP functionality across different environments and SDK versions.
-
-### Usage
+### Test Command
 
 ```bash
-yarn test <test-suite> [options]
+yarn test <suite> [options]
 ```
 
-### Arguments
+**Test Suites:**
 
-- `test-suite` - Test suite name (functional, convos, groups, etc.)
-
-### Options
-
-- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
-- `--attempts <number>` - Maximum retry attempts [default: 3]
-- `--debug` - Enable file logging (saves to logs/ directory)
-- `--no-fail` - Exit with success code even on failures
-- `--parallel` - Run tests in parallel (default: consecutive)
-- `--versions <count>` - Use multiple SDK versions for testing
-
-### Available test suites
-
-**Core functionality:**
-
-- `functional` - Complete functional test suite
+- `functional` - Complete functional tests
 - `convos` - Direct message tests
 - `groups` - Group conversation tests
-
-**Performance & scale:**
-
-- `performance` - Core performance metrics and large groups
+- `performance` - Performance metrics
 - `delivery` - Message delivery reliability
-- `bench` - Benchmarking suite
+- `browser` - Playwright automation
+- `agents` - Bot monitoring
+- `networkchaos` - Network partition tests
+- `other` - Security, spam, rate limiting
 
-**Cross-platform & compatibility:**
+**Options:**
 
-- `browser` - Playwright browser automation
-- `agents` - Live bot monitoring
+- `--env <env>` - Environment (local/dev/production) [default: local]
+- `--attempts <n>` - Retry attempts [default: 3]
+- `--debug` - Enable file logging
+- `--no-fail` - Exit with success on failures
+- `--parallel` - Run tests in parallel
+- `--versions <n>` - Test multiple SDK versions
 
-**Network & reliability:**
-
-- `networkchaos` - Network partition tolerance
-- `other` - Security, spam detection, rate limiting
-- `forks` - Git commit-based testing
-
-### Examples
-
-```bash
-# Quick functionality test
-yarn test convos --env dev
-
-# Full functional suite with debugging
-yarn test functional --env dev --debug --no-fail
-
-# Multi-version compatibility testing
-yarn test functional --versions 3 --debug
-
-# Parallel performance testing
-yarn test performance --parallel --env production
-```
-
-## Send command
-
-The `send` command simulates multiple users sending messages to test delivery reliability and performance.
-
-### Usage
+### Send Command
 
 ```bash
 yarn send [options]
 ```
 
-### Options
+**Options:**
 
-- `--address <address>` - Target wallet address to send messages to
-- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
-- `--users <count>` - Number of users to simulate [default: 5]
-- `--tresshold <percent>` - Success threshold percentage [default: 95]
-- `--wait` - Wait for responses from target
+- `--address <addr>` - Target wallet address
+- `--env <env>` - XMTP environment [default: local]
+- `--users <count>` - Number of users [default: 5]
+- `--tresshold <percent>` - Success threshold [default: 95]
+- `--wait` - Wait for responses
 
-### Environment Variables
-
-- `ADDRESS` - Default target address
-- `XMTP_ENV` - Default environment
-- `LOGGING_LEVEL` - Logging level
-
-### Examples
+### Bot Command
 
 ```bash
-# Basic message sending test
-yarn send --address 0x1234... --env dev --users 10
-
-# Production load testing with response waiting
-yarn send --address 0x1234... --env production --users 500 --wait
-
-# Custom success threshold
-yarn send --address 0x1234... --tresshold 90 --users 100
+yarn bot <name> [options]
 ```
 
-## Bot command
-
-The `bot` command runs interactive XMTP bots for testing and monitoring purposes.
-
-### Usage
-
-```bash
-yarn bot <bot-name> [options]
-```
-
-### Arguments
-
-- `bot-name` - Name of the bot to run (echo, key-check)
-
-### Options
-
-- `--env <environment>` - XMTP environment (local, dev, production) [default: local]
-
-### Available bots
+**Available Bots:**
 
 - `echo` - Echo bot that responds to messages
 - `key-check` - Key validation bot
 
-### Examples
+**Options:**
 
-```bash
-# Run echo bot in development environment
-yarn bot echo --env dev
+- `--env <env>` - XMTP environment [default: local]
 
-# Run key validation bot locally
-yarn bot key-check --env local
-```
-
-## Generator command
-
-The `gen` command generates test inboxes and encryption keys for testing across multiple environments.
-
-### Usage
+### Generator Command
 
 ```bash
 yarn gen [options]
 ```
 
-### Options
+**Options:**
 
-- `--count <number>` - Number of inboxes to generate [default: 200]
-- `--envs <environments>` - Comma-separated environments (local,dev,production) [default: local]
-- `--installations <num>` - Number of installations per inbox [default: 2]
+- `--count <n>` - Number of inboxes [default: 200]
+- `--envs <list>` - Environments (local,dev,production) [default: local]
+- `--installations <n>` - Installations per inbox [default: 2]
 - `--debug` - Enable debug logging
-- `--clean` - Clean up logs/ and .data/ directories before running
+- `--clean` - Clean logs/ and .data/ directories
 
-### Preset commands
-
-```bash
-yarn update:local      # Generate 500 inboxes for local testing
-yarn update:prod       # Generate inboxes for production testing
-```
-
-### Examples
-
-```bash
-# Generate test data for local environment
-yarn gen --count 500 --envs local
-
-# Multi-environment setup
-yarn gen --envs local,dev --installations 3
-
-# Clean setup with debugging
-yarn gen --clean --debug
-```
-
-## Versions command
-
-The `versions` command manages SDK version testing by creating bindings symlinks for different XMTP SDK versions.
-
-### Usage
+### Versions Command
 
 ```bash
 yarn versions [options]
 ```
 
-### Options
+**Options:**
 
-- `--clean` - Clean package.json imports and node_modules before setup
+- `--clean` - Clean package.json and node_modules before setup
 
-### Description
-
-Sets up SDK version testing by creating bindings symlinks for different XMTP SDK versions. This enables testing across multiple SDK versions simultaneously.
-
-### Examples
-
-```bash
-# Standard version setup
-yarn versions
-
-# Clean setup
-yarn versions --clean
-```
-
-## Revoke command
-
-The `revoke` command revokes installations for a given inbox, useful for testing installation management.
-
-### Usage
+### Revoke Command
 
 ```bash
 yarn revoke <inbox-id> [installations-to-save]
 ```
 
-### Arguments
+**Arguments:**
 
-- `inbox-id` - 64-character hexadecimal inbox ID
-- `installations-to-save` - Comma-separated installation IDs to keep (optional)
+- `inbox-id` - 64-character hex inbox ID
+- `installations-to-save` - Comma-separated IDs to keep (optional)
 
-### Description
-
-Revokes all installations for a given inbox except those specified in installations-to-save. If no installations are specified, only the current installation is kept.
-
-### Requirements
-
-- Node.js version 20 or higher
-- .env file with WALLET_KEY, ENCRYPTION_KEY, and XMTP_ENV
-
-### Examples
+### Groups Command
 
 ```bash
-# Revoke all installations except current
-yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
-
-# Keep specific installations
-yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"
+yarn groups [options] --target <address> --members <count> --group-name <name> --permissions <type>
 ```
 
-## Environment options
+**Options:**
 
-All commands support the following environments:
+- `--target <addr>` - Target wallet address
+- `--members <count>` - Number of members
+- `--group-name <name>` - Group name
+- `--permissions <type>` - Permissions (default/admin-only/read-only/open)
 
-- **`local`**: Local XMTP network for development
-- **`dev`**: Development XMTP network (default)
-- **`production`**: Production XMTP network
+## Environment Options
 
-## Common options
+All commands support:
 
-Most commands support these common options:
+- `local` - Local XMTP network
+- `dev` - Development network (default)
+- `production` - Production network
+
+## Common Options
+
+Most commands support:
 
 ```bash
 --env <environment>    # Set XMTP environment
 --debug               # Enable file logging
---no-fail             # Exit with success code even on failures
---help, -h            # Show help for any command
+--no-fail             # Exit with success on failures
+--help, -h            # Show help
 ```
 
-## Getting help
+## Environment Variables
 
-Each CLI command provides detailed help:
+- `TARGET` - Default target address
+- `XMTP_ENV` - Default environment
+- `LOGGING_LEVEL` - Logging level
+- `WALLET_KEY` - Wallet private key (for revoke)
+- `ENCRYPTION_KEY` - Encryption key (for revoke)
+
+## Requirements
+
+- Node.js 20+
+- .env file with required keys (for revoke command)
+
+## Examples
+
+```bash
+# Quick functionality test
+yarn test convos --env dev
+
+# Load testing with response waiting
+yarn send --address 0x1234... --env production --users 500 --wait
+
+# Multi-version compatibility testing
+yarn test functional --versions 3 --debug
+
+# Generate test data for multiple environments
+yarn gen --count 500 --envs local,dev --installations 3
+
+# Run echo bot in development
+yarn bot echo --env dev
+
+# Revoke all installations except current
+yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+```
+
+## Help Commands
 
 ```bash
 yarn test --help       # Test command help
@@ -280,29 +183,12 @@ yarn bot --help        # Bot command help
 yarn gen --help        # Generator help
 yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
+yarn groups --help     # Groups help
 ```
 
-## Monitoring and analysis
+## Monitoring
 
 ```bash
-# Log analysis
 yarn ansi:clean        # Clean raw logs
 yarn ansi:forks        # Clean fork logs
 ```
-
-## Groups command
-
-The `groups` command creates Direct Messages (DMs) and groups with specified permissions.
-
-### Usage
-
-```bash
-yarn groups [options] --target <address> --members <count> --group-name <name> --permissions <type>
-```
-
-### Options
-
-- `--target <address>` - Target wallet address to invite to group
-- `--members <count>` - Number of members to invite to group
-- `--group-name <name>` - Name of the group to create
-- `--permissions <type>` - Type of permissions to set (default, admin-only, read-only, open)
