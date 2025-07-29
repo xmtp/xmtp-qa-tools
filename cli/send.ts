@@ -9,7 +9,7 @@ import {
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
-import { getWorkers } from "../workers/manager";
+import { getWorkers } from "@workers/manager";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait

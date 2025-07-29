@@ -6,8 +6,8 @@ import {
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
-import { getRandomInboxIds } from "../inboxes/utils";
-import { getWorkers } from "../workers/manager";
+import { getRandomInboxIds } from "@inboxes/utils";
+import { getWorkers } from "@workers/manager";
 
 interface Config {
   operation: "dm" | "group";
@@ -20,19 +20,18 @@ interface Config {
   groupDescription?: string;
   members?: number;
   targetAddress?: string;
-  permissions?: "default" | "admin-only" | "read-only" | "open";
 }
 
 function showHelp() {
   console.log(`
-XMTP Create CLI - Create DMs and Groups with permissions
+XMTP Create CLI - Create DMs and Groups
 
 USAGE:
-  yarn create <operation> [options]
+  yarn groups <operation> [options]
 
 OPERATIONS:
   dm                      Create direct message conversations
-  group                   Create a group with members and permissions
+  group                   Create a group with members
 
 OPTIONS:
   --env <environment>     XMTP environment (local, dev, production) [default: local]
@@ -41,7 +40,6 @@ OPTIONS:
   --group-desc <desc>     Group description
   --members <count>       Number of random members for groups [default: 5]
   --target <address>      Target address to invite to group
-  --permissions <type>    Group permissions: default, admin-only, read-only, open
   -h, --help             Show this help message
 
 ENVIRONMENTS:
@@ -49,24 +47,9 @@ ENVIRONMENTS:
   dev         Development XMTP network (default)
   production  Production XMTP network
 
-PERMISSION TYPES:
-  default     - Standard group permissions (recommended)
-  admin-only  - Only admins can add/remove members and update metadata
-  read-only   - Only super admin can make changes
-  open        - All members can add/remove members and update metadata
-
 EXAMPLES:
   # Create 3 DMs between random users
-  yarn create dm --dm-count 3 --env dev
-  
-  # Create group with default permissions
-  yarn create group --group-name "Test Group" --members 5 --env dev
-  
-  # Create admin-only group and invite target
-  yarn create group --group-name "Admin Group" --target 0x1234... --permissions admin-only --env production
-  
-  # Create read-only group
-  yarn create group --group-name "Read Only" --permissions read-only --env dev
+  yarn groups dm --dm-count 3 --env dev
 
 ENVIRONMENT VARIABLES:
   XMTP_ENV             Default environment
@@ -84,7 +67,6 @@ function parseArgs(): Config {
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     dmCount: 1,
     members: 5,
-    permissions: "default",
   };
 
   // First argument is the operation
@@ -120,13 +102,6 @@ function parseArgs(): Config {
       i++;
     } else if (arg === "--target" && nextArg) {
       config.targetAddress = nextArg;
-      i++;
-    } else if (arg === "--permissions" && nextArg) {
-      config.permissions = nextArg as
-        | "default"
-        | "admin-only"
-        | "read-only"
-        | "open";
       i++;
     }
   }
@@ -226,20 +201,17 @@ async function runGroupOperation(config: Config): Promise<void> {
   const groupName = config.groupName || `Test Group ${Date.now()}`;
   const groupDescription =
     config.groupDescription || "Group created by XMTP Create CLI";
-  const permissions = undefined;
 
   console.log(`👥 Creating group: "${groupName}"`);
   console.log(`📝 Description: "${groupDescription}"`);
-  console.log(`🔐 Permissions: ${config.permissions}`);
 
   try {
-    // Create group with existing inbox IDs and permissions
+    // Create group with existing inbox IDs
     const group = (await mainWorker.client.conversations.newGroup(
       memberInboxIds,
       {
         groupName,
         groupDescription,
-        permissions,
       },
     )) as Group;
 
@@ -256,18 +228,6 @@ async function runGroupOperation(config: Config): Promise<void> {
           },
         ]);
         console.log(`✅ Added target address to group`);
-
-        // Make target address an admin if using admin-only permissions
-        if (config.permissions === "admin-only") {
-          try {
-            await group.addAdmin(config.targetAddress);
-            console.log(`👑 Made ${config.targetAddress} an admin`);
-          } catch (error) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
-            console.warn(`⚠️  Could not make target admin: ${errorMessage}`);
-          }
-        }
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
@@ -288,10 +248,9 @@ async function runGroupOperation(config: Config): Promise<void> {
     if (config.targetAddress) {
       console.log(`   Target Member: ${config.targetAddress}`);
     }
-    console.log(`   Permission Type: ${config.permissions}`);
 
     // Send welcome message to group
-    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP Create CLI with ${groupMembers.length} members and ${config.permissions} permissions.`;
+    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP Create CLI with ${groupMembers.length} members.`;
     await group.send(welcomeMessage);
     console.log(`💬 Sent welcome message to group`);
 

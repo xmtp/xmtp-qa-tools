@@ -2,7 +2,6 @@
   "permissions": {
     "allow": [
       "Bash(yarn *)",
-      "Bash(yarn create:*)",
       "Bash(yarn groups:*)",
       "Bash(ls:*)",
       "Bash(yarn send:*)"

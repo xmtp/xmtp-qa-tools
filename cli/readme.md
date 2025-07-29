@@ -13,6 +13,7 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn versions`                              | Manage SDK versions   | `yarn versions --help` |
 | `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`   |
 | `yarn groups`                                | Create DMs/groups     | `yarn groups --help`   |
+| `yarn permissions`                           | Manage permissions    | `yarn permissions --help` |
 
 ## Core Commands
 
@@ -110,15 +111,43 @@ yarn revoke <inbox-id> [installations-to-save]
 ### Groups Command
 
 ```bash
-yarn groups [options] --target <address> --members <count> --group-name <name> --permissions <type>
+yarn groups <operation> [options]
 ```
+
+**Operations:**
+
+- `dm` - Create direct message conversations
+- `group` - Create a group with members
 
 **Options:**
 
-- `--target <addr>` - Target wallet address
-- `--members <count>` - Number of members
+- `--env <env>` - XMTP environment [default: local]
+- `--dm-count <n>` - Number of DMs to create [default: 1]
 - `--group-name <name>` - Group name
-- `--permissions <type>` - Permissions (default/admin-only/read-only/open)
+- `--group-desc <desc>` - Group description
+- `--members <count>` - Number of members [default: 5]
+- `--target <addr>` - Target wallet address to invite
+
+### Permissions Command
+
+```bash
+yarn permissions <operation> [options]
+```
+
+**Operations:**
+
+- `list <group-id>` - List current permissions and member roles
+- `set <group-id> <policy>` - Set group permission policy
+- `admin <group-id> <inbox-id> <action>` - Manage admin/super admin roles
+- `test <group-id>` - Test permission enforcement
+- `info <group-id>` - Show detailed group information
+
+**Options:**
+
+- `--env <env>` - XMTP environment [default: local]
+- `--policy <type>` - Permission policy (default/admin-only/read-only/open)
+- `--action <action>` - Admin action (add/remove/list)
+- `--target <addr>` - Target address for operations
 
 ## Environment Options
 
@@ -164,6 +193,12 @@ yarn bot echo --env dev
 
 # Revoke all installations except current
 yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+
+# List permissions for a group
+yarn permissions list 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+
+# Add admin to group
+yarn permissions admin 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 0x1234... add
 ```
 
 ## Help Commands
@@ -176,4 +211,5 @@ yarn gen --help        # Generator help
 yarn versions --help   # Versions help
 yarn revoke --help     # Revoke help
 yarn groups --help     # Groups help
+yarn permissions --help # Permissions help
 ```
