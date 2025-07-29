@@ -2,6 +2,7 @@ import {
   type Client,
   type Group,
   type LogLevel,
+  type PermissionUpdateType,
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
@@ -424,7 +425,10 @@ async function runUpdatePermissionsOperation(config: Config): Promise<void> {
           ];
 
         // Use the SDK's updatePermission method
-        await group.updatePermission(permissionType, permissionPolicy);
+        await group.updatePermission(
+          permissionType as PermissionUpdateType,
+          permissionPolicy,
+        );
         console.log(
           `   ✅ Updated ${feature} permission to ${config.permissions}`,
         );
