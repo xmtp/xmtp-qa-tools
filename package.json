@@ -15,6 +15,7 @@
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
+    "create-xmtp": "tsx cli/create.ts",
     "format": "prettier -w .",
     "gen": "tsx cli/gen.ts",
     "lint": "eslint .",
