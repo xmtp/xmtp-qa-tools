@@ -17,7 +17,7 @@ import {
   getDbPathQA,
   getEncryptionKeyFromHex,
 } from "../helpers/client";
-import { getRandomInboxIds, getInboxByInstallationCount } from "../inboxes/utils";
+import { getInboxByInstallationCount } from "../inboxes/utils";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
@@ -131,7 +131,9 @@ function parseArgs(): Config {
   }
 
   if (config.groupId && config.target) {
-    console.error("❌ Error: Cannot use both --group-id and --address. Choose one.");
+    console.error(
+      "❌ Error: Cannot use both --group-id and --address. Choose one.",
+    );
     process.exit(1);
   }
 
@@ -186,23 +188,26 @@ function calculatePercentile(values: number[], percentile: number): number {
 
 async function sendGroupMessage(config: Config): Promise<void> {
   if (!config.groupId || !config.message) {
-    console.error("❌ Error: Group ID and message are required for group messaging");
+    console.error(
+      "❌ Error: Group ID and message are required for group messaging",
+    );
     return;
   }
 
   console.log(`📤 Sending message to group ${config.groupId} on ${config.env}`);
-  
+
   // Use an existing inbox that was likely used in group creation
   const existingInboxes = getInboxByInstallationCount(2);
   if (existingInboxes.length === 0) {
     console.error("❌ No existing inboxes available for group messaging");
     return;
   }
-  
+
   // Try different inboxes if one fails
-  let inboxData = existingInboxes[Math.floor(Math.random() * existingInboxes.length)];
+  let inboxData =
+    existingInboxes[Math.floor(Math.random() * existingInboxes.length)];
   console.log(`📋 Using existing inbox: ${inboxData.inboxId}`);
-  
+
   const dbEncryptionKey = getEncryptionKeyFromHex(inboxData.dbEncryptionKey);
   const signer = createSigner(inboxData.walletKey as `0x${string}`);
   const signerIdentifier = (await signer.getIdentifier()).identifier;
@@ -227,16 +232,20 @@ async function sendGroupMessage(config: Config): Promise<void> {
     // Sync conversations to get all available groups
     console.log(`🔄 Syncing conversations...`);
     await client.conversations.sync();
-    
+
     // Get all conversations and find the group by ID
     const conversations = await client.conversations.list();
     console.log(`📋 Found ${conversations.length} conversations`);
-    
-    const group = conversations.find(conv => conv.id === config.groupId) as Group;
+
+    const group = conversations.find(
+      (conv) => conv.id === config.groupId,
+    ) as Group;
     if (!group) {
       console.error(`❌ Group with ID ${config.groupId} not found`);
       console.log(`📋 Available conversation IDs:`);
-      conversations.forEach(conv => console.log(`   - ${conv.id}`));
+      conversations.forEach((conv) => {
+        console.log(`   - ${conv.id}`);
+      });
       return;
     }
 
@@ -249,8 +258,9 @@ async function sendGroupMessage(config: Config): Promise<void> {
 
     console.log(`✅ Message sent successfully in ${sendTime}ms`);
     console.log(`💬 Message: "${config.message}"`);
-    console.log(`🔗 Group URL: https://xmtp.chat/conversations/${config.groupId}`);
-
+    console.log(
+      `🔗 Group URL: https://xmtp.chat/conversations/${config.groupId}`,
+    );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to send group message: ${errorMessage}`);
@@ -599,7 +609,7 @@ async function runsendTest(config: Config): Promise<void> {
 
 async function main(): Promise<void> {
   const config = parseArgs();
-  
+
   if (config.groupId) {
     await sendGroupMessage(config);
   } else {
