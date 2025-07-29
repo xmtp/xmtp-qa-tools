@@ -45,7 +45,7 @@ OPTIONS:
   --group-id <id>         Target group ID to send message to
   --message <text>        Custom message to send (required for group messages)
   --sender <address>      Wallet address to use as sender (must be group member)
-  --env <environment>     XMTP environment (local, dev, production) [default: local]
+  --env <environment>     XMTP environment (local, dev, production) [default: production]
   --users <count>         Number of users to simulate [default: 5]
   --tresshold <percent>   Success threshold percentage [default: 95]
   --wait                  Wait for responses from target

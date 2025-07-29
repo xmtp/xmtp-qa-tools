@@ -22,7 +22,7 @@ ARGUMENTS:
   bot-name              Name of the bot to run (echo, key-check)
 
 OPTIONS:
-  --env <environment>   XMTP environment (local, dev, production) [default: local]
+  --env <environment>   XMTP environment (local, dev, production) [default: production]
   -h, --help           Show this help message
 
 ENVIRONMENTS:

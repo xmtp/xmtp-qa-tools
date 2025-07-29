@@ -37,7 +37,7 @@ yarn test <suite> [options]
 
 **Options:**
 
-- `--env <env>` - Environment (local/dev/production) [default: local]
+- `--env <env>` - Environment (local/dev/production) [default: production]
 - `--attempts <n>` - Retry attempts [default: 3]
 - `--debug` - Enable file logging
 - `--no-fail` - Exit with success on failures
@@ -53,7 +53,7 @@ yarn send [options]
 **Options:**
 
 - `--address <addr>` - Target wallet address
-- `--env <env>` - XMTP environment [default: local]
+- `--env <env>` - XMTP environment [default: production]
 - `--users <count>` - Number of users [default: 5]
 - `--tresshold <percent>` - Success threshold [default: 95]
 - `--wait` - Wait for responses
@@ -71,7 +71,7 @@ yarn bot <name> [options]
 
 **Options:**
 
-- `--env <env>` - XMTP environment [default: local]
+- `--env <env>` - XMTP environment [default: production]
 
 ### Generator Command
 
@@ -82,7 +82,7 @@ yarn gen [options]
 **Options:**
 
 - `--count <n>` - Number of inboxes [default: 200]
-- `--envs <list>` - Environments (local,dev,production) [default: local]
+- `--envs <list>` - Environments (local,dev,production) [default: production]
 - `--installations <n>` - Installations per inbox [default: 2]
 - `--debug` - Enable debug logging
 - `--clean` - Clean logs/ and .data/ directories
@@ -121,7 +121,7 @@ yarn groups <operation> [options]
 
 **Options:**
 
-- `--env <env>` - XMTP environment [default: local]
+- `--env <env>` - XMTP environment [default: production]
 - `--dm-count <n>` - Number of DMs to create [default: 1]
 - `--group-name <name>` - Group name
 - `--group-desc <desc>` - Group description
@@ -144,7 +144,7 @@ yarn permissions <operation> <group-id> [options]
 
 - `--features <feature-list>` - Comma-separated features to update
 - `--permissions <permission-type>` - Permission type to apply
-- `--env <env>` - XMTP environment [default: local]
+- `--env <env>` - XMTP environment [default: production]
 - `--target <addr>` - Target address for operations
 
 **Available Features:**

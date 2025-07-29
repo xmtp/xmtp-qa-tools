@@ -48,7 +48,7 @@ OPERATIONS:
 OPTIONS:
   --features <feature-list>                 Comma-separated features to update
   --permissions <permission-type>           Permission type to apply
-  --env <environment>                       XMTP environment (local, dev, production) [default: local]
+  --env <environment>                       XMTP environment (local, dev, production) [default: production]
   --target <address>                        Target address for operations
   -h, --help                               Show this help message
 

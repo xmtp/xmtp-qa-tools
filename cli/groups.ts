@@ -34,7 +34,7 @@ OPERATIONS:
   group                   Create a group with members
 
 OPTIONS:
-  --env <environment>     XMTP environment (local, dev, production) [default: local]
+  --env <environment>     XMTP environment (local, dev, production) [default: production]
   --dm-count <number>     Number of DMs to create [default: 1]
   --group-name <name>     Group name for group operations
   --group-desc <desc>     Group description
