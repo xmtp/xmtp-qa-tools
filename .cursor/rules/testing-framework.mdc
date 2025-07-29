@@ -528,7 +528,7 @@ describe(testName, async () => {
 });
 ```
 
-## getWorkers API
+## Workers
 
 The `getWorkers` function has three input modes with optional configuration:
 
