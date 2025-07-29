@@ -167,19 +167,13 @@ async function createClient(
   });
 }
 
-// Helper function to get permission set based on type
-function getPermissionSet(type: string) {
-  // For now, return undefined to use default permissions
-  // This can be expanded later when permission types are properly imported
-  return undefined;
-}
-
 // Operation: Create DMs
 async function runDmOperation(config: Config): Promise<void> {
-  console.log(`💬 Creating ${config.dmCount} direct message conversations`);
+  const dmCount = config.dmCount ?? 1;
+  console.log(`💬 Creating ${dmCount} direct message conversations`);
 
   // Create users for DMs
-  const userCount = Math.max(2, config.dmCount! + 1); // Need at least 2 users for DMs
+  const userCount = Math.max(2, dmCount + 1); // Need at least 2 users for DMs
   const users: Client[] = [];
 
   console.log(`👥 Creating ${userCount} users...`);
@@ -191,27 +185,30 @@ async function runDmOperation(config: Config): Promise<void> {
 
   // Create DMs between users
   const conversations: Conversation[] = [];
-  let dmCount = 0;
+  let createdDmCount = 0;
 
   console.log(`💬 Creating DMs...`);
-  for (let i = 0; i < users.length && dmCount < config.dmCount!; i++) {
-    for (let j = i + 1; j < users.length && dmCount < config.dmCount!; j++) {
+  for (let i = 0; i < users.length && createdDmCount < dmCount; i++) {
+    for (let j = i + 1; j < users.length && createdDmCount < dmCount; j++) {
       try {
         const conversation = await users[i].conversations.newDm(
           users[j].inboxId,
         );
         conversations.push(conversation);
-        dmCount++;
-        console.log(`✅ Created DM ${dmCount}: user ${i + 1} ↔ user ${j + 1}`);
+        createdDmCount++;
+        console.log(
+          `✅ Created DM ${createdDmCount}: user ${i + 1} ↔ user ${j + 1}`,
+        );
 
         // Send a test message
-        await conversation.send(
-          `Hello from user ${i + 1} to user ${j + 1}! DM created by XMTP Create CLI.`,
-        );
-        console.log(`📤 Sent test message in DM ${dmCount}`);
+        const message = `Hello from user ${i + 1} to user ${j + 1}! DM created by XMTP Create CLI.`;
+        await conversation.send(message);
+        console.log(`📤 Sent test message in DM ${createdDmCount}`);
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         console.warn(
-          `⚠️  Failed to create DM between user ${i + 1} and user ${j + 1}: ${error}`,
+          `⚠️  Failed to create DM between user ${i + 1} and user ${j + 1}: ${errorMessage}`,
         );
       }
     }
@@ -220,27 +217,28 @@ async function runDmOperation(config: Config): Promise<void> {
   console.log(`\n📊 DM Summary:`);
   console.log(`   Users Created: ${users.length}`);
   console.log(`   DMs Created: ${conversations.length}`);
-  console.log(`   Target DMs: ${config.dmCount}`);
+  console.log(`   Target DMs: ${dmCount}`);
   console.log(`   Environment: ${config.env}`);
 }
 
 // Operation: Create Group
 async function runGroupOperation(config: Config): Promise<void> {
-  console.log(`🏗️  Creating group with ${config.members} members`);
+  const members = config.members ?? 5;
+  console.log(`🏗️  Creating group with ${members} members`);
 
   // Create main client
   const mainClient = await createClient(0, config.env, config.loggingLevel);
   console.log(`✅ Main client created: ${mainClient.inboxId}`);
 
   // Get existing inbox IDs for group members
-  const memberInboxIds = getRandomInboxIds(config.members!, 2);
+  const memberInboxIds = getRandomInboxIds(members, 2);
   console.log(`📋 Using ${memberInboxIds.length} existing inbox IDs`);
 
   // Set up group options
   const groupName = config.groupName || `Test Group ${Date.now()}`;
   const groupDescription =
     config.groupDescription || "Group created by XMTP Create CLI";
-  const permissions = getPermissionSet(config.permissions!);
+  const permissions = undefined;
 
   console.log(`👥 Creating group: "${groupName}"`);
   console.log(`📝 Description: "${groupDescription}"`);
@@ -274,23 +272,27 @@ async function runGroupOperation(config: Config): Promise<void> {
             await group.addAdmin(config.targetAddress);
             console.log(`👑 Made ${config.targetAddress} an admin`);
           } catch (error) {
-            console.warn(`⚠️  Could not make target admin: ${error}`);
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            console.warn(`⚠️  Could not make target admin: ${errorMessage}`);
           }
         }
       } catch (error) {
-        console.warn(`⚠️  Failed to add target address: ${error}`);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.warn(`⚠️  Failed to add target address: ${errorMessage}`);
       }
     }
 
     // Sync group to get updated member list
     await group.sync();
-    const members = await group.members();
+    const groupMembers = await group.members();
 
     console.log(`\n📊 Group Summary:`);
     console.log(`   Group ID: ${group.id}`);
     console.log(`   Group Name: ${group.name}`);
     console.log(`   Description: ${group.description || "No description"}`);
-    console.log(`   Total Members: ${members.length}`);
+    console.log(`   Total Members: ${groupMembers.length}`);
     console.log(`   Random Members: ${memberInboxIds.length}`);
     if (config.targetAddress) {
       console.log(`   Target Member: ${config.targetAddress}`);
@@ -298,7 +300,7 @@ async function runGroupOperation(config: Config): Promise<void> {
     console.log(`   Permission Type: ${config.permissions}`);
 
     // Send welcome message to group
-    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP Create CLI with ${members.length} members and ${config.permissions} permissions.`;
+    const welcomeMessage = `Welcome to ${groupName}! This group was created by the XMTP Create CLI with ${groupMembers.length} members and ${config.permissions} permissions.`;
     await group.send(welcomeMessage);
     console.log(`💬 Sent welcome message to group`);
 
@@ -307,8 +309,9 @@ async function runGroupOperation(config: Config): Promise<void> {
       `   Group can be accessed at: https://xmtp.chat/conversations/${group.id}`,
     );
   } catch (error) {
-    console.error(`❌ Failed to create group: ${error}`);
-    process.exit(1);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Failed to create group: ${errorMessage}`);
+    return;
   }
 }
 
