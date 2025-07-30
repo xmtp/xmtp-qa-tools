@@ -13,7 +13,8 @@ import { getWorkers } from "@workers/manager";
 
 // gm-bot
 // yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
-
+// local gm bot=
+// yarn send --address 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local   --users 500  --attempts 10
 // echo
 // yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
@@ -31,6 +32,7 @@ interface Config {
   tresshold: number;
   loggingLevel: LogLevel;
   waitForResponse: boolean;
+  attempts: number;
 }
 
 function showHelp() {
@@ -47,6 +49,7 @@ OPTIONS:
   --sender <address>      Wallet address to use as sender (must be group member)
   --env <environment>     XMTP environment (local, dev, production) [default: production]
   --users <count>         Number of users to simulate [default: 5]
+  --attempts <count>      Number of attempts to send messages [default: 1]
   --tresshold <percent>   Success threshold percentage [default: 95]
   --wait                  Wait for responses from target
   -h, --help             Show this help message
@@ -59,6 +62,7 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn send --address 0x1234... --env dev --users 10
   yarn send --address 0x1234... --env production --users 500 --wait
+  yarn send --address 0x1234... --env production --users 10 --attempts 5
   yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
@@ -81,6 +85,7 @@ function parseArgs(): Config {
     tresshold: 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     waitForResponse: false,
+    attempts: 1, // Default to 1 attempt
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -108,6 +113,9 @@ function parseArgs(): Config {
     } else if (arg === "--users" && nextArg) {
       config.userCount = parseInt(nextArg, 10);
       i++;
+    } else if (arg === "--attempts" && nextArg) {
+      config.attempts = parseInt(nextArg, 10);
+      i++;
     } else if (arg === "--tresshold" && nextArg) {
       config.tresshold = parseInt(nextArg, 10);
       i++;
@@ -131,6 +139,11 @@ function parseArgs(): Config {
 
   if (!config.groupId && !config.target) {
     console.error("❌ Error: Either --group-id or --address is required");
+    process.exit(1);
+  }
+
+  if (config.attempts < 1) {
+    console.error("❌ Error: --attempts must be at least 1");
     process.exit(1);
   }
 
@@ -240,18 +253,18 @@ async function sendGroupMessage(config: Config): Promise<void> {
 
 async function runsendTest(config: Config): Promise<void> {
   const startTime = Date.now();
-  console.log(`🚀 Testing ${config.userCount} users on ${config.env} `);
+  console.log(
+    `🚀 Testing ${config.userCount} users on ${config.env} with ${config.attempts} attempt(s)`,
+  );
 
   cleanupsendDatabases(config.env);
-
-  // Initialize workers using the workers API
-  console.log(`📋 Initializing ${config.userCount} workers concurrently...`);
 
   const logSummary = (
     results: Array<{
       success: boolean;
       sendTime: number;
       responseTime: number;
+      attempt: number;
     }>,
     completedWorkers: number,
     totalMessagesSent: number,
@@ -260,11 +273,13 @@ async function runsendTest(config: Config): Promise<void> {
     lastMessageTime: number,
   ) => {
     const successful = results.filter((r) => r.success);
-    const successRate = (successful.length / config.userCount) * 100;
-    const failed = config.userCount - successful.length;
+    const successRate =
+      (successful.length / (config.userCount * config.attempts)) * 100;
+    const failed = config.userCount * config.attempts - successful.length;
     const duration = Date.now() - startTime;
 
     console.log(`\n📊 Summary:`);
+    console.log(`   Attempts: ${config.attempts}`);
     console.log(`   Successful: ${successful.length}`);
     console.log(`   Failed: ${failed}`);
     console.log(`   Success Rate: ${successRate.toFixed(1)}%`);
@@ -307,212 +322,277 @@ async function runsendTest(config: Config): Promise<void> {
     }
   };
 
-  // Create worker manager and initialize workers
-  const workerManager = await getWorkers(config.userCount, {
-    env: config.env as XmtpEnv,
-    useVersions: false, // Use latest version for send tests
-  });
-
-  const workers = workerManager.getAll();
-  console.log(`\n✅ All ${config.userCount} workers initialized successfully`);
-
-  // Run all workers in parallel
-  console.log(`🔄 Starting parallel execution...`);
-
-  // Shared counters
+  // Shared counters across all attempts
   let totalMessagesSent = 0;
   let completedWorkers = 0;
   let summaryPrinted = false;
   let firstMessageTime = 0;
   let lastMessageTime = 0;
-  const results: Array<{
+  const allResults: Array<{
     success: boolean;
     sendTime: number;
     responseTime: number;
+    attempt: number;
   }> = [];
 
-  const promises = workers.map((worker, i) => {
-    return new Promise<{
+  // Run attempts sequentially with fresh workers each time
+  for (let attempt = 1; attempt <= config.attempts; attempt++) {
+    console.log(`\n🔄 Starting attempt ${attempt}/${config.attempts}...`);
+
+    // Create fresh workers for each attempt to ensure new installations
+    console.log(
+      `📋 Initializing ${config.userCount} fresh workers for attempt ${attempt}...`,
+    );
+    prefix;
+    const workerManager = await getWorkers(config.userCount, {
+      env: config.env as XmtpEnv,
+      useVersions: false, // Use latest version for send tests
+    });
+
+    const workers = workerManager.getAll();
+    console.log(
+      `✅ All ${config.userCount} fresh workers initialized for attempt ${attempt}`,
+    );
+
+    // Reset counters for this attempt
+    let attemptMessagesSent = 0;
+    let attemptCompletedWorkers = 0;
+    const attemptResults: Array<{
       success: boolean;
       sendTime: number;
       responseTime: number;
-    }>((resolve) => {
-      let responseReceived = false;
-      let sendCompleteTime = 0;
-      let sendTime = 0;
+      attempt: number;
+    }> = [];
 
-      const process = async () => {
-        try {
-          let conversation: Conversation;
+    // Run all workers in parallel for this attempt
+    console.log(`🔄 Starting parallel execution for attempt ${attempt}...`);
 
-          conversation = (await worker.client.conversations.newDmWithIdentifier(
-            {
-              identifier: config.target,
-              identifierKind: IdentifierKind.Ethereum,
-            },
-          )) as Conversation;
+    const promises = workers.map((worker, i) => {
+      return new Promise<{
+        success: boolean;
+        sendTime: number;
+        responseTime: number;
+        attempt: number;
+      }>((resolve) => {
+        let responseReceived = false;
+        let sendCompleteTime = 0;
+        let sendTime = 0;
 
-          if (config.waitForResponse) {
-            console.log(`📡 ${i}: Setting up message stream...`);
-            // Set up stream
-            void worker.client.conversations.streamAllMessages({
-              onValue: (message: DecodedMessage) => {
-                // Check for bot response
-                if (
-                  message.senderInboxId.toLowerCase() !==
-                    worker.inboxId.toLowerCase() &&
-                  !responseReceived
-                ) {
-                  responseReceived = true;
+        const process = async () => {
+          try {
+            let conversation: Conversation;
 
-                  // 3. Calculate response time
-                  const responseTime = Date.now() - sendCompleteTime;
+            conversation =
+              (await worker.client.conversations.newDmWithIdentifier({
+                identifier: config.target,
+                identifierKind: IdentifierKind.Ethereum,
+              })) as Conversation;
 
-                  const result = {
-                    success: true,
-                    sendTime,
-                    responseTime,
-                  };
-                  results.push(result);
-                  completedWorkers++;
-
-                  const successRate =
-                    (results.filter((r) => r.success).length /
-                      config.userCount) *
-                    100;
-                  console.log(
-                    `✅ ${i}: Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
-                  );
-
-                  // Check if we've reached the success threshold
-                  if (successRate >= config.tresshold && !summaryPrinted) {
-                    console.log(
-                      `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
-                    );
-                    summaryPrinted = true;
-                    logSummary(
-                      results,
-                      completedWorkers,
-                      totalMessagesSent,
-                      startTime,
-                      firstMessageTime,
-                      lastMessageTime,
-                    );
-                  }
-
-                  resolve(result);
-                }
-              },
-            });
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-
-          console.log(`📤 ${i}: Sending test message...`);
-          // 2. Time message send
-          const sendStart = Date.now();
-          await conversation.send(`test-${i}-${Date.now()}`);
-          totalMessagesSent++;
-          sendTime = Date.now() - sendStart;
-          sendCompleteTime = Date.now();
-
-          // Track first and last message times
-          if (firstMessageTime === 0) {
-            firstMessageTime = sendCompleteTime;
-          }
-          lastMessageTime = sendCompleteTime;
-
-          console.log(
-            `📩 ${i}: Message sent in ${sendTime}ms (Total sent: ${totalMessagesSent})`,
-          );
-
-          // If not waiting for response, resolve immediately
-          if (!config.waitForResponse) {
-            const result = {
-              success: true,
-              sendTime,
-              responseTime: 0, // No response time when not waiting
-            };
-            results.push(result);
-            completedWorkers++;
-
-            const successRate =
-              (results.filter((r) => r.success).length / config.userCount) *
-              100;
-            console.log(
-              `✅ ${i}: Send=${sendTime}ms (${completedWorkers}/${config.userCount}, ${successRate.toFixed(1)}% success)`,
-            );
-
-            // Check if we've reached the success threshold
-            if (successRate >= config.tresshold && !summaryPrinted) {
+            if (config.waitForResponse) {
               console.log(
-                `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
+                `📡 ${i}: Setting up message stream for attempt ${attempt}...`,
               );
-              summaryPrinted = true;
-              logSummary(
-                results,
-                completedWorkers,
-                totalMessagesSent,
-                startTime,
-                firstMessageTime,
-                lastMessageTime,
-              );
+              // Set up stream
+              void worker.client.conversations.streamAllMessages({
+                onValue: (message: DecodedMessage) => {
+                  // Check for bot response
+                  if (
+                    message.senderInboxId.toLowerCase() !==
+                      worker.inboxId.toLowerCase() &&
+                    !responseReceived
+                  ) {
+                    responseReceived = true;
+
+                    // 3. Calculate response time
+                    const responseTime = Date.now() - sendCompleteTime;
+
+                    const result = {
+                      success: true,
+                      sendTime,
+                      responseTime,
+                      attempt,
+                    };
+                    attemptResults.push(result);
+                    allResults.push(result);
+                    attemptCompletedWorkers++;
+                    completedWorkers++;
+
+                    const successRate =
+                      (allResults.filter((r) => r.success).length /
+                        (config.userCount * config.attempts)) *
+                      100;
+                    console.log(
+                      `✅ ${i}: Attempt ${attempt}, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount * config.attempts}, ${successRate.toFixed(1)}% success)`,
+                    );
+
+                    // Check if we've reached the success threshold
+                    if (successRate >= config.tresshold && !summaryPrinted) {
+                      console.log(
+                        `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
+                      );
+                      summaryPrinted = true;
+                      logSummary(
+                        allResults,
+                        completedWorkers,
+                        totalMessagesSent,
+                        startTime,
+                        firstMessageTime,
+                        lastMessageTime,
+                      );
+                    }
+
+                    resolve(result);
+                  }
+                },
+              });
+              await new Promise((resolve) => setTimeout(resolve, 1000));
             }
 
-            resolve(result);
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      };
+            console.log(
+              `📤 ${i}: Sending test message for attempt ${attempt}...`,
+            );
+            // 2. Time message send
+            const sendStart = Date.now();
+            await conversation.send(`test-${i}-${attempt}-${Date.now()}`);
+            attemptMessagesSent++;
+            totalMessagesSent++;
+            sendTime = Date.now() - sendStart;
+            sendCompleteTime = Date.now();
 
-      process().catch(() => {
-        const result = {
-          success: false,
-          sendTime: 0,
-          responseTime: 0,
+            // Track first and last message times
+            if (firstMessageTime === 0) {
+              firstMessageTime = sendCompleteTime;
+            }
+            lastMessageTime = sendCompleteTime;
+
+            console.log(
+              `📩 ${i}: Attempt ${attempt}, Message sent in ${sendTime}ms (Total sent: ${totalMessagesSent})`,
+            );
+
+            // If not waiting for response, resolve immediately
+            if (!config.waitForResponse) {
+              const result = {
+                success: true,
+                sendTime,
+                responseTime: 0, // No response time when not waiting
+                attempt,
+              };
+              attemptResults.push(result);
+              allResults.push(result);
+              attemptCompletedWorkers++;
+              completedWorkers++;
+
+              const successRate =
+                (allResults.filter((r) => r.success).length /
+                  (config.userCount * config.attempts)) *
+                100;
+              console.log(
+                `✅ ${i}: Attempt ${attempt}, Send=${sendTime}ms (${completedWorkers}/${config.userCount * config.attempts}, ${successRate.toFixed(1)}% success)`,
+              );
+
+              // Check if we've reached the success threshold
+              if (successRate >= config.tresshold && !summaryPrinted) {
+                console.log(
+                  `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
+                );
+                summaryPrinted = true;
+                logSummary(
+                  allResults,
+                  completedWorkers,
+                  totalMessagesSent,
+                  startTime,
+                  firstMessageTime,
+                  lastMessageTime,
+                );
+              }
+
+              resolve(result);
+            }
+          } catch (error) {
+            console.error(error);
+          }
         };
-        results.push(result);
-        completedWorkers++;
-        console.log(
-          `❌ ${i}: Failed (${completedWorkers}/${config.userCount})`,
-        );
-        resolve(result);
+
+        process().catch(() => {
+          const result = {
+            success: false,
+            sendTime: 0,
+            responseTime: 0,
+            attempt,
+          };
+          attemptResults.push(result);
+          allResults.push(result);
+          attemptCompletedWorkers++;
+          completedWorkers++;
+          console.log(
+            `❌ ${i}: Attempt ${attempt} failed (${completedWorkers}/${config.userCount * config.attempts})`,
+          );
+          resolve(result);
+        });
       });
     });
-  });
 
-  // First, wait for all messages to be sent (no timeout for sending)
-  console.log(`📤 Waiting for all messages to be sent...`);
+    // First, wait for all messages to be sent for this attempt (no timeout for sending)
+    console.log(
+      `📤 Waiting for all messages to be sent for attempt ${attempt}...`,
+    );
 
-  // For non-wait mode, promises resolve immediately after sending
-  // For wait mode, promises resolve after receiving responses
-  const sendPromises = promises.map((promise) =>
-    promise.then((result) => result),
-  );
+    // For non-wait mode, promises resolve immediately after sending
+    // For wait mode, promises resolve after receiving responses
+    const sendPromises = promises.map((promise) =>
+      promise.then((result) => result),
+    );
 
-  // Wait for all messages to be sent first (no timeout)
-  await Promise.all(sendPromises);
-  console.log(`✅ All messages sent successfully`);
+    // Wait for all messages to be sent first (no timeout)
+    await Promise.all(sendPromises);
+    console.log(`✅ All messages sent successfully for attempt ${attempt}`);
 
-  // Now start the timeout for waiting for responses (only relevant for wait mode)
-  if (config.waitForResponse) {
-    console.log(`⏳ Waiting for responses (timeout: ${config.timeout}ms)...`);
+    // Now start the timeout for waiting for responses (only relevant for wait mode)
+    if (config.waitForResponse) {
+      console.log(
+        `⏳ Waiting for responses for attempt ${attempt} (timeout: ${config.timeout}ms)...`,
+      );
 
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(`Test timed out after ${config.timeout}ms`));
-      }, config.timeout);
-    });
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new Error(`Attempt ${attempt} timed out after ${config.timeout}ms`),
+          );
+        }, config.timeout);
+      });
 
-    try {
-      const finalResults = await Promise.race([
-        Promise.all(promises),
-        timeoutPromise,
-      ]);
+      try {
+        const finalResults = await Promise.race([
+          Promise.all(promises),
+          timeoutPromise,
+        ]);
 
+        if (!summaryPrinted) {
+          logSummary(
+            allResults,
+            completedWorkers,
+            totalMessagesSent,
+            startTime,
+            firstMessageTime,
+            lastMessageTime,
+          );
+        }
+      } catch (error) {
+        console.error(
+          `\n⏰ ${error instanceof Error ? error.message : `Attempt ${attempt} timed out`}`,
+        );
+        console.log(`📊 Partial Summary for attempt ${attempt}:`);
+        console.log(
+          `   Completed: ${attemptCompletedWorkers}/${config.userCount}`,
+        );
+        console.log(`   Duration: ${Date.now() - startTime}ms`);
+        console.log(`   Total Sent: ${totalMessagesSent}`);
+      }
+    } else {
+      // For non-wait mode, all promises have already resolved after sending
       if (!summaryPrinted) {
         logSummary(
-          finalResults,
+          allResults,
           completedWorkers,
           totalMessagesSent,
           startTime,
@@ -520,27 +600,34 @@ async function runsendTest(config: Config): Promise<void> {
           lastMessageTime,
         );
       }
-    } catch (error) {
-      console.error(
-        `\n⏰ ${error instanceof Error ? error.message : "Test timed out"}`,
-      );
-      console.log(`📊 Partial Summary:`);
-      console.log(`   Completed: ${completedWorkers}/${config.userCount}`);
-      console.log(`   Duration: ${Date.now() - startTime}ms`);
-      console.log(`   Total Sent: ${totalMessagesSent}`);
     }
-  } else {
-    // For non-wait mode, all promises have already resolved after sending
-    if (!summaryPrinted) {
-      logSummary(
-        results,
-        completedWorkers,
-        totalMessagesSent,
-        startTime,
-        firstMessageTime,
-        lastMessageTime,
-      );
+
+    // Clean up workers for this attempt to free resources
+    console.log(`🧹 Cleaning up workers for attempt ${attempt}...`);
+    await workerManager.terminateAll(true); // Delete databases to ensure fresh state
+
+    // If we've reached the success threshold, exit early
+    if (summaryPrinted) {
+      break;
     }
+
+    // Add a small delay between attempts (except for the last one)
+    if (attempt < config.attempts) {
+      console.log(`⏳ Waiting 2 seconds before next attempt...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+
+  // Final summary if not already printed
+  if (!summaryPrinted) {
+    logSummary(
+      allResults,
+      completedWorkers,
+      totalMessagesSent,
+      startTime,
+      firstMessageTime,
+      lastMessageTime,
+    );
   }
 
   process.exit(0);
