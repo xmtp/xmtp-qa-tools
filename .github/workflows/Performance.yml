@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [10-50-100]
+        size: [5-10-50]
         env: [dev, production]
         cache-data: [false]
     env:
