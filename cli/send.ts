@@ -420,26 +420,17 @@ async function runsendTest(config: Config): Promise<void> {
                     completedWorkers++;
 
                     const successRate =
-                      (allResults.filter((r) => r.success).length /
-                        (config.userCount * config.attempts)) *
+                      (attemptResults.filter((r) => r.success).length /
+                        config.userCount) *
                       100;
                     console.log(
                       `✅ ${i}: Attempt ${attempt}, Send=${sendTime}ms, Response=${responseTime}ms (${completedWorkers}/${config.userCount * config.attempts}, ${successRate.toFixed(1)}% success)`,
                     );
 
-                    // Check if we've reached the success threshold
-                    if (successRate >= config.tresshold && !summaryPrinted) {
+                    // Check if we've reached the success threshold for this attempt
+                    if (successRate >= config.tresshold) {
                       console.log(
-                        `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
-                      );
-                      summaryPrinted = true;
-                      logSummary(
-                        allResults,
-                        completedWorkers,
-                        totalMessagesSent,
-                        startTime,
-                        firstMessageTime,
-                        lastMessageTime,
+                        `🎯 Success threshold (${config.tresshold}%) reached for attempt ${attempt}!`,
                       );
                     }
 
@@ -484,26 +475,17 @@ async function runsendTest(config: Config): Promise<void> {
               completedWorkers++;
 
               const successRate =
-                (allResults.filter((r) => r.success).length /
-                  (config.userCount * config.attempts)) *
+                (attemptResults.filter((r) => r.success).length /
+                  config.userCount) *
                 100;
               console.log(
                 `✅ ${i}: Attempt ${attempt}, Send=${sendTime}ms (${completedWorkers}/${config.userCount * config.attempts}, ${successRate.toFixed(1)}% success)`,
               );
 
-              // Check if we've reached the success threshold
-              if (successRate >= config.tresshold && !summaryPrinted) {
+              // Check if we've reached the success threshold for this attempt
+              if (successRate >= config.tresshold) {
                 console.log(
-                  `🎯 Success threshold (${config.tresshold}%) reached! Exiting early.`,
-                );
-                summaryPrinted = true;
-                logSummary(
-                  allResults,
-                  completedWorkers,
-                  totalMessagesSent,
-                  startTime,
-                  firstMessageTime,
-                  lastMessageTime,
+                  `🎯 Success threshold (${config.tresshold}%) reached for attempt ${attempt}!`,
                 );
               }
 
@@ -593,11 +575,6 @@ async function runsendTest(config: Config): Promise<void> {
     // Clean up workers for this attempt to free resources
     console.log(`🧹 Cleaning up workers for attempt ${attempt}...`);
     await workerManager.terminateAll(true); // Delete databases to ensure fresh state
-
-    // If we've reached the success threshold, exit early
-    if (summaryPrinted) {
-      break;
-    }
 
     // Add a small delay between attempts (except for the last one)
     if (attempt < config.attempts) {
