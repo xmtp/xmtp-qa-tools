@@ -19,6 +19,7 @@
     "gen": "tsx cli/gen.ts",
     "groups": "tsx cli/groups.ts",
     "lint": "eslint .",
+    "mock": "tsx cli/mock-client.ts",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "permissions": "tsx cli/permissions.ts",
     "record": "npx playwright codegen 'https://xmtp.chat/'",

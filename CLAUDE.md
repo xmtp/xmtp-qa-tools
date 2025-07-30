@@ -20,6 +20,8 @@ You may ONLY execute the following CLI commands:
 
 For full list of commands, see [CLI README](./cli/readme.md).
 
+> If you are asked to run a command that is not in the list, you analyze improving the CLI.
+
 ## Strict Restrictions
 
 1. **NO file system access** outside of CLI commands

@@ -14,6 +14,7 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`      |
 | `yarn groups`                                | Create DMs/groups     | `yarn groups --help`      |
 | `yarn permissions`                           | Manage permissions    | `yarn permissions --help` |
+| `yarn mock`                                  | Mock client           | `yarn mock --help`        |
 
 ## Core Commands
 
@@ -241,3 +242,21 @@ yarn revoke --help     # Revoke help
 yarn groups --help     # Groups help
 yarn permissions --help # Permissions help
 ```
+
+# Mock Client
+
+You can use the mock client to check your own inbox ID and address, list all conversations, and list messages in a conversation.
+
+```bash
+yarn mock [options]
+```
+
+**Options:**
+
+- `--env <env>` - XMTP environment [default: production]
+
+**Operations:**
+
+- `identity` - Check your own inbox ID and address
+- `conversations` - List all conversations
+- `messages` - List messages in a conversation
