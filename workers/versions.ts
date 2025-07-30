@@ -57,11 +57,11 @@ import {
   Group as Group322,
 } from "@xmtp/node-sdk-3.2.2";
 import {
-  Client as Client400,
-  Conversation as Conversation400,
-  Dm as Dm400,
-  Group as Group400,
-} from "@xmtp/node-sdk-4.0.0";
+  Client as Client401,
+  Conversation as Conversation401,
+  Dm as Dm401,
+  Group as Group401,
+} from "@xmtp/node-sdk-4.0.1";
 
 export {
   Client,
@@ -84,11 +84,11 @@ export {
 // SDK version mappings
 export const VersionList = [
   {
-    Client: Client400,
-    Conversation: Conversation400,
-    Dm: Dm400,
-    Group: Group400,
-    nodeSDK: "4.0.0",
+    Client: Client401,
+    Conversation: Conversation401,
+    Dm: Dm401,
+    Group: Group401,
+    nodeSDK: "4.0.1",
     nodeBindings: "1.3.3",
     auto: true,
   },
