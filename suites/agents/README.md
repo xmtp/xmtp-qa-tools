@@ -78,4 +78,19 @@ Link to test code [../suites/agents/agents-untagged.test.ts](../suites/agents/ag
 - **respondOnTagged**: Whether agent responds to tagged messages
 - **live**: Production status flag
 
-- See agents [configuration](../suites/agents/agents.json)
+### Example (gm bot):
+
+```json
+{
+  "name": "gm",
+  "baseName": "gm.base.eth",
+  "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+  "sendMessage": "hola",
+  "live": false,
+  "networks": ["dev", "production"],
+  "slackChannel": "#gm-alerts",
+  "respondOnTagged": false
+}
+```
+
+See agents [configuration](agents.json)
