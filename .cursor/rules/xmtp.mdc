@@ -1,6 +1,6 @@
-description:
-globs:
-alwaysApply: false
+---
+alwaysApply: true
+---
 
 # Writing XMTP Agents
 
@@ -889,20 +889,6 @@ await group.removeAdmin(inboxId);
 await group.addSuperAdmin(inboxId);
 await group.removeSuperAdmin(inboxId);
 ```
-
-### Permission Validation Matrix
-
-The following table shows valid policy combinations for each permission type:
-
-| Permission Type | Allow | Deny | Admin | SuperAdmin |
-| --------------- | ----- | ---- | ----- | ---------- |
-| AddMember       | ✅    | ✅   | ✅    | ✅         |
-| RemoveMember    | ✅    | ✅   | ✅    | ✅         |
-| AddAdmin        | ❌    | ✅   | ✅    | ✅         |
-| RemoveAdmin     | ❌    | ✅   | ✅    | ✅         |
-| UpdateMetadata  | ✅    | ✅   | ✅    | ✅         |
-
-**Note**: `AddAdmin` and `RemoveAdmin` cannot be set to "Allow" for security reasons, as this would allow any member to grant admin privileges.
 
 ### Custom Permission Sets
 
