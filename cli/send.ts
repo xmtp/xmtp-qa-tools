@@ -358,8 +358,6 @@ async function runsendTest(config: Config): Promise<void> {
       `✅ All ${config.userCount} fresh workers initialized for attempt ${attempt}`,
     );
 
-    // Reset counters for this attempt
-    let attemptMessagesSent = 0;
     let attemptCompletedWorkers = 0;
     const attemptResults: Array<{
       success: boolean;
@@ -458,7 +456,6 @@ async function runsendTest(config: Config): Promise<void> {
             // 2. Time message send
             const sendStart = Date.now();
             await conversation.send(`test-${i}-${attempt}-${Date.now()}`);
-            attemptMessagesSent++;
             totalMessagesSent++;
             sendTime = Date.now() - sendStart;
             sendCompleteTime = Date.now();
@@ -557,20 +554,7 @@ async function runsendTest(config: Config): Promise<void> {
         `⏳ Waiting for responses for attempt ${attempt} (timeout: ${config.timeout}ms)...`,
       );
 
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(
-            new Error(`Attempt ${attempt} timed out after ${config.timeout}ms`),
-          );
-        }, config.timeout);
-      });
-
       try {
-        const finalResults = await Promise.race([
-          Promise.all(promises),
-          timeoutPromise,
-        ]);
-
         if (!summaryPrinted) {
           logSummary(
             allResults,

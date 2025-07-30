@@ -1,5 +1,6 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
+import { ProgressBar } from "@helpers/logger";
 import { Client, type XmtpEnv } from "@workers/versions";
 import {
   createSigner,
@@ -7,7 +8,6 @@ import {
   getEncryptionKeyFromHex,
   loadEnv,
 } from "../helpers/client";
-import { ProgressBar } from "@helpers/progress";
 
 const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes";

@@ -3,7 +3,7 @@ import { appendFile } from "fs/promises";
 import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
-import { ProgressBar } from "@helpers/progress";
+import { ProgressBar } from "@helpers/logger";
 import {
   getVersions,
   VersionList,
