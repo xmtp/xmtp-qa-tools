@@ -343,10 +343,15 @@ async function runsendTest(config: Config): Promise<void> {
     console.log(
       `📋 Initializing ${config.userCount} fresh workers for attempt ${attempt}...`,
     );
-    prefix;
-    const workerManager = await getWorkers(config.userCount, {
+
+    const prefixedNames = [`test`];
+    for (let i = 0; i < config.userCount; i++) {
+      prefixedNames.push(`test-${i}`);
+    }
+
+    const workerManager = await getWorkers(prefixedNames, {
       env: config.env as XmtpEnv,
-      useVersions: false, // Use latest version for send tests
+      useVersions: false,
     });
 
     const workers = workerManager.getAll();
