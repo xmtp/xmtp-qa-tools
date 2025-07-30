@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 10
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -18,6 +18,11 @@ jobs:
         size: [5-10, 50-100]
         env: [dev, production]
         cache-data: [false]
+        include:
+          - size: 5-10
+            delay_minutes: 0
+          - size: 50-100
+            delay_minutes: 5
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
@@ -31,6 +36,10 @@ jobs:
           cache-data: ${{ matrix.cache-data }}
           test-name: ${{ matrix.test }}-${{ matrix.size }}
           env: ${{ matrix.env }}
+
+      - name: Sleep for ${{ matrix.delay_minutes }} minutes
+        if: matrix.delay_minutes > 0
+        run: sleep $(( ${{ matrix.delay_minutes }} * 60 ))
 
       - name: Run tests ${{ matrix.size }}
         run: yarn test ${{ matrix.test }} --no-fail --debug --env ${{ matrix.env }} --size ${{ matrix.size }}
