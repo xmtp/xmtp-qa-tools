@@ -344,9 +344,9 @@ async function runsendTest(config: Config): Promise<void> {
       `📋 Initializing ${config.userCount} fresh workers for attempt ${attempt}...`,
     );
 
-    const prefixedNames = [`test`];
+    const prefixedNames = [`test-attempt${attempt}`];
     for (let i = 0; i < config.userCount; i++) {
-      prefixedNames.push(`randomtest${i}`);
+      prefixedNames.push(`randomtest${i}${attempt}`);
     }
 
     const workerManager = await getWorkers(prefixedNames, {
