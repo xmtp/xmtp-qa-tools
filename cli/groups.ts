@@ -10,7 +10,7 @@ import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 
 interface Config {
-  operation: "dm" | "group";
+  operation: "dm" | "group" | "update";
   env: string;
   loggingLevel: LogLevel;
   // DM options
@@ -20,6 +20,9 @@ interface Config {
   groupDescription?: string;
   members?: number;
   targetAddress?: string;
+  // Update options
+  groupId?: string;
+  imageUrl?: string;
 }
 
 function showHelp() {
@@ -32,6 +35,7 @@ USAGE:
 OPERATIONS:
   dm                      Create direct message conversations
   group                   Create a group with members
+  update                  Update an existing group's metadata
 
 OPTIONS:
   --env <environment>     XMTP environment (local, dev, production) [default: production]
@@ -40,6 +44,10 @@ OPTIONS:
   --group-desc <desc>     Group description
   --members <count>       Number of random members for groups [default: 5]
   --target <address>      Target address to invite to group
+  --group-id <id>         Group ID for update operations (required for update)
+  --name <name>           New group name for update operations
+  --description <desc>    New group description for update operations
+  --image-url <url>       New group image URL for update operations
   -h, --help             Show this help message
 
 ENVIRONMENTS:
@@ -50,6 +58,12 @@ ENVIRONMENTS:
 EXAMPLES:
   # Create 3 DMs between random users
   yarn groups dm --dm-count 3 --env dev
+
+  # Update a group's name and description
+  yarn groups update --group-id <group-id> --name "New Name" --description "New description"
+
+  # Update only the group image
+  yarn groups update --group-id <group-id> --image-url "https://example.com/image.jpg"
 
 ENVIRONMENT VARIABLES:
   XMTP_ENV             Default environment
@@ -71,8 +85,8 @@ function parseArgs(): Config {
 
   // First argument is the operation
   if (args.length > 0 && !args[0].startsWith("--")) {
-    const operation = args[0] as "dm" | "group";
-    if (operation === "dm" || operation === "group") {
+    const operation = args[0] as "dm" | "group" | "update";
+    if (operation === "dm" || operation === "group" || operation === "update") {
       config.operation = operation;
       args.shift(); // Remove operation from args
     }
@@ -102,6 +116,18 @@ function parseArgs(): Config {
       i++;
     } else if (arg === "--target" && nextArg) {
       config.targetAddress = nextArg;
+      i++;
+    } else if (arg === "--group-id" && nextArg) {
+      config.groupId = nextArg;
+      i++;
+    } else if (arg === "--name" && nextArg) {
+      config.groupName = nextArg;
+      i++;
+    } else if (arg === "--description" && nextArg) {
+      config.groupDescription = nextArg;
+      i++;
+    } else if (arg === "--image-url" && nextArg) {
+      config.imageUrl = nextArg;
       i++;
     }
   }
@@ -253,6 +279,88 @@ async function runGroupOperation(config: Config): Promise<void> {
   }
 }
 
+// Operation: Update Group
+async function runUpdateOperation(config: Config): Promise<void> {
+  if (!config.groupId) {
+    console.error(`❌ Error: --group-id is required for update operations`);
+    console.log(
+      `   Usage: yarn groups update --group-id <group-id> [--name <name>] [--description <desc>] [--image-url <url>]`,
+    );
+    return;
+  }
+
+  const hasUpdates =
+    config.groupName || config.groupDescription || config.imageUrl;
+  if (!hasUpdates) {
+    console.error(
+      `❌ Error: At least one update parameter is required (--name, --description, or --image-url)`,
+    );
+    console.log(
+      `   Usage: yarn groups update --group-id <group-id> [--name <name>] [--description <desc>] [--image-url <url>]`,
+    );
+    return;
+  }
+
+  console.log(`🔄 Updating group: ${config.groupId}`);
+
+  // Create a worker to perform the update
+  const workerManager = await createWorkerManager(1, config.env);
+  const worker = workerManager.getAll()[0];
+  console.log(`✅ Worker created: ${worker.inboxId}`);
+
+  try {
+    // Get the group by ID
+    const group = (await worker.client.conversations.getConversationById(
+      config.groupId,
+    )) as Group;
+
+    if (!group) {
+      console.error(`❌ Group not found: ${config.groupId}`);
+      return;
+    }
+
+    console.log(`📋 Current group info:`);
+    console.log(`   Name: ${group.name}`);
+    console.log(`   Description: ${group.description || "No description"}`);
+    console.log(`   Image URL: ${group.imageUrl || "No image"}`);
+
+    // Perform updates
+    const updates: string[] = [];
+
+    if (config.groupName) {
+      console.log(`✏️  Updating name to: "${config.groupName}"`);
+      await group.updateName(config.groupName);
+      updates.push(`name: "${config.groupName}"`);
+    }
+
+    if (config.groupDescription) {
+      console.log(`✏️  Updating description to: "${config.groupDescription}"`);
+      await group.updateDescription(config.groupDescription);
+      updates.push(`description: "${config.groupDescription}"`);
+    }
+
+    if (config.imageUrl) {
+      console.log(`✏️  Updating image URL to: "${config.imageUrl}"`);
+      await group.updateImageUrl(config.imageUrl);
+      updates.push(`image URL: "${config.imageUrl}"`);
+    }
+
+    console.log(`\n📊 Update Summary:`);
+    console.log(`   Group ID: ${group.id}`);
+    console.log(`   Updated fields: ${updates.join(", ")}`);
+    console.log(`   Environment: ${config.env}`);
+
+    console.log(`\n🎉 Group updated successfully!`);
+    console.log(
+      `   Group can be accessed at: https://xmtp.chat/conversations/${group.id}`,
+    );
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Failed to update group: ${errorMessage}`);
+    return;
+  }
+}
+
 async function main(): Promise<void> {
   const config = parseArgs();
 
@@ -262,6 +370,9 @@ async function main(): Promise<void> {
       break;
     case "group":
       await runGroupOperation(config);
+      break;
+    case "update":
+      await runUpdateOperation(config);
       break;
     default:
       showHelp();
