@@ -1,5 +1,9 @@
 import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { IdentifierKind, type XmtpEnv } from "@workers/versions";
+import { Client } from "@xmtp/node-sdk";
 
 // MOCK AGENT ADDRESS 0x7723d790A5e00b650BF146A0961F8Bb148F0450C
 
@@ -55,6 +59,10 @@ class MockXmtpAgent {
 
   constructor(private env: XmtpEnv = "production") {}
 
+  get environment(): XmtpEnv {
+    return this.env;
+  }
+
   // Client management
   createClient(inboxId: string, address: string): MockClient {
     const client: MockClient = {
@@ -66,6 +74,52 @@ class MockXmtpAgent {
     this.clients.set(inboxId, client);
     console.log(`✅ Created mock client: ${inboxId} (${address})`);
     return client;
+  }
+
+  // Read-only: Get real XMTP client state for verification
+  async getRealXmtpState(clientName: string): Promise<{
+    client: Client;
+    conversations: any[];
+    groups: any[];
+    dms: any[];
+  }> {
+    const walletKey = process.env.WALLET_KEY;
+    const encryptionKey = process.env.ENCRYPTION_KEY;
+
+    if (!walletKey || !encryptionKey) {
+      throw new Error(
+        "WALLET_KEY and ENCRYPTION_KEY must be set in environment",
+      );
+    }
+
+    const signer = createSigner(walletKey as `0x${string}`);
+    const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
+
+    const client = await Client.create(signer, {
+      dbEncryptionKey,
+      env: this.env,
+    });
+
+    console.log(
+      `📖 Reading XMTP state for client: ${clientName} (${client.inboxId})`,
+    );
+
+    // Sync conversations to get latest state
+    await client.conversations.sync();
+
+    // Get all conversations
+    const conversations = await client.conversations.list();
+    const groups = conversations.filter(conv => conv.constructor.name === 'Group');
+    const dms = conversations.filter(conv => conv.constructor.name === 'Dm');
+
+    console.log(`📊 Found ${conversations.length} conversations (${groups.length} groups, ${dms.length} DMs)`);
+
+    return {
+      client,
+      conversations,
+      groups,
+      dms
+    };
   }
 
   // Group operations
@@ -115,6 +169,7 @@ class MockXmtpAgent {
     console.log(`✅ Created mock group: ${group.name} (${groupId})`);
     console.log(`   Members: ${group.members.length}`);
     console.log(`   Creator: ${creatorInboxId}`);
+    this.saveState();
     return group;
   }
 
@@ -417,6 +472,86 @@ class MockXmtpAgent {
     this.groupCounter = 0;
     this.dmCounter = 0;
     console.log("🔄 Mock agent state reset");
+    this.saveState();
+  }
+
+  // Persistence methods
+  private getStateFilePath(): string {
+    const stateDir = path.join(process.cwd(), ".data", "mock-agent");
+    if (!fs.existsSync(stateDir)) {
+      fs.mkdirSync(stateDir, { recursive: true });
+    }
+    return path.join(stateDir, `state-${this.env}.json`);
+  }
+
+  saveState(): void {
+    const state = {
+      groups: Array.from(this.groups.entries()),
+      dms: Array.from(this.dms.entries()),
+      clients: Array.from(this.clients.entries()),
+      messageCounter: this.messageCounter,
+      groupCounter: this.groupCounter,
+      dmCounter: this.dmCounter,
+      env: this.env,
+    };
+
+    try {
+      fs.writeFileSync(this.getStateFilePath(), JSON.stringify(state, null, 2));
+    } catch (error) {
+      console.warn("⚠️  Failed to save mock agent state:", error);
+    }
+  }
+
+  loadState(): void {
+    try {
+      const statePath = this.getStateFilePath();
+      if (fs.existsSync(statePath)) {
+        const stateData = JSON.parse(fs.readFileSync(statePath, "utf8"));
+
+        // Reconstruct groups with proper date objects
+        const groups = new Map();
+        if (stateData.groups) {
+          for (const [id, groupData] of stateData.groups) {
+            const group = groupData;
+            group.createdAt = new Date(group.createdAt);
+            if (group.messages) {
+              group.messages = group.messages.map((msg: any) => ({
+                ...msg,
+                sentAt: new Date(msg.sentAt),
+              }));
+            }
+            groups.set(id, group);
+          }
+        }
+        this.groups = groups;
+
+        // Reconstruct DMs with proper date objects
+        const dms = new Map();
+        if (stateData.dms) {
+          for (const [id, dmData] of stateData.dms) {
+            const dm = dmData;
+            dm.createdAt = new Date(dm.createdAt);
+            if (dm.messages) {
+              dm.messages = dm.messages.map((msg: any) => ({
+                ...msg,
+                sentAt: new Date(msg.sentAt),
+              }));
+            }
+            dms.set(id, dm);
+          }
+        }
+        this.dms = dms;
+
+        this.clients = new Map(stateData.clients || []);
+        this.messageCounter = stateData.messageCounter || 0;
+        this.groupCounter = stateData.groupCounter || 0;
+        this.dmCounter = stateData.dmCounter || 0;
+
+        console.log("📂 Loaded mock agent state from file");
+      }
+    } catch (error) {
+      console.warn("⚠️  Failed to load mock agent state:", error);
+    }
   }
 }
 
@@ -424,8 +559,9 @@ class MockXmtpAgent {
 let globalMockAgent: MockXmtpAgent | null = null;
 
 export function getMockAgent(env: XmtpEnv = "production"): MockXmtpAgent {
-  if (!globalMockAgent) {
+  if (!globalMockAgent || globalMockAgent.environment !== env) {
     globalMockAgent = new MockXmtpAgent(env);
+    globalMockAgent.loadState();
   }
   return globalMockAgent;
 }
@@ -471,6 +607,7 @@ USAGE:
 
 OPERATIONS:
   client                    Create a mock client
+  verify                    Read real XMTP state for verification
   group                     Create a mock group
   dm                        Create mock DMs
   message                   Send messages to groups/DMs
@@ -620,6 +757,45 @@ async function runClientOperation(config: MockConfig): Promise<void> {
 
   if (config.list) {
     mockAgent.listClients();
+  }
+}
+
+// Operation: Verify real XMTP state
+async function runVerifyOperation(config: MockConfig): Promise<void> {
+  const mockAgent = getMockAgent(config.env as any);
+
+  try {
+    const clientName = config.clientInboxId || "ai-agent";
+    const realState = await mockAgent.getRealXmtpState(clientName);
+    
+    console.log(`\n🔍 REAL XMTP STATE VERIFICATION:`);
+    console.log(`   Client Inbox ID: ${realState.client.inboxId}`);
+    console.log(`   Environment: ${config.env}`);
+    console.log(`   Total Conversations: ${realState.conversations.length}`);
+    console.log(`   Groups: ${realState.groups.length}`);
+    console.log(`   DMs: ${realState.dms.length}`);
+    
+    // Show group details
+    if (realState.groups.length > 0) {
+      console.log(`\n🏗️  REAL GROUPS:`);
+      for (const group of realState.groups) {
+        console.log(`   - ${group.name || 'Unnamed'} (${group.id})`);
+        const members = await group.members();
+        console.log(`     Members: ${members.length}`);
+      }
+    }
+    
+    // Show DM details
+    if (realState.dms.length > 0) {
+      console.log(`\n💬 REAL DMs:`);
+      for (const dm of realState.dms) {
+        console.log(`   - DM with ${dm.peerInboxId} (${dm.id})`);
+      }
+    }
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Failed to verify real XMTP state: ${errorMessage}`);
   }
 }
 
@@ -863,6 +1039,9 @@ async function main(): Promise<void> {
     switch (config.operation) {
       case "client":
         await runClientOperation(config);
+        break;
+      case "verify":
+        await runVerifyOperation(config);
         break;
       case "group":
         await runGroupOperation(config);
