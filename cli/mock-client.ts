@@ -8,7 +8,7 @@ import { Client, IdentifierKind } from "@xmtp/node-sdk";
 class MockXmtpAgent {
   private client: Client | null = null;
 
-  constructor(private env: XmtpEnv = "production") {}
+  constructor(public env: XmtpEnv = "production") {}
 
   // Initialize the single fixed client
   async initializeClient(): Promise<Client> {
@@ -65,9 +65,11 @@ class MockXmtpAgent {
     if (groups.length > 0) {
       console.log(`\n🏗️  GROUPS (${groups.length}):`);
       for (const group of groups) {
-        console.log(`\n   Group: ${group.name || "Unnamed"}`);
+        console.log(`\n   Group: ${(group as any).name || "Unnamed"}`);
         console.log(`   ID: ${group.id}`);
-        console.log(`   Description: ${group.description || "No description"}`);
+        console.log(
+          `   Description: ${(group as any).description || "No description"}`,
+        );
 
         const members = await group.members();
         console.log(`   Members: ${members.length}`);
@@ -75,7 +77,7 @@ class MockXmtpAgent {
         // Show member details
         for (const member of members) {
           const ethAddress = member.accountIdentifiers.find(
-            (id) => id.identifierKind === 0,
+            (id) => id.identifierKind === IdentifierKind.Ethereum,
           )?.identifier;
           console.log(
             `     - ${member.inboxId} (${ethAddress || "no address"})`,
@@ -88,7 +90,7 @@ class MockXmtpAgent {
     if (dms.length > 0) {
       console.log(`\n💬 DIRECT MESSAGES (${dms.length}):`);
       for (const dm of dms) {
-        console.log(`\n   DM with: ${dm.peerInboxId}`);
+        console.log(`\n   DM with: ${(dm as any).peerInboxId}`);
         console.log(`   ID: ${dm.id}`);
       }
     }
@@ -132,7 +134,7 @@ class MockXmtpAgent {
     for (const message of messages) {
       console.log(`\n   [${message.sentAt.toISOString()}]`);
       console.log(`   From: ${message.senderInboxId}`);
-      console.log(`   Content: "${message.content}"`);
+      console.log(`   Content: "${message.content as string}"`);
     }
   }
 

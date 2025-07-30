@@ -28,6 +28,7 @@ interface Config {
   target: string;
   groupId?: string;
   message?: string;
+  customMessage?: string;
   senderAddress?: string;
   tresshold: number;
   loggingLevel: LogLevel;
@@ -46,6 +47,7 @@ OPTIONS:
   --address <address>     Target wallet address to send messages to
   --group-id <id>         Target group ID to send message to
   --message <text>        Custom message to send (required for group messages)
+  --custom-message <text> Custom message for individual DM messages (default: auto-generated)
   --sender <address>      Wallet address to use as sender (must be group member)
   --env <environment>     XMTP environment (local, dev, production) [default: production]
   --users <count>         Number of users to simulate [default: 5]
@@ -63,6 +65,7 @@ EXAMPLES:
   yarn send --address 0x1234... --env dev --users 10
   yarn send --address 0x1234... --env production --users 500 --wait
   yarn send --address 0x1234... --env production --users 10 --attempts 5
+  yarn send --address 0x1234... --custom-message "Hello from CLI!" --env dev
   yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
@@ -103,6 +106,9 @@ function parseArgs(): Config {
       i++;
     } else if (arg === "--message" && nextArg) {
       config.message = nextArg;
+      i++;
+    } else if (arg === "--custom-message" && nextArg) {
+      config.customMessage = nextArg;
       i++;
     } else if (arg === "--sender" && nextArg) {
       config.senderAddress = nextArg;
@@ -446,7 +452,11 @@ async function runsendTest(config: Config): Promise<void> {
             );
             // 2. Time message send
             const sendStart = Date.now();
-            await conversation.send(`test-${i}-${attempt}-${Date.now()}`);
+
+            // Use custom message if provided, otherwise use auto-generated message
+            const messageText =
+              config.customMessage || `test-${i}-${attempt}-${Date.now()}`;
+            await conversation.send(messageText);
             totalMessagesSent++;
             sendTime = Date.now() - sendStart;
             sendCompleteTime = Date.now();
