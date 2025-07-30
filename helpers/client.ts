@@ -495,7 +495,7 @@ export const browserTimeout = 10000;
 export const streamColdStartTimeout = 1000; // 1 second
 export const streamTimeout = process.env.DEFAULT_STREAM_TIMEOUT_MS
   ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
-  : 10000; // 10 seconds
+  : 60000; // 60 seconds
 
 export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return "0 B";
