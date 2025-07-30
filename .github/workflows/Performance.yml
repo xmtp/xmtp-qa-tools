@@ -9,20 +9,15 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 30
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [5-10, 50-100]
+        size: [5-10-50]
         env: [dev, production]
         cache-data: [false]
-        include:
-          - size: 5-10
-            delay_minutes: 0
-          - size: 50-100
-            delay_minutes: 5
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
