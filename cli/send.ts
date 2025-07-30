@@ -346,12 +346,11 @@ async function runsendTest(config: Config): Promise<void> {
 
     const prefixedNames = [`test`];
     for (let i = 0; i < config.userCount; i++) {
-      prefixedNames.push(`test-${i}`);
+      prefixedNames.push(`randomtest${i}`);
     }
 
     const workerManager = await getWorkers(prefixedNames, {
       env: config.env as XmtpEnv,
-      useVersions: false,
     });
 
     const workers = workerManager.getAll();

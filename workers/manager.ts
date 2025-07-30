@@ -3,6 +3,7 @@ import { appendFile } from "fs/promises";
 import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
+import { ProgressBar } from "@helpers/progress";
 import {
   getVersions,
   VersionList,
@@ -498,6 +499,7 @@ export async function getWorkers(
   );
 
   let workerPromises: Promise<Worker>[] = [];
+  let descriptors: string[] = [];
 
   // Handle different input types
   if (typeof workers === "number" || Array.isArray(workers)) {
@@ -507,7 +509,7 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    let descriptors = options.nodeSDK
+    descriptors = options.nodeSDK
       ? names.map((name) => `${name}-${options.nodeSDK}`)
       : options.useVersions
         ? nameWithVersions(names)
@@ -527,12 +529,31 @@ export async function getWorkers(
       ]);
     }
 
+    descriptors = entries.map(([descriptor]) => descriptor);
     workerPromises = entries.map(([descriptor, apiUrl]) =>
       manager.createWorker(descriptor, apiUrl),
     );
   }
 
-  await Promise.all(workerPromises);
+  // Initialize progress bar
+  const progressBar = new ProgressBar(workerPromises.length);
+  console.log(`🚀 Initializing ${workerPromises.length} workers...`);
+
+  // Create workers with progress tracking
+  await Promise.all(
+    workerPromises.map(async (promise, index) => {
+      try {
+        const worker = await promise;
+        progressBar.update(index + 1);
+        return worker;
+      } catch (error) {
+        progressBar.update(index + 1);
+        throw error;
+      }
+    }),
+  );
+
+  console.log("✅ All workers initialized successfully!");
 
   manager.checkCLI();
   await manager.printWorkers();
