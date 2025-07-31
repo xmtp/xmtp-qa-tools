@@ -23,8 +23,8 @@ describe(testName, () => {
       receiver.client.inboxId,
     )) as Dm;
     console.log("New dm created", dm.id);
-    const result = await verifyMessageStream(dm, [receiver]);
-    expect(result.allReceived).toBe(true);
+    const resultFirstDm = await verifyMessageStream(dm, [receiver]);
+    expect(resultFirstDm.allReceived).toBe(true);
     // Create fresh random1 client
     const bobB = await getWorkers(["randombob-b"]);
     creator = bobB.get("randombob", "b")!;
@@ -32,7 +32,7 @@ describe(testName, () => {
       receiver.client.inboxId,
     )) as Dm;
     console.log("New dm created", dm.id);
-    const result = await verifyMessageStream(dm, [receiver]);
-    expect(result.allReceived).toBe(true);
+    const resultSecondDm = await verifyMessageStream(dm, [receiver]);
+    expect(resultSecondDm.allReceived).toBe(true);
   });
 });
