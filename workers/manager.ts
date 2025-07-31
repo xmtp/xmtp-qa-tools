@@ -117,6 +117,7 @@ export interface Worker extends WorkerBase {
   env: XmtpEnv;
   folder: string;
   address: string;
+  initializationTime: number;
 }
 
 /**
@@ -497,7 +498,10 @@ export class WorkerManager implements IWorkerManager {
     // Create and initialize the worker
     const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
 
+    const startTime = performance.now();
     const initializedWorker = await workerClient.initialize();
+    const endTime = performance.now();
+    const initializationTime = endTime - startTime;
 
     // Create the complete worker
     const worker: Worker = {
@@ -510,6 +514,7 @@ export class WorkerManager implements IWorkerManager {
       env: this.env,
       folder,
       worker: workerClient,
+      initializationTime,
     };
 
     // Store the new worker for potential cleanup later

@@ -7,7 +7,7 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
-import { getWorkers, type Worker } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -19,20 +19,14 @@ import {
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";
-describe(testName, async () => {
+describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10];
   let dm: Dm | undefined;
-  let workers = await getWorkers(10, {
-    randomNames: false,
-  });
 
   let newGroup: Group;
   const POPULATE_SIZE = [4, 10];
-  const creator = workers.get("edward");
-  const receiver = workers.get("bob");
-  const creatorClient = creator!.client;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -54,22 +48,35 @@ describe(testName, async () => {
   });
 
   for (const populateSize of POPULATE_SIZE) {
-    let randomWorker: Worker;
-    it(`create-${populateSize}: measure creating a client`, async () => {
-      const workers = await getWorkers(["bob"]);
-      randomWorker = workers.get("randomclient")!;
-      expect(randomWorker.inboxId).toBeDefined();
+    let workers: WorkerManager;
+    let creator: Worker | undefined;
+    let receiver: Worker | undefined;
+    it(`no-op-${populateSize}: measure no-op`, async () => {
+      workers = await getWorkers(10, {
+        randomNames: false,
+      });
+      creator = workers.get("edward")!;
+      receiver = workers.get("bob")!;
+      setCustomDuration(creator.initializationTime);
     });
+
     it(`populate-${populateSize}: measure populating a client`, async () => {
-      randomWorker = workers.get("bob")!;
-      await randomWorker.worker.populate(populateSize);
-      await randomWorker.client.conversations.sync();
-      const conversations = await randomWorker.client.conversations.list();
+      await creator!.worker.populate(populateSize);
+      await creator!.client.conversations.sync();
+      const conversations = await creator!.client.conversations.list();
       expect(conversations.length).toBe(populateSize);
+    });
+    it(`create-${populateSize}: measure creating a client`, async () => {
+      workers = await getWorkers(10, {
+        randomNames: false,
+      });
+      creator = workers.get("edward")!;
+      receiver = workers.get("bob")!;
+      setCustomDuration(creator.initializationTime);
     });
 
     it(`canMessage-${populateSize}:measure canMessage`, async () => {
-      const randomAddress = randomWorker.address;
+      const randomAddress = receiver!.address;
       if (!randomAddress) {
         throw new Error("Random client not found");
       }
@@ -81,17 +88,17 @@ describe(testName, async () => {
             identifierKind: IdentifierKind.Ethereum,
           },
         ],
-        randomWorker.env,
+        receiver!.env,
       );
       setCustomDuration(Date.now() - start);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     });
     it(`inboxState-${populateSize}:measure inboxState`, async () => {
-      const inboxState = await creatorClient.preferences.inboxState(true);
+      const inboxState = await creator!.client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     });
     it(`newDm-${populateSize}:measure creating a DM`, async () => {
-      dm = (await creatorClient.conversations.newDm(
+      dm = (await creator!.client.conversations.newDm(
         receiver!.client.inboxId,
       )) as Dm;
       expect(dm).toBeDefined();
@@ -108,7 +115,7 @@ describe(testName, async () => {
     });
     it(`getConversationById-${populateSize}:measure getting a conversation by id`, async () => {
       const conversation =
-        await creatorClient.conversations.getConversationById(dm!.id);
+        await creator!.client.conversations.getConversationById(dm!.id);
       expect(conversation!.id).toBe(dm!.id);
     });
     it(`send-${populateSize}:measure sending a gm`, async () => {
@@ -117,14 +124,14 @@ describe(testName, async () => {
     });
 
     it(`consent:group consent`, async () => {
-      await creatorClient.preferences.setConsentStates([
+      await creator!.client.preferences.setConsentStates([
         {
           entity: receiver!.client.inboxId,
           entityType: ConsentEntityType.InboxId,
           state: ConsentState.Allowed,
         },
       ]);
-      const consentState = await creatorClient.preferences.getConsentState(
+      const consentState = await creator!.client.preferences.getConsentState(
         ConsentEntityType.InboxId,
         receiver!.client.inboxId,
       );
@@ -146,12 +153,11 @@ describe(testName, async () => {
     });
 
     for (const i of BATCH_SIZE) {
-      const creatorClient = workers.getCreator().client;
       it(`newGroup-${i}-${populateSize}:create a large group of ${i} members ${i}`, async () => {
         allMembersWithExtra = getInboxIds(i + 1);
         allMembers = allMembersWithExtra.slice(0, i);
 
-        newGroup = (await creatorClient.conversations.newGroup([
+        newGroup = (await creator!.client.conversations.newGroup([
           ...allMembers,
           ...workers.getAllButCreator().map((w) => w.client.inboxId),
         ])) as Group;
@@ -159,10 +165,10 @@ describe(testName, async () => {
         // Add current group to cumulative tracking
         cumulativeGroups.push(newGroup);
       });
-      it(`newGroupByAddress-${i}-${populateSize}    :create a large group of ${i} members ${i}`, async () => {
+      it(`newGroupByAddress-${i}-${populateSize}:create a large group of ${i} members ${i}`, async () => {
         const callMembersWithExtraWithAddress = getAddresses(i + 1);
         const newGroupByIdentifier =
-          await creatorClient.conversations.newGroupWithIdentifiers(
+          await creator!.client.conversations.newGroupWithIdentifiers(
             callMembersWithExtraWithAddress.map((address) => ({
               identifier: address,
               identifierKind: IdentifierKind.Ethereum,
