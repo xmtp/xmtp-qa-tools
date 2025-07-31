@@ -9,7 +9,6 @@ const testName = "clients";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let workers: WorkerManager;
-  let creator: Worker;
   workers = await getWorkers([
     "henry",
     "ivy",
