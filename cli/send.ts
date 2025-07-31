@@ -350,6 +350,7 @@ async function runsendTest(config: Config): Promise<void> {
   // Run attempts sequentially with fresh workers each time
   for (let attempt = 1; attempt <= config.attempts; attempt++) {
     console.log(`\n🔄 Starting attempt ${attempt}/${config.attempts}...`);
+    console.log(`🔍 Attempt loop iteration ${attempt} of ${config.attempts}`);
 
     // Create fresh workers for each attempt to ensure new installations
     console.log(
@@ -543,8 +544,20 @@ async function runsendTest(config: Config): Promise<void> {
     );
 
     // Wait for all messages to be sent first (no timeout)
-    await Promise.all(sendPromises);
-    console.log(`✅ All messages sent successfully for attempt ${attempt}`);
+    console.log(
+      `🔍 About to wait for all promises to resolve for attempt ${attempt}...`,
+    );
+    try {
+      await Promise.all(sendPromises);
+      console.log(`✅ All messages sent successfully for attempt ${attempt}`);
+    } catch (error) {
+      console.error(
+        `❌ Error during message sending for attempt ${attempt}:`,
+        error,
+      );
+      // Continue to cleanup even if some messages failed
+    }
+    console.log(`🔍 Finished waiting for promises for attempt ${attempt}`);
 
     // Now start the timeout for waiting for responses (only relevant for wait mode)
     if (config.waitForResponse) {
@@ -590,16 +603,34 @@ async function runsendTest(config: Config): Promise<void> {
     }
 
     // Clean up workers for this attempt to free resources
-    console.log(`🧹 Cleaning up workers for attempt ${attempt}...`);
-    await workerManager.terminateAll(true); // Delete databases to ensure fresh state
+    console.log(`🧹 Starting cleanup for attempt ${attempt}...`);
+    try {
+      console.log(`🔍 About to call terminateAll for attempt ${attempt}...`);
+      await workerManager.terminateAll(true); // Delete databases to ensure fresh state
+      console.log(`✅ Workers cleaned up successfully for attempt ${attempt}`);
+    } catch (error) {
+      console.error(
+        `❌ Error cleaning up workers for attempt ${attempt}:`,
+        error,
+      );
+      // Continue anyway - don't let cleanup errors stop the test
+    }
+    console.log(`🔍 Finished cleanup for attempt ${attempt}`);
 
     // Add a small delay between attempts (except for the last one)
     if (attempt < config.attempts) {
       console.log(`⏳ Waiting 2 seconds before next attempt...`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(`🔍 Finished waiting, about to start attempt ${attempt + 1}`);
+    } else {
+      console.log(
+        `🔍 This was the last attempt (${attempt}/${config.attempts}), no more waiting`,
+      );
     }
+    console.log(`🔍 Completed attempt ${attempt}/${config.attempts}`);
   }
 
+  console.log(`🔍 Finished all attempts, about to print final summary`);
   // Final summary if not already printed
   if (!summaryPrinted) {
     logSummary(
