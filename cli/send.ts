@@ -553,16 +553,24 @@ async function runsendTest(config: Config): Promise<void> {
       );
 
       try {
-        if (!summaryPrinted) {
-          logSummary(
-            allResults,
-            completedWorkers,
-            totalMessagesSent,
-            startTime,
-            firstMessageTime,
-            lastMessageTime,
-          );
-        }
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(
+              new Error(
+                `Attempt ${attempt} timed out after ${config.timeout}ms`,
+              ),
+            );
+          }, config.timeout);
+        });
+
+        // Wait for all responses or timeout
+        await Promise.race([
+          Promise.all(sendPromises), // Wait for all responses
+          timeoutPromise, // Or timeout
+        ]);
+
+        console.log(`✅ All responses received for attempt ${attempt}`);
       } catch (error) {
         console.error(
           `\n⏰ ${error instanceof Error ? error.message : `Attempt ${attempt} timed out`}`,
@@ -576,16 +584,9 @@ async function runsendTest(config: Config): Promise<void> {
       }
     } else {
       // For non-wait mode, all promises have already resolved after sending
-      if (!summaryPrinted) {
-        logSummary(
-          allResults,
-          completedWorkers,
-          totalMessagesSent,
-          startTime,
-          firstMessageTime,
-          lastMessageTime,
-        );
-      }
+      console.log(
+        `✅ All messages sent for attempt ${attempt} (no response waiting)`,
+      );
     }
 
     // Clean up workers for this attempt to free resources
