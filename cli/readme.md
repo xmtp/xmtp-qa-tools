@@ -4,17 +4,17 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 
 ## Quick Reference
 
-| Command                                      | Purpose               | Help                      |
-| -------------------------------------------- | --------------------- | ------------------------- |
-| `yarn test <suite>`                          | Run test suites       | `yarn test --help`        |
-| `yarn send --address <addr> --users <count>` | Test message delivery | `yarn send --help`        |
-| `yarn bot <name>`                            | Run interactive bots  | `yarn bot --help`         |
-| `yarn gen`                                   | Generate test data    | `yarn gen --help`         |
-| `yarn versions`                              | Manage SDK versions   | `yarn versions --help`    |
-| `yarn revoke <inbox-id>`                     | Revoke installations  | `yarn revoke --help`      |
-| `yarn groups`                                | Create DMs/groups     | `yarn groups --help`      |
-| `yarn permissions`                           | Manage permissions    | `yarn permissions --help` |
-| `yarn mock`                                  | Mock client           | `yarn mock --help`        |
+| Command                                     | Purpose               | Help                      |
+| ------------------------------------------- | --------------------- | ------------------------- |
+| `yarn test <suite>`                         | Run test suites       | `yarn test --help`        |
+| `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`        |
+| `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`         |
+| `yarn gen`                                  | Generate test data    | `yarn gen --help`         |
+| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`    |
+| `yarn revoke <inbox-id>`                    | Revoke installations  | `yarn revoke --help`      |
+| `yarn groups`                               | Create DMs/groups     | `yarn groups --help`      |
+| `yarn permissions`                          | Manage permissions    | `yarn permissions --help` |
+| `yarn mock`                                 | Mock client           | `yarn mock --help`        |
 
 ## Core Commands
 
@@ -53,7 +53,7 @@ yarn send [options]
 
 **Options:**
 
-- `--address <addr>` - Target wallet address
+- `--target <addr>` - Target wallet target
 - `--env <env>` - XMTP environment [default: production]
 - `--users <count>` - Number of users [default: 5]
 - `--tresshold <percent>` - Success threshold [default: 95]
@@ -203,7 +203,7 @@ All commands support:
 yarn test convos --env dev
 
 # Load testing with response waiting
-yarn send --address 0x1234... --env production --users 500 --wait
+yarn send --target 0x1234... --env production --users 500 --wait
 
 # Multi-version compatibility testing
 yarn test functional --versions 3 --debug

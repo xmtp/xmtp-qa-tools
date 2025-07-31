@@ -12,11 +12,11 @@ import path from "node:path";
 import { getWorkers } from "@workers/manager";
 
 // gm-bot
-// yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
+// yarn send --target 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
 // local gm bot=
-// yarn send --address 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local   --users 500  --attempts 10
+// yarn send --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local   --users 500  --attempts 10
 // echo
-// yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
+// yarn send --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
 // group message
 // yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
@@ -44,7 +44,7 @@ USAGE:
   yarn send [options]
 
 OPTIONS:
-  --address <address>     Target wallet address to send messages to
+  --target <address>     Target wallet address to send messages to
   --group-id <id>         Target group ID to send message to
   --message <text>        Custom message to send (required for group messages)
   --custom-message <text> Custom message for individual DM messages (default: auto-generated)
@@ -62,10 +62,10 @@ ENVIRONMENTS:
   production  Production XMTP network
 
 EXAMPLES:
-  yarn send --address 0x1234... --env dev --users 10
-  yarn send --address 0x1234... --env production --users 500 --wait
-  yarn send --address 0x1234... --env production --users 10 --attempts 5
-  yarn send --address 0x1234... --custom-message "Hello from CLI!" --env dev
+  yarn send --target 0x1234... --env dev --users 10
+  yarn send --target 0x1234... --env production --users 500 --wait
+  yarn send --target 0x1234... --env production --users 10 --attempts 5
+  yarn send --target 0x1234... --custom-message "Hello from CLI!" --env dev
   yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
@@ -98,7 +98,7 @@ function parseArgs(): Config {
     if (arg === "--help" || arg === "-h") {
       showHelp();
       process.exit(0);
-    } else if (arg === "--address" && nextArg) {
+    } else if (arg === "--target" && nextArg) {
       config.target = nextArg;
       i++;
     } else if (arg === "--group-id" && nextArg) {
@@ -138,13 +138,13 @@ function parseArgs(): Config {
 
   if (config.groupId && config.target) {
     console.error(
-      "❌ Error: Cannot use both --group-id and --address. Choose one.",
+      "❌ Error: Cannot use both --group-id and --target. Choose one.",
     );
     process.exit(1);
   }
 
   if (!config.groupId && !config.target) {
-    console.error("❌ Error: Either --group-id or --address is required");
+    console.error("❌ Error: Either --group-id or --target is required");
     process.exit(1);
   }
 
@@ -350,7 +350,7 @@ async function runsendTest(config: Config): Promise<void> {
       `📋 Initializing ${config.userCount} fresh workers for attempt ${attempt}...`,
     );
 
-    const prefixedNames = [`test-attempt${attempt}`];
+    const prefixedNames = [];
     for (let i = 0; i < config.userCount; i++) {
       prefixedNames.push(`randomtest${i}${attempt}`);
     }
