@@ -16,6 +16,7 @@ interface ParsedTestName {
   operationType: "group" | "core";
   operationName: string;
   members: string;
+  populate: string;
 }
 
 // Simplified metric tags interface - consolidates all previous metric tag types
@@ -222,11 +223,13 @@ export function parseTestName(testName: string): ParsedTestName {
 
   let operationName = "";
   let members = "";
+  let populate = "";
 
   if (operationParts[1]) {
-    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?$/);
+    // Updated regex to handle optional populate size: operationName-number-populateSize
+    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?-?(\d+)?$/);
     if (match) {
-      [, operationName, members = ""] = match;
+      [, operationName, members = "", populate = ""] = match;
     } else {
       operationName = operationParts[1];
     }
@@ -239,6 +242,7 @@ export function parseTestName(testName: string): ParsedTestName {
     operationType: parseInt(members) > 5 ? "group" : "core",
     operationName,
     members,
+    populate,
   };
 }
 

@@ -159,7 +159,7 @@ describe(testName, async () => {
         // Add current group to cumulative tracking
         cumulativeGroups.push(newGroup);
       });
-      it(`newGroupByAddress-${i}-${populateSize}:create a large group of ${i} members ${i}`, async () => {
+      it(`newGroupByAddress-${i}-${populateSize}    :create a large group of ${i} members ${i}`, async () => {
         const callMembersWithExtraWithAddress = getAddresses(i + 1);
         const newGroupByIdentifier =
           await creatorClient.conversations.newGroupWithIdentifiers(
