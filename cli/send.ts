@@ -297,14 +297,20 @@ async function runsendTest(config: Config): Promise<void> {
       const totalSendTime = lastMessageTime - firstMessageTime;
       const avgSend =
         sendTimes.reduce((sum, time) => sum + time, 0) / successful.length;
-      const messagesPerSecond = (
-        totalMessagesSent /
-        (totalSendTime / 1000)
-      ).toFixed(2);
 
       console.log(`   Total Send Time: ${(totalSendTime / 1000).toFixed(2)}s`);
       console.log(`   Avg Send: ${(avgSend / 1000).toFixed(2)}s`);
-      console.log(`   Messages/Second: ${messagesPerSecond}`);
+
+      // Guard against division by zero
+      if (totalSendTime > 0) {
+        const messagesPerSecond = (
+          totalMessagesSent /
+          (totalSendTime / 1000)
+        ).toFixed(2);
+        console.log(`   Messages/Second: ${messagesPerSecond}`);
+      } else {
+        console.log(`   Messages/Second: N/A (no time difference)`);
+      }
 
       if (config.waitForResponse) {
         const responseTimes = successful.map((r) => r.responseTime);
