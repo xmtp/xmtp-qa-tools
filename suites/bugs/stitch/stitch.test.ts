@@ -1,6 +1,6 @@
+import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { type Dm } from "@workers/versions";
+import { Client, type Dm, type XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "stitch";
@@ -9,28 +9,47 @@ describe(testName, () => {
   setupTestLifecycle({ testName });
 
   // Global variables to encapsulate shared state
-  let workers: WorkerManager;
-  let creator: Worker;
-  let receiver: Worker;
+  let aliceClient: Client;
+  let bobClientA: Client;
+  let bobClientB: Client;
   let dm: Dm; // The DM conversation
 
   it("setup", async () => {
     const messageTimeout = 5000; // 5 second timeout for message reception
 
-    workers = await getWorkers(["randombob-a", "alice"]);
-    creator = workers.get("randombob", "a")!;
-    receiver = workers.get("alice")!;
-    dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
+    // Create Alice client (receiver)
+    const aliceSigner = createSigner(
+      process.env.WALLET_KEY_ALICE as `0x${string}`,
+    );
+    const aliceEncryptionKey = getEncryptionKeyFromHex(
+      process.env.ENCRYPTION_KEY_ALICE!,
+    );
+    aliceClient = await Client.create(aliceSigner, {
+      dbEncryptionKey: aliceEncryptionKey,
+      env: process.env.XMTP_ENV as XmtpEnv,
+    });
+
+    // Create Bob client A (first installation)
+    const bobSigner = createSigner(process.env.WALLET_KEY_BOB as `0x${string}`);
+    const bobEncryptionKey = getEncryptionKeyFromHex(
+      process.env.ENCRYPTION_KEY_BOB!,
+    );
+    bobClientA = await Client.create(bobSigner, {
+      dbEncryptionKey: bobEncryptionKey,
+      env: process.env.XMTP_ENV as XmtpEnv,
+      dbPath: ".data/bob-a", // Separate database path for installation A
+    });
+
+    // Create DM from first installation
+    dm = (await bobClientA.conversations.newDm(aliceClient.inboxId)) as Dm;
     console.log("New dm created", dm.id);
 
     // Test first installation - should work
     const testMessage1 = "gm from installation A";
 
     // Start streaming messages on receiver
-    await receiver.client.conversations.sync();
-    const stream = receiver.client.conversations.streamAllMessages();
+    await aliceClient.conversations.sync();
+    const stream = aliceClient.conversations.streamAllMessages();
 
     let receivedMessages: any[] = [];
     const messagePromise = new Promise((resolve) => {
@@ -61,20 +80,23 @@ describe(testName, () => {
     expect(firstResult).toBe(true);
     console.log("First installation test passed");
 
-    // Create fresh second installation
-    const bobB = await getWorkers(["randombob-b"]);
-    creator = bobB.get("randombob", "b")!;
-    dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
+    // Create Bob client B (second installation - same user, different installation)
+    bobClientB = await Client.create(bobSigner, {
+      dbEncryptionKey: bobEncryptionKey,
+      env: process.env.XMTP_ENV as XmtpEnv,
+      dbPath: ".data/bob-b", // Separate database path for installation B
+    });
+
+    // Create DM from second installation
+    dm = (await bobClientB.conversations.newDm(aliceClient.inboxId)) as Dm;
     console.log("New dm created", dm.id);
 
     // Test second installation - should fail
     const testMessage2 = "gm from installation B";
 
     // Start streaming for second test
-    await receiver.client.conversations.sync();
-    const stream2 = receiver.client.conversations.streamAllMessages();
+    await aliceClient.conversations.sync();
+    const stream2 = aliceClient.conversations.streamAllMessages();
 
     let receivedMessages2: any[] = [];
     const messagePromise2 = new Promise((resolve) => {
