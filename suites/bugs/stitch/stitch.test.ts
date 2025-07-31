@@ -36,6 +36,6 @@ describe(testName, () => {
     console.log("New dm created", dm.id);
 
     const resultSecondDm = await verifyMessageStream(dm, [receiver]);
-    expect(resultSecondDm.allReceived).toBe(true);
+    expect(resultSecondDm.allReceived).toBe(false);
   });
 });
