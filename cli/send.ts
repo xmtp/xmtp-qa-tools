@@ -70,7 +70,7 @@ EXAMPLES:
   yarn send --help
 
 ENVIRONMENT VARIABLES:
-  ADDRESS               Default target address
+  TARGET               Default target address
   XMTP_ENV             Default environment
   LOGGING_LEVEL        Logging level
 
