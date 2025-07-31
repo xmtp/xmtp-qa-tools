@@ -8,7 +8,9 @@ import {
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
+import { execSync } from "node:child_process";
 import path from "node:path";
+import { send } from "node:process";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
@@ -1111,6 +1113,12 @@ export class WorkerClient extends Worker {
       }
       numIndex++;
     }
+  }
+
+  pupulate(count: number) {
+    console.log(this.address);
+    execSync(`yarn send --target ${this.address} --env dev --users ${count}`);
+    console.log("done");
   }
 
   /**
