@@ -12,11 +12,11 @@ import path from "node:path";
 import { getWorkers } from "@workers/manager";
 
 // gm-bot
-// yarn send --address 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
+// yarn send --target 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --env production --users 500 --wait
 // local gm bot=
-// yarn send --address 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local   --users 500  --attempts 10
+// yarn send --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local   --users 500  --attempts 10
 // echo
-// yarn send --address 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
+// yarn send --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
 
 // group message
 // yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
@@ -44,7 +44,7 @@ USAGE:
   yarn send [options]
 
 OPTIONS:
-  --address <address>     Target wallet address to send messages to
+  --target <address>     Target wallet address to send messages to
   --group-id <id>         Target group ID to send message to
   --message <text>        Custom message to send (required for group messages)
   --custom-message <text> Custom message for individual DM messages (default: auto-generated)
@@ -62,15 +62,15 @@ ENVIRONMENTS:
   production  Production XMTP network
 
 EXAMPLES:
-  yarn send --address 0x1234... --env dev --users 10
-  yarn send --address 0x1234... --env production --users 500 --wait
-  yarn send --address 0x1234... --env production --users 10 --attempts 5
-  yarn send --address 0x1234... --custom-message "Hello from CLI!" --env dev
+  yarn send --target 0x1234... --env dev --users 10
+  yarn send --target 0x1234... --env production --users 500 --wait
+  yarn send --target 0x1234... --env production --users 10 --attempts 5
+  yarn send --target 0x1234... --custom-message "Hello from CLI!" --env dev
   yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
   yarn send --help
 
 ENVIRONMENT VARIABLES:
-  ADDRESS               Default target address
+  TARGET               Default target address
   XMTP_ENV             Default environment
   LOGGING_LEVEL        Logging level
 
@@ -98,7 +98,7 @@ function parseArgs(): Config {
     if (arg === "--help" || arg === "-h") {
       showHelp();
       process.exit(0);
-    } else if (arg === "--address" && nextArg) {
+    } else if (arg === "--target" && nextArg) {
       config.target = nextArg;
       i++;
     } else if (arg === "--group-id" && nextArg) {
@@ -138,13 +138,13 @@ function parseArgs(): Config {
 
   if (config.groupId && config.target) {
     console.error(
-      "❌ Error: Cannot use both --group-id and --address. Choose one.",
+      "❌ Error: Cannot use both --group-id and --target. Choose one.",
     );
     process.exit(1);
   }
 
   if (!config.groupId && !config.target) {
-    console.error("❌ Error: Either --group-id or --address is required");
+    console.error("❌ Error: Either --group-id or --target is required");
     process.exit(1);
   }
 
@@ -297,14 +297,20 @@ async function runsendTest(config: Config): Promise<void> {
       const totalSendTime = lastMessageTime - firstMessageTime;
       const avgSend =
         sendTimes.reduce((sum, time) => sum + time, 0) / successful.length;
-      const messagesPerSecond = (
-        totalMessagesSent /
-        (totalSendTime / 1000)
-      ).toFixed(2);
 
       console.log(`   Total Send Time: ${(totalSendTime / 1000).toFixed(2)}s`);
       console.log(`   Avg Send: ${(avgSend / 1000).toFixed(2)}s`);
-      console.log(`   Messages/Second: ${messagesPerSecond}`);
+
+      // Guard against division by zero
+      if (totalSendTime > 0) {
+        const messagesPerSecond = (
+          totalMessagesSent /
+          (totalSendTime / 1000)
+        ).toFixed(2);
+        console.log(`   Messages/Second: ${messagesPerSecond}`);
+      } else {
+        console.log(`   Messages/Second: N/A (no time difference)`);
+      }
 
       if (config.waitForResponse) {
         const responseTimes = successful.map((r) => r.responseTime);
@@ -344,13 +350,14 @@ async function runsendTest(config: Config): Promise<void> {
   // Run attempts sequentially with fresh workers each time
   for (let attempt = 1; attempt <= config.attempts; attempt++) {
     console.log(`\n🔄 Starting attempt ${attempt}/${config.attempts}...`);
+    console.log(`🔍 Attempt loop iteration ${attempt} of ${config.attempts}`);
 
     // Create fresh workers for each attempt to ensure new installations
     console.log(
       `📋 Initializing ${config.userCount} fresh workers for attempt ${attempt}...`,
     );
 
-    const prefixedNames = [`test-attempt${attempt}`];
+    const prefixedNames = [];
     for (let i = 0; i < config.userCount; i++) {
       prefixedNames.push(`randomtest${i}${attempt}`);
     }
@@ -537,8 +544,20 @@ async function runsendTest(config: Config): Promise<void> {
     );
 
     // Wait for all messages to be sent first (no timeout)
-    await Promise.all(sendPromises);
-    console.log(`✅ All messages sent successfully for attempt ${attempt}`);
+    console.log(
+      `🔍 About to wait for all promises to resolve for attempt ${attempt}...`,
+    );
+    try {
+      await Promise.all(sendPromises);
+      console.log(`✅ All messages sent successfully for attempt ${attempt}`);
+    } catch (error) {
+      console.error(
+        `❌ Error during message sending for attempt ${attempt}:`,
+        error,
+      );
+      // Continue to cleanup even if some messages failed
+    }
+    console.log(`🔍 Finished waiting for promises for attempt ${attempt}`);
 
     // Now start the timeout for waiting for responses (only relevant for wait mode)
     if (config.waitForResponse) {
@@ -547,16 +566,24 @@ async function runsendTest(config: Config): Promise<void> {
       );
 
       try {
-        if (!summaryPrinted) {
-          logSummary(
-            allResults,
-            completedWorkers,
-            totalMessagesSent,
-            startTime,
-            firstMessageTime,
-            lastMessageTime,
-          );
-        }
+        // Create a timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(
+              new Error(
+                `Attempt ${attempt} timed out after ${config.timeout}ms`,
+              ),
+            );
+          }, config.timeout);
+        });
+
+        // Wait for all responses or timeout
+        await Promise.race([
+          Promise.all(sendPromises), // Wait for all responses
+          timeoutPromise, // Or timeout
+        ]);
+
+        console.log(`✅ All responses received for attempt ${attempt}`);
       } catch (error) {
         console.error(
           `\n⏰ ${error instanceof Error ? error.message : `Attempt ${attempt} timed out`}`,
@@ -570,29 +597,40 @@ async function runsendTest(config: Config): Promise<void> {
       }
     } else {
       // For non-wait mode, all promises have already resolved after sending
-      if (!summaryPrinted) {
-        logSummary(
-          allResults,
-          completedWorkers,
-          totalMessagesSent,
-          startTime,
-          firstMessageTime,
-          lastMessageTime,
-        );
-      }
+      console.log(
+        `✅ All messages sent for attempt ${attempt} (no response waiting)`,
+      );
     }
 
     // Clean up workers for this attempt to free resources
-    console.log(`🧹 Cleaning up workers for attempt ${attempt}...`);
-    await workerManager.terminateAll(true); // Delete databases to ensure fresh state
+    console.log(`🧹 Starting cleanup for attempt ${attempt}...`);
+    try {
+      console.log(`🔍 About to call terminateAll for attempt ${attempt}...`);
+      await workerManager.terminateAll(true); // Delete databases to ensure fresh state
+      console.log(`✅ Workers cleaned up successfully for attempt ${attempt}`);
+    } catch (error) {
+      console.error(
+        `❌ Error cleaning up workers for attempt ${attempt}:`,
+        error,
+      );
+      // Continue anyway - don't let cleanup errors stop the test
+    }
+    console.log(`🔍 Finished cleanup for attempt ${attempt}`);
 
     // Add a small delay between attempts (except for the last one)
     if (attempt < config.attempts) {
       console.log(`⏳ Waiting 2 seconds before next attempt...`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(`🔍 Finished waiting, about to start attempt ${attempt + 1}`);
+    } else {
+      console.log(
+        `🔍 This was the last attempt (${attempt}/${config.attempts}), no more waiting`,
+      );
     }
+    console.log(`🔍 Completed attempt ${attempt}/${config.attempts}`);
   }
 
+  console.log(`🔍 Finished all attempts, about to print final summary`);
   // Final summary if not already printed
   if (!summaryPrinted) {
     logSummary(
