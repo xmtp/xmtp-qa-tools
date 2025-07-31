@@ -30,7 +30,7 @@ interface MetricTags {
   test?: string;
   country_iso_code?: string;
   members?: string;
-  installations?: string;
+  populate?: string;
 }
 export interface DeliveryMetricTags extends MetricTags {
   metric_type: "delivery" | "order";
@@ -60,6 +60,9 @@ export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
+  members: string;
+  installations: string;
+  populate: string;
 }
 interface LogPayload {
   metric_type: "log";
@@ -125,6 +128,7 @@ function enrichTags(tags: MetricTags): MetricTags {
 // Operation key generator
 function getOperationKey(tags: MetricTags, metricName: string): string {
   const memberCount = tags.members || "";
+  const populate = tags.populate || "";
   return tags.operation
     ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
     : metricName;
@@ -167,7 +171,7 @@ export function sendMetric(
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        members: enrichedTags.members,
+        members: enrichedTags.members || "",
       };
     }
     state.collectedMetrics[operationKey].values.push(metricValue);
