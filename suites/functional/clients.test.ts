@@ -1,14 +1,15 @@
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getVersions } from "@workers/versions";
+import { getVersions, type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let workers: WorkerManager;
-
+  let creator: Worker;
   workers = await getWorkers([
     "henry",
     "ivy",
@@ -91,7 +92,29 @@ describe(testName, async () => {
       `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
     );
   });
+  it("stitching", async () => {
+    workers = await getWorkers(["randombob-a", "alice"]);
+    let creator = workers.get("randombob", "a")!;
+    const receiver = workers.get("alice")!;
+    let dm = (await creator.client.conversations.newDm(
+      receiver.client.inboxId,
+    )) as Dm;
+    console.log("New dm created", dm.id);
 
+    const resultFirstDm = await verifyMessageStream(dm, [receiver]);
+    expect(resultFirstDm.allReceived).toBe(true);
+
+    // Create fresh random1 client
+    const bobB = await getWorkers(["randombob-b"]);
+    creator = bobB.get("randombob", "b")!;
+    dm = (await creator.client.conversations.newDm(
+      receiver.client.inboxId,
+    )) as Dm;
+    console.log("New dm created", dm.id);
+
+    const resultSecondDm = await verifyMessageStream(dm, [receiver]);
+    expect(resultSecondDm.allReceived).toBe(false);
+  });
   it("inbox state", async () => {
     const bobInboxId = workers.get("bob")!.client.inboxId;
     const inboxState = await workers
