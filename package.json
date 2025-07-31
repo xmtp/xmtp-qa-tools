@@ -30,7 +30,8 @@
     "ui": "vitest --ui --standalone --watch",
     "update:local": "yarn gen --env local --installations 2 --count 500",
     "update:prod": "yarn gen --env production --installations 2",
-    "versions": "tsx cli/versions.ts"
+    "versions": "tsx cli/versions.ts",
+    "worker-address": "tsx cli/get-worker-address.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",

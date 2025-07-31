@@ -12,8 +12,8 @@ import { getWorkers } from "@workers/manager";
 
 // Examples:
 // yarn send --target 0xf1be9a945de5e4e270321cf47672f82380fd3463 --env dev --users 100
-// yarn send --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --await
-// yarn send --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local --users 500 --attempts 10
+// yarn send --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
+// yarn send --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local --users 10 --wait
 // yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
 
 interface Config {
@@ -48,7 +48,7 @@ OPTIONS:
   --users <count>         Number of users to simulate [default: 5]
   --attempts <count>      Number of attempts to send messages [default: 1]
   --threshold <percent>   Success threshold percentage [default: 95]
-  --await                 Wait for responses from target
+  --wait                 Wait for responses from target
   -h, --help             Show this help message
 
 ENVIRONMENTS:
@@ -58,7 +58,7 @@ ENVIRONMENTS:
 
 EXAMPLES:
   yarn send --target 0x1234... --env dev --users 10
-  yarn send --target 0x1234... --env production --users 500 --await
+  yarn send --target 0x1234... --env production --users 500 --wait
   yarn send --target 0x1234... --env production --users 10 --attempts 5
   yarn send --target 0x1234... --custom-message "Hello from CLI!" --env dev
   yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
@@ -120,7 +120,7 @@ function parseArgs(): Config {
     } else if (arg === "--threshold" && nextArg) {
       config.threshold = parseInt(nextArg, 10);
       i++;
-    } else if (arg === "--await") {
+    } else if (arg === "--wait") {
       config.awaitResponse = true;
     }
   }

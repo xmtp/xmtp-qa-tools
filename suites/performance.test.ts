@@ -258,6 +258,7 @@ describe(testName, async () => {
       await clientSingleSync.conversations.sync();
       const end = performance.now();
       setCustomDuration(end - start);
+      expect(end - start).toBeLessThan(1000);
     });
     it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
       const singleSyncWorkers = await getWorkers(["randomB"]);
@@ -267,6 +268,7 @@ describe(testName, async () => {
       await clientSingleSync.conversations.syncAll();
       const end = performance.now();
       setCustomDuration(end - start);
+      expect(end - start).toBeLessThan(1000);
     });
 
     it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
@@ -279,6 +281,7 @@ describe(testName, async () => {
       await clientSingleSync.conversations.sync();
       const end = performance.now();
       setCustomDuration(end - start);
+      expect(end - start).toBeLessThan(1000);
     });
     it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
       const singleSyncWorkers = await getWorkers(["randomD"]);
@@ -290,6 +293,7 @@ describe(testName, async () => {
       await clientSingleSync.conversations.syncAll();
       const end = performance.now();
       setCustomDuration(end - start);
+      expect(end - start).toBeLessThan(1000);
     });
   }
 });

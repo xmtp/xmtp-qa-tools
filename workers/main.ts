@@ -9,6 +9,7 @@ import {
 } from "@workers/versions";
 import "dotenv/config";
 import path from "node:path";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
@@ -1110,6 +1111,91 @@ export class WorkerClient extends Worker {
         return newId;
       }
       numIndex++;
+    }
+  }
+
+  async populate(convos = 1) {
+    console.log(
+      `[${this.nameId}] Populating ${convos} conversations to self...`,
+    );
+
+    // Create a temporary worker for sending messages to self
+    const tempWorkerName = `${this.name}-populate-${Date.now()}`;
+
+    try {
+      // Create a temporary worker using the same wallet key
+      const tempWorker = new WorkerClient(
+        {
+          name: tempWorkerName,
+          sdk: this.sdk,
+          folder: "temp",
+          walletKey: this.walletKey,
+          encryptionKey: this.encryptionKeyHex,
+        },
+        this.env,
+        {},
+        this.apiUrl,
+      );
+
+      // Initialize the temporary worker
+      await tempWorker.initialize();
+
+      console.log(
+        `[${this.nameId}] Temporary worker created: ${tempWorker.client.inboxId}`,
+      );
+      console.log(
+        `[${this.nameId}] Sending ${convos} messages to self (${this.address})...`,
+      );
+
+      // Send messages to self
+      for (let i = 0; i < convos; i++) {
+        try {
+          // Create conversation with self
+          const conversation =
+            await tempWorker.client.conversations.newDmWithIdentifier({
+              identifier: this.address,
+              identifierKind: IdentifierKind.Ethereum,
+            });
+
+          // Send message
+          const messageText = `populate-${this.nameId}-${i + 1}-${Date.now()}`;
+          await conversation.send(messageText);
+
+          console.log(
+            `[${this.nameId}] Sent message ${i + 1}/${convos}: "${messageText}"`,
+          );
+
+          // Small delay between messages
+          if (i < convos - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 100));
+          }
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          console.error(
+            `[${this.nameId}] Failed to send message ${i + 1}: ${errorMessage}`,
+          );
+        }
+      }
+
+      console.log(
+        `[${this.nameId}] Successfully populated ${convos} conversations`,
+      );
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error(
+        `[${this.nameId}] Failed to populate conversations: ${errorMessage}`,
+      );
+    } finally {
+      // Clean up temporary worker
+      try {
+        // The temporary worker will be cleaned up automatically when it goes out of scope
+        // since it uses a different database path
+        console.log(`[${this.nameId}] Cleaned up temporary worker`);
+      } catch (cleanupError) {
+        console.error(`[${this.nameId}] Cleanup error:`, cleanupError);
+      }
     }
   }
 
