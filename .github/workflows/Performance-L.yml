@@ -2,7 +2,7 @@ name: Performance Large
 description: "performance of large groups"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "15 */2 * * *" # Runs every 2 hours at 15 minutes past the hour (avoids :00 and provides separation from Performance at :30)
   workflow_dispatch:
@@ -15,13 +15,17 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [100-150, 200-250]
+        size: [100, 150, 200, 250]
         env: [dev, production]
         cache-data: [false]
         include:
-          - size: 100-150
+          - size: 100
             delay_minutes: 0
-          - size: 200-250
+          - size: 150
+            delay_minutes: 5
+          - size: 200
+            delay_minutes: 10
+          - size: 250
             delay_minutes: 15
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
