@@ -19,6 +19,51 @@ import {
   type typeofStream,
 } from "./main";
 
+/**
+ * Interface documenting all methods available in WorkerManager class
+ * This provides a quick reference for all available functionality
+ */
+interface IWorkerManager {
+  // Lifecycle Management
+  terminateAll(deleteDbs?: boolean): Promise<void>;
+
+  // Worker Access & Retrieval
+  getLength(): number;
+  getAll(): Worker[];
+  get(baseName: string | number, installationId?: string): Worker | undefined;
+  getRandomWorkers(count: number): Worker[];
+  getRandomWorker(): Worker;
+  getCreator(): Worker;
+  getReceiver(): Worker;
+  getAllBut(excludeName: string): Worker[];
+  getAllButCreator(): Worker[];
+
+  // Worker Creation & Management
+  addWorker(baseName: string, installationId: string, worker: Worker): void;
+  createWorker(descriptor: string, apiUrl?: string): Promise<Worker>;
+
+  // Monitoring & Statistics
+  checkStatistics(): Promise<void>;
+  checkForks(): Promise<void>;
+  checkForksForGroup(groupId: string): Promise<bigint>;
+  printWorkers(): Promise<void>;
+
+  // Installation Management
+  revokeExcessInstallations(threshold?: number): Promise<void>;
+
+  // CLI & Configuration
+  checkCLI(): void;
+
+  // Streaming
+  startStream(streamType: typeofStream): void;
+
+  // Group Operations
+  createGroupBetweenAll(
+    groupName?: string,
+    extraMembers?: string[],
+  ): Promise<Group>;
+}
+
 // Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
@@ -78,7 +123,7 @@ export interface Worker extends WorkerBase {
  * WorkerManager: A unified class for managing workers and their lifecycle
  * Combines the functionality of both WorkerManager and WorkerFactory
  */
-export class WorkerManager {
+export class WorkerManager implements IWorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private activeWorkers: WorkerClient[] = [];
   private env: XmtpEnv;
