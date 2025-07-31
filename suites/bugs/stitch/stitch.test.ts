@@ -16,45 +16,32 @@ describe(testName, () => {
   let dm: Dm; // The DM conversation
 
   it("setup", async () => {
-    workers = await getWorkers(["random1", "alice"]);
-    creator = workers.get("random1")!;
+    workers = await getWorkers(["randombob-a", "alice"]);
+    creator = workers.get("randombob", "a")!;
     receiver = workers.get("alice")!;
     dm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
-    console.log(dm.id);
+    console.log("New dm created", dm.id);
   });
 
-  it("message delivery works after DM stitching", async () => {
-    const verifyResult = await verifyMessageStream(
-      dm,
-      [receiver],
-      1,
-      undefined,
-      2000,
-    );
-    expect(verifyResult.allReceived).toBe(true);
-    expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+  it("check stream for message", async () => {
+    const result = await verifyMessageStream(dm, [receiver]);
+    expect(result.allReceived).toBe(true);
   });
 
   it("create fresh random1 client and DM accessibility", async () => {
     // Create fresh random1 client
-    const freshrandom1 = await getWorkers(["random1-fresh"]);
-    const random1Fresh = freshrandom1.get("random1", "fresh")!;
-    const testDm = (await random1Fresh.client.conversations.newDm(
+    const bobB = await getWorkers(["randombob-b"]);
+    creator = bobB.get("randombob", "b")!;
+    dm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
-    console.log(testDm.id);
-    const verifyResult = await verifyMessageStream(
-      testDm,
-      [receiver],
-      1,
-      undefined,
-      2000,
-    );
+    console.log("New dm created", dm.id);
+  });
 
-    // message delivery works after stitching
-    expect(verifyResult.allReceived).toBe(true);
-    expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+  it("check stream for message", async () => {
+    const result = await verifyMessageStream(dm, [receiver]);
+    expect(result.allReceived).toBe(true);
   });
 });
