@@ -1196,16 +1196,15 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
 
   async populate(count: number) {
-    await this.client.conversations.sync();
     const messagesBefore = await this.client.conversations.list();
     console.log(`Before: ${messagesBefore.length}`);
     console.log(`Populating ${this.name} with ${count} conversations...`);
 
-    if (count < messagesBefore.length) {
+    if (count > messagesBefore.length) {
       console.log(
         `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
       );
-      count = messagesBefore.length;
+      return;
     }
 
     const prefix = "random";

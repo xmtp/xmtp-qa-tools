@@ -54,18 +54,23 @@ describe(testName, () => {
     let creator: Worker | undefined;
     let receiver: Worker | undefined;
     it(`create(${populateSize}): measure creating a client`, async () => {
-      workers = await getWorkers(10, {
+      workers = await getWorkers(6, {
         randomNames: false,
       });
       creator = workers.get("edward")!;
       receiver = workers.get("bob")!;
       setCustomDuration(creator.initializationTime);
     });
-
+    it(`sync(${populateSize}):measure sync`, async () => {
+      await creator!.client.conversations.sync();
+    });
+    it(`syncAll(${populateSize}):measure syncAll`, async () => {
+      await creator!.client.conversations.syncAll();
+    });
     it(`populate(${populateSize}): measure populating a client`, async () => {
       await creator!.worker.populate(populateSize);
       const messagesAfter = await creator!.client.conversations.list();
-      const diff = populateSize - messagesAfter.length;
+      const diff = messagesAfter.length - populateSize;
       if (diff < 50) {
         console.error(
           `Populated ${messagesAfter.length} conversations, expected ${diff}`,
