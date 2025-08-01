@@ -226,8 +226,8 @@ export function parseTestName(testName: string): ParsedTestName {
   let populate = "";
 
   if (operationParts[1]) {
-    // Updated regex to handle optional populate size: operationName-number-populateSize
-    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?-?(\d+)?$/);
+    // Updated regex to handle optional populate size: operationName-number(populateSize)
+    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?\(?(\d+)?\)?$/);
     if (match) {
       [, operationName, members = "", populate = ""] = match;
     } else {

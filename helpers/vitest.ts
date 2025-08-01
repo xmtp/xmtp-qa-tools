@@ -51,14 +51,20 @@ export const setupTestLifecycle = ({
         duration = customDuration;
       }
     }
-    const { testNameExtracted, operationType, operationName, members } =
-      parseTestName(testName);
+    const {
+      testNameExtracted,
+      operationType,
+      operationName,
+      members,
+      populate,
+    } = parseTestName(testName);
 
     if (sendMetrics && sendDurationMetrics) {
       sendMetric("duration", duration, {
         metric_type: "operation",
         metric_subtype: operationType,
         operation: operationName,
+        populate,
         test: testNameExtracted,
         sdk: sdk || getVersions()[0].nodeSDK,
         installations: members,
