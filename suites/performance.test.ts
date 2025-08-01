@@ -26,7 +26,9 @@ describe(testName, () => {
   let dm: Dm | undefined;
 
   let newGroup: Group;
-  const POPULATE_SIZE = [4, 10];
+  const POPULATE_SIZE = process.env.POPULATE_SIZE
+    ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
+    : [0];
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
