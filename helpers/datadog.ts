@@ -16,6 +16,7 @@ interface ParsedTestName {
   operationType: "group" | "core";
   operationName: string;
   members: string;
+  conversation_count: string;
 }
 
 // Simplified metric tags interface - consolidates all previous metric tag types
@@ -30,7 +31,7 @@ interface MetricTags {
   test?: string;
   country_iso_code?: string;
   members?: string;
-  installations?: string;
+  conversation_count?: string;
 }
 export interface DeliveryMetricTags extends MetricTags {
   metric_type: "delivery" | "order";
@@ -60,6 +61,9 @@ export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
+  members: string;
+  installations: string;
+  conversation_count: string;
 }
 interface LogPayload {
   metric_type: "log";
@@ -125,6 +129,7 @@ function enrichTags(tags: MetricTags): MetricTags {
 // Operation key generator
 function getOperationKey(tags: MetricTags, metricName: string): string {
   const memberCount = tags.members || "";
+  const conversation_count = tags.conversation_count || "";
   return tags.operation
     ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
     : metricName;
@@ -167,7 +172,7 @@ export function sendMetric(
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        members: enrichedTags.members,
+        members: enrichedTags.members || "",
       };
     }
     state.collectedMetrics[operationKey].values.push(metricValue);
@@ -208,21 +213,16 @@ export function parseTestName(testName: string): ParsedTestName {
   const operationParts = metricName.split(".");
 
   let testNameExtracted = operationParts[0];
-  if (testNameExtracted === "large") {
-    testNameExtracted = "m_large";
-  } else if (testNameExtracted === "delivery") {
-    testNameExtracted = "m_delivery";
-  } else if (testNameExtracted === "performance") {
-    testNameExtracted = "m_performance";
-  }
 
   let operationName = "";
   let members = "";
+  let conversation_count = "";
 
   if (operationParts[1]) {
-    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?$/);
+    // Updated regex to handle optional conversation_count size: operationName-number(conversation_countSize)
+    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?\(?(\d+)?\)?$/);
     if (match) {
-      [, operationName, members = ""] = match;
+      [, operationName, members = "", conversation_count = ""] = match;
     } else {
       operationName = operationParts[1];
     }
@@ -235,6 +235,7 @@ export function parseTestName(testName: string): ParsedTestName {
     operationType: parseInt(members) > 5 ? "group" : "core",
     operationName,
     members,
+    conversation_count,
   };
 }
 

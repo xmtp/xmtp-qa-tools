@@ -19,6 +19,51 @@ import {
   type typeofStream,
 } from "./main";
 
+/**
+ * Interface documenting all methods available in WorkerManager class
+ * This provides a quick reference for all available functionality
+ */
+interface IWorkerManager {
+  // Lifecycle Management
+  terminateAll(deleteDbs?: boolean): Promise<void>;
+
+  // Worker Access & Retrieval
+  getLength(): number;
+  getAll(): Worker[];
+  get(baseName: string | number, installationId?: string): Worker | undefined;
+  getRandomWorkers(count: number): Worker[];
+  getRandomWorker(): Worker;
+  getCreator(): Worker;
+  getReceiver(): Worker;
+  getAllBut(excludeName: string): Worker[];
+  getAllButCreator(): Worker[];
+
+  // Worker Creation & Management
+  addWorker(baseName: string, installationId: string, worker: Worker): void;
+  createWorker(descriptor: string, apiUrl?: string): Promise<Worker>;
+
+  // Monitoring & Statistics
+  checkStatistics(): Promise<void>;
+  checkForks(): Promise<void>;
+  checkForksForGroup(groupId: string): Promise<bigint>;
+  printWorkers(): Promise<void>;
+
+  // Installation Management
+  revokeExcessInstallations(threshold?: number): Promise<void>;
+
+  // CLI & Configuration
+  checkCLI(): void;
+
+  // Streaming
+  startStream(streamType: typeofStream): void;
+
+  // Group Operations
+  createGroupBetweenAll(
+    groupName?: string,
+    extraMembers?: string[],
+  ): Promise<Group>;
+}
+
 // Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
@@ -72,13 +117,14 @@ export interface Worker extends WorkerBase {
   env: XmtpEnv;
   folder: string;
   address: string;
+  initializationTime: number;
 }
 
 /**
  * WorkerManager: A unified class for managing workers and their lifecycle
  * Combines the functionality of both WorkerManager and WorkerFactory
  */
-export class WorkerManager {
+export class WorkerManager implements IWorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private activeWorkers: WorkerClient[] = [];
   private env: XmtpEnv;
@@ -371,7 +417,7 @@ export class WorkerManager {
     }
 
     // Keys don't exist, generate new ones
-    console.debug(`Generating new keys for ${baseName}`);
+    //console.debug(`Generating new keys for ${baseName}`);
     const walletKey = generatePrivateKey();
     const account = privateKeyToAccount(walletKey);
     const encryptionKey = generateEncryptionKeyHex();
@@ -452,7 +498,10 @@ export class WorkerManager {
     // Create and initialize the worker
     const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
 
+    const startTime = performance.now();
     const initializedWorker = await workerClient.initialize();
+    const endTime = performance.now();
+    const initializationTime = endTime - startTime;
 
     // Create the complete worker
     const worker: Worker = {
@@ -465,6 +514,7 @@ export class WorkerManager {
       env: this.env,
       folder,
       worker: workerClient,
+      initializationTime,
     };
 
     // Store the new worker for potential cleanup later

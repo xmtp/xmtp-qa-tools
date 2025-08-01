@@ -457,52 +457,15 @@ declare class Client {
   constructor(client: Client$1, signer: Signer, codecs: ContentCodec[]);
 ```
 
-## Identifiers Reference
+## XMTP Identifiers
 
-When working with XMTP, you'll encounter several types of identifiers:
+Common identifier formats used in XMTP:
 
-### Ethereum Addresses
-
-- Format: `0x` followed by 40 hexadecimal characters
-- Example: `0xfb55CB623f2aB58Da17D8696501054a2ACeD1944`
-- Usage: Identifies blockchain wallets associated with XMTP users
-
-### Private Key
-
-- Format: `0x` followed by 64 hexadecimal characters
-- Example: `0x11567776b95bdbed513330f503741e19877bf7fe73e7957bf6f0ecf3e267fdb8`
-- Usage: Used to create the signer for authenticating with XMTP
-
-### Encryption Key
-
-- Format: 64 hexadecimal characters (without "0x" prefix)
-- Example: `11973168e34839f9d31749ad77204359c5c39c404e1154eacb7f35a867ee47de`
-- Usage: Used for encrypting the local database
-
-### Inbox ID
-
-- Format: 64 hexadecimal characters (without "0x" prefix)
-- Example: `1180478fde9f6dfd4559c25f99f1a3f1505e1ad36b9c3a4dd3d5afb68c419179`
-- Usage: Primary identifier for XMTP conversations
-
-### Installation ID
-
-- Format: 64 hexadecimal characters (without "0x" prefix)
-- Example: `a83166f3ab057f28d634cc04df5587356063dba11bf7d6bcc08b21a8802f4028`
-- Usage: Identifies a specific XMTP client installation
-- Access via `member.installationIds` array on GroupMember objects
-
-### Example User Credentials Set
-
-```json
-{
-  "accountAddress": "0xfb55CB623f2aB58Da17D8696501054a2ACeD1944",
-  "privateKey": "0x11567776b95bdbed513330f503741e19877bf7fe73e7957bf6f0ecf3e267fdb8",
-  "encryptionKey": "11973168e34839f9d31749ad77204359c5c39c404e1154eacb7f35a867ee47de",
-  "inboxId": "1180478fde9f6dfd4559c25f99f1a3f1505e1ad36b9c3a4dd3d5afb68c419179",
-  "installationId": "a83166f3ab057f28d634cc04df5587356063dba11bf7d6bcc08b21a8802f4028"
-}
-```
+- **Ethereum Address**: `0x` + 40 hex chars (e.g., `0xfb55CB623f2aB58Da17D8696501054a2ACeD1944`)
+- **Private Key**: `0x` + 64 hex chars (e.g., `0x11567776b95bdbed513330f503741e19877bf7fe73e7957bf6f0ecf3e267fdb8`)
+- **Encryption Key**: 64 hex chars without prefix (e.g., `11973168e34839f9d31749ad77204359c5c39c404e1154eacb7f35a867ee47de`)
+- **Inbox ID**: 64 hex chars without prefix (e.g., `1180478fde9f6dfd4559c25f99f1a3f1505e1ad36b9c3a4dd3d5afb68c419179`)
+- **Installation ID**: 64 hex chars without prefix (e.g., `a83166f3ab057f28d634cc04df5587356063dba11bf7d6bcc08b21a8802f4028`)
 
 ## Working with Members
 

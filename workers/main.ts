@@ -3,12 +3,14 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
+  IdentifierKind,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
 } from "@workers/versions";
 import "dotenv/config";
 import path from "node:path";
+import { getWorkers } from "@workers/manager";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
@@ -32,6 +34,86 @@ export enum StreamCollectorType {
   GroupUpdated = "stream_group_updated",
   Conversation = "stream_conversation",
   Consent = "stream_consent",
+}
+
+/**
+ * Interface documenting all methods available in WorkerClient class
+ * This provides a quick reference for all available functionality
+ */
+interface IWorkerClient {
+  // Lifecycle Management
+  terminate(): Promise<number>;
+  initialize(): Promise<{
+    client: Client;
+    dbPath: string;
+    installationId: string;
+    address: `0x${string}`;
+  }>;
+  reinstall(): Promise<void>;
+  clearDB(): Promise<boolean>;
+
+  // Statistics & Monitoring
+  getStats(): Promise<void>;
+  getSQLiteFileSizes(): Promise<{
+    dbFile: number;
+    walFile: number;
+    shmFile: number;
+    total: number;
+    conversations: number;
+  }>;
+
+  // Stream Management
+  startStream(streamType: typeofStream): void;
+  endStream(streamType?: typeofStream): void;
+  stopStreams(): void;
+  startSync(syncType: typeOfSync, interval?: number): void;
+
+  // Stream Collection Methods
+  collectStreamEvents<T extends StreamMessage>(options: {
+    type: typeofStream;
+    filterFn?: (msg: StreamMessage) => boolean;
+    count: number;
+    customTimeout?: number;
+  }): Promise<T[]>;
+  collectMessages(
+    groupId: string,
+    count: number,
+    types?: string[],
+    customTimeout?: number,
+  ): Promise<StreamTextMessage[]>;
+  collectGroupUpdates(
+    groupId: string,
+    count: number,
+    customTimeout?: number,
+  ): Promise<StreamGroupUpdateMessage[]>;
+  collectAddedMembers(
+    groupId: string,
+    count?: number,
+    customTimeout?: number,
+  ): Promise<StreamGroupUpdateMessage[]>;
+  collectConversations(
+    fromInboxId: string,
+    count?: number,
+    customTimeout?: number,
+  ): Promise<StreamConversationMessage[]>;
+  collectConsentUpdates(count?: number): Promise<StreamConsentMessage[]>;
+
+  // Installation Management
+  checkAndManageInstallations(targetCount: number): Promise<number>;
+  checkInstallationAge(): Promise<void>;
+  revokeExcessInstallations(threshold?: number): Promise<void>;
+  addNewInstallation(): Promise<{
+    client: Client;
+    dbPath: string;
+    installationId: string;
+    address: `0x${string}`;
+  }>;
+
+  // Utility Methods
+  populate(count: number): Promise<void>;
+
+  // Properties
+  readonly currentFolder: string;
 }
 
 // Worker thread code as a string
@@ -127,7 +209,7 @@ type StreamMessage =
   | StreamConversationMessage
   | StreamConsentMessage;
 
-export class WorkerClient extends Worker {
+export class WorkerClient extends Worker implements IWorkerClient {
   public name: string;
   public sdk: string;
   private nameId: string;
@@ -1111,6 +1193,43 @@ export class WorkerClient extends Worker {
       }
       numIndex++;
     }
+  }
+
+  async populate(count: number) {
+    const messagesBefore = await this.client.conversations.list();
+    console.log(`Before: ${messagesBefore.length}`);
+    console.log(`Populating ${this.name} with ${count} conversations...`);
+
+    if (count > messagesBefore.length) {
+      console.log(
+        `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
+      );
+      return;
+    }
+
+    const prefix = "random";
+    // Create conversations where this worker receives messages
+    // We need to create DMs TO this worker, not FROM this worker
+    const senders = await getWorkers(
+      Array.from({ length: count }, (_, i) => `${prefix}${i}`),
+    );
+
+    const senderWorkers = senders.getAll();
+    await Promise.all(
+      senderWorkers.map(async (sender) => {
+        await sender.client.conversations.newDmWithIdentifier({
+          identifier: this.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+        console.log(`Created conversation ${sender.name}`);
+      }),
+    );
+
+    await this.client.conversations.sync();
+    const messagesAfter = await this.client.conversations.list();
+    console.log(`After: ${messagesAfter.length}`);
+
+    console.log(`Done populating ${this.name} with ${count} conversations`);
   }
 
   /**

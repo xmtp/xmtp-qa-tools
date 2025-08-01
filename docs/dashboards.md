@@ -101,7 +101,7 @@ Shows delivery and order rates over time:
 Network-level operation performance:
 
 ```bash
-Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:m_performance, $operation, metric_subtype:core} by {operation}
+Query: avg:xmtp.sdk.duration{$env,$region,$sdk,test:performance, $operation, metric_subtype:core} by {operation}
 ```
 
 ## Performance analysis
@@ -124,19 +124,19 @@ Multiple widgets tracking group-related operations:
 **newGroup performance over time (by members)**:
 
 ```bash
-Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {members}
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:large, $operation, $region} by {members}
 ```
 
 **newGroup performance over time (by operation)**:
 
 ```bash
-Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:m_large, $operation, $region} by {operation}
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$members,test:large, $operation, $region} by {operation}
 ```
 
 **Group performance over time**:
 
 ```bash
-Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:m_large, operation:newgroup} by {members,operation}
+Query: avg:xmtp.sdk.duration{metric_subtype:group,$env,$region,$members, test:large, operation:newgroup} by {members,operation}
 ```
 
 ### Operation performance table

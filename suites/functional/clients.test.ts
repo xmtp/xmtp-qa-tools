@@ -9,7 +9,6 @@ const testName = "clients";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   let workers: WorkerManager;
-  let creator: Worker;
   workers = await getWorkers([
     "henry",
     "ivy",
@@ -124,6 +123,18 @@ describe(testName, async () => {
     expect(inboxState[0].inboxId).toBe(bobInboxId);
   });
 
+  it("populate", async () => {
+    const workers = await getWorkers(["henry"]);
+    const amount = 10;
+    const worker = workers.get("henry")!;
+    await worker.client.conversations.sync();
+    const existingConvs = await worker.client.conversations.list();
+    const existingConvsCount = existingConvs.length;
+    await worker.worker.populate(amount);
+    await worker.client.conversations.sync();
+    const conversations = await worker.client.conversations.list();
+    expect(conversations.length).toBe(existingConvsCount + amount);
+  });
   it("installations", async () => {
     const baseName = "randomguy";
 
