@@ -449,6 +449,14 @@ export const getEncryptionKeyFromHex = (hex: string) => {
 };
 ```
 
+## Packages Reference
+
+```tsx
+// Client Class
+declare class Client {
+  constructor(client: Client$1, signer: Signer, codecs: ContentCodec[]);
+```
+
 ## XMTP Identifiers
 
 Common identifier formats used in XMTP:
@@ -541,6 +549,23 @@ await group.addSuperAdmin("memberInboxId");
 When creating a new group, use the correct options interface:
 
 ```typescript
+export declare const enum PermissionUpdateType {
+  AddMember = 0,
+  RemoveMember = 1,
+  AddAdmin = 2,
+  RemoveAdmin = 3,
+  UpdateMetadata = 4,
+}
+
+export declare const enum PermissionPolicy {
+  Allow = 0,
+  Deny = 1,
+  Admin = 2,
+  SuperAdmin = 3,
+  DoesNotExist = 4,
+  Other = 5,
+}
+
 export interface CreateGroupOptions {
   permissions?: GroupPermissionsOptions;
   groupName?: string;
@@ -711,6 +736,13 @@ export interface Identifier {
 export declare const enum IdentifierKind {
   Ethereum = 0,
   Passkey = 1,
+}
+
+// CreateGroupOptions Interface
+export interface CreateGroupOptions {
+  groupName?: string;
+  groupImageUrlSquare?: string;
+  groupDescription?: string;
 }
 ```
 
