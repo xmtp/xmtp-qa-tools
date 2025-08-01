@@ -1196,7 +1196,17 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
 
   async populate(count: number) {
+    await this.client.conversations.sync();
+    const messagesBefore = await this.client.conversations.list();
+    console.log(`Before: ${messagesBefore.length}`);
     console.log(`Populating ${this.name} with ${count} conversations...`);
+
+    if (count < messagesBefore.length) {
+      console.log(
+        `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
+      );
+      count = messagesBefore.length;
+    }
 
     const prefix = "random";
     // Create conversations where this worker receives messages
@@ -1215,6 +1225,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
         console.log(`Created conversation ${sender.name}`);
       }),
     );
+
+    await this.client.conversations.sync();
+    const messagesAfter = await this.client.conversations.list();
+    console.log(`After: ${messagesAfter.length}`);
 
     console.log(`Done populating ${this.name} with ${count} conversations`);
   }

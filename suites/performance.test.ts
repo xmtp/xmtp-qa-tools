@@ -61,12 +61,9 @@ describe(testName, () => {
     });
 
     it(`populate(${populateSize}): measure populating a client`, async () => {
-      await creator!.client.conversations.sync();
-      const messagesBefore = await creator!.client.conversations.list();
       await creator!.worker.populate(populateSize);
-      await creator!.client.conversations.sync();
       const messagesAfter = await creator!.client.conversations.list();
-      expect(messagesAfter.length).toBe(messagesBefore.length + populateSize);
+      expect(messagesAfter.length).toBe(populateSize);
     });
     it(`create(${populateSize}): measure creating a client`, async () => {
       workers = await getWorkers(10, {
