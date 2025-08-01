@@ -1,7 +1,4 @@
-import {
-  verifyAgentMessageStream,
-  verifyMessageStream,
-} from "@helpers/streams";
+import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@workers/versions";
