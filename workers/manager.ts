@@ -417,7 +417,7 @@ export class WorkerManager implements IWorkerManager {
     }
 
     // Keys don't exist, generate new ones
-    console.debug(`Generating new keys for ${baseName}`);
+    //console.debug(`Generating new keys for ${baseName}`);
     const walletKey = generatePrivateKey();
     const account = privateKeyToAccount(walletKey);
     const encryptionKey = generateEncryptionKeyHex();
