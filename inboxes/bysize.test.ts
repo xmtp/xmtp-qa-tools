@@ -45,6 +45,8 @@ describe(testName, () => {
       workers = await getWorkers(workerNames);
       creator = workers.get(bysizeWorkerName)!;
       receiver = workers.get(randomNames[0])!;
+      console.log("Creator name", creator.name);
+      console.log("Receiver name", receiver.name);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
       await creator!.client.conversations.sync();
