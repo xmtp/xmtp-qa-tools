@@ -117,13 +117,38 @@ async function handler(req: Request) {
     });
 
     // Send ping message
+    const stream = await conversation.stream();
     await conversation.send(message);
+    let success = false;
+    // Wait for response with timeout
+    const responsePromise = (async () => {
+      for await (const message of stream) {
+        // Skip if the message is from the agent
+        if (
+          message.senderInboxId.toLowerCase() === client.inboxId.toLowerCase()
+        ) {
+          continue;
+        }
+
+        console.log("Message received", message.content);
+        success = true;
+        break;
+      }
+    })();
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Timeout waiting for response"));
+      }, 8000);
+    });
+
+    await Promise.race([responsePromise, timeoutPromise]);
 
     const responseTime = Date.now() - startTime;
     console.log(`Ping completed in ${responseTime}ms`);
 
     const response = {
-      success: true,
+      success,
       address,
       network,
       responseTime,
@@ -158,6 +183,6 @@ async function handler(req: Request) {
 //   fetch: handler,
 // });
 
-// console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
+console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
 
-// export { handler };
+export { handler };
