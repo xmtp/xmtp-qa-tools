@@ -400,6 +400,18 @@ export class WorkerManager implements IWorkerManager {
       return this.keysCache[baseName];
     }
 
+    // Check if this is a bysize worker and load from bysize.json
+    if (baseName.toLowerCase().includes("bysize")) {
+      const bysizeKeys = this.loadBysizeKeys(baseName);
+      if (bysizeKeys) {
+        this.keysCache[baseName] = {
+          walletKey: bysizeKeys.walletKey,
+          encryptionKey: bysizeKeys.encryptionKey,
+        };
+        return this.keysCache[baseName];
+      }
+    }
+
     const walletKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}`;
     const encryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
 
@@ -446,6 +458,54 @@ export class WorkerManager implements IWorkerManager {
     return this.keysCache[baseName];
   }
 
+  private loadBysizeKeys(
+    baseName: string,
+  ): { walletKey: string; encryptionKey: string; dbPath?: string } | null {
+    try {
+      // Extract size from baseName (e.g., "bysize500" -> 500)
+      const sizeMatch = baseName.match(/bysize(\d+)/i);
+      if (!sizeMatch) {
+        console.debug(`Could not extract size from bysize name: ${baseName}`);
+        return null;
+      }
+
+      const targetSize = parseInt(sizeMatch[1], 10);
+
+      // Load bysize.json
+      const bysizePath = path.resolve(
+        process.cwd(),
+        "inboxes",
+        "bysize",
+        "bysize.json",
+      );
+      const bysizeData = JSON.parse(
+        fs.readFileSync(bysizePath, "utf8"),
+      ) as Array<{
+        walletKey: string;
+        encryptionKey: string;
+        size: number;
+        path?: string;
+      }>;
+
+      // Find the matching entry
+      const entry = bysizeData.find((item) => item.size === targetSize);
+      if (!entry) {
+        console.debug(`No bysize entry found for size: ${targetSize}`);
+        return null;
+      }
+
+      console.debug(`Loaded bysize keys for ${baseName} (size: ${targetSize})`);
+      return {
+        walletKey: entry.walletKey,
+        encryptionKey: entry.encryptionKey,
+        dbPath: entry.path,
+      };
+    } catch (error) {
+      console.debug(`Failed to load bysize keys for ${baseName}:`, error);
+      return null;
+    }
+  }
+
   /**
    * Creates a new worker with all necessary initialization
    */
@@ -480,11 +540,31 @@ export class WorkerManager implements IWorkerManager {
       return this.workers[baseName][providedInstallId];
     }
 
-    // Determine folder/installation ID
-    const folder = providedInstallId || getNextFolderName();
-
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
+
+    // Debug: Log the keys being used for bysize workers
+    if (baseName.toLowerCase().includes("bysize")) {
+      console.debug(
+        `[${baseName}] Using wallet key: ${walletKey.substring(0, 10)}...`,
+      );
+      console.debug(
+        `[${baseName}] Using encryption key: ${encryptionKey.substring(0, 10)}...`,
+      );
+    }
+
+    // Check if this is a bysize worker to get the dbPath
+    let customDbPath: string | undefined;
+    if (baseName.toLowerCase().includes("bysize")) {
+      const bysizeKeys = this.loadBysizeKeys(baseName);
+      if (bysizeKeys?.dbPath) {
+        customDbPath = path.resolve(process.cwd(), bysizeKeys.dbPath);
+        console.debug(`Using custom dbPath for ${baseName}: ${customDbPath}`);
+      }
+    }
+
+    // Determine folder/installation ID
+    const folder = providedInstallId || getNextFolderName();
 
     // Create the base worker data
     const workerData: WorkerBase = {
@@ -496,7 +576,13 @@ export class WorkerManager implements IWorkerManager {
     };
 
     // Create and initialize the worker
-    const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
+    const workerClient = new WorkerClient(
+      workerData,
+      this.env,
+      {},
+      apiUrl,
+      customDbPath,
+    );
 
     const startTime = performance.now();
     const initializedWorker = await workerClient.initialize();

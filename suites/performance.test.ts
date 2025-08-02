@@ -71,18 +71,6 @@ describe(testName, () => {
       const inboxState = await creator!.client.preferences.inboxState();
       console.log("inboxState", inboxState);
     });
-    it(`populate(${populateSize}): measure populating a client`, async () => {
-      await creator!.worker.populate(populateSize);
-      const messagesAfter = await creator!.client.conversations.list();
-      const diff = messagesAfter.length - populateSize;
-      if (diff < 50) {
-        console.error(
-          `Populated ${messagesAfter.length} conversations, expected ${diff}`,
-        );
-        expect(messagesAfter.length).toBe(diff);
-      }
-    });
-
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const randomAddress = receiver!.address;
       if (!randomAddress) {
