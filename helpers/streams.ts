@@ -266,8 +266,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([k, v]) => `${k}: ${v.join(",")}`)
       .join(","),
     averageEventTiming,
-    receptionPercentage: stats?.receptionPercentage ?? 0,
-    orderPercentage: stats?.orderPercentage ?? 0,
+    receptionPercentage: stats?.receptionPercentage,
+    orderPercentage: stats?.orderPercentage,
   };
   console.debug("allResults", JSON.stringify(allResults, null, 2));
   return allResults;

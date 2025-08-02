@@ -213,7 +213,7 @@ describe(testName, () => {
           installations: i.toString(),
         } as ResponseMetricTags);
 
-        setCustomDuration(verifyResult?.averageEventTiming ?? 0);
+        setCustomDuration(verifyResult?.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       });
       it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
