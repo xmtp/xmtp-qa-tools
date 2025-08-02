@@ -52,62 +52,50 @@ describe(testName, () => {
     let receiver: Worker | undefined;
     let usingBysizeWorker = false;
 
-    // Get the bysize worker name for this populate size
-    const bysizeWorkerName = getBysizeWorkerName(populateSize);
-
     it(`create(${populateSize}): measure creating a client`, async () => {
+      // Always initialize 6 workers first
+      workers = await getWorkers(6, {
+        randomNames: false,
+      });
+
+      // Get the bysize worker name for this populate size
+      const bysizeWorkerName = getBysizeWorkerName(populateSize);
+
       if (bysizeWorkerName) {
-        // Use the specific bysize worker for this populate size
-        try {
-          console.log(
-            `Attempting to create bysize worker: ${bysizeWorkerName} for size ${populateSize}`,
-          );
-          workers = await getWorkers([bysizeWorkerName], {
-            randomNames: false,
-          });
-          const creatorWorker = workers.get(bysizeWorkerName);
-          if (!creatorWorker) {
-            throw new Error(`Failed to get worker: ${bysizeWorkerName}`);
-          }
-          creator = creatorWorker;
+        console.log(
+          `Attempting to create bysize worker: ${bysizeWorkerName} for size ${populateSize}`,
+        );
+
+        // Create the bysize worker separately
+        const bysizeWorkers = await getWorkers([bysizeWorkerName], {
+          randomNames: false,
+        });
+        const bysizeWorker = bysizeWorkers.get(bysizeWorkerName);
+
+        if (bysizeWorker) {
+          creator = bysizeWorker;
           usingBysizeWorker = true;
           console.log(
             `✓ Successfully created bysize worker for size ${populateSize}`,
           );
-
-          // Create a regular worker for receiver
-          const receiverWorkers = await getWorkers(["bob"], {
-            randomNames: false,
-          });
-          receiver = receiverWorkers.get("bob")!;
-        } catch (error) {
-          console.warn(
-            `Failed to create bysize worker for size ${populateSize}:`,
-            error,
-          );
+        } else {
           console.log(
-            `Falling back to regular workers for size ${populateSize}`,
+            `Failed to get bysize worker for size ${populateSize}, using regular worker`,
           );
-          // Fallback to regular workers
-          workers = await getWorkers(6, {
-            randomNames: false,
-          });
           creator = workers.get("edward")!;
-          receiver = workers.get("bob")!;
           usingBysizeWorker = false;
         }
       } else {
-        // Fallback to regular workers if no bysize worker found
+        // No bysize worker found, use regular worker
         console.log(
-          `No bysize worker found for size ${populateSize}, using regular workers`,
+          `No bysize worker found for size ${populateSize}, using regular worker`,
         );
-        workers = await getWorkers(6, {
-          randomNames: false,
-        });
         creator = workers.get("edward")!;
-        receiver = workers.get("bob")!;
         usingBysizeWorker = false;
       }
+
+      // Always use a regular worker as receiver
+      receiver = workers.get("bob")!;
 
       const workerType = usingBysizeWorker ? "bysize" : "regular";
       console.log(
