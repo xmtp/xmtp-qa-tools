@@ -1249,25 +1249,12 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
       await Promise.all(
         senderWorkers.map(async (sender, i) => {
-          try {
-            const conversation =
-              await sender.client.conversations.newDmWithIdentifier({
-                identifier: this.address,
-                identifierKind: IdentifierKind.Ethereum,
-              });
-            console.log(
-              `[${this.nameId}] Created conversation ${conversation.id} with ${sender.name}`,
-            );
-            totalCreated++;
-            batchCreated++;
-          } catch (error: unknown) {
-            const errorMessage =
-              error instanceof Error ? error.message : String(error);
-            console.error(
-              `[${this.nameId}] Failed to create conversation with ${sender.name}: ${errorMessage}`,
-            );
-            batchFailed++;
-          }
+          await sender.client.conversations.newDmWithIdentifier({
+            identifier: this.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+          totalCreated++;
+          batchCreated++;
         }),
       );
 

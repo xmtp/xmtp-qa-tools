@@ -626,8 +626,6 @@ export async function getWorkers(
     (result) => (result as PromiseFulfilledResult<Worker>).value,
   );
 
-  console.log("✅ All workers initialized successfully!");
-
   // Add all successful workers to the manager
   for (const worker of successfulResults) {
     manager.addWorker(worker.name, worker.folder, worker);
