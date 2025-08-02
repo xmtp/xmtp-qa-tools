@@ -673,14 +673,18 @@ export async function getWorkers(
     );
   }
 
-  // Initialize progress bar
-  const progressBar = new ProgressBar(
-    workerPromises.length,
-    `Initializing ${workerPromises.length} workers...`,
-  );
+  // Only use progress bar if there are more than 50 workers
+  const useProgressBar = workerPromises.length > 50;
+  let progressBar: ProgressBar | undefined;
 
-  // Show initial progress immediately
-  progressBar.update(0);
+  if (useProgressBar) {
+    progressBar = new ProgressBar(
+      workerPromises.length,
+      `Initializing ${workerPromises.length} workers...`,
+    );
+    // Show initial progress immediately
+    progressBar.update(0);
+  }
 
   // Track all workers in parallel and update progress as each completes
   let completedCount = 0;
@@ -689,11 +693,15 @@ export async function getWorkers(
       try {
         const worker = await workerPromise;
         completedCount++;
-        progressBar.update(completedCount);
+        if (useProgressBar && progressBar) {
+          progressBar.update(completedCount);
+        }
         return worker;
       } catch (error) {
         completedCount++;
-        progressBar.update(completedCount);
+        if (useProgressBar && progressBar) {
+          progressBar.update(completedCount);
+        }
         throw error;
       }
     }),
