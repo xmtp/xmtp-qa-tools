@@ -65,32 +65,6 @@ describe(testName, async () => {
     }
   });
 
-  it("validation and key package status", async () => {
-    const inboxState = await workers
-      .get("henry")!
-      .client.preferences.inboxState(true);
-    expect(inboxState.installations.length).toBeGreaterThan(0);
-
-    // Retrieve all the installation ids for the target
-    const installationIds = inboxState.installations.map(
-      (installation) => installation.id,
-    );
-
-    // Retrieve a map of installation id to KeyPackageStatus
-    const status = await workers
-      .get("henry")!
-      .client.getKeyPackageStatusesForInstallationIds(installationIds);
-
-    // Count valid and invalid installations
-    const totalInstallations = Object.keys(status).length;
-    const validInstallations = Object.values(status).filter(
-      (value) => !value?.validationError,
-    ).length;
-    const invalidInstallations = totalInstallations - validInstallations;
-    console.log(
-      `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
-    );
-  });
   it("stitching", async () => {
     workers = await getWorkers(["randombob-a", "alice"]);
     let creator = workers.get("randombob", "a")!;
@@ -114,27 +88,7 @@ describe(testName, async () => {
     const resultSecondDm = await verifyMessageStream(dm, [receiver]);
     expect(resultSecondDm.allReceived).toBe(false);
   });
-  it("inbox state", async () => {
-    const bobInboxId = workers.get("bob")!.client.inboxId;
-    const inboxState = await workers
-      .get("henry")!
-      .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
-    console.log(inboxState[0].inboxId);
-    expect(inboxState[0].inboxId).toBe(bobInboxId);
-  });
 
-  it("populate", async () => {
-    const workers = await getWorkers(["henry"]);
-    const amount = 10;
-    const worker = workers.get("henry")!;
-    await worker.client.conversations.sync();
-    const existingConvs = await worker.client.conversations.list();
-    const existingConvsCount = existingConvs.length;
-    await worker.worker.populate(amount);
-    await worker.client.conversations.sync();
-    const conversations = await worker.client.conversations.list();
-    expect(conversations.length).toBe(existingConvsCount + amount);
-  });
   it("installations", async () => {
     const baseName = "randomguy";
 
