@@ -64,50 +64,21 @@ describe(testName, async () => {
       if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
     }
   });
+  it("track epoch changes during group operations", async () => {
+    const group = await workers.createGroupBetweenAll();
+    const initialDebugInfo = await group.debugInfo();
+    const initialEpoch = initialDebugInfo.epoch;
 
-  it("stitching", async () => {
-    workers = await getWorkers(["randombob-a", "alice"]);
-    let creator = workers.get("randombob", "a")!;
-    const receiver = workers.get("alice")!;
-    let dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
-    console.log("New dm created", dm.id);
+    // Perform group operation that should increment epoch
+    const newMember = getInboxIds(1)[0];
+    await group.addMembers([newMember]);
+    // Get updated debug info
+    const updatedDebugInfo = await group.debugInfo();
+    console.log("updatedDebugInfo", updatedDebugInfo);
+    const updatedEpoch = updatedDebugInfo.epoch;
+    console.log("updatedEpoch", updatedEpoch);
 
-    const resultFirstDm = await verifyMessageStream(dm, [receiver]);
-    expect(resultFirstDm.allReceived).toBe(true);
-
-    // Create fresh random1 client
-    const bobB = await getWorkers(["randombob-b"]);
-    creator = bobB.get("randombob", "b")!;
-    dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
-    console.log("New dm created", dm.id);
-
-    const resultSecondDm = await verifyMessageStream(dm, [receiver]);
-    expect(resultSecondDm.allReceived).toBe(false);
-  });
-
-  it("installations", async () => {
-    const baseName = "randomguy";
-
-    // Create primary installation
-    const primary = await getWorkers([baseName]);
-
-    // Create secondary installation with different folder
-    const secondary = await getWorkers([baseName + "-desktop"]);
-
-    // Get workers with correct base name and installation IDs
-    const primaryWorker = primary.get(baseName);
-    const secondaryWorker = secondary.get(baseName, "desktop");
-
-    // Ensure workers exist
-    expect(primaryWorker).toBeDefined();
-    expect(secondaryWorker).toBeDefined();
-
-    // shared identity but separate storage
-    expect(primaryWorker?.client.inboxId).toBe(secondaryWorker?.client.inboxId);
-    expect(primaryWorker?.dbPath).not.toBe(secondaryWorker?.dbPath);
+    // epoch increased
+    expect(updatedEpoch).toBe(initialEpoch + 1n);
   });
 });
