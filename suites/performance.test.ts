@@ -62,17 +62,16 @@ describe(testName, () => {
   let receiver: Worker | undefined;
 
   beforeAll(async () => {
+    const uniqueNames: string[] = [
+      "edward",
+      "bob",
+      "alice",
+      "charlie",
+      "diana",
+      "fiona",
+    ];
     for (const [i, populateSize] of POPULATE_SIZE.entries()) {
-      const uniqueNames: string[] = [
-        `edward_${populateSize}`,
-        `bob_${populateSize}`,
-        `alice_${populateSize}`,
-        `charlie_${populateSize}`,
-        `diana_${populateSize}`,
-        `fiona_${populateSize}`,
-      ];
-      creator = workers.get(uniqueNames[i])!;
-      receiver = workers.get(uniqueNames[i + 1])!;
+      creator = workers.get(uniqueNames[i] + "_" + populateSize)!;
       workers = await getWorkers(uniqueNames, {
         randomNames: false,
       });
@@ -85,7 +84,11 @@ describe(testName, () => {
 
   for (const populateSize of POPULATE_SIZE) {
     it(`create(${populateSize}): measure creating a client`, () => {
-      setCustomDuration(creator!.initializationTime);
+      creator = workers.get(uniqueNames[i] + "_" + populateSize)!;
+      receiver = workers.get(uniqueNames[i + 1] + "_" + populateSize)!;
+      console.log("creator", creator);
+      console.log("receiver", receiver);
+      setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
       await creator!.client.conversations.sync();
