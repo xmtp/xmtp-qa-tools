@@ -1,5 +1,5 @@
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
+import { getRandomAddress } from "@inboxes/utils";
 import {
   getBysizeWorkerName,
   getBysizeWorkerNames,
@@ -7,7 +7,7 @@ import {
   type Worker,
   type WorkerManager,
 } from "@workers/manager";
-import { Client, IdentifierKind, type Dm, type Group } from "@workers/versions";
+import { Client, IdentifierKind, type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "bysize";
