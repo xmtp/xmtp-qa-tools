@@ -25,7 +25,7 @@ describe(testName, () => {
 
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000];
+    : [0, 500, 1000, 2000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [100, 200];
