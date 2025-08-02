@@ -46,5 +46,8 @@ describe(testName, () => {
       creator = workers.get(bysizeWorkerName)!;
       receiver = workers.get(randomNames[0])!;
     });
+    it(`sync(${populateSize}):measure sync`, async () => {
+      await creator!.client.conversations.sync();
+    });
   }
 });
