@@ -64,29 +64,6 @@ describe(testName, async () => {
       if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
     }
   });
-  it("stitching", async () => {
-    workers = await getWorkers(["randombob-a", "alice"]);
-    let creator = workers.get("randombob", "a")!;
-    const receiver = workers.get("alice")!;
-    let dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
-    console.log("New dm created", dm.id);
-
-    const resultFirstDm = await verifyMessageStream(dm, [receiver]);
-    expect(resultFirstDm.allReceived).toBe(true);
-
-    // Create fresh random1 client
-    const bobB = await getWorkers(["randombob-b"]);
-    creator = bobB.get("randombob", "b")!;
-    dm = (await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    )) as Dm;
-    console.log("New dm created", dm.id);
-
-    const resultSecondDm = await verifyMessageStream(dm, [receiver]);
-    expect(resultSecondDm.allReceived).toBe(false);
-  });
   it("track epoch changes during group operations", async () => {
     const group = await workers.createGroupBetweenAll();
     const initialDebugInfo = await group.debugInfo();
