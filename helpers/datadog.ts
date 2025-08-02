@@ -129,7 +129,6 @@ function enrichTags(tags: MetricTags): MetricTags {
 // Operation key generator
 function getOperationKey(tags: MetricTags, metricName: string): string {
   const memberCount = tags.members || "";
-  const conversation_count = tags.conversation_count || "";
   return tags.operation
     ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
     : metricName;

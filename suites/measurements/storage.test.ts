@@ -2,7 +2,7 @@ import { formatBytes, getMessageByMb } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { afterAll, beforeAll, describe, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 interface StorageMetrics {
   totalSizeMB: number;

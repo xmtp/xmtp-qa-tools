@@ -111,3 +111,12 @@ yarn test functional --versions 3  # Test latest 3 auto-enabled versions
 yarn test functional --nodeSDK 3.2.2 # custom version
 yarn regression  # Vibe check on latest version
 ```
+
+## Upgrade procedure
+
+When upgrading XMTP node-sdk versions, update these 3 files:
+
+1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
+2. Add import for new SDK version to `workers/versions.ts`.
+3. Add VersionList entry (`auto: false` for latest) to `workers/versions.ts`.
+4. Run `yarn regression`.
