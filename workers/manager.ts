@@ -590,18 +590,17 @@ export async function getWorkers(
   console.log(`🚀 Initializing ${workerPromises.length} workers...`);
 
   // Create workers with progress tracking
-  await Promise.all(
-    workerPromises.map(async (promise, index) => {
-      try {
-        const worker = await promise;
-        progressBar.update(index + 1);
-        return worker;
-      } catch (error) {
-        progressBar.update(index + 1);
-        throw error;
-      }
-    }),
-  );
+  const results = [];
+  for (let i = 0; i < workerPromises.length; i++) {
+    try {
+      const worker = await workerPromises[i];
+      results.push(worker);
+      progressBar.update(i + 1);
+    } catch (error) {
+      progressBar.update(i + 1);
+      throw error;
+    }
+  }
 
   console.log("✅ All workers initialized successfully!");
 

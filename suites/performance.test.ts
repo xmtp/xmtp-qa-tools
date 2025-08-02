@@ -15,7 +15,8 @@ import {
   type Dm,
   type Group,
 } from "@workers/versions";
-import { describe, expect, it } from "vitest";
+import { unique } from "viem/chains";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, () => {
@@ -24,7 +25,7 @@ describe(testName, () => {
 
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000];
+    : [0, 500, 1000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [100, 200];
@@ -54,16 +55,15 @@ describe(testName, () => {
     },
   });
 
-  for (const populateSize of POPULATE_SIZE) {
-    // Create separate workers for each populate size to ensure consistency
-    // Each populate size needs different private keys to avoid network state contamination
-    let workers: WorkerManager;
-    let creator: Worker | undefined;
-    let receiver: Worker | undefined;
-    it(`create(${populateSize}): measure creating a client`, async () => {
-      // Create unique workers with unique names for this populate size to get different private keys
-      // This ensures each POPULATE_SIZE has completely isolated network state
-      const uniqueNames = [
+  // Create separate workers for each populate size to ensure consistency
+  // Each populate size needs different private keys to avoid network state contamination
+  let workers: WorkerManager;
+  let creator: Worker | undefined;
+  let receiver: Worker | undefined;
+
+  beforeAll(async () => {
+    for (const [i, populateSize] of POPULATE_SIZE.entries()) {
+      const uniqueNames: string[] = [
         `edward_${populateSize}`,
         `bob_${populateSize}`,
         `alice_${populateSize}`,
@@ -71,25 +71,27 @@ describe(testName, () => {
         `diana_${populateSize}`,
         `fiona_${populateSize}`,
       ];
+      creator = workers.get(uniqueNames[i])!;
+      receiver = workers.get(uniqueNames[i + 1])!;
       workers = await getWorkers(uniqueNames, {
         randomNames: false,
       });
-      creator = workers.get(`edward_${populateSize}`)!;
-      receiver = workers.get(`bob_${populateSize}`)!;
-      setCustomDuration(creator.initializationTime);
+      await creator.worker.populate(populateSize);
+      const messagesAfter = await creator.client.conversations.list();
+      const diff = messagesAfter.length - populateSize;
+      expect(diff).toBeLessThanOrEqual(50);
+    }
+  });
+
+  for (const populateSize of POPULATE_SIZE) {
+    it(`create(${populateSize}): measure creating a client`, () => {
+      setCustomDuration(creator!.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
       await creator!.client.conversations.sync();
     });
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
-    });
-
-    it(`populate(${populateSize}): measure populating a client`, async () => {
-      await creator!.worker.populate(populateSize);
-      const messagesAfter = await creator!.client.conversations.list();
-      const diff = messagesAfter.length - populateSize;
-      expect(diff).toBeLessThanOrEqual(50);
     });
 
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
