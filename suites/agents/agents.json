@@ -117,7 +117,7 @@
     "address": "0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b",
     "sendMessage": "hola",
     "live": false,
-    "networks": ["local"],
+    "networks": ["production"],
     "slackChannel": "#local-alerts",
     "respondOnTagged": false
   },
