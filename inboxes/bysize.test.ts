@@ -1,8 +1,9 @@
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomAddress } from "@inboxes/utils";
 import {
   getBysizeWorkerName,
   getBysizeWorkerNames,
+  getRandomAddress,
+} from "@inboxes/utils";
+import {
   getRandomNames,
   getWorkers,
   type Worker,
@@ -31,21 +32,8 @@ describe(testName, () => {
 
   let dm: Dm | undefined;
 
-  let customDuration: number | undefined = undefined;
-  const setCustomDuration = (duration: number | undefined) => {
-    customDuration = duration;
-  };
+  const randomNames = getRandomNames(5);
 
-  setupTestLifecycle({
-    testName,
-    getCustomDuration: () => customDuration,
-    setCustomDuration: (v) => {
-      customDuration = v;
-    },
-    initDataDog: true,
-    sendDurationMetrics: true,
-    networkStats: true,
-  });
   let workers: WorkerManager;
   let creator: Worker | undefined;
   let receiver: Worker | undefined;
@@ -56,56 +44,11 @@ describe(testName, () => {
       if (!bysizeWorkerName) {
         throw new Error("Bysize worker name not found");
       }
-      workers = await getWorkers([bysizeWorkerName, ...getRandomNames(6)]);
-      creator = workers.get("edward")!;
-      receiver = workers.get("bob")!;
-      setCustomDuration(creator.initializationTime);
-    });
-
-    it(`canMessage(${populateSize}):measure canMessage`, async () => {
-      if (!receiver) {
-        throw new Error("Receiver not initialized");
-      }
-      const randomAddress = receiver.address;
-      if (!randomAddress) {
-        throw new Error("Random client not found");
-      }
-      const start = Date.now();
-      const canMessage = await Client.canMessage(
-        [
-          {
-            identifier: randomAddress,
-            identifierKind: IdentifierKind.Ethereum,
-          },
-        ],
-        receiver.env,
-      );
-      setCustomDuration(Date.now() - start);
-      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
-    });
-
-    it(`newDm(${populateSize}):measure creating a DM`, async () => {
-      if (!creator || !receiver) {
-        throw new Error("Creator or receiver not initialized");
-      }
-      dm = (await creator.client.conversations.newDm(
-        receiver.client.inboxId,
-      )) as Dm;
-      expect(dm).toBeDefined();
-      expect(dm.id).toBeDefined();
-    });
-
-    it(`newDmByAddress(${populateSize}):measure creating a DM`, async () => {
-      if (!receiver) {
-        throw new Error("Receiver not initialized");
-      }
-      const dm2 = await receiver.client.conversations.newDmWithIdentifier({
-        identifier: getRandomAddress(1)[0],
-        identifierKind: IdentifierKind.Ethereum,
-      });
-
-      expect(dm2).toBeDefined();
-      expect(dm2.id).toBeDefined();
+      const workerNames = [bysizeWorkerName, ...randomNames];
+      console.log("workerNames", workerNames);
+      workers = await getWorkers(workerNames);
+      creator = workers.get(bysizeWorkerName)!;
+      receiver = workers.get(randomNames[0])!;
     });
   }
 });

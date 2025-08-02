@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import newInboxes2 from "./byinstallation/2.json";
 import newInboxes5 from "./byinstallation/5.json";
 import newInboxes10 from "./byinstallation/10.json";
@@ -96,4 +98,56 @@ export function getAddresses(count: number) {
   return getInboxByInstallationCount(2)
     .slice(0, count)
     .map((inbox) => inbox.accountAddress);
+}
+
+/**
+ * Get bysize worker names from bysize.json
+ * @returns Array of bysize worker names (e.g., ["bysize500", "bysize1000", ...])
+ */
+export function getBysizeWorkerNames(): string[] {
+  try {
+    const bysizePath = path.resolve(
+      process.cwd(),
+      "inboxes",
+      "bysize",
+      "bysize.json",
+    );
+    const bysizeData = JSON.parse(
+      fs.readFileSync(bysizePath, "utf8"),
+    ) as Array<{
+      size: number;
+    }>;
+
+    return bysizeData.map((item) => `bysize${item.size}`);
+  } catch (error) {
+    console.debug("Failed to load bysize worker names:", error);
+    return [];
+  }
+}
+
+/**
+ * Get bysize worker name for a specific size
+ * @param size The size to look for
+ * @returns The bysize worker name or null if not found
+ */
+export function getBysizeWorkerName(size: number): string | null {
+  try {
+    const bysizePath = path.resolve(
+      process.cwd(),
+      "inboxes",
+      "bysize",
+      "bysize.json",
+    );
+    const bysizeData = JSON.parse(
+      fs.readFileSync(bysizePath, "utf8"),
+    ) as Array<{
+      size: number;
+    }>;
+
+    const entry = bysizeData.find((item) => item.size === size);
+    return entry ? `bysize${size}` : null;
+  } catch (error) {
+    console.debug(`Failed to get bysize worker name for size ${size}:`, error);
+    return null;
+  }
 }

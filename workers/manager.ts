@@ -747,58 +747,6 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 
-/**
- * Get bysize worker names from bysize.json
- * @returns Array of bysize worker names (e.g., ["bysize500", "bysize1000", ...])
- */
-export function getBysizeWorkerNames(): string[] {
-  try {
-    const bysizePath = path.resolve(
-      process.cwd(),
-      "inboxes",
-      "bysize",
-      "bysize.json",
-    );
-    const bysizeData = JSON.parse(
-      fs.readFileSync(bysizePath, "utf8"),
-    ) as Array<{
-      size: number;
-    }>;
-
-    return bysizeData.map((item) => `bysize${item.size}`);
-  } catch (error) {
-    console.debug("Failed to load bysize worker names:", error);
-    return [];
-  }
-}
-
-/**
- * Get bysize worker name for a specific size
- * @param size The size to look for
- * @returns The bysize worker name or null if not found
- */
-export function getBysizeWorkerName(size: number): string | null {
-  try {
-    const bysizePath = path.resolve(
-      process.cwd(),
-      "inboxes",
-      "bysize",
-      "bysize.json",
-    );
-    const bysizeData = JSON.parse(
-      fs.readFileSync(bysizePath, "utf8"),
-    ) as Array<{
-      size: number;
-    }>;
-
-    const entry = bysizeData.find((item) => item.size === size);
-    return entry ? `bysize${size}` : null;
-  } catch (error) {
-    console.debug(`Failed to get bysize worker name for size ${size}:`, error);
-    return null;
-  }
-}
-
 // 100 unique names
 export const defaultNames = [
   "alice",
