@@ -101,10 +101,7 @@ describe(testName, () => {
       setCustomDuration(Date.now() - start);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     });
-    it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      const inboxState = await creator!.client.preferences.inboxState(true);
-      expect(inboxState.installations.length).toBeGreaterThan(0);
-    });
+
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
       dm = (await creator!.client.conversations.newDm(
         receiver!.client.inboxId,

@@ -301,6 +301,7 @@ export class ProgressBar {
   private current = 0;
   private barLength: number;
   private lastUpdate = Date.now();
+  private isUpdating = false;
 
   constructor(total: number, barLength = 40) {
     this.total = total;
@@ -308,26 +309,42 @@ export class ProgressBar {
   }
 
   update(current?: number) {
-    if (current !== undefined) this.current = current;
-    else this.current++;
+    // Prevent concurrent updates
+    if (this.isUpdating) return;
+    this.isUpdating = true;
 
-    const now = Date.now();
-    if (now - this.lastUpdate < 100 && this.current < this.total) return;
-    this.lastUpdate = now;
+    try {
+      if (current !== undefined) this.current = current;
+      else this.current++;
 
-    const pct = Math.round((this.current / Math.max(1, this.total)) * 100);
-    const filled = Math.round(
-      (this.current / Math.max(1, this.total)) * this.barLength,
-    );
-    const bar =
-      "█".repeat(Math.max(0, filled)) +
-      "░".repeat(Math.max(0, this.barLength - filled));
+      const now = Date.now();
+      // Always show progress for 0 or when complete, otherwise throttle updates
+      if (
+        now - this.lastUpdate < 100 &&
+        this.current > 0 &&
+        this.current < this.total
+      ) {
+        this.isUpdating = false;
+        return;
+      }
+      this.lastUpdate = now;
 
-    process.stdout.write(
-      `\r🚀 Progress: [${bar}] ${pct}% (${this.current}/${this.total})`,
-    );
+      const pct = Math.round((this.current / Math.max(1, this.total)) * 100);
+      const filled = Math.round(
+        (this.current / Math.max(1, this.total)) * this.barLength,
+      );
+      const bar =
+        "█".repeat(Math.max(0, filled)) +
+        "░".repeat(Math.max(0, this.barLength - filled));
 
-    if (this.current >= this.total) process.stdout.write("\n");
+      process.stdout.write(
+        `\r🚀 Progress: [${bar}] ${pct}% (${this.current}/${this.total})`,
+      );
+
+      if (this.current >= this.total) process.stdout.write("\n");
+    } finally {
+      this.isUpdating = false;
+    }
   }
 
   finish() {

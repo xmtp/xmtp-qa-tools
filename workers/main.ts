@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath, streamTimeout } from "@helpers/client";
+import { ProgressBar } from "@helpers/logger";
 import {
   ConsentState,
   IdentifierKind,
@@ -1200,32 +1201,64 @@ export class WorkerClient extends Worker implements IWorkerClient {
     console.log(`Before: ${messagesBefore.length}`);
     console.log(`Populating ${this.name} with ${count} conversations...`);
 
-    if (count > messagesBefore.length) {
+    if (count <= messagesBefore.length) {
       console.log(
         `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
       );
       return;
     }
+    let diff = count - messagesBefore.length;
 
     const prefix = "random";
-    // Create conversations where this worker receives messages
-    // We need to create DMs TO this worker, not FROM this worker
-    const senders = await getWorkers(
-      Array.from({ length: count }, (_, i) => `${prefix}${i}`),
+    const BATCH_SIZE = 100;
+    const totalBatches = Math.ceil(diff / BATCH_SIZE);
+
+    console.log(
+      `Preparing to create ${diff} sender workers in ${totalBatches} batches of ${BATCH_SIZE}...`,
     );
 
-    const senderWorkers = senders.getAll();
-    await Promise.all(
-      senderWorkers.map(async (sender) => {
-        await sender.client.conversations.newDmWithIdentifier({
-          identifier: this.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
-        console.log(`Created conversation ${sender.name}`);
-      }),
-    );
+    let totalCreated = 0;
+    const progressBar = new ProgressBar(diff);
 
-    await this.client.conversations.sync();
+    // Process workers in batches to avoid resource exhaustion
+    for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+      const startIndex = batchIndex * BATCH_SIZE;
+      const endIndex = Math.min(startIndex + BATCH_SIZE, diff);
+      const batchSize = endIndex - startIndex;
+
+      console.log(
+        `Processing batch ${batchIndex + 1}/${totalBatches} (${batchSize} workers)...`,
+      );
+
+      // Create batch of workers
+      const batchWorkerNames = Array.from(
+        { length: batchSize },
+        (_, i) => `${prefix}${startIndex + i}`,
+      );
+
+      const senders = await getWorkers(batchWorkerNames);
+      const senderWorkers = senders.getAll();
+
+      // Create conversations for this batch
+      await Promise.all(
+        senderWorkers.map(async (sender, index) => {
+          await sender.client.conversations.newDmWithIdentifier({
+            identifier: this.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+          totalCreated++;
+          progressBar.update(totalCreated);
+        }),
+      );
+
+      // Sync after each batch to ensure conversations are registered
+      await this.client.conversations.sync();
+
+      console.log(
+        `Completed batch ${batchIndex + 1}/${totalBatches} (${totalCreated}/${diff} total)`,
+      );
+    }
+
     const messagesAfter = await this.client.conversations.list();
     console.log(`After: ${messagesAfter.length}`);
 

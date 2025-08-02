@@ -564,6 +564,7 @@ export async function getWorkers(
       : options.useVersions
         ? nameWithVersions(names)
         : names;
+    console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
@@ -580,6 +581,7 @@ export async function getWorkers(
     }
 
     descriptors = entries.map(([descriptor]) => descriptor);
+    console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = entries.map(([descriptor, apiUrl]) =>
       manager.createWorker(descriptor, apiUrl),
     );
@@ -588,22 +590,46 @@ export async function getWorkers(
   // Initialize progress bar
   const progressBar = new ProgressBar(workerPromises.length);
   console.log(`🚀 Initializing ${workerPromises.length} workers...`);
+  
+  // Show initial progress immediately
+  progressBar.update(0);
 
-  // Create workers with progress tracking
-  await Promise.all(
-    workerPromises.map(async (promise, index) => {
+  // Track all workers in parallel and update progress as each completes
+  let completedCount = 0;
+  const results = await Promise.allSettled(
+    workerPromises.map(async (workerPromise) => {
       try {
-        const worker = await promise;
-        progressBar.update(index + 1);
+        const worker = await workerPromise;
+        completedCount++;
+        progressBar.update(completedCount);
         return worker;
       } catch (error) {
-        progressBar.update(index + 1);
+        completedCount++;
+        progressBar.update(completedCount);
         throw error;
       }
     }),
   );
 
+  // Check for any failures
+  const failedResults = results.filter(
+    (result) => result.status === "rejected",
+  );
+  if (failedResults.length > 0) {
+    throw failedResults[0].reason;
+  }
+
+  // Extract successful results
+  const successfulResults = results.map(
+    (result) => (result as PromiseFulfilledResult<Worker>).value,
+  );
+
   console.log("✅ All workers initialized successfully!");
+
+  // Add all successful workers to the manager
+  for (const worker of successfulResults) {
+    manager.addWorker(worker.name, worker.folder, worker);
+  }
 
   manager.checkCLI();
   await manager.printWorkers();
