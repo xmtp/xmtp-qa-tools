@@ -46,7 +46,6 @@ describe(testName, () => {
         message: string;
       };
       console.log(JSON.stringify(result, null, 2));
-      expect(result.success).toBe(true);
       sendMetric("response", Number(result.responseTime), {
         test: testName,
         metric_type: "agent",
@@ -59,8 +58,7 @@ describe(testName, () => {
         api_endpoint: API_ENDPOINT,
         sdk: "api",
       } as ResponseMetricTags);
-
-      expect(true).toBe(true);
+      expect(result.success).toBe(true);
     });
   }
 });
