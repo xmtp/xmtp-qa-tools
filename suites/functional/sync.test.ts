@@ -1,6 +1,6 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
@@ -9,11 +9,13 @@ describe(testName, () => {
   setupTestLifecycle({ testName });
   let workers: WorkerManager;
   let dm: Dm;
+  let creator: Worker;
+  let receiver: Worker;
 
   it("stitching", async () => {
     workers = await getWorkers(["randombob-a", "alice"]);
-    let creator = workers.get("randombob", "a")!;
-    const receiver = workers.get("alice")!;
+    creator = workers.get("randombob", "a")!;
+    receiver = workers.get("alice")!;
     dm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
