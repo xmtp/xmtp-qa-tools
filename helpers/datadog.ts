@@ -142,7 +142,14 @@ export function initializeDatadog(): boolean {
   if (state.isInitialized) return true;
 
   try {
-    metrics.init({ apiKey: process.env.DATADOG_API_KEY });
+    metrics.init({
+      apiKey: process.env.DATADOG_API_KEY,
+      // Configure histogram defaults to include p95
+      histogram: {
+        aggregates: ["sum", "avg", "count", "min", "max"],
+        percentiles: [0.95], // This will create p95 metrics
+      },
+    });
     state.isInitialized = true;
     return true;
   } catch (error) {
@@ -196,9 +203,60 @@ export function sendMetric(
     }
 
     metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
+
+    // Also send as histogram for p95 calculation (duration metrics only)
+    if (
+      enrichedTags.metric_type === "operation" ||
+      enrichedTags.metric_type === "delivery"
+    ) {
+      metrics.histogram(fullMetricName, Math.round(metricValue), formattedTags);
+    }
   } catch (error) {
     console.error(
       `❌ Error sending metric '${metricName}':`,
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+}
+
+// Send histogram metric for p95 calculation
+export function sendHistogramMetric(
+  metricName: string,
+  metricValue: number,
+  tags: MetricTags,
+): void {
+  try {
+    if (metricValue <= 0) {
+      console.error(
+        `❌ Histogram metric value is 0 or negative: ${metricName}`,
+      );
+      return;
+    }
+    const enrichedTags = enrichTags(tags);
+    const fullMetricName = `xmtp.sdk.${metricName}`;
+
+    // Format tags for DataDog
+    const formattedTags = Object.entries(enrichedTags)
+      .map(([key, value]) => `${key}:${String(value || "").trim()}`)
+      .filter((tag) => !tag.endsWith(":"));
+
+    // Debug logging
+    console.debug(
+      JSON.stringify(
+        {
+          histogramMetricName: fullMetricName,
+          metricValue: Math.round(metricValue),
+          tags: formattedTags,
+        },
+        null,
+        2,
+      ),
+    );
+
+    metrics.histogram(fullMetricName, Math.round(metricValue), formattedTags);
+  } catch (error) {
+    console.error(
+      `❌ Error sending histogram metric '${metricName}':`,
       error instanceof Error ? error.message : String(error),
     );
   }
