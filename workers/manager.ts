@@ -588,8 +588,10 @@ export async function getWorkers(
   }
 
   // Initialize progress bar
-  const progressBar = new ProgressBar(workerPromises.length);
-  console.log(`🚀 Initializing ${workerPromises.length} workers...`);
+  const progressBar = new ProgressBar(
+    workerPromises.length,
+    `Initializing ${workerPromises.length} workers...`,
+  );
 
   // Show initial progress immediately
   progressBar.update(0);

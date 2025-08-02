@@ -1,10 +1,10 @@
-import newInboxes2 from "./2.json";
-import newInboxes5 from "./5.json";
-import newInboxes10 from "./10.json";
-import newInboxes15 from "./15.json";
-import newInboxes20 from "./20.json";
-import newInboxes25 from "./25.json";
-import newInboxes30 from "./30.json";
+import newInboxes2 from "./byinstallation/2.json";
+import newInboxes5 from "./byinstallation/5.json";
+import newInboxes10 from "./byinstallation/10.json";
+import newInboxes15 from "./byinstallation/15.json";
+import newInboxes20 from "./byinstallation/20.json";
+import newInboxes25 from "./byinstallation/25.json";
+import newInboxes30 from "./byinstallation/30.json";
 
 // Type definitions for inbox data
 interface InboxData {

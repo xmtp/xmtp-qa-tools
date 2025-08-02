@@ -1218,7 +1218,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
     );
 
     let totalCreated = 0;
-    const progressBar = new ProgressBar(diff);
+    const progressBar = new ProgressBar(
+      totalBatches,
+      `Populating ${this.name}`,
+    );
 
     // Process workers in batches to avoid resource exhaustion
     for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
@@ -1240,20 +1243,43 @@ export class WorkerClient extends Worker implements IWorkerClient {
       const senderWorkers = senders.getAll();
 
       // Create conversations for this batch
+      console.log(`[${this.nameId}] Creating ${batchSize} conversations...`);
+      let batchCreated = 0;
+      let batchFailed = 0;
+
       await Promise.all(
         senderWorkers.map(async (sender, i) => {
-          console.debug(`Creating conversation ${i + 1} of ${batchSize}...`);
-          await sender.client.conversations.newDmWithIdentifier({
-            identifier: this.address,
-            identifierKind: IdentifierKind.Ethereum,
-          });
-          totalCreated++;
-          progressBar.update(totalCreated);
+          try {
+            const conversation =
+              await sender.client.conversations.newDmWithIdentifier({
+                identifier: this.address,
+                identifierKind: IdentifierKind.Ethereum,
+              });
+            console.log(
+              `[${this.nameId}] Created conversation ${conversation.id} with ${sender.name}`,
+            );
+            totalCreated++;
+            batchCreated++;
+          } catch (error: unknown) {
+            const errorMessage =
+              error instanceof Error ? error.message : String(error);
+            console.error(
+              `[${this.nameId}] Failed to create conversation with ${sender.name}: ${errorMessage}`,
+            );
+            batchFailed++;
+          }
         }),
+      );
+
+      console.log(
+        `[${this.nameId}] Batch completed: ${batchCreated} created, ${batchFailed} failed`,
       );
 
       // Sync after each batch to ensure conversations are registered
       await this.client.conversations.sync();
+
+      // Update progress bar for completed batch
+      progressBar.update(batchIndex + 1);
 
       console.log(
         `Completed batch ${batchIndex + 1}/${totalBatches} (${totalCreated}/${diff} total)`,
