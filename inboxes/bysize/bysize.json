@@ -4,34 +4,34 @@
     "encryptionKey": "4ba1dd9f6f0b59954ba382de0d95d7dc1c8c5f6c4c856fa894acf7ae2b1f9789",
     "accountAddress": "0x42378DFd4393d17C42EC15a571EC8E03457A573F",
     "size": 500,
-    "path": "bysize/.data/bysize500/a"
+    "path": "inboxes/bysize/.data/bysize500/a"
   },
   {
     "walletKey": "0xd392c4d86883816a94bea11347682055d1781c3efc48e331fe7ac54f29d4fafd",
     "encryptionKey": "f1e83903489a78699c3d6246cf533e4ce10c78486fcc752668d7612185864f15",
     "accountAddress": "0x3377db728e36a78e705EF72F0D4dc786c0c2175f",
     "size": 1000,
-    "path": "bysize/.data/bysize1000/a"
+    "path": "inboxes/bysize/.data/bysize1000/a"
   },
   {
     "walletKey": "0xa5dced94906b2446b113e6439b9e30844f0ef904ad83677fd992b1c8239167e3",
     "encryptionKey": "884a37285ea0c43359481666302a870d7bb38c278f29939b7a4d0f75d27c81c6",
     "accountAddress": "0xB17DE11c10ef4626a9a6C08612ED37b44c2177C5",
     "size": 2000,
-    "path": "bysize/.data/bysize2000/a"
+    "path": "inboxes/bysize/.data/bysize2000/a"
   },
   {
     "walletKey": "0x192e3d6ea4251ee136c74c997fc42debc88bc7083a3b5a1893b690ca92ca04a9",
     "encryptionKey": "63a54cb9056c2dea5c698be2010387a976dd53cc773f906a0bcbc8cb8628422f",
     "accountAddress": "0x2eaFb13fC3335e717B7341F109A95492D23119bF",
     "size": 5000,
-    "path": "bysize/.data/bysize5000/a"
+    "path": "inboxes/bysize/.data/bysize5000/a"
   },
   {
     "walletKey": "0xf917b8a6907d170d4ac3448c0f1c3a86e7e0a2bcf1a23589d974440a52698ce3",
     "encryptionKey": "4aa99f9e2e370bf5996037a68f3cf0fc7e9bf5f4738621f61091832764fd41f8",
     "accountAddress": "0x9E12Ccb45e837c330F2Ca622c7E3218471De6dA5",
     "size": 10000,
-    "path": "bysize/.data/bysize10000/a"
+    "path": "inboxes/bysize/.data/bysize10000/a"
   }
 ]

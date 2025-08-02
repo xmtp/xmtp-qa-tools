@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath, streamTimeout } from "@helpers/client";
+import { createClient, getDataPath, streamTimeout, getEncryptionKeyFromHex } from "@helpers/client";
+import { privateKeyToAccount } from "viem/accounts";
+import { regressionClient } from "@workers/versions";
 import { ProgressBar } from "@helpers/logger";
 import {
   ConsentState,
@@ -231,6 +233,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     env: XmtpEnv,
     options: WorkerOptions = {},
     apiUrl?: string,
+    customDbPath?: string,
   ) {
     options.workerData = {
       worker,
@@ -245,6 +248,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     this.nameId = worker.name + "-" + worker.sdk.split("-")[0];
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
+    this.dbPath = customDbPath || "";
     this.setupEventHandlers();
   }
 
@@ -519,26 +523,51 @@ export class WorkerClient extends Worker implements IWorkerClient {
         sdk: this.sdk,
       },
     });
-    const { client, dbPath, address } = await createClient(
-      this.walletKey as `0x${string}`,
-      this.encryptionKeyHex,
-      this.sdk,
-      this.name,
-      this.folder,
-      this.env,
-      this.apiUrl,
-    );
+
+    let dbPath: string;
+    let client: unknown;
+
+    if (this.dbPath) {
+      // Use the custom dbPath if provided
+      console.debug(`[${this.nameId}] Using custom dbPath: ${this.dbPath}`);
+      const account = privateKeyToAccount(this.walletKey as `0x${string}`);
+      const address = account.address;
+      
+      // Create client with custom dbPath
+      client = await regressionClient(
+        this.sdk,
+        this.walletKey as `0x${string}`,
+        getEncryptionKeyFromHex(this.encryptionKeyHex),
+        this.dbPath,
+        this.env,
+        this.apiUrl,
+      );
+      dbPath = this.dbPath;
+    } else {
+      // Use the default path generation
+      const result = await createClient(
+        this.walletKey as `0x${string}`,
+        this.encryptionKeyHex,
+        this.sdk,
+        this.name,
+        this.folder,
+        this.env,
+        this.apiUrl,
+      );
+      client = result.client;
+      dbPath = result.dbPath;
+    }
 
     this.dbPath = dbPath;
     this.client = client as Client;
-    this.address = address;
+    this.address = (client as any).address || privateKeyToAccount(this.walletKey as `0x${string}`).address;
 
     const installationId = this.client.installationId;
 
     return {
       client: this.client,
       dbPath,
-      address: address,
+      address: this.address,
       installationId,
     };
   }

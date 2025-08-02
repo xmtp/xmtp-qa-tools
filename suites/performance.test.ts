@@ -6,7 +6,12 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import {
+  getBysizeWorkerName,
+  getWorkers,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -21,7 +26,7 @@ const testName = "performance";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0];
+    : [0, 500];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10];
@@ -52,26 +57,49 @@ describe(testName, () => {
     let workers: WorkerManager;
     let creator: Worker | undefined;
     let receiver: Worker | undefined;
-    it(`create(${populateSize}): measure creating a client`, async () => {
-      workers = await getWorkers(6, {
-        randomNames: false,
-      });
-      creator = workers.get("edward")!;
-      receiver = workers.get("bob")!;
+
+    // Get the bysize worker name for this populate size
+    const bysizeWorkerName = getBysizeWorkerName(populateSize);
+    const testName = bysizeWorkerName || `size${populateSize}`;
+
+    it(`create(${testName}): measure creating a client`, async () => {
+      if (bysizeWorkerName) {
+        // Use the specific bysize worker for this populate size
+        workers = await getWorkers([bysizeWorkerName], {
+          randomNames: false,
+        });
+        const creatorWorker = workers.get(bysizeWorkerName);
+        if (!creatorWorker) {
+          throw new Error(`Failed to get worker: ${bysizeWorkerName}`);
+        }
+        creator = creatorWorker;
+        // Create a regular worker for receiver
+        const receiverWorkers = await getWorkers(["bob"], {
+          randomNames: false,
+        });
+        receiver = receiverWorkers.get("bob")!;
+      } else {
+        // Fallback to regular workers if no bysize worker found
+        workers = await getWorkers(6, {
+          randomNames: false,
+        });
+        creator = workers.get("edward")!;
+        receiver = workers.get("bob")!;
+      }
       setCustomDuration(creator.initializationTime);
     });
-    it(`sync(${populateSize}):measure sync`, async () => {
+    it(`sync(${testName}):measure sync`, async () => {
       await creator!.client.conversations.sync();
     });
-    it(`syncAll(${populateSize}):measure syncAll`, async () => {
+    it(`syncAll(${testName}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
 
-    it(`inboxState(${populateSize}):measure inboxState`, async () => {
+    it(`inboxState(${testName}):measure inboxState`, async () => {
       const inboxState = await creator!.client.preferences.inboxState();
       console.log("inboxState", inboxState);
     });
-    it(`populate(${populateSize}): measure populating a client`, async () => {
+    it(`populate(${testName}): measure populating a client`, async () => {
       await creator!.worker.populate(populateSize);
       const messagesAfter = await creator!.client.conversations.list();
       const diff = messagesAfter.length - populateSize;
@@ -83,7 +111,7 @@ describe(testName, () => {
       }
     });
 
-    it(`canMessage(${populateSize}):measure canMessage`, async () => {
+    it(`canMessage(${testName}):measure canMessage`, async () => {
       const randomAddress = receiver!.address;
       if (!randomAddress) {
         throw new Error("Random client not found");
