@@ -2,7 +2,6 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import { createRequire } from "node:module";
 import path from "node:path";
-import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -411,12 +410,6 @@ export const randomlyRemoveDb = async (
       await worker.worker?.initialize();
     }
   }
-};
-
-export const getManualUsers = (filterBy: string[] = []): ManualUser[] => {
-  return (manualUsers as ManualUser[]).filter(
-    (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
-  );
 };
 
 /**
