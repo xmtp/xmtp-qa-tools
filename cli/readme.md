@@ -4,17 +4,18 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 
 ## Quick Reference
 
-| Command                                     | Purpose               | Help                      |
-| ------------------------------------------- | --------------------- | ------------------------- |
-| `yarn test <suite>`                         | Run test suites       | `yarn test --help`        |
-| `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`        |
-| `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`         |
-| `yarn gen`                                  | Generate test data    | `yarn gen --help`         |
-| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`    |
-| `yarn revoke <inbox-id>`                    | Revoke installations  | `yarn revoke --help`      |
-| `yarn groups`                               | Create DMs/groups     | `yarn groups --help`      |
-| `yarn permissions`                          | Manage permissions    | `yarn permissions --help` |
-| `yarn mock`                                 | Mock client           | `yarn mock --help`        |
+| Command                                     | Purpose               | Help                        |
+| ------------------------------------------- | --------------------- | --------------------------- |
+| `yarn test <suite>`                         | Run test suites       | `yarn test --help`          |
+| `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`          |
+| `yarn installations`                        | Manage installations  | `yarn installations --help` |
+| `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
+| `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
+| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`      |
+| `yarn revoke <inbox-id>`                    | Revoke installations  | `yarn revoke --help`        |
+| `yarn groups`                               | Create DMs/groups     | `yarn groups --help`        |
+| `yarn permissions`                          | Manage permissions    | `yarn permissions --help`   |
+| `yarn mock`                                 | Mock client           | `yarn mock --help`          |
 
 ## Core Commands
 
@@ -58,6 +59,40 @@ yarn send [options]
 - `--users <count>` - Number of users [default: 5]
 - `--tresshold <percent>` - Success threshold [default: 95]
 - `--wait` - Wait for responses
+
+### Installations Command
+
+```bash
+yarn installations [options]
+```
+
+**Options:**
+
+- `--create` - Create a new installation
+- `--name <name>` - Name for the installation
+- `--target <addr>` - Target wallet address to send message to
+- `--message <text>` - Message to send to target
+- `--list` - List all installations
+- `--load <name>` - Load existing installation by name
+- `--wallet-key <key>` - Wallet private key (for loading existing installation)
+- `--encryption-key <key>` - Encryption key (for loading existing installation)
+- `--env <env>` - XMTP environment [default: production]
+
+**Examples:**
+
+```bash
+# Create a new installation
+yarn installations --create --name "my-installation"
+
+# Create installation and send message
+yarn installations --create --target 0x1234... --message "Hello!"
+
+# Load existing installation and send message
+yarn installations --load "my-installation" --target 0x1234... --message "Hello!"
+
+# List all installations
+yarn installations --list
+```
 
 ### Bot Command
 

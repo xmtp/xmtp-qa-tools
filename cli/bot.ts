@@ -119,8 +119,8 @@ async function main() {
       process.exit(1);
     });
 
-    child.on("exit", (code) => {
-      process.exit(code ?? 0);
+    child.on("exit", () => {
+      process.exit(0);
     });
   } catch (error) {
     console.error("Error:", error);

@@ -15,7 +15,7 @@ describe(testName, async () => {
   setupTestLifecycle({
     testName,
     sendMetrics: true,
-    sendDurationMetrics: true,
+    sendDurationMetrics: false,
   });
   const ERROR_TRESHOLD = parseInt(process.env.ERROR_TRESHOLD ?? "90");
   const MESSAGE_COUNT = parseInt(process.env.DELIVERY_AMOUNT ?? "10");

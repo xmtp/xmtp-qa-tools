@@ -277,7 +277,7 @@ export class WorkerManager implements IWorkerManager {
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
             `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk} ${installationCount.installations.length} - ${formatBytes(
-              (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
+              (await currentWorker.worker.getSQLiteFileSizes())?.total,
             )}`,
           );
         }

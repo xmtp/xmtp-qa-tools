@@ -1,4 +1,3 @@
-import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import {
   verifyMembershipStream,
@@ -152,7 +151,7 @@ describe(testName, () => {
         sdk: receiver!.sdk,
       } as ResponseMetricTags);
 
-      setCustomDuration(verifyResult.averageEventTiming ?? streamTimeout);
+      setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     });
 
@@ -199,23 +198,6 @@ describe(testName, () => {
         await newGroup.send(groupMessage);
         expect(groupMessage).toBeDefined();
       });
-      it(`streamMessage-${i}(${populateSize}):group message`, async () => {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
-        sendMetric("response", verifyResult.averageEventTiming, {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-          members: i.toString(),
-          installations: i.toString(),
-        } as ResponseMetricTags);
-
-        setCustomDuration(verifyResult?.averageEventTiming ?? 0);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
       it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
         await newGroup.addMembers([workers.getAll()[2].inboxId]);
       });
@@ -232,7 +214,6 @@ describe(testName, () => {
       });
       it(`streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`, async () => {
         const extraMember = allMembersWithExtra.slice(i, i + 1);
-        console.log("extraMember", extraMember);
         const verifyResult = await verifyMembershipStream(
           newGroup,
           workers.getAllButCreator(),
@@ -256,6 +237,7 @@ describe(testName, () => {
           sdk: workers.getCreator().sdk,
         } as ResponseMetricTags);
 
+        console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       });

@@ -18,6 +18,7 @@
     "format": "prettier -w .",
     "gen": "tsx cli/gen.ts",
     "groups": "tsx cli/groups.ts",
+    "installations": "tsx cli/installations.ts",
     "lint": "eslint .",
     "mock": "tsx cli/mock-client.ts",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
