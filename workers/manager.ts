@@ -595,14 +595,17 @@ export async function getWorkers(
   progressBar.update(0);
 
   // Track all workers in parallel and update progress as each completes
+  let completedCount = 0;
   const results = await Promise.allSettled(
-    workerPromises.map(async (workerPromise, index) => {
+    workerPromises.map(async (workerPromise) => {
       try {
         const worker = await workerPromise;
-        progressBar.update(index + 1);
+        completedCount++;
+        progressBar.update(completedCount);
         return worker;
       } catch (error) {
-        progressBar.update(index + 1);
+        completedCount++;
+        progressBar.update(completedCount);
         throw error;
       }
     }),
