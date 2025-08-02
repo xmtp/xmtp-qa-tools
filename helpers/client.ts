@@ -2,7 +2,6 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import { createRequire } from "node:module";
 import path from "node:path";
-import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -279,12 +278,12 @@ function loadDataPath(name: string, installationId: string): string {
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
 
   // Check if name includes "random" and add subfolder if it does
-  const randomSubfolder = name.toLowerCase().includes("random")
-    ? "/random"
-    : "";
+  const randomSubfolder = baseName.toLowerCase().includes("random")
+    ? "random/" + name
+    : name;
 
   // Use baseName for the parent folder, not the full name
-  let basePath = `${preBasePath}/.data/${baseName}${randomSubfolder}/${installationId}`;
+  let basePath = `${preBasePath}/.data/${randomSubfolder}/${installationId}`;
 
   return basePath;
 }
@@ -411,12 +410,6 @@ export const randomlyRemoveDb = async (
       await worker.worker?.initialize();
     }
   }
-};
-
-export const getManualUsers = (filterBy: string[] = []): ManualUser[] => {
-  return (manualUsers as ManualUser[]).filter(
-    (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
-  );
 };
 
 /**

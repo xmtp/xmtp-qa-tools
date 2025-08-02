@@ -1,15 +1,10 @@
-import {
-  createSigner,
-  getEncryptionKeyFromHex,
-  getManualUsers,
-} from "@helpers/client";
+import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {
-  manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIdsWithRandomInstallations(100), // 100 DMs like the Rust test
   groupCount: 200, // 200 groups like the Rust test
   timeoutSeconds: 15, // Same timeout as Rust test
