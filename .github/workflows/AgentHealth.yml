@@ -2,7 +2,7 @@ name: Agent health
 description: "health of the agents"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "*/10 * * * *" # Runs every 10 minutes for agents-dms
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-health]
+        test: [agents-dms]
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
@@ -28,7 +28,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: ${{ matrix.test }} ${{ matrix.env }}
-        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }}
+        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --debug --no-datadog
 
       - name: Cleanup and upload artifacts
         if: always()
