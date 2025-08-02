@@ -116,8 +116,7 @@ yarn regression  # Vibe check on latest version
 
 When upgrading XMTP node-sdk versions, update these 3 files:
 
-1. Add `@xmtp/node-sdk` and `@xmtp/node-bindings` to package.json.
-2. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
-3. Add import for new SDK version to `workers/versions.ts`.
-4. Add VersionList entry (`auto: false` for latest) to `workers/versions.ts`.
-5. Run `yarn versions`.
+1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
+2. Add import for new SDK version to `workers/versions.ts`.
+3. Add VersionList entry (`auto: false` for latest) to `workers/versions.ts`.
+4. Run `yarn regression`.
