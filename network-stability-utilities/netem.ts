@@ -33,12 +33,3 @@ export function clear(container: DockerContainer): void {
   console.log(`[netem] Clearing latency from ${container.veth}`);
   container.sh(`sudo tc qdisc del dev ${container.veth} root`, true);
 }
-
-export function applyBidirectionalLatency(
-  a: DockerContainer,
-  b: DockerContainer,
-  ms: number,
-): void {
-  applyLatency(a, ms);
-  applyLatency(b, ms);
-}

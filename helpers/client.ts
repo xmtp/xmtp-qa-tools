@@ -3,7 +3,7 @@ import { getRandomValues } from "node:crypto";
 import { createRequire } from "node:module";
 import path from "node:path";
 import manualUsers from "@inboxes/manualusers.json";
-import type { Worker, WorkerManager } from "@workers/manager";
+import type { Worker } from "@workers/manager";
 import {
   Client,
   IdentifierKind,
@@ -21,45 +21,6 @@ import {
 } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { addFileLogging, setupPrettyLogs } from "./logger";
-
-export function validateEnvironment(vars: string[]): Record<string, string> {
-  const missing = vars.filter((v) => !process.env[v]);
-
-  if (missing.length) {
-    try {
-      const envPath = path.resolve(process.cwd(), ".env");
-      if (fs.existsSync(envPath)) {
-        const envVars = fs
-          .readFileSync(envPath, "utf-8")
-          .split("\n")
-          .filter((line) => line.trim() && !line.startsWith("#"))
-          .reduce<Record<string, string>>((acc, line) => {
-            const [key, ...val] = line.split("=");
-            if (key && val.length) acc[key.trim()] = val.join("=").trim();
-            return acc;
-          }, {});
-
-        missing.forEach((v) => {
-          if (envVars[v]) process.env[v] = envVars[v];
-        });
-      }
-    } catch (e) {
-      console.error(e);
-      /* ignore errors */
-    }
-
-    const stillMissing = vars.filter((v) => !process.env[v]);
-    if (stillMissing.length) {
-      console.error("Missing env vars:", stillMissing.join(", "));
-      process.exit(1);
-    }
-  }
-
-  return vars.reduce<Record<string, string>>((acc, key) => {
-    acc[key] = process.env[key] as string;
-    return acc;
-  }, {});
-}
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -227,15 +188,6 @@ export const getDbPath = (description: string = "xmtp") => {
   }
   return `${volumePath}/${description}.db3`;
 };
-export const getDbPathQA = (description: string = "xmtp") => {
-  //Checks if the environment is a Railway deployment
-  const volumePath = ".data/";
-  // Create database directory if it doesn't exist
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  return `${volumePath}/${description}.db3`;
-};
 
 export async function createClient(
   walletKey: `0x${string}`,
@@ -379,34 +331,6 @@ export const createRandomInstallations = async (
 export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
 
-/**
- * Randomly reinstalls a worker
- */
-export const randomReinstall = async (
-  workers: WorkerManager,
-): Promise<void> => {
-  const worker = workers.getRandomWorkers(1)[0];
-  console.debug(`[${worker.name}] Reinstalling worker`);
-  await worker.worker?.reinstall();
-};
-
-/**
- * Randomly removes database from workers
- */
-export const randomlyRemoveDb = async (
-  workers: WorkerManager,
-): Promise<void> => {
-  for (const worker of workers.getAll()) {
-    if (Math.random() < 0.5) {
-      console.warn(
-        `${worker.name} terminates, deletes local data, and restarts`,
-      );
-      await worker.worker?.clearDB();
-      await worker.worker?.initialize();
-    }
-  }
-};
-
 export const getManualUsers = (filterBy: string[] = []): ManualUser[] => {
   return (manualUsers as ManualUser[]).filter(
     (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
@@ -418,70 +342,6 @@ export const getManualUsers = (filterBy: string[] = []): ManualUser[] => {
  */
 export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
-/**
- * Appends a variable to the .env file
- */
-export const appendToEnv = (key: string, value: string): void => {
-  try {
-    const envPath = getEnvPath();
-    console.debug(`[appendToEnv] Env path resolved to: ${envPath}`);
-    console.debug(`[appendToEnv] File exists: ${fs.existsSync(envPath)}`);
-
-    // Update process.env
-    if (key in process.env) {
-      process.env[key] = value;
-    }
-
-    // Read/create .env file
-    let envContent = "";
-    try {
-      envContent = fs.readFileSync(envPath, "utf8");
-      console.debug(
-        `[appendToEnv] Read existing .env content (${envContent.length} chars)`,
-      );
-    } catch (error: unknown) {
-      console.debug(
-        `[appendToEnv] Creating new .env file, error reading: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-
-    // Escape regex special chars
-    const escapedKey = key.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-    console.debug(`[appendToEnv] Escaped key: ${escapedKey}`);
-
-    // Update or add the key
-    if (envContent.includes(`${key}=`)) {
-      console.debug(`[appendToEnv] Key ${key} already exists, updating`);
-      envContent = envContent.replace(
-        new RegExp(`${escapedKey}=.*(\\r?\\n|$)`, "g"),
-        `${key}="${value}"$1`,
-      );
-    } else {
-      console.debug(`[appendToEnv] Key ${key} does not exist, appending`);
-      envContent += `\n${key}="${value}"\n`;
-    }
-
-    console.debug(`[appendToEnv] About to write to file: ${envPath}`);
-    console.debug(
-      `[appendToEnv] New content length: ${envContent.length} chars`,
-    );
-
-    fs.writeFileSync(envPath, envContent);
-    console.debug(`[appendToEnv] Successfully wrote to file`);
-
-    // the write
-    const verifyContent = fs.readFileSync(envPath, "utf8");
-    const hasOurKey = verifyContent.includes(`${key}=`);
-    console.debug(
-      `[appendToEnv] Verification - file contains ${key}: ${hasOurKey}`,
-    );
-
-    console.debug(`Updated .env with ${key}: ${value}`);
-  } catch (error) {
-    console.error(`Failed to update .env with ${key}:`, error);
-  }
 };
 
 export async function removeDataFolder(): Promise<void> {

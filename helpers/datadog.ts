@@ -106,12 +106,6 @@ const state = {
 
 const execAsync = promisify(exec);
 
-// Utility functions
-export const calculateAverage = (values: number[]): number =>
-  values.length === 0
-    ? 0
-    : values.reduce((sum, val) => sum + val, 0) / values.length;
-
 // Tag enrichment helper
 function enrichTags(tags: MetricTags): MetricTags {
   return {

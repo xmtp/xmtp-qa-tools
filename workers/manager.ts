@@ -613,14 +613,6 @@ export async function getWorkers(
 }
 
 /**
- * Helper function to get worker names array from a WorkerManager
- * Always returns names in the same order (sorted by creation order)
- */
-export function getWorkerNames(workers: WorkerManager): string[] {
-  return workers.getAll().map((worker) => worker.name);
-}
-
-/**
  * Helper function to get the next available folder name
  */
 function getNextFolderName(): string {
@@ -635,14 +627,6 @@ function getNextFolderName(): string {
     );
   }
   return folder;
-}
-
-/**
- * Helper function to count data subfolders
- */
-export function getDataSubFolderCount() {
-  const preBasePath = process.cwd();
-  return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 
 // 100 unique names

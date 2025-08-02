@@ -41,5 +41,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Validate code quality'
+          workflow-name: "Validate code quality"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

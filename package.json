@@ -9,7 +9,6 @@
     "workers"
   ],
   "scripts": {
-    "ai": "tsx cli/ai.ts",
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
     "bot": "tsx cli/bot.ts",
