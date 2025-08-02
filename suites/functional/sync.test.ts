@@ -1,22 +1,41 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { type Dm } from "@workers/versions";
+import { getInboxIds } from "@inboxes/utils";
+import { getWorkers } from "@workers/manager";
+import { type Dm, type Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";
 describe(testName, () => {
   setupTestLifecycle({ testName });
-  let workers: WorkerManager;
-  let dm: Dm;
-  let creator: Worker;
-  let receiver: Worker;
+
+  it("create a group", async () => {
+    const workers = await getWorkers(["henry", "john"]);
+    const creator = workers.get("henry")!;
+    const receiver = workers.get("john")!;
+    const allInboxIds = getInboxIds(2);
+    console.log("All inbox ids", allInboxIds);
+    const group = (await creator.client.conversations.newGroup(
+      allInboxIds,
+    )) as Group;
+
+    await group.send(receiver.inboxId);
+    console.log(receiver.inboxId);
+    await receiver.client.conversations.syncAll();
+    const stream = receiver.client.conversations.stream();
+    await group.addMembers([receiver.client.inboxId]);
+    for await (const conversation of await stream) {
+      console.log("Conversation", conversation?.id);
+      expect(conversation?.id).toBe(group.id);
+      break;
+    }
+  }, 500);
 
   it("stitching", async () => {
-    workers = await getWorkers(["randombob-a", "alice"]);
-    creator = workers.get("randombob", "a")!;
-    receiver = workers.get("alice")!;
-    dm = (await creator.client.conversations.newDm(
+    const workers = await getWorkers(["randombob-a", "alice"]);
+    let creator = workers.get("randombob", "a")!;
+    const receiver = workers.get("alice")!;
+    const dm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
 
@@ -28,12 +47,12 @@ describe(testName, () => {
     // Create fresh random1 client
     const bobB = await getWorkers(["randombob-b"]);
     creator = bobB.get("randombob", "b")!;
-    dm = (await creator.client.conversations.newDm(
+    const secondDm = (await creator.client.conversations.newDm(
       receiver.client.inboxId,
     )) as Dm;
     console.log("New dm created", dm.id);
 
-    const resultSecondDm = await verifyMessageStream(dm, [receiver]);
+    const resultSecondDm = await verifyMessageStream(secondDm, [receiver]);
     expect(resultSecondDm.allReceived).toBe(false);
   });
 });
