@@ -2,7 +2,7 @@ name: Agent health
 description: "health of the agents"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "*/10 * * * *" # Runs every 10 minutes for agents-dms
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-dms]
+        test: [agents-health]
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}

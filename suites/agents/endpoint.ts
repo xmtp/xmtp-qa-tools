@@ -127,6 +127,7 @@ async function handler(req: Request) {
       address,
       network,
       responseTime,
+      message,
       timestamp: new Date().toISOString(),
     };
 
@@ -151,12 +152,12 @@ async function handler(req: Request) {
   }
 }
 
-// Bun server configuration for Railway Functions
-const server = Bun.serve({
-  port: 3000,
-  fetch: handler,
-});
+// // Bun server configuration for Railway Functions
+// const server = Bun.serve({
+//   port: 3000,
+//   fetch: handler,
+// });
 
-console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
+// console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
 
-export { handler };
+// export { handler };
