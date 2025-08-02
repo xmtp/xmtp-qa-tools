@@ -318,7 +318,12 @@ export class ProgressBar {
       else this.current++;
 
       const now = Date.now();
-      if (now - this.lastUpdate < 100 && this.current < this.total) {
+      // Always show progress for 0 or when complete, otherwise throttle updates
+      if (
+        now - this.lastUpdate < 100 &&
+        this.current > 0 &&
+        this.current < this.total
+      ) {
         this.isUpdating = false;
         return;
       }
