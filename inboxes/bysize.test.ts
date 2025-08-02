@@ -3,6 +3,7 @@ import { getRandomAddress } from "@inboxes/utils";
 import {
   getBysizeWorkerName,
   getBysizeWorkerNames,
+  getRandomNames,
   getWorkers,
   type Worker,
   type WorkerManager,
@@ -45,62 +46,19 @@ describe(testName, () => {
     sendDurationMetrics: true,
     networkStats: true,
   });
+  let workers: WorkerManager;
+  let creator: Worker | undefined;
+  let receiver: Worker | undefined;
 
   for (const populateSize of POPULATE_SIZE) {
-    let workers: WorkerManager;
-    let creator: Worker | undefined;
-    let receiver: Worker | undefined;
-    let usingBysizeWorker = false;
-
     it(`create(${populateSize}): measure creating a client`, async () => {
-      // Always initialize 6 workers first
-      workers = await getWorkers(6, {
-        randomNames: false,
-      });
-
-      // Get the bysize worker name for this populate size
       const bysizeWorkerName = getBysizeWorkerName(populateSize);
-
-      if (bysizeWorkerName) {
-        console.log(
-          `Attempting to create bysize worker: ${bysizeWorkerName} for size ${populateSize}`,
-        );
-
-        // Create the bysize worker separately
-        const bysizeWorkers = await getWorkers([bysizeWorkerName], {
-          randomNames: false,
-        });
-        const bysizeWorker = bysizeWorkers.get(bysizeWorkerName);
-
-        if (bysizeWorker) {
-          creator = bysizeWorker;
-          usingBysizeWorker = true;
-          console.log(
-            `✓ Successfully created bysize worker for size ${populateSize}`,
-          );
-        } else {
-          console.log(
-            `Failed to get bysize worker for size ${populateSize}, using regular worker`,
-          );
-          creator = workers.get("edward")!;
-          usingBysizeWorker = false;
-        }
-      } else {
-        // No bysize worker found, use regular worker
-        console.log(
-          `No bysize worker found for size ${populateSize}, using regular worker`,
-        );
-        creator = workers.get("edward")!;
-        usingBysizeWorker = false;
+      if (!bysizeWorkerName) {
+        throw new Error("Bysize worker name not found");
       }
-
-      // Always use a regular worker as receiver
+      workers = await getWorkers([bysizeWorkerName, ...getRandomNames(6)]);
+      creator = workers.get("edward")!;
       receiver = workers.get("bob")!;
-
-      const workerType = usingBysizeWorker ? "bysize" : "regular";
-      console.log(
-        `Measuring client creation for size ${populateSize} using ${workerType} worker`,
-      );
       setCustomDuration(creator.initializationTime);
     });
 
@@ -149,5 +107,5 @@ describe(testName, () => {
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
     });
-  } // Close the for loop
-}); // Close the describe block
+  }
+});
