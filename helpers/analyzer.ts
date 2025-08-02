@@ -16,6 +16,13 @@ export const PATTERNS = {
       uniqueErrorLines: ["FAIL browser > conversation stream with message"],
     },
     {
+      testName: "Browser",
+      uniqueErrorLines: [
+        "FAIL  suites/browser.test.ts > browser > newDm and message stream",
+        "FAIL  suites/browser.test.ts > browser > newGroup and message stream",
+      ],
+    },
+    {
       testName: "Functional",
       uniqueErrorLines: [
         "FAIL  suites/functional/streams.test.ts > streams > metadata: group metadata updates",
@@ -23,7 +30,6 @@ export const PATTERNS = {
       ],
     },
   ],
-  min_fail_lines: 3,
   min_line_length: 40,
   max_line_length: 150,
   max_error_logs: 20,
