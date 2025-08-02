@@ -50,9 +50,7 @@ describe(testName, () => {
   let creator: Worker | undefined;
   let receiver: Worker | undefined;
   it(`create: measure creating a client`, async () => {
-    workers = await getWorkers(6, {
-      randomNames: false,
-    });
+    workers = await getWorkers(6);
     creator = workers.get("edward")!;
     receiver = workers.get("bob")!;
     setCustomDuration(creator.initializationTime);
