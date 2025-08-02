@@ -72,48 +72,8 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 Link to test code [../suites/functional/clients.test.ts](../suites/functional/clients.test.ts)
 
 - `downgrade last versions`
-- `validation and key package status`
-- `inbox state`
-- `installations`
 - `upgrade last versions`
-
-### Content handling
-
-Link to test code [../suites/functional/codec.test.ts](../suites/functional/codec.test.ts)
-
-- `errors:  handle codec errors gracefully when sending unsupported content types`
-
-### Debug operations
-
-Link to test code [../suites/functional/debug.test.ts](../suites/functional/debug.test.ts)
-
-- `retrieve group debug information`
-- `track epoch changes during group operations`
-- `epoch consistency across members`
-- `detect potential forks in group state`
-- `debug info after metadata changes`
-- `debug info structure completeness`
-
-### Metadata operations
-
-Link to test code [../suites/functional/metadata.test.ts](../suites/functional/metadata.test.ts)
-
-- `update group name and persistence`
-- `update group description and persistence`
-- `update group image URL`
-- `metadata propagation to other members`
-- `handle empty and special characters in metadata`
-- `metadata state after group operations`
-
-### Permission system
-
-Link to test code [../suites/functional/permissions.test.ts](../suites/functional/permissions.test.ts)
-
-- `add and remove admin permissions`
-- `add and remove super admin permissions`
-- `admin list management`
-- `admin can remove other members`
-- `super admin can manage other admins`
+- `validation and key package status`
 
 ### Streams
 
@@ -132,9 +92,21 @@ Link to test code [../suites/functional/streams.test.ts](../suites/functional/st
 
 Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
 
-- `sync: client.conversations.sync()`
-- `group sync: individual conversation.sync()`
-- `syncall: client.conversations.sync()`
+- `stitching: client.conversations.sync()`
+- `group welcome message`
+
+### Conversations
+
+Link to test code [../suites/functional/convos.test.ts](../suites/functional/convos.test.ts)
+
+- `new dm`
+- `new group`
+- `new group by address`
+- `send message`
+- `stream message`
+- `sync`
+- `sync all`
+- `add member`
 
 ## 4. Browser
 
