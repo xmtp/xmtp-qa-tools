@@ -22,9 +22,13 @@ describe("populate", () => {
 
       const coworkers = await getWorkers([creatorName]);
       const creator = coworkers.get(creatorName);
-      if (!creator) {
-        throw new Error(`Creator ${creatorName} not found`);
-      }
+      if (!creator) throw new Error(`Creator ${creatorName} not found`);
+
+      console.log(`Syncing all conversations for ${creatorName}...`);
+
+      console.time("syncAll");
+      await creator?.client.conversations.sync();
+      console.timeEnd("syncAll");
 
       console.log(
         `Populating ${populateSize} conversations for ${creatorName}...`,

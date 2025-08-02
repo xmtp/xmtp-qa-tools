@@ -299,13 +299,13 @@ export const addFileLogging = (filename: string) => {
 export class ProgressBar {
   private total: number;
   private current = 0;
-  private barLength: number;
+  private label: string;
   private lastUpdate = Date.now();
   private isUpdating = false;
 
-  constructor(total: number, barLength = 40) {
+  constructor(total: number, label = "") {
     this.total = total;
-    this.barLength = barLength;
+    this.label = label;
   }
 
   update(current?: number) {
@@ -330,15 +330,12 @@ export class ProgressBar {
       this.lastUpdate = now;
 
       const pct = Math.round((this.current / Math.max(1, this.total)) * 100);
-      const filled = Math.round(
-        (this.current / Math.max(1, this.total)) * this.barLength,
-      );
+      const filled = Math.round((this.current / Math.max(1, this.total)) * 40);
       const bar =
-        "█".repeat(Math.max(0, filled)) +
-        "░".repeat(Math.max(0, this.barLength - filled));
+        "█".repeat(Math.max(0, filled)) + "░".repeat(Math.max(0, 40 - filled));
 
       process.stdout.write(
-        `\r🚀 Progress: [${bar}] ${pct}% (${this.current}/${this.total})`,
+        `\r${this.label} [${bar}] ${pct}% (${this.current}/${this.total})`,
       );
 
       if (this.current >= this.total) process.stdout.write("\n");

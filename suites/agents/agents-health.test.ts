@@ -49,7 +49,7 @@ describe(testName, () => {
       sendMetric("response", Number(result.responseTime), {
         test: testName,
         metric_type: "agent",
-        metric_subtype: "api_ping",
+        metric_subtype: "dm",
         live: agent.live ? "true" : "false",
         status: agent.live ? "live_" + env : "not_live_" + env,
         slackChannel: agent.slackChannel,

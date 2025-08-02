@@ -588,8 +588,10 @@ export async function getWorkers(
   }
 
   // Initialize progress bar
-  const progressBar = new ProgressBar(workerPromises.length);
-  console.log(`🚀 Initializing ${workerPromises.length} workers...`);
+  const progressBar = new ProgressBar(
+    workerPromises.length,
+    `Initializing ${workerPromises.length} workers...`,
+  );
 
   // Show initial progress immediately
   progressBar.update(0);
@@ -623,8 +625,6 @@ export async function getWorkers(
   const successfulResults = results.map(
     (result) => (result as PromiseFulfilledResult<Worker>).value,
   );
-
-  console.log("✅ All workers initialized successfully!");
 
   // Add all successful workers to the manager
   for (const worker of successfulResults) {
