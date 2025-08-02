@@ -49,10 +49,13 @@ describe("populate", () => {
         );
       }
     }
+
+    // Initialize workers after populating conversations
+    workers = await getWorkers(uniqueNames);
   });
 
-  for (const name of uniqueNames) {
-    it(`check conversations for ${name}`, async () => {
+  it("check all conversations", async () => {
+    for (const name of uniqueNames) {
       const worker = workers!.get(name);
       if (!worker) {
         throw new Error(`Worker ${name} not found`);
@@ -61,8 +64,16 @@ describe("populate", () => {
       const conversations = await worker.client.conversations.list();
       console.log(`User ${name} has ${conversations.length} conversations`);
 
-      const expectedSize =
-        POPULATE_SIZE.find((size) => name.endsWith(size.toString())) || 0;
+      const expectedSize = (() => {
+        // Sort sizes in descending order to check longest matches first
+        const sortedSizes = [...POPULATE_SIZE].sort((a, b) => b - a);
+        for (const size of sortedSizes) {
+          if (name.endsWith(size.toString())) {
+            return size;
+          }
+        }
+        return 0;
+      })();
 
       if (expectedSize > 0) {
         const tolerance = getTolerance(expectedSize);
@@ -74,6 +85,6 @@ describe("populate", () => {
       } else {
         expect(conversations.length).toBe(expectedSize);
       }
-    });
-  }
+    }
+  });
 });

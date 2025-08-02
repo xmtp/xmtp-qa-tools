@@ -23,30 +23,3 @@ export interface AgentConfig {
   /**  the agent is production */
   live: boolean;
 }
-
-/**
- * Agent test result interface
- */
-export interface AgentTestResult {
-  agentName: string;
-  agentAddress: string;
-  responded: boolean;
-  responseTime?: number;
-  errorMessage?: string;
-  errorLogs?: Set<string>;
-  retries?: number;
-}
-
-/**
- * Agent notification configuration
- */
-export interface AgentNotificationConfig {
-  /** Default Slack channel if not specified per agent */
-  defaultSlackChannel?: string;
-  /** Whether to send notifications for successful tests */
-  notifyOnSuccess?: boolean;
-  /** Whether to send notifications for failed tests */
-  notifyOnFailure?: boolean;
-  /** Custom message template */
-  messageTemplate?: string;
-}

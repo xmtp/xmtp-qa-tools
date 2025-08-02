@@ -44,28 +44,31 @@ const getDbPath = (description = "xmtp") => {
   return `${volumePath}/${description}.db3`;
 };
 
-let client: Client | null = null;
+const clients = new Map<XmtpEnv, Client>();
 
-const initClient = async () => {
-  if (client) return client;
+const initClient = async (network: XmtpEnv = "dev") => {
+  if (clients.has(network)) {
+    const existingClient = clients.get(network);
+    if (existingClient) return existingClient;
+  }
 
   const signer = createSigner(process.env.WALLET_KEY as `0x${string}`);
   const dbEncryptionKey = getEncryptionKeyFromHex(
     process.env.ENCRYPTION_KEY as string,
   );
-  const env: XmtpEnv = (process.env.XMTP_ENV as XmtpEnv) || "dev";
 
-  client = await Client.create(signer, {
+  const client = await Client.create(signer, {
     dbEncryptionKey,
-    env,
+    env: network,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
-    dbPath: getDbPath("ping-api-" + env),
+    dbPath: getDbPath(`ping-api-${network}`),
   });
 
+  clients.set(network, client);
   return client;
 };
 
-export default async function handler(req: Request) {
+async function handler(req: Request) {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,
@@ -74,7 +77,11 @@ export default async function handler(req: Request) {
   }
 
   try {
-    const { address } = (await req.json()) as { address: `0x${string}` };
+    const body = await req.json();
+    const { address, network = "dev" } = body as {
+      address: `0x${string}`;
+      network?: XmtpEnv;
+    };
 
     if (!address) {
       return new Response(JSON.stringify({ error: "Address is required" }), {
@@ -83,7 +90,19 @@ export default async function handler(req: Request) {
       });
     }
 
-    const client = await initClient();
+    if (network !== "dev" && network !== "production") {
+      return new Response(
+        JSON.stringify({ error: "Network must be 'dev' or 'production'" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    console.log(`Pinging ${address} on ${network}...`);
+
+    const client = await initClient(network);
     const startTime = Date.now();
 
     // Create or get conversation
@@ -96,30 +115,43 @@ export default async function handler(req: Request) {
     await conversation.send("ping");
 
     const responseTime = Date.now() - startTime;
+    console.log(`Ping completed in ${responseTime}ms`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        address,
-        responseTime: `${responseTime}ms`,
-        timestamp: new Date().toISOString(),
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    const response = {
+      success: true,
+      address,
+      network,
+      responseTime,
+      timestamp: new Date().toISOString(),
+    };
+
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("Ping error:", error);
-    return new Response(
-      JSON.stringify({
-        error: "Failed to ping address",
-        details: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Ping error: ${errorMessage}`);
+
+    const errorResponse = {
+      error: "Failed to ping address",
+      details: errorMessage,
+      timestamp: new Date().toISOString(),
+    };
+
+    return new Response(JSON.stringify(errorResponse), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
+
+// Bun server configuration for Railway Functions
+const server = Bun.serve({
+  port: 3000,
+  fetch: handler,
+});
+
+console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
+
+export { handler };
