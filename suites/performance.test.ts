@@ -66,6 +66,27 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
+
+    it(`inboxStateFromInboxIds(${populateSize}):measure inbox state`, async () => {
+      const inboxState =
+        await creator!.client.preferences.inboxStateFromInboxIds(
+          [creator!.client.inboxId],
+          true,
+        );
+      expect(inboxState[0].inboxId).toBe(creator!.client.inboxId);
+    });
+
+    it(`keyPackageStatuses(${populateSize}):measure keyPackageStatuses`, async () => {
+      const keyPackageStatuses =
+        await creator!.client.getKeyPackageStatusesForInstallationIds([
+          creator!.installationId,
+        ]);
+      console.log("keyPackageStatuses", keyPackageStatuses);
+    });
+    it(`inboxState(${populateSize}):measure inboxState`, async () => {
+      const inboxState = await creator!.client.preferences.inboxState();
+      console.log("inboxState", inboxState);
+    });
     it(`populate(${populateSize}): measure populating a client`, async () => {
       await creator!.worker.populate(populateSize);
       const messagesAfter = await creator!.client.conversations.list();
