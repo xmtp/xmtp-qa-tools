@@ -59,30 +59,24 @@ describe(testName, () => {
   });
 
   beforeAll(async () => {
-    uniqueNames = ["edward", "bob", "alice", "charlie", "diana", "fiona"];
+    uniqueNames = ["edward", "bob", "charlie", "alice", "diana", "fiona"];
+
     for (const [i, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;
+
       const creatorName = uniqueNames[i] + populateSize.toString();
       uniqueNames[i] = creatorName;
-      const coworkers = await getWorkers([creatorName], {
-        randomNames: false,
-      });
-      creator = coworkers.get(creatorName);
-      if (!creator) {
-        throw new Error("Creator not found");
-      }
-      await creator.worker.populate(populateSize);
-      const messagesAfter = await creator.client.conversations.list();
-      console.log("messagesAfter", creatorName, messagesAfter.length);
-    }
 
-    workers = await getWorkers(6, {
-      randomNames: false,
-    });
-    const receiverName = uniqueNames.find((name) => !name.endsWith("0"))!;
-    receiver = workers.get(receiverName)!;
+      const coworkers = await getWorkers([creatorName]);
+      const creator = coworkers.get(creatorName);
+      if (!creator) {
+        throw new Error(`Creator ${creatorName} not found`);
+      }
+
+      await creator.worker.populate(populateSize);
+    }
   });
-  return;
+
   for (const populateSize of POPULATE_SIZE) {
     it(`create(${populateSize}): measure creating a client`, () => {
       const creatorName = uniqueNames.find((name) =>
@@ -183,7 +177,7 @@ describe(testName, () => {
 
         newGroup = (await creator!.client.conversations.newGroup([
           ...allMembers,
-          ...workers.getAllButCreator().map((w) => w.client.inboxId),
+          ...workers!.getAllButCreator().map((w) => w.client.inboxId),
         ])) as Group;
         expect(newGroup.id).toBeDefined();
         // Add current group to cumulative tracking
@@ -220,7 +214,7 @@ describe(testName, () => {
         expect(groupMessage).toBeDefined();
       });
       it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
-        await newGroup.addMembers([workers.getAll()[2].inboxId]);
+        await newGroup.addMembers([workers!.getAll()[2].inboxId]);
       });
       it(`removeMembers-${i}(${populateSize}):remove a participant from a group`, async () => {
         const previousMembers = await newGroup.members();
@@ -238,7 +232,7 @@ describe(testName, () => {
         const extraMember = allMembersWithExtra.slice(i, i + 1);
         const verifyResult = await verifyMembershipStream(
           newGroup,
-          workers.getAllButCreator(),
+          workers!.getAllButCreator(),
           extraMember,
         );
 
@@ -249,14 +243,14 @@ describe(testName, () => {
       it(`streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`, async () => {
         const verifyResult = await verifyMessageStream(
           newGroup,
-          workers.getAllButCreator(),
+          workers!.getAllButCreator(),
         );
 
         sendMetric("response", verifyResult.averageEventTiming, {
           test: testName,
           metric_type: "stream",
           metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
+          sdk: workers!.getCreator().sdk,
         } as ResponseMetricTags);
 
         console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
@@ -267,7 +261,7 @@ describe(testName, () => {
       it(`streamMetadata-${i}(${populateSize}): stream members of metadata changes in ${i} member group`, async () => {
         const verifyResult = await verifyMetadataStream(
           newGroup,
-          workers.getAllButCreator(),
+          workers!.getAllButCreator(),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);
