@@ -32,7 +32,7 @@ export const setupTestLifecycle = ({
   sdk,
   getCustomDuration,
   setCustomDuration,
-  sendMetrics = false,
+  initDataDog = false,
   sendDurationMetrics = false,
   networkStats = false,
   createSummaryTable = false,
@@ -42,7 +42,7 @@ export const setupTestLifecycle = ({
   sdk?: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
-  sendMetrics?: boolean;
+  initDataDog?: boolean;
   sendDurationMetrics?: boolean;
   networkStats?: boolean;
   createSummaryTable?: boolean;
@@ -50,7 +50,7 @@ export const setupTestLifecycle = ({
 }) => {
   beforeAll(() => {
     loadEnv(testName);
-    if (sendMetrics) initDataDog();
+    if (initDataDog) initDataDog();
   });
   let skipNetworkStats = false;
   let start: number;
@@ -107,7 +107,7 @@ export const setupTestLifecycle = ({
       }
     }
 
-    if (sendMetrics && sendDurationMetrics) {
+    if (initDataDog && sendDurationMetrics) {
       sendMetric("duration", duration, {
         metric_type: "operation",
         metric_subtype: operationType,
@@ -122,7 +122,7 @@ export const setupTestLifecycle = ({
 
     // Network stats handling for performance tests
     if (
-      sendMetrics &&
+      initDataDog &&
       sendDurationMetrics &&
       networkStats &&
       !skipNetworkStats

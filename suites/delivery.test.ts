@@ -14,7 +14,7 @@ const testName = "delivery";
 describe(testName, async () => {
   setupTestLifecycle({
     testName,
-    sendMetrics: true,
+    initDataDog: true,
     sendDurationMetrics: false,
   });
   const ERROR_TRESHOLD = parseInt(process.env.ERROR_TRESHOLD ?? "90");

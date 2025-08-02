@@ -78,9 +78,14 @@ async function handler(req: Request) {
 
   try {
     const body = await req.json();
-    const { address, network = "dev" } = body as {
+    const {
+      address,
+      network = "dev",
+      message,
+    } = body as {
       address: `0x${string}`;
       network?: XmtpEnv;
+      message: string;
     };
 
     if (!address) {
@@ -112,7 +117,7 @@ async function handler(req: Request) {
     });
 
     // Send ping message
-    await conversation.send("ping");
+    await conversation.send(message);
 
     const responseTime = Date.now() - startTime;
     console.log(`Ping completed in ${responseTime}ms`);
@@ -146,12 +151,12 @@ async function handler(req: Request) {
   }
 }
 
-// // Bun server configuration for Railway Functions
-// const server = Bun.serve({
-//   port: 3000,
-//   fetch: handler,
-// });
+// Bun server configuration for Railway Functions
+const server = Bun.serve({
+  port: 3000,
+  fetch: handler,
+});
 
-// console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
+console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
 
-// export { handler };
+export { handler };

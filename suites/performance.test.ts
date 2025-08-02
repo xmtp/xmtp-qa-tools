@@ -43,7 +43,7 @@ describe(testName, () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    sendMetrics: true,
+    initDataDog: true,
     sendDurationMetrics: true,
     networkStats: true,
   });

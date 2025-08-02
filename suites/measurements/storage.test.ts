@@ -33,7 +33,7 @@ const inboxSizes = {
 
 const testName = "storage";
 describe(testName, () => {
-  setupTestLifecycle({ testName, sendMetrics: true });
+  setupTestLifecycle({ testName, initDataDog: true });
 
   // Performance measurement data collection
   const performanceMeasurements: Record<
