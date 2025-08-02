@@ -68,7 +68,7 @@ const initClient = async (network: XmtpEnv = "dev") => {
   return client;
 };
 
-async function handler(req: Request) {
+export async function handler(req: Request) {
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405,

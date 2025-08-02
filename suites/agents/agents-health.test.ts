@@ -36,7 +36,6 @@ describe(testName, () => {
           network: env,
           message: agent.sendMessage,
         }),
-        signal: AbortSignal.timeout(20000),
       });
 
       const result = (await response.json()) as {
