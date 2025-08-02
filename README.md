@@ -92,12 +92,12 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./docs/monitoring.md)
-- Measurements: Performance metrics and targets - see [section](./docs/measurements.md)
+- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./suites/README.md)
+- Measurements: Performance metrics and targets - see [section](./suites/measurements/README.md)
 - Agents: Agent QA & monitoring - see [section](./suites/agents/README.md)
 - Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
 - Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
-- Version management: How to manage SDK and bindings versions - see [section](./docs/version-management.md)
+- Version management: How to manage SDK and bindings versions - see [section](./workers/README.md)
 - CLI: Command line interface for testing - see [section](./cli/readme.md)
 
 ## Tools & utilities
