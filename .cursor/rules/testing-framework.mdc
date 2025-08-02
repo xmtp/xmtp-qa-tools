@@ -504,36 +504,6 @@ import { IdentifierKind } from "@workers/versions";
 workers.getReceiver().worker.startStream(typeofStream.Message);
 ```
 
-# Testing Worker Framework Rules
-
-## Core Testing Pattern
-
-```typescript
-import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkerNames, getWorkers } from "@workers/manager";
-import { describe, it } from "vitest";
-
-const testName = "my-test";
-
-describe(testName, async () => {
-  // Simplified API - versioning enabled by default
-  const workers = await getWorkers(["alice", "bob"]);
-
-  setupTestLifecycle({ testName });
-
-  it("do something", async () => {
-    // Test logic here
-  });
-});
-```
-
-## Workers
-
-The `getWorkers` function has three input modes with optional configuration:
-
-### Input Modes
-
 ```typescript
 // 1. Number - creates that many workers with random names (default)
 const workers = await getWorkers(5);
