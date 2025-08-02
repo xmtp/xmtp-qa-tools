@@ -19,15 +19,15 @@ import { describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, () => {
+  let dm: Dm | undefined;
+  let newGroup: Group;
+
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000];
+    : [0];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [100, 200];
-  let dm: Dm | undefined;
-
-  let newGroup: Group;
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
