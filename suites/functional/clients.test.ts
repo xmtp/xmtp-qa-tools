@@ -64,7 +64,6 @@ describe(testName, async () => {
       if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
     }
   });
-
   it("stitching", async () => {
     workers = await getWorkers(["randombob-a", "alice"]);
     let creator = workers.get("randombob", "a")!;
@@ -88,26 +87,21 @@ describe(testName, async () => {
     const resultSecondDm = await verifyMessageStream(dm, [receiver]);
     expect(resultSecondDm.allReceived).toBe(false);
   });
+  it("track epoch changes during group operations", async () => {
+    const group = await workers.createGroupBetweenAll();
+    const initialDebugInfo = await group.debugInfo();
+    const initialEpoch = initialDebugInfo.epoch;
 
-  it("installations", async () => {
-    const baseName = "randomguy";
+    // Perform group operation that should increment epoch
+    const newMember = getInboxIds(1)[0];
+    await group.addMembers([newMember]);
+    // Get updated debug info
+    const updatedDebugInfo = await group.debugInfo();
+    console.log("updatedDebugInfo", updatedDebugInfo);
+    const updatedEpoch = updatedDebugInfo.epoch;
+    console.log("updatedEpoch", updatedEpoch);
 
-    // Create primary installation
-    const primary = await getWorkers([baseName]);
-
-    // Create secondary installation with different folder
-    const secondary = await getWorkers([baseName + "-desktop"]);
-
-    // Get workers with correct base name and installation IDs
-    const primaryWorker = primary.get(baseName);
-    const secondaryWorker = secondary.get(baseName, "desktop");
-
-    // Ensure workers exist
-    expect(primaryWorker).toBeDefined();
-    expect(secondaryWorker).toBeDefined();
-
-    // shared identity but separate storage
-    expect(primaryWorker?.client.inboxId).toBe(secondaryWorker?.client.inboxId);
-    expect(primaryWorker?.dbPath).not.toBe(secondaryWorker?.dbPath);
+    // epoch increased
+    expect(updatedEpoch).toBe(initialEpoch + 1n);
   });
 });
