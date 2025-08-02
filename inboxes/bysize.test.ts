@@ -1,8 +1,4 @@
-import {
-  getBysizeWorkerName,
-  getBysizeWorkerNames,
-  getRandomAddress,
-} from "@inboxes/utils";
+import { getBysizeWorkerName, getBysizeWorkerNames } from "@inboxes/utils";
 import {
   getRandomNames,
   getWorkers,

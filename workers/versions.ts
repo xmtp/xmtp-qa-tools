@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
@@ -207,6 +209,12 @@ export const regressionClient = async (
     );
   }
 
+  // Ensure the database directory exists
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+
   const versionConfig = VersionList.find((v) => v.nodeSDK === nodeSDK);
   if (!versionConfig) {
     throw new Error(`SDK version ${nodeSDK} not found in VersionList`);
@@ -215,15 +223,47 @@ export const regressionClient = async (
   let client = null;
 
   const signer = createSigner(walletKey);
-  // @ts-expect-error - TODO: fix this
-  client = await ClientClass.create(signer, {
-    dbEncryptionKey,
-    dbPath,
-    env,
-    loggingLevel,
-    apiUrl,
-    codecs: [new ReactionCodec(), new ReplyCodec()],
-  });
+
+  try {
+    // @ts-expect-error - TODO: fix this
+    client = await ClientClass.create(signer, {
+      dbEncryptionKey,
+      dbPath,
+      env,
+      loggingLevel,
+      apiUrl,
+      codecs: [new ReactionCodec(), new ReplyCodec()],
+    });
+  } catch (error) {
+    // If database file is corrupted, try using a different path
+    if (
+      error instanceof Error &&
+      error.message.includes("Unable to open the database file")
+    ) {
+      console.debug(
+        `Database file corrupted, trying alternative path: ${dbPath}`,
+      );
+
+      // Try with a different database path by adding a timestamp
+      const timestamp = Date.now();
+      const alternativeDbPath = `${dbPath}-${timestamp}`;
+
+      console.debug(`Using alternative database path: ${alternativeDbPath}`);
+
+      // Try to create the client with the alternative path
+      // @ts-expect-error - TODO: fix this
+      client = await ClientClass.create(signer, {
+        dbEncryptionKey,
+        dbPath: alternativeDbPath,
+        env,
+        loggingLevel,
+        apiUrl,
+        codecs: [new ReactionCodec(), new ReplyCodec()],
+      });
+    } else {
+      throw error;
+    }
+  }
 
   if (!client) {
     throw new Error(`Failed to create client for SDK version ${nodeSDK}`);

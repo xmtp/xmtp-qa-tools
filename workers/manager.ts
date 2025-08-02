@@ -543,6 +543,16 @@ export class WorkerManager implements IWorkerManager {
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
 
+    // Debug: Log the keys being used for bysize workers
+    if (baseName.toLowerCase().includes("bysize")) {
+      console.debug(
+        `[${baseName}] Using wallet key: ${walletKey.substring(0, 10)}...`,
+      );
+      console.debug(
+        `[${baseName}] Using encryption key: ${encryptionKey.substring(0, 10)}...`,
+      );
+    }
+
     // Check if this is a bysize worker to get the dbPath
     let customDbPath: string | undefined;
     if (baseName.toLowerCase().includes("bysize")) {
