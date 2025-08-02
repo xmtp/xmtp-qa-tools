@@ -1200,18 +1200,19 @@ export class WorkerClient extends Worker implements IWorkerClient {
     console.log(`Before: ${messagesBefore.length}`);
     console.log(`Populating ${this.name} with ${count} conversations...`);
 
-    if (count > messagesBefore.length) {
+    if (count <= messagesBefore.length) {
       console.log(
         `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
       );
       return;
     }
+    let diff = count - messagesBefore.length;
 
     const prefix = "random";
     // Create conversations where this worker receives messages
     // We need to create DMs TO this worker, not FROM this worker
     const senders = await getWorkers(
-      Array.from({ length: count }, (_, i) => `${prefix}${i}`),
+      Array.from({ length: diff }, (_, i) => `${prefix}${i}`),
     );
 
     const senderWorkers = senders.getAll();
