@@ -1242,7 +1242,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       // Create conversations for this batch
       await Promise.all(
         senderWorkers.map(async (sender, i) => {
-          console.log(`Creating conversation ${i + 1} of ${batchSize}...`);
+          console.debug(`Creating conversation ${i + 1} of ${batchSize}...`);
           await sender.client.conversations.newDmWithIdentifier({
             identifier: this.address,
             identifierKind: IdentifierKind.Ethereum,

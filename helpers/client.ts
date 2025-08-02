@@ -279,12 +279,12 @@ function loadDataPath(name: string, installationId: string): string {
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
 
   // Check if name includes "random" and add subfolder if it does
-  const randomSubfolder = name.toLowerCase().includes("random")
-    ? "/random"
-    : "";
+  const randomSubfolder = baseName.toLowerCase().includes("random")
+    ? "random/" + name
+    : name;
 
   // Use baseName for the parent folder, not the full name
-  let basePath = `${preBasePath}/.data/${baseName}${randomSubfolder}/${installationId}`;
+  let basePath = `${preBasePath}/.data/${randomSubfolder}/${installationId}`;
 
   return basePath;
 }
