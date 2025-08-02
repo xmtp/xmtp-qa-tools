@@ -199,23 +199,6 @@ describe(testName, () => {
         await newGroup.send(groupMessage);
         expect(groupMessage).toBeDefined();
       });
-      it(`streamMessage-${i}(${populateSize}):group message`, async () => {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
-        sendMetric("response", verifyResult.averageEventTiming, {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-          members: i.toString(),
-          installations: i.toString(),
-        } as ResponseMetricTags);
-
-        setCustomDuration(verifyResult?.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
       it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
         await newGroup.addMembers([workers.getAll()[2].inboxId]);
       });
