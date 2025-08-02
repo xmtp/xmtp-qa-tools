@@ -72,16 +72,6 @@
     "respondOnTagged": false
   },
   {
-    "name": "onit.prediction",
-    "baseName": "onit.base.eth",
-    "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
-    "sendMessage": "hey there how are you?",
-    "live": false,
-    "networks": ["production"],
-    "slackChannel": "#onit-alerts",
-    "respondOnTagged": true
-  },
-  {
     "name": "onit",
     "baseName": "onit.base.eth",
     "address": "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
@@ -117,7 +107,7 @@
     "address": "0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b",
     "sendMessage": "hola",
     "live": false,
-    "networks": ["local"],
+    "networks": ["production"],
     "slackChannel": "#local-alerts",
     "respondOnTagged": false
   },

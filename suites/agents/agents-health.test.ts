@@ -6,7 +6,7 @@ import { type AgentConfig } from "./helper";
 
 const testName = "agents-health";
 describe(testName, () => {
-  setupTestLifecycle({ testName, sendMetrics: true });
+  setupTestLifecycle({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as string;
 
   const API_ENDPOINT =
@@ -34,6 +34,7 @@ describe(testName, () => {
         body: JSON.stringify({
           address: agent.address,
           network: env,
+          message: agent.sendMessage,
         }),
         signal: AbortSignal.timeout(20000),
       });
@@ -43,8 +44,10 @@ describe(testName, () => {
         address: string;
         responseTime: number;
         timestamp: string;
+        message: string;
       };
-
+      console.log(JSON.stringify(result, null, 2));
+      expect(result.success).toBe(true);
       sendMetric("response", Number(result.responseTime), {
         test: testName,
         metric_type: "agent",
