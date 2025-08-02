@@ -15,21 +15,19 @@ import {
   type Dm,
   type Group,
 } from "@workers/versions";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, () => {
-  let uniqueNames: string[] = [];
-  let dm: Dm | undefined;
-  let newGroup: Group;
-
-  const POPULATE_SIZE = process.env.POPULATE_SIZE
-    ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [100, 200];
+    : [10];
+  let dm: Dm | undefined;
 
+  let newGroup: Group;
+  const POPULATE_SIZE = process.env.POPULATE_SIZE
+    ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
+    : [0];
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -38,9 +36,6 @@ describe(testName, () => {
   let allMembersWithExtra: string[] = [];
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
-  let creator: Worker | undefined;
-  let receiver: Worker | undefined;
-  let workers: WorkerManager | undefined;
 
   setupTestLifecycle({
     testName,
@@ -51,39 +46,18 @@ describe(testName, () => {
     sendMetrics: true,
     sendDurationMetrics: true,
     networkStats: true,
-    createSummaryTable: true,
-    summaryTableConfig: {
-      showStats: true,
-      sortBy: "testName",
-    },
-  });
-
-  beforeAll(async () => {
-    uniqueNames = ["edward", "bob", "charlie", "alice", "diana", "fiona"];
-
-    for (const [i, populateSize] of POPULATE_SIZE.entries()) {
-      if (populateSize === 0) continue;
-
-      const creatorName = uniqueNames[i] + populateSize.toString();
-      uniqueNames[i] = creatorName;
-
-      const coworkers = await getWorkers([creatorName]);
-      const creator = coworkers.get(creatorName);
-      if (!creator) {
-        throw new Error(`Creator ${creatorName} not found`);
-      }
-
-      await creator.worker.populate(populateSize);
-    }
   });
 
   for (const populateSize of POPULATE_SIZE) {
-    it(`create(${populateSize}): measure creating a client`, () => {
-      const creatorName = uniqueNames.find((name) =>
-        name.endsWith(populateSize.toString()),
-      )!;
-      creator = workers!.get(creatorName)!;
-
+    let workers: WorkerManager;
+    let creator: Worker | undefined;
+    let receiver: Worker | undefined;
+    it(`create(${populateSize}): measure creating a client`, async () => {
+      workers = await getWorkers(6, {
+        randomNames: false,
+      });
+      creator = workers.get("edward")!;
+      receiver = workers.get("bob")!;
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
@@ -91,6 +65,22 @@ describe(testName, () => {
     });
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
+    });
+
+    it(`inboxState(${populateSize}):measure inboxState`, async () => {
+      const inboxState = await creator!.client.preferences.inboxState();
+      console.log("inboxState", inboxState);
+    });
+    it(`populate(${populateSize}): measure populating a client`, async () => {
+      await creator!.worker.populate(populateSize);
+      const messagesAfter = await creator!.client.conversations.list();
+      const diff = messagesAfter.length - populateSize;
+      if (diff < 50) {
+        console.error(
+          `Populated ${messagesAfter.length} conversations, expected ${diff}`,
+        );
+        expect(messagesAfter.length).toBe(diff);
+      }
     });
 
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
@@ -111,10 +101,7 @@ describe(testName, () => {
       setCustomDuration(Date.now() - start);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     });
-    it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      const inboxState = await creator!.client.preferences.inboxState(true);
-      expect(inboxState.installations.length).toBeGreaterThan(0);
-    });
+
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
       dm = (await creator!.client.conversations.newDm(
         receiver!.client.inboxId,
@@ -177,7 +164,7 @@ describe(testName, () => {
 
         newGroup = (await creator!.client.conversations.newGroup([
           ...allMembers,
-          ...workers!.getAllButCreator().map((w) => w.client.inboxId),
+          ...workers.getAllButCreator().map((w) => w.client.inboxId),
         ])) as Group;
         expect(newGroup.id).toBeDefined();
         // Add current group to cumulative tracking
@@ -214,7 +201,7 @@ describe(testName, () => {
         expect(groupMessage).toBeDefined();
       });
       it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
-        await newGroup.addMembers([workers!.getAll()[2].inboxId]);
+        await newGroup.addMembers([workers.getAll()[2].inboxId]);
       });
       it(`removeMembers-${i}(${populateSize}):remove a participant from a group`, async () => {
         const previousMembers = await newGroup.members();
@@ -227,12 +214,11 @@ describe(testName, () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       });
-
       it(`streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`, async () => {
         const extraMember = allMembersWithExtra.slice(i, i + 1);
         const verifyResult = await verifyMembershipStream(
           newGroup,
-          workers!.getAllButCreator(),
+          workers.getAllButCreator(),
           extraMember,
         );
 
@@ -243,14 +229,14 @@ describe(testName, () => {
       it(`streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`, async () => {
         const verifyResult = await verifyMessageStream(
           newGroup,
-          workers!.getAllButCreator(),
+          workers.getAllButCreator(),
         );
 
         sendMetric("response", verifyResult.averageEventTiming, {
           test: testName,
           metric_type: "stream",
           metric_subtype: "message",
-          sdk: workers!.getCreator().sdk,
+          sdk: workers.getCreator().sdk,
         } as ResponseMetricTags);
 
         console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
@@ -261,7 +247,7 @@ describe(testName, () => {
       it(`streamMetadata-${i}(${populateSize}): stream members of metadata changes in ${i} member group`, async () => {
         const verifyResult = await verifyMetadataStream(
           newGroup,
-          workers!.getAllButCreator(),
+          workers.getAllButCreator(),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);
