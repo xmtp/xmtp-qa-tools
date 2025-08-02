@@ -183,6 +183,6 @@ async function handler(req: Request) {
 //   fetch: handler,
 // });
 
-console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
+//console.log(`🚀 XMTP Ping API server running on port ${server.port}`);
 
-export { handler };
+//export { handler };
