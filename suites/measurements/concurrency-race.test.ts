@@ -3,7 +3,6 @@ import {
   getEncryptionKeyFromHex,
   getManualUsers,
 } from "@helpers/client";
-import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
@@ -113,6 +112,7 @@ describe(testName, () => {
         const maxMessages = 10; // Just collect a few to verify it works
 
         for await (const message of stream) {
+          console.log("Message", message);
           messageCount++;
           if (messageCount >= maxMessages) {
             break;

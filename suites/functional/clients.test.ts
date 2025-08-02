@@ -1,8 +1,7 @@
-import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getVersions, type Dm } from "@workers/versions";
+import { getVersions } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
