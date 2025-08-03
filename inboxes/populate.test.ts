@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 describe("populate", () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 20000];
+    : [0, 10000];
   let uniqueNames: string[] = [];
   let workers: WorkerManager | undefined;
 
@@ -12,7 +12,7 @@ describe("populate", () => {
     Math.max(5, Math.floor(expectedSize * 0.1));
 
   beforeAll(async () => {
-    uniqueNames = ["edward", "bob", "charlie", "alice", "diana", "fiona"];
+    uniqueNames = ["edward", "diana"];
 
     for (const [i, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;

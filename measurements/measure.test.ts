@@ -29,7 +29,7 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0];
+    : [0, 500, 1000, 2000, 5000, 10000, 20000];
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
@@ -73,6 +73,13 @@ describe(testName, () => {
     });
     it(`sync(${populateSize}):measure sync`, async () => {
       await creator!.client.conversations.sync();
+      const listConversations = await creator!.client.conversations.list();
+      console.warn(
+        "worker.name",
+        creator!.name,
+        "listConversations ",
+        listConversations.length,
+      );
     });
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
