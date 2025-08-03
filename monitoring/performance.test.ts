@@ -18,7 +18,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

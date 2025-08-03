@@ -4,7 +4,7 @@ import {
   type Group,
   type LogLevel,
   type XmtpEnv,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import "dotenv/config";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";

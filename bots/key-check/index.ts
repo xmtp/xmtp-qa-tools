@@ -5,7 +5,7 @@ import {
   type Conversation,
   type DecodedMessage,
   type GroupMember,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 // Get XMTP SDK version from package.json

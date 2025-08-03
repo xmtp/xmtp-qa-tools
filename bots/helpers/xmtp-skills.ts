@@ -3,7 +3,7 @@ import {
   type Conversation,
   type DecodedMessage,
   type Group,
-} from "@workers/versions";
+} from "version-management/client-versions";
 
 /**
  * Skill-related options for message processing

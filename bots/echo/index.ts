@@ -2,7 +2,7 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { initializeClient } from "../helpers/xmtp-handler";
 
 let count = 0;

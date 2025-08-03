@@ -1,4 +1,7 @@
-import { IdentifierKind, type XmtpEnv } from "@workers/versions";
+import {
+  IdentifierKind,
+  type XmtpEnv,
+} from "version-management/client-versions";
 import "dotenv/config";
 import {
   createSigner,

@@ -8,7 +8,7 @@ import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";

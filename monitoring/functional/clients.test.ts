@@ -1,7 +1,7 @@
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { getVersions } from "@workers/versions";
+import { getVersions } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";

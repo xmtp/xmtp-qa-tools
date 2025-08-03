@@ -2,7 +2,7 @@ import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { getVersions, type Group } from "@workers/versions";
+import { getVersions, type Group } from "version-management/client-versions";
 import { describe, it } from "vitest";
 
 // Count of groups to create

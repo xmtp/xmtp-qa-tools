@@ -1,4 +1,4 @@
-import { getVersions } from "@workers/versions";
+import { getVersions } from "version-management/client-versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 import { loadEnv } from "./client";
 import {

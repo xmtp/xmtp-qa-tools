@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Dm, type Group } from "@workers/versions";
+import { type Dm, type Group } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";
