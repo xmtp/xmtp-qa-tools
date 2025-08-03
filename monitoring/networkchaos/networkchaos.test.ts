@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
-import { DockerContainer } from "../../network-stability-utilities/container";
+import { DockerContainer } from "../../network-stability/container";
 
 const testName = "networkchaos";
 describe(testName, async () => {

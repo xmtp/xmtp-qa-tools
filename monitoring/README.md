@@ -4,19 +4,19 @@ Monitoring setup that tells us when things are working well and alerts us immedi
 
 ## Automated workflows
 
-| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                                        | Run frequency | Networks           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)              | Every 2 hours | `dev` `production` |
-| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/performance.test.ts)    | Every 30 min  | `dev` `production` |
-| Delivery    | [![Dev Delivery](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)      | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/delivery.test.ts)          | Every 30 min  | `dev` `production` |
-| Agents      | [![Agents](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)                | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                      | Every 5 min   | `dev` `production` |
-| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
+| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                                            | Run frequency | Networks           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------ |
+| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/functional)              | Every 2 hours | `dev` `production` |
+| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/performance.test.ts)    | Every 30 min  | `dev` `production` |
+| Delivery    | [![Dev Delivery](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)      | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/delivery.test.ts)          | Every 30 min  | `dev` `production` |
+| Agents      | [![Agents](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)                | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)                      | Every 5 min   | `dev` `production` |
+| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
 
 Our test suite is organized into 6 primary categories that validate XMTP protocol functionality, performance, and reliability across different scales and environments.
 
 ## 1. Performance
 
-Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
+Link to test code [../monitoring/performance.test.ts](../monitoring/performance.test.ts)
 
 **Purpose**: Measures operation timing and throughput for dms and small groups (5-10 members).
 
@@ -47,7 +47,7 @@ Link to test code [../suites/performance.test.ts](../suites/performance.test.ts)
 
 ## 2. Delivery
 
-Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
+Link to test code [../monitoring/delivery.test.ts](../monitoring/delivery.test.ts)
 
 **Purpose**: Validates message delivery reliability, ordering accuracy, and recovery mechanisms.
 
@@ -69,7 +69,7 @@ Link to test code [../suites/delivery.test.ts](../suites/delivery.test.ts)
 
 ### Client management
 
-Link to test code [../suites/functional/clients.test.ts](../suites/functional/clients.test.ts)
+Link to test code [../monitoring/functional/clients.test.ts](../monitoring/functional/clients.test.ts)
 
 - `downgrade last versions`
 - `upgrade last versions`
@@ -77,7 +77,7 @@ Link to test code [../suites/functional/clients.test.ts](../suites/functional/cl
 
 ### Streams
 
-Link to test code [../suites/functional/streams.test.ts](../suites/functional/streams.test.ts)
+Link to test code [../monitoring/functional/streams.test.ts](../monitoring/functional/streams.test.ts)
 
 - `member addition notifications`
 - `consent state changes for direct messages`
@@ -90,14 +90,14 @@ Link to test code [../suites/functional/streams.test.ts](../suites/functional/st
 
 ### Sync
 
-Link to test code [../suites/functional/sync.test.ts](../suites/functional/sync.test.ts)
+Link to test code [../monitoring/functional/sync.test.ts](../monitoring/functional/sync.test.ts)
 
 - `stitching: client.conversations.sync()`
 - `group welcome message`
 
 ### Conversations
 
-Link to test code [../suites/functional/convos.test.ts](../suites/functional/convos.test.ts)
+Link to test code [../monitoring/functional/convos.test.ts](../monitoring/functional/convos.test.ts)
 
 - `new dm`
 - `new group`
@@ -110,7 +110,7 @@ Link to test code [../suites/functional/convos.test.ts](../suites/functional/con
 
 ## 4. Browser
 
-Link to test code [../suites/functional/browser.test.ts](../suites/functional/browser.test.ts)
+Link to test code [../monitoring/functional/browser.test.ts](../monitoring/functional/browser.test.ts)
 
 **Purpose**: Validates XMTP functionality in the browser SDK using Playwright automation.
 
@@ -144,7 +144,7 @@ Link to test code [../suites/functional/browser.test.ts](../suites/functional/br
 
 ## 6. Network chaos test suite
 
-Link to test code [../suites/networkchaos](../suites/networkchaos)
+Link to test code [../monitoring/networkchaos](../monitoring/networkchaos)
 
 **Purpose**: Validates XMTP protocol resilience under adverse network conditions using local 4-node XMTP-go cluster with simulated network partitions, delays, and failures.
 

@@ -2,10 +2,10 @@
 
 ## Automated workflows
 
-| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                        | Run frequency | Networks           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)      | Every 30 min  | `dev` `production` |
-| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents) | Every 4 hours | `dev` `production` |
+| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency | Networks           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
+| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)      | Every 30 min  | `dev` `production` |
+| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 4 hours | `dev` `production` |
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
@@ -23,7 +23,7 @@
 
 ## 1. Direct message testing
 
-Link to test code [../suites/agents/agents-dms.test.ts](../suites/agents/agents-dms.test.ts)
+Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
 
 ### Test flow:
 
@@ -39,7 +39,7 @@ Link to test code [../suites/agents/agents-dms.test.ts](../suites/agents/agents-
 
 ## 2. Tagged message testing
 
-Link to test code [../suites/agents/agents-tagged.test.ts](../suites/agents/agents-tagged.test.ts)
+Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
 
 ### Test flow:
 
@@ -56,7 +56,7 @@ Link to test code [../suites/agents/agents-tagged.test.ts](../suites/agents/agen
 
 ## 3. Untagged message testing
 
-Link to test code [../suites/agents/agents-untagged.test.ts](../suites/agents/agents-untagged.test.ts)
+Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/agents/agents-untagged.test.ts)
 
 ### Test flow:
 

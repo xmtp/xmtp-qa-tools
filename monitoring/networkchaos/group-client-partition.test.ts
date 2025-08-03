@@ -3,7 +3,7 @@ import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
-import * as iptables from "../../network-stability-utilities/iptables";
+import * as iptables from "../../network-stability/iptables";
 
 const testName = "group-client-partition";
 describe(testName, async () => {

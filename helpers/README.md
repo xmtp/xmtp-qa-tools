@@ -78,11 +78,11 @@ export const PATTERNS = {
   KNOWN_ISSUES: [
     {
       testName: "Browser",
-      uniqueErrorLines: ["FAIL suites/browser/browser.test.ts"],
+      uniqueErrorLines: ["FAIL monitoring/browser/browser.test.ts"],
     },
     {
       testName: "Dms",
-      uniqueErrorLines: ["FAIL suites/functional/dms.test.ts"],
+      uniqueErrorLines: ["FAIL monitoring/functional/dms.test.ts"],
     },
   ],
   DEDUPE: ["sync worker error", "sqlcipher_mlock", "Collector timed out"],

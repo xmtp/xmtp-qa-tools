@@ -1,16 +1,21 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath, streamTimeout, getEncryptionKeyFromHex } from "@helpers/client";
-import { privateKeyToAccount } from "viem/accounts";
-import { regressionClient } from "@workers/versions";
+import {
+  createClient,
+  getDataPath,
+  getEncryptionKeyFromHex,
+  streamTimeout,
+} from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
 import {
   ConsentState,
   IdentifierKind,
+  regressionClient,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
 } from "@workers/versions";
+import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";
 import { getWorkers } from "@workers/manager";
@@ -530,9 +535,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
     if (this.dbPath) {
       // Use the custom dbPath if provided
       console.debug(`[${this.nameId}] Using custom dbPath: ${this.dbPath}`);
-      const account = privateKeyToAccount(this.walletKey as `0x${string}`);
-      const address = account.address;
-      
       // Create client with custom dbPath
       client = await regressionClient(
         this.sdk,
@@ -560,7 +562,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
     this.dbPath = dbPath;
     this.client = client as Client;
-    this.address = (client as any).address || privateKeyToAccount(this.walletKey as `0x${string}`).address;
+    this.address =
+      (client as any).address ||
+      privateKeyToAccount(this.walletKey as `0x${string}`).address;
 
     const installationId = this.client.installationId;
 

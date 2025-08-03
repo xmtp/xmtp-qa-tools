@@ -62,7 +62,7 @@ jobs:
 
       - name: Run ${{ matrix.test_file }}
         run: |
-          FILE=suites/networkchaos/${{ matrix.test_file }}
+          FILE=monitoring/networkchaos/${{ matrix.test_file }}
           echo "Running $FILE"
           if ! npx vitest run $FILE; then
             echo "Initial run failed for $FILE. Retrying after env reset..."

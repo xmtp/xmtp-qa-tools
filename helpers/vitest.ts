@@ -135,13 +135,22 @@ export function parseTestName(testName: string): ParsedTestName {
   let conversation_count = "";
 
   if (operationParts[1]) {
-    // Updated regex to handle optional conversation_count size: operationName-number(conversation_countSize)
+    // Handle different patterns:
+    // 1. Simple operation name: "create", "sync", "newDm"
+    // 2. Operation with number: "newGroup-10", "send-5"
+    // 3. Operation with number and parentheses: "newGroup-10(1000)"
     const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?\(?(\d+)?\)?$/);
     if (match) {
       [, operationName, members = "", conversation_count = ""] = match;
     } else {
+      // If regex doesn't match, use the entire part as operation name
       operationName = operationParts[1];
     }
+  }
+
+  // Ensure operationName is never empty - use a fallback
+  if (!operationName && operationParts[1]) {
+    operationName = operationParts[1];
   }
 
   return {
