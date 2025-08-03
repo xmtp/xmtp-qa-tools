@@ -1,57 +1,57 @@
 # Performance Test Results: performance
 
-**Generated:** 2025-08-03T02:03:39.500Z
+**Generated:** 2025-08-03T02:29:07.686Z
 
-**Summary:** 49 tests across 3 iterations
+**Summary:** 49 tests across 2 iterations
 
-| Test | Base | unknown | 1000 | Min | Max | Avg |
-| --- | --- | --- | --- | --- | --- | --- |
-| addMember-10 | 3 | - | - | 3 | 3 | 3 |
-| addMember-10 | - | - | 3 | 3 | 3 | 3 |
-| canMessage | 3 | - | - | 3 | 3 | 3 |
-| canMessage | - | - | 6 | 6 | 6 | 6 |
-| consent | - | 0 | - | 0 | 2 | 1 |
-| create | 110 | - | - | 110 | 110 | 110 |
-| create | - | - | 97 | 97 | 97 | 97 |
-| getConversationById | 1 | - | - | 1 | 1 | 1 |
-| getConversationById | - | - | 1 | 1 | 1 | 1 |
-| groupsync-10 | 5 | - | - | 5 | 5 | 5 |
-| groupsync-10 | - | - | 7 | 7 | 7 | 7 |
-| inboxState | 0 | - | - | 0 | 0 | 0 |
-| inboxState | - | - | 1 | 1 | 1 | 1 |
-| newDm | 0 | - | - | 0 | 0 | 0 |
-| newDm | - | - | 0 | 0 | 0 | 0 |
-| newDmByAddress | 60 | - | - | 60 | 60 | 60 |
-| newDmByAddress | - | - | 44 | 44 | 44 | 44 |
-| newGroup-10 | 93 | - | - | 93 | 93 | 93 |
-| newGroup-10 | - | - | 117 | 117 | 117 | 117 |
-| newGroupByAddress-10 | 85 | - | - | 85 | 85 | 85 |
-| newGroupByAddress-10 | - | - | 70 | 70 | 70 | 70 |
-| removeMembers-10 | 19 | - | - | 19 | 19 | 19 |
-| removeMembers-10 | - | - | 92 | 92 | 92 | 92 |
-| send-10 | 12 | - | - | 12 | 12 | 12 |
-| send-10 | - | - | 2 | 2 | 2 | 2 |
-| send | 15 | - | - | 15 | 15 | 15 |
-| send | - | - | 16 | 16 | 16 | 16 |
-| stream | 29 | - | - | 29 | 29 | 29 |
-| stream | - | - | 27 | 27 | 27 | 27 |
-| streamMembership-10 | 68 | - | - | 68 | 68 | 68 |
-| streamMembership-10 | - | - | 75 | 75 | 75 | 75 |
-| streamMessage-10 | 29 | - | - | 29 | 29 | 29 |
-| streamMessage-10 | - | - | 45 | 45 | 45 | 45 |
-| streamMetadata-10 | 55 | - | - | 55 | 55 | 55 |
-| streamMetadata-10 | - | - | 72 | 72 | 72 | 72 |
-| sync-10 | 55 | - | - | 55 | 55 | 55 |
-| sync-10 | - | - | 57 | 57 | 57 | 57 |
-| sync | 3 | - | - | 3 | 3 | 3 |
-| sync | - | - | 2 | 2 | 2 | 2 |
-| syncAll-10 | 71 | - | - | 71 | 71 | 71 |
-| syncAll-10 | - | - | 103 | 103 | 103 | 103 |
-| syncAll | 9 | - | - | 9 | 9 | 9 |
-| syncAll | - | - | 17 | 17 | 17 | 17 |
-| syncAllCumulative-10 | 81 | - | - | 81 | 81 | 81 |
-| syncAllCumulative-10 | - | - | 88 | 88 | 88 | 88 |
-| syncCumulative-10 | 51 | - | - | 51 | 51 | 51 |
-| syncCumulative-10 | - | - | 135 | 135 | 135 | 135 |
-| updateName-10 | 15 | - | - | 15 | 15 | 15 |
-| updateName-10 | - | - | 19 | 19 | 19 | 19 |
+| Test                 | Base | 1000 | Min | Max | Avg |
+| -------------------- | ---- | ---- | --- | --- | --- |
+| create               | 355  | -    | 355 | 355 | 355 |
+| sync                 | 5    | -    | 5   | 5   | 5   |
+| syncAll              | 37   | -    | 37  | 37  | 37  |
+| inboxState           | 0    | -    | 0   | 0   | 0   |
+| canMessage           | 5    | -    | 5   | 5   | 5   |
+| newDm                | 0    | -    | 0   | 0   | 0   |
+| newDmByAddress       | 42   | -    | 42  | 42  | 42  |
+| getConversationById  | 0    | -    | 0   | 0   | 0   |
+| send                 | 14   | -    | 14  | 14  | 14  |
+| consent              | 1    | -    | 0   | 1   | 0   |
+| stream               | 41   | -    | 41  | 41  | 41  |
+| newGroup-10          | 161  | -    | 161 | 161 | 161 |
+| newGroupByAddress-10 | 55   | -    | 55  | 55  | 55  |
+| groupsync-10         | 7    | -    | 7   | 7   | 7   |
+| updateName-10        | 12   | -    | 12  | 12  | 12  |
+| send-10              | 7    | -    | 7   | 7   | 7   |
+| addMember-10         | 2    | -    | 2   | 2   | 2   |
+| removeMembers-10     | 17   | -    | 17  | 17  | 17  |
+| streamMembership-10  | 66   | -    | 66  | 66  | 66  |
+| streamMessage-10     | 37   | -    | 37  | 37  | 37  |
+| streamMetadata-10    | 94   | -    | 94  | 94  | 94  |
+| sync-10              | 42   | -    | 42  | 42  | 42  |
+| syncAll-10           | 62   | -    | 62  | 62  | 62  |
+| syncCumulative-10    | 43   | -    | 43  | 43  | 43  |
+| syncAllCumulative-10 | 59   | -    | 59  | 59  | 59  |
+| create               | -    | 271  | 271 | 271 | 271 |
+| sync                 | -    | 3    | 3   | 3   | 3   |
+| syncAll              | -    | 27   | 27  | 27  | 27  |
+| inboxState           | -    | 1    | 1   | 1   | 1   |
+| canMessage           | -    | 8    | 8   | 8   | 8   |
+| newDm                | -    | 0    | 0   | 0   | 0   |
+| newDmByAddress       | -    | 111  | 111 | 111 | 111 |
+| getConversationById  | -    | 2    | 2   | 2   | 2   |
+| send                 | -    | 14   | 14  | 14  | 14  |
+| stream               | -    | 38   | 38  | 38  | 38  |
+| newGroup-10          | -    | 126  | 126 | 126 | 126 |
+| newGroupByAddress-10 | -    | 55   | 55  | 55  | 55  |
+| groupsync-10         | -    | 11   | 11  | 11  | 11  |
+| updateName-10        | -    | 19   | 19  | 19  | 19  |
+| send-10              | -    | 13   | 13  | 13  | 13  |
+| addMember-10         | -    | 4    | 4   | 4   | 4   |
+| removeMembers-10     | -    | 28   | 28  | 28  | 28  |
+| streamMembership-10  | -    | 81   | 81  | 81  | 81  |
+| streamMessage-10     | -    | 52   | 52  | 52  | 52  |
+| streamMetadata-10    | -    | 74   | 74  | 74  | 74  |
+| sync-10              | -    | 125  | 125 | 125 | 125 |
+| syncAll-10           | -    | 231  | 231 | 231 | 231 |
+| syncCumulative-10    | -    | 98   | 98  | 98  | 98  |
+| syncAllCumulative-10 | -    | 128  | 128 | 128 | 128 |

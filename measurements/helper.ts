@@ -1,4 +1,5 @@
 import { writeFileSync } from "fs";
+import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
 import { afterAll, afterEach, beforeEach, expect } from "vitest";
 
@@ -93,11 +94,11 @@ function extractIteration(testName: string, groupByPattern?: string): string {
   if (!groupByPattern) {
     // Default pattern to extract numbers in parentheses like "create(1000)"
     const match = testName.match(/\((\d+)\)/);
-    return match ? match[1] : "unknown";
+    return match ? match[1] : "0"; // Default to "0" instead of "unknown"
   }
 
   const match = testName.match(new RegExp(groupByPattern));
-  return match ? match[1] || match[0] : "unknown";
+  return match ? match[1] || match[0] : "0"; // Default to "0" instead of "unknown"
 }
 
 function cleanTestName(testName: string, groupByPattern?: string): string {
@@ -220,21 +221,8 @@ function displaySummaryTable(
   console.log("│ " + headerRow + " │");
   console.log("├─" + colWidths.map((w) => "─".repeat(w)).join("─┼─") + "─┤");
 
-  // Sort test results
-  const sortedTests = Array.from(groupedResults.entries()).sort(([a], [b]) => {
-    if (config.sortBy === "duration") {
-      const resultsA = groupedResults.get(a);
-      const resultsB = groupedResults.get(b);
-      if (resultsA && resultsB) {
-        const avgA =
-          resultsA.reduce((sum, r) => sum + r.duration, 0) / resultsA.length;
-        const avgB =
-          resultsB.reduce((sum, r) => sum + r.duration, 0) / resultsB.length;
-        return avgA - avgB;
-      }
-    }
-    return a.localeCompare(b);
-  });
+  // Keep original test order - don't sort
+  const sortedTests = Array.from(groupedResults.entries());
 
   // Print rows
   sortedTests.forEach(([testName, testResults]) => {
@@ -311,7 +299,7 @@ function saveSummaryTableToMarkdown(
     });
 
   // Create markdown content
-  const outputFile = testName + ".md";
+  const outputFile = "./measurements/" + testName + getTime() + ".md";
   const timestamp = new Date().toISOString();
 
   let markdown = `# Performance Test Results: ${testName}\n\n`;
@@ -329,21 +317,8 @@ function saveSummaryTableToMarkdown(
   markdown += "| " + header.join(" | ") + " |\n";
   markdown += "| " + header.map(() => "---").join(" | ") + " |\n";
 
-  // Sort test results
-  const sortedTests = Array.from(groupedResults.entries()).sort(([a], [b]) => {
-    if (config.sortBy === "duration") {
-      const resultsA = groupedResults.get(a);
-      const resultsB = groupedResults.get(b);
-      if (resultsA && resultsB) {
-        const avgA =
-          resultsA.reduce((sum, r) => sum + r.duration, 0) / resultsA.length;
-        const avgB =
-          resultsB.reduce((sum, r) => sum + r.duration, 0) / resultsB.length;
-        return avgA - avgB;
-      }
-    }
-    return a.localeCompare(b);
-  });
+  // Keep original test order - don't sort
+  const sortedTests = Array.from(groupedResults.entries());
 
   // Add rows
   sortedTests.forEach(([testName, testResults]) => {
