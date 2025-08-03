@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
@@ -277,7 +277,7 @@ function saveSummaryTableToMarkdown(testName: string): void {
   const { allIterations, header, sortedTests } = tableData;
 
   // Create markdown content
-  const outputFile = "logs/measurements/" + testName + getTime() + ".md";
+  const outputFile = "logs/" + testName + getTime() + ".md";
 
   let markdown = "";
 
@@ -317,6 +317,11 @@ function saveSummaryTableToMarkdown(testName: string): void {
 
   // Save to file
   try {
+    // Ensure the directory exists
+    const dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
     writeFileSync(outputFile, markdown, "utf8");
     console.log(`📄 Results saved to: ${outputFile}`);
   } catch (error) {

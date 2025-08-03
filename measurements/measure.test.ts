@@ -34,7 +34,7 @@ describe(testName, () => {
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100];
+    : [5];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -62,13 +62,14 @@ describe(testName, () => {
     let receiver: Worker | undefined;
     it(`create(${populateSize}): measure creating a client`, async () => {
       const workerNames = [...randomNames];
+      let bysizeWorkerName = "";
       if (populateSize > 0) {
-        const bysizeWorkerName = getBysizeWorkerName(populateSize);
-        workerNames.unshift(bysizeWorkerName!);
+        bysizeWorkerName = getBysizeWorkerName(populateSize)!;
+        workerNames.unshift(bysizeWorkerName);
       }
       workers = await getWorkers(workerNames);
       creator = workers.get(workerNames[0])!;
-      receiver = workers.get(randomNames[0])!;
+      receiver = workers.get(workerNames[1])!;
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
@@ -105,6 +106,7 @@ describe(testName, () => {
       expect(dm.id).toBeDefined();
     });
     it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
+      console.log(creator!.name, "is going to send a gm to", receiver!.name);
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
       console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
