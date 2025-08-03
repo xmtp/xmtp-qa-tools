@@ -2,13 +2,13 @@ import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getAddresses } from "@inboxes/utils";
+import { getRandomAddress } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
@@ -44,7 +44,7 @@ describe(testName, async () => {
             identifierKind: IdentifierKind.Ethereum,
           },
           {
-            identifier: getAddresses(1)[0],
+            identifier: getRandomAddress(1)[0],
             identifierKind: IdentifierKind.Ethereum,
           },
         ]);

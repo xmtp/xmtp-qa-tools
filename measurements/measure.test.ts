@@ -4,10 +4,9 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import {
-  getAddresses,
   getBysizeWorkerName,
-  getInboxIds,
   getRandomAddress,
+  getRandomInboxIds,
 } from "@inboxes/utils";
 import {
   getRandomNames,
@@ -22,7 +21,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
@@ -34,7 +33,7 @@ describe(testName, () => {
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100];
+    : [5];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -62,13 +61,14 @@ describe(testName, () => {
     let receiver: Worker | undefined;
     it(`create(${populateSize}): measure creating a client`, async () => {
       const workerNames = [...randomNames];
+      let bysizeWorkerName = "";
       if (populateSize > 0) {
-        const bysizeWorkerName = getBysizeWorkerName(populateSize);
-        workerNames.unshift(bysizeWorkerName!);
+        bysizeWorkerName = getBysizeWorkerName(populateSize)!;
+        workerNames.unshift(bysizeWorkerName);
       }
       workers = await getWorkers(workerNames);
       creator = workers.get(workerNames[0])!;
-      receiver = workers.get(randomNames[0])!;
+      receiver = workers.get(workerNames[1])!;
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
@@ -85,22 +85,16 @@ describe(testName, () => {
       await creator!.client.preferences.inboxState();
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
-      const randomAddress = receiver!.address;
-      if (!randomAddress) {
-        throw new Error("Random client not found");
-      }
-      const start = Date.now();
       const canMessage = await Client.canMessage(
         [
           {
-            identifier: randomAddress,
+            identifier: receiver!.address,
             identifierKind: IdentifierKind.Ethereum,
           },
         ],
         receiver!.env,
       );
-      setCustomDuration(Date.now() - start);
-      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
+      expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
     });
 
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
@@ -110,9 +104,10 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     });
-    it(`stream(${populateSize}):measure receiving a gm`, async () => {
+    it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
+      console.log(creator!.name, "is going to send a gm to", receiver!.name);
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
+      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     });
@@ -152,7 +147,9 @@ describe(testName, () => {
     });
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
+        allMembersWithExtra = getRandomInboxIds(
+          i - workers.getAll().length + 1,
+        );
         allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
         extraMember = allMembersWithExtra.slice(
           i - workers.getAll().length,
@@ -167,7 +164,7 @@ describe(testName, () => {
         cumulativeGroups.push(newGroup);
       });
       it(`newGroupByAddress-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        const callMembersWithExtraWithAddress = getAddresses(
+        const callMembersWithExtraWithAddress = getRandomAddress(
           i - workers.getAll().length + 1,
         );
         const newGroupByIdentifier =

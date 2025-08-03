@@ -3,6 +3,8 @@ import { getRandomValues } from "node:crypto";
 import { createRequire } from "node:module";
 import path from "node:path";
 import type { Worker, WorkerManager } from "@workers/manager";
+import dotenv from "dotenv";
+import { fromString, toString } from "uint8arrays";
 import {
   Client,
   IdentifierKind,
@@ -10,9 +12,7 @@ import {
   type Conversation,
   type Signer,
   type XmtpEnv,
-} from "@workers/versions";
-import dotenv from "dotenv";
-import { fromString, toString } from "uint8arrays";
+} from "version-management/client-versions";
 import { createWalletClient, http, toBytes } from "viem";
 import {
   privateKeyToAccount,

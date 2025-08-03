@@ -9,7 +9,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
+import { getRandomAddress, getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -18,7 +18,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";
@@ -70,22 +70,16 @@ describe(testName, () => {
     await creator!.client.preferences.inboxState();
   });
   it(`canMessage:measure canMessage`, async () => {
-    const randomAddress = receiver!.address;
-    if (!randomAddress) {
-      throw new Error("Random client not found");
-    }
-    const start = Date.now();
     const canMessage = await Client.canMessage(
       [
         {
-          identifier: randomAddress,
+          identifier: receiver!.address,
           identifierKind: IdentifierKind.Ethereum,
         },
       ],
       receiver!.env,
     );
-    setCustomDuration(Date.now() - start);
-    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
+    expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
   });
 
   it(`newDm:measure creating a DM`, async () => {
@@ -126,19 +120,18 @@ describe(testName, () => {
       ConsentEntityType.InboxId,
       receiver!.client.inboxId,
     );
-    console.log("consentState", consentState);
     expect(consentState).toBe(ConsentState.Allowed);
   });
-  it(`stream:measure receiving a gm`, async () => {
-    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
+  it(`streamMessage:measure receiving a gm`, async () => {
+    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.allReceived).toBe(true);
   });
 
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
+      allMembersWithExtra = getRandomInboxIds(i - workers.getAll().length + 1);
       allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
       extraMember = allMembersWithExtra.slice(
         i - workers.getAll().length,
@@ -153,7 +146,7 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-      const callMembersWithExtraWithAddress = getAddresses(
+      const callMembersWithExtraWithAddress = getRandomAddress(
         i - workers.getAll().length + 1,
       );
       const newGroupByIdentifier =

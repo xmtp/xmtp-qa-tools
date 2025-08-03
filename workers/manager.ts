@@ -10,7 +10,7 @@ import {
   type Client,
   type Group,
   type XmtpEnv,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,

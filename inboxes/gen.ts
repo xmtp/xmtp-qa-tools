@@ -1,7 +1,7 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import { ProgressBar } from "@helpers/logger";
-import { Client, type XmtpEnv } from "@workers/versions";
+import { Client, type XmtpEnv } from "version-management/client-versions";
 import {
   createSigner,
   generateEncryptionKeyHex,
@@ -10,7 +10,7 @@ import {
 } from "../helpers/client";
 
 const BASE_LOGPATH = "./logs";
-const INBOXES_DIR = "./inboxes";
+const INBOXES_DIR = "./inboxes/byinstallation";
 let debugMode = false;
 
 // === Tweakable Defaults ===

@@ -10,8 +10,6 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`          |
 | `yarn installations`                        | Manage installations  | `yarn installations --help` |
 | `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
-| `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
-| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`      |
 | `yarn revoke <inbox-id>`                    | Revoke installations  | `yarn revoke --help`        |
 | `yarn groups`                               | Create DMs/groups     | `yarn groups --help`        |
 | `yarn permissions`                          | Manage permissions    | `yarn permissions --help`   |
@@ -44,7 +42,6 @@ yarn test <suite> [options]
 - `--debug` - Enable file logging
 - `--no-fail` - Exit with success on failures
 - `--parallel` - Run tests in parallel
-- `--versions <n>` - Test multiple SDK versions
 
 ### Send Command
 
@@ -108,30 +105,6 @@ yarn bot <name> [options]
 **Options:**
 
 - `--env <env>` - XMTP environment [default: production]
-
-### Generator Command
-
-```bash
-yarn gen [options]
-```
-
-**Options:**
-
-- `--count <n>` - Number of inboxes [default: 200]
-- `--env <list>` - Environments (local,dev,production) [default: production]
-- `--installations <n>` - Installations per inbox [default: 2]
-- `--debug` - Enable debug logging
-- `--clean` - Clean logs/ and .data/ directories
-
-### Versions Command
-
-```bash
-yarn versions [options]
-```
-
-**Options:**
-
-- `--clean` - Clean package.json and node_modules before setup
 
 ### Revoke Command
 

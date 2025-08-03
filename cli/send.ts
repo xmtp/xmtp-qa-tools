@@ -4,7 +4,7 @@ import {
   type Group,
   type LogLevel,
   type XmtpEnv,
-} from "@workers/versions";
+} from "version-management/client-versions";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";

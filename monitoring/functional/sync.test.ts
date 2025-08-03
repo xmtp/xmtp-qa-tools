@@ -1,8 +1,8 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Dm, type Group } from "@workers/versions";
+import { type Dm, type Group } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";
@@ -13,7 +13,7 @@ describe(testName, () => {
     const workers = await getWorkers(["henry", "john"]);
     const creator = workers.get("henry")!;
     const receiver = workers.get("john")!;
-    const allInboxIds = getInboxIds(2);
+    const allInboxIds = getRandomInboxIds(2);
     console.log("All inbox ids", allInboxIds);
     const group = (await creator.client.conversations.newGroup(
       allInboxIds,

@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Group } from "@workers/versions";
+import { type Group } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability/container";
 

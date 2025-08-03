@@ -7,7 +7,7 @@ import {
   type Client,
   type Conversation,
   type Group,
-} from "@workers/versions";
+} from "version-management/client-versions";
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {

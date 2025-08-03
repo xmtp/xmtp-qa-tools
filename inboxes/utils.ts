@@ -25,7 +25,7 @@ const typedInboxes25 = newInboxes25 as InboxData[];
 const typedInboxes15 = newInboxes15 as InboxData[];
 const typedInboxes30 = newInboxes30 as InboxData[];
 
-export function getInboxByInstallationCount(
+function getInboxByInstallationCount(
   installationCount: number,
   index?: number,
 ) {
@@ -57,20 +57,6 @@ export function getInboxByInstallationCount(
   return typedInboxes2;
 }
 
-export function getRandomInboxIdsWithRandomInstallations(count: number) {
-  let totalInboxes = [];
-  const possibleInstallations = [2, 5, 10, 15, 20, 25, 30];
-  for (let i = 0; i < count; i++) {
-    let inboxes = getInboxByInstallationCount(
-      possibleInstallations[
-        Math.floor(Math.random() * possibleInstallations.length)
-      ],
-    );
-    let whichRandom = Math.floor(Math.random() * inboxes.length);
-    totalInboxes.push(inboxes[whichRandom]);
-  }
-  return totalInboxes.map((inbox) => inbox.inboxId);
-}
 export function getRandomInboxIds(
   count: number,
   installationCount: number = 2,
@@ -89,47 +75,6 @@ export function getRandomAddress(count: number, installationCount: number = 2) {
     .map((inbox) => inbox.accountAddress);
 }
 
-export function getInboxIds(count: number) {
-  return getInboxByInstallationCount(2)
-    .slice(0, count)
-    .map((inbox) => inbox.inboxId);
-}
-export function getAddresses(count: number) {
-  return getInboxByInstallationCount(2)
-    .slice(0, count)
-    .map((inbox) => inbox.accountAddress);
-}
-
-/**
- * Get bysize worker names from bysize.json
- * @returns Array of bysize worker names (e.g., ["bysize500", "bysize1000", ...])
- */
-export function getBysizeWorkerNames(): string[] {
-  try {
-    const bysizePath = path.resolve(
-      process.cwd(),
-      "inboxes",
-      "bysize",
-      "bysize.json",
-    );
-    const bysizeData = JSON.parse(
-      fs.readFileSync(bysizePath, "utf8"),
-    ) as Array<{
-      size: number;
-    }>;
-
-    return bysizeData.map((item) => `bysize${item.size}`);
-  } catch (error) {
-    console.debug("Failed to load bysize worker names:", error);
-    return [];
-  }
-}
-
-/**
- * Get bysize worker name for a specific size
- * @param size The size to look for
- * @returns The bysize worker name or null if not found
- */
 export function getBysizeWorkerName(size: number): string | null {
   try {
     const bysizePath = path.resolve(

@@ -1,4 +1,4 @@
-import { writeFileSync } from "fs";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
@@ -40,12 +40,14 @@ export const setupSummaryTable = ({
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
+    console.log(currentTestName);
+
     if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });
 
   afterEach(function () {
     const currentTestName = expect.getState().currentTestName ?? "";
-    console.log(currentTestName);
+
     let duration = performance.now() - start;
     if (getCustomDuration) {
       const customDuration = getCustomDuration();
@@ -275,7 +277,7 @@ function saveSummaryTableToMarkdown(testName: string): void {
   const { allIterations, header, sortedTests } = tableData;
 
   // Create markdown content
-  const outputFile = "./measurements/" + testName + getTime() + ".md";
+  const outputFile = "logs/" + testName + getTime() + ".md";
 
   let markdown = "";
 
@@ -315,6 +317,11 @@ function saveSummaryTableToMarkdown(testName: string): void {
 
   // Save to file
   try {
+    // Ensure the directory exists
+    const dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
     writeFileSync(outputFile, markdown, "utf8");
     console.log(`📄 Results saved to: ${outputFile}`);
   } catch (error) {
