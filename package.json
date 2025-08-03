@@ -9,14 +9,13 @@
     "workers"
   ],
   "scripts": {
-    "ai": "tsx cli/ai.ts",
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "format": "prettier -w .",
-    "gen": "tsx cli/gen.ts",
+    "gen": "tsx inboxes/gen.ts",
     "groups": "tsx cli/groups.ts",
     "installations": "tsx cli/installations.ts",
     "lint": "eslint .",
@@ -31,7 +30,7 @@
     "ui": "vitest --ui --standalone --watch",
     "update:local": "yarn gen --env local --installations 2 --count 500",
     "update:prod": "yarn gen --env production --installations 2",
-    "versions": "tsx cli/versions.ts"
+    "versions": "tsx version-management/versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
