@@ -3,9 +3,7 @@ import { afterAll, afterEach, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
   groupBy?: string; // regex pattern to extract grouping key (e.g., iteration number)
-  showStats?: boolean; // show min/max/avg columns
   sortBy?: "testName" | "duration";
-  outputFile?: string; // markdown file name (default: test-results.md)
 }
 
 interface TestResult {
@@ -180,9 +178,7 @@ function displaySummaryTable(
     "Test",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  if (config.showStats) {
-    header.push("Min", "Max", "Avg");
-  }
+  header.push("Min", "Max", "Avg");
 
   // Calculate proper column widths based on actual data
   const testNames = Array.from(groupedResults.keys());
@@ -208,9 +204,7 @@ function displaySummaryTable(
     ...iterationColWidths,
   ];
 
-  if (config.showStats) {
-    colWidths.push(6, 6, 6); // Min, Max, Avg columns
-  }
+  colWidths.push(6, 6, 6); // Min, Max, Avg columns
 
   // Print header
   const headerRow = header
@@ -258,7 +252,7 @@ function displaySummaryTable(
     });
 
     // Add stats if enabled
-    if (config.showStats && testResults.length > 0) {
+    if (testResults.length > 0) {
       const durations = testResults.map((r) => r.duration);
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();
@@ -316,7 +310,7 @@ function saveSummaryTableToMarkdown(
     });
 
   // Create markdown content
-  const outputFile = config.outputFile || "test-results.md";
+  const outputFile = testName + ".md";
   const timestamp = new Date().toISOString();
 
   let markdown = `# Performance Test Results: ${testName}\n\n`;
@@ -328,9 +322,7 @@ function saveSummaryTableToMarkdown(
     "Test",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  if (config.showStats) {
-    header.push("Min", "Max", "Avg");
-  }
+  header.push("Min", "Max", "Avg");
 
   // Create markdown table
   markdown += "| " + header.join(" | ") + " |\n";
@@ -364,7 +356,7 @@ function saveSummaryTableToMarkdown(
     });
 
     // Add stats if enabled
-    if (config.showStats && testResults.length > 0) {
+    if (testResults.length > 0) {
       const durations = testResults.map((r) => r.duration);
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();

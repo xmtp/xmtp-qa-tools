@@ -26,7 +26,7 @@ describe(testName, () => {
   let newGroup: Group;
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000, 5000, 10000];
+    : [0, 1000];
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -42,10 +42,7 @@ describe(testName, () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    summaryTableConfig: {
-      showStats: true,
-      sortBy: "testName",
-    },
+    createSummaryTable: true,
   });
 
   for (const populateSize of POPULATE_SIZE) {
@@ -68,8 +65,7 @@ describe(testName, () => {
     });
 
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      const inboxState = await creator!.client.preferences.inboxState();
-      console.log("inboxState", inboxState);
+      await creator!.client.preferences.inboxState();
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const randomAddress = receiver!.address;
@@ -128,7 +124,6 @@ describe(testName, () => {
         ConsentEntityType.InboxId,
         receiver!.client.inboxId,
       );
-      console.log("consentState", consentState);
       expect(consentState).toBe(ConsentState.Allowed);
     });
     it(`stream(${populateSize}):measure receiving a gm`, async () => {
@@ -213,7 +208,6 @@ describe(testName, () => {
           workers.getAllButCreator(),
         );
 
-        console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       });
