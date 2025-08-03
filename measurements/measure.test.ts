@@ -3,8 +3,18 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import {
+  getAddresses,
+  getBysizeWorkerName,
+  getInboxIds,
+  getRandomAddress,
+} from "@inboxes/utils";
+import {
+  getRandomNames,
+  getWorkers,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -21,6 +31,7 @@ describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
     : [0];
+  const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10, 50, 100];
@@ -50,11 +61,14 @@ describe(testName, () => {
     let creator: Worker | undefined;
     let receiver: Worker | undefined;
     it(`create(${populateSize}): measure creating a client`, async () => {
-      workers = await getWorkers(6, {
-        randomNames: false,
-      });
-      creator = workers.get("edward")!;
-      receiver = workers.get("bob")!;
+      const workerNames = [...randomNames];
+      if (populateSize > 0) {
+        const bysizeWorkerName = getBysizeWorkerName(populateSize);
+        workerNames.unshift(bysizeWorkerName!);
+      }
+      workers = await getWorkers(workerNames);
+      creator = workers.get(workerNames[0])!;
+      receiver = workers.get(randomNames[0])!;
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
