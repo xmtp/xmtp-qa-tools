@@ -179,15 +179,4 @@ Storage utilization comparison between sender and receiver across varying group 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### Large inbox syncs
-
-Sync performance and storage requirements for inboxes with varying numbers of existing groups.
-
-| Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
-| ---------- | -------------- | ------------ | --------------- | ------------------ |
-| Small      | 335            | 20           | 5               | 17                 |
-| Medium     | 364            | 107          | 17              | 53                 |
-| Large      | 365            | 208          | 31              | 95                 |
-| XL         | 376            | 410          | 59              | 179                |
-
 > For large groups measurments see [bench](./monitoring/bench/README.md)

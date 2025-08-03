@@ -18,15 +18,15 @@ import { setupSummaryTable } from "./helper";
 
 const testName = "performance";
 describe(testName, () => {
-  const BATCH_SIZE = process.env.BATCH_SIZE
-    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10];
-  let dm: Dm | undefined;
-
-  let newGroup: Group;
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
     : [0, 1000, 2000, 5000, 10000];
+  const BATCH_SIZE = process.env.BATCH_SIZE
+    ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
+    : [10, 50, 100, 150, 200, 250];
+  let dm: Dm | undefined;
+
+  let newGroup: Group;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -63,7 +63,10 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
-
+    it(`storage(${populateSize}):measure storage`, async () => {
+      const storage = await creator!.worker.getSQLiteFileSizes();
+      setCustomDuration(storage.dbFile);
+    });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
       await creator!.client.preferences.inboxState();
     });

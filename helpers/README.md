@@ -4,15 +4,14 @@ Utility modules that power the XMTP testing framework. These helpers provide the
 
 ## Quick reference
 
-| Module            | Purpose                          | Key Features                                         |
-| ----------------- | -------------------------------- | ---------------------------------------------------- |
-| **client.ts**     | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
-| **analyzer.ts**   | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
-| **logger.ts**     | Logging utilities                | File logging, ANSI stripping, pretty console output  |
-| **vitest.ts**     | Test lifecycle management        | Test setup, performance metrics, cleanup             |
-| **playwright.ts** | Browser automation               | UI testing, group creation, message verification     |
-| **datadog.ts**    | Metrics and monitoring           | Performance tracking, network stats, reporting       |
-| **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing        |
+| Module          | Purpose                          | Key Features                                         |
+| --------------- | -------------------------------- | ---------------------------------------------------- |
+| **client.ts**   | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
+| **analyzer.ts** | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
+| **logger.ts**   | Logging utilities                | File logging, ANSI stripping, pretty console output  |
+| **vitest.ts**   | Test lifecycle management        | Test setup, performance metrics, cleanup             |
+| **datadog.ts**  | Metrics and monitoring           | Performance tracking, network stats, reporting       |
+| **streams.ts**  | Message streaming utilities      | Stream verification, message delivery testing        |
 
 ## Usage
 
@@ -140,41 +139,6 @@ Lifecycle hooks:
 - `afterAll`: Flushes metrics and cleanup
 
 Functions: Automatic setup, performance tracking, custom duration support, cleanup management.
-
-## Playwright module
-
-Browser automation for testing XMTP web applications.
-
-```typescript
-// Create a Playwright instance
-const browser = new playwright({
-  headless: true,
-  env: "dev",
-  defaultUser: {
-    walletKey: "0x...",
-    accountAddress: "0x...",
-    dbEncryptionKey: "...",
-    inboxId: "...",
-  },
-});
-
-// Start browser session
-const { page } = await browser.startPage();
-
-// Create a new group through UI
-const groupId = await browser.newGroupFromUI([address1, address2]);
-
-// Send a message
-await browser.sendMessage("Hello world!");
-
-// Wait for response
-const received = await browser.waitForResponse(["Hello", "response"]);
-
-// Take a screenshot
-await browser.takeSnapshot("test-completed");
-```
-
-Functions: Headless browser automation, XMTP web app integration, group management, message testing, screenshot capture.
 
 ## Datadog module
 
