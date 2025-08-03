@@ -4,7 +4,7 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
@@ -35,7 +35,7 @@ describe(testName, () => {
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
 
-  setupTestLifecycle({
+  setupDurationTracking({
     testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
@@ -51,8 +51,8 @@ describe(testName, () => {
   let receiver: Worker | undefined;
   it(`create: measure creating a client`, async () => {
     workers = await getWorkers(6);
-    creator = workers.get("edward")!;
-    receiver = workers.get("bob")!;
+    creator = workers.getCreator();
+    receiver = workers.getReceiver();
     setCustomDuration(creator.initializationTime);
   });
   it(`sync:measure sync`, async () => {

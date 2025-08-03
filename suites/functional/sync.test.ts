@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@workers/versions";
@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "sync";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   it("create a group", async () => {
     const workers = await getWorkers(["henry", "john"]);

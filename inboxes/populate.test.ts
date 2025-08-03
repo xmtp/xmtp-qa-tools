@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 describe("populate", () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000, 10000];
+    : [0, 20000];
   let uniqueNames: string[] = [];
   let workers: WorkerManager | undefined;
 

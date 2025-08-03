@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
@@ -23,7 +23,7 @@ describe(testName, async () => {
 
   const workers = await getWorkers(userDescriptors);
 
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   it("survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroupBetweenAll(

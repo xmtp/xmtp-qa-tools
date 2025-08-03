@@ -1,5 +1,5 @@
 import { getTime } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { getVersions, type Group } from "@workers/versions";
@@ -36,7 +36,7 @@ const installationCount = 2; // How many installations to use randomly in the cr
 
 const testName = "forks";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   const createOperations = async (worker: Worker, group: Group) => {
     // This syncs all and can contribute to the fork

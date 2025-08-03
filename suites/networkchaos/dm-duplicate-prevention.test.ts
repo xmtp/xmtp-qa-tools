@@ -1,4 +1,4 @@
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Dm } from "@workers/versions";
@@ -14,7 +14,7 @@ describe(testName, async () => {
   // Start message streams for duplicate prevention test
   workers.startStream(typeofStream.Message);
 
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
 

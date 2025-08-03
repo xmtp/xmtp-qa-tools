@@ -9,16 +9,6 @@ interface MetricData {
   members?: string;
 }
 
-interface ParsedTestName {
-  metricName: string;
-  metricDescription: string;
-  testNameExtracted: string;
-  operationType: "group" | "core";
-  operationName: string;
-  members: string;
-  conversation_count: string;
-}
-
 // Simplified metric tags interface - consolidates all previous metric tag types
 interface MetricTags {
   metric_type: string;
@@ -260,39 +250,6 @@ export function sendHistogramMetric(
       error instanceof Error ? error.message : String(error),
     );
   }
-}
-
-// Test name parsing - simplified
-export function parseTestName(testName: string): ParsedTestName {
-  const [metricNameParts, metricDescription = ""] = testName.split(":");
-  const metricName = metricNameParts.replaceAll(" > ", ".");
-  const operationParts = metricName.split(".");
-
-  let testNameExtracted = operationParts[0];
-
-  let operationName = "";
-  let members = "";
-  let conversation_count = "";
-
-  if (operationParts[1]) {
-    // Updated regex to handle optional conversation_count size: operationName-number(conversation_countSize)
-    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?\(?(\d+)?\)?$/);
-    if (match) {
-      [, operationName, members = "", conversation_count = ""] = match;
-    } else {
-      operationName = operationParts[1];
-    }
-  }
-
-  return {
-    metricName,
-    metricDescription,
-    testNameExtracted,
-    operationType: parseInt(members) > 5 ? "group" : "core",
-    operationName,
-    members,
-    conversation_count,
-  };
 }
 
 // Network statistics - streamlined

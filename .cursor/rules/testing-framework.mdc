@@ -7,7 +7,7 @@ alwaysApply: false
 
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 import { describe, it } from "vitest";
 
@@ -17,7 +17,7 @@ describe(testName, async () => {
   // Simplified API - versioning enabled by default
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   it("do something", async () => {
     // Test logic here
@@ -336,7 +336,7 @@ worker.worker.startStream(typeofStream.Consent);
 #### 3. Handle Stream Cleanup
 
 ```typescript
-// Streams are automatically cleaned up by setupTestLifecycle
+// Streams are automatically cleaned up by setupDurationTracking
 // Manual cleanup if needed:
 afterEach(() => {
   workers.getAll().forEach((worker) => {
@@ -420,14 +420,14 @@ Use predefined names from the 61 available:
 
 - Use `useVersions: true` option for version testing
 - Use `typeofStream.Message` for message streaming
-- Always call `setupTestLifecycle({testName})` for proper cleanup
+- Always call `setupDurationTracking({testName})` for proper cleanup
 - Test file naming: `*.test.ts` in `suites/` directory
 
 ## Key Imports
 
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@workers/versions";
 ```
@@ -496,7 +496,7 @@ const workers = await getWorkers(["alice", "bob"], { useVersions: true });
 ### Stream Setup
 
 ```typescript
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@workers/versions";
 

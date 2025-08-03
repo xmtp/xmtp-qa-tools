@@ -1,12 +1,12 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   it("stitching", async () => {
     const workers = await getWorkers(["randombob-a", "alice"]);

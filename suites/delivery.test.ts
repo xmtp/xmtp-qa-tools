@@ -4,7 +4,7 @@ import {
   type ResponseMetricTags,
 } from "@helpers/datadog";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 const testName = "delivery";
 
 describe(testName, async () => {
-  setupTestLifecycle({
+  setupDurationTracking({
     testName,
     initDataDog: true,
     sendDurationMetrics: false,

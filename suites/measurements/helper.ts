@@ -1,4 +1,5 @@
 import { writeFileSync } from "fs";
+import { parseTestName } from "@helpers/vitest";
 import { afterAll, afterEach, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
@@ -47,7 +48,6 @@ export const setupSummaryTable = ({
         duration = customDuration;
       }
     }
-
     // Collect results for summary table
     if (createSummaryTable) {
       const iteration = extractIteration(
@@ -239,10 +239,9 @@ function displaySummaryTable(
   // Print rows
   sortedTests.forEach(([testName, testResults]) => {
     // Truncate test name if too long
-    const truncatedTestName =
-      testName.length > 33 ? testName.substring(0, 30) + "..." : testName;
+    const { operationName, members } = parseTestName(testName);
 
-    const row = [truncatedTestName.padEnd(colWidths[0])];
+    const row = [operationName + "-" + members.padEnd(colWidths[0])];
 
     // Add duration for each iteration
     allIterations.forEach((iteration, i) => {
@@ -346,7 +345,8 @@ function saveSummaryTableToMarkdown(
 
   // Add rows
   sortedTests.forEach(([testName, testResults]) => {
-    const row = [testName];
+    const { operationName, members } = parseTestName(testName);
+    const row = [operationName + "-" + members];
 
     // Add duration for each iteration
     allIterations.forEach((iteration) => {

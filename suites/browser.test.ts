@@ -1,7 +1,7 @@
 import { sleep, streamTimeout } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
   let groupId: string;
   const headless = false;
   let xmtpTester: playwright;

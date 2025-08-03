@@ -25,7 +25,7 @@ import {
   verifyConversationStream,
   verifyMessageStream,
 } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 ```
 
 ## Client module
@@ -122,7 +122,7 @@ Test lifecycle management and performance tracking integration.
 
 ```typescript
 // Set up test lifecycle with automatic metrics
-setupTestLifecycle({
+setupDurationTracking({
   testName: "my-test-suite",
   expect,
   getCustomDuration: () => customDuration,

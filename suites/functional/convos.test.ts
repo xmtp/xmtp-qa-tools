@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Dm, type Group } from "@workers/versions";
@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "convos";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
   let newGroup: Group;
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
