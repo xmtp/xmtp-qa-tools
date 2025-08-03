@@ -174,10 +174,10 @@ Storage utilization comparison between sender and receiver across varying group 
 
 Storage utilization comparison between sender and receiver across varying inbox sizes.
 
-| Inbox Size | Conversations | Size   |
-| ---------- | ------------- | ------ |
-| 1000       | 1000          | 240 mb |
-| 2000       | 2000          | 252 mb |
-| 5000       | 5000          | 265 mb |
-| 10000      | 10000         | 282 mb |
-| 20000      | 20000         | 300 mb |
+| Inbox Size | Conversations | Size (mb) |
+| ---------- | ------------- | --------- |
+| 1000       | 1000          | 240       |
+| 2000       | 2000          | 252       |
+| 5000       | 5000          | 265       |
+| 10000      | 10000         | 282       |
+| 20000      | 20000         | 300       |
