@@ -25,7 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10];
+    : [10, 50, 100, 150, 200, 250];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -67,8 +67,7 @@ describe(testName, () => {
   });
 
   it(`inboxState:measure inboxState`, async () => {
-    const inboxState = await creator!.client.preferences.inboxState();
-    console.log("inboxState", inboxState);
+    await creator!.client.preferences.inboxState();
   });
   it(`canMessage:measure canMessage`, async () => {
     const randomAddress = receiver!.address;

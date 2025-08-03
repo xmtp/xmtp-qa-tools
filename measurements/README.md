@@ -160,6 +160,6 @@ Weekly SLO performance tracking for critical XMTP SDK metrics.
 | ----------------------------- | ------ | -------- | ------- | -------- | -------- | ------ |
 | Network uptime                | 99%    | 100.000% | 99.900% | 100.000% | 100.000% | ✅     |
 | Messages ordered              | 99%    | 100.000% | 99.205% | 100.000% | 100.000% | ✅     |
-| New group under 2 seconds     | 99%    | 100.000% | 99.503% | 100.000% | 100.000% | ✅     |
+| New group under 1.5 seconds   | 99%    | 100.000% | 99.503% | 100.000% | 100.000% | ✅     |
 | Response times under 1 second | 99%    | 100.000% | 99.602% | 100.000% | 100.000% | ✅     |
 | Messages delivered            | 99%    | 96.079%  | 95.086% | 99.106%  | 95.066%  | ❌     |

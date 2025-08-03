@@ -3,8 +3,18 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import {
+  getAddresses,
+  getBysizeWorkerName,
+  getInboxIds,
+  getRandomAddress,
+} from "@inboxes/utils";
+import {
+  getRandomNames,
+  getWorkers,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -16,14 +26,15 @@ import {
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
-const testName = "performance";
+const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000];
+    : [0];
+  const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50];
+    : [10, 50, 100];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -50,11 +61,14 @@ describe(testName, () => {
     let creator: Worker | undefined;
     let receiver: Worker | undefined;
     it(`create(${populateSize}): measure creating a client`, async () => {
-      workers = await getWorkers(6, {
-        randomNames: false,
-      });
-      creator = workers.get("edward")!;
-      receiver = workers.get("bob")!;
+      const workerNames = [...randomNames];
+      if (populateSize > 0) {
+        const bysizeWorkerName = getBysizeWorkerName(populateSize);
+        workerNames.unshift(bysizeWorkerName!);
+      }
+      workers = await getWorkers(workerNames);
+      creator = workers.get(workerNames[0])!;
+      receiver = workers.get(randomNames[0])!;
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
@@ -96,6 +110,13 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     });
+    it(`stream(${populateSize}):measure receiving a gm`, async () => {
+      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.allReceived).toBe(true);
+    });
+
     it(`newDmByAddress(${populateSize}):measure creating a DM`, async () => {
       const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
         identifier: getRandomAddress(1)[0],
@@ -129,13 +150,6 @@ describe(testName, () => {
       );
       expect(consentState).toBe(ConsentState.Allowed);
     });
-    it(`stream(${populateSize}):measure receiving a gm`, async () => {
-      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.allReceived).toBe(true);
-    });
-
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
         allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
