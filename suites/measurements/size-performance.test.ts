@@ -1,10 +1,8 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import {
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
@@ -16,6 +14,7 @@ import {
   type Group,
 } from "@workers/versions";
 import { describe, expect, it } from "vitest";
+import { setupSummaryTable } from "./helper";
 
 const testName = "performance";
 describe(testName, () => {
@@ -37,15 +36,12 @@ describe(testName, () => {
   // Cumulative tracking variables
   let cumulativeGroups: Group[] = [];
 
-  setupTestLifecycle({
+  setupSummaryTable({
     testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    initDataDog: true,
-    sendDurationMetrics: true,
-    networkStats: true,
     summaryTableConfig: {
       showStats: true,
       sortBy: "testName",
@@ -138,13 +134,6 @@ describe(testName, () => {
     it(`stream(${populateSize}):measure receiving a gm`, async () => {
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
-      sendMetric("response", verifyResult.averageEventTiming, {
-        test: testName,
-        metric_type: "stream",
-        metric_subtype: "message",
-        sdk: receiver!.sdk,
-      } as ResponseMetricTags);
-
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     });
@@ -223,13 +212,6 @@ describe(testName, () => {
           newGroup,
           workers.getAllButCreator(),
         );
-
-        sendMetric("response", verifyResult.averageEventTiming, {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-        } as ResponseMetricTags);
 
         console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
         setCustomDuration(verifyResult.averageEventTiming);
