@@ -279,7 +279,7 @@ function saveSummaryTableToMarkdown(testName: string): void {
   const { allIterations, header, sortedTests } = tableData;
 
   // Create markdown content
-  const outputFile = "./measurements/" + testName + getTime() + ".md";
+  const outputFile = "./logs/measurements/" + testName + getTime() + ".md";
 
   let markdown = "";
 
