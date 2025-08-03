@@ -250,13 +250,11 @@ function displaySummaryTable(testName: string): void {
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();
 
-      // Calculate orders of magnitude difference between min and max
+      // Calculate ratio between min and max
       const minVal = Math.min(...durations);
       const maxVal = Math.max(...durations);
-      const ordersOfMagnitude =
-        minVal > 0 ? Math.floor(Math.log10(maxVal / minVal)) : 0;
-      const orders =
-        ordersOfMagnitude === 0 ? "1x" : `${Math.pow(10, ordersOfMagnitude)}x`;
+      const ratio = minVal > 0 ? maxVal / minVal : 1;
+      const orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
 
       row.push(min.padStart(colWidths[colWidths.length - 3]));
       row.push(max.padStart(colWidths[colWidths.length - 2]));
@@ -303,13 +301,11 @@ function saveSummaryTableToMarkdown(testName: string): void {
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();
 
-      // Calculate orders of magnitude difference between min and max
+      // Calculate ratio between min and max
       const minVal = Math.min(...durations);
       const maxVal = Math.max(...durations);
-      const ordersOfMagnitude =
-        minVal > 0 ? Math.floor(Math.log10(maxVal / minVal)) : 0;
-      const orders =
-        ordersOfMagnitude === 0 ? "1x" : `${Math.pow(10, ordersOfMagnitude)}x`;
+      const ratio = minVal > 0 ? maxVal / minVal : 1;
+      const orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
 
       row.push(min, max, orders);
     }

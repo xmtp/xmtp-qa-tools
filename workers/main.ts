@@ -1281,7 +1281,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       let batchFailed = 0;
 
       await Promise.all(
-        senderWorkers.map(async (sender, i) => {
+        senderWorkers.map(async (sender) => {
           await sender.client.conversations.newDmWithIdentifier({
             identifier: this.address,
             identifierKind: IdentifierKind.Ethereum,

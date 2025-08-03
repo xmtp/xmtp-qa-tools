@@ -18,15 +18,15 @@ import { setupSummaryTable } from "./helper";
 
 const testName = "performance";
 describe(testName, () => {
+  const POPULATE_SIZE = process.env.POPULATE_SIZE
+    ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
+    : [0, 20000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10];
+    : [10, 50, 100, 150, 200, 250];
   let dm: Dm | undefined;
 
   let newGroup: Group;
-  const POPULATE_SIZE = process.env.POPULATE_SIZE
-    ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000, 5000, 10000];
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -63,7 +63,10 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
-
+    it(`storage(${populateSize}):measure storage`, async () => {
+      const storage = await creator!.worker.getSQLiteFileSizes();
+      setCustomDuration(storage.dbFile);
+    });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
       await creator!.client.preferences.inboxState();
     });
@@ -135,7 +138,7 @@ describe(testName, () => {
 
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getInboxIds(i + 1);
+        allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
         allMembers = allMembersWithExtra.slice(0, i);
 
         newGroup = (await creator!.client.conversations.newGroup([
@@ -147,7 +150,9 @@ describe(testName, () => {
         cumulativeGroups.push(newGroup);
       });
       it(`newGroupByAddress-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        const callMembersWithExtraWithAddress = getAddresses(i + 1);
+        const callMembersWithExtraWithAddress = getAddresses(
+          i - workers.getAll().length + 1,
+        );
         const newGroupByIdentifier =
           await creator!.client.conversations.newGroupWithIdentifiers(
             callMembersWithExtraWithAddress.map((address) => ({

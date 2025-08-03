@@ -8,131 +8,122 @@ Here are the average measurements that are supported by the [datadog dashboard](
 
 Core XMTP SDK functionality performance measurements across different operations and group sizes.
 
-### Core SDK operations
+### by duration
 
 Individual SDK operation performance metrics including client creation, messaging, and group management.
 
-| Operation         | Description                            | Avg | Target | Performance |
-| ----------------- | -------------------------------------- | --- | ------ | ----------- |
-| create            | Creating a client                      | 588 | <350   | Concern     |
-| inboxState        | Checking inbox state                   | 41  | <350   | On Target   |
-| newDm             | Creating a direct message conversation | 258 | <350   | On Target   |
-| newDmByAddress    | Creating a dm by address               | 294 | <350   | On Target   |
-| send              | Sending a group message                | 126 | <200   | On Target   |
-| stream            | Receiving a group message              | 87  | <200   | On Target   |
-| newGroup          | Creating a group                       | 315 | <350   | On Target   |
-| newGroupByAddress | Creating a group by address            | 313 | <350   | On Target   |
-| sync              | Syncing group state                    | 76  | <200   | On Target   |
-| updateName        | Updating group metadata                | 129 | <200   | On Target   |
-| removeMembers     | Removing members from a group          | 127 | <250   | On Target   |
-
-### Group operations
-
-Performance measurements for group-specific operations broken down by group size and operation type.
-
-#### Sender-side average
-
-Average performance metrics measured from the message sender's perspective after group creation.
-
-| Size | Send message | Update name | Remove members | Create | Performance |
-| ---- | ------------ | ----------- | -------------- | ------ | ----------- |
-| 50   | 86           | 135         | 139            | 1329   | On Target   |
-| 100  | 88           | 145         | 157            | 1522   | On Target   |
-| 150  | 95           | 203         | 190            | 2306   | On Target   |
-| 200  | 93           | 193         | 205            | 3344   | On Target   |
-| 250  | 108          | 219         | 237            | 4276   | On Target   |
-| 300  | 97           | 244         | 247            | 5463   | On Target   |
-| 350  | 101          | 264         | 308            | 6641   | On Target   |
-| 400  | 111          | 280         | 320            | 7641   | On Target   |
-
-_Note: This measurments are taken only from the sender side and after the group is created._
-
-#### Receiver-side stream
-
-Stream performance metrics measured from message receivers when processing real-time updates.
-
-| Group Size | New conversation | Metadata | Messages | Add Members | Performance |
-| ---------- | ---------------- | -------- | -------- | ----------- | ----------- |
-| 50         | 687              | 141      | 131      | 401         | On Target   |
-| 100        | 746              | 155      | 117      | 420         | On Target   |
-| 150        | 833              | 163      | 147      | 435         | On Target   |
-| 200        | 953              | 179      | 173      | 499         | On Target   |
-| 250        | 1007             | 187      | 161      | 526         | Concern     |
-| 300        | 1040             | 195      | 167      | 543         | Concern     |
-| 350        | 1042             | 198      | 178      | 581         | Concern     |
-| 400        | 1192             | 214      | 173      | 609         | Concern     |
-
-_Note: This measurments are taken only from the receiver side and after the group is created._
-
-#### Receiver-side sync
-
-Sync operation performance for receivers during cold starts and cumulative syncs.
-
-| Size | syncAll |      | sync |      | Performance |
-| ---- | ------- | ---- | ---- | ---- | ----------- |
-| 50   | 366     | ...  | 291  | ...  | On Target   |
-| 100  | 503     | 521  | 424  | 372  | On Target   |
-| 150  | 665     | 727  | 522  | 622  | On Target   |
-| 200  | 854     | 1066 | 653  | 936  | On Target   |
-| 250  | 966     | 1582 | 768  | 1148 | Concern     |
-| 300  | 1225    | 1619 | 861  | 1362 | Concern     |
-| 350  | 1322    | 1846 | 1218 | 2017 | Concern     |
-| 400  | 1292    | 2082 | 1325 | 1792 | Concern     |
-
-_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
-
-## Networks
-
-Network-level performance metrics including connection times and regional variations.
-
-### Network performance
-
-Core network operation timings from DNS lookup through server response processing.
-
-| Performance Metric | Average | Target | Performance |
-| ------------------ | ------- | ------ | ----------- |
-| DNS Lookup         | 13      | <50    | On Target   |
-| TCP Connection     | 48      | <70    | On Target   |
-| TLS Handshake      | 124     | <150   | On Target   |
-| Processing         | 35      | <100   | On Target   |
-| Server Call        | 159     | <250   | On Target   |
-
-### Regional network performance
-
-Comparative network performance across different global regions relative to US East baseline.
-
-| Region        | Server Call | TLS | ~ us-east | Performance |
-| ------------- | ----------- | --- | --------- | ----------- |
-| us-east       | 140         | 123 | Baseline  | On Target   |
-| us-west       | 151         | 118 | <20% ~    | On Target   |
-| europe        | 230         | 180 | <40% ~    | On Target   |
-| asia          | 450         | 350 | >100% ~   | Concern     |
-| south-america | 734         | 573 | >200% ~   | Concern     |
+| Operation           | Description                            | Avg | Target | Performance |
+| ------------------- | -------------------------------------- | --- | ------ | ----------- |
+| create              | Creating a client                      | 998 | <500   | Concern     |
+| newGroup            | Creating a group                       | 502 | <800   | On Target   |
+| syncAllCumulative   | Syncing all conversations cumulatively | 391 | <500   | On Target   |
+| newGroupByAddress   | Creating a group by address            | 343 | <350   | On Target   |
+| streamMembership    | Streaming membership changes           | 303 | <400   | On Target   |
+| newdmbyAddress      | Creating a dm by address               | 264 | <350   | On Target   |
+| syncCumulative      | Cumulative sync operation              | 214 | <300   | On Target   |
+| newDm               | Creating a direct message conversation | 198 | <350   | On Target   |
+| streamMetadata      | Streaming metadata changes             | 170 | <200   | On Target   |
+| syncAll             | Syncing all conversations              | 164 | <500   | On Target   |
+| canMessage          | Checking if can message user           | 147 | <200   | On Target   |
+| streamMessage       | Streaming message updates              | 125 | <200   | On Target   |
+| removeMembers       | Removing members from a group          | 110 | <250   | On Target   |
+| send                | Sending a group message                | 95  | <200   | On Target   |
+| sync                | Syncing group state                    | 77  | <200   | On Target   |
+| updateName          | Updating group metadata                | 76  | <200   | On Target   |
+| stream              | Receiving a group message              | 69  | <200   | On Target   |
+| groupSync           | Group sync operation                   | 66  | <200   | On Target   |
+| addMember           | Adding a member to a group             | 32  | <250   | On Target   |
+| populate            | Populating conversation data           | 28  | <200   | On Target   |
+| inboxState          | Checking inbox state                   | 16  | <350   | On Target   |
+| consent             | Managing consent preferences           | 2   | <100   | On Target   |
+| getConversationById | Getting conversation by ID             | 1   | <100   | On Target   |
 
 _Note: Baseline is `us-east` region and `production` network._
 
-_Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
+### by group size
+
+Performance measurements for group-specific operations broken down by group size and operation type.
+
+#### by sender
+
+Operations performed by the message sender including group creation and management.
+
+| Operation         | Description               | 10  | 50   | 100  | 150  | 200  | 250   | Performance |
+| ----------------- | ------------------------- | --- | ---- | ---- | ---- | ---- | ----- | ----------- |
+| newGroup          | Creating a group          | 565 | 1930 | 4428 | 5941 | 8400 | 12370 | Concern     |
+| newGroupByAddress | Creating group by address | 441 | 1586 | 2813 | 4764 | 6691 | -     | Concern     |
+| send              | Sending a message         | 92  | 105  | 79   | 79   | 92   | 88    | On Target   |
+| addMember         | Adding a member           | 35  | 36   | 35   | 46   | 57   | 60    | On Target   |
+| groupSync         | Group sync                | 71  | 294  | 81   | 87   | 111  | 114   | On Target   |
+| removeMembers     | Removing members          | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
+| updateName        | Updating group name       | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
+
+_Note: Measurements taken from the sender's perspective during group operations._
+
+#### by receiver
+
+Operations performed by message receivers including streaming and synchronization.
+
+| Operation         | Description          | 10  | 50  | 100  | 150  | 200  | 250  | Performance |
+| ----------------- | -------------------- | --- | --- | ---- | ---- | ---- | ---- | ----------- |
+| streamMessage     | Streaming messages   | 106 | 116 | 394  | 176  | 235  | 186  | On Target   |
+| streamMembership  | Streaming membership | 283 | 429 | 554  | 541  | 586  | 604  | Concern     |
+| streamMetadata    | Streaming metadata   | 144 | 265 | 466  | 436  | 548  | 487  | On Target   |
+| sync              | Syncing group        | 202 | 480 | 862  | 1188 | 1461 | 1838 | Concern     |
+| syncCumulative    | Sync previous        | 194 | 470 | 781  | 1142 | 1460 | 1856 | Concern     |
+| syncAll           | Syncing all          | 386 | 719 | 1207 | 1429 | 1706 | 2145 | Concern     |
+| syncAllCumulative | Sync all previous    | 384 | 715 | 1077 | 1417 | 1749 | 2168 | Concern     |
+
+_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
+
+## Node performance
+
+Network-level performance metrics including connection times and regional variations.
+
+### by network
+
+Core network operation timings from DNS lookup through server response processing.
+
+| Performance Metric | Production | Dev | Target | Performance |
+| ------------------ | ---------- | --- | ------ | ----------- |
+| Server Call        | 157        | 143 | <250   | On Target   |
+| Tls Handshake      | 125        | 113 | <150   | On Target   |
+| Tcp Connection     | 56         | 46  | <70    | On Target   |
+| Processing         | 32         | 30  | <100   | On Target   |
+| Dns Lookup         | 23         | 16  | <50    | On Target   |
+
+### by region
+
+Comparative network performance across different global regions relative to us-east baseline.
+
+| Region        | Production | Dev | ~ baseline | Performance |
+| ------------- | ---------- | --- | ---------- | ----------- |
+| us east-1     | 50         | 46  | -37%       | On Target   |
+| us east       | 79         | 70  | Baseline   | On Target   |
+| es west       | 116        | 114 | +47%       | On Target   |
+| europe        | 203        | 198 | +157%      | On Target   |
+| asia          | 425        | 521 | +438%      | Concern     |
+| south-america | 734        | 734 | +438%      | Concern     |
+
+_Note: Baseline is `us-east` region and `production` network._
 
 ## Message reliability
 
 Message delivery and ordering reliability metrics across different testing scenarios.
 
-### Message delivery testing
-
-Comprehensive delivery rate and message ordering accuracy across stream, poll, and recovery methods.
-
-| Test Area            | Average         | Target         | Performance |
-| -------------------- | --------------- | -------------- | ----------- |
-| Stream Delivery Rate | 100% successful | 99.9% minimum  | On Target   |
-| Poll Delivery Rate   | 100% successful | 99.9% minimum  | On Target   |
-| Recovery Rate        | 100% successful | 99.9% minimum  | On Target   |
-| Stream Order         | 100% in order   | 99.9% in order | On Target   |
-| Poll Order           | 100% in order   | 99.9% in order | On Target   |
-| Recovery Order       | 100% in order   | 99.9% in order | On Target   |
+| Test Area             | Average         | Target         | Performance |
+| --------------------- | --------------- | -------------- | ----------- |
+| Average Response Time | 400ms           | <500ms         | On Target   |
+| Stream Delivery Rate  | 100% successful | 99.9% minimum  | On Target   |
+| Poll Delivery Rate    | 100% successful | 99.9% minimum  | On Target   |
+| Recovery Rate         | 100% successful | 99.9% minimum  | On Target   |
+| Stream Order          | 100% in order   | 99.9% in order | On Target   |
+| Poll Order            | 100% in order   | 99.9% in order | On Target   |
+| Recovery Order        | 100% in order   | 99.9% in order | On Target   |
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-### Operation by inbox size
+## Operation by inbox size
 
 | Operation            | Base | 1000 | 2000 | 5000 | 10000 | Min | Max  | Orders |
 | -------------------- | ---- | ---- | ---- | ---- | ----- | --- | ---- | ------ |
@@ -162,11 +153,11 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | syncCumulative-10    | 50   | 44   | 68   | 108  | 215   | 44  | 215  | 1x     |
 | syncAllCumulative-10 | 76   | 70   | 201  | 171  | 1769  | 70  | 1769 | 10x    |
 
-## Storage
+## Storage performance
 
 Database storage efficiency and performance metrics for different group sizes and inbox configurations.
 
-### Storage by group size
+### By group size
 
 Storage utilization comparison between sender and receiver across varying group member counts.
 
@@ -179,15 +170,26 @@ Storage utilization comparison between sender and receiver across varying group 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### Large inbox syncs
+### By inbox size
 
-Sync performance and storage requirements for inboxes with varying numbers of existing groups.
+Storage utilization comparison between sender and receiver across varying inbox sizes.
 
-| Inbox Size | Sync Time (ms) | DB Size (MB) | Existing Groups | queryGroupMessages |
-| ---------- | -------------- | ------------ | --------------- | ------------------ |
-| Small      | 335            | 20           | 5               | 17                 |
-| Medium     | 364            | 107          | 17              | 53                 |
-| Large      | 365            | 208          | 31              | 95                 |
-| XL         | 376            | 410          | 59              | 179                |
+| Inbox Size | Conversations | Size (mb) |
+| ---------- | ------------- | --------- |
+| 1000       | 1000          | 240       |
+| 2000       | 2000          | 252       |
+| 5000       | 5000          | 265       |
+| 10000      | 10000         | 282       |
+| 20000      | 20000         | 300       |
 
-> For large groups measurments see [bench](./monitoring/bench/README.md)
+## Service Level Objectives (SLOs)
+
+Weekly SLO performance tracking for critical XMTP SDK metrics.
+
+| SLO Name                      | Target | JUL-7    | JUL-14  | JUL-21   | WTD      | Status |
+| ----------------------------- | ------ | -------- | ------- | -------- | -------- | ------ |
+| Network uptime                | 99%    | 100.000% | 99.900% | 100.000% | 100.000% | ✅     |
+| Messages ordered              | 99%    | 100.000% | 99.205% | 100.000% | 100.000% | ✅     |
+| New group under 2 seconds     | 99%    | 100.000% | 99.503% | 100.000% | 100.000% | ✅     |
+| Response times under 1 second | 99%    | 100.000% | 99.602% | 100.000% | 100.000% | ✅     |
+| Messages delivered            | 99%    | 96.079%  | 95.086% | 99.106%  | 95.066%  | ❌     |
