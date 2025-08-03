@@ -110,6 +110,13 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     });
+    it(`stream(${populateSize}):measure receiving a gm`, async () => {
+      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.allReceived).toBe(true);
+    });
+
     it(`newDmByAddress(${populateSize}):measure creating a DM`, async () => {
       const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
         identifier: getRandomAddress(1)[0],
@@ -143,13 +150,6 @@ describe(testName, () => {
       );
       expect(consentState).toBe(ConsentState.Allowed);
     });
-    it(`stream(${populateSize}):measure receiving a gm`, async () => {
-      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.allReceived).toBe(true);
-    });
-
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
         allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
