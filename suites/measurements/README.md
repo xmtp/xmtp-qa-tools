@@ -81,6 +81,33 @@ Sync operation performance for receivers during cold starts and cumulative syncs
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
+### Operations by size
+
+| Test                | Base | 1000 | 2000 | 5000 | 10000 | unknown | Min | Max | Avg |
+| ------------------- | ---- | ---- | ---- | ---- | ----- | ------- | --- | --- | --- |
+| addMember           | 5    | 7    | 10   | 11   | 10    | -       | 5   | 11  | 9   |
+| canMessage          | 8    | 21   | 16   | 7    | 12    | -       | 7   | 21  | 13  |
+| consent             | -    | -    | -    | -    | -     | 1       | 1   | 2   | 2   |
+| create              | 96   | 82   | 84   | 90   | 106   | -       | 82  | 106 | 92  |
+| getConversationById | 1    | 3    | 1    | 2    | 1     | -       | 1   | 3   | 1   |
+| groupsync           | 13   | 17   | 13   | 21   | 18    | -       | 13  | 21  | 16  |
+| inboxState          | 1    | 1    | 0    | 1    | 1     | -       | 0   | 1   | 1   |
+| newDm               | 1    | 1    | 1    | 1    | 2     | -       | 1   | 2   | 1   |
+| newDmByAddress      | 51   | 61   | 131  | 76   | 90    | -       | 51  | 131 | 82  |
+| newGroup            | 121  | 121  | 135  | 132  | 149   | -       | 121 | 149 | 131 |
+| newGroupByAddress   | 75   | 84   | 79   | 101  | 114   | -       | 75  | 114 | 91  |
+| send                | 17   | 28   | 34   | 36   | 36    | -       | 17  | 36  | 30  |
+| stream              | 35   | 42   | 82   | 41   | 111   | -       | 35  | 111 | 62  |
+| streamMembership    | 67   | 76   | 116  | 125  | 120   | -       | 67  | 125 | 101 |
+| streamMessage       | 36   | 92   | 52   | 95   | 54    | -       | 36  | 95  | 66  |
+| streamMetadata      | 61   | 95   | 135  | 90   | 101   | -       | 61  | 135 | 96  |
+| sync                | 45   | 58   | 64   | 53   | 93    | -       | 45  | 93  | 62  |
+| sync                | 8    | 6    | 7    | 6    | 6     | -       | 6   | 8   | 7   |
+| syncAll             | 60   | 88   | 87   | 97   | 159   | -       | 60  | 159 | 98  |
+| syncAll             | 40   | 41   | 51   | 64   | 57    | -       | 40  | 64  | 51  |
+
+> Measurments made in `local` network only.
+
 ## Networks
 
 Network-level performance metrics including connection times and regional variations.

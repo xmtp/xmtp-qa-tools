@@ -130,6 +130,18 @@ setupTestLifecycle({
     customDuration = v;
   },
 });
+
+// Set up test lifecycle with summary table and file export
+setupTestLifecycle({
+  testName: "performance-test-suite",
+  createSummaryTable: true,
+  summaryTableConfig: {
+    showStats: true,
+    sortBy: "testName",
+  },
+  saveToFile: true, // Saves summary table to JSON file
+});
+```
 ```
 
 Lifecycle hooks:
@@ -139,7 +151,7 @@ Lifecycle hooks:
 - `afterEach`: Sends performance metrics
 - `afterAll`: Flushes metrics and cleanup
 
-Functions: Automatic setup, performance tracking, custom duration support, cleanup management.
+Functions: Automatic setup, performance tracking, custom duration support, cleanup management, summary table generation with optional file export.
 
 ## Playwright module
 

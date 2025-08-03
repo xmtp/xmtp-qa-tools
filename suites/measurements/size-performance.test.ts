@@ -46,10 +46,12 @@ describe(testName, () => {
     initDataDog: true,
     sendDurationMetrics: true,
     networkStats: true,
+    createSummaryTable: true,
     summaryTableConfig: {
       showStats: true,
       sortBy: "testName",
     },
+    saveToFile: true,
   });
 
   for (const populateSize of POPULATE_SIZE) {
@@ -72,8 +74,7 @@ describe(testName, () => {
     });
 
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      const inboxState = await creator!.client.preferences.inboxState();
-      console.log("inboxState", inboxState);
+      await creator!.client.preferences.inboxState();
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const randomAddress = receiver!.address;
@@ -132,7 +133,6 @@ describe(testName, () => {
         ConsentEntityType.InboxId,
         receiver!.client.inboxId,
       );
-      console.log("consentState", consentState);
       expect(consentState).toBe(ConsentState.Allowed);
     });
     it(`stream(${populateSize}):measure receiving a gm`, async () => {
@@ -231,7 +231,6 @@ describe(testName, () => {
           sdk: workers.getCreator().sdk,
         } as ResponseMetricTags);
 
-        console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       });
