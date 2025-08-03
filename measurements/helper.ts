@@ -87,8 +87,8 @@ export const setupSummaryTable = ({
   afterAll(() => {
     // Display and save summary table if enabled
     if (createSummaryTable) {
-      displaySummaryTable(testName, summaryTableConfig);
-      saveSummaryTableToMarkdown(testName, summaryTableConfig);
+      displaySummaryTable(testName);
+      saveSummaryTableToMarkdown(testName);
     }
   });
 };
@@ -155,10 +155,10 @@ function processResultsForTable(testName: string) {
 
   // Create header
   const header = [
-    "Test",
+    "Operation",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  header.push("Min", "Max", "Avg");
+  header.push("Min", "Max", "Orders");
 
   // Keep original test order - don't sort
   const sortedTests = Array.from(groupedResults.entries()).map(
@@ -177,14 +177,10 @@ function processResultsForTable(testName: string) {
     allIterations,
     header,
     sortedTests,
-    summary: `${groupedResults.size} tests across ${allIterations.length} iterations`,
   };
 }
 
-function displaySummaryTable(
-  testName: string,
-  config: SummaryTableConfig,
-): void {
+function displaySummaryTable(testName: string): void {
   const tableData = processResultsForTable(testName);
 
   if (!tableData) {
@@ -192,19 +188,9 @@ function displaySummaryTable(
     return;
   }
 
-  const { groupedResults, allIterations, header, sortedTests, summary } =
-    tableData;
+  const { groupedResults, allIterations, header, sortedTests } = tableData;
 
   console.log("\n");
-  console.log(
-    "┌─────────────────────────────────────────────────────────────────────────────────┐",
-  );
-  console.log(
-    "│                           📊 Performance Test Summary                           │",
-  );
-  console.log(
-    "└─────────────────────────────────────────────────────────────────────────────────┘",
-  );
 
   // Calculate proper column widths based on actual data
   const testNames = Array.from(groupedResults.keys());
@@ -263,41 +249,37 @@ function displaySummaryTable(
       const durations = testResults.map((r) => r.duration);
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();
-      const avg = Math.round(
-        durations.reduce((a, b) => a + b, 0) / durations.length,
-      ).toString();
+
+      // Calculate orders of magnitude difference between min and max
+      const minVal = Math.min(...durations);
+      const maxVal = Math.max(...durations);
+      const ordersOfMagnitude =
+        minVal > 0 ? Math.floor(Math.log10(maxVal / minVal)) : 0;
+      const orders =
+        ordersOfMagnitude === 0 ? "1x" : `${Math.pow(10, ordersOfMagnitude)}x`;
 
       row.push(min.padStart(colWidths[colWidths.length - 3]));
       row.push(max.padStart(colWidths[colWidths.length - 2]));
-      row.push(avg.padStart(colWidths[colWidths.length - 1]));
+      row.push(orders.padStart(colWidths[colWidths.length - 1]));
     }
 
     console.log("│ " + row.join(" │ ") + " │");
   });
-
-  console.log("└─" + colWidths.map((w) => "─".repeat(w)).join("─┴─") + "─┘");
-  console.log(`📈 Summary: ${summary}\n`);
 }
 
-function saveSummaryTableToMarkdown(
-  testName: string,
-  config: SummaryTableConfig,
-): void {
+function saveSummaryTableToMarkdown(testName: string): void {
   const tableData = processResultsForTable(testName);
 
   if (!tableData) {
     return;
   }
 
-  const { allIterations, header, sortedTests, summary } = tableData;
+  const { allIterations, header, sortedTests } = tableData;
 
   // Create markdown content
   const outputFile = "./measurements/" + testName + getTime() + ".md";
-  const timestamp = new Date().toISOString();
 
-  let markdown = `# Performance Test Results: ${testName}\n\n`;
-  markdown += `**Generated:** ${timestamp}\n\n`;
-  markdown += `**Summary:** ${summary}\n\n`;
+  let markdown = "";
 
   // Create markdown table
   markdown += "| " + header.join(" | ") + " |\n";
@@ -320,11 +302,16 @@ function saveSummaryTableToMarkdown(
       const durations = testResults.map((r) => r.duration);
       const min = Math.round(Math.min(...durations)).toString();
       const max = Math.round(Math.max(...durations)).toString();
-      const avg = Math.round(
-        durations.reduce((a, b) => a + b, 0) / durations.length,
-      ).toString();
 
-      row.push(min, max, avg);
+      // Calculate orders of magnitude difference between min and max
+      const minVal = Math.min(...durations);
+      const maxVal = Math.max(...durations);
+      const ordersOfMagnitude =
+        minVal > 0 ? Math.floor(Math.log10(maxVal / minVal)) : 0;
+      const orders =
+        ordersOfMagnitude === 0 ? "1x" : `${Math.pow(10, ordersOfMagnitude)}x`;
+
+      row.push(min, max, orders);
     }
 
     markdown += "| " + row.join(" | ") + " |\n";
