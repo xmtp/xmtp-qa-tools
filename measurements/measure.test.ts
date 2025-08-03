@@ -16,11 +16,11 @@ import {
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
-const testName = "performance";
+const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000, 5000, 10000, 20000];
+    : [0];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10, 50, 100];
