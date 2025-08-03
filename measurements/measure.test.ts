@@ -104,9 +104,9 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     });
-    it(`stream(${populateSize}):measure receiving a gm`, async () => {
+    it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
+      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     });

@@ -27,7 +27,7 @@ Link to test code [../monitoring/performance.test.ts](../monitoring/performance.
 - `inboxState: measure inboxState`
 - `newDm: measure creating a DM`
 - `send: measure sending a gm`
-- `stream: measure receiving a gm`
+- `streamMessage: measure receiving a gm`
 - `newDmByAddress: measure creating a DM`
 
 ### Scaled operations (per group size):
@@ -37,7 +37,7 @@ Link to test code [../monitoring/performance.test.ts](../monitoring/performance.
 - `groupsync-{i}: sync a large group of {i} members`
 - `updateName-{i}: update the group name`
 - `send-{i}: measure sending a gm in a group of {i} members`
-- `stream-{i}: group message`
+- `streamMessage-{i}: group message`
 - `addMember-{i}: add members to a group`
 - `removeMembers-{i}: remove a participant from a group`
 
@@ -53,7 +53,7 @@ Link to test code [../monitoring/delivery.test.ts](../monitoring/delivery.test.t
 
 ### Core tests:
 
-- `stream: message delivery and order accuracy using streams`
+- `streamMessage: message delivery and order accuracy using streams`
 - `poll: message delivery and order accuracy using polling`
 - `recovery: message recovery after stream interruption`
 
@@ -103,7 +103,7 @@ Link to test code [../monitoring/functional/convos.test.ts](../monitoring/functi
 - `new group`
 - `new group by address`
 - `send message`
-- `stream message`
+- `streamMessage message`
 - `sync`
 - `sync all`
 - `add member`

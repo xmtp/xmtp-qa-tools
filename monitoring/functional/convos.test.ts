@@ -61,7 +61,7 @@ describe(testName, async () => {
     expect(dmId).toBeDefined();
   });
 
-  it("stream:receive and message delivery in DM conversation", async () => {
+  it("streamMessage:receive and message delivery in DM conversation", async () => {
     const verifyResult = await verifyMessageStream(convo, [
       workers.get("randomguy")!,
     ]);

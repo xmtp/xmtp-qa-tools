@@ -123,7 +123,7 @@ describe(testName, () => {
     console.log("consentState", consentState);
     expect(consentState).toBe(ConsentState.Allowed);
   });
-  it(`stream:measure receiving a gm`, async () => {
+  it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
     setCustomDuration(verifyResult.averageEventTiming);

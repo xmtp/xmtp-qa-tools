@@ -23,7 +23,7 @@ describe(testName, async () => {
   const workers = await getWorkers(WORKER_COUNT);
   const group = await workers.createGroupBetweenAll();
 
-  it("stream:message delivery and order accuracy using streams", async () => {
+  it("streamMessage:message delivery and order accuracy using streams", async () => {
     const stats = await verifyMessageStream(
       group,
       workers.getAllButCreator(),

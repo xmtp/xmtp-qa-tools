@@ -47,9 +47,7 @@ export const setupSummaryTable = ({
 
   afterEach(function () {
     const currentTestName = expect.getState().currentTestName ?? "";
-    if (expect.getState().error) {
-      console.error("Test failed", currentTestName);
-    }
+
     let duration = performance.now() - start;
     if (getCustomDuration) {
       const customDuration = getCustomDuration();
@@ -279,7 +277,7 @@ function saveSummaryTableToMarkdown(testName: string): void {
   const { allIterations, header, sortedTests } = tableData;
 
   // Create markdown content
-  const outputFile = "./logs/measurements/" + testName + getTime() + ".md";
+  const outputFile = "logs/measurements/" + testName + getTime() + ".md";
 
   let markdown = "";
 
