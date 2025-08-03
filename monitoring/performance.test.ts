@@ -1,4 +1,8 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
+import {
+  sendMetric,
+  type DeliveryMetricTags,
+  type ResponseMetricTags,
+} from "@helpers/datadog";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -32,7 +36,7 @@ describe(testName, () => {
   };
   let allMembers: string[] = [];
   let allMembersWithExtra: string[] = [];
-  // Cumulative tracking variables
+  let extraMember: string[] = [];
   let cumulativeGroups: Group[] = [];
 
   setupDurationTracking({
@@ -129,13 +133,6 @@ describe(testName, () => {
   it(`stream:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
-    sendMetric("response", verifyResult.averageEventTiming, {
-      test: testName,
-      metric_type: "stream",
-      metric_subtype: "message",
-      sdk: receiver!.sdk,
-    } as ResponseMetricTags);
-
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.allReceived).toBe(true);
   });
@@ -143,8 +140,11 @@ describe(testName, () => {
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
       allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
-      allMembers = allMembersWithExtra.slice(0, i);
-
+      allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
+      extraMember = allMembersWithExtra.slice(
+        i - workers.getAll().length,
+        i - workers.getAll().length + 1,
+      );
       newGroup = (await creator!.client.conversations.newGroup([
         ...allMembers,
         ...workers.getAllButCreator().map((w) => w.client.inboxId),
@@ -199,7 +199,6 @@ describe(testName, () => {
       expect(members.length).toBe(previousMembers.length - 1);
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-      const extraMember = allMembersWithExtra.slice(i, i + 1);
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),
@@ -222,6 +221,14 @@ describe(testName, () => {
         metric_subtype: "message",
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
+
+      sendMetric("delivery", verifyResult.receptionPercentage, {
+        sdk: workers.getCreator().sdk,
+        test: testName,
+        metric_type: "delivery",
+        metric_subtype: "stream",
+        conversation_type: "group",
+      } as DeliveryMetricTags);
 
       console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
