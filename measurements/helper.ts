@@ -1,7 +1,8 @@
 import { writeFileSync } from "fs";
+import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
-import { afterAll, afterEach, beforeEach, expect } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
   groupBy?: string; // regex pattern to extract grouping key (e.g., iteration number)
@@ -32,6 +33,9 @@ export const setupSummaryTable = ({
   summaryTableConfig?: SummaryTableConfig;
 }) => {
   let start: number;
+  beforeAll(() => {
+    loadEnv(testName);
+  });
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
@@ -103,42 +107,28 @@ function extractIteration(testName: string, groupByPattern?: string): string {
 
 function cleanTestName(testName: string, groupByPattern?: string): string {
   if (!groupByPattern) {
-    // Default: extract iteration numbers in parentheses and append to test name
-    const match = testName.match(/\((\d+)\)/);
+    // Default: extract just the base test name without iteration numbers
     const baseName = testName
       .replace(/\(\d+\)/, "")
       .replace(/:\s*$/, "")
       .trim();
-
-    if (match) {
-      return `${baseName}-${match[1]}`;
-    }
     return baseName;
   }
 
-  // For custom patterns, extract the group size and append it
-  const match = testName.match(new RegExp(groupByPattern));
+  // For custom patterns, extract just the base name without the pattern
   const baseName = testName.replace(new RegExp(groupByPattern), "").trim();
-
-  if (match) {
-    const groupSize = match[1] || match[0];
-    return `${baseName}-${groupSize}`;
-  }
   return baseName;
 }
 
-function displaySummaryTable(
-  testName: string,
-  config: SummaryTableConfig,
-): void {
+// Shared function to process results for both display and markdown
+function processResultsForTable(testName: string) {
   const results = Array.from(summaryResults.entries())
     .filter(([key]) => key.startsWith(testName))
     .map(([, results]) => results)
     .flat();
 
   if (results.length === 0) {
-    console.log("\n📊 No results collected for summary table");
-    return;
+    return null;
   }
 
   // Group results by test name
@@ -163,6 +153,48 @@ function displaySummaryTable(
       return numA - numB;
     });
 
+  // Create header
+  const header = [
+    "Test",
+    ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
+  ];
+  header.push("Min", "Max", "Avg");
+
+  // Keep original test order - don't sort
+  const sortedTests = Array.from(groupedResults.entries()).map(
+    ([testName, results]) => {
+      // Parse the test name to get operationName-members format
+      const { operationName, members } = parseTestName(testName);
+      const displayName = members
+        ? `${operationName}-${members}`
+        : operationName;
+      return [displayName, results] as [string, TestResult[]];
+    },
+  );
+
+  return {
+    groupedResults,
+    allIterations,
+    header,
+    sortedTests,
+    summary: `${groupedResults.size} tests across ${allIterations.length} iterations`,
+  };
+}
+
+function displaySummaryTable(
+  testName: string,
+  config: SummaryTableConfig,
+): void {
+  const tableData = processResultsForTable(testName);
+
+  if (!tableData) {
+    console.log("\n📊 No results collected for summary table");
+    return;
+  }
+
+  const { groupedResults, allIterations, header, sortedTests, summary } =
+    tableData;
+
   console.log("\n");
   console.log(
     "┌─────────────────────────────────────────────────────────────────────────────────┐",
@@ -173,13 +205,6 @@ function displaySummaryTable(
   console.log(
     "└─────────────────────────────────────────────────────────────────────────────────┘",
   );
-
-  // Create header with cleaner labels
-  const header = [
-    "Test",
-    ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
-  ];
-  header.push("Min", "Max", "Avg");
 
   // Calculate proper column widths based on actual data
   const testNames = Array.from(groupedResults.keys());
@@ -221,17 +246,10 @@ function displaySummaryTable(
   console.log("│ " + headerRow + " │");
   console.log("├─" + colWidths.map((w) => "─".repeat(w)).join("─┼─") + "─┤");
 
-  // Keep original test order - don't sort
-  const sortedTests = Array.from(groupedResults.entries());
-
   // Print rows
   sortedTests.forEach(([testName, testResults]) => {
-    // Truncate test name if too long
-    const { operationName, members } = parseTestName(testName);
-
-    // Create display name - only add dash if members is not empty
-    const displayName = members ? `${operationName}-${members}` : operationName;
-    const row = [displayName.padEnd(colWidths[0])];
+    // Use the test name directly since it's already cleaned
+    const row = [testName.padEnd(colWidths[0])];
 
     // Add duration for each iteration
     allIterations.forEach((iteration, i) => {
@@ -258,45 +276,20 @@ function displaySummaryTable(
   });
 
   console.log("└─" + colWidths.map((w) => "─".repeat(w)).join("─┴─") + "─┘");
-  console.log(
-    `📈 Summary: ${groupedResults.size} tests across ${allIterations.length} iterations\n`,
-  );
+  console.log(`📈 Summary: ${summary}\n`);
 }
 
 function saveSummaryTableToMarkdown(
   testName: string,
   config: SummaryTableConfig,
 ): void {
-  const results = Array.from(summaryResults.entries())
-    .filter(([key]) => key.startsWith(testName))
-    .map(([, results]) => results)
-    .flat();
+  const tableData = processResultsForTable(testName);
 
-  if (results.length === 0) {
+  if (!tableData) {
     return;
   }
 
-  // Group results by test name
-  const groupedResults = new Map<string, TestResult[]>();
-  results.forEach((result) => {
-    const key = result.testName;
-    if (!groupedResults.has(key)) {
-      groupedResults.set(key, []);
-    }
-    const existingResults = groupedResults.get(key);
-    if (existingResults) {
-      existingResults.push(result);
-    }
-  });
-
-  // Get all unique iterations and sort them
-  const allIterations = Array.from(new Set(results.map((r) => r.iteration)))
-    .filter((iter) => iter !== undefined)
-    .sort((a, b) => {
-      const numA = parseInt(a || "0");
-      const numB = parseInt(b || "0");
-      return numA - numB;
-    });
+  const { allIterations, header, sortedTests, summary } = tableData;
 
   // Create markdown content
   const outputFile = "./measurements/" + testName + getTime() + ".md";
@@ -304,28 +297,16 @@ function saveSummaryTableToMarkdown(
 
   let markdown = `# Performance Test Results: ${testName}\n\n`;
   markdown += `**Generated:** ${timestamp}\n\n`;
-  markdown += `**Summary:** ${groupedResults.size} tests across ${allIterations.length} iterations\n\n`;
-
-  // Create header
-  const header = [
-    "Test",
-    ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
-  ];
-  header.push("Min", "Max", "Avg");
+  markdown += `**Summary:** ${summary}\n\n`;
 
   // Create markdown table
   markdown += "| " + header.join(" | ") + " |\n";
   markdown += "| " + header.map(() => "---").join(" | ") + " |\n";
 
-  // Keep original test order - don't sort
-  const sortedTests = Array.from(groupedResults.entries());
-
   // Add rows
   sortedTests.forEach(([testName, testResults]) => {
-    const { operationName, members } = parseTestName(testName);
-    // Create display name - only add dash if members is not empty
-    const displayName = members ? `${operationName}-${members}` : operationName;
-    const row = [displayName];
+    // Use the test name directly since it's already cleaned
+    const row = [testName];
 
     // Add duration for each iteration
     allIterations.forEach((iteration) => {
