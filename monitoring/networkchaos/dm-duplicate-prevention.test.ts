@@ -3,7 +3,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Dm } from "@workers/versions";
 import { describe, expect, it } from "vitest";
-import { DockerContainer } from "../../network-stability-utilities/container";
+import { DockerContainer } from "../../network-stability/container";
 
 const testName = "dm-duplicate-chaos";
 describe(testName, async () => {

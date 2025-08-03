@@ -4,7 +4,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
-import { DockerContainer } from "../../network-stability-utilities/container";
+import { DockerContainer } from "../../network-stability/container";
 
 const testName = "group-node-blackhole";
 describe(testName, async () => {

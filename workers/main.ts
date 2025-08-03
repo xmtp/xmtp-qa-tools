@@ -535,9 +535,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
     if (this.dbPath) {
       // Use the custom dbPath if provided
       console.debug(`[${this.nameId}] Using custom dbPath: ${this.dbPath}`);
-      const account = privateKeyToAccount(this.walletKey as `0x${string}`);
-      const address = account.address;
-
       // Create client with custom dbPath
       client = await regressionClient(
         this.sdk,
