@@ -10,7 +10,7 @@ import {
 } from "../helpers/client";
 
 const BASE_LOGPATH = "./logs";
-const INBOXES_DIR = "./inboxes";
+const INBOXES_DIR = "./inboxes/byinstallation";
 let debugMode = false;
 
 // === Tweakable Defaults ===
