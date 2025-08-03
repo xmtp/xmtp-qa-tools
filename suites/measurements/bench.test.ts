@@ -1,7 +1,7 @@
 import fs from "fs";
 import { getTime } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@workers/versions";
@@ -23,7 +23,7 @@ describe(testName, () => {
     customDuration = duration;
   };
 
-  setupTestLifecycle({
+  setupDurationTracking({
     testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

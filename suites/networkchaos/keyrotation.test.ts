@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -7,7 +7,7 @@ import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "keyrotation-chaos";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
   const allNodes = [
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),

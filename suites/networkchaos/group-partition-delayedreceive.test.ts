@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@workers/versions";
 import { describe, expect, it } from "vitest";
@@ -15,7 +15,7 @@ describe(testName, async () => {
   });
   // Start message and response streams for the chaos testing
 
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

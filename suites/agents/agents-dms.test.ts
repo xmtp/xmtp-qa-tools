@@ -1,7 +1,7 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
@@ -14,7 +14,7 @@ import { type AgentConfig } from "./helper";
 
 const testName = "agents-dms";
 describe(testName, async () => {
-  setupTestLifecycle({ testName, initDataDog: true });
+  setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["randomguy"]);
 

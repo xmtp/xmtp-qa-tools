@@ -1,5 +1,5 @@
 import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@workers/versions";
@@ -8,7 +8,7 @@ import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "group-node-blackhole";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",

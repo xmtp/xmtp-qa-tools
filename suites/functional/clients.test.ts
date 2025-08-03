@@ -1,4 +1,4 @@
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { getVersions } from "@workers/versions";
@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "clients";
 describe(testName, async () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
   let workers: WorkerManager;
   workers = await getWorkers([
     "henry",

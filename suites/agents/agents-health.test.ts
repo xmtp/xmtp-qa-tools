@@ -1,12 +1,12 @@
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
 const testName = "agents-health";
 describe(testName, () => {
-  setupTestLifecycle({ testName, initDataDog: true });
+  setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as string;
 
   const API_ENDPOINT =

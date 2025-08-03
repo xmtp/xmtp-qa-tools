@@ -1,5 +1,5 @@
 import { formatBytes, getMessageByMb } from "@helpers/client";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
@@ -33,7 +33,7 @@ const inboxSizes = {
 
 const testName = "storage";
 describe(testName, () => {
-  setupTestLifecycle({ testName, initDataDog: true });
+  setupDurationTracking({ testName, initDataDog: true });
 
   // Performance measurement data collection
   const performanceMeasurements: Record<

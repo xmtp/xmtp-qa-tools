@@ -1,5 +1,5 @@
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { setupTestLifecycle } from "@helpers/vitest";
+import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, it } from "vitest";
@@ -12,7 +12,7 @@ const testConfig = {
 
 const testName = "concurrency-race";
 describe(testName, () => {
-  setupTestLifecycle({ testName });
+  setupDurationTracking({ testName });
 
   let primaryClient: Client;
   let secondaryClient: Client;
