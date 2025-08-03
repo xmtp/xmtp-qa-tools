@@ -120,12 +120,11 @@ describe(testName, () => {
       ConsentEntityType.InboxId,
       receiver!.client.inboxId,
     );
-    console.log("consentState", consentState);
     expect(consentState).toBe(ConsentState.Allowed);
   });
+
   it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.allReceived).toBe(true);
   });
