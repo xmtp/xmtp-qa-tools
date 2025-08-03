@@ -15,13 +15,13 @@ Individual SDK operation performance metrics including client creation, messagin
 | Operation           | Description                            | Avg | Target | Performance |
 | ------------------- | -------------------------------------- | --- | ------ | ----------- |
 | create              | Creating a client                      | 998 | <350   | Concern     |
-| newgroup            | Creating a group                       | 502 | <350   | Concern     |
-| syncallcumulative   | Syncing all conversations cumulatively | 391 | <500   | On Target   |
-| newgroupbyaddress   | Creating a group by address            | 343 | <350   | On Target   |
-| streammembership    | Streaming membership changes           | 303 | <400   | On Target   |
-| newdmbyaddress      | Creating a dm by address               | 264 | <350   | On Target   |
-| synccumulative      | Cumulative sync operation              | 214 | <300   | On Target   |
-| newdm               | Creating a direct message conversation | 198 | <350   | On Target   |
+| newGroup            | Creating a group                       | 502 | <350   | Concern     |
+| syncAllCumulative   | Syncing all conversations cumulatively | 391 | <500   | On Target   |
+| newGroupbyaddress   | Creating a group by address            | 343 | <350   | On Target   |
+| streamMembership    | Streaming membership changes           | 303 | <400   | On Target   |
+| newdmbyAddress      | Creating a dm by address               | 264 | <350   | On Target   |
+| syncCumulative      | Cumulative sync operation              | 214 | <300   | On Target   |
+| newDm               | Creating a direct message conversation | 198 | <350   | On Target   |
 | streammetadata      | Streaming metadata changes             | 170 | <200   | On Target   |
 | syncall             | Syncing all conversations              | 164 | <500   | On Target   |
 | canmessage          | Checking if can message user           | 147 | <100   | Concern     |
