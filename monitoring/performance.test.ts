@@ -142,7 +142,7 @@ describe(testName, () => {
 
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getInboxIds(i + 1);
+      allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
       allMembers = allMembersWithExtra.slice(0, i);
 
       newGroup = (await creator!.client.conversations.newGroup([
@@ -154,7 +154,9 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-      const callMembersWithExtraWithAddress = getAddresses(i + 1);
+      const callMembersWithExtraWithAddress = getAddresses(
+        i - workers.getAll().length + 1,
+      );
       const newGroupByIdentifier =
         await creator!.client.conversations.newGroupWithIdentifiers(
           callMembersWithExtraWithAddress.map((address) => ({

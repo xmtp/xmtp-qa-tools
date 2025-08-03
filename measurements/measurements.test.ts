@@ -20,10 +20,10 @@ const testName = "performance";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 1000, 2000, 5000, 10000];
+    : [0, 20000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100, 150, 200];
+    : [10, 50, 100, 150, 200, 250];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -138,7 +138,7 @@ describe(testName, () => {
 
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getInboxIds(i + 1);
+        allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
         allMembers = allMembersWithExtra.slice(0, i);
 
         newGroup = (await creator!.client.conversations.newGroup([
@@ -150,7 +150,9 @@ describe(testName, () => {
         cumulativeGroups.push(newGroup);
       });
       it(`newGroupByAddress-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        const callMembersWithExtraWithAddress = getAddresses(i + 1);
+        const callMembersWithExtraWithAddress = getAddresses(
+          i - workers.getAll().length + 1,
+        );
         const newGroupByIdentifier =
           await creator!.client.conversations.newGroupWithIdentifiers(
             callMembersWithExtraWithAddress.map((address) => ({

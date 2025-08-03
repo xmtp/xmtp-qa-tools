@@ -33,5 +33,12 @@
     "accountAddress": "0x9E12Ccb45e837c330F2Ca622c7E3218471De6dA5",
     "size": 10000,
     "path": "inboxes/bysize/.data/bysize10000/a"
+  },
+  {
+    "walletKey": "0xec4a6ad3c3938041cab9dd902271bd13d29ed4f4ac9502dd8175d099a7c0444a",
+    "encryptionKey": "75ca5cded92599aaca479e4b6bee1360acc03d65672cc7d89b694f9e4e437b16",
+    "accountAddress": "0x2b5ddb497815aAaE3de861421EC18E45e48b5b01",
+    "size": 20000,
+    "path": "inboxes/bysize/.data/bysize20000/a"
   }
 ]
