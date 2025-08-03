@@ -31,7 +31,7 @@ Individual SDK operation performance metrics including client creation, messagin
 | sync                | Syncing group state                    | 77  | <200   | On Target   |
 | updateName          | Updating group metadata                | 76  | <200   | On Target   |
 | stream              | Receiving a group message              | 69  | <200   | On Target   |
-| groupsync           | Group sync operation                   | 66  | <200   | On Target   |
+| groupSync           | Group sync operation                   | 66  | <200   | On Target   |
 | addMember           | Adding a member to a group             | 32  | <250   | On Target   |
 | populate            | Populating conversation data           | 28  | <200   | On Target   |
 | inboxState          | Checking inbox state                   | 16  | <350   | On Target   |
@@ -50,13 +50,13 @@ Operations performed by the message sender including group creation and manageme
 
 | Operation         | Description               | 10  | 50   | 100  | 150  | 200  | 250   | Performance |
 | ----------------- | ------------------------- | --- | ---- | ---- | ---- | ---- | ----- | ----------- |
-| newgroup          | Creating a group          | 565 | 1930 | 4428 | 5941 | 8400 | 12370 | Concern     |
-| newgroupbyaddress | Creating group by address | 441 | 1586 | 2813 | 4764 | 6691 | -     | Concern     |
+| newGroup          | Creating a group          | 565 | 1930 | 4428 | 5941 | 8400 | 12370 | Concern     |
+| newGroupByAddress | Creating group by address | 441 | 1586 | 2813 | 4764 | 6691 | -     | Concern     |
 | send              | Sending a message         | 92  | 105  | 79   | 79   | 92   | 88    | On Target   |
-| addmember         | Adding a member           | 35  | 36   | 35   | 46   | 57   | 60    | On Target   |
-| groupsync         | Group sync                | 71  | 294  | 81   | 87   | 111  | 114   | On Target   |
-| removemembers     | Removing members          | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
-| updatename        | Updating group name       | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
+| addMember         | Adding a member           | 35  | 36   | 35   | 46   | 57   | 60    | On Target   |
+| groupSync         | Group sync                | 71  | 294  | 81   | 87   | 111  | 114   | On Target   |
+| removeMembers     | Removing members          | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
+| updateName        | Updating group name       | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
 
 _Note: Measurements taken from the sender's perspective during group operations._
 
@@ -66,13 +66,13 @@ Operations performed by message receivers including streaming and synchronizatio
 
 | Operation         | Description          | 10  | 50  | 100  | 150  | 200  | 250  | Performance |
 | ----------------- | -------------------- | --- | --- | ---- | ---- | ---- | ---- | ----------- |
-| streammessage     | Streaming messages   | 106 | 116 | 394  | 176  | 235  | 186  | On Target   |
-| streammembership  | Streaming membership | 283 | 429 | 554  | 541  | 586  | 604  | Concern     |
-| streammetadata    | Streaming metadata   | 144 | 265 | 466  | 436  | 548  | 487  | On Target   |
+| streamMessage     | Streaming messages   | 106 | 116 | 394  | 176  | 235  | 186  | On Target   |
+| streamMembership  | Streaming membership | 283 | 429 | 554  | 541  | 586  | 604  | Concern     |
+| streamMetadata    | Streaming metadata   | 144 | 265 | 466  | 436  | 548  | 487  | On Target   |
 | sync              | Syncing group        | 202 | 480 | 862  | 1188 | 1461 | 1838 | Concern     |
-| synccumulative    | Cumulative sync      | 194 | 470 | 781  | 1142 | 1460 | 1856 | Concern     |
-| syncall           | Syncing all          | 386 | 719 | 1207 | 1429 | 1706 | 2145 | Concern     |
-| syncallcumulative | Sync all cumulative  | 384 | 715 | 1077 | 1417 | 1749 | 2168 | Concern     |
+| syncCumulative    | Sync previous        | 194 | 470 | 781  | 1142 | 1460 | 1856 | Concern     |
+| syncAll           | Syncing all          | 386 | 719 | 1207 | 1429 | 1706 | 2145 | Concern     |
+| syncAllCumulative | Sync all previous    | 384 | 715 | 1077 | 1417 | 1749 | 2168 | Concern     |
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
@@ -181,3 +181,15 @@ Storage utilization comparison between sender and receiver across varying inbox 
 | 5000       | 5000          | 265       |
 | 10000      | 10000         | 282       |
 | 20000      | 20000         | 300       |
+
+## Service Level Objectives (SLOs)
+
+Weekly SLO performance tracking for critical XMTP SDK metrics.
+
+| SLO Name                      | Target | JUL-7    | JUL-14  | JUL-21   | WTD      | Status |
+| ----------------------------- | ------ | -------- | ------- | -------- | -------- | ------ |
+| Network uptime                | 99%    | 100.000% | 99.900% | 100.000% | 100.000% | ✅     |
+| Messages ordered              | 99%    | 100.000% | 99.205% | 100.000% | 100.000% | ✅     |
+| New group under 2 seconds     | 99%    | 100.000% | 99.503% | 100.000% | 100.000% | ✅     |
+| Response times under 1 second | 99%    | 100.000% | 99.602% | 100.000% | 100.000% | ✅     |
+| Messages delivered            | 99%    | 96.079%  | 95.086% | 99.106%  | 95.066%  | ❌     |
