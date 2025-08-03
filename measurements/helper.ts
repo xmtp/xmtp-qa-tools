@@ -241,7 +241,9 @@ function displaySummaryTable(
     // Truncate test name if too long
     const { operationName, members } = parseTestName(testName);
 
-    const row = [operationName + "-" + members.padEnd(colWidths[0])];
+    // Create display name - only add dash if members is not empty
+    const displayName = members ? `${operationName}-${members}` : operationName;
+    const row = [displayName.padEnd(colWidths[0])];
 
     // Add duration for each iteration
     allIterations.forEach((iteration, i) => {
@@ -346,7 +348,9 @@ function saveSummaryTableToMarkdown(
   // Add rows
   sortedTests.forEach(([testName, testResults]) => {
     const { operationName, members } = parseTestName(testName);
-    const row = [operationName + "-" + members];
+    // Create display name - only add dash if members is not empty
+    const displayName = members ? `${operationName}-${members}` : operationName;
+    const row = [displayName];
 
     // Add duration for each iteration
     allIterations.forEach((iteration) => {
