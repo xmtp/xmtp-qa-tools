@@ -40,12 +40,16 @@ export const setupSummaryTable = ({
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
+    console.log(currentTestName);
+
     if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });
 
   afterEach(function () {
     const currentTestName = expect.getState().currentTestName ?? "";
-    console.log(currentTestName);
+    if (expect.getState().error) {
+      console.error("Test failed", currentTestName);
+    }
     let duration = performance.now() - start;
     if (getCustomDuration) {
       const customDuration = getCustomDuration();

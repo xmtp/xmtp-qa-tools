@@ -85,22 +85,16 @@ describe(testName, () => {
       await creator!.client.preferences.inboxState();
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
-      const randomAddress = receiver!.address;
-      if (!randomAddress) {
-        throw new Error("Random client not found");
-      }
-      const start = Date.now();
       const canMessage = await Client.canMessage(
         [
           {
-            identifier: randomAddress,
+            identifier: receiver!.address,
             identifierKind: IdentifierKind.Ethereum,
           },
         ],
         receiver!.env,
       );
-      setCustomDuration(Date.now() - start);
-      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
+      expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
     });
 
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
