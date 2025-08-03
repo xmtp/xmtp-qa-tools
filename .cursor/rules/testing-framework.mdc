@@ -421,7 +421,7 @@ Use predefined names from the 61 available:
 - Use `useVersions: true` option for version testing
 - Use `typeofStream.Message` for message streaming
 - Always call `setupDurationTracking({testName})` for proper cleanup
-- Test file naming: `*.test.ts` in `suites/` directory
+- Test file naming: `*.test.ts` in `monitoring/` directory
 
 ## Key Imports
 

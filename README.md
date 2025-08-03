@@ -4,13 +4,13 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 ## Automated workflows
 
-| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                                        | Run frequency | Networks           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)              | Every 2 hours | `dev` `production` |
-| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/performance.test.ts)    | Every 30 min  | `dev` `production` |
-| Delivery    | [![Dev Delivery](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)      | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/delivery.test.ts)          | Every 30 min  | `dev` `production` |
-| Agents      | [![Agents](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)                | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                      | Every 5 min   | `dev` `production` |
-| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
+| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                                            | Run frequency | Networks           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------ |
+| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/functional)              | Every 2 hours | `dev` `production` |
+| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/performance.test.ts)    | Every 30 min  | `dev` `production` |
+| Delivery    | [![Dev Delivery](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)      | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/delivery.test.ts)          | Every 30 min  | `dev` `production` |
+| Agents      | [![Agents](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)                | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)                      | Every 5 min   | `dev` `production` |
+| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/functional/browser.test.ts) | Every 30 min  | `dev` `production` |
 
 ## Architecture
 
@@ -92,11 +92,11 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ## Documentation
 
-- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./suites/README.md)
+- Monitoring: E2E tests, metrics tracking, and alerting - see [section](./monitoring/README.md)
 - Measurements: Performance metrics and targets - see [section](./measurements/README.md)
-- Agents: Agent QA & monitoring - see [section](./suites/agents/README.md)
-- Network: Network chaos testing - see [section](./suites/networkchaos/README.md)
-- Forks: Probabilistic fork testing - see [section](./suites/forks/README.md)
+- Agents: Agent QA & monitoring - see [section](./monitoring/agents/README.md)
+- Network: Network chaos testing - see [section](./monitoring/networkchaos/README.md)
+- Forks: Probabilistic fork testing - see [section](./monitoring/forks/README.md)
 - Version management: How to manage SDK and bindings versions - see [section](./workers/version-management.md)
 - CLI: Command line interface for testing - see [section](./cli/readme.md)
 
@@ -158,7 +158,7 @@ yarn test functional --no-fail --debug
 
 ### Resources
 
-- Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
+- Test suites: Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/)
 - Inboxes: Inboxes for testing - [see section](/inboxes/)
 - Networks: Work in [local](/dev/) or [multinode](/dev/multinode) network
 - Workers: Worker for testing with CLI - [see section](/workers/)

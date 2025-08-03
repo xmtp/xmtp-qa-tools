@@ -79,6 +79,6 @@ iptables.blockHostPort(6556);
 ## Test execution
 
 ```bash
-npm test suites/networkchaos
+npm test monitoring/networkchaos
 cd multinode && ./up  # Setup required
 ```

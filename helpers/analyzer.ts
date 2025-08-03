@@ -8,7 +8,7 @@ export const PATTERNS = {
     {
       testName: "convos",
       uniqueErrorLines: [
-        "FAIL  suites/functional/convos.test.ts > convos > fail on purpose",
+        "FAIL  monitoring/functional/convos.test.ts > convos > fail on purpose",
       ],
     },
     {
@@ -18,15 +18,15 @@ export const PATTERNS = {
     {
       testName: "Browser",
       uniqueErrorLines: [
-        "FAIL  suites/browser.test.ts > browser > newDm and message stream",
-        "FAIL  suites/browser.test.ts > browser > newGroup and message stream",
+        "FAIL  monitoring/browser.test.ts > browser > newDm and message stream",
+        "FAIL  monitoring/browser.test.ts > browser > newGroup and message stream",
       ],
     },
     {
       testName: "Functional",
       uniqueErrorLines: [
-        "FAIL  suites/functional/streams.test.ts > streams > metadata: group metadata updates",
-        "FAIL  suites/functional/streams.test.ts > streams > members: member addition to existing group",
+        "FAIL  monitoring/functional/streams.test.ts > streams > metadata: group metadata updates",
+        "FAIL  monitoring/functional/streams.test.ts > streams > members: member addition to existing group",
       ],
     },
   ],
@@ -383,7 +383,9 @@ export function extractErrorLogs(testName: string): Set<string> {
  * Extract lines that contain test failures
  */
 export function extractfail_lines(errorLogs: Set<string>): string[] {
-  return Array.from(errorLogs).filter((log) => log.includes("FAIL  suites/"));
+  return Array.from(errorLogs).filter((log) =>
+    log.includes("FAIL  monitoring/"),
+  );
 }
 
 /**
