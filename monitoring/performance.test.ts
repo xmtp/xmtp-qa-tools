@@ -36,7 +36,7 @@ describe(testName, () => {
   };
   let allMembers: string[] = [];
   let allMembersWithExtra: string[] = [];
-  // Cumulative tracking variables
+  let extraMember: string[] = [];
   let cumulativeGroups: Group[] = [];
 
   setupDurationTracking({
@@ -140,8 +140,11 @@ describe(testName, () => {
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
       allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
-      allMembers = allMembersWithExtra.slice(0, i);
-
+      allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
+      extraMember = allMembersWithExtra.slice(
+        i - workers.getAll().length,
+        i - workers.getAll().length + 1,
+      );
       newGroup = (await creator!.client.conversations.newGroup([
         ...allMembers,
         ...workers.getAllButCreator().map((w) => w.client.inboxId),
@@ -196,7 +199,6 @@ describe(testName, () => {
       expect(members.length).toBe(previousMembers.length - 1);
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-      const extraMember = allMembersWithExtra.slice(i, i + 1);
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),

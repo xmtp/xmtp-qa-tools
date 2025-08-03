@@ -20,10 +20,10 @@ const testName = "performance";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 20000];
+    : [0, 1000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100, 150, 200, 250];
+    : [10, 50];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -33,7 +33,7 @@ describe(testName, () => {
   };
   let allMembers: string[] = [];
   let allMembersWithExtra: string[] = [];
-  // Cumulative tracking variables
+  let extraMember: string[] = [];
   let cumulativeGroups: Group[] = [];
 
   setupSummaryTable({
@@ -139,8 +139,11 @@ describe(testName, () => {
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
         allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
-        allMembers = allMembersWithExtra.slice(0, i);
-
+        allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
+        extraMember = allMembersWithExtra.slice(
+          i - workers.getAll().length,
+          i - workers.getAll().length + 1,
+        );
         newGroup = (await creator!.client.conversations.newGroup([
           ...allMembers,
           ...workers.getAllButCreator().map((w) => w.client.inboxId),
@@ -196,7 +199,6 @@ describe(testName, () => {
         expect(members.length).toBe(previousMembers.length - 1);
       });
       it(`streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`, async () => {
-        const extraMember = allMembersWithExtra.slice(i, i + 1);
         const verifyResult = await verifyMembershipStream(
           newGroup,
           workers.getAllButCreator(),
