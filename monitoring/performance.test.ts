@@ -9,7 +9,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getAddresses, getInboxIds, getRandomAddress } from "@inboxes/utils";
+import { getRandomAddress, getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -131,7 +131,7 @@ describe(testName, () => {
 
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
+      allMembersWithExtra = getRandomInboxIds(i - workers.getAll().length + 1);
       allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
       extraMember = allMembersWithExtra.slice(
         i - workers.getAll().length,
@@ -146,7 +146,7 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-      const callMembersWithExtraWithAddress = getAddresses(
+      const callMembersWithExtraWithAddress = getRandomAddress(
         i - workers.getAll().length + 1,
       );
       const newGroupByIdentifier =

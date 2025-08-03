@@ -8,7 +8,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@workers/versions";
 import {
@@ -33,7 +33,7 @@ describe(testName, async () => {
     const verifyResult = await verifyMembershipStream(
       group,
       workers.getAllButCreator(),
-      getInboxIds(1),
+      getRandomInboxIds(1),
     );
     expect(verifyResult.allReceived).toBe(true);
   });
@@ -90,7 +90,7 @@ describe(testName, async () => {
     group = (await creator.client.conversations.newGroup([
       receiver.client.inboxId,
     ])) as Group;
-    const addMembers = getInboxIds(1);
+    const addMembers = getRandomInboxIds(1);
     const verifyResult = await verifyAddMemberStream(
       group,
       [receiver],

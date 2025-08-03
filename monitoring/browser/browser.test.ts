@@ -1,7 +1,7 @@
 import { sleep, streamTimeout } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -84,7 +84,7 @@ describe(testName, () => {
   it("newGroup and message stream", async () => {
     await sleep(1000);
     groupId = await xmtpTester.newGroupFromUI([
-      ...getInboxIds(4),
+      ...getRandomInboxIds(4),
       receiver.inboxId,
     ]);
     await sleep(1000); // Give time for group creation to sync
@@ -99,7 +99,7 @@ describe(testName, () => {
     "conversation stream when creating the group",
     async () => {
       await xmtpTester.newGroupFromUI(
-        [...getInboxIds(4), creator.inboxId],
+        [...getRandomInboxIds(4), creator.inboxId],
         false,
       );
       await sleep(2000); // Give time for group creation to sync
@@ -119,7 +119,7 @@ describe(testName, () => {
   it(
     "conversation stream for new member",
     async () => {
-      groupId = await xmtpTester.newGroupFromUI([...getInboxIds(4)]);
+      groupId = await xmtpTester.newGroupFromUI([...getRandomInboxIds(4)]);
       await sleep(2000); // Give time for group creation to sync
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
       await sleep(2000); // Give time for member addition to sync

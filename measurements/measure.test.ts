@@ -4,10 +4,9 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import {
-  getAddresses,
   getBysizeWorkerName,
-  getInboxIds,
   getRandomAddress,
+  getRandomInboxIds,
 } from "@inboxes/utils";
 import {
   getRandomNames,
@@ -148,7 +147,9 @@ describe(testName, () => {
     });
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getInboxIds(i - workers.getAll().length + 1);
+        allMembersWithExtra = getRandomInboxIds(
+          i - workers.getAll().length + 1,
+        );
         allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
         extraMember = allMembersWithExtra.slice(
           i - workers.getAll().length,
@@ -163,7 +164,7 @@ describe(testName, () => {
         cumulativeGroups.push(newGroup);
       });
       it(`newGroupByAddress-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        const callMembersWithExtraWithAddress = getAddresses(
+        const callMembersWithExtraWithAddress = getRandomAddress(
           i - workers.getAll().length + 1,
         );
         const newGroupByIdentifier =

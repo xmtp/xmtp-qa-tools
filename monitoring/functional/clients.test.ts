@@ -1,5 +1,5 @@
 import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { getVersions } from "@workers/versions";
 import { describe, expect, it } from "vitest";
@@ -23,7 +23,7 @@ describe(testName, async () => {
 
   it(`downgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getInboxIds(1)[0];
+    const receiverInboxId = getRandomInboxIds(1)[0];
 
     for (const version of versions) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -45,7 +45,7 @@ describe(testName, async () => {
 
   it(`upgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getInboxIds(1)[0];
+    const receiverInboxId = getRandomInboxIds(1)[0];
 
     for (const version of versions.reverse()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -69,7 +69,7 @@ describe(testName, async () => {
     const initialEpoch = initialDebugInfo.epoch;
 
     // Perform group operation that should increment epoch
-    const newMember = getInboxIds(1)[0];
+    const newMember = getRandomInboxIds(1)[0];
     await group.addMembers([newMember]);
     // Get updated debug info
     const updatedDebugInfo = await group.debugInfo();
