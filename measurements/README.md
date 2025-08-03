@@ -4,7 +4,7 @@ Performance metrics and benchmarks for XMTP SDK operations tracked in our monito
 
 Here are the average measurements that are supported by the [datadog dashboard](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d).
 
-## Operations
+## Core operations
 
 Core XMTP SDK functionality performance measurements across different operations and group sizes.
 
@@ -40,11 +40,11 @@ Individual SDK operation performance metrics including client creation, messagin
 
 _Note: Baseline is `us-east` region and `production` network._
 
-### by group size
+## Group operations
 
 Performance measurements for group-specific operations broken down by group size and operation type.
 
-#### by sender
+### by sender
 
 Operations performed by the message sender including group creation and management.
 
@@ -60,7 +60,7 @@ Operations performed by the message sender including group creation and manageme
 
 _Note: Measurements taken from the sender's perspective during group operations._
 
-#### by receiver
+### by receiver
 
 Operations performed by message receivers including streaming and synchronization.
 
@@ -123,41 +123,11 @@ Message delivery and ordering reliability metrics across different testing scena
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-## Operation by inbox size
-
-| Operation            | Base | 1000 | 2000 | 5000 | 10000 | Min | Max  | Orders |
-| -------------------- | ---- | ---- | ---- | ---- | ----- | --- | ---- | ------ |
-| create               | 114  | 142  | 120  | 109  | 118   | 109 | 142  | 1x     |
-| sync                 | 3    | 3    | 2    | 2    | 4     | 2   | 4    | 1x     |
-| syncAll              | 64   | 83   | 604  | 324  | 293   | 64  | 604  | 1x     |
-| inboxState           | 1    | 0    | 14   | 1    | 1     | 0   | 14   | 10x    |
-| canMessage           | 7    | 5    | 8    | 6    | 6     | 5   | 8    | 1x     |
-| newDm                | 1    | 0    | 0    | 1    | 0     | 0   | 1    | 1x     |
-| newDmByAddress       | 40   | 40   | 336  | 97   | 54    | 40  | 336  | 1x     |
-| getConversationById  | 1    | 0    | 1    | 1    | 1     | 0   | 1    | 1x     |
-| send                 | 18   | 17   | 62   | 31   | 17    | 17  | 62   | 1x     |
-| consent              | 1    | -    | -    | -    | -     | 0   | 1    | 1x     |
-| stream               | 28   | 108  | 20   | 139  | 43    | 20  | 139  | 1x     |
-| newGroup-10          | 163  | 79   | 107  | 727  | 115   | 79  | 727  | 1x     |
-| newGroupByAddress-10 | 65   | 72   | 163  | 556  | 356   | 65  | 556  | 1x     |
-| groupsync-10         | 7    | 6    | 13   | 32   | 10    | 6   | 32   | 1x     |
-| updateName-10        | 15   | 13   | 24   | 29   | 21    | 13  | 29   | 1x     |
-| send-10              | 12   | 10   | 13   | 30   | 32    | 10  | 32   | 1x     |
-| addMember-10         | 2    | 4    | 7    | 111  | 48    | 2   | 111  | 10x    |
-| removeMembers-10     | 19   | 24   | 61   | 54   | 151   | 19  | 151  | 1x     |
-| streamMembership-10  | 43   | 69   | 46   | 497  | 174   | 43  | 497  | 10x    |
-| streamMessage-10     | 31   | 78   | 29   | 41   | 616   | 29  | 616  | 10x    |
-| streamMetadata-10    | 35   | 77   | 68   | 283  | 79    | 35  | 283  | 1x     |
-| sync-10              | 48   | 49   | 82   | 140  | 132   | 48  | 140  | 1x     |
-| syncAll-10           | 99   | 85   | 152  | 274  | 240   | 85  | 274  | 1x     |
-| syncCumulative-10    | 50   | 44   | 68   | 108  | 215   | 44  | 215  | 1x     |
-| syncAllCumulative-10 | 76   | 70   | 201  | 171  | 1769  | 70  | 1769 | 10x    |
-
-## Storage performance
+## Database
 
 Database storage efficiency and performance metrics for different group sizes and inbox configurations.
 
-### By group size
+### by group size
 
 Storage utilization comparison between sender and receiver across varying group member counts.
 
@@ -170,7 +140,7 @@ Storage utilization comparison between sender and receiver across varying group 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### By inbox size
+### by inbox size
 
 Storage utilization comparison between sender and receiver across varying inbox sizes.
 
