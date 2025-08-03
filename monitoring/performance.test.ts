@@ -1,4 +1,8 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
+import {
+  sendMetric,
+  type DeliveryMetricTags,
+  type ResponseMetricTags,
+} from "@helpers/datadog";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -129,13 +133,6 @@ describe(testName, () => {
   it(`stream:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
 
-    sendMetric("response", verifyResult.averageEventTiming, {
-      test: testName,
-      metric_type: "stream",
-      metric_subtype: "message",
-      sdk: receiver!.sdk,
-    } as ResponseMetricTags);
-
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.allReceived).toBe(true);
   });
@@ -222,6 +219,14 @@ describe(testName, () => {
         metric_subtype: "message",
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
+
+      sendMetric("delivery", verifyResult.receptionPercentage, {
+        sdk: workers.getCreator().sdk,
+        test: testName,
+        metric_type: "delivery",
+        metric_subtype: "stream",
+        conversation_type: "group",
+      } as DeliveryMetricTags);
 
       console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
