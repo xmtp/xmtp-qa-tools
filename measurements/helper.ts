@@ -163,7 +163,6 @@ function processResultsForTable(testName: string) {
     "Operation-Members",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  header.push("Min", "Max", "Increase");
 
   // Keep original test order - don't sort
   const sortedTests = Array.from(groupedResults.entries()).map(
@@ -221,8 +220,6 @@ function displaySummaryTable(testName: string): void {
     ...iterationColWidths,
   ];
 
-  colWidths.push(6, 6, 6); // Min, Max, Avg columns
-
   // Print header
   const headerRow = header
     .map((h, i) => {
@@ -254,28 +251,6 @@ function displaySummaryTable(testName: string): void {
 
       row.push(duration.padStart(colWidths[i + 1])); // Right-align numbers
     });
-
-    // Add stats if enabled
-    if (testResults.length > 0) {
-      const durations = testResults.map((r) => r.duration);
-      const min = Math.round(Math.min(...durations)).toString();
-      const max = Math.round(Math.max(...durations)).toString();
-
-      // Calculate ratio between min and max
-      const minVal = Math.min(...durations);
-      const maxVal = Math.max(...durations);
-      const ratio = minVal > 0 ? maxVal / minVal : 1;
-      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
-
-      // Add alert emoji for values > 100x increase
-      if (ratio > 100) {
-        orders += " 🚨";
-      }
-
-      row.push(min.padStart(colWidths[colWidths.length - 3]));
-      row.push(max.padStart(colWidths[colWidths.length - 2]));
-      row.push(orders.padStart(colWidths[colWidths.length - 1]));
-    }
 
     console.log("│ " + row.join(" │ ") + " │");
   });
@@ -316,26 +291,6 @@ function saveSummaryTableToMarkdown(testName: string): void {
 
       row.push(duration);
     });
-
-    // Add stats if enabled
-    if (testResults.length > 0) {
-      const durations = testResults.map((r) => r.duration);
-      const min = Math.round(Math.min(...durations)).toString();
-      const max = Math.round(Math.max(...durations)).toString();
-
-      // Calculate ratio between min and max
-      const minVal = Math.min(...durations);
-      const maxVal = Math.max(...durations);
-      const ratio = minVal > 0 ? maxVal / minVal : 1;
-      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
-
-      // Add alert emoji for values > 100x increase
-      if (ratio > 100) {
-        orders += " 🚨";
-      }
-
-      row.push(min, max, orders);
-    }
 
     markdown += "| " + row.join(" | ") + " |\n";
   });
