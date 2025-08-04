@@ -178,7 +178,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   // await Promise.all(
   //   receivers.map((worker) => worker.client.conversations.sync()),
   // );
-  console.log("Starting collectors 1 ");
   // Start collectors FIRST - before any messages are sent
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
@@ -197,14 +196,12 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     ),
   );
 
-  console.log("Starting collectors 2 ");
   // Wait for streams to be ready and collectors to be active
   await sleep(streamColdStartTimeout);
 
   // NOW send the messages - after collectors are listening
   const sentEvents = await options.triggerEvents();
 
-  console.log("Starting collectors 3 ");
   // Wait for all collectors to finish
   const allReceived = await Promise.all(collectPromises);
 
@@ -225,15 +222,12 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       }
     });
   });
-  console.log("Starting collectors 4 ");
   const averageEventTiming = Math.round(
     timingCount > 0 ? timingSum / timingCount : 0,
   );
-  console.log("Starting collectors 5 ");
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) => getMessage(m.event as TReceived)),
   );
-  console.log("Starting collectors 6 ");
   const stats = calculateMessageStats(
     messagesAsStrings,
     statsLabel,
