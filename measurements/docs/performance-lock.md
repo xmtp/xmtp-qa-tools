@@ -5,7 +5,7 @@
 - 0⚠️ indicates timeout
 - Streams are all `streamAllMessages`
 
-## Bindings 1.4.0dev-2
+### `node-bindings@1.4.0-dev.7f5d8e0`
 
 | Operation-Members   | Base | 500 | 1000     | 2000     | 5000      | 10000     |
 | ------------------- | ---- | --- | -------- | -------- | --------- | --------- |
@@ -31,7 +31,7 @@
 | streamMessage-10    | 50   | 42  | 47       | 0 ⚠️     | 0 ⚠️      | 0 ⚠️      |
 | streamMetadata-10   | 118  | 90  | 58       | 61       | 0 ⚠️      | 0 ⚠️      |
 
-## Bindings 1.4.0dev-1
+## `node-bindings@1.4.0-dev.256c8fc`
 
 | Operation-Members   | No conversations | 500 | 1000 | 2000    | 5000     | 10000    |
 | ------------------- | ---------------- | --- | ---- | ------- | -------- | -------- |
@@ -56,7 +56,7 @@
 | streamMessage-10    | 51               | 43  | 0⚠️  | 0⚠️     | 0⚠️      | 0⚠️      |
 | streamMetadata-10   | 44               | 53  | 56   | 77      | 0⚠️      | 0⚠️      |
 
-## Bindings 1.3.4
+## `node-bindings@1.3.4`
 
 | Operation-Members    | Base | 500     | 1000    | 2000    | 5000     | 10000    |
 | -------------------- | ---- | ------- | ------- | ------- | -------- | -------- |
@@ -100,5 +100,3 @@
 | addMember-100        | 67   | 42      | 60      | 51      | 13       | 9        |
 | streamMessage-100    | 61   | 72      | 72      | 80      | 0⚠️      | 0⚠️      |
 | streamMetadata-100   | 120  | 136     | 125     | 103     | 0⚠️      | 0⚠️      |
-
-# Bindings 1.4.0dev
