@@ -3,11 +3,7 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import {
-  getBysizeWorkerName,
-  getRandomAddress,
-  getRandomInboxIds,
-} from "@inboxes/utils";
+import { getRandomAddress, getRandomInboxIds } from "@inboxes/utils";
 import {
   getRandomNames,
   getWorkers,
@@ -29,11 +25,11 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0];
+    : [0, 500, 1000, 2000, 5000, 10000];
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [5];
+    : [10, 50, 100];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -63,7 +59,7 @@ describe(testName, () => {
       const workerNames = [...randomNames];
       let bysizeWorkerName = "";
       if (populateSize > 0) {
-        bysizeWorkerName = getBysizeWorkerName(populateSize)!;
+        bysizeWorkerName = `bysize${populateSize}`;
         workerNames.unshift(bysizeWorkerName);
       }
       workers = await getWorkers(workerNames);
@@ -73,7 +69,16 @@ describe(testName, () => {
     });
     it(`sync(${populateSize}):measure sync`, async () => {
       await creator!.client.conversations.sync();
+      const listConversations = await creator!.client.conversations.list();
+      console.warn(
+        "creator",
+        creator!.name,
+        "has",
+        listConversations.length,
+        "conversations",
+      );
     });
+
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
