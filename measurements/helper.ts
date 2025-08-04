@@ -2,6 +2,8 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
+import { getWorkers, type Worker } from "@workers/manager";
+import { type Group } from "version-management/client-versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
@@ -327,4 +329,47 @@ function saveSummaryTableToMarkdown(testName: string): void {
   } catch (error) {
     console.error(`❌ Failed to save results to ${outputFile}:`, error);
   }
+}
+
+export async function getReceiverGroup(
+  receiver: Worker,
+  groupId: string,
+): Promise<Group> {
+  // Sync all conversations first
+  await receiver.client.conversations.syncAll();
+
+  // Get the group by receiver with retry logic
+  let groupByReceiver: Group | undefined;
+  let retryCount = 0;
+  const maxRetries = 3;
+
+  while (!groupByReceiver && retryCount < maxRetries) {
+    try {
+      groupByReceiver =
+        (await receiver.client.conversations.getConversationById(
+          groupId,
+        )) as Group;
+
+      if (groupByReceiver) {
+        break;
+      }
+    } catch (error) {
+      console.error(`Attempt ${retryCount + 1} failed:`, error);
+    }
+    retryCount++;
+    if (retryCount < maxRetries) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retry
+    }
+  }
+
+  if (!groupByReceiver) {
+    throw new Error(
+      `Failed to get group ${groupId} after ${maxRetries} attempts`,
+    );
+  }
+
+  // Sync the specific group
+  await groupByReceiver.sync();
+
+  return groupByReceiver;
 }

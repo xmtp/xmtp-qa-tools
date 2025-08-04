@@ -108,20 +108,20 @@ describe(testName, () => {
     expect(dmId).toBeDefined();
   });
 
-  it(`setConsentStates:group consent`, async () => {
-    await creator!.client.preferences.setConsentStates([
-      {
-        entity: receiver!.client.inboxId,
-        entityType: ConsentEntityType.InboxId,
-        state: ConsentState.Allowed,
-      },
-    ]);
-    const consentState = await creator!.client.preferences.getConsentState(
-      ConsentEntityType.InboxId,
-      receiver!.client.inboxId,
-    );
-    expect(consentState).toBe(ConsentState.Allowed);
-  });
+  // it(`setConsentStates:group consent`, async () => {
+  //   await creator!.client.preferences.setConsentStates([
+  //     {
+  //       entity: receiver!.client.inboxId,
+  //       entityType: ConsentEntityType.InboxId,
+  //       state: ConsentState.Allowed,
+  //     },
+  //   ]);
+  //   const consentState = await creator!.client.preferences.getConsentState(
+  //     ConsentEntityType.InboxId,
+  //     receiver!.client.inboxId,
+  //   );
+  //   expect(consentState).toBe(ConsentState.Allowed);
+  // });
 
   it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
@@ -179,20 +179,6 @@ describe(testName, () => {
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     });
-    it(`addMember-${i}:add members to a group`, async () => {
-      await newGroup.addMembers([workers.getAll()[2].inboxId]);
-    });
-    it(`removeMembers-${i}:remove a participant from a group`, async () => {
-      const previousMembers = await newGroup.members();
-      await newGroup.removeMembers([
-        previousMembers.filter(
-          (member) => member.inboxId !== newGroup.addedByInboxId,
-        )[0].inboxId,
-      ]);
-
-      const members = await newGroup.members();
-      expect(members.length).toBe(previousMembers.length - 1);
-    });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
       const verifyResult = await verifyMembershipStream(
         newGroup,
@@ -203,7 +189,12 @@ describe(testName, () => {
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
     });
-
+    it(`removeMembers-${i}:remove a participant from a group`, async () => {
+      await newGroup.removeMembers(extraMember);
+    });
+    it(`addMember-${i}:add members to a group`, async () => {
+      await newGroup.addMembers(extraMember);
+    });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,

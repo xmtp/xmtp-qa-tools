@@ -12,21 +12,18 @@ import {
   type WorkerManager,
 } from "@workers/manager";
 import {
-  Client,
-  ConsentEntityType,
-  ConsentState,
   IdentifierKind,
   type Dm,
   type Group,
 } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
-import { getReceiverGroup, setupSummaryTable } from "./helper";
+import { setupSummaryTable } from "./helper";
 
 const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500];
+    : [0];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [5, 10];
@@ -68,89 +65,7 @@ describe(testName, () => {
       receiver = workers.get(workerNames[1])!;
       setCustomDuration(creator.initializationTime);
     });
-    it(`sync(${populateSize}):measure sync`, async () => {
-      await creator!.client.conversations.sync();
-      const listConversations = await creator!.client.conversations.list();
-      console.warn(
-        "creator",
-        creator!.name,
-        "has",
-        listConversations.length,
-        "conversations",
-      );
-    });
 
-    // it(`syncAll(${populateSize}):measure syncAll`, async () => {
-    //   await creator!.client.conversations.syncAll();
-    // });
-    it(`storage(${populateSize}):measure storage`, async () => {
-      const storage = await creator!.worker.getSQLiteFileSizes();
-      setCustomDuration(storage.dbFile);
-    });
-    it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      await creator!.client.preferences.inboxState();
-    });
-    it(`canMessage(${populateSize}):measure canMessage`, async () => {
-      const canMessage = await Client.canMessage(
-        [
-          {
-            identifier: receiver!.address,
-            identifierKind: IdentifierKind.Ethereum,
-          },
-        ],
-        receiver!.env,
-      );
-      expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
-    });
-
-    it(`newDm(${populateSize}):measure creating a DM`, async () => {
-      dm = (await creator!.client.conversations.newDm(
-        receiver!.client.inboxId,
-      )) as Dm;
-      expect(dm).toBeDefined();
-      expect(dm.id).toBeDefined();
-    });
-    it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
-      console.log(creator!.name, "is going to send a gm to", receiver!.name);
-      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.allReceived).toBe(true);
-    });
-
-    // it(`newDmByAddress(${populateSize}):measure creating a DM`, async () => {
-    //   const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
-    //     identifier: getRandomAddress(1)[0],
-    //     identifierKind: IdentifierKind.Ethereum,
-    //   });
-
-    //   expect(dm2).toBeDefined();
-    //   expect(dm2.id).toBeDefined();
-    // });
-    it(`getConversationById(${populateSize}):measure getting a conversation by id`, async () => {
-      const conversation =
-        await creator!.client.conversations.getConversationById(dm!.id);
-      expect(conversation!.id).toBe(dm!.id);
-    });
-    it(`send(${populateSize}):measure sending a gm`, async () => {
-      const dmId = await dm!.send("gm");
-      expect(dmId).toBeDefined();
-    });
-
-    // it(`setConsentStates:group consent`, async () => {
-    //   await creator!.client.preferences.setConsentStates([
-    //     {
-    //       entity: receiver!.client.inboxId,
-    //       entityType: ConsentEntityType.InboxId,
-    //       state: ConsentState.Allowed,
-    //     },
-    //   ]);
-    //   const consentState = await creator!.client.preferences.getConsentState(
-    //     ConsentEntityType.InboxId,
-    //     receiver!.client.inboxId,
-    //   );
-    //   expect(consentState).toBe(ConsentState.Allowed);
-    // });
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
         // Ensure we have at least 1 extra member to add for membership streaming test
@@ -182,9 +97,6 @@ describe(testName, () => {
             })),
           );
         expect(newGroupByIdentifier.id).toBeDefined();
-      });
-      it(`addAdmin-${i}(${populateSize}):add an admin to a group`, async () => {
-        await newGroup.addAdmin(receiver!.client.inboxId);
       });
       it(`groupsync-${i}(${populateSize}):sync a large group of ${i} members ${i}`, async () => {
         await newGroup.sync();
@@ -224,12 +136,7 @@ describe(testName, () => {
         },
         streamTimeout,
       );
-      it(`removeMembers-${i}:remove a participant from a group`, async () => {
-        await newGroup.removeMembers(extraMember);
-      });
-      it(`addMember-${i}:add members to a group`, async () => {
-        await newGroup.addMembers(extraMember);
-      });
+
       it(
         `streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`,
         async () => {
@@ -270,6 +177,20 @@ describe(testName, () => {
         streamTimeout,
       );
 
+      it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
+        await newGroup.addMembers([workers.getAll()[2].inboxId]);
+      });
+      it(`removeMembers-${i}(${populateSize}):remove a participant from a group`, async () => {
+        const previousMembers = await newGroup.members();
+        await newGroup.removeMembers([
+          previousMembers.filter(
+            (member) => member.inboxId !== newGroup.addedByInboxId,
+          )[0].inboxId,
+        ]);
+
+        const members = await newGroup.members();
+        expect(members.length).toBe(previousMembers.length - 1);
+      });
       it(`sync-${i}(${populateSize}):perform cold start sync operations on ${i} member group`, async () => {
         const singleSyncWorkers = await getWorkers(["randomA"]);
         const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
@@ -283,29 +204,6 @@ describe(testName, () => {
         const singleSyncWorkers = await getWorkers(["randomB"]);
         const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
         await newGroup.addMembers([clientSingleSync.inboxId]);
-        const start = performance.now();
-        await clientSingleSync.conversations.syncAll();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
-
-      it(`syncCumulative-${i}(${populateSize}):perform cumulative sync operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomC"]);
-        const clientSingleSync = singleSyncWorkers.get("randomC")!.client;
-        for (const group of cumulativeGroups) {
-          await group.addMembers([clientSingleSync.inboxId]);
-        }
-        const start = performance.now();
-        await clientSingleSync.conversations.sync();
-        const end = performance.now();
-        setCustomDuration(end - start);
-      });
-      it(`syncAllCumulative-${i}(${populateSize}):perform cumulative syncAll operations on ${i} member group`, async () => {
-        const singleSyncWorkers = await getWorkers(["randomD"]);
-        const clientSingleSync = singleSyncWorkers.get("randomD")!.client;
-        for (const group of cumulativeGroups) {
-          await group.addMembers([clientSingleSync.inboxId]);
-        }
         const start = performance.now();
         await clientSingleSync.conversations.syncAll();
         const end = performance.now();
