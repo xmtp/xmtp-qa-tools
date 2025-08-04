@@ -9,7 +9,6 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 30
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -24,9 +23,9 @@ jobs:
           - size: 150
             delay_minutes: 5
           - size: 200
-            delay_minutes: 10
-          - size: 250
             delay_minutes: 15
+          - size: 250
+            delay_minutes: 25
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
