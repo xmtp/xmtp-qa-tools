@@ -2,8 +2,6 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
-import { getWorkers, type Worker } from "@workers/manager";
-import { type Group } from "version-management/client-versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
@@ -20,23 +18,26 @@ interface TestResult {
 
 // Global summary tracking
 const summaryResults = new Map<string, TestResult[]>();
+const csvFiles = new Map<string, string>();
+const markdownFiles = new Map<string, string>();
 
 export const setupSummaryTable = ({
   testName,
   getCustomDuration,
   setCustomDuration,
-  createSummaryTable = false,
   summaryTableConfig = {},
 }: {
   testName: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
-  createSummaryTable?: boolean;
   summaryTableConfig?: SummaryTableConfig;
 }) => {
   let start: number;
   beforeAll(() => {
     loadEnv(testName);
+
+    initializeCsvFile(testName);
+    initializeMarkdownFile(testName);
   });
   beforeEach(() => {
     start = performance.now();
@@ -59,44 +60,196 @@ export const setupSummaryTable = ({
       }
     }
     // Collect results for summary table
-    if (createSummaryTable) {
-      const iteration = extractIteration(
-        currentTestName,
-        summaryTableConfig.groupBy,
-      );
-      const baseTestName = cleanTestName(
-        currentTestName,
-        summaryTableConfig.groupBy,
-      );
+    const iteration = extractIteration(
+      currentTestName,
+      summaryTableConfig.groupBy,
+    );
+    const baseTestName = cleanTestName(
+      currentTestName,
+      summaryTableConfig.groupBy,
+    );
 
-      const result: TestResult = {
-        testName: baseTestName,
-        duration,
-        iteration,
-        timestamp: Date.now(),
-      };
+    const result: TestResult = {
+      testName: baseTestName,
+      duration,
+      iteration,
+      timestamp: Date.now(),
+    };
 
-      const key = `${testName}-${baseTestName}`;
-      if (!summaryResults.has(key)) {
-        summaryResults.set(key, []);
-      }
-      const existingResults = summaryResults.get(key);
-      if (existingResults) {
-        existingResults.push(result);
-      }
+    const key = `${testName}-${baseTestName}`;
+    if (!summaryResults.has(key)) {
+      summaryResults.set(key, []);
     }
+    const existingResults = summaryResults.get(key);
+    if (existingResults) {
+      existingResults.push(result);
+    }
+
+    // Update table, CSV, and markdown in real-time
+    updateTableAndFiles(testName);
 
     if (setCustomDuration) setCustomDuration(undefined); // Reset after each test if available
   });
 
   afterAll(() => {
-    // Display and save summary table if enabled
-    if (createSummaryTable) {
-      displaySummaryTable(testName);
-      saveSummaryTableToMarkdown(testName);
-    }
+    // Display final summary table if enabled
+    displaySummaryTable(testName);
+    console.log(`📊 Final results saved to CSV: ${csvFiles.get(testName)}`);
+
+    // Display final markdown table if enabled
+    console.log(
+      `📄 Final results saved to markdown: ${markdownFiles.get(testName)}`,
+    );
   });
 };
+
+// Initialize CSV file with headers
+function initializeCsvFile(testName: string): void {
+  const csvFile = `logs/${testName}${getTime()}.csv`;
+  csvFiles.set(testName, csvFile);
+
+  try {
+    // Ensure the directory exists
+    const dir = csvFile.substring(0, csvFile.lastIndexOf("/"));
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+
+    // Write CSV header (will be updated as we get more data)
+    writeFileSync(csvFile, "Operation-Members\n", "utf8");
+    console.log(`📄 CSV file initialized: ${csvFile}`);
+  } catch (error) {
+    console.error(`❌ Failed to initialize CSV file ${csvFile}:`, error);
+  }
+}
+
+// Initialize markdown file with headers
+function initializeMarkdownFile(testName: string): void {
+  const markdownFile = `logs/${testName}${getTime()}.md`;
+  markdownFiles.set(testName, markdownFile);
+
+  try {
+    // Ensure the directory exists
+    const dir = markdownFile.substring(0, markdownFile.lastIndexOf("/"));
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+
+    // Write markdown header (will be updated as we get more data)
+    writeFileSync(
+      markdownFile,
+      "| Operation-Members |\n| -------------------- |\n",
+      "utf8",
+    );
+    console.log(`📄 Markdown file initialized: ${markdownFile}`);
+  } catch (error) {
+    console.error(
+      `❌ Failed to initialize markdown file ${markdownFile}:`,
+      error,
+    );
+  }
+}
+
+// Update table, CSV, and markdown in real-time
+function updateTableAndFiles(testName: string): void {
+  const tableData = processResultsForTable(testName);
+  if (!tableData) return;
+
+  const { allIterations, header, sortedTests } = tableData;
+
+  // Update CSV file if enabled
+  const csvFile = csvFiles.get(testName);
+  if (csvFile) {
+    try {
+      // Update CSV file with current data
+      let csvContent = header.join(",") + "\n";
+
+      sortedTests.forEach(([testName, testResults]) => {
+        const row = [testName];
+
+        allIterations.forEach((iteration) => {
+          const result = testResults.find((r) => r.iteration === iteration);
+          let duration = result ? Math.round(result.duration).toString() : "-";
+
+          // Don't add emojis to CSV - keep it clean
+          row.push(duration);
+        });
+
+        csvContent += row.join(",") + "\n";
+      });
+
+      writeFileSync(csvFile, csvContent, "utf8");
+    } catch (error) {
+      console.error(`❌ Failed to update CSV file ${csvFile}:`, error);
+    }
+  }
+
+  const markdownFile = markdownFiles.get(testName);
+  if (markdownFile) {
+    try {
+      // Generate markdown table content
+      const markdownContent = generateMarkdownTable(tableData);
+      writeFileSync(markdownFile, markdownContent, "utf8");
+    } catch (error) {
+      console.error(
+        `❌ Failed to update markdown file ${markdownFile}:`,
+        error,
+      );
+    }
+  }
+
+  displaySummaryTable(testName);
+}
+
+// Generate markdown table content
+function generateMarkdownTable(tableData: {
+  allIterations: string[];
+  header: string[];
+  sortedTests: [string, TestResult[]][];
+}): string {
+  const { allIterations, header, sortedTests } = tableData;
+
+  // Create header row
+  const headerRow = header.join(" | ");
+  const separatorRow = header
+    .map((h, i) => {
+      if (i === 0) {
+        return "--------------------";
+      }
+      return "-------";
+    })
+    .join(" | ");
+
+  let markdownContent = `| ${headerRow} |\n`;
+  markdownContent += `| ${separatorRow} |\n`;
+
+  // Add data rows
+  sortedTests.forEach(([testName, testResults]) => {
+    const row = [testName];
+
+    allIterations.forEach((iteration) => {
+      const result = testResults.find((r) => r.iteration === iteration);
+      let duration = result ? Math.round(result.duration).toString() : "-";
+
+      // Debug logging for zero values
+      if (result && result.duration === 0) {
+        console.log(
+          `Found zero duration for ${result.testName} in iteration ${iteration}`,
+        );
+      }
+
+      if (result && (result.duration > 10000 || result.duration === 0)) {
+        duration += " ⚠️";
+      }
+
+      row.push(duration);
+    });
+
+    markdownContent += `| ${row.join(" | ")} |\n`;
+  });
+
+  return markdownContent;
+}
 
 // Helper functions for summary table
 function extractIteration(testName: string, groupByPattern?: string): string {
@@ -163,7 +316,6 @@ function processResultsForTable(testName: string) {
     "Operation-Members",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  header.push("Min", "Max", "Increase");
 
   // Keep original test order - don't sort
   const sortedTests = Array.from(groupedResults.entries()).map(
@@ -221,8 +373,6 @@ function displaySummaryTable(testName: string): void {
     ...iterationColWidths,
   ];
 
-  colWidths.push(6, 6, 6); // Min, Max, Avg columns
-
   // Print header
   const headerRow = header
     .map((h, i) => {
@@ -247,109 +397,20 @@ function displaySummaryTable(testName: string): void {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
 
-      // Add warning emoji for values > 1000 seconds
-      if (result && result.duration > 1000) {
-        duration += "⚠️";
+      // Debug logging for zero values
+      if (result && result.duration === 0) {
+        console.log(
+          `Console: Found zero duration for ${result.testName} in iteration ${iteration}`,
+        );
+      }
+
+      if (result && (result.duration > 10000 || result.duration === 0)) {
+        duration += " ⚠️";
       }
 
       row.push(duration.padStart(colWidths[i + 1])); // Right-align numbers
     });
 
-    // Add stats if enabled
-    if (testResults.length > 0) {
-      const durations = testResults.map((r) => r.duration);
-      const min = Math.round(Math.min(...durations)).toString();
-      const max = Math.round(Math.max(...durations)).toString();
-
-      // Calculate ratio between min and max
-      const minVal = Math.min(...durations);
-      const maxVal = Math.max(...durations);
-      const ratio = minVal > 0 ? maxVal / minVal : 1;
-      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
-
-      // Add alert emoji for values > 100x increase
-      if (ratio > 100) {
-        orders += " 🚨";
-      }
-
-      row.push(min.padStart(colWidths[colWidths.length - 3]));
-      row.push(max.padStart(colWidths[colWidths.length - 2]));
-      row.push(orders.padStart(colWidths[colWidths.length - 1]));
-    }
-
     console.log("│ " + row.join(" │ ") + " │");
   });
-}
-
-function saveSummaryTableToMarkdown(testName: string): void {
-  const tableData = processResultsForTable(testName);
-
-  if (!tableData) {
-    return;
-  }
-
-  const { allIterations, header, sortedTests } = tableData;
-
-  // Create markdown content
-  const outputFile = "logs/" + testName + getTime() + ".md";
-
-  let markdown = "";
-
-  // Create markdown table
-  markdown += "| " + header.join(" | ") + " |\n";
-  markdown += "| " + header.map(() => "---").join(" | ") + " |\n";
-
-  // Add rows
-  sortedTests.forEach(([testName, testResults]) => {
-    // Use the test name directly since it's already cleaned
-    const row = [testName];
-
-    // Add duration for each iteration
-    allIterations.forEach((iteration) => {
-      const result = testResults.find((r) => r.iteration === iteration);
-      let duration = result ? Math.round(result.duration).toString() : "-";
-
-      // Add warning emoji for values > 1000 seconds
-      if (result && result.duration > 1000) {
-        duration += "⚠️";
-      }
-
-      row.push(duration);
-    });
-
-    // Add stats if enabled
-    if (testResults.length > 0) {
-      const durations = testResults.map((r) => r.duration);
-      const min = Math.round(Math.min(...durations)).toString();
-      const max = Math.round(Math.max(...durations)).toString();
-
-      // Calculate ratio between min and max
-      const minVal = Math.min(...durations);
-      const maxVal = Math.max(...durations);
-      const ratio = minVal > 0 ? maxVal / minVal : 1;
-      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
-
-      // Add alert emoji for values > 100x increase
-      if (ratio > 100) {
-        orders += " 🚨";
-      }
-
-      row.push(min, max, orders);
-    }
-
-    markdown += "| " + row.join(" | ") + " |\n";
-  });
-
-  // Save to file
-  try {
-    // Ensure the directory exists
-    const dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
-    writeFileSync(outputFile, markdown, "utf8");
-    console.log(`📄 Results saved to: ${outputFile}`);
-  } catch (error) {
-    console.error(`❌ Failed to save results to ${outputFile}:`, error);
-  }
 }

@@ -13,6 +13,8 @@ import {
 } from "@workers/manager";
 import {
   Client,
+  ConsentEntityType,
+  ConsentState,
   IdentifierKind,
   type Dm,
   type Group,
@@ -24,10 +26,10 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000];
+    : [0, 500, 1000, 2000, 5000, 10000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100];
+    : [10];
   const randomNames = getRandomNames(5);
   let dm: Dm | undefined;
 
@@ -44,10 +46,9 @@ describe(testName, () => {
   setupSummaryTable({
     testName,
     getCustomDuration: () => customDuration,
-    setCustomDuration: (v) => {
+    setCustomDuration: (v: number | undefined) => {
       customDuration = v;
     },
-    createSummaryTable: true,
   });
 
   for (const populateSize of POPULATE_SIZE) {
@@ -73,8 +74,22 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
+
+    it(`storage(${populateSize}):measure storage`, async () => {
+      const storage = await creator!.worker.getSQLiteFileSizes();
+      setCustomDuration(storage.dbFile);
+    });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
       await creator!.client.preferences.inboxState();
+    });
+    it(`setConsentStates:group consent`, async () => {
+      await creator!.client.preferences.setConsentStates([
+        {
+          entity: getRandomInboxIds(1)[0],
+          entityType: ConsentEntityType.InboxId,
+          state: ConsentState.Allowed,
+        },
+      ]);
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const canMessage = await Client.canMessage(

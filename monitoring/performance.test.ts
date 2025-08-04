@@ -108,20 +108,15 @@ describe(testName, () => {
     expect(dmId).toBeDefined();
   });
 
-  // it(`setConsentStates:group consent`, async () => {
-  //   await creator!.client.preferences.setConsentStates([
-  //     {
-  //       entity: receiver!.client.inboxId,
-  //       entityType: ConsentEntityType.InboxId,
-  //       state: ConsentState.Allowed,
-  //     },
-  //   ]);
-  //   const consentState = await creator!.client.preferences.getConsentState(
-  //     ConsentEntityType.InboxId,
-  //     receiver!.client.inboxId,
-  //   );
-  //   expect(consentState).toBe(ConsentState.Allowed);
-  // });
+  it(`setConsentStates:group consent`, async () => {
+    await creator!.client.preferences.setConsentStates([
+      {
+        entity: getRandomInboxIds(1)[0],
+        entityType: ConsentEntityType.InboxId,
+        state: ConsentState.Allowed,
+      },
+    ]);
+  });
 
   it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
