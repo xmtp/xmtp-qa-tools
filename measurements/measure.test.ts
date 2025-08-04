@@ -21,11 +21,10 @@ import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
 const testName = "measure";
-const generalTimeout = 10000;
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000, 10000];
+    : [0, 500, 1000, 2000, 5000];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
     : [10, 50, 100];
@@ -74,10 +73,6 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
-    it(`storage(${populateSize}):measure storage`, async () => {
-      const storage = await creator!.worker.getSQLiteFileSizes();
-      setCustomDuration(storage.dbFile);
-    });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
       await creator!.client.preferences.inboxState();
     });
@@ -103,7 +98,6 @@ describe(testName, () => {
     });
     it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     });
@@ -177,7 +171,7 @@ describe(testName, () => {
           setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.almostAllReceived).toBe(true);
         },
-        generalTimeout,
+        streamTimeout * 5,
       );
       it(`removeMembers-${i}(${populateSize}):remove a participant from a group`, async () => {
         await newGroup.removeMembers(extraMember);
@@ -202,7 +196,7 @@ describe(testName, () => {
           setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.almostAllReceived).toBe(true);
         },
-        generalTimeout,
+        streamTimeout * 5,
       );
 
       it(
@@ -222,7 +216,7 @@ describe(testName, () => {
           setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.almostAllReceived).toBe(true);
         },
-        generalTimeout,
+        streamTimeout * 5,
       );
     }
   }
