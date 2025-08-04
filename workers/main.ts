@@ -344,10 +344,11 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
     if (this.activeStreamTypes.has(streamType)) {
       console.debug(`[${this.nameId}] Stream ${streamType} is already active`);
-      return;
+      //return;
+    } else {
+      console.debug(`[${this.nameId}] Starting ${streamType} stream`);
+      this.activeStreamTypes.add(streamType);
     }
-
-    this.activeStreamTypes.add(streamType);
 
     try {
       switch (streamType) {
@@ -616,9 +617,8 @@ export class WorkerClient extends Worker implements IWorkerClient {
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
-                `Received group updated ${
-                  (message.content as any)?.addedInboxes.length
-                }`,
+                `Received group updated`,
+                JSON.stringify(message.content, null, 2),
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
@@ -915,8 +915,15 @@ export class WorkerClient extends Worker implements IWorkerClient {
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
     customTimeout?: number;
+    testName?: string;
   }): Promise<T[]> {
-    const { type, filterFn, count, customTimeout = streamTimeout } = options;
+    const {
+      type,
+      filterFn,
+      count,
+      customTimeout = streamTimeout,
+      testName,
+    } = options;
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
@@ -952,7 +959,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
           }
         } else {
           console.debug(
-            `[${this.nameId}] Collector ${collectorId} rejected message`,
+            `[${this.nameId}] Collector ${collectorId} rejected message ${testName}`,
           );
         }
       };
@@ -965,9 +972,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
           resolved = true;
           this.off("worker_message", onMessage);
           console.error(
-            `[${this.nameId}] Collector timed out. ${
-              customTimeout / 1000
-            }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
+            `[${this.nameId}-${testName}] Collector timed out. ${customTimeout / 1000}s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
           resolve(events);
@@ -1009,6 +1014,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       },
       count,
       customTimeout,
+      testName: "streamMessage",
     });
   }
   /**
@@ -1038,6 +1044,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       },
       count,
       customTimeout,
+      testName: "streamGroupUpdated",
     });
   }
 
@@ -1061,6 +1068,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       },
       count,
       customTimeout,
+      testName: "streamGroupUpdated",
     });
   }
   /**
@@ -1081,6 +1089,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         : undefined,
       count,
       customTimeout,
+      testName: "streamConversation",
     });
   }
 
@@ -1091,6 +1100,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     return this.collectStreamEvents<StreamConsentMessage>({
       type: typeofStream.Consent,
       count,
+      testName: "streamConsent",
     });
   }
 
