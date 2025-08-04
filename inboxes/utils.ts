@@ -74,25 +74,3 @@ export function getRandomAddress(count: number, installationCount: number = 2) {
     .slice(0, count)
     .map((inbox) => inbox.accountAddress);
 }
-
-export function getBysizeWorkerName(size: number): string | null {
-  try {
-    const bysizePath = path.resolve(
-      process.cwd(),
-      "inboxes",
-      "bysize",
-      "bysize.json",
-    );
-    const bysizeData = JSON.parse(
-      fs.readFileSync(bysizePath, "utf8"),
-    ) as Array<{
-      size: number;
-    }>;
-
-    const entry = bysizeData.find((item) => item.size === size);
-    return entry ? `bysize${size}` : null;
-  } catch (error) {
-    console.debug(`Failed to get bysize worker name for size ${size}:`, error);
-    return null;
-  }
-}
