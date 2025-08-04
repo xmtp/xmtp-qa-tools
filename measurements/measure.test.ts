@@ -46,7 +46,7 @@ describe(testName, () => {
   setupSummaryTable({
     testName,
     getCustomDuration: () => customDuration,
-    setCustomDuration: (v) => {
+    setCustomDuration: (v: number | undefined) => {
       customDuration = v;
     },
   });
