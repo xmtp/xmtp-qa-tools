@@ -21,11 +21,11 @@ jobs:
           - size: 100
             delay_minutes: 0
           - size: 150
-            delay_minutes: 5
+            delay_minutes: 10
           - size: 200
-            delay_minutes: 15
+            delay_minutes: 20
           - size: 250
-            delay_minutes: 25
+            delay_minutes: 30
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
