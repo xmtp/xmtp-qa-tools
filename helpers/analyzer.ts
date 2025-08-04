@@ -20,8 +20,8 @@ export const PATTERNS = {
     {
       testName: "Browser",
       uniqueErrorLines: [
-        "FAIL  monitoring/browser.test.ts > browser > newDm and message stream",
-        "FAIL  monitoring/browser.test.ts > browser > newGroup and message stream",
+        "FAIL  monitoring/browser/browser.test.ts > browser > newDm and message stream",
+        "FAIL  monitoring/browser/browser.test.ts > browser > newGroup and message stream",
       ],
     },
     {
