@@ -2,6 +2,8 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
+import { getWorkers, type Worker } from "@workers/manager";
+import { type Group } from "version-management/client-versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 
 interface SummaryTableConfig {
@@ -40,7 +42,7 @@ export const setupSummaryTable = ({
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
-    console.log(currentTestName);
+    console.debug("Starting test", currentTestName);
 
     if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });
@@ -48,6 +50,7 @@ export const setupSummaryTable = ({
   afterEach(function () {
     const currentTestName = expect.getState().currentTestName ?? "";
 
+    console.debug("Ending test", currentTestName);
     let duration = performance.now() - start;
     if (getCustomDuration) {
       const customDuration = getCustomDuration();

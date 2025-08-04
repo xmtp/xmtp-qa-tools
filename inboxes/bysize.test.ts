@@ -10,7 +10,7 @@ describe("populate", () => {
     Math.max(5, Math.floor(expectedSize * 0.1));
 
   beforeAll(async () => {
-    for (const [i, populateSize] of POPULATE_SIZE.entries()) {
+    for (const [, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;
 
       const creatorName = "bysizeprev" + populateSize.toString();
