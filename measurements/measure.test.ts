@@ -73,6 +73,9 @@ describe(testName, () => {
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
+    it(`inboxState(${populateSize}):measure inboxState`, async () => {
+      await creator!.client.preferences.inboxState();
+    });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const canMessage = await Client.canMessage(
         [
