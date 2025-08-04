@@ -13,7 +13,9 @@ export const PATTERNS = {
     },
     {
       testName: "Browser",
-      uniqueErrorLines: ["FAIL browser > conversation stream with message"],
+      uniqueErrorLines: [
+        "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream for new member",
+      ],
     },
     {
       testName: "Browser",
