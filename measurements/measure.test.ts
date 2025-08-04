@@ -102,14 +102,10 @@ describe(testName, () => {
       expect(dm.id).toBeDefined();
     });
     it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
-      try {
-        const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-        console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
-      } catch (error) {
-        console.error("error", error);
-      }
+      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.allReceived).toBe(true);
     });
 
     it(`getConversationById(${populateSize}):measure getting a conversation by id`, async () => {
@@ -123,107 +119,72 @@ describe(testName, () => {
     });
 
     for (const i of BATCH_SIZE) {
-      it(
-        `newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`,
-        async () => {
-          // Ensure we have at least 1 extra member to add for membership streaming test
-          const extraMembersNeeded = Math.max(
-            1,
-            i - workers.getAll().length + 1,
-          );
-          allMembersWithExtra = getRandomInboxIds(extraMembersNeeded);
+      it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
+        // Ensure we have at least 1 extra member to add for membership streaming test
+        const extraMembersNeeded = Math.max(1, i - workers.getAll().length + 1);
+        allMembersWithExtra = getRandomInboxIds(extraMembersNeeded);
 
-          // Fix the slice logic to handle negative indices properly
-          const membersForGroup = Math.max(0, i - workers.getAll().length);
-          allMembers = allMembersWithExtra.slice(0, membersForGroup);
-          extraMember = allMembersWithExtra.slice(membersForGroup);
-          console.warn("extraMember", extraMember);
-          newGroup = (await creator!.client.conversations.newGroup([
-            ...allMembers,
-            ...workers.getAll().map((w) => w.client.inboxId),
-          ])) as Group;
-          expect(newGroup.id).toBeDefined();
-          // Add current group to cumulative tracking
-          cumulativeGroups.push(newGroup);
-        },
-        generalTimeout,
-      );
+        // Fix the slice logic to handle negative indices properly
+        const membersForGroup = Math.max(0, i - workers.getAll().length);
+        allMembers = allMembersWithExtra.slice(0, membersForGroup);
+        extraMember = allMembersWithExtra.slice(membersForGroup);
+        console.warn("extraMember", extraMember);
+        newGroup = (await creator!.client.conversations.newGroup([
+          ...allMembers,
+          ...workers.getAll().map((w) => w.client.inboxId),
+        ])) as Group;
+        expect(newGroup.id).toBeDefined();
+        // Add current group to cumulative tracking
+        cumulativeGroups.push(newGroup);
+      });
 
-      it(
-        `groupsync-${i}(${populateSize}):sync a large group of ${i} members ${i}`,
-        async () => {
-          await newGroup.sync();
-          const members = await newGroup.members();
-          expect(members.length).toBe(members.length);
-        },
-        generalTimeout,
-      );
+      it(`groupsync-${i}(${populateSize}):sync a large group of ${i} members ${i}`, async () => {
+        await newGroup.sync();
+        const members = await newGroup.members();
+        expect(members.length).toBe(members.length);
+      });
 
-      it(
-        `updateName-${i}(${populateSize}):update the group name`,
-        async () => {
-          const newName = "Large Group";
-          await newGroup.updateName(newName);
-          const name = newGroup.name;
-          expect(name).toBe(newName);
-        },
-        generalTimeout,
-      );
-      it(
-        `send-${i}(${populateSize}):measure sending a gm in a group of ${i} members`,
-        async () => {
-          const groupMessage =
-            "gm-" + Math.random().toString(36).substring(2, 15);
+      it(`updateName-${i}(${populateSize}):update the group name`, async () => {
+        const newName = "Large Group";
+        await newGroup.updateName(newName);
+        const name = newGroup.name;
+        expect(name).toBe(newName);
+      });
+      it(`send-${i}(${populateSize}):measure sending a gm in a group of ${i} members`, async () => {
+        const groupMessage =
+          "gm-" + Math.random().toString(36).substring(2, 15);
 
-          await newGroup.send(groupMessage);
-          expect(groupMessage).toBeDefined();
-        },
-        generalTimeout,
-      );
+        await newGroup.send(groupMessage);
+        expect(groupMessage).toBeDefined();
+      });
+      it(`addAdmin-${i}(${populateSize}):add an admin to a group`, async () => {
+        await newGroup.addAdmin(receiver!.client.inboxId);
+      });
       it(
-        `addAdmin-${i}(${populateSize}):add an admin to a group`,
+        `streamMembership-${i}(${populateSize}): new member added to group`,
         async () => {
-          await newGroup.addAdmin(receiver!.client.inboxId);
-        },
-        generalTimeout,
-      );
-      it(
-        `streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`,
-        async () => {
-          try {
-            await receiver?.client.conversations.sync();
-            const groupByReceiver =
-              await receiver?.client.conversations.getConversationById(
-                newGroup.id,
-              );
-            const verifyResult = await verifyMembershipStream(
-              groupByReceiver as Group,
-              [creator!],
-              extraMember,
+          await receiver?.client.conversations.sync();
+          const groupByReceiver =
+            await receiver?.client.conversations.getConversationById(
+              newGroup.id,
             );
+          const verifyResult = await verifyMembershipStream(
+            groupByReceiver as Group,
+            [creator!],
+            extraMember,
+          );
 
-            setCustomDuration(verifyResult.averageEventTiming);
-            expect(verifyResult.almostAllReceived).toBe(true);
-          } catch (error) {
-            console.error("error", error);
-          }
+          setCustomDuration(verifyResult.averageEventTiming);
+          expect(verifyResult.almostAllReceived).toBe(true);
         },
         generalTimeout,
       );
-      it(
-        `removeMembers-${i}(${populateSize}):remove a participant from a group`,
-        async () => {
-          await newGroup.removeMembers(extraMember);
-        },
-        generalTimeout,
-      );
-      it(
-        `addMember-${i}(${populateSize}):add members to a group`,
-        async () => {
-          await newGroup.addMembers(extraMember);
-        },
-        generalTimeout,
-      );
+      it(`removeMembers-${i}(${populateSize}):remove a participant from a group`, async () => {
+        await newGroup.removeMembers(extraMember);
+      });
+      it(`addMember-${i}(${populateSize}):add members to a group`, async () => {
+        await newGroup.addMembers(extraMember);
+      });
       it(
         `streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`,
         async () => {
