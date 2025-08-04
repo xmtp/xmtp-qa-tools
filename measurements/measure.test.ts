@@ -29,7 +29,7 @@ describe(testName, () => {
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [0];
+    : [10, 50, 100];
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -71,12 +71,14 @@ describe(testName, () => {
       await creator!.client.conversations.sync();
       const listConversations = await creator!.client.conversations.list();
       console.warn(
-        "worker.name",
+        "creator",
         creator!.name,
-        "listConversations ",
+        "has",
         listConversations.length,
+        "conversations",
       );
     });
+
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
       await creator!.client.conversations.syncAll();
     });
