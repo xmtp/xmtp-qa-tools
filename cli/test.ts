@@ -42,6 +42,8 @@ OPTIONS:
   --no-fail             Exit with success code even on failures
   --parallel            Run tests in parallel (default: consecutive)
   --versions <count>    Use multiple SDK versions for testing
+  --size <range>        Batch size range (e.g., 5-10)
+  --populate <number>   Population size for testing (e.g., 1000)
   -h, --help            Show this help message
 
 ENVIRONMENTS:
@@ -290,6 +292,16 @@ function parseTestArgs(args: string[]): {
           console.warn("--size flag requires a value (e.g., --size 5-10)");
         }
         break;
+      case "--populate":
+        if (nextArg) {
+          process.env.POPULATE_SIZE = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--populate flag requires a value (e.g., --populate 1000)",
+          );
+        }
+        break;
       case "--forks":
         options.reportForkCount = true;
         break;
@@ -348,6 +360,7 @@ function logDetails(testName: string, options: TestOptions) {
   console.info(`Max Attempts: ${options.attempts}`);
   console.info(`Sync Strategy: ${process.env.SYNC_STRATEGY}`);
   console.info(`Batch Size: ${process.env.BATCH_SIZE}`);
+  console.info(`Populate Size: ${process.env.POPULATE_SIZE}`);
   console.info(`Node SDK: ${process.env.NODE_VERSION}`);
   console.info(`Versions: ${process.env.TEST_VERSIONS}`);
   console.info(`File logging: ${options.fileLogging ? "Enabled" : "Disabled"}`);

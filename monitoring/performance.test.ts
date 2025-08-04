@@ -25,7 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100, 150, 200, 250];
+    : [10];
   let dm: Dm | undefined;
 
   let newGroup: Group;

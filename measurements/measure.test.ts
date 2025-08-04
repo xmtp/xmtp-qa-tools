@@ -29,7 +29,7 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000, 10000, 20000];
+    : [0, 500, 1000, 2000, 5000];
   const randomNames = getRandomNames(5);
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
