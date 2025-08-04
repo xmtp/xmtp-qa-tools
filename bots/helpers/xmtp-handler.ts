@@ -1,4 +1,8 @@
-import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
+import {
+  Client,
+  type LogLevel,
+  type XmtpEnv,
+} from "version-management/client-versions";
 import "dotenv/config";
 import {
   createSigner,

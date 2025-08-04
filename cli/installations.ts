@@ -8,7 +8,7 @@ import {
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
-import { Client } from "@xmtp/node-sdk";
+import { Client } from "version-management/client-versions";
 import { generatePrivateKey } from "viem/accounts";
 
 interface Config {
