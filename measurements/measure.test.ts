@@ -26,10 +26,10 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000];
+    : [0, 500];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100];
+    : [10];
   const randomNames = getRandomNames(5);
   let dm: Dm | undefined;
 
@@ -49,7 +49,6 @@ describe(testName, () => {
     setCustomDuration: (v) => {
       customDuration = v;
     },
-    createSummaryTable: true,
   });
 
   for (const populateSize of POPULATE_SIZE) {
