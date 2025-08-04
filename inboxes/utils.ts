@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import newInboxes2 from "./byinstallation/2.json";
 import newInboxes5 from "./byinstallation/5.json";
 import newInboxes10 from "./byinstallation/10.json";

@@ -25,8 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10];
-  let dm: Dm | undefined;
+    : [5, 10, 15];
 
   let newGroup: Group;
 
@@ -53,6 +52,7 @@ describe(testName, () => {
   let workers: WorkerManager;
   let creator: Worker | undefined;
   let receiver: Worker | undefined;
+  let dm: Dm | undefined;
   it(`create: measure creating a client`, async () => {
     workers = await getWorkers(6);
     creator = workers.getCreator();
@@ -131,12 +131,15 @@ describe(testName, () => {
 
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getRandomInboxIds(i - workers.getAll().length + 1);
-      allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
-      extraMember = allMembersWithExtra.slice(
-        i - workers.getAll().length,
-        i - workers.getAll().length + 1,
-      );
+      // Ensure we have at least 1 extra member to add for membership streaming test
+      const extraMembersNeeded = Math.max(1, i - workers.getAll().length + 1);
+      allMembersWithExtra = getRandomInboxIds(extraMembersNeeded);
+
+      // Fix the slice logic to handle negative indices properly
+      const membersForGroup = Math.max(0, i - workers.getAll().length);
+      allMembers = allMembersWithExtra.slice(0, membersForGroup);
+      extraMember = allMembersWithExtra.slice(membersForGroup);
+
       newGroup = (await creator!.client.conversations.newGroup([
         ...allMembers,
         ...workers.getAllButCreator().map((w) => w.client.inboxId),

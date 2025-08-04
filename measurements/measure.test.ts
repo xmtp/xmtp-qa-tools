@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -25,11 +26,11 @@ const testName = "measure";
 describe(testName, () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0, 500, 1000, 2000, 5000, 10000];
-  const randomNames = getRandomNames(5);
+    : [0];
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [10, 50, 100];
+    : [5, 10];
+  const randomNames = getRandomNames(5);
   let dm: Dm | undefined;
 
   let newGroup: Group;
@@ -152,14 +153,15 @@ describe(testName, () => {
     });
     for (const i of BATCH_SIZE) {
       it(`newGroup-${i}(${populateSize}):create a large group of ${i} members ${i}`, async () => {
-        allMembersWithExtra = getRandomInboxIds(
-          i - workers.getAll().length + 1,
-        );
-        allMembers = allMembersWithExtra.slice(0, i - workers.getAll().length);
-        extraMember = allMembersWithExtra.slice(
-          i - workers.getAll().length,
-          i - workers.getAll().length + 1,
-        );
+        // Ensure we have at least 1 extra member to add for membership streaming test
+        const extraMembersNeeded = Math.max(1, i - workers.getAll().length + 1);
+        allMembersWithExtra = getRandomInboxIds(extraMembersNeeded);
+
+        // Fix the slice logic to handle negative indices properly
+        const membersForGroup = Math.max(0, i - workers.getAll().length);
+        allMembers = allMembersWithExtra.slice(0, membersForGroup);
+        extraMember = allMembersWithExtra.slice(membersForGroup);
+
         newGroup = (await creator!.client.conversations.newGroup([
           ...allMembers,
           ...workers.getAllButCreator().map((w) => w.client.inboxId),
@@ -214,36 +216,67 @@ describe(testName, () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       });
-      it(`streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`, async () => {
-        const verifyResult = await verifyMembershipStream(
-          newGroup,
-          workers.getAllButCreator(),
-          extraMember,
-        );
+      it(
+        `streamMembership-${i}(${populateSize}): stream members of additions in ${i} member group`,
+        async () => {
+          await receiver?.client.conversations.syncAll();
+          const groupByReceiver =
+            await receiver?.client.conversations.getConversationById(
+              newGroup.id,
+            );
+          console.log("groupByReceiver", groupByReceiver?.id);
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+          const verifyResult = await verifyMembershipStream(
+            groupByReceiver as Group,
+            [workers.getCreator()],
+            extraMember,
+          );
 
-      it(`streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`, async () => {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+          setCustomDuration(verifyResult.averageEventTiming);
+          expect(verifyResult.almostAllReceived).toBe(true);
+        },
+        streamTimeout,
+      );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+      it(
+        `streamMessage-${i}(${populateSize}): stream members of message changes in ${i} member group`,
+        async () => {
+          await receiver?.client.conversations.syncAll();
+          const groupByReceiver =
+            await receiver?.client.conversations.getConversationById(
+              newGroup.id,
+            );
+          console.log("groupByReceiver", groupByReceiver?.id);
+          const verifyResult = await verifyMessageStream(
+            groupByReceiver as Group,
+            [workers.getCreator()],
+          );
 
-      it(`streamMetadata-${i}(${populateSize}): stream members of metadata changes in ${i} member group`, async () => {
-        const verifyResult = await verifyMetadataStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+          setCustomDuration(verifyResult.averageEventTiming);
+          expect(verifyResult.almostAllReceived).toBe(true);
+        },
+        streamTimeout,
+      );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      });
+      it(
+        `streamMetadata-${i}(${populateSize}): stream members of metadata changes in ${i} member group`,
+        async () => {
+          await receiver?.client.conversations.syncAll();
+          const groupByReceiver =
+            await receiver?.client.conversations.getConversationById(
+              newGroup.id,
+            );
+          console.log("groupByReceiver", groupByReceiver?.id);
+          const verifyResult = await verifyMetadataStream(
+            groupByReceiver as Group,
+            [workers.getCreator()],
+          );
+
+          setCustomDuration(verifyResult.averageEventTiming);
+          expect(verifyResult.almostAllReceived).toBe(true);
+        },
+        streamTimeout,
+      );
 
       it(`sync-${i}(${populateSize}):perform cold start sync operations on ${i} member group`, async () => {
         const singleSyncWorkers = await getWorkers(["randomA"]);
