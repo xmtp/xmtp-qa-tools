@@ -30,12 +30,10 @@ Individual SDK operation performance metrics including client creation, messagin
 | send                | Sending a group message                | 95  | <200   | On Target   |
 | sync                | Syncing group state                    | 77  | <200   | On Target   |
 | updateName          | Updating group metadata                | 76  | <200   | On Target   |
-| stream              | Receiving a group message              | 69  | <200   | On Target   |
 | groupSync           | Group sync operation                   | 66  | <200   | On Target   |
 | addMember           | Adding a member to a group             | 32  | <250   | On Target   |
-| populate            | Populating conversation data           | 28  | <200   | On Target   |
 | inboxState          | Checking inbox state                   | 16  | <350   | On Target   |
-| consent             | Managing consent preferences           | 2   | <100   | On Target   |
+| setConsentStates    | Managing consent preferences           | 2   | <100   | On Target   |
 | getConversationById | Getting conversation by ID             | 1   | <100   | On Target   |
 
 _Note: Baseline is `us-east` region and `production` network._
