@@ -108,7 +108,7 @@ describe(testName, () => {
     expect(dmId).toBeDefined();
   });
 
-  it(`consent:group consent`, async () => {
+  it(`setConsentStates:group consent`, async () => {
     await creator!.client.preferences.setConsentStates([
       {
         entity: receiver!.client.inboxId,

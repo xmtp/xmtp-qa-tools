@@ -46,7 +46,7 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("consent: consent state changes in groups", async () => {
+  it("groupConsent: consent state changes in groups", async () => {
     group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyGroupConsentStream(
       group,
