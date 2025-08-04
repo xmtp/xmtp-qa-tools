@@ -1,10 +1,10 @@
-name: Performance Large
+name: Performance Medium
 description: "performance of medium groups"
 
 on:
   #pull_request:
   schedule:
-    - cron: "30 */2 * * *" # Runs every 2 hours at 15 minutes past the hour (avoids :00 and provides separation from Performance at :30)
+    - cron: "0 */2 * * *" # Runs every 2 hours at 15 minutes past the hour (avoids :00 and provides separation from Performance at :30)
   workflow_dispatch:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [performance]
-        size: [200-250]
+        size: [100-150]
         env: [dev, production]
         cache-data: [false]
     env:
