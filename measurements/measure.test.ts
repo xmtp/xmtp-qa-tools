@@ -13,6 +13,8 @@ import {
 } from "@workers/manager";
 import {
   Client,
+  ConsentEntityType,
+  ConsentState,
   IdentifierKind,
   type Dm,
   type Group,
@@ -75,6 +77,15 @@ describe(testName, () => {
     });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
       await creator!.client.preferences.inboxState();
+    });
+    it(`setConsentStates:group consent`, async () => {
+      await creator!.client.preferences.setConsentStates([
+        {
+          entity: getRandomInboxIds(1)[0],
+          entityType: ConsentEntityType.InboxId,
+          state: ConsentState.Allowed,
+        },
+      ]);
     });
     it(`canMessage(${populateSize}):measure canMessage`, async () => {
       const canMessage = await Client.canMessage(
