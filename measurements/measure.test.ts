@@ -65,99 +65,62 @@ describe(testName, () => {
       workers = await getWorkers(workerNames);
       creator = workers.get(workerNames[0])!;
       receiver = workers.get(workerNames[1])!;
-      creator.worker.stopStreams();
       setCustomDuration(creator.initializationTime);
     });
-    it(
-      `sync(${populateSize}):measure sync`,
-      async () => {
-        await creator!.client.conversations.sync();
-      },
-      generalTimeout,
-    );
+    it(`sync(${populateSize}):measure sync`, async () => {
+      await creator!.client.conversations.sync();
+    });
 
-    it(
-      `syncAll(${populateSize}):measure syncAll`,
-      async () => {
-        await creator!.client.conversations.syncAll();
-      },
-      generalTimeout,
-    );
-    it(
-      `storage(${populateSize}):measure storage`,
-      async () => {
-        const storage = await creator!.worker.getSQLiteFileSizes();
-        setCustomDuration(storage.dbFile);
-      },
-      generalTimeout,
-    );
-    it(
-      `inboxState(${populateSize}):measure inboxState`,
-      async () => {
-        await creator!.client.preferences.inboxState();
-      },
-      generalTimeout,
-    );
-    it(
-      `canMessage(${populateSize}):measure canMessage`,
-      async () => {
-        const canMessage = await Client.canMessage(
-          [
-            {
-              identifier: receiver!.address,
-              identifierKind: IdentifierKind.Ethereum,
-            },
-          ],
-          receiver!.env,
-        );
-        expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
-      },
-      generalTimeout,
-    );
+    it(`syncAll(${populateSize}):measure syncAll`, async () => {
+      await creator!.client.conversations.syncAll();
+    });
+    it(`storage(${populateSize}):measure storage`, async () => {
+      const storage = await creator!.worker.getSQLiteFileSizes();
+      setCustomDuration(storage.dbFile);
+    });
+    it(`inboxState(${populateSize}):measure inboxState`, async () => {
+      await creator!.client.preferences.inboxState();
+    });
+    it(`canMessage(${populateSize}):measure canMessage`, async () => {
+      const canMessage = await Client.canMessage(
+        [
+          {
+            identifier: receiver!.address,
+            identifierKind: IdentifierKind.Ethereum,
+          },
+        ],
+        receiver!.env,
+      );
+      expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
+    });
 
-    it(
-      `newDm(${populateSize}):measure creating a DM`,
-      async () => {
-        dm = (await creator!.client.conversations.newDm(
-          receiver!.client.inboxId,
-        )) as Dm;
-        expect(dm).toBeDefined();
-        expect(dm.id).toBeDefined();
-      },
-      generalTimeout,
-    );
-    it(
-      `streamMessage(${populateSize}):measure receiving a gm`,
-      async () => {
-        try {
-          const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-          console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
-          setCustomDuration(verifyResult.averageEventTiming);
-          expect(verifyResult.allReceived).toBe(true);
-        } catch (error) {
-          console.error("error", error);
-        }
-      },
-      generalTimeout,
-    );
+    it(`newDm(${populateSize}):measure creating a DM`, async () => {
+      dm = (await creator!.client.conversations.newDm(
+        receiver!.client.inboxId,
+      )) as Dm;
+      expect(dm).toBeDefined();
+      expect(dm.id).toBeDefined();
+    });
+    it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
+      try {
+        const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+        console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
+        setCustomDuration(verifyResult.averageEventTiming);
+        expect(verifyResult.allReceived).toBe(true);
+      } catch (error) {
+        console.error("error", error);
+      }
+    });
 
-    it(
-      `getConversationById(${populateSize}):measure getting a conversation by id`,
-      async () => {
-        const conversation =
-          await creator!.client.conversations.getConversationById(dm!.id);
-        expect(conversation!.id).toBe(dm!.id);
-      },
-      generalTimeout,
-    );
-    it(
-      `send(${populateSize}):measure sending a gm`,
-      async () => {
-        const dmId = await dm!.send("gm");
-        expect(dmId).toBeDefined();
-      },
-      generalTimeout,
-    );
+    it(`getConversationById(${populateSize}):measure getting a conversation by id`, async () => {
+      const conversation =
+        await creator!.client.conversations.getConversationById(dm!.id);
+      expect(conversation!.id).toBe(dm!.id);
+    });
+    it(`send(${populateSize}):measure sending a gm`, async () => {
+      const dmId = await dm!.send("gm");
+      expect(dmId).toBeDefined();
+    });
 
     for (const i of BATCH_SIZE) {
       it(
