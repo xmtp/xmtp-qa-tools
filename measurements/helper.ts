@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from "fs";
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { parseTestName } from "@helpers/vitest";
@@ -20,6 +20,7 @@ interface TestResult {
 
 // Global summary tracking
 const summaryResults = new Map<string, TestResult[]>();
+const csvFiles = new Map<string, string>();
 
 export const setupSummaryTable = ({
   testName,
@@ -37,6 +38,11 @@ export const setupSummaryTable = ({
   let start: number;
   beforeAll(() => {
     loadEnv(testName);
+
+    // Initialize CSV file if summary table is enabled
+    if (createSummaryTable) {
+      initializeCsvFile(testName);
+    }
   });
   beforeEach(() => {
     start = performance.now();
@@ -84,19 +90,79 @@ export const setupSummaryTable = ({
       if (existingResults) {
         existingResults.push(result);
       }
+
+      // Update table and CSV in real-time
+      updateTableAndCsv(testName);
     }
 
     if (setCustomDuration) setCustomDuration(undefined); // Reset after each test if available
   });
 
   afterAll(() => {
-    // Display and save summary table if enabled
+    // Display final summary table if enabled
     if (createSummaryTable) {
       displaySummaryTable(testName);
-      saveSummaryTableToMarkdown(testName);
+      console.log(`📊 Final results saved to CSV: ${csvFiles.get(testName)}`);
     }
   });
 };
+
+// Initialize CSV file with headers
+function initializeCsvFile(testName: string): void {
+  const csvFile = `logs/${testName}${getTime()}.csv`;
+  csvFiles.set(testName, csvFile);
+
+  try {
+    // Ensure the directory exists
+    const dir = csvFile.substring(0, csvFile.lastIndexOf("/"));
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+
+    // Write CSV header (will be updated as we get more data)
+    writeFileSync(csvFile, "Operation-Members\n", "utf8");
+    console.log(`📄 CSV file initialized: ${csvFile}`);
+  } catch (error) {
+    console.error(`❌ Failed to initialize CSV file ${csvFile}:`, error);
+  }
+}
+
+// Update both table and CSV in real-time
+function updateTableAndCsv(testName: string): void {
+  const tableData = processResultsForTable(testName);
+  if (!tableData) return;
+
+  const { allIterations, header, sortedTests } = tableData;
+  const csvFile = csvFiles.get(testName);
+
+  if (!csvFile) return;
+
+  try {
+    // Update CSV file with current data
+    let csvContent = header.join(",") + "\n";
+
+    sortedTests.forEach(([testName, testResults]) => {
+      const row = [testName];
+
+      allIterations.forEach((iteration) => {
+        const result = testResults.find((r) => r.iteration === iteration);
+        let duration = result ? Math.round(result.duration).toString() : "-";
+
+        // Don't add emojis to CSV - keep it clean
+        row.push(duration);
+      });
+
+      csvContent += row.join(",") + "\n";
+    });
+
+    writeFileSync(csvFile, csvContent, "utf8");
+
+    // Display updated table
+    displaySummaryTable(testName);
+  } catch (error) {
+    console.error(`❌ Failed to update CSV file ${csvFile}:`, error);
+  }
+}
 
 // Helper functions for summary table
 function extractIteration(testName: string, groupByPattern?: string): string {
@@ -249,62 +315,14 @@ function displaySummaryTable(testName: string): void {
         duration += "⚠️";
       }
 
+      // Add waiting emoji for values of 0
+      if (result && result.duration === 0) {
+        duration += "⏳";
+      }
+
       row.push(duration.padStart(colWidths[i + 1])); // Right-align numbers
     });
 
     console.log("│ " + row.join(" │ ") + " │");
   });
-}
-
-function saveSummaryTableToMarkdown(testName: string): void {
-  const tableData = processResultsForTable(testName);
-
-  if (!tableData) {
-    return;
-  }
-
-  const { allIterations, header, sortedTests } = tableData;
-
-  // Create markdown content
-  const outputFile = "logs/" + testName + getTime() + ".md";
-
-  let markdown = "";
-
-  // Create markdown table
-  markdown += "| " + header.join(" | ") + " |\n";
-  markdown += "| " + header.map(() => "---").join(" | ") + " |\n";
-
-  // Add rows
-  sortedTests.forEach(([testName, testResults]) => {
-    // Use the test name directly since it's already cleaned
-    const row = [testName];
-
-    // Add duration for each iteration
-    allIterations.forEach((iteration) => {
-      const result = testResults.find((r) => r.iteration === iteration);
-      let duration = result ? Math.round(result.duration).toString() : "-";
-
-      // Add warning emoji for values > 1000 seconds
-      if (result && result.duration > 1000) {
-        duration += "⚠️";
-      }
-
-      row.push(duration);
-    });
-
-    markdown += "| " + row.join(" | ") + " |\n";
-  });
-
-  // Save to file
-  try {
-    // Ensure the directory exists
-    const dir = outputFile.substring(0, outputFile.lastIndexOf("/"));
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
-    writeFileSync(outputFile, markdown, "utf8");
-    console.log(`📄 Results saved to: ${outputFile}`);
-  } catch (error) {
-    console.error(`❌ Failed to save results to ${outputFile}:`, error);
-  }
 }
