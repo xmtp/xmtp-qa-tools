@@ -231,8 +231,8 @@ function generateMarkdownTable(tableData: {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
 
-      // Add warning emoji for values > 10000 seconds or 0
-      if (result && (result.duration > 10000 || result.duration === 0)) {
+      // Add warning emoji for values > 500ms or 0
+      if (result && (result.duration > 500 || result.duration === 0)) {
         duration += " ⚠️";
       }
 
@@ -391,8 +391,8 @@ function displaySummaryTable(testName: string): void {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
 
-      // Add warning emoji for values > 10000 seconds or 0
-      if (result && (result.duration > 10000 || result.duration === 0)) {
+      // Add warning emoji for values > 500ms or 0
+      if (result && (result.duration > 500 || result.duration === 0)) {
         duration += " ⚠️";
       }
 
