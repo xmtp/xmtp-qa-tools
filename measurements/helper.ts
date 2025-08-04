@@ -160,10 +160,10 @@ function processResultsForTable(testName: string) {
 
   // Create header
   const header = [
-    "Operation",
+    "Operation-Members",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
-  header.push("Min", "Max", "Orders");
+  header.push("Min", "Max", "Increase");
 
   // Keep original test order - don't sort
   const sortedTests = Array.from(groupedResults.entries()).map(
@@ -245,7 +245,13 @@ function displaySummaryTable(testName: string): void {
     // Add duration for each iteration
     allIterations.forEach((iteration, i) => {
       const result = testResults.find((r) => r.iteration === iteration);
-      const duration = result ? Math.round(result.duration).toString() : "-";
+      let duration = result ? Math.round(result.duration).toString() : "-";
+
+      // Add warning emoji for values > 1000 seconds
+      if (result && result.duration > 1000) {
+        duration += "⚠️";
+      }
+
       row.push(duration.padStart(colWidths[i + 1])); // Right-align numbers
     });
 
@@ -259,7 +265,12 @@ function displaySummaryTable(testName: string): void {
       const minVal = Math.min(...durations);
       const maxVal = Math.max(...durations);
       const ratio = minVal > 0 ? maxVal / minVal : 1;
-      const orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
+      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
+
+      // Add alert emoji for values > 100x increase
+      if (ratio > 100) {
+        orders += " 🚨";
+      }
 
       row.push(min.padStart(colWidths[colWidths.length - 3]));
       row.push(max.padStart(colWidths[colWidths.length - 2]));
@@ -296,7 +307,13 @@ function saveSummaryTableToMarkdown(testName: string): void {
     // Add duration for each iteration
     allIterations.forEach((iteration) => {
       const result = testResults.find((r) => r.iteration === iteration);
-      const duration = result ? Math.round(result.duration).toString() : "-";
+      let duration = result ? Math.round(result.duration).toString() : "-";
+
+      // Add warning emoji for values > 1000 seconds
+      if (result && result.duration > 1000) {
+        duration += "⚠️";
+      }
+
       row.push(duration);
     });
 
@@ -310,7 +327,12 @@ function saveSummaryTableToMarkdown(testName: string): void {
       const minVal = Math.min(...durations);
       const maxVal = Math.max(...durations);
       const ratio = minVal > 0 ? maxVal / minVal : 1;
-      const orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
+      let orders = ratio === 1 ? "1x" : `${Math.round(ratio)}x`;
+
+      // Add alert emoji for values > 100x increase
+      if (ratio > 100) {
+        orders += " 🚨";
+      }
 
       row.push(min, max, orders);
     }
