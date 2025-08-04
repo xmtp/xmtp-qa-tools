@@ -90,7 +90,7 @@ Core network operation timings from DNS lookup through server response processin
 | Processing         | 32         | 30  | <100   | On Target   |
 | Dns Lookup         | 23         | 16  | <50    | On Target   |
 
-### by region
+### By region
 
 Comparative network performance across different global regions relative to us-east baseline.
 
@@ -111,7 +111,7 @@ Message delivery and ordering reliability metrics across different testing scena
 
 | Test Area             | Average         | Target         | Performance |
 | --------------------- | --------------- | -------------- | ----------- |
-| Average Response Time | 400ms           | <500ms         | On Target   |
+| Average response time | 400ms           | <500ms         | On Target   |
 | Stream Delivery Rate  | 100% successful | 99.9% minimum  | On Target   |
 | Poll Delivery Rate    | 100% successful | 99.9% minimum  | On Target   |
 | Recovery Rate         | 100% successful | 99.9% minimum  | On Target   |
@@ -125,7 +125,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 Database storage efficiency and performance metrics for different group sizes and inbox configurations.
 
-### by group size
+### By group size
 
 Storage utilization comparison between sender and receiver across varying group member counts.
 
@@ -138,7 +138,7 @@ Storage utilization comparison between sender and receiver across varying group 
 | 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
 | 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
 
-### by inbox size
+### By inbox size
 
 Storage utilization comparison between sender and receiver across varying inbox sizes.
 
@@ -150,7 +150,7 @@ Storage utilization comparison between sender and receiver across varying inbox 
 | 10000      | 10000         | 282       |
 | 20000      | 20000         | 300       |
 
-## Service Level Objectives (SLOs)
+## Service level objectives (SLOs)
 
 Weekly SLO performance tracking for critical XMTP SDK metrics.
 
