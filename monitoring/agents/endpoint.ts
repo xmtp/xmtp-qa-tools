@@ -1,13 +1,13 @@
 import "dotenv/config";
 import fs from "node:fs";
+import { fromString } from "uint8arrays";
 import {
   Client,
   IdentifierKind,
   type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
-import { fromString } from "uint8arrays";
+} from "version-management/client-versions";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";

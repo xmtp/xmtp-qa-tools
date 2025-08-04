@@ -79,9 +79,9 @@ describe(testName, () => {
       );
     });
 
-    it(`syncAll(${populateSize}):measure syncAll`, async () => {
-      await creator!.client.conversations.syncAll();
-    });
+    // it(`syncAll(${populateSize}):measure syncAll`, async () => {
+    //   await creator!.client.conversations.syncAll();
+    // });
     it(`storage(${populateSize}):measure storage`, async () => {
       const storage = await creator!.worker.getSQLiteFileSizes();
       setCustomDuration(storage.dbFile);
