@@ -88,13 +88,6 @@ Link to test code [../monitoring/functional/streams.test.ts](../monitoring/funct
 - `new conversation notifications`
 - `member addition to existing group`
 
-### Sync
-
-Link to test code [../monitoring/functional/sync.test.ts](../monitoring/functional/sync.test.ts)
-
-- `stitching: client.conversations.sync()`
-- `group welcome message`
-
 ### Conversations
 
 Link to test code [../monitoring/functional/convos.test.ts](../monitoring/functional/convos.test.ts)
@@ -107,6 +100,13 @@ Link to test code [../monitoring/functional/convos.test.ts](../monitoring/functi
 - `sync`
 - `sync all`
 - `add member`
+
+### Other
+
+Link to test code [../monitoring/functional/other.test.ts](../monitoring/functional/other.test.ts)
+
+- `stitching`
+- `group welcome message`
 
 ## 4. Browser
 
