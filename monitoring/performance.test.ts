@@ -25,7 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [50, 100];
+    : [100, 150];
 
   let newGroup: Group;
 
@@ -139,6 +139,9 @@ describe(testName, () => {
         ...workers.getAllButCreator().map((w) => w.client.inboxId),
       ])) as Group;
       expect(newGroup.id).toBeDefined();
+      if (!newGroup.id) {
+        throw new Error("Group ID is undefined, cancelling the test");
+      }
       // Add current group to cumulative tracking
       cumulativeGroups.push(newGroup);
     });
