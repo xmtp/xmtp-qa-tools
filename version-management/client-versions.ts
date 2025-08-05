@@ -188,7 +188,7 @@ export const VersionList = [
 export const getLatestVersion = () => {
   checkNoNameContains(VersionList);
   const nodesdk = process.env.NODE_VERSION || getVersions()[0].nodeSDK;
-  console.log(nodesdk);
+
   return nodesdk;
 };
 export const getVersions = (filterAuto: boolean = true) => {
