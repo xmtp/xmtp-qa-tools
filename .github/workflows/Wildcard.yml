@@ -26,14 +26,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Print workflow region
-        run: |
-          echo "Workflow IP region:"
-          curl -s https://ipinfo.io/region
-          echo ""
-          echo "Full IP info:"
-          curl -s https://ipinfo.io/json | jq .
-
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
@@ -57,5 +49,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Wildcard (${{ matrix.test }}, ${{ matrix.env }})'
+          workflow-name: "Wildcard (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
