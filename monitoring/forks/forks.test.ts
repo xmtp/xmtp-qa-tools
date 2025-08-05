@@ -88,7 +88,7 @@ describe(testName, () => {
   it("perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
-      nodeSDK: NODE_VERSION.nodeSDK,
+      nodeSDK: NODE_VERSION,
     });
     // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
     // Create groups
