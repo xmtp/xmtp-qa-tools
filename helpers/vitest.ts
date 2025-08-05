@@ -93,7 +93,7 @@ export const setupDurationTracking = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || (process.env.NODE_VERSION as string),
+          sdk: sdk || getLatestVersion(),
           operation: operationName,
           test: testNameExtracted,
         };
