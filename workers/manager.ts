@@ -5,7 +5,7 @@ import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
 import {
-  getLatestVersion,
+  getActiveVersion,
   getVersions,
   VersionList,
   type Client,
@@ -75,32 +75,6 @@ export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
 
-// Deprecated: Use getWorkers with useVersions option instead
-export function nameWithVersions(workerNames: string[]): string[] {
-  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-
-  if (!testVersions) {
-    // No versions specified, return names as-is (will use latest version)
-    return workerNames;
-  }
-
-  const availableVersions = getVersions().slice(0, testVersions);
-  const descriptors: string[] = [];
-  for (const workerName of workerNames) {
-    // Pick a random version from the specified list
-    const randomVersion =
-      availableVersions[Math.floor(Math.random() * availableVersions.length)];
-
-    // If workerName already contains installation ID (has dash), don't add another "-a"
-    if (workerName.includes("-")) {
-      descriptors.push(`${workerName}-${randomVersion.nodeSDK}`);
-    } else {
-      descriptors.push(`${workerName}-a-${randomVersion.nodeSDK}`);
-    }
-  }
-
-  return descriptors;
-}
 export interface WorkerBase {
   name: string;
   sdk: string;
@@ -452,13 +426,14 @@ export class WorkerManager implements IWorkerManager {
    */
   public async createWorker(
     descriptor: string,
+    nodeSDK?: string,
     apiUrl?: string,
   ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = getVersions()[0].nodeSDK;
+    let defaultSdk = nodeSDK || getActiveVersion().nodeSDK;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
@@ -542,11 +517,9 @@ export async function getWorkers(
   options: {
     env?: XmtpEnv;
     nodeSDK?: string;
-    useVersions?: boolean;
     randomNames?: boolean;
   } = {
     env: undefined,
-    useVersions: true,
     randomNames: true,
     nodeSDK: undefined,
   },
@@ -554,7 +527,12 @@ export async function getWorkers(
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-  const nodeSDK = options.nodeSDK || getLatestVersion();
+  let sdkVersions = [options.nodeSDK || getActiveVersion().nodeSDK];
+  if (process.env.TEST_VERSIONS) {
+    sdkVersions = getVersions()
+      .slice(0, parseInt(process.env.TEST_VERSIONS))
+      .map((v) => v.nodeSDK);
+  }
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 
@@ -566,31 +544,22 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    descriptors = nodeSDK
-      ? names.map((name) => `${name}-${nodeSDK}`)
-      : options.useVersions
-        ? nameWithVersions(names)
-        : names;
+    descriptors = names;
     console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = descriptors.map((descriptor) =>
-      manager.createWorker(descriptor),
+      manager.createWorker(
+        descriptor,
+        sdkVersions[Math.floor(Math.random() * sdkVersions.length)],
+      ),
     );
   } else {
     // Record input - apply versioning if requested
     let entries = Object.entries(workers);
 
-    if (options.useVersions) {
-      const versionedKeys = Object.keys(workers);
-      entries = versionedKeys.map((key, index) => [
-        key,
-        Object.values(workers)[index],
-      ]);
-    }
-
     descriptors = entries.map(([descriptor]) => descriptor);
     console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = entries.map(([descriptor, apiUrl]) =>
-      manager.createWorker(descriptor, apiUrl),
+      manager.createWorker(descriptor, sdkVersions[0], apiUrl),
     );
   }
 

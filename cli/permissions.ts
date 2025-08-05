@@ -167,7 +167,6 @@ function parseArgs(): Config {
 async function getClient(env: string): Promise<Client> {
   const workerManager = await getWorkers(1, {
     env: env as XmtpEnv,
-    useVersions: false, // Use latest version for permission operations
   });
   const worker = workerManager.getAll()[0];
   return worker.client;

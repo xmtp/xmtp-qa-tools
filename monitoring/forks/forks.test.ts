@@ -3,7 +3,7 @@ import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import {
-  getLatestVersion,
+  getActiveVersion,
   type Group,
 } from "version-management/client-versions";
 import { describe, it } from "vitest";
@@ -11,7 +11,7 @@ import { describe, it } from "vitest";
 // Count of groups to create
 const groupCount = 5;
 const parallelOperations = 5; // How many operations to perform in parallel
-const NODE_VERSION = getLatestVersion(); // default to latest version, can be overridden with --nodeSDK=3.1.1
+const NODE_VERSION = getActiveVersion(); // default to latest version, can be overridden with --nodeSDK=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
 const workerNames = [
@@ -88,7 +88,7 @@ describe(testName, () => {
   it("perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
-      nodeSDK: NODE_VERSION,
+      nodeSDK: NODE_VERSION.nodeSDK,
     });
     // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
     // Create groups

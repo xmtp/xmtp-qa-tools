@@ -3,7 +3,6 @@ import path from "path";
 import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
-import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import {
   Client as Client209,
   Conversation as Conversation209,
@@ -64,6 +63,7 @@ import {
   Dm as Dm401,
   Group as Group401,
 } from "@xmtp/node-sdk-4.0.1";
+import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.1dev";
 
 export {
   Client,
@@ -81,9 +81,8 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
+} from "@xmtp/node-sdk-4.0.1dev"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
 
-// SDK version mappings
 export const VersionList = [
   {
     Client: Client401,
@@ -185,11 +184,18 @@ export const VersionList = [
     auto: true,
   },
 ];
-export const getLatestVersion = () => {
+export const getActiveVersion = () => {
   checkNoNameContains(VersionList);
-  const nodesdk = process.env.NODE_VERSION || getVersions()[0].nodeSDK;
-
-  return nodesdk;
+  const nodesdk = process.env.NODE_VERSION || getVersions()[0];
+  return nodesdk as {
+    Client: typeof Client401;
+    Conversation: typeof Conversation401;
+    Dm: typeof Dm401;
+    Group: typeof Group401;
+    nodeSDK: string;
+    nodeBindings: string;
+    auto: boolean;
+  };
 };
 export const getVersions = (filterAuto: boolean = true) => {
   checkNoNameContains(VersionList);
@@ -214,7 +220,7 @@ export const regressionClient = async (
   dbPath: string,
   env: XmtpEnv,
   apiURL?: string,
-): Promise<unknown> => {
+): Promise<any> => {
   const loggingLevel = (process.env.LOGGING_LEVEL || "error") as LogLevel;
   const apiUrl = apiURL;
   if (apiUrl) {
