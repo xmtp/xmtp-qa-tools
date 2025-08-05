@@ -23,7 +23,10 @@ describe(testName, async () => {
 
   it(`downgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
-    console.log("versions", versions);
+    console.log(
+      "versions",
+      versions.map((v) => v.nodeSDK),
+    );
     const receiverInboxId = getRandomInboxIds(1)[0];
 
     for (const version of versions) {
@@ -35,7 +38,7 @@ describe(testName, async () => {
 
       // When useVersions is false, the worker name doesn't include the version
       // So we need to get it by the base name without the version
-      const downgrade = versionWorkers.get(name);
+      const downgrade = versionWorkers.get("downgrade");
       console.log("Found downgrade worker:", downgrade ? "yes" : "no");
       console.log("Downgraded to ", "sdk:" + String(downgrade?.sdk));
       let convo = await downgrade?.client.conversations.newDm(receiverInboxId);
@@ -58,8 +61,7 @@ describe(testName, async () => {
 
       // When useVersions is false, the worker name doesn't include the version
       // So we need to get it by the base name without the version
-      const baseName = name.split("-")[0]; // "upgrade"
-      const upgrade = versionWorkers.get(baseName);
+      const upgrade = versionWorkers.get("upgrade");
       console.log("Upgraded to ", "sdk:" + String(upgrade?.sdk));
       let convo = await upgrade?.client.conversations.newDm(receiverInboxId);
       expect(convo?.id).toBeDefined();

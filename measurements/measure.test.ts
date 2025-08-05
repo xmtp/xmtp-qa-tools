@@ -143,6 +143,9 @@ describe(testName, () => {
           ...workers.getAll().map((w) => w.client.inboxId),
         ])) as Group;
         expect(newGroup.id).toBeDefined();
+        if (!newGroup.id) {
+          throw new Error("Group ID is undefined, cancelling the test");
+        }
         // Add current group to cumulative tracking
         cumulativeGroups.push(newGroup);
       });

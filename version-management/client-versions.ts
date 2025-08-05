@@ -66,7 +66,7 @@ import {
 } from "@xmtp/node-sdk-4.0.1";
 
 export {
-  Client,
+  Client as ClientClass,
   ConsentState,
   type Signer,
   type ClientOptions,
@@ -92,7 +92,7 @@ export const VersionList = [
     Group: Group401,
     nodeSDK: "4.0.1dev",
     nodeBindings: "1.4.0dev",
-    auto: false,
+    auto: true,
   },
   {
     Client: Client401,
@@ -229,11 +229,6 @@ export const regressionClient = async (
     fs.mkdirSync(dbDir, { recursive: true });
   }
 
-  const versionConfig = VersionList.find((v) => v.nodeSDK === nodeSDK);
-  if (!versionConfig) {
-    throw new Error(`SDK version ${nodeSDK} not found in VersionList`);
-  }
-  const ClientClass = versionConfig.Client;
   let client = null;
 
   const signer = createSigner(walletKey);

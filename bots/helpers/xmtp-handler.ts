@@ -1,5 +1,5 @@
 import {
-  Client,
+  ClientClass,
   type LogLevel,
   type XmtpEnv,
 } from "version-management/client-versions";
@@ -45,7 +45,7 @@ export const DEFAULT_CORE_OPTIONS: ClientOptions = {
  * Handle message streaming with onMessage callback
  */
 const handleStream = async (
-  client: Client,
+  client: ClientClass,
   callBack: MessageHandler,
   skillOpts: SkillOptions,
 ): Promise<void> => {
@@ -86,14 +86,14 @@ const handleStream = async (
 export const initializeClient = async (
   messageHandler: MessageHandler,
   coreOptions: ClientOptions[],
-): Promise<Client[]> => {
+): Promise<ClientClass[]> => {
   // Merge default options with the provided options
   const mergedCoreOptions = coreOptions.map((opt) => ({
     ...DEFAULT_CORE_OPTIONS,
     ...opt,
   }));
 
-  const clients: Client[] = [];
+  const clients: ClientClass[] = [];
   const streamPromises: Promise<void>[] = [];
 
   for (const option of mergedCoreOptions) {
@@ -118,7 +118,7 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        const client = await Client.create(signer, {
+        const client = await ClientClass.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
