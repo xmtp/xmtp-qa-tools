@@ -59,8 +59,8 @@ EXAMPLES:
   yarn gen --help
 
 PRESET COMMANDS:
-  yarn update:local      Generate 500 inboxes for local testing
-  yarn update:prod       Generate inboxes for production testing
+  yarn update:local      Update 500 inboxes for local testing
+  yarn update:prod       Update inboxes for production testing
 
 For more information, see: cli/readme.md
 `);
