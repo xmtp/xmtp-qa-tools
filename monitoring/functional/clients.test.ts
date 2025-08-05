@@ -43,9 +43,7 @@ describe(testName, () => {
     for (const version of versions.reverse()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const name = "upgrade-" + "a" + "-" + version.nodeSDK;
-      const versionWorkers = await getWorkers([name], {
-        useVersions: false,
-      });
+      const versionWorkers = await getWorkers([name], {});
 
       // When useVersions is false, the worker name doesn't include the version
       // So we need to get it by the base name without the version

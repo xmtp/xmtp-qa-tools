@@ -542,11 +542,9 @@ export async function getWorkers(
   options: {
     env?: XmtpEnv;
     nodeSDK?: string;
-    useVersions?: boolean;
     randomNames?: boolean;
   } = {
     env: undefined,
-    useVersions: true,
     randomNames: true,
     nodeSDK: undefined,
   },
@@ -566,11 +564,7 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    descriptors = nodeSDK
-      ? names.map((name) => `${name}-${nodeSDK}`)
-      : options.useVersions
-        ? nameWithVersions(names)
-        : names;
+    descriptors = names;
     console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
@@ -578,14 +572,6 @@ export async function getWorkers(
   } else {
     // Record input - apply versioning if requested
     let entries = Object.entries(workers);
-
-    if (options.useVersions) {
-      const versionedKeys = Object.keys(workers);
-      entries = versionedKeys.map((key, index) => [
-        key,
-        Object.values(workers)[index],
-      ]);
-    }
 
     descriptors = entries.map(([descriptor]) => descriptor);
     console.log(`Preparing to create ${descriptors.length} workers...`);

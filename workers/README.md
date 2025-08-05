@@ -17,7 +17,6 @@ const workers = await getWorkers(["alice", "bob", "charlie"]);
 ```typescript
 type GetWorkersOptions = {
   env?: XmtpEnv; // XMTP environment (default: from XMTP_ENV)
-  useVersions?: boolean; // Apply version descriptors (default: true)
   randomNames?: boolean; // Use random names for number input (default: true)
 };
 
@@ -25,7 +24,7 @@ type GetWorkersOptions = {
 await getWorkers(3); // 3 workers with random names, versioned
 await getWorkers(3, { randomNames: false }); // 3 workers with fixed names (bob, alice, fabri)
 await getWorkers(["alice", "bob"]); // Specific names, versioned
-await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
+await getWorkers(["alice", "bob"], {}); // Specific names, no versioning
 await getWorkers(5, { env: "production" }); // 5 random workers on production
 ```
 
@@ -69,7 +68,7 @@ const workers = await getWorkers(["alice", "bob"]); // Specific workers
 ```typescript
 // Versioning is enabled by default
 const workers = await getWorkers(3); // Uses random SDK versions
-const workers = await getWorkers(3, { useVersions: false }); // All latest version
+const workers = await getWorkers(3, {}); // All latest version
 ```
 
 ### Environment-Specific Testing

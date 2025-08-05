@@ -196,7 +196,6 @@ async function sendGroupMessage(config: Config): Promise<void> {
   // Create a single worker for group messaging
   const workerManager = await getWorkers(1, {
     env: config.env as XmtpEnv,
-    useVersions: false, // Use latest version for group messaging
   });
 
   const worker = workerManager.getAll()[0];
