@@ -62,8 +62,9 @@ import {
   Conversation as Conversation401,
   Dm as Dm401,
   Group as Group401,
+  type LogLevel,
+  type XmtpEnv,
 } from "@xmtp/node-sdk-4.0.1";
-import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.1dev";
 
 export {
   Client,
