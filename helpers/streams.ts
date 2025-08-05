@@ -175,9 +175,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   } = options;
 
   // // Sync conversations for all receiving workers to ensure they have local group instances
-  // await Promise.all(
-  //   receivers.map((worker) => worker.client.conversations.sync()),
-  // );
+  await Promise.all(
+    receivers.map((worker) => worker.client.conversations.sync()),
+  );
   // Start collectors FIRST - before any messages are sent
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]

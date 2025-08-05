@@ -5,6 +5,7 @@ import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
 import {
+  getLatestVersion,
   getVersions,
   VersionList,
   type Client,
@@ -553,7 +554,7 @@ export async function getWorkers(
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-  const nodeSDK = options.nodeSDK || process.env.NODE_VERSION;
+  const nodeSDK = options.nodeSDK || getLatestVersion();
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 
