@@ -18,6 +18,12 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Functional",
+      uniqueErrorLines: [
+        "FAIL  monitoring/functional/other.test.ts > sync > create a group",
+      ],
+    },
+    {
       testName: "Browser",
       uniqueErrorLines: [
         "FAIL  monitoring/browser/browser.test.ts > browser > newDm and message stream",

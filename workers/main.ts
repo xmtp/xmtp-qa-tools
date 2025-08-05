@@ -6,10 +6,8 @@ import {
   getEncryptionKeyFromHex,
   streamTimeout,
 } from "@helpers/client";
-import { ProgressBar } from "@helpers/logger";
 import {
   ConsentState,
-  IdentifierKind,
   regressionClient,
   type Client,
   type DecodedMessage,
@@ -18,7 +16,6 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";
-import { getWorkers } from "@workers/manager";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
