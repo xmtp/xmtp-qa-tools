@@ -306,7 +306,7 @@ function processResultsForTable(testName: string) {
 
   // Create header
   const header = [
-    "Operation-Members",
+    "Operation-Members[Installations]",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
 
