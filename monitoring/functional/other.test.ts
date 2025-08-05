@@ -26,7 +26,7 @@ describe(testName, () => {
     await group.addMembers([receiver.client.inboxId]);
     for await (const conversation of await stream) {
       console.log("Conversation", conversation?.id);
-      //expect(conversation?.id).toBe(group.id);
+      expect(conversation?.id).toBe(group.id);
       break;
     }
   }, 500);
