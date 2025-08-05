@@ -81,7 +81,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.0.1dev"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
+} from "@xmtp/node-sdk-4.0.2"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
 
 export const VersionList = [
   {
@@ -89,8 +89,8 @@ export const VersionList = [
     Conversation: Conversation401,
     Dm: Dm401,
     Group: Group401,
-    nodeSDK: "4.0.1dev",
-    nodeBindings: "1.4.0dev",
+    nodeSDK: "4.0.2",
+    nodeBindings: "1.3.5",
     auto: true,
   },
   {
