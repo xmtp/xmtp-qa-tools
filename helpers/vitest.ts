@@ -65,7 +65,7 @@ export const setupDurationTracking = ({
         operation: operationName,
         conversation_count,
         test: testNameExtracted,
-        sdk: sdk || getVersions()[0].nodeSDK,
+        sdk: sdk || process.env.NODE_VERSION,
         installations: members,
         members,
       } as DurationMetricTags);
@@ -92,7 +92,7 @@ export const setupDurationTracking = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || getVersions()[0].nodeSDK,
+          sdk: sdk || process.env.NODE_VERSION,
           operation: operationName,
           test: testNameExtracted,
         };
@@ -109,7 +109,7 @@ export const setupDurationTracking = ({
       metric_type: "test",
       metric_subtype: "duration",
       test: testName,
-      sdk: sdk || getVersions()[0].nodeSDK,
+      sdk: sdk || process.env.NODE_VERSION,
     });
   });
 };

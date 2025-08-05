@@ -2,13 +2,13 @@ import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { getVersions, type Group } from "version-management/client-versions";
+import { type Group } from "version-management/client-versions";
 import { describe, it } from "vitest";
 
 // Count of groups to create
 const groupCount = 5;
 const parallelOperations = 5; // How many operations to perform in parallel
-const NODE_VERSION = getVersions()[0].nodeSDK; // default to latest version, can be overridden with --nodeSDK=3.1.1
+const NODE_VERSION = process.env.NODE_VERSION; // default to latest version, can be overridden with --nodeSDK=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
 const workerNames = [
