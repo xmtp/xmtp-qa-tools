@@ -117,9 +117,6 @@ interface IWorkerClient {
     address: `0x${string}`;
   }>;
 
-  // Utility Methods
-  populate(count: number): Promise<void>;
-
   // Properties
   readonly currentFolder: string;
 }
@@ -1236,89 +1233,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
       }
       numIndex++;
     }
-  }
-
-  async populate(count: number) {
-    const messagesBefore = await this.client.conversations.list();
-    console.log(`Before: ${messagesBefore.length}`);
-    console.log(`Populating ${this.name} with ${count} conversations...`);
-
-    if (count <= messagesBefore.length) {
-      console.log(
-        `Skipping populating ${this.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
-      );
-      return;
-    }
-    let diff = count - messagesBefore.length;
-
-    const prefix = "random";
-    const BATCH_SIZE = 100;
-    const totalBatches = Math.ceil(diff / BATCH_SIZE);
-
-    console.log(
-      `Preparing to create ${diff} sender workers in ${totalBatches} batches of ${BATCH_SIZE}...`,
-    );
-
-    let totalCreated = 0;
-    const progressBar = new ProgressBar(
-      totalBatches,
-      `Populating ${this.name}`,
-    );
-
-    // Process workers in batches to avoid resource exhaustion
-    for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
-      const startIndex = batchIndex * BATCH_SIZE;
-      const endIndex = Math.min(startIndex + BATCH_SIZE, diff);
-      const batchSize = endIndex - startIndex;
-
-      console.log(
-        `Processing batch ${batchIndex + 1}/${totalBatches} (${batchSize} workers)...`,
-      );
-
-      // Create batch of workers
-      const batchWorkerNames = Array.from(
-        { length: batchSize },
-        (_, i) => `${prefix}${startIndex + i}`,
-      );
-
-      const senders = await getWorkers(batchWorkerNames);
-      const senderWorkers = senders.getAll();
-
-      // Create conversations for this batch
-      console.log(`[${this.nameId}] Creating ${batchSize} conversations...`);
-      let batchCreated = 0;
-      let batchFailed = 0;
-
-      await Promise.all(
-        senderWorkers.map(async (sender) => {
-          await sender.client.conversations.newDmWithIdentifier({
-            identifier: this.address,
-            identifierKind: IdentifierKind.Ethereum,
-          });
-          totalCreated++;
-          batchCreated++;
-        }),
-      );
-
-      console.log(
-        `[${this.nameId}] Batch completed: ${batchCreated} created, ${batchFailed} failed`,
-      );
-
-      // Sync after each batch to ensure conversations are registered
-      await this.client.conversations.sync();
-
-      // Update progress bar for completed batch
-      progressBar.update(batchIndex + 1);
-
-      console.log(
-        `Completed batch ${batchIndex + 1}/${totalBatches} (${totalCreated}/${diff} total)`,
-      );
-    }
-
-    const messagesAfter = await this.client.conversations.list();
-    console.log(`After: ${messagesAfter.length}`);
-
-    console.log(`Done populating ${this.name} with ${count} conversations`);
   }
 
   /**
