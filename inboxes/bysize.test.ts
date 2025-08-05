@@ -1,7 +1,7 @@
 import { ProgressBar } from "@helpers/logger";
 import { getWorkers, type Worker } from "@workers/manager";
 import { IdentifierKind } from "version-management/client-versions";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("bysize", () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
