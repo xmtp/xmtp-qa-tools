@@ -250,7 +250,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
-    this.nameId = worker.name + "-" + worker.sdk.split("-")[0];
+    this.nameId = worker.name + "-" + worker.sdk;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
     this.dbPath = customDbPath || "";

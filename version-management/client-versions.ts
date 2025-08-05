@@ -186,16 +186,16 @@ export const VersionList = [
 ];
 export const getActiveVersion = () => {
   checkNoNameContains(VersionList);
-  const nodesdk = process.env.NODE_VERSION || getVersions()[0];
-  return nodesdk as {
-    Client: typeof Client401;
-    Conversation: typeof Conversation401;
-    Dm: typeof Dm401;
-    Group: typeof Group401;
-    nodeSDK: string;
-    nodeBindings: string;
-    auto: boolean;
-  };
+  let nodesdk = getVersions()[0];
+  if (process.env.NODE_VERSION) {
+    nodesdk = getVersions().find(
+      (v) => v.nodeSDK === process.env.NODE_VERSION,
+    ) as (typeof VersionList)[number];
+    if (!nodesdk) {
+      throw new Error(`Node version ${process.env.NODE_VERSION} not found`);
+    }
+  }
+  return nodesdk;
 };
 export const getVersions = (filterAuto: boolean = true) => {
   checkNoNameContains(VersionList);
