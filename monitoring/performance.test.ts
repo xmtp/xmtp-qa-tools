@@ -107,6 +107,11 @@ describe(testName, () => {
     const dmId = await dm!.send("gm");
     expect(dmId).toBeDefined();
   });
+  it(`streamMessage:measure receiving a gm`, async () => {
+    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+    setCustomDuration(verifyResult.averageEventTiming);
+    expect(verifyResult.allReceived).toBe(true);
+  });
 
   it(`setConsentStates:group consent`, async () => {
     await creator!.client.preferences.setConsentStates([
@@ -116,12 +121,6 @@ describe(testName, () => {
         state: ConsentState.Allowed,
       },
     ]);
-  });
-
-  it(`streamMessage:measure receiving a gm`, async () => {
-    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-    setCustomDuration(verifyResult.averageEventTiming);
-    expect(verifyResult.allReceived).toBe(true);
   });
 
   for (const i of BATCH_SIZE) {

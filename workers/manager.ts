@@ -553,7 +553,7 @@ export async function getWorkers(
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-
+  const nodeSDK = options.nodeSDK || process.env.NODE_VERSION;
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 
@@ -565,8 +565,8 @@ export async function getWorkers(
           ? getRandomNames(workers)
           : getFixedNames(workers)
         : workers;
-    descriptors = options.nodeSDK
-      ? names.map((name) => `${name}-${options.nodeSDK}`)
+    descriptors = nodeSDK
+      ? names.map((name) => `${name}-${nodeSDK}`)
       : options.useVersions
         ? nameWithVersions(names)
         : names;
