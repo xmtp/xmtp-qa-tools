@@ -16,23 +16,18 @@ describe(testName, () => {
     for (const version of versions) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const name = "downgrade";
-      console.log(name);
+      console.log("starting downgrade to", version.nodeSDK);
       const versionWorkers = await getWorkers([name], {
         nodeSDK: version.nodeSDK,
       });
 
-      // When useVersions is false, the worker name doesn't include the version
-      // So we need to get it by the base name without the version
-      const baseName = name.split("-")[0]; // "upgrade"
-      console.log("baseName", baseName);
-      const filteredWorker = versionWorkers.get(baseName);
-      console.log("Found downgrade worker:", filteredWorker ? "yes" : "no");
-      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
+      const filteredWorker = versionWorkers.get(name);
       let convo =
         await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
       expect(convo?.id).toBeDefined();
-      if (!convo?.id) console.error("Dowgrading from version", version.nodeSDK);
+      if (!convo?.id) console.error("Downgrading to version", version.nodeSDK);
+      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
     }
   });
 
@@ -42,20 +37,19 @@ describe(testName, () => {
 
     for (const version of versions.reverse()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const name = "upgrade-" + "a" + "-" + version.nodeSDK;
-      const versionWorkers = await getWorkers([name], {});
+      const name = "upgrade";
+      console.log("starting upgrade to", version.nodeSDK);
+      const versionWorkers = await getWorkers([name], {
+        nodeSDK: version.nodeSDK,
+      });
 
-      // When useVersions is false, the worker name doesn't include the version
-      // So we need to get it by the base name without the version
-      const baseName = name.split("-")[0]; // "upgrade"
-      const filteredWorker = versionWorkers.get(baseName);
-      console.log("Found downgrade worker:", filteredWorker ? "yes" : "no");
-      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
+      const filteredWorker = versionWorkers.get(name);
       let convo =
         await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
       expect(convo?.id).toBeDefined();
-      if (!convo?.id) console.error("Dowgrading from version", version.nodeSDK);
+      if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
+      console.log("Upgraded to ", "sdk:" + String(filteredWorker?.sdk));
     }
   });
   it("track epoch changes during group operations", async () => {
