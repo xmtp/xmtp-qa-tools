@@ -457,7 +457,7 @@ export class WorkerManager implements IWorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = process.env.NODE_VERSION;
+    let defaultSdk = getVersions()[0].nodeSDK;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
@@ -553,10 +553,7 @@ export async function getWorkers(
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-  //SDK
   const nodeSDK = options.nodeSDK || process.env.NODE_VERSION;
-  process.env.NODE_VERSION = nodeSDK;
-
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 

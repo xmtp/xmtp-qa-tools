@@ -532,7 +532,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
     let dbPath: string;
     let client: unknown;
-
     if (this.dbPath) {
       // Use the custom dbPath if provided
       console.debug(`[${this.nameId}] Using custom dbPath: ${this.dbPath}`);

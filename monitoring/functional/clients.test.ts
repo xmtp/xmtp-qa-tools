@@ -23,18 +23,20 @@ describe(testName, async () => {
 
   it(`downgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
+    console.log("versions", versions);
     const receiverInboxId = getRandomInboxIds(1)[0];
 
     for (const version of versions) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const versionWorkers = await getWorkers(
-        ["downgrade-" + "a" + "-" + version.nodeSDK],
-        {
-          useVersions: false,
-        },
-      );
+      const name = "downgrade-" + "a" + "-" + version.nodeSDK;
+      const versionWorkers = await getWorkers([name], {
+        useVersions: false,
+      });
 
-      const downgrade = versionWorkers.get("downgrade");
+      // When useVersions is false, the worker name doesn't include the version
+      // So we need to get it by the base name without the version
+      const downgrade = versionWorkers.get(name);
+      console.log("Found downgrade worker:", downgrade ? "yes" : "no");
       console.log("Downgraded to ", "sdk:" + String(downgrade?.sdk));
       let convo = await downgrade?.client.conversations.newDm(receiverInboxId);
 
@@ -49,14 +51,15 @@ describe(testName, async () => {
 
     for (const version of versions.reverse()) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const versionWorkers = await getWorkers(
-        ["upgrade-" + "a" + "-" + version.nodeSDK],
-        {
-          useVersions: false,
-        },
-      );
+      const name = "upgrade-" + "a" + "-" + version.nodeSDK;
+      const versionWorkers = await getWorkers([name], {
+        useVersions: false,
+      });
 
-      const upgrade = versionWorkers.get("upgrade");
+      // When useVersions is false, the worker name doesn't include the version
+      // So we need to get it by the base name without the version
+      const baseName = name.split("-")[0]; // "upgrade"
+      const upgrade = versionWorkers.get(baseName);
       console.log("Upgraded to ", "sdk:" + String(upgrade?.sdk));
       let convo = await upgrade?.client.conversations.newDm(receiverInboxId);
       expect(convo?.id).toBeDefined();
@@ -73,11 +76,7 @@ describe(testName, async () => {
     await group.addMembers([newMember]);
     // Get updated debug info
     const updatedDebugInfo = await group.debugInfo();
-    console.log("updatedDebugInfo", updatedDebugInfo);
-    const updatedEpoch = updatedDebugInfo.epoch;
-    console.log("updatedEpoch", updatedEpoch);
-
-    // epoch increased
-    expect(updatedEpoch).toBe(initialEpoch + 1n);
+    console.log("updatedEpoch", updatedDebugInfo.epoch);
+    expect(updatedDebugInfo.epoch).toBe(initialEpoch + 1n);
   });
 });
