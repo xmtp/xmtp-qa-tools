@@ -5,40 +5,31 @@ import { getVersions } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
-describe(testName, async () => {
+describe(testName, () => {
   setupDurationTracking({ testName });
   let workers: WorkerManager;
-  workers = await getWorkers([
-    "henry",
-    "ivy",
-    "jack",
-    "karen",
-    "bob",
-    "randomguy",
-    "larry",
-    "mary",
-    "nancy",
-    "oscar",
-  ]);
 
   it(`downgrade last versions`, async () => {
     const versions = getVersions().slice(0, 3);
-    console.log("versions", versions);
     const receiverInboxId = getRandomInboxIds(1)[0];
 
     for (const version of versions) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const name = "downgrade-" + "a" + "-" + version.nodeSDK;
+      const name = "downgrade";
+      console.log(name);
       const versionWorkers = await getWorkers([name], {
-        useVersions: false,
+        nodeSDK: version.nodeSDK,
       });
 
       // When useVersions is false, the worker name doesn't include the version
       // So we need to get it by the base name without the version
-      const downgrade = versionWorkers.get(name);
-      console.log("Found downgrade worker:", downgrade ? "yes" : "no");
-      console.log("Downgraded to ", "sdk:" + String(downgrade?.sdk));
-      let convo = await downgrade?.client.conversations.newDm(receiverInboxId);
+      const baseName = name.split("-")[0]; // "upgrade"
+      console.log("baseName", baseName);
+      const filteredWorker = versionWorkers.get(baseName);
+      console.log("Found downgrade worker:", filteredWorker ? "yes" : "no");
+      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
+      let convo =
+        await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
       expect(convo?.id).toBeDefined();
       if (!convo?.id) console.error("Dowgrading from version", version.nodeSDK);
@@ -59,14 +50,19 @@ describe(testName, async () => {
       // When useVersions is false, the worker name doesn't include the version
       // So we need to get it by the base name without the version
       const baseName = name.split("-")[0]; // "upgrade"
-      const upgrade = versionWorkers.get(baseName);
-      console.log("Upgraded to ", "sdk:" + String(upgrade?.sdk));
-      let convo = await upgrade?.client.conversations.newDm(receiverInboxId);
+      const filteredWorker = versionWorkers.get(baseName);
+      console.log("Found downgrade worker:", filteredWorker ? "yes" : "no");
+      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
+      let convo =
+        await filteredWorker?.client.conversations.newDm(receiverInboxId);
+
       expect(convo?.id).toBeDefined();
-      if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
+      if (!convo?.id) console.error("Dowgrading from version", version.nodeSDK);
     }
   });
   it("track epoch changes during group operations", async () => {
+    workers = await getWorkers(5);
+
     const group = await workers.createGroupBetweenAll();
     const initialDebugInfo = await group.debugInfo();
     const initialEpoch = initialDebugInfo.epoch;

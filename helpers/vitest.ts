@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { getLatestVersion } from "version-management/client-versions";
+import { getActiveVersion } from "version-management/client-versions";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 import { loadEnv } from "./client";
 import {
@@ -66,7 +66,7 @@ export const setupDurationTracking = ({
         operation: operationName,
         conversation_count,
         test: testNameExtracted,
-        sdk: sdk || getLatestVersion(),
+        sdk: sdk || getActiveVersion().nodeSDK,
         installations: members,
         members,
       } as DurationMetricTags);
@@ -93,7 +93,7 @@ export const setupDurationTracking = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || getLatestVersion(),
+          sdk: sdk || getActiveVersion().nodeSDK,
           operation: operationName,
           test: testNameExtracted,
         };
@@ -110,7 +110,7 @@ export const setupDurationTracking = ({
       metric_type: "test",
       metric_subtype: "duration",
       test: testName,
-      sdk: sdk || getLatestVersion(),
+      sdk: sdk || getActiveVersion().nodeSDK,
     });
   });
 };

@@ -7,8 +7,10 @@ import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import {
   Client,
+  getActiveVersion,
   IdentifierKind,
   regressionClient,
+  VersionList,
   type Conversation,
   type Signer,
   type XmtpEnv,
@@ -157,9 +159,14 @@ export const logAgentDetails = async (
   const packageJson = require("../package.json") as {
     dependencies: Record<string, string>;
   };
-  const xmtpSdkVersion = packageJson.dependencies["@xmtp/node-sdk"];
+  const xmtpSdkVersion =
+    packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeSDK];
   const bindingVersion = (
-    require("../node_modules/@xmtp/node-bindings/package.json") as {
+    require(
+      "../node_modules/@xmtp/node-bindings-" +
+        VersionList[0].nodeBindings +
+        "/package.json",
+    ) as {
       version: string;
     }
   ).version;
