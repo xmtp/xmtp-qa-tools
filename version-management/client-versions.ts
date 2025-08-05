@@ -92,7 +92,7 @@ export const VersionList = [
     Group: Group401,
     nodeSDK: "4.0.1dev",
     nodeBindings: "1.4.0dev",
-    auto: true,
+    auto: false,
   },
   {
     Client: Client401,
@@ -188,7 +188,7 @@ export const VersionList = [
 export const getLatestVersion = () => {
   checkNoNameContains(VersionList);
   const nodesdk = process.env.NODE_VERSION || getVersions()[0].nodeSDK;
-  console.log(nodesdk);
+
   return nodesdk;
 };
 export const getVersions = (filterAuto: boolean = true) => {
