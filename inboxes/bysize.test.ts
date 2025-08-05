@@ -1,15 +1,17 @@
-import { getWorkers } from "@workers/manager";
-import { beforeAll, describe } from "vitest";
+import { ProgressBar } from "@helpers/logger";
+import { getWorkers, type Worker } from "@workers/manager";
+import { IdentifierKind } from "version-management/client-versions";
+import { describe, expect, it } from "vitest";
 
-describe("populate", () => {
+describe("bysize", () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
     ? process.env.POPULATE_SIZE.split("-").map((v) => Number(v))
-    : [0];
+    : [1];
 
   const getTolerance = (expectedSize: number) =>
     Math.max(5, Math.floor(expectedSize * 0.1));
 
-  beforeAll(async () => {
+  it("populate", async () => {
     for (const [, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;
 
@@ -28,7 +30,7 @@ describe("populate", () => {
       console.log(
         `Populating ${populateSize} conversations for ${creatorName}...`,
       );
-      await creator.worker.populate(populateSize);
+      await populate(populateSize, creator);
 
       const conversationsAfter = await creator.client.conversations.list();
       console.log(
@@ -50,3 +52,86 @@ describe("populate", () => {
     }
   });
 });
+
+async function populate(count: number, worker: Worker) {
+  const messagesBefore = await worker.client.conversations.list();
+  console.log(`Before: ${messagesBefore.length}`);
+  console.log(`Populating ${worker.name} with ${count} conversations...`);
+
+  if (count <= messagesBefore.length) {
+    console.log(
+      `Skipping populating ${worker.name} with ${count} conversations because we already have ${messagesBefore.length} conversations`,
+    );
+    return;
+  }
+  let diff = count - messagesBefore.length;
+
+  const prefix = "random";
+  const BATCH_SIZE = 100;
+  const totalBatches = Math.ceil(diff / BATCH_SIZE);
+
+  console.log(
+    `Preparing to create ${diff} sender workers in ${totalBatches} batches of ${BATCH_SIZE}...`,
+  );
+
+  let totalCreated = 0;
+  const progressBar = new ProgressBar(
+    totalBatches,
+    `Populating ${worker.name}`,
+  );
+
+  // Process workers in batches to avoid resource exhaustion
+  for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+    const startIndex = batchIndex * BATCH_SIZE;
+    const endIndex = Math.min(startIndex + BATCH_SIZE, diff);
+    const batchSize = endIndex - startIndex;
+
+    console.log(
+      `Processing batch ${batchIndex + 1}/${totalBatches} (${batchSize} workers)...`,
+    );
+
+    // Create batch of workers
+    const batchWorkerNames = Array.from(
+      { length: batchSize },
+      (_, i) => `${prefix}${startIndex + i}`,
+    );
+
+    const senders = await getWorkers(batchWorkerNames);
+    const senderWorkers = senders.getAll();
+
+    // Create conversations for this batch
+    console.log(`[${worker.name}] Creating ${batchSize} conversations...`);
+    let batchCreated = 0;
+    let batchFailed = 0;
+
+    await Promise.all(
+      senderWorkers.map(async (sender) => {
+        await sender.client.conversations.newDmWithIdentifier({
+          identifier: worker.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+        totalCreated++;
+        batchCreated++;
+      }),
+    );
+
+    console.log(
+      `[${worker.name}] Batch completed: ${batchCreated} created, ${batchFailed} failed`,
+    );
+
+    // Sync after each batch to ensure conversations are registered
+    await worker.client.conversations.sync();
+
+    // Update progress bar for completed batch
+    progressBar.update(batchIndex + 1);
+
+    console.log(
+      `Completed batch ${batchIndex + 1}/${totalBatches} (${totalCreated}/${diff} total)`,
+    );
+  }
+
+  const messagesAfter = await worker.client.conversations.list();
+  console.log(`After: ${messagesAfter.length}`);
+
+  console.log(`Done populating ${worker.name} with ${count} conversations`);
+}
