@@ -231,13 +231,6 @@ function generateMarkdownTable(tableData: {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
 
-      // Debug logging for zero values
-      if (result && result.duration === 0) {
-        console.log(
-          `Found zero duration for ${result.testName} in iteration ${iteration}`,
-        );
-      }
-
       if (result && (result.duration > 10000 || result.duration === 0)) {
         duration += " ⚠️";
       }
@@ -313,7 +306,7 @@ function processResultsForTable(testName: string) {
 
   // Create header
   const header = [
-    "Operation-Members",
+    "Operation-Members[Installations]",
     ...allIterations.map((iter) => (iter === "0" ? "Base" : iter)),
   ];
 
@@ -396,13 +389,6 @@ function displaySummaryTable(testName: string): void {
     allIterations.forEach((iteration, i) => {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
-
-      // Debug logging for zero values
-      if (result && result.duration === 0) {
-        console.log(
-          `Console: Found zero duration for ${result.testName} in iteration ${iteration}`,
-        );
-      }
 
       if (result && (result.duration > 10000 || result.duration === 0)) {
         duration += " ⚠️";
