@@ -3,7 +3,6 @@ import path from "path";
 import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
-import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import {
   Client as Client209,
   Conversation as Conversation209,
@@ -64,6 +63,7 @@ import {
   Dm as Dm401,
   Group as Group401,
 } from "@xmtp/node-sdk-4.0.1";
+import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.1dev";
 
 export {
   Client,
@@ -81,7 +81,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
+} from "@xmtp/node-sdk-4.0.1dev"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
 
 // SDK version mappings
 export const VersionList = [
