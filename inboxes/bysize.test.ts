@@ -13,7 +13,7 @@ describe("populate", () => {
     for (const [, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;
 
-      const creatorName = "bysizeprev" + populateSize.toString();
+      const creatorName = "bysizepre1" + populateSize.toString();
 
       const coworkers = await getWorkers([creatorName]);
       const creator = coworkers.get(creatorName);
