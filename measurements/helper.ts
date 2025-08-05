@@ -231,13 +231,6 @@ function generateMarkdownTable(tableData: {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
 
-      // Debug logging for zero values
-      if (result && result.duration === 0) {
-        console.log(
-          `Found zero duration for ${result.testName} in iteration ${iteration}`,
-        );
-      }
-
       if (result && (result.duration > 10000 || result.duration === 0)) {
         duration += " ⚠️";
       }
@@ -396,13 +389,6 @@ function displaySummaryTable(testName: string): void {
     allIterations.forEach((iteration, i) => {
       const result = testResults.find((r) => r.iteration === iteration);
       let duration = result ? Math.round(result.duration).toString() : "-";
-
-      // Debug logging for zero values
-      if (result && result.duration === 0) {
-        console.log(
-          `Console: Found zero duration for ${result.testName} in iteration ${iteration}`,
-        );
-      }
 
       if (result && (result.duration > 10000 || result.duration === 0)) {
         duration += " ⚠️";
