@@ -1,5 +1,4 @@
 import {
-  VersionList,
   type Client,
   type LogLevel,
   type XmtpEnv,
@@ -12,6 +11,7 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
 } from "@helpers/client";
+import { getActiveVersion } from "version-management/client-versions";
 import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -119,11 +119,8 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        const ClientClass = VersionList.find(
-          (v) => v.nodeSDK === process.env.NODE_VERSION,
-        )?.Client;
         // @ts-expect-error - TODO: fix this
-        const client = await ClientClass.create(signer, {
+        const client = await getActiveVersion().Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,

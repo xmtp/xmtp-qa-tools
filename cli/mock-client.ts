@@ -1,8 +1,9 @@
 import "dotenv/config";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import {
-  Client,
+  getActiveVersion,
   IdentifierKind,
+  type Client,
   type XmtpEnv,
 } from "version-management/client-versions";
 
@@ -31,13 +32,14 @@ class MockXmtpAgent {
     const signer = createSigner(walletKey as `0x${string}`);
     const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
 
-    this.client = await Client.create(signer, {
+    // @ts-expect-error - TODO: fix this
+    this.client = await getActiveVersion().Client.create(signer, {
       dbEncryptionKey,
       env: this.env,
     });
 
-    console.log(`📖 Initialized XMTP client: ${this.client.inboxId}`);
-    return this.client;
+    console.log(`📖 Initialized XMTP client: ${this.client?.inboxId}`);
+    return this.client as Client;
   }
 
   // List all conversations with details
