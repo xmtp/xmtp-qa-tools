@@ -1,3 +1,4 @@
+import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -9,11 +10,11 @@ describe(testName, () => {
   setupDurationTracking({ testName });
   let workers: WorkerManager;
 
-  it(`downgrade last versions`, async () => {
-    const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getRandomInboxIds(1)[0];
+  const versions = getVersions().slice(0, 3);
+  for (const version of versions) {
+    it(`downgrade last versions`, async () => {
+      const receiverInboxId = getRandomInboxIds(1)[0];
 
-    for (const version of versions) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const name = "downgrade";
       console.log("starting downgrade to", version.nodeSDK);
@@ -25,17 +26,19 @@ describe(testName, () => {
       let convo =
         await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
-      expect(convo?.id).toBeDefined();
-      if (!convo?.id) console.error("Downgrading to version", version.nodeSDK);
+      if (!convo) {
+        console.error("Downgrading to version", version.nodeSDK);
+        return;
+      }
+      const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
+      console.log("verifyResult", verifyResult);
+      expect(verifyResult.allReceived).toBe(true);
       console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
-    }
-  });
-
-  it(`upgrade last versions`, async () => {
-    const versions = getVersions().slice(0, 3);
-    const receiverInboxId = getRandomInboxIds(1)[0];
-
-    for (const version of versions.reverse()) {
+    });
+  }
+  for (const version of versions.reverse()) {
+    it(`upgrade last versions`, async () => {
+      const receiverInboxId = getRandomInboxIds(1)[0];
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const name = "upgrade";
       console.log("starting upgrade to", version.nodeSDK);
@@ -47,11 +50,17 @@ describe(testName, () => {
       let convo =
         await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
-      expect(convo?.id).toBeDefined();
-      if (!convo?.id) console.error("Upgrading to version", version.nodeSDK);
+      if (!convo) {
+        console.error("Upgrading to version", version.nodeSDK);
+        return;
+      }
+      expect(convo.id).toBeDefined();
+      const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
+      console.log("verifyResult", verifyResult);
+      //expect(verifyResult.allReceived).toBe(true);
       console.log("Upgraded to ", "sdk:" + String(filteredWorker?.sdk));
-    }
-  });
+    });
+  }
   it("track epoch changes during group operations", async () => {
     workers = await getWorkers(5);
 

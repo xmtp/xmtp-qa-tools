@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import {
+  getActiveVersion,
   IdentifierKind,
-  VersionList,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -13,7 +13,7 @@ import { initializeClient } from "../helpers/xmtp-handler";
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
 const xmtpSdkVersion =
-  packageJson.dependencies["@xmtp/node-sdk-" + VersionList[0].nodeSDK];
+  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeSDK];
 
 // Track when the bot started
 const startTime = new Date();

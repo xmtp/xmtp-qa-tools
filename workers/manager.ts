@@ -528,13 +528,11 @@ export async function getWorkers(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
   let sdkVersions = [options.nodeSDK || getActiveVersion().nodeSDK];
-  console.log("sdkVersions", options.nodeSDK, getActiveVersion());
   if (process.env.TEST_VERSIONS) {
     sdkVersions = getVersions()
       .slice(0, parseInt(process.env.TEST_VERSIONS))
       .map((v) => v.nodeSDK);
   }
-  console.log("sdkVersions", sdkVersions);
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 
