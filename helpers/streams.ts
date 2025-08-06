@@ -34,7 +34,11 @@ export async function updateGroupConsent(
 }
 
 // Generic property extractor
-function getProperty<T>(obj: unknown, path: string[]): T | undefined {
+function getProperty<T>(
+  obj: unknown,
+  path: string[],
+  _typeHint?: T,
+): T | undefined {
   let current: any = obj;
   for (const key of path) {
     if (current && typeof current === "object" && key in current) {
@@ -178,7 +182,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
 
   const messagesAsStrings = allReceived.map((msgs) =>
-    msgs.map((m) => getMessage(m.event as TReceived)),
+    msgs.map((m) => getMessage(m.event)),
   );
 
   const stats = calculateMessageStats(
