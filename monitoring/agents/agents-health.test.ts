@@ -45,8 +45,8 @@ describe(testName, () => {
         timestamp: string;
         message: string;
       };
-      console.log(JSON.stringify(result, null, 2));
-      sendMetric("response", Number(result.responseTime), {
+
+      sendMetric("response", result.responseTime, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
