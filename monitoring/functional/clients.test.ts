@@ -27,4 +27,22 @@ describe(testName, () => {
       }
     }
   });
+  it(`upgrade last versions`, async () => {
+    for (const version of getVersions().slice(0, 3).reverse()) {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const versionWorkers = await getWorkers(["creator", "receiver"], {
+          nodeSDK: version.nodeSDK,
+        });
+
+        const creator = versionWorkers.getCreator();
+        const receiver = versionWorkers.getReceiver();
+        let convo = await creator.client.conversations.newDm(receiver.inboxId);
+        const verifyResult = await verifyMessageStream(convo, [receiver]);
+        expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
+      } catch (error) {
+        console.error("Error upgrading to version", version.nodeSDK, error);
+      }
+    }
+  });
 });
