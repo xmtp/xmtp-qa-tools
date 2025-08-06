@@ -213,7 +213,6 @@ describe(testName, () => {
         conversation_type: "group",
       } as DeliveryMetricTags);
 
-      console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });

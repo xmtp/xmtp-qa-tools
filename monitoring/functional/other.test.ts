@@ -30,6 +30,22 @@ describe(testName, () => {
     }
   }, 500);
 
+  it("track epoch changes during group operations", async () => {
+    const workers = await getWorkers(3);
+
+    const group = await workers.createGroupBetweenAll();
+    const initialDebugInfo = await group.debugInfo();
+    const initialEpoch = initialDebugInfo.epoch;
+
+    // Perform group operation that should increment epoch
+    const newMember = getRandomInboxIds(1)[0];
+    await group.addMembers([newMember]);
+    // Get updated debug info
+    const updatedDebugInfo = await group.debugInfo();
+    console.log("updatedEpoch", updatedDebugInfo.epoch);
+    expect(updatedDebugInfo.epoch).toBe(initialEpoch + 1n);
+  });
+
   it("stitching", async () => {
     const workers = await getWorkers(["randombob-a", "alice"]);
     let creator = workers.get("randombob", "a")!;
