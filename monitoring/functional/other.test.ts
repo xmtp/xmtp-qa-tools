@@ -20,7 +20,6 @@ describe(testName, () => {
     )) as Group;
 
     await group.send(receiver.inboxId);
-    console.log(receiver.inboxId);
     await receiver.client.conversations.syncAll();
     const stream = receiver.client.conversations.stream();
     await group.addMembers([receiver.client.inboxId]);

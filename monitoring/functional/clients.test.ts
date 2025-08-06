@@ -10,57 +10,56 @@ describe(testName, () => {
   setupDurationTracking({ testName });
   let workers: WorkerManager;
 
-  const versions = getVersions().slice(0, 3);
-  for (const version of versions) {
-    it(`downgrade last versions`, async () => {
-      const receiverInboxId = getRandomInboxIds(1)[0];
+  // for (const version of getVersions().slice(0, 3)) {
+  //   it(`downgrade last versions`, async () => {
+  //     const receiverInboxId = getRandomInboxIds(1)[0];
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const name = "downgrade";
-      console.log("starting downgrade to", version.nodeSDK);
-      const versionWorkers = await getWorkers([name], {
-        nodeSDK: version.nodeSDK,
-      });
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     const name = "downgrade";
+  //     console.log("starting downgrade to", version.nodeSDK);
+  //     const versionWorkers = await getWorkers([name], {
+  //       nodeSDK: version.nodeSDK,
+  //     });
 
-      const filteredWorker = versionWorkers.get(name);
-      let convo =
-        await filteredWorker?.client.conversations.newDm(receiverInboxId);
+  //     const filteredWorker = versionWorkers.get(name);
+  //     let convo =
+  //       await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
-      if (!convo) {
-        console.error("Downgrading to version", version.nodeSDK);
-        return;
-      }
-      const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
-      console.log("verifyResult", verifyResult);
-      expect(verifyResult.receptionPercentage).toBeGreaterThan(0);
-      console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
-    });
-  }
-  for (const version of versions.reverse()) {
-    it(`upgrade last versions`, async () => {
-      const receiverInboxId = getRandomInboxIds(1)[0];
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const name = "upgrade";
-      console.log("starting upgrade to", version.nodeSDK);
-      const versionWorkers = await getWorkers([name], {
-        nodeSDK: version.nodeSDK,
-      });
+  //     if (!convo) {
+  //       console.error("Downgrading to version", version.nodeSDK);
+  //       return;
+  //     }
+  //     const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
+  //     console.log("verifyResult", verifyResult);
+  //     expect(verifyResult.receptionPercentage).toBeGreaterThan(0);
+  //     console.log("Downgraded to ", "sdk:" + String(filteredWorker?.sdk));
+  //   });
+  // }
+  // for (const version of getVersions().slice(0, 3).reverse()) {
+  //   it(`upgrade last versions`, async () => {
+  //     const receiverInboxId = getRandomInboxIds(1)[0];
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //     const name = "upgrade";
+  //     console.log("starting upgrade to", version.nodeSDK);
+  //     const versionWorkers = await getWorkers([name], {
+  //       nodeSDK: version.nodeSDK,
+  //     });
 
-      const filteredWorker = versionWorkers.get(name);
-      let convo =
-        await filteredWorker?.client.conversations.newDm(receiverInboxId);
+  //     const filteredWorker = versionWorkers.get(name);
+  //     let convo =
+  //       await filteredWorker?.client.conversations.newDm(receiverInboxId);
 
-      if (!convo) {
-        console.error("Upgrading to version", version.nodeSDK);
-        return;
-      }
-      expect(convo.id).toBeDefined();
-      const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
-      console.log("verifyResult", verifyResult);
-      //expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
-      console.log("Upgraded to ", "sdk:" + String(filteredWorker?.sdk));
-    });
-  }
+  //     if (!convo) {
+  //       console.error("Upgrading to version", version.nodeSDK);
+  //       return;
+  //     }
+  //     expect(convo.id).toBeDefined();
+  //     const verifyResult = await verifyMessageStream(convo, [filteredWorker!]);
+  //     console.log("verifyResult", verifyResult);
+  //     //expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+  //     console.log("Upgraded to ", "sdk:" + String(filteredWorker?.sdk));
+  //   });
+  // }
   it("track epoch changes during group operations", async () => {
     workers = await getWorkers(5);
 

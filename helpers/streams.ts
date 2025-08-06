@@ -21,7 +21,6 @@ export async function updateGroupConsent(
   group: Group,
 ): Promise<void> {
   const getState = await group.consentState;
-
   await client.preferences.setConsentStates([
     {
       entity: group.id,
@@ -34,114 +33,73 @@ export async function updateGroupConsent(
   ]);
 }
 
-// Type guard for sent event with sentAt
-function hasSentAt(obj: unknown): obj is { sentAt: number } {
-  return (obj as { sentAt: number }).sentAt !== undefined;
+// Generic property extractor
+function getProperty<T>(obj: unknown, path: string[]): T | undefined {
+  let current: any = obj;
+  for (const key of path) {
+    if (current && typeof current === "object" && key in current) {
+      current = current[key];
+    } else {
+      return undefined;
+    }
+  }
+  return current as T;
 }
+
+// Simplified type guard and property extractors
+function hasSentAt(obj: unknown): obj is { sentAt: number } {
+  return getProperty<number>(obj, ["sentAt"]) !== undefined;
+}
+
 function extractGroupName(ev: unknown): string {
-  const event = ev as {
-    content?: {
-      metadataFieldChanges?: Array<{ fieldName: string; newValue: string }>;
-    };
-  };
-  const changes = event.content?.metadataFieldChanges || [];
+  const changes =
+    getProperty<Array<{ fieldName: string; newValue: string }>>(ev, [
+      "content",
+      "metadataFieldChanges",
+    ]) || [];
   const nameChange = changes.find((c) => c.fieldName === "group_name");
   return nameChange?.newValue || "";
 }
 
-/**
- * Extract added inbox IDs from a membership update event
- */
 function extractAddedInboxes(ev: unknown): string {
-  if (typeof ev !== "object" || ev === null) {
-    return "";
-  }
+  // Try different paths for added inboxes
+  const paths = [
+    ["inboxId"],
+    ["addedInboxes", "0", "inboxId"],
+    ["group", "addedInboxes", "0", "inboxId"],
+    ["content", "addedInboxes", "0", "inboxId"],
+  ];
 
-  const event = ev as {
-    inboxId?: string; // For sent events
-    addedInboxes?: Array<{ inboxId: string }>; // For direct events
-    group?: {
-      addedInboxes?: Array<{ inboxId: string }>; // For stream events
-    };
-    content?: {
-      addedInboxes?: Array<{ inboxId: string }>; // Legacy format
-    };
-  };
-
-  // If this is a sent event with inboxId directly
-  if (event.inboxId) {
-    return event.inboxId;
-  }
-
-  // Try top-level first (current format)
-  let addedInboxes = event.addedInboxes || [];
-
-  // Try group structure (stream events)
-  if (addedInboxes.length === 0 && event.group?.addedInboxes) {
-    addedInboxes = event.group.addedInboxes;
-  }
-
-  // Fallback to content structure (legacy format)
-  if (addedInboxes.length === 0 && event.content?.addedInboxes) {
-    addedInboxes = event.content.addedInboxes;
-  }
-
-  // Return the first added inbox ID, or empty string if none
-  return addedInboxes.length > 0 ? addedInboxes[0].inboxId : "";
-}
-
-function extractContent(ev: unknown): string {
-  if (typeof ev === "object" && ev !== null) {
-    if (
-      Object.prototype.hasOwnProperty.call(ev, "content") &&
-      typeof (ev as Record<string, unknown>).content === "string"
-    ) {
-      return (ev as Record<string, string>).content;
-    }
-    if (
-      Object.prototype.hasOwnProperty.call(ev, "message") &&
-      typeof (ev as Record<string, unknown>).message === "object" &&
-      (ev as Record<string, unknown>).message !== null &&
-      typeof (ev as { message: { content?: unknown } }).message.content ===
-        "string"
-    ) {
-      return (ev as { message: { content: string } }).message.content;
-    }
+  for (const path of paths) {
+    const result = getProperty<string>(ev, path);
+    if (result) return result;
   }
   return "";
 }
 
+function extractContent(ev: unknown): string {
+  const content = getProperty<string>(ev, ["content"]);
+  if (content) return content;
+
+  const messageContent = getProperty<string>(ev, ["message", "content"]);
+  return messageContent || "";
+}
+
 function extractTimestamp(ev: unknown): number | null {
-  if (typeof ev === "object" && ev !== null) {
-    // Try different timestamp fields that might exist in message events
-    const possibleFields = ["receivedAt", "timestamp", "sentAt", "createdAt"];
+  const timestampFields = ["receivedAt", "timestamp", "sentAt", "createdAt"];
 
-    for (const field of possibleFields) {
-      if (
-        Object.prototype.hasOwnProperty.call(ev, field) &&
-        typeof (ev as Record<string, unknown>)[field] === "number"
-      ) {
-        return (ev as Record<string, number>)[field];
-      }
-    }
-
-    // Try nested in message object
-    if (
-      Object.prototype.hasOwnProperty.call(ev, "message") &&
-      typeof (ev as Record<string, unknown>).message === "object" &&
-      (ev as Record<string, unknown>).message !== null
-    ) {
-      const message = (ev as { message: Record<string, unknown> }).message;
-      for (const field of possibleFields) {
-        if (
-          Object.prototype.hasOwnProperty.call(message, field) &&
-          typeof message[field] === "number"
-        ) {
-          return message[field];
-        }
-      }
-    }
+  // Try top-level fields
+  for (const field of timestampFields) {
+    const value = getProperty<number>(ev, [field]);
+    if (value) return value;
   }
+
+  // Try nested in message object
+  for (const field of timestampFields) {
+    const value = getProperty<number>(ev, ["message", field]);
+    if (value) return value;
+  }
+
   return null;
 }
 
@@ -169,25 +127,20 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     messageTemplate,
   } = options;
 
-  // // Sync conversations for all receiving workers to ensure they have local group instances
+  // Sync conversations for all receiving workers
   await Promise.all(
     receivers.map((worker) => worker.client.conversations.sync()),
   );
+
   // Start collectors FIRST - before any messages are sent
-  const collectPromises: Promise<
-    { key: string; receivedAt: number; message: string; event: unknown }[]
-  >[] = receivers.map((r) =>
+  const collectPromises = receivers.map((r) =>
     startCollectors(r).then((events) =>
-      events.map((ev) => {
-        // Try to extract the actual received timestamp from the event
-        const eventTimestamp = extractTimestamp(ev);
-        return {
-          key: getKey(ev),
-          receivedAt: eventTimestamp || Date.now(),
-          message: getMessage(ev),
-          event: ev,
-        };
-      }),
+      events.map((ev) => ({
+        key: getKey(ev),
+        receivedAt: extractTimestamp(ev) || Date.now(),
+        message: getMessage(ev),
+        event: ev,
+      })),
     ),
   );
 
@@ -200,9 +153,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   // Wait for all collectors to finish
   const allReceived = await Promise.all(collectPromises);
 
+  // Calculate timing statistics
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
   let timingCount = 0;
+
   receivers.forEach((r, idx) => {
     const received = allReceived[idx];
     eventTimings[r.name] = {};
@@ -217,12 +172,15 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       }
     });
   });
+
   const averageEventTiming = Math.round(
     timingCount > 0 ? timingSum / timingCount : 0,
   );
+
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) => getMessage(m.event as TReceived)),
   );
+
   const stats = calculateMessageStats(
     messagesAsStrings,
     statsLabel,
@@ -261,9 +219,9 @@ export async function verifyMessageStream(
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        let content = messageTemplate;
-        content = content.replace("{i}", `${i + 1}`);
-        content = content.replace("{randomSuffix}", randomSuffix);
+        let content = messageTemplate
+          .replace("{i}", `${i + 1}`)
+          .replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
@@ -303,9 +261,9 @@ export async function verifyMetadataStream(
     triggerEvents: async () => {
       const sent: { name: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        let name = messageTemplate;
-        name = name.replace("{i}", `${i + 1}`);
-        name = name.replace("{randomSuffix}", randomSuffix);
+        let name = messageTemplate
+          .replace("{i}", `${i + 1}`)
+          .replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
         await group.updateName(name);
         sent.push({ name, sentAt });
@@ -380,6 +338,7 @@ export async function verifyGroupConsentStream(
     membersForStats: receivers,
   });
 }
+
 /**
  * Specialized function to consent streams
  */
