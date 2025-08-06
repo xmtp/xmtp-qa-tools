@@ -247,6 +247,14 @@ function parseTestArgs(args: string[]): {
         options.fileLogging = true;
         process.env.LOGGING_LEVEL = "debug";
         break;
+      case "--log":
+        if (nextArg) {
+          process.env.LOGGING_LEVEL = nextArg;
+          i++;
+        } else {
+          console.warn("--log flag requires a value (e.g., --log debug)");
+        }
+        break;
       case "--nodeSDK":
         if (nextArg) {
           process.env.NODE_VERSION = nextArg;

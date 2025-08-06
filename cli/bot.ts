@@ -64,12 +64,11 @@ function parseArgs(): Config {
       config.env = nextArg;
       i++;
     } else if (arg === "--nodeSDK" && nextArg) {
-      if (nextArg) {
-        process.env.NODE_VERSION = nextArg;
-        i++;
-      } else {
-        console.warn("--nodeSDK flag requires a value (e.g., --nodeSDK 3.1.1)");
-      }
+      process.env.NODE_VERSION = nextArg;
+      i++;
+    } else if (arg === "--log" && nextArg) {
+      process.env.LOGGING_LEVEL = nextArg;
+      i++;
     } else if (!config.botName) {
       // First non-flag argument is the bot name
       config.botName = arg;
