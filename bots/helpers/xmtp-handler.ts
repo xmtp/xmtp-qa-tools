@@ -1,5 +1,6 @@
 import {
-  Client,
+  VersionList,
+  type Client,
   type LogLevel,
   type XmtpEnv,
 } from "version-management/client-versions";
@@ -118,7 +119,11 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        const client = await Client.create(signer, {
+        const ClientClass = VersionList.find(
+          (v) => v.nodeSDK === process.env.NODE_VERSION,
+        )?.Client;
+        // @ts-expect-error - TODO: fix this
+        const client = await ClientClass.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
