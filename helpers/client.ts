@@ -10,7 +10,6 @@ import {
   getActiveVersion,
   IdentifierKind,
   regressionClient,
-  VersionList,
   type Conversation,
   type Signer,
   type XmtpEnv,
