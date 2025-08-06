@@ -63,7 +63,7 @@ import {
   Dm as Dm401,
   Group as Group401,
 } from "@xmtp/node-sdk-4.0.1";
-import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.1dev";
+import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.2";
 
 export {
   Client,
@@ -81,7 +81,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.0.1dev"; // replace with @xmtp/node-sdk 3.2.2 for specific version across all files
+} from "@xmtp/node-sdk-4.0.2";
 
 export const VersionList = [
   {
@@ -89,8 +89,8 @@ export const VersionList = [
     Conversation: Conversation401,
     Dm: Dm401,
     Group: Group401,
-    nodeSDK: "4.0.1dev",
-    nodeBindings: "1.4.0dev",
+    nodeSDK: "4.0.2",
+    nodeBindings: "1.3.5",
     auto: true,
   },
   {
