@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { describe, expect, it } from "vitest";
@@ -46,7 +47,7 @@ describe(testName, () => {
         message: string;
       };
 
-      sendMetric("response", result.responseTime, {
+      sendMetric("response", result.responseTime ?? streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
