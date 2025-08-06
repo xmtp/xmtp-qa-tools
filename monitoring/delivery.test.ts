@@ -3,7 +3,9 @@ import {
   type DeliveryMetricTags,
   type ResponseMetricTags,
 } from "@helpers/datadog";
-import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
+import {
+  verifyMessageStream,
+} from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -66,9 +68,14 @@ describe(testName, async () => {
       await group.send(`poll-${i}-${randomSuffix}`);
     }
 
+    // Wait a bit for messages to propagate
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Poll messages from all receivers
     const messagesByWorker: string[][] = [];
     for (const worker of workers.getAllButCreator()) {
+      // Sync conversations first to ensure we have the latest messages
+      await worker.client.conversations.sync();
       const conversation =
         await worker.client.conversations.getConversationById(group.id);
       const messages = await conversation?.messages();
@@ -86,14 +93,14 @@ describe(testName, async () => {
       messagesByWorker.push(filteredMessages);
     }
 
-    const stats = calculateMessageStats(
+    const stats = calculateDeliveryAndOrder(
       messagesByWorker,
       "poll-",
       MESSAGE_COUNT,
       randomSuffix,
     );
 
-    sendMetric("delivery", stats.receptionPercentage, {
+    sendMetric("delivery", stats.deliveryPercentage, {
       sdk: workers.getCreator().sdk,
       test: testName,
       metric_type: "delivery",
@@ -110,7 +117,7 @@ describe(testName, async () => {
     } as DeliveryMetricTags);
 
     expect(stats.orderPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
-    expect(stats.receptionPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
+    expect(stats.deliveryPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 
   it("recovery:message recovery after stream interruption", async () => {
@@ -150,14 +157,14 @@ describe(testName, async () => {
         )
         .map((msg) => msg.content as string) ?? [];
 
-    const stats = calculateMessageStats(
+    const stats = calculateDeliveryAndOrder(
       [recoveredMessages],
       "recovery-",
       MESSAGE_COUNT,
       randomSuffix,
     );
 
-    sendMetric("delivery", stats.receptionPercentage, {
+    sendMetric("delivery", stats.deliveryPercentage, {
       sdk: offlineWorker.sdk,
       test: testName,
       metric_type: "delivery",
@@ -174,6 +181,52 @@ describe(testName, async () => {
     } as DeliveryMetricTags);
 
     expect(stats.orderPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
-    expect(stats.receptionPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
+    expect(stats.deliveryPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 });
++
+/**
+ * Simple helper to calculate delivery and order percentage for polling tests
+ */
+export function calculateDeliveryAndOrder(
+  messagesByWorker: string[][],
+  expectedPrefix: string,
+  expectedCount: number,
+  suffix: string,
+) {
+  // Helper: check if arr is an ordered subsequence of expected
+  function isOrderedSubsequence(arr: string[], expected: string[]): boolean {
+    if (arr.length === 0) return false;
+    let i = 0;
+    for (let j = 0; j < expected.length && i < arr.length; j++) {
+      if (arr[i] === expected[j]) {
+        i++;
+      }
+    }
+    return i === arr.length;
+  }
+
+  const totalExpectedMessages = expectedCount * messagesByWorker.length;
+  const totalReceivedMessages = messagesByWorker.reduce(
+    (sum, msgs) => sum + msgs.length,
+    0,
+  );
+
+  let workersInOrder = 0;
+  const workerCount = messagesByWorker.length;
+
+  for (const messages of messagesByWorker) {
+    const expectedMessages = Array.from(
+      { length: expectedCount },
+      (_, i) => `${expectedPrefix}${i + 1}-${suffix}`,
+    );
+    const inOrder = isOrderedSubsequence(messages, expectedMessages);
+    if (inOrder) workersInOrder++;
+  }
+
+  const deliveryPercentage =
+    (totalReceivedMessages / totalExpectedMessages) * 100;
+  const orderPercentage = (workersInOrder / workerCount) * 100;
+
+  return { deliveryPercentage, orderPercentage };
+}
