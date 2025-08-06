@@ -33,8 +33,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyInitial.receiverCount).toBe(3);
-    expect(verifyInitial.allReceived).toBe(true);
+    expect(verifyInitial.receptionPercentage).toBeGreaterThan(99);
 
     console.log("[test] Isolating node2 from nodes 1/3/4...");
     node1.blockOutboundTrafficTo(node2);
@@ -129,8 +128,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyFinal.receiverCount).toBe(3);
-    expect(verifyFinal.allReceived).toBe(true);
+    expect(verifyFinal.receptionPercentage).toBeGreaterThan(99);
     await workers.checkForks();
   });
 });

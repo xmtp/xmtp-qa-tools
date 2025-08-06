@@ -63,7 +63,7 @@ describe(testName, async () => {
             console.log("[verify] Checking fork and delivery under chaos");
             await workers.checkForks();
             const res = await verifyMessageStream(group, otherUsers);
-            expect(res.allReceived).toBe(true);
+            expect(res.receptionPercentage).toBeGreaterThan(99);
           } catch (e) {
             console.warn("[verify] Skipping check due to exception:", e);
           }
@@ -121,6 +121,6 @@ describe(testName, async () => {
     console.log("[final] Validating full group state and message sync");
     await workers.checkForks();
     const verifyFinal = await verifyMessageStream(group, otherUsers);
-    expect(verifyFinal.allReceived).toBe(true);
+    expect(verifyFinal.receptionPercentage).toBeGreaterThan(99);
   });
 });

@@ -14,20 +14,13 @@ export const PATTERNS = {
     {
       testName: "Browser",
       uniqueErrorLines: [
-        "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream for new member",
+        "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream when creating the group",
       ],
     },
     {
       testName: "Functional",
       uniqueErrorLines: [
         "FAIL  monitoring/functional/other.test.ts > sync > create a group",
-      ],
-    },
-    {
-      testName: "Browser",
-      uniqueErrorLines: [
-        "FAIL  monitoring/browser/browser.test.ts > browser > newDm and message stream",
-        "FAIL  monitoring/browser/browser.test.ts > browser > newGroup and message stream",
       ],
     },
     {

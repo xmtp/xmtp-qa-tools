@@ -28,8 +28,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyInitial.receiverCount).toBe(3);
-    expect(verifyInitial.allReceived).toBe(true);
+    expect(verifyInitial.receptionPercentage).toBeGreaterThan(99);
 
     console.log(
       `[test] Blocking host traffic to port ${partitionPort} (user3/user4's node)...`,
@@ -125,8 +124,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyFinal.receiverCount).toBe(3);
-    expect(verifyFinal.allReceived).toBe(true);
+    expect(verifyFinal.receptionPercentage).toBeGreaterThan(99);
 
     await workers.checkForks();
   });

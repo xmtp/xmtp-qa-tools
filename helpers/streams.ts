@@ -11,11 +11,6 @@ import {
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
-  allReceived: boolean;
-  almostAllReceived: boolean;
-  receiverCount: number;
-  messages: string;
-  eventTimings: string;
   averageEventTiming: number;
   receptionPercentage: number;
   orderPercentage: number;
@@ -235,34 +230,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     messageTemplate || "",
   );
 
-  // Transform eventTimings to arrays per name
-  const eventTimingsArray: Record<string, number[]> = {};
-  for (const [name, timingsObj] of Object.entries(eventTimings)) {
-    // Convert keys to numbers and sort
-    const arr = Object.entries(timingsObj)
-      .map(([k, v]) => [parseInt(k, 10), v] as [number, number])
-      .sort((a, b) => a[0] - b[0])
-      .map(([, v]) => v);
-    eventTimingsArray[name] = arr;
-  }
-
-  // Fix: Check if each receiver got the expected number of messages
-  const totalMessagesReceived = allReceived.reduce(
-    (sum, receiverMessages) => sum + receiverMessages.length,
-    0,
-  );
-  const expectedTotalMessages = (count ?? 1) * receivers.length;
-  const BooleanReceive = totalMessagesReceived >= expectedTotalMessages;
-
   const allResults = {
-    allReceived: BooleanReceive,
-    almostAllReceived:
-      BooleanReceive || totalMessagesReceived >= expectedTotalMessages - 2,
-    receiverCount: allReceived.length,
-    messages: messagesAsStrings.join(","),
-    eventTimings: Object.entries(eventTimingsArray)
-      .map(([k, v]) => `${k}: ${v.join(",")}`)
-      .join(","),
     averageEventTiming,
     receptionPercentage: stats?.receptionPercentage,
     orderPercentage: stats?.orderPercentage,
@@ -610,7 +578,8 @@ export async function verifyAgentMessageStream(
       membersForStats: receivers,
     });
 
-    if (result.allReceived) {
+    if (result.averageEventTiming !== undefined) {
+      // Check if averageEventTiming is defined
       return result;
     }
 

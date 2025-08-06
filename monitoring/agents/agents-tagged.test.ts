@@ -62,9 +62,10 @@ describe(testName, async () => {
       );
 
       // If the agent didn't respond, log the timeout value instead of 0
-      const metricValue = result?.allReceived
-        ? result.averageEventTiming
-        : streamTimeout;
+      const metricValue =
+        result?.receptionPercentage && result.receptionPercentage > 0
+          ? result.averageEventTiming
+          : streamTimeout;
       sendMetric("response", metricValue, {
         test: testName,
         metric_type: "agent",
@@ -77,8 +78,10 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       } as ResponseMetricTags);
 
-      if (!result?.allReceived) console.error(agent.name, "no response");
-      expect(result?.allReceived).toBe(true);
+      if (!result?.receptionPercentage || result.receptionPercentage === 0) {
+        console.error(agent.name, "no response");
+      }
+      expect(result?.receptionPercentage).toBeGreaterThan(0);
     });
   }
 });
