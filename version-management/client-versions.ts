@@ -94,7 +94,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.0.2";
+} from "@xmtp/node-sdk-4.0.1";
 
 export const VersionList = [
   {
@@ -210,7 +210,7 @@ export const getActiveVersion = () => {
   checkNoNameContains(VersionList);
   let nodesdk = getVersions()[0];
   if (process.env.NODE_VERSION) {
-    nodesdk = getVersions().find(
+    nodesdk = getVersions(false).find(
       (v) => v.nodeSDK === process.env.NODE_VERSION,
     ) as (typeof VersionList)[number];
     if (!nodesdk) {
