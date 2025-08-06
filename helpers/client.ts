@@ -164,7 +164,7 @@ export const logAgentDetails = async (
   const bindingVersion = (
     require(
       "../node_modules/@xmtp/node-bindings-" +
-        VersionList[0].nodeBindings +
+        getActiveVersion().nodeBindings +
         "/package.json",
     ) as {
       version: string;

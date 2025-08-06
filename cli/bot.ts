@@ -9,6 +9,7 @@ const __dirname = join(__filename, "..");
 interface Config {
   botName: string;
   env: string;
+  nodeSDK: string;
 }
 
 function showHelp() {
@@ -23,6 +24,7 @@ ARGUMENTS:
 
 OPTIONS:
   --env <environment>   XMTP environment (local, dev, production) [default: production]
+  --nodeSDK <version>  XMTP Node SDK version to use [default: latest]
   -h, --help           Show this help message
 
 ENVIRONMENTS:
@@ -48,6 +50,7 @@ function parseArgs(): Config {
   const config: Config = {
     botName: "",
     env: process.env.XMTP_ENV ?? "production",
+    nodeSDK: "latest",
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -60,6 +63,13 @@ function parseArgs(): Config {
     } else if (arg === "--env" && nextArg) {
       config.env = nextArg;
       i++;
+    } else if (arg === "--nodeSDK" && nextArg) {
+      if (nextArg) {
+        process.env.NODE_VERSION = nextArg;
+        i++;
+      } else {
+        console.warn("--nodeSDK flag requires a value (e.g., --nodeSDK 3.1.1)");
+      }
     } else if (!config.botName) {
       // First non-flag argument is the bot name
       config.botName = arg;
@@ -102,6 +112,7 @@ async function main() {
 
     console.log(`Starting bot: ${config.botName}`);
     console.log(`Environment: ${config.env}`);
+    console.log(`Node SDK: ${config.nodeSDK}`);
     console.log(`Path: ${botPath}`);
 
     // Run the bot using tsx with environment variable
@@ -111,6 +122,7 @@ async function main() {
       env: {
         ...process.env,
         XMTP_ENV: config.env,
+        XMTP_NODE_SDK: config.nodeSDK,
       },
     });
 
