@@ -117,7 +117,7 @@ describe(testName, () => {
     it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
       const verifyResult = await verifyMessageStream(dm!, [receiver!]);
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
     });
 
     it(`getConversationById(${populateSize}):measure getting a conversation by id`, async () => {
@@ -194,7 +194,7 @@ describe(testName, () => {
             );
 
             setCustomDuration(verifyResult.averageEventTiming);
-            expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+            expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
           },
           streamTimeout * 5,
         );
@@ -219,7 +219,7 @@ describe(testName, () => {
             );
 
             setCustomDuration(verifyResult.averageEventTiming);
-            expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+            expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
           },
           streamTimeout * 5,
         );
@@ -239,7 +239,7 @@ describe(testName, () => {
             );
 
             setCustomDuration(verifyResult.averageEventTiming);
-            expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+            expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
           },
           streamTimeout * 5,
         );

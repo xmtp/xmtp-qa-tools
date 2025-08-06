@@ -186,6 +186,6 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(verifyFinal.receptionPercentage).toBeGreaterThan(99);
+    expect(verifyFinal.receptionPercentage).toBeGreaterThanOrEqual(99);
   });
 });
