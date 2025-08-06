@@ -71,6 +71,12 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@xmtp/node-sdk-4.0.2";
+import {
+  Client as Client403,
+  Conversation as Conversation403,
+  Dm as Dm403,
+  Group as Group403,
+} from "@xmtp/node-sdk-4.0.3";
 
 export {
   Client,
@@ -92,13 +98,22 @@ export {
 
 export const VersionList = [
   {
+    Client: Client403,
+    Conversation: Conversation403,
+    Dm: Dm403,
+    Group: Group403,
+    nodeSDK: "4.0.3",
+    nodeBindings: "1.3.6",
+    auto: true,
+  },
+  {
     Client: Client402,
     Conversation: Conversation402,
     Dm: Dm402,
     Group: Group402,
     nodeSDK: "4.0.2",
     nodeBindings: "1.3.5",
-    auto: true,
+    auto: false,
   },
   {
     Client: Client401,
