@@ -3,9 +3,7 @@ import {
   type DeliveryMetricTags,
   type ResponseMetricTags,
 } from "@helpers/datadog";
-import {
-  verifyMessageStream,
-} from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -184,11 +182,8 @@ describe(testName, async () => {
     expect(stats.deliveryPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 });
-+
-/**
- * Simple helper to calculate delivery and order percentage for polling tests
- */
-export function calculateDeliveryAndOrder(
+
+function calculateDeliveryAndOrder(
   messagesByWorker: string[][],
   expectedPrefix: string,
   expectedCount: number,
