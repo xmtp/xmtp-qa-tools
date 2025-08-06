@@ -1,4 +1,4 @@
-import { sleep, streamTimeout } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
@@ -11,7 +11,7 @@ const testName = "browser";
 describe(testName, () => {
   setupDurationTracking({ testName });
   let groupId: string;
-  const headless = false;
+  const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
@@ -48,7 +48,7 @@ describe(testName, () => {
         groupName: "Test Group 1 " + getTime(),
       },
     );
-    await sleep(1000);
+    await sleep();
     await newGroup.addMembers([xmtpChat.inboxId]);
     await newGroup.send(`hi ${receiver.name}`);
     console.log("waiting for new conversation");
@@ -64,7 +64,7 @@ describe(testName, () => {
         groupName: "Test Group 2 " + getTime(),
       },
     );
-    await sleep(1000);
+    await sleep();
     await newGroup.addMembers([xmtpChat.inboxId]);
     console.log("waiting for new conversation");
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
@@ -72,7 +72,7 @@ describe(testName, () => {
   });
 
   it("newDm and message stream", async () => {
-    await sleep(1000);
+    await sleep();
     await xmtpTester.newDmFromUI(receiver.address);
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     console.log("waiting for response");
@@ -82,12 +82,12 @@ describe(testName, () => {
   });
 
   it("newGroup and message stream", async () => {
-    await sleep(1000);
+    await sleep();
     groupId = await xmtpTester.newGroupFromUI([
       ...getRandomInboxIds(4),
       receiver.inboxId,
     ]);
-    await sleep(1000); // Give time for group creation to sync
+    await sleep(); // Give time for group creation to sync
     await xmtpTester.sendMessage(`hi ${receiver.name}`);
     console.log("waiting for response");
     const result = await xmtpTester.waitForResponse(["gm"]);
@@ -95,45 +95,38 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it(
-    "conversation stream when creating the group",
-    async () => {
-      await xmtpTester.newGroupFromUI(
-        [...getRandomInboxIds(4), creator.inboxId],
-        false,
-      );
-      await sleep(2000); // Give time for group creation to sync
-      const conversationStream = creator.client.conversations.stream();
-      for await (const conversation of await conversationStream) {
-        if (conversation?.id === groupId) {
-          console.log("conversation found", conversation?.id);
-          expect(conversation.id).toBe(groupId);
-          break;
-        }
+  it("conversation stream when creating the group", async () => {
+    const conversationStream = creator.client.conversations.stream();
+    groupId = await xmtpTester.newGroupFromUI(
+      [...getRandomInboxIds(4), creator.inboxId],
+      false,
+    );
+    await sleep(); // Give time for group creation to sync
+    for await (const conversation of await conversationStream) {
+      if (conversation?.id === groupId) {
+        console.log("conversation found", conversation?.id);
+        expect(conversation.id).toBe(groupId);
         break;
       }
-    },
-    streamTimeout,
-  );
+      break;
+    }
+  }, 30000);
 
-  it(
-    "conversation stream for new member",
-    async () => {
-      groupId = await xmtpTester.newGroupFromUI([...getRandomInboxIds(4)]);
-      await sleep(2000); // Give time for group creation to sync
-      await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
-      await sleep(2000); // Give time for member addition to sync
-      const conversationStream = creator.client.conversations.stream();
-      for await (const conversation of await conversationStream) {
-        if (conversation?.id === groupId) {
-          console.log("conversation found", conversation?.id);
-          expect(conversation.id).toBe(groupId);
-          break;
-        }
+  it("conversation stream for new member", async () => {
+    groupId = await xmtpTester.newGroupFromUI([...getRandomInboxIds(4)]);
+    await sleep(); // Give time for group creation to sync
+    const conversationStream = creator.client.conversations.stream();
+    await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+    await sleep(); // Give time for member addition to sync
+    for await (const conversation of await conversationStream) {
+      console.log("conversation stream", conversation);
+      if (conversation?.id === groupId) {
+        console.log("conversation found", conversation?.id);
+        expect(conversation.id).toBe(groupId);
+        break;
       }
-    },
-    streamTimeout,
-  );
+    }
+  }, 30000);
 
   it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
