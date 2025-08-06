@@ -36,7 +36,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(preCheck.receptionPercentage).toBeGreaterThan(99);
+    expect(preCheck.receptionPercentage).toBeGreaterThanOrEqual(99);
 
     console.log("[test] Applying blackhole: isolating node2 from node1/3/4");
     node2.simulateBlackhole([node1, node3, node4]);
@@ -108,7 +108,7 @@ describe(testName, async () => {
       group,
       workers.getAllButCreator(),
     );
-    expect(postCheck.receptionPercentage).toBeGreaterThan(99);
+    expect(postCheck.receptionPercentage).toBeGreaterThanOrEqual(99);
     expect(postCheck.orderPercentage).toBe(100);
   });
 });

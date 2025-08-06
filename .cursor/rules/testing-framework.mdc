@@ -209,8 +209,8 @@ const verifyResult = await verifyMessageStream(
 );
 
 // Check delivery results
-expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
-expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(95);
 expect(verifyResult.averageEventTiming).toBeLessThan(500);
 ```
 
@@ -224,7 +224,7 @@ const verifyResult = await verifyMetadataStream(
   3, // number of name updates
   "GroupName-{i}-{randomSuffix}", // name template
 );
-expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
 ```
 
 #### Membership Streams
@@ -236,7 +236,7 @@ const verifyResult = await verifyMembershipStream(
   workers.getAllButCreator(), // receivers
   [newMemberInboxId], // members to add
 );
-expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
 ```
 
 #### Conversation Streams
@@ -247,7 +247,7 @@ const verifyResult = await verifyConversationStream(
   workers.getCreator(), // initiator
   [workers.getReceiver()], // receivers
 );
-expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
 ```
 
 #### Consent Streams
@@ -258,7 +258,7 @@ const verifyResult = await verifyConsentStream(
   workers.getCreator(), // initiator
   workers.getReceiver(), // receiver
 );
-expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
 ```
 
 #### Bot Response Streams
@@ -297,10 +297,10 @@ console.log(`Order: ${result.orderPercentage}%`);
 console.log(`Average timing: ${result.averageEventTiming}ms`);
 
 // Flexible assertions based on requirements
-expect(result.allReceived || result.almostreceptionPercentage).toBeGreaterThan(
-  99,
-);
-expect(result.receptionPercentage).toBeGreaterThan(90);
+expect(
+  result.allReceived || result.almostreceptionPercentage,
+).toBeGreaterThanOrEqual(99);
+expect(result.receptionPercentage).toBeGreaterThanOrEqual(90);
 expect(result.averageEventTiming).toBeLessThan(2000);
 ```
 
@@ -350,16 +350,16 @@ afterEach(() => {
 
 ```typescript
 // For high-performance requirements
-expect(result.receptionPercentage).toBeGreaterThan(99);
+expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
 expect(result.averageEventTiming).toBeLessThan(200);
 
 // For reliability testing with some tolerance
-expect(result.almostreceptionPercentage).toBeGreaterThan(99);
-expect(result.receptionPercentage).toBeGreaterThan(95);
+expect(result.almostreceptionPercentage).toBeGreaterThanOrEqual(99);
+expect(result.receptionPercentage).toBeGreaterThanOrEqual(95);
 
 // For large-scale testing with relaxed requirements
-expect(result.receptionPercentage).toBeGreaterThan(80);
-expect(result.orderPercentage).toBeGreaterThan(90);
+expect(result.receptionPercentage).toBeGreaterThanOrEqual(80);
+expect(result.orderPercentage).toBeGreaterThanOrEqual(90);
 ```
 
 ### Common Stream Testing Patterns
@@ -380,7 +380,7 @@ it("deliver messages in real-time", async () => {
     "realtime-{i}-{randomSuffix}",
   );
 
-  expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+  expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
   expect(verifyResult.averageEventTiming).toBeLessThan(500);
 });
 ```
@@ -402,7 +402,7 @@ it("all members of receive updates", async () => {
     3,
   );
 
-  expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+  expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
 });
 ```
 
@@ -457,7 +457,7 @@ const group = await workers.createGroupBetweenAll("Test Group");
 ```typescript
 // Simple message test
 const result = await verifyMessageStream(dm, [bob], 1, "test-{i}");
-expect(result.receptionPercentage).toBeGreaterThan(99);
+expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
 ```
 
 ### Large Group Creation

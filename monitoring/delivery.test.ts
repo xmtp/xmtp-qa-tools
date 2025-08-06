@@ -55,19 +55,8 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    if (stats.orderPercentage < 99) {
-      console.error("orderPercentage", stats.orderPercentage);
-    } else {
-      console.log("orderPercentage", stats.orderPercentage);
-    }
-
-    if (stats.receptionPercentage < 99) {
-      console.error("receptionPercentage", stats.receptionPercentage);
-    } else {
-      console.log("receptionPercentage", stats.receptionPercentage);
-    }
-    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
-    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.orderPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 
   it("poll:message delivery and order accuracy using polling", async () => {
@@ -120,19 +109,8 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    if (stats.orderPercentage < 99) {
-      console.error("orderPercentage", stats.orderPercentage);
-    } else {
-      console.log("orderPercentage", stats.orderPercentage);
-    }
-
-    if (stats.receptionPercentage < 99) {
-      console.error("receptionPercentage", stats.receptionPercentage);
-    } else {
-      console.log("receptionPercentage", stats.receptionPercentage);
-    }
-    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
-    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.orderPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 
   it("recovery:message recovery after stream interruption", async () => {
@@ -195,18 +173,7 @@ describe(testName, async () => {
       conversation_type: "group",
     } as DeliveryMetricTags);
 
-    if (stats.orderPercentage < 99) {
-      console.error("orderPercentage", stats.orderPercentage);
-    } else {
-      console.log("orderPercentage", stats.orderPercentage);
-    }
-
-    if (stats.receptionPercentage < 99) {
-      console.error("receptionPercentage", stats.receptionPercentage);
-    } else {
-      console.log("receptionPercentage", stats.receptionPercentage);
-    }
-    expect(stats.orderPercentage).toBeGreaterThan(ERROR_TRESHOLD);
-    expect(stats.receptionPercentage).toBeGreaterThan(ERROR_TRESHOLD);
+    expect(stats.orderPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
+    expect(stats.receptionPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 });

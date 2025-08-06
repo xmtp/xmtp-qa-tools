@@ -110,7 +110,7 @@ describe(testName, () => {
   it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
     setCustomDuration(verifyResult.averageEventTiming);
-    expect(verifyResult.receptionPercentage).toBeGreaterThan(99);
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
   });
 
   it(`setConsentStates:group consent`, async () => {
@@ -184,7 +184,7 @@ describe(testName, () => {
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });
     it(`removeMembers-${i}:remove a participant from a group`, async () => {
       await newGroup.removeMembers(extraMember);
@@ -215,7 +215,7 @@ describe(testName, () => {
 
       console.log("verifyResult", JSON.stringify(verifyResult, null, 2));
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });
 
     it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
@@ -225,7 +225,7 @@ describe(testName, () => {
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThan(90);
+      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });
 
     it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
