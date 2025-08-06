@@ -263,13 +263,22 @@ export class playwright {
   }
 
   /**
+   * Checks if browser is already initialized
+   */
+  isInitialized(): boolean {
+    return !!(this.browser && this.page);
+  }
+
+  /**
    * Starts a new page with the specified options
    */
   async startPage(): Promise<BrowserSession> {
     try {
       if (this.browser && this.page) {
+        console.debug("Reusing existing browser instance");
         return { browser: this.browser, page: this.page };
       }
+      console.debug("Creating new browser instance");
       const browser = await chromium.launch({
         headless: this.isHeadless,
         slowMo: this.isHeadless ? 0 : 100,
