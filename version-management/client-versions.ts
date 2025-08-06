@@ -63,7 +63,7 @@ import {
   Dm as Dm401,
   Group as Group401,
 } from "@xmtp/node-sdk-4.0.1";
-import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.1dev";
+import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk-4.0.2";
 
 export {
   Client,
