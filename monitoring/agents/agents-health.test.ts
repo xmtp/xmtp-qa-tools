@@ -1,6 +1,7 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
+import { getActiveVersion } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
@@ -38,6 +39,7 @@ describe(testName, () => {
           message: agent.sendMessage,
         }),
       });
+      console.log(response);
 
       const result = (await response.json()) as {
         success: boolean;
@@ -52,12 +54,10 @@ describe(testName, () => {
         metric_type: "agent",
         metric_subtype: "dm",
         live: agent.live ? "true" : "false",
-
         slackChannel: agent.slackChannel,
         agent: agent.name,
         address: agent.address,
-        api_endpoint: API_ENDPOINT,
-        sdk: "api",
+        sdk: getActiveVersion().nodeSDK,
       } as ResponseMetricTags);
       expect(result.success).toBe(true);
     });

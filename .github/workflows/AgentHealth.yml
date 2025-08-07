@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-health]
+        test: [agents-dms]
         env: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
