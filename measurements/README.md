@@ -1,5 +1,7 @@
 # Measurements (supported by datadog)
 
+> Last updated: 2025-08-07
+
 Performance metrics and benchmarks for XMTP SDK operations tracked in our monitoring dashboard.
 
 Here are the average measurements that are supported by the [datadog dashboard](https://p.datadoghq.com/sb/a5c739de-7e2c-11ec-bc0b-da7ad0900002-efaf10f4988297b8a8581128f2867a3d).
