@@ -951,9 +951,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
             resolve(events);
           }
         } else {
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} rejected message ${testName}`,
-          );
+          // console.debug(
+          //   `[${this.nameId}] Collector ${collectorId} rejected message ${testName}`,
+          // );
         }
       };
 

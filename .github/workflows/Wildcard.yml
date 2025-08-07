@@ -45,6 +45,9 @@ jobs:
           env: ${{ matrix.env }}
           save-to-cache: true
 
+      - name: Trigger test failure
+        run: exit 1
+
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
