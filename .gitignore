@@ -59,6 +59,9 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+# playwright cache
+.playwright-cache/
+
 # typescript
 *.tsbuildinfo
 
