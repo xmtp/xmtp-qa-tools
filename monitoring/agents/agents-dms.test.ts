@@ -54,7 +54,7 @@ describe(testName, async () => {
       );
       console.log(JSON.stringify(result, null, 2));
 
-      sendMetric("response", result?.receptionPercentage ?? streamTimeout, {
+      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",

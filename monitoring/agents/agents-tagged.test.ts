@@ -63,7 +63,7 @@ describe(testName, async () => {
 
       // If the agent didn't respond, log the timeout value instead of 0
 
-      sendMetric("response", result?.receptionPercentage ?? streamTimeout, {
+      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
