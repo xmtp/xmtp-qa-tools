@@ -6,7 +6,7 @@ import {
   type XmtpEnv,
 } from "version-management/client-versions";
 import "dotenv/config";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 
 interface Config {
@@ -207,7 +207,7 @@ async function runGroupOperation(config: Config): Promise<void> {
   console.log(`✅ Main worker created: ${mainWorker.inboxId}`);
 
   // Get existing inbox IDs for group members
-  const memberInboxIds = getRandomInboxIds(members, 2);
+  const memberInboxIds = getInboxes(members, 2).map((a) => a.inboxId);
   console.log(`📋 Using ${memberInboxIds.length} existing inbox IDs`);
 
   // Set up group options

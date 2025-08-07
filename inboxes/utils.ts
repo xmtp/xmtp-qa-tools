@@ -7,7 +7,7 @@ import newInboxes25 from "./byinstallation/25.json";
 import newInboxes30 from "./byinstallation/30.json";
 
 // Type definitions for inbox data
-interface InboxData {
+export interface InboxData {
   accountAddress: string;
   walletKey: string;
   dbEncryptionKey: string;
@@ -55,20 +55,10 @@ function getInboxByInstallationCount(
   return typedInboxes2;
 }
 
-export function getRandomInboxIds(
-  count: number,
-  installationCount: number = 2,
-) {
+export function getInboxes(count: number, installationCount: number = 2) {
   const pool = getInboxByInstallationCount(installationCount);
   return pool
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
-    .map((inbox) => inbox.inboxId);
-}
-export function getRandomAddress(count: number, installationCount: number = 2) {
-  const pool = getInboxByInstallationCount(installationCount);
-  return pool
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count)
-    .map((inbox) => inbox.accountAddress);
+    .map((inbox) => inbox);
 }

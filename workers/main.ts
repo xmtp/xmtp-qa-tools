@@ -919,7 +919,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     } = options;
 
     // Create unique collector ID to prevent conflicts
-    const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    //const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
     return new Promise((resolve) => {
       const events: T[] = [];

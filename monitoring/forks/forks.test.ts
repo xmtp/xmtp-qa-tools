@@ -1,6 +1,6 @@
 import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import {
   getActiveVersion,
@@ -60,22 +60,24 @@ describe(testName, () => {
         getGroup().then(() => worker.worker.addNewInstallation()),
       addMember: () =>
         getGroup().then((g) => {
-          const randomInboxIds = getRandomInboxIds(
+          const randomInboxIds = getInboxes(
             randomInboxIdsCount,
             installationCount,
           );
           return g.addMembers([
-            randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)],
+            randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)]
+              .inboxId,
           ]);
         }),
       removeMember: () =>
         getGroup().then((g) => {
-          const randomInboxIds = getRandomInboxIds(
+          const randomInboxIds = getInboxes(
             randomInboxIdsCount,
             installationCount,
           );
           return g.removeMembers([
-            randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)],
+            randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)]
+              .inboxId,
           ]);
         }),
       sendMessage: () =>

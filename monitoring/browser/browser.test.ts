@@ -1,7 +1,7 @@
 import { sleep } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -43,7 +43,7 @@ describe(testName, () => {
 
   it("conversation stream with message", async () => {
     const newGroup = await creator.client.conversations.newGroup(
-      getRandomInboxIds(4),
+      getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 1 " + getTime(),
       },
@@ -59,7 +59,7 @@ describe(testName, () => {
 
   it("conversation stream without message", async () => {
     const newGroup = await creator.client.conversations.newGroup(
-      getRandomInboxIds(4),
+      getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 2 " + getTime(),
       },
@@ -84,7 +84,7 @@ describe(testName, () => {
   it("newGroup and message stream", async () => {
     await sleep();
     groupId = await xmtpTester.newGroupFromUI([
-      ...getRandomInboxIds(4),
+      ...getInboxes(4).map((a) => a.inboxId),
       receiver.inboxId,
     ]);
     await sleep(); // Give time for group creation to sync
@@ -98,7 +98,7 @@ describe(testName, () => {
   it("conversation stream when creating the group", async () => {
     const conversationStream = creator.client.conversations.stream();
     groupId = await xmtpTester.newGroupFromUI(
-      [...getRandomInboxIds(4), creator.inboxId],
+      [...getInboxes(4).map((a) => a.inboxId), creator.inboxId],
       false,
     );
     await sleep(); // Give time for group creation to sync
@@ -113,7 +113,9 @@ describe(testName, () => {
   }, 30000);
 
   it("conversation stream for new member", async () => {
-    groupId = await xmtpTester.newGroupFromUI([...getRandomInboxIds(4)]);
+    groupId = await xmtpTester.newGroupFromUI([
+      ...getInboxes(4).map((a) => a.inboxId),
+    ]);
     await sleep(); // Give time for group creation to sync
     const conversationStream = creator.client.conversations.stream();
     await xmtpTester.addMemberToGroup(groupId, creator.inboxId);

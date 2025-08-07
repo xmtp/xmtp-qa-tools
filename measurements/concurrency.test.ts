@@ -1,11 +1,11 @@
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { Client, type XmtpEnv } from "version-management/client-versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {
-  randomInboxIds: getRandomInboxIds(100), // 100 DMs like the Rust test
+  randomInboxIds: getInboxes(100).map((a) => a.inboxId), // 100 DMs like the Rust test
   groupCount: 200, // 200 groups like the Rust test
   timeoutSeconds: 15, // Same timeout as Rust test
 } as const;

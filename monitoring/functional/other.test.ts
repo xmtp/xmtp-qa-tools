@@ -1,6 +1,6 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
@@ -13,7 +13,7 @@ describe(testName, () => {
     const workers = await getWorkers(["henry", "john"]);
     const creator = workers.get("henry")!;
     const receiver = workers.get("john")!;
-    const allInboxIds = getRandomInboxIds(2);
+    const allInboxIds = getInboxes(2).map((a) => a.inboxId);
     console.log("All inbox ids", allInboxIds);
     const group = (await creator.client.conversations.newGroup(
       allInboxIds,
@@ -38,7 +38,7 @@ describe(testName, () => {
     const initialEpoch = initialDebugInfo.epoch;
 
     // Perform group operation that should increment epoch
-    const newMember = getRandomInboxIds(1)[0];
+    const newMember = getInboxes(1)[0].inboxId;
     await group.addMembers([newMember]);
     // Get updated debug info
     const updatedDebugInfo = await group.debugInfo();

@@ -4,7 +4,7 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes, type InboxData } from "@inboxes/utils";
 import {
   getRandomNames,
   getWorkers,
@@ -41,9 +41,9 @@ describe(testName, () => {
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
   };
-  let allMembers: string[] = [];
-  let allMembersWithExtra: string[] = [];
-  let extraMember: string[] = [];
+  let allMembers: InboxData[] = [];
+  let allMembersWithExtra: InboxData[] = [];
+  let extraMember: InboxData;
   let cumulativeGroups: Group[] = [];
 
   setupSummaryTable({
@@ -88,7 +88,7 @@ describe(testName, () => {
     it(`setConsentStates:group consent`, async () => {
       await creator!.client.preferences.setConsentStates([
         {
-          entity: getRandomInboxIds(1)[0],
+          entity: getInboxes(1)[0].inboxId,
           entityType: ConsentEntityType.InboxId,
           state: ConsentState.Allowed,
         },
@@ -132,31 +132,32 @@ describe(testName, () => {
 
     for (const i of BATCH_SIZE) {
       for (const installationPerMember of INSTALLATION_PER_MEMBER) {
-        it(`newGroup-${i}(${populateSize})[${installationPerMember}]:create a large group of ${i} members ${i}`, async () => {
-          // Ensure we have at least 1 extra member to add for membership streaming test
-          const extraMembersNeeded = Math.max(
-            1,
-            i - workers.getAll().length + 1,
+        it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
+          allMembersWithExtra = getInboxes(i - workers.getAll().length + 1);
+          allMembers = allMembersWithExtra.slice(
+            0,
+            allMembersWithExtra.length - 1,
           );
-          allMembersWithExtra = getRandomInboxIds(
-            extraMembersNeeded,
-            installationPerMember,
-          );
-
-          // Fix the slice logic to handle negative indices properly
-          const membersForGroup = Math.max(0, i - workers.getAll().length);
-          allMembers = allMembersWithExtra.slice(0, membersForGroup);
-          extraMember = allMembersWithExtra.slice(membersForGroup);
-          console.warn("extraMember", extraMember);
-          newGroup = (await creator!.client.conversations.newGroup([
-            ...allMembers,
-            ...workers.getAll().map((w) => w.client.inboxId),
-          ])) as Group;
+          newGroup =
+            (await creator!.client.conversations.newGroupWithIdentifiers([
+              ...allMembers.map((a) => ({
+                identifier: a.accountAddress,
+                identifierKind: IdentifierKind.Ethereum,
+              })),
+              ...workers.getAllButCreator().map((w) => ({
+                identifier: w.address,
+                identifierKind: IdentifierKind.Ethereum,
+              })),
+            ])) as Group;
+          const members = await newGroup.members();
+          expect(members.length).toBe(i);
           expect(newGroup.id).toBeDefined();
+          if (!newGroup.id) {
+            throw new Error("Group ID is undefined, cancelling the test");
+          }
           // Add current group to cumulative tracking
           cumulativeGroups.push(newGroup);
         });
-
         it(`groupsync-${i}(${populateSize})[${installationPerMember}]:sync a large group of ${i} members ${i}`, async () => {
           await newGroup.sync();
           const members = await newGroup.members();
@@ -182,6 +183,7 @@ describe(testName, () => {
         it(
           `streamMembership-${i}(${populateSize})[${installationPerMember}]: new member added to group`,
           async () => {
+            extraMember = allMembersWithExtra[allMembersWithExtra.length];
             await receiver?.client.conversations.sync();
             const groupByReceiver =
               await receiver?.client.conversations.getConversationById(
@@ -190,7 +192,7 @@ describe(testName, () => {
             const verifyResult = await verifyMembershipStream(
               groupByReceiver as Group,
               [creator!],
-              extraMember,
+              [extraMember.inboxId],
             );
 
             setCustomDuration(verifyResult.averageEventTiming);
@@ -199,10 +201,10 @@ describe(testName, () => {
           streamTimeout * 5,
         );
         it(`removeMembers-${i}(${populateSize})[${installationPerMember}]:remove a participant from a group`, async () => {
-          await newGroup.removeMembers(extraMember);
+          await newGroup.removeMembers([extraMember.inboxId]);
         });
         it(`addMember-${i}(${populateSize})[${installationPerMember}]:add members to a group`, async () => {
-          await newGroup.addMembers(extraMember);
+          await newGroup.addMembers([extraMember.inboxId]);
         });
         it(
           `streamMessage-${i}(${populateSize})[${installationPerMember}]: stream members of message changes in ${i} member group`,
