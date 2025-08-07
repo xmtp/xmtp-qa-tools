@@ -52,7 +52,7 @@ describe(testName, () => {
         metric_type: "agent",
         metric_subtype: "dm",
         live: agent.live ? "true" : "false",
-        status: agent.live ? "live_" + env : "not_live_" + env,
+
         slackChannel: agent.slackChannel,
         agent: agent.name,
         address: agent.address,
