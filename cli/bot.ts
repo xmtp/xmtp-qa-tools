@@ -10,6 +10,7 @@ interface Config {
   botName: string;
   env: string;
   nodeSDK: string;
+  logLevel: string;
 }
 
 function showHelp() {
@@ -24,7 +25,8 @@ ARGUMENTS:
 
 OPTIONS:
   --env <environment>   XMTP environment (local, dev, production) [default: production]
-  --nodeSDK <version>  XMTP Node SDK version to use [default: latest]
+  --nodeSDK <version>   XMTP Node SDK version to use [default: latest]
+  --log <level>         Logging level (info, warn, error) [default: info]
   -h, --help           Show this help message
 
 ENVIRONMENTS:
@@ -47,11 +49,7 @@ For more information, see: cli/readme.md
 
 function parseArgs(): Config {
   const args = process.argv.slice(2);
-  const config: Config = {
-    botName: "",
-    env: process.env.XMTP_ENV ?? "production",
-    nodeSDK: "latest",
-  };
+  let botName = "";
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -61,7 +59,7 @@ function parseArgs(): Config {
       showHelp();
       process.exit(0);
     } else if (arg === "--env" && nextArg) {
-      config.env = nextArg;
+      process.env.XMTP_ENV = nextArg;
       i++;
     } else if (arg === "--nodeSDK" && nextArg) {
       process.env.NODE_VERSION = nextArg;
@@ -69,13 +67,18 @@ function parseArgs(): Config {
     } else if (arg === "--log" && nextArg) {
       process.env.LOGGING_LEVEL = nextArg;
       i++;
-    } else if (!config.botName) {
+    } else if (!botName) {
       // First non-flag argument is the bot name
-      config.botName = arg;
+      botName = arg;
     }
   }
 
-  return config;
+  return {
+    botName,
+    env: process.env.XMTP_ENV as string,
+    nodeSDK: process.env.NODE_VERSION as string,
+    logLevel: process.env.LOGGING_LEVEL as string,
+  };
 }
 
 async function main() {
@@ -122,6 +125,7 @@ async function main() {
         ...process.env,
         XMTP_ENV: config.env,
         XMTP_NODE_SDK: config.nodeSDK,
+        LOGGING_LEVEL: config.logLevel,
       },
     });
 
