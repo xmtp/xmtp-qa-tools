@@ -39,7 +39,7 @@ yarn test <suite> [options]
 
 - `--env <env>` - Environment (local/dev/production) [default: production]
 - `--attempts <n>` - Retry attempts [default: 3]
-- `--debug` - Enable file logging
+- `--log warn --file` - Enable file logging
 - `--no-fail` - Exit with success on failures
 - `--parallel` - Run tests in parallel
 
@@ -214,7 +214,7 @@ yarn test convos --env dev
 yarn send --target 0x1234... --env production --users 500 --wait
 
 # Multi-version compatibility testing
-yarn test functional --versions 3 --debug
+yarn test functional --versions 3 --log warn --file
 
 # Generate test data for multiple environments
 yarn gen --count 500 --env local,dev --installations 3

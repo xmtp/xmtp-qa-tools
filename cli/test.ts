@@ -38,7 +38,9 @@ ARGUMENTS:
 OPTIONS:
   --env <environment>    XMTP environment (local, dev, production) [default: production]
   --attempts <number>    Maximum retry attempts [default: 3]
-  --debug               Enable file logging (saves to logs/ directory)
+  --log <level>         Set logging level (debug, info, warn, error) [default: warn]
+  --winston <level>     Set winston logging level (debug, info, warn, error) [default: warn]
+  --file                Enable file logging (saves to logs/ directory)
   --no-fail             Exit with success code even on failures
   --parallel            Run tests in parallel (default: consecutive)
   --versions <count>    Use multiple SDK versions for testing
@@ -65,7 +67,7 @@ TEST SUITES:
   forks          Git commit-based testing
 
 EXAMPLES:
-  yarn test functional --env dev --debug
+  yarn test functional --env dev --log warn --file
   yarn test convos --no-fail --parallel
   yarn test performance --versions 3
   yarn test --help
@@ -243,9 +245,18 @@ function parseTestArgs(args: string[]): {
           console.warn("--versions flag requires a value (e.g., --versions 3)");
         }
         break;
-      case "--debug":
+      case "--file":
         options.fileLogging = true;
-        process.env.LOGGING_LEVEL = "debug";
+        break;
+      case "--winston":
+        if (nextArg) {
+          process.env.LOG_LEVEL = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--winston flag requires a value (e.g., --winston warn)",
+          );
+        }
         break;
       case "--log":
         if (nextArg) {

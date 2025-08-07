@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-tagged ${{ matrix.env }}
-        run: yarn test agents-tagged --no-fail --debug --no-datadog --env ${{ matrix.env }}
+        run: yarn test agents-tagged --no-fail --log warn --file --no-datadog --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -59,7 +59,7 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run agents-untagged tests
-        run: yarn test agents-untagged --no-fail --debug --env ${{ matrix.env }}
+        run: yarn test agents-untagged --no-fail --log warn --file --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
