@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -27,12 +27,12 @@
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
+    "test:update-sdk": "node version-management/test-update-sdk.js",
     "ui": "vitest --ui --standalone --watch",
     "update:local": "yarn gen --env local --installations 2 --count 500",
     "update:prod": "yarn gen --env production --installations 2",
-    "versions": "tsx version-management/cli-versions.ts",
     "update:sdk": "node version-management/update-sdk.js",
-    "test:update-sdk": "node version-management/test-update-sdk.js"
+    "versions": "tsx version-management/cli-versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
