@@ -9,7 +9,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomAddress, getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -33,9 +33,9 @@ describe(testName, () => {
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
   };
-  let allMembers: string[] = [];
-  let allMembersWithExtra: string[] = [];
-  let extraMember: string[] = [];
+  let extraMember: InboxData;
+  let allMembers: InboxData[] = [];
+  let allMembersWithExtra: InboxData[] = [];
   let cumulativeGroups: Group[] = [];
 
   setupDurationTracking({
@@ -91,7 +91,7 @@ describe(testName, () => {
   });
   it(`newDmByAddress:measure creating a DM`, async () => {
     const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
-      identifier: getRandomAddress(1)[0],
+      identifier: getInboxes(1)[0].accountAddress,
       identifierKind: IdentifierKind.Ethereum,
     });
 
@@ -116,7 +116,7 @@ describe(testName, () => {
   it(`setConsentStates:group consent`, async () => {
     await creator!.client.preferences.setConsentStates([
       {
-        entity: getRandomInboxIds(1)[0],
+        entity: getInboxes(1)[0].accountAddress,
         entityType: ConsentEntityType.InboxId,
         state: ConsentState.Allowed,
       },
@@ -124,39 +124,27 @@ describe(testName, () => {
   });
 
   for (const i of BATCH_SIZE) {
-    it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      // Ensure we have at least 1 extra member to add for membership streaming test
-      const extraMembersNeeded = Math.max(1, i - workers.getAll().length + 1);
-      allMembersWithExtra = getRandomInboxIds(extraMembersNeeded);
-
-      // Fix the slice logic to handle negative indices properly
-      const membersForGroup = Math.max(0, i - workers.getAll().length);
-      allMembers = allMembersWithExtra.slice(0, membersForGroup);
-      extraMember = allMembersWithExtra.slice(membersForGroup);
-
-      newGroup = (await creator!.client.conversations.newGroup([
-        ...allMembers,
-        ...workers.getAllButCreator().map((w) => w.client.inboxId),
+    it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
+      allMembersWithExtra = getInboxes(i - workers.getAll().length + 1);
+      allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 1);
+      newGroup = (await creator!.client.conversations.newGroupWithIdentifiers([
+        ...allMembers.map((a) => ({
+          identifier: a.accountAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        })),
+        ...workers.getAllButCreator().map((w) => ({
+          identifier: w.address,
+          identifierKind: IdentifierKind.Ethereum,
+        })),
       ])) as Group;
+      const members = await newGroup.members();
+      expect(members.length).toBe(i);
       expect(newGroup.id).toBeDefined();
       if (!newGroup.id) {
         throw new Error("Group ID is undefined, cancelling the test");
       }
       // Add current group to cumulative tracking
       cumulativeGroups.push(newGroup);
-    });
-    it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-      const callMembersWithExtraWithAddress = getRandomAddress(
-        i - workers.getAll().length + 1,
-      );
-      const newGroupByIdentifier =
-        await creator!.client.conversations.newGroupWithIdentifiers(
-          callMembersWithExtraWithAddress.map((address) => ({
-            identifier: address,
-            identifierKind: IdentifierKind.Ethereum,
-          })),
-        );
-      expect(newGroupByIdentifier.id).toBeDefined();
     });
     it(`groupsync-${i}:sync a large group of ${i} members ${i}`, async () => {
       await newGroup.sync();
@@ -177,20 +165,21 @@ describe(testName, () => {
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
+      extraMember = allMembersWithExtra[allMembersWithExtra.length];
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),
-        extraMember,
+        [extraMember.inboxId],
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });
     it(`removeMembers-${i}:remove a participant from a group`, async () => {
-      await newGroup.removeMembers(extraMember);
+      await newGroup.removeMembers([extraMember.inboxId]);
     });
     it(`addMember-${i}:add members to a group`, async () => {
-      await newGroup.addMembers(extraMember);
+      await newGroup.addMembers([extraMember.inboxId]);
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
       const verifyResult = await verifyMessageStream(

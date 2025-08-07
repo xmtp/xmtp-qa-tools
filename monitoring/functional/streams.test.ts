@@ -8,7 +8,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   ContentTypeReaction,
@@ -33,7 +33,7 @@ describe(testName, async () => {
     const verifyResult = await verifyMembershipStream(
       group,
       workers.getAllButCreator(),
-      getRandomInboxIds(1),
+      getInboxes(1).map((a) => a.inboxId),
     );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
@@ -90,7 +90,7 @@ describe(testName, async () => {
     group = (await creator.client.conversations.newGroup([
       receiver.client.inboxId,
     ])) as Group;
-    const addMembers = getRandomInboxIds(1);
+    const addMembers = getInboxes(1).map((a) => a.inboxId);
     const verifyResult = await verifyAddMemberStream(
       group,
       [receiver],

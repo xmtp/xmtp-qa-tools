@@ -36,6 +36,10 @@ jobs:
         env:
           GITHUB_ACTIONS: true
 
+      - name: Install to update lockfile
+        run: |
+          yarn install
+
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
@@ -52,4 +56,3 @@ jobs:
             automated-pr
           signoff: false
           delete-branch: true
-

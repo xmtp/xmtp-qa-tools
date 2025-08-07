@@ -2,7 +2,7 @@ import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomAddress } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
@@ -49,7 +49,7 @@ describe(testName, async () => {
             identifierKind: IdentifierKind.Ethereum,
           },
           {
-            identifier: getRandomAddress(1)[0],
+            identifier: getInboxes(1)[0].accountAddress,
             identifierKind: IdentifierKind.Ethereum,
           },
         ]);

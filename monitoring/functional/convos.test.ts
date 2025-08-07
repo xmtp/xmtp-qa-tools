@@ -1,6 +1,6 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
@@ -74,7 +74,7 @@ describe(testName, async () => {
   console.warn(BATCH_SIZE);
   for (const i of BATCH_SIZE) {
     it(`create a group with ${i} members`, async () => {
-      const sliced = getRandomInboxIds(i);
+      const sliced = getInboxes(i).map((a) => a.inboxId);
       console.log("Creating group with", sliced.length, "members");
       newGroup = (await workers
         .getCreator()
