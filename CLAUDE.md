@@ -33,7 +33,7 @@ For full list of commands, see [CLI README](./cli/readme.md).
 ## Logging
 
 - Logs are saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
-- Use `--debug` for file logging only
+- Use `--log warn --file` for file logging only
 
 ## Safety First
 

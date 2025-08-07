@@ -151,7 +151,7 @@ yarn test performance
 #### Debug mode
 
 ```bash
-yarn test functional --no-fail --debug
+yarn test functional --no-fail --log warn --file
 ```
 
 > This will save logs to `logs/` directory and will not print to the terminal.

@@ -64,7 +64,7 @@ yarn gen --count 200 --installations 5 --env local,dev,production
 - **`--count`** - Number of accounts to generate (default: 200)
 - **`--installations`** - Number of installations per account (default: 2)
 - **`--env`** - Target environments: `local`, `dev`, `production` (default: production)
-- **`--debug`** - Enable verbose logging
+- **`--log warn --file`** - Enable verbose logging
 
 ## Troubleshooting
 

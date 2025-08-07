@@ -43,7 +43,7 @@ OPTIONS:
   --count <number>       Number of inboxes to generate [default: 200]
   --env <environments>  Comma-separated environments (local,dev,production) [default: production]
   --installations <num>  Number of installations per inbox [default: 2]
-  --debug               Enable debug logging
+  --log warn --file               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
   -h, --help            Show this help message
 
@@ -55,7 +55,7 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn gen --count 500 --env local
   yarn gen --env local,dev --installations 3
-  yarn gen --clean --debug
+  yarn gen --clean --log warn --file
   yarn gen --help
 
 PRESET COMMANDS:
@@ -432,7 +432,7 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = args[i + 1];
-    if (arg === "--debug") debugMode = true;
+    if (arg === "--log warn --file") debugMode = true;
   });
 
   if (count === undefined) count = DEFAULT_COUNT;

@@ -32,7 +32,7 @@ jobs:
         run: sleep 30
 
       - name: Run forks test
-        run: yarn test forks --attempts 50 --env local --debug --forks
+        run: yarn test forks --attempts 50 --env local --log warn --file --forks
 
       - name: Stop local XMTP network
         if: always()
@@ -50,5 +50,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Forks'
+          workflow-name: "Forks"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
