@@ -38,7 +38,9 @@ ARGUMENTS:
 OPTIONS:
   --env <environment>    XMTP environment (local, dev, production) [default: production]
   --attempts <number>    Maximum retry attempts [default: 3]
-  --log warn --file               Enable file logging (saves to logs/ directory)
+  --log <level>         Set logging level (debug, info, warn, error) [default: warn]
+  --winston <level>     Set winston logging level (debug, info, warn, error) [default: warn]
+  --file                Enable file logging (saves to logs/ directory)
   --no-fail             Exit with success code even on failures
   --parallel            Run tests in parallel (default: consecutive)
   --versions <count>    Use multiple SDK versions for testing
@@ -245,6 +247,16 @@ function parseTestArgs(args: string[]): {
         break;
       case "--file":
         options.fileLogging = true;
+        break;
+      case "--winston":
+        if (nextArg) {
+          process.env.LOG_LEVEL = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--winston flag requires a value (e.g., --winston warn)",
+          );
+        }
         break;
       case "--log":
         if (nextArg) {
