@@ -33,7 +33,6 @@ Link to test code [../monitoring/performance.test.ts](../monitoring/performance.
 ### Scaled operations (per group size):
 
 - `newGroup-{i}: create a large group of {i} members`
-- `newGroupByAddress-{i}: create a large group of {i} members`
 - `groupsync-{i}: sync a large group of {i} members`
 - `updateName-{i}: update the group name`
 - `send-{i}: measure sending a gm in a group of {i} members`
