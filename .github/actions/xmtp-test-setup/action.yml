@@ -32,6 +32,16 @@ runs:
         restore-keys: |
           deps-
 
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: |
+          .playwright-cache
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package.json') }}
+        restore-keys: |
+          playwright-
+
     - name: Cache test data
       if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
       uses: actions/cache@v4
