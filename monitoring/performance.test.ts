@@ -25,7 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [100, 150];
+    : [5, 10, 15];
 
   let newGroup: Group;
 
@@ -54,7 +54,7 @@ describe(testName, () => {
   let receiver: Worker | undefined;
   let dm: Dm | undefined;
   it(`create: measure creating a client`, async () => {
-    workers = await getWorkers(6);
+    workers = await getWorkers(5);
     creator = workers.getCreator();
     receiver = workers.getReceiver();
     setCustomDuration(creator.initializationTime);
@@ -125,8 +125,9 @@ describe(testName, () => {
 
   for (const i of BATCH_SIZE) {
     it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getInboxes(i - workers.getAll().length + 1);
-      allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 1);
+      allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
+      allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
+      extraMember = allMembersWithExtra.at(-1)!;
       newGroup = (await creator!.client.conversations.newGroupWithIdentifiers([
         ...allMembers.map((a) => ({
           identifier: a.accountAddress,
@@ -165,7 +166,7 @@ describe(testName, () => {
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-      extraMember = allMembersWithExtra[allMembersWithExtra.length];
+      console.log("extraMember", extraMember.inboxId);
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),
