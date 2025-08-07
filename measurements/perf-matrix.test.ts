@@ -133,11 +133,12 @@ describe(testName, () => {
     for (const i of BATCH_SIZE) {
       for (const installationPerMember of INSTALLATION_PER_MEMBER) {
         it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
-          allMembersWithExtra = getInboxes(i - workers.getAll().length + 1);
+          allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
           allMembers = allMembersWithExtra.slice(
             0,
-            allMembersWithExtra.length - 1,
+            allMembersWithExtra.length - 2,
           );
+          extraMember = allMembersWithExtra.at(-1)!;
           newGroup =
             (await creator!.client.conversations.newGroupWithIdentifiers([
               ...allMembers.map((a) => ({
@@ -183,7 +184,6 @@ describe(testName, () => {
         it(
           `streamMembership-${i}(${populateSize})[${installationPerMember}]: new member added to group`,
           async () => {
-            extraMember = allMembersWithExtra[allMembersWithExtra.length];
             await receiver?.client.conversations.sync();
             const groupByReceiver =
               await receiver?.client.conversations.getConversationById(
