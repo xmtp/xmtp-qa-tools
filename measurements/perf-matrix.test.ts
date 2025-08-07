@@ -132,7 +132,7 @@ describe(testName, () => {
 
     for (const i of BATCH_SIZE) {
       for (const installationPerMember of INSTALLATION_PER_MEMBER) {
-        it(`newGroupByAddress-${i}:create a large group of ${i} members ${i}`, async () => {
+        it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
           allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
           allMembers = allMembersWithExtra.slice(
             0,

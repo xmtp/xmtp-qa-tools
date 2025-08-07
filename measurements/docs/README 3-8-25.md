@@ -12,19 +12,18 @@ Core XMTP SDK functionality performance measurements across different operations
 
 Individual SDK operation performance metrics including client creation, messaging, and group management.
 
-| Operation         | Description                            | Avg | Target | Performance |
-| ----------------- | -------------------------------------- | --- | ------ | ----------- |
-| create            | Creating a client                      | 588 | <350   | Concern     |
-| inboxState        | Checking inbox state                   | 41  | <350   | On Target   |
-| newDm             | Creating a direct message conversation | 258 | <350   | On Target   |
-| newDmByAddress    | Creating a dm by address               | 294 | <350   | On Target   |
-| send              | Sending a group message                | 126 | <200   | On Target   |
-| stream            | Receiving a group message              | 87  | <200   | On Target   |
-| newGroup          | Creating a group                       | 315 | <350   | On Target   |
-| newGroupByAddress | Creating a group by address            | 313 | <350   | On Target   |
-| sync              | Syncing group state                    | 76  | <200   | On Target   |
-| updateName        | Updating group metadata                | 129 | <200   | On Target   |
-| removeMembers     | Removing members from a group          | 127 | <250   | On Target   |
+| Operation      | Description                            | Avg | Target | Performance |
+| -------------- | -------------------------------------- | --- | ------ | ----------- |
+| create         | Creating a client                      | 588 | <350   | Concern     |
+| inboxState     | Checking inbox state                   | 41  | <350   | On Target   |
+| newDm          | Creating a direct message conversation | 258 | <350   | On Target   |
+| newDmByAddress | Creating a dm by address               | 294 | <350   | On Target   |
+| send           | Sending a group message                | 126 | <200   | On Target   |
+| stream         | Receiving a group message              | 87  | <200   | On Target   |
+| newGroup       | Creating a group                       | 315 | <350   | On Target   |
+| sync           | Syncing group state                    | 76  | <200   | On Target   |
+| updateName     | Updating group metadata                | 129 | <200   | On Target   |
+| removeMembers  | Removing members from a group          | 127 | <250   | On Target   |
 
 ### Group operations
 

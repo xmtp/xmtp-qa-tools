@@ -19,7 +19,6 @@ Individual SDK operation performance metrics including client creation, messagin
 | create              | Creating a client                      | 998 | <500   | Concern     |
 | newGroup            | Creating a group                       | 502 | <800   | On Target   |
 | syncAllCumulative   | Syncing all conversations cumulatively | 391 | <500   | On Target   |
-| newGroupByAddress   | Creating a group by address            | 343 | <350   | On Target   |
 | streamMembership    | Streaming membership changes           | 303 | <400   | On Target   |
 | newdmbyAddress      | Creating a dm by address               | 264 | <350   | On Target   |
 | syncCumulative      | Cumulative sync operation              | 214 | <300   | On Target   |
@@ -48,15 +47,14 @@ Performance measurements for group-specific operations broken down by group size
 
 Operations performed by the message sender including group creation and management.
 
-| Operation         | Description               | 10  | 50   | 100  | 150  | 200  | 250   | Performance |
-| ----------------- | ------------------------- | --- | ---- | ---- | ---- | ---- | ----- | ----------- |
-| newGroup          | Creating a group          | 565 | 1930 | 4428 | 5941 | 8400 | 12370 | Concern     |
-| newGroupByAddress | Creating group by address | 441 | 1586 | 2813 | 4764 | 6691 | -     | Concern     |
-| send              | Sending a message         | 92  | 105  | 79   | 79   | 92   | 88    | On Target   |
-| addMember         | Adding a member           | 35  | 36   | 35   | 46   | 57   | 60    | On Target   |
-| groupSync         | Group sync                | 71  | 294  | 81   | 87   | 111  | 114   | On Target   |
-| removeMembers     | Removing members          | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
-| updateName        | Updating group name       | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
+| Operation     | Description         | 10  | 50   | 100  | 150  | 200  | 250   | Performance |
+| ------------- | ------------------- | --- | ---- | ---- | ---- | ---- | ----- | ----------- |
+| newGroup      | Creating a group    | 565 | 1930 | 4428 | 5941 | 8400 | 12370 | Concern     |
+| send          | Sending a message   | 92  | 105  | 79   | 79   | 92   | 88    | On Target   |
+| addMember     | Adding a member     | 35  | 36   | 35   | 46   | 57   | 60    | On Target   |
+| groupSync     | Group sync          | 71  | 294  | 81   | 87   | 111  | 114   | On Target   |
+| removeMembers | Removing members    | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
+| updateName    | Updating group name | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
 
 _Note: Measurements taken from the sender's perspective during group operations._
 
