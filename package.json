@@ -22,8 +22,7 @@
     "mock": "tsx cli/mock-client.ts",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "permissions": "tsx cli/permissions.ts",
-    "playwright:install": "./scripts/install-playwright.sh",
-    "record": "yarn playwright:install && npx playwright codegen 'https://xmtp.chat/'",
+    "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn test functional --env local --sync all --versions 3 --size 10-50-100",
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
@@ -101,6 +100,5 @@
   "packageManager": "yarn@4.6.0",
   "engines": {
     "node": ">=20"
-  },
-  "postinstall": "./scripts/install-playwright.sh"
+  }
 }

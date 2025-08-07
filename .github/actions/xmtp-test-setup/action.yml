@@ -37,6 +37,7 @@ runs:
       with:
         path: |
           .playwright-cache
+          ~/.cache/ms-playwright
         key: playwright-${{ hashFiles('package.json') }}
         restore-keys: |
           playwright-
