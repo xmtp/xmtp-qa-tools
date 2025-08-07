@@ -545,7 +545,6 @@ export async function getWorkers(
           : getFixedNames(workers)
         : workers;
     descriptors = names;
-    console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(
         descriptor,
@@ -557,7 +556,6 @@ export async function getWorkers(
     let entries = Object.entries(workers);
 
     descriptors = entries.map(([descriptor]) => descriptor);
-    console.log(`Preparing to create ${descriptors.length} workers...`);
     workerPromises = entries.map(([descriptor, apiUrl]) =>
       manager.createWorker(descriptor, sdkVersions[0], apiUrl),
     );

@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [production]
-        test: [delivery] # performance test with more large groups
+        test: [convos] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [dms] # health check
@@ -45,8 +45,8 @@ jobs:
           env: ${{ matrix.env }}
           save-to-cache: true
 
-      - name: Trigger test failure
-        run: exit 1
+      # - name: Trigger test failure
+      #   run: exit 1
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
