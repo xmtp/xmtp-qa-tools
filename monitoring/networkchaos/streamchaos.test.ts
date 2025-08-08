@@ -47,7 +47,7 @@ async function getWorkersFromNodeList(totalWorkers: number, nodeUrls: string[]) 
 describe(testName, async () => {
   setupDurationTracking({
     testName,
-    initDataDog: true,
+    initDataDog: false,
     sendDurationMetrics: false,
   });
   const ERROR_TRESHOLD = parseInt(process.env.ERROR_TRESHOLD ?? "90");
