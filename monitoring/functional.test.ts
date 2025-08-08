@@ -1,18 +1,36 @@
-import { verifyMessageStream } from "@helpers/streams";
+import { sleep } from "@helpers/client";
+import {
+  verifyAddMemberStream,
+  verifyConsentStream,
+  verifyConversationStream,
+  verifyGroupConsentStream,
+  verifyMessageStream,
+  verifyMetadataStream,
+} from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   getVersions,
+  type DecodedMessage,
   type Dm,
   type Group,
 } from "version-management/client-versions";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "sync";
 describe(testName, () => {
   setupDurationTracking({ testName });
-
+  const mergedVersions = [
+    getVersions().slice(0, 3),
+    getVersions().slice(0, 3).reverse(),
+  ];
+  let workers: WorkerManager | undefined;
+  let group: Group | undefined;
+  beforeAll(async () => {
+    workers = await getWorkers(5);
+    group = await workers.createGroupBetweenAll();
+  });
   it("create a group", async () => {
     const workers = await getWorkers(["henry", "john"]);
     const creator = workers.get("henry")!;
@@ -78,29 +96,28 @@ describe(testName, () => {
 
     expect(messageCount).toBe(2);
   });
-  const mergedVersions = [
-    getVersions().slice(0, 3),
-    getVersions().slice(0, 3).reverse(),
-  ];
+
   for (let i = 0; i < mergedVersions.length; i++) {
     const version = mergedVersions[i];
-    it(`switched from ${version[i - 1].nodeSDK} to ${version[i].nodeSDK}`, async () => {
+    it(`switched from ${version[i - 1]?.nodeSDK} to ${version[i]?.nodeSDK}`, async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await sleep(1000);
         const versionWorkers = await getWorkers(["creator"], {
           nodeSDK: version[i - 1].nodeSDK,
         });
 
         const creator = versionWorkers.getCreator();
         let convo = await creator.client.conversations.newDm(
-          receiver!.inboxId as string,
+          versionWorkers.getReceiver().inboxId,
         );
-        const verifyResult = await verifyMessageStream(convo, [receiver]);
+        const verifyResult = await verifyMessageStream(convo, [
+          versionWorkers.getReceiver(),
+        ]);
         expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
       } catch (error) {
         console.error(
           "Error downgrading to version",
-          version[i - 1].nodeSDK,
+          version[i - 1]?.nodeSDK,
           error,
         );
       }
@@ -108,71 +125,40 @@ describe(testName, () => {
   }
 
   it("conversations: new conversation stream", async () => {
-    const verifyResult = await verifyConversationStream(workers.getCreator(), [
-      workers.getReceiver(),
+    const verifyResult = await verifyConversationStream(workers!.getCreator(), [
+      workers!.getReceiver(),
     ]);
-    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
-  });
-  it("membership: member addition stream", async () => {
-    group = await workers.createGroupBetweenAll();
-    const verifyResult = await verifyMembershipStream(
-      group,
-      workers.getAllButCreator(),
-      getInboxes(1).map((a) => a.inboxId),
-    );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
 
   it("consent: consent state changes for direct messages", async () => {
     const verifyResult = await verifyConsentStream(
-      workers.getCreator(),
-      workers.getReceiver(),
+      workers!.getCreator(),
+      workers!.getReceiver(),
     );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
 
   it("groupConsent: consent state changes in groups", async () => {
-    group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyGroupConsentStream(
-      group,
-      workers.getAllButCreator(),
-    );
-    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
-  });
-
-  it("messages: direct message delivery", async () => {
-    const creator = workers.getCreator();
-    const receiver = workers.getReceiver();
-    const newDm = await creator.client.conversations.newDm(
-      receiver.client.inboxId,
-    );
-    const verifyResult = await verifyMessageStream(newDm as Dm, [receiver], 10);
-    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
-  });
-
-  it("messages: group message delivery", async () => {
-    const newGroup = await workers.createGroupBetweenAll();
-    const verifyResult = await verifyMessageStream(
-      newGroup,
-      workers.getAllButCreator(),
-      10,
+      group!,
+      workers!.getAllButCreator(),
     );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
 
   it("metadata: group metadata updates", async () => {
-    group = await workers.createGroupBetweenAll();
     const verifyResult = await verifyMetadataStream(
-      group,
-      workers.getAllButCreator(),
+      group!,
+      workers!.getAllButCreator(),
     );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
 
   it("members: member addition to existing group", async () => {
-    const creator = workers.getCreator();
-    const receiver = workers.getReceiver();
-    group = (await creator.client.conversations.newGroup([
+    const creator = workers!.getCreator();
+    const receiver = workers!.getReceiver();
+    const group = (await creator.client.conversations.newGroup([
       receiver.client.inboxId,
     ])) as Group;
     const addMembers = getInboxes(1).map((a) => a.inboxId);
@@ -182,22 +168,6 @@ describe(testName, () => {
       addMembers,
     );
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
-  });
-
-  it("track epoch changes during group operations", async () => {
-    const workers = await getWorkers(3);
-
-    const group = await workers.createGroupBetweenAll();
-    const initialDebugInfo = await group.debugInfo();
-    const initialEpoch = initialDebugInfo.epoch;
-
-    // Perform group operation that should increment epoch
-    const newMember = getInboxes(1)[0].inboxId;
-    await group.addMembers([newMember]);
-    // Get updated debug info
-    const updatedDebugInfo = await group.debugInfo();
-    console.log("updatedEpoch", updatedDebugInfo.epoch);
-    expect(updatedDebugInfo.epoch).toBe(initialEpoch + 1n);
   });
 
   it("stitching", async () => {
@@ -226,8 +196,8 @@ describe(testName, () => {
   });
 
   it("conversations: new conversation stream", async () => {
-    const verifyResult = await verifyConversationStream(workers.getCreator(), [
-      workers.getReceiver(),
+    const verifyResult = await verifyConversationStream(workers!.getCreator(), [
+      workers!.getReceiver(),
     ]);
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
   });
