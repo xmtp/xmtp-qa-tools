@@ -1,24 +1,8 @@
-import {
-  sendMetric,
-  type DeliveryMetricTags,
-  type ResponseMetricTags,
-} from "@helpers/datadog";
-import {
-  verifyMembershipStream,
-  verifyMessageStream,
-  verifyMetadataStream,
-} from "@helpers/streams";
+import "@helpers/datadog";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import {
-  Client,
-  ConsentEntityType,
-  ConsentState,
-  IdentifierKind,
-  type Dm,
-  type Group,
-} from "version-management/client-versions";
+import { type Dm } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";
@@ -27,7 +11,6 @@ describe(testName, () => {
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
   };
-
   setupDurationTracking({
     testName,
     getCustomDuration: () => customDuration,
@@ -49,7 +32,6 @@ describe(testName, () => {
     receiver = workers.getReceiver();
     setCustomDuration(creator.initializationTime);
   });
-
   it(`newDm:measure creating a DM`, async () => {
     dm = (await creator!.client.conversations.newDm(
       receiver!.client.inboxId,
@@ -61,6 +43,16 @@ describe(testName, () => {
     const dmId = await dm!.send("gm");
     expect(dmId).toBeDefined();
   });
+  it(`streamMessage:measure receiving a gm`, async () => {
+    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+    setCustomDuration(verifyResult.averageEventTiming);
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
+  });
+  it(`send:measure sending a gm`, async () => {
+    const dmId = await dm!.send("gm");
+    expect(dmId).toBeDefined();
+  });
+
   it(`streamMessage:measure receiving a gm`, async () => {
     const verifyResult = await verifyMessageStream(dm!, [receiver!]);
     setCustomDuration(verifyResult.averageEventTiming);

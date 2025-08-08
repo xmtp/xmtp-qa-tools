@@ -37,14 +37,14 @@ export async function updateGroupConsent(
 function getProperty<T>(
   obj: unknown,
   path: string[],
-  _typeHint?: T,
+  defaultValue?: T,
 ): T | undefined {
   let current: any = obj;
   for (const key of path) {
     if (current && typeof current === "object" && key in current) {
       current = current[key];
     } else {
-      return undefined;
+      return defaultValue;
     }
   }
   return current as T;
