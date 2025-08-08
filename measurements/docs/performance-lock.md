@@ -1,9 +1,12 @@
 # Performance report
 
-- Testing in `local`
-- Columns correspond to conversations per member
-- 0⚠️ indicates timeout
-- Streams are all `streamAllMessages`
+- All in in `local`
+- Columns correspond to conversations (DMs) per member
+- 0 indicates stream timeout
+- ⚠️ indicates more than 10 seconds
+- Streams are all streamAllMessages
+- Timeout for streams is 50 seconds
+- All is in milliseconds
 
 ### `node-bindings@1.4.0-dev.7f5d8e0`
 

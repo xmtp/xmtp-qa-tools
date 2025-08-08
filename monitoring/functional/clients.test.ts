@@ -6,11 +6,16 @@ import {
   getVersions,
   type DecodedMessage,
 } from "version-management/client-versions";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 describe(testName, () => {
   setupDurationTracking({ testName });
+  let receiver: Worker;
+  beforeAll(async () => {
+    const workers = await getWorkers(1);
+    receiver = workers.get("receiver")!;
+  });
 
   it("check stream restart (prev 4.0.2 bug)", async () => {
     const agentWorkers = await getWorkers(1);
@@ -56,40 +61,31 @@ describe(testName, () => {
 
     expect(messageCount).toBe(2);
   });
-
-  for (const version of getVersions().slice(0, 3)) {
-    it(`downgrade to ${version.nodeSDK}`, async () => {
+  const mergedVersions = [
+    getVersions().slice(0, 3),
+    getVersions().slice(0, 3).reverse(),
+  ];
+  for (let i = 0; i < mergedVersions.length; i++) {
+    const version = mergedVersions[i];
+    it(`switched from ${version[i - 1].nodeSDK} to ${version[i].nodeSDK}`, async () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const versionWorkers = await getWorkers(["creator", "receiver"], {
-          nodeSDK: version.nodeSDK,
+        const versionWorkers = await getWorkers(["creator"], {
+          nodeSDK: version[i - 1].nodeSDK,
         });
 
         const creator = versionWorkers.getCreator();
-        const receiver = versionWorkers.getReceiver();
-        let convo = await creator.client.conversations.newDm(receiver.inboxId);
+        let convo = await creator.client.conversations.newDm(
+          receiver!.inboxId as string,
+        );
         const verifyResult = await verifyMessageStream(convo, [receiver]);
         expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
       } catch (error) {
-        console.error("Error downgrading to version", version.nodeSDK, error);
-      }
-    });
-  }
-  for (const version of getVersions().slice(0, 3).reverse()) {
-    it(`upgrade to ${version.nodeSDK}`, async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const versionWorkers = await getWorkers(["creator", "receiver"], {
-          nodeSDK: version.nodeSDK,
-        });
-
-        const creator = versionWorkers.getCreator();
-        const receiver = versionWorkers.getReceiver();
-        let convo = await creator.client.conversations.newDm(receiver.inboxId);
-        const verifyResult = await verifyMessageStream(convo, [receiver]);
-        expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
-      } catch (error) {
-        console.error("Error upgrading to version", version.nodeSDK, error);
+        console.error(
+          "Error downgrading to version",
+          version[i - 1].nodeSDK,
+          error,
+        );
       }
     });
   }
