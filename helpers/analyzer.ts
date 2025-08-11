@@ -45,6 +45,8 @@ export const PATTERNS = {
     "receiveGroupMessage",
     "receiveNewConversation",
     "Skipping welcome",
+    "sqlite3Codec",
+    "sqlcipher_page_cipher",
     "Skipping already processed",
     "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
