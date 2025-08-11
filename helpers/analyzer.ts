@@ -54,7 +54,7 @@ export const PATTERNS = {
   ],
 
   // Patterns to match error log lines
-  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
+  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/, /WARN/],
 } as const;
 
 /**
