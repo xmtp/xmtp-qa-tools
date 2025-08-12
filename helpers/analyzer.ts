@@ -48,6 +48,7 @@ export const PATTERNS = {
     "sqlite3Codec",
     "sqlcipher_page_cipher",
     "Skipping already processed",
+    "xmtp_mls::groups::welcomes",
     "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",

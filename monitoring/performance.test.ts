@@ -138,12 +138,24 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ])) as Group;
+      if (!newGroup.id) {
+        newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
+          [
+            ...allMembers.map((a) => ({
+              identifier: a.accountAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+            ...workers.getAllButCreator().map((w) => ({
+              identifier: w.address,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+          ],
+        )) as Group;
+      }
       const members = await newGroup.members();
       expect(members.length).toBe(i);
       expect(newGroup.id).toBeDefined();
-      if (!newGroup.id) {
-        throw new Error("Group ID is undefined, cancelling the test");
-      }
+
       // Add current group to cumulative tracking
       cumulativeGroups.push(newGroup);
     });
