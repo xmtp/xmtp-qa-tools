@@ -141,12 +141,6 @@ describe(testName, () => {
       newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
         membersToAdd,
       )) as Group;
-      if (!newGroup.id) {
-        //try again if failed
-        newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
-          membersToAdd,
-        )) as Group;
-      }
       const members = await newGroup.members();
       expect(members.length).toBe(i);
       expect(newGroup.id).toBeDefined();

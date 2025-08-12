@@ -86,9 +86,9 @@ export function processErrorLine(line: string): {
     return { cleanLine, shouldSkip: true };
   }
   // Trim long lines to 200 characters max
-  if (cleanLine.length > PATTERNS.max_line_length) {
-    cleanLine = cleanLine.substring(0, PATTERNS.max_line_length - 3) + "...";
-  }
+  // if (cleanLine.length > PATTERNS.max_line_length) {
+  //   cleanLine = cleanLine.substring(0, PATTERNS.max_line_length - 3) + "...";
+  // }
 
   return { cleanLine, shouldSkip: false };
 }
