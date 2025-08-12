@@ -16,6 +16,7 @@ jobs:
       matrix:
         test: [performance]
         size: [5-10-50]
+        versions: [3]
         env: [dev, production]
         cache-data: [false]
     env:
@@ -37,7 +38,7 @@ jobs:
         run: sleep $(( ${{ matrix.delay_minutes }} * 60 ))
 
       - name: Run tests ${{ matrix.size }}
-        run: yarn test ${{ matrix.test }} --no-fail --log warn --file --env ${{ matrix.env }} --size ${{ matrix.size }}
+        run: yarn test ${{ matrix.test }} --no-fail --log warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --versions ${{ matrix.versions }}
 
       - name: Cleanup and upload artifacts
         if: always()
