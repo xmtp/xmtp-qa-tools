@@ -128,7 +128,7 @@ describe(testName, () => {
       allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
       allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
       extraMember = allMembersWithExtra.at(-1)!;
-      newGroup = (await creator!.client.conversations.newGroupWithIdentifiers([
+      const membersToAdd = [
         ...allMembers.map((a) => ({
           identifier: a.accountAddress,
           identifierKind: IdentifierKind.Ethereum,
@@ -137,19 +137,14 @@ describe(testName, () => {
           identifier: w.address,
           identifierKind: IdentifierKind.Ethereum,
         })),
-      ])) as Group;
+      ];
+      newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
+        membersToAdd,
+      )) as Group;
       if (!newGroup.id) {
+        //try again if failed
         newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
-          [
-            ...allMembers.map((a) => ({
-              identifier: a.accountAddress,
-              identifierKind: IdentifierKind.Ethereum,
-            })),
-            ...workers.getAllButCreator().map((w) => ({
-              identifier: w.address,
-              identifierKind: IdentifierKind.Ethereum,
-            })),
-          ],
+          membersToAdd,
         )) as Group;
       }
       const members = await newGroup.members();
