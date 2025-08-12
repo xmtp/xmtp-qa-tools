@@ -1,0 +1,45 @@
+name: Agent health
+description: "health of the agents"
+
+on:
+  #pull_request:
+  schedule:
+    - cron: "*/10 * * * *" # Runs every 10 minutes for agents-dms
+  workflow_dispatch:
+
+jobs:
+  agents-dms:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [agents-dms]
+        env: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      REGION: ${{ vars.REGION }}
+      LOG_LEVEL: "info"
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: ${{ matrix.test }} ${{ matrix.env }}
+        run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --log warn --file --no-datadog
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Agent health (${{ matrix.test }}, ${{ matrix.env }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

@@ -1,0 +1,56 @@
+name: Wildcard
+description: "Manual PR verification workflow - supports functional and performance tests"
+
+on:
+  #pull_request:
+  schedule:
+    - cron: "0 0 1 1 *"
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [production]
+        test: [convos] # performance test with more large groups
+        # test: [functional] # full functional test
+        # test: [performance] # performance test with more large groups
+        # test: [dms] # health check
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: true
+
+      # - name: Run script version
+      #   run: yarn versions
+
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }}
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
+          save-to-cache: true
+
+      # - name: Trigger test failure
+      #   run: exit 1
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Wildcard (${{ matrix.test }}, ${{ matrix.env }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

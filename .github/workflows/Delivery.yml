@@ -1,0 +1,44 @@
+name: Delivery
+description: "message loss when receiving via 200 streams"
+
+on:
+  schedule:
+    - cron: "5,40 * * * *" # Runs at 25 and 55 minutes past each hour
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [delivery]
+        env: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      REGION: ${{ vars.REGION }}
+      DELIVERY_AMOUNT: 100
+      ERROR_TRESHOLD: 90
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --no-fail --log warn --file --env ${{ matrix.env }}
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Delivery (${{ matrix.test }}, ${{ matrix.env }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

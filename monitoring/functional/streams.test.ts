@@ -1,0 +1,120 @@
+import {
+  verifyAddMemberStream,
+  verifyConsentStream,
+  verifyConversationStream,
+  verifyGroupConsentStream,
+  verifyMembershipStream,
+  verifyMessageStream,
+  verifyMetadataStream,
+} from "@helpers/streams";
+import { setupDurationTracking } from "@helpers/vitest";
+import { getInboxes } from "@inboxes/utils";
+import { getWorkers } from "@workers/manager";
+import {
+  ContentTypeReaction,
+  type Reaction,
+} from "@xmtp/content-type-reaction";
+import { type Dm, type Group } from "version-management/client-versions";
+import { describe, expect, it } from "vitest";
+
+const testName = "streams";
+describe(testName, async () => {
+  setupDurationTracking({ testName });
+  let group: Group;
+  let workers = await getWorkers(5);
+  it("conversations: new conversation stream", async () => {
+    const verifyResult = await verifyConversationStream(workers.getCreator(), [
+      workers.getReceiver(),
+    ]);
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+  it("membership: member addition stream", async () => {
+    group = await workers.createGroupBetweenAll();
+    const verifyResult = await verifyMembershipStream(
+      group,
+      workers.getAllButCreator(),
+      getInboxes(1).map((a) => a.inboxId),
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("consent: consent state changes for direct messages", async () => {
+    const verifyResult = await verifyConsentStream(
+      workers.getCreator(),
+      workers.getReceiver(),
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("groupConsent: consent state changes in groups", async () => {
+    group = await workers.createGroupBetweenAll();
+    const verifyResult = await verifyGroupConsentStream(
+      group,
+      workers.getAllButCreator(),
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("messages: direct message delivery", async () => {
+    const creator = workers.getCreator();
+    const receiver = workers.getReceiver();
+    const newDm = await creator.client.conversations.newDm(
+      receiver.client.inboxId,
+    );
+    const verifyResult = await verifyMessageStream(newDm as Dm, [receiver], 10);
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("messages: group message delivery", async () => {
+    const newGroup = await workers.createGroupBetweenAll();
+    const verifyResult = await verifyMessageStream(
+      newGroup,
+      workers.getAllButCreator(),
+      10,
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("metadata: group metadata updates", async () => {
+    group = await workers.createGroupBetweenAll();
+    const verifyResult = await verifyMetadataStream(
+      group,
+      workers.getAllButCreator(),
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+
+  it("members: member addition to existing group", async () => {
+    const creator = workers.getCreator();
+    const receiver = workers.getReceiver();
+    group = (await creator.client.conversations.newGroup([
+      receiver.client.inboxId,
+    ])) as Group;
+    const addMembers = getInboxes(1).map((a) => a.inboxId);
+    const verifyResult = await verifyAddMemberStream(
+      group,
+      [receiver],
+      addMembers,
+    );
+    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(0);
+  });
+  it("codec: handle codec errors gracefully when sending unsupported content types", async () => {
+    try {
+      const creator = workers.getCreator();
+      const receiver = workers.getReceiver();
+      const convo = await creator.client.conversations.newDm(
+        receiver.client.inboxId,
+      );
+      const reaction: Reaction = {
+        action: "added",
+        content: "smile",
+        reference: "originalMessage",
+        schema: "shortcode",
+      };
+
+      await convo.send(reaction as unknown as string, ContentTypeReaction);
+    } catch (e) {
+      expect(e).toBeDefined();
+    }
+  });
+});

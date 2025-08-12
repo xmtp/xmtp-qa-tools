@@ -1,0 +1,67 @@
+name: "XMTP Test Setup"
+description: "Sets up Node.js environment with caching and installs dependencies for XMTP tests"
+
+inputs:
+  cache-data:
+    description: "Whether to cache .data and .env files"
+    required: false
+    default: "false"
+  test-name:
+    description: "Name of the test for notifications and artifact naming"
+    required: true
+  env:
+    description: "Test environment (dev, production, etc.)"
+    required: false
+    default: "dev"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: ".node-version"
+
+    - name: Cache dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+          .yarn/cache
+        key: deps-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          deps-
+
+    - name: Cache Playwright browsers
+      uses: actions/cache@v4
+      with:
+        path: |
+          .playwright-cache
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package.json') }}
+        restore-keys: |
+          playwright-
+
+    - name: Cache test data
+      if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          .data
+          .env
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
+        restore-keys: |
+          data-${{ inputs.env }}-
+
+    - name: Show cache status
+      if: ${{ inputs.cache-data == 'true' || inputs.cache-data == true }}
+      run: |
+        echo "Data caching is ENABLED for .data and .env files"
+        echo "Cache key: data-${{ inputs.env }}-${{ inputs.test-name }}"
+        echo "Environment: ${{ inputs.env }}"
+        echo "Test name: ${{ inputs.test-name }}"
+      shell: bash
+
+    - name: Install dependencies
+      run: yarn
+      shell: bash

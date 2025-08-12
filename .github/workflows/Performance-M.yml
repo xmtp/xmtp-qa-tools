@@ -1,0 +1,50 @@
+name: Performance Medium
+description: "performance of medium groups"
+
+on:
+  #pull_request:
+  schedule:
+    - cron: "0 */2 * * *" # Runs every 2 hours at 15 minutes past the hour (avoids :00 and provides separation from Performance at :30)
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [performance]
+        size: [100-150]
+        env: [dev, production]
+        cache-data: [false]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
+          env: ${{ matrix.env }}
+
+      - name: Run tests ${{ matrix.size }}
+        run: yarn test ${{ matrix.test }} --no-fail --log warn --file --env ${{ matrix.env }} --size ${{ matrix.size }}
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          save-to-cache: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
+          env: ${{ matrix.env }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Performance Large (${{ matrix.test }}, ${{ matrix.env }}, ${{ matrix.size }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

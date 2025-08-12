@@ -1,0 +1,76 @@
+name: "XMTP Test Cleanup"
+description: "Handles notifications and artifact uploads for XMTP tests"
+
+inputs:
+  test-name:
+    description: "Name of the test for notifications and artifact naming"
+    required: true
+  env:
+    description: "Test env (dev, production, etc.)"
+    required: true
+  retention-days:
+    description: "Number of days to retain artifacts"
+    required: false
+    default: "90"
+  save-to-cache:
+    description: "Whether to save .data and .env back to cache after processing"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Upload logs and env
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.env }}-${{ inputs.test-name }}-logs
+        path: |
+          logs/**/*
+          .env
+        if-no-files-found: ignore
+        overwrite: true
+        include-hidden-files: true
+        retention-days: ${{ inputs.retention-days }}
+
+    - name: Upload installation databases
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.env }}-${{ inputs.test-name }}-dbs
+        path: |
+          .data/**/*
+        if-no-files-found: ignore
+        overwrite: true
+        include-hidden-files: true
+        retention-days: ${{ inputs.retention-days }}
+
+    - name: Save processed data to cache
+      if: ${{ always() && (inputs.save-to-cache == 'true' || inputs.save-to-cache == true) }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          .data
+          .env
+        key: data-${{ inputs.env }}-${{ inputs.test-name }}
+        restore-keys: |
+          data-${{ inputs.env }}-
+
+    - name: Show cache save status
+      if: ${{ always() && (inputs.save-to-cache == 'true' || inputs.save-to-cache == true) }}
+      run: |
+        echo "Saving data to cache with key: data-${{ inputs.env }}-${{ inputs.test-name }}"
+        echo "Environment: ${{ inputs.env }}"
+        echo "Test name: ${{ inputs.test-name }}"
+        echo "Files being cached:"
+        if [ -d ".data" ]; then
+          echo "  .data directory exists with $(find .data -type f | wc -l) files"
+        else
+          echo "  .data directory does not exist"
+        fi
+        if [ -f ".env" ]; then
+          echo "  .env file exists"
+        else
+          echo "  .env file does not exist"
+        fi
+      shell: bash
