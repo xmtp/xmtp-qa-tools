@@ -50,7 +50,7 @@ jobs:
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          yarn test convos --env dev
+          yarn test performance --env dev
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
