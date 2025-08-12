@@ -3,7 +3,7 @@ description: "message loss when receiving via 200 streams"
 
 on:
   schedule:
-    - cron: "5,40 * * * *" # Runs at 25 and 55 minutes past each hour
+    - cron: "5 * * * *" # Runs every hour at 5 minutes past the hour
   workflow_dispatch:
 
 jobs:
