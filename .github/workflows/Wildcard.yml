@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "0 0 1 1 *"
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         env: [production]
-        test: [convos] # performance test with more large groups
+        test: [browser] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
         # test: [dms] # health check
