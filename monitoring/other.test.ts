@@ -1,8 +1,14 @@
+import { sleep } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { type Dm, type Group } from "version-management/client-versions";
+import {
+  getVersions,
+  type DecodedMessage,
+  type Dm,
+  type Group,
+} from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";

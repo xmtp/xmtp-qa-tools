@@ -67,7 +67,7 @@ runs:
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-        MESSAGE="*Workflow*: ${WORKFLOW_NAME} ${STATUS_TEXT} ${EMOJI} ${MENTION_USER}
+        MESSAGE="*Workflow*: ${WORKFLOW_NAME} ${STATUS_TEXT} ${EMOJI} 
         *Timestamp*: \`${TIMESTAMP}\`
         *env*: \`${XMTP_ENV:-unknown}\` | *region*: \`${REGION:-unknown}\`
         <${RUN_URL}|View run>"
