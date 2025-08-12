@@ -19,6 +19,8 @@ jobs:
         with:
           node-version-file: ".node-version"
           # Disable built-in cache to use shared cache below
+      - name: Enable Corepack
+        run: corepack enable
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -41,5 +43,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Validate code quality'
+          workflow-name: "Validate code quality"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
