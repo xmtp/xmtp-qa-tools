@@ -6,10 +6,10 @@ The `getWorkers` function has three input modes with optional configuration:
 
 ```typescript
 // 1. Number - creates that many workers with random names (default)
-const workers = await getWorkers(5);
+workers = await getWorkers(5);
 
 // 2. Array of specific worker names
-const workers = await getWorkers(["alice", "bob", "charlie"]);
+workers = await getWorkers(["alice", "bob", "charlie"]);
 ```
 
 ### Options Configuration
@@ -57,23 +57,23 @@ const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
 
 ### Simple Testing
 
-```typescript
+```tsx
 // Most common patterns
-const workers = await getWorkers(5); // 5 random workers
-const workers = await getWorkers(["alice", "bob"]); // Specific workers
+let workers = await getWorkers(5); // 5 random workers
+workers = await getWorkers(["alice", "bob"]); // Specific workers
 ```
 
 ### Version Testing
 
-```typescript
+```tsx
 // Versioning is enabled by default
-const workers = await getWorkers(3); // Uses random SDK versions
-const workers = await getWorkers(3, {}); // All latest version
+workers = await getWorkers(3); // Uses random SDK versions
+workers = await getWorkers(3, {}); // All latest version
 ```
 
 ### Environment-Specific Testing
 
-```typescript
-const workers = await getWorkers(5, { env: "production" });
-const workers = await getWorkers(["alice"], { env: "local" });
+```tsx
+workers = await getWorkers(5, { env: "production" });
+workers = await getWorkers(["alice"], { env: "local" });
 ```

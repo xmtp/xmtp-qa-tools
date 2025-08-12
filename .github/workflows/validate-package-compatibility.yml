@@ -106,5 +106,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Validate package compatibility (${{ matrix.node-version }}, ${{ matrix.package-manager }})'
+          workflow-name: "Validate package compatibility (${{ matrix.node-version }}, ${{ matrix.package-manager }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

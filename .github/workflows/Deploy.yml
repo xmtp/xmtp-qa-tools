@@ -122,5 +122,5 @@ jobs:
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: 'Deploy'
+          workflow-name: "Deploy"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
