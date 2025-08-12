@@ -15,18 +15,21 @@ Monitoring that validates protocol functionality and alerts when things break.
 ---
 
 ## 1) Performance
+
 Location: [`monitoring/performance.test.ts`](../monitoring/performance.test.ts)
 
 - Timing/throughput for core ops (create, canMessage, inboxState, DM send/stream)
 - Scaled group ops per size (create, sync, add/remove members, metadata updates)
 
 ## 2) Delivery
+
 Location: [`monitoring/delivery.test.ts`](../monitoring/delivery.test.ts)
 
 - Message delivery and order via streams and polling
 - Recovery after stream interruptions
 
 ## 3) Regression (functional tests)
+
 Location: [`monitoring/functional`](../monitoring/functional)
 
 - Clients
@@ -48,6 +51,7 @@ Location: [`monitoring/functional`](../monitoring/functional)
   - Stitching across fresh clients
 
 ## 4) Browser
+
 Location: [`monitoring/browser/browser.test.ts`](../monitoring/browser/browser.test.ts)
 
 - Core conversation + message streaming flows in browser SDK (Playwright)
@@ -57,6 +61,7 @@ Location: [`monitoring/browser/browser.test.ts`](../monitoring/browser/browser.t
 - Scalability checks across 50–250 members (create, sync, stream, metadata)
 
 ## 6) Network chaos
+
 Location: [`monitoring/networkchaos`](../monitoring/networkchaos)
 
 - Resilience under partitions/delays/failures on a local 4-node cluster
