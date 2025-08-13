@@ -28,9 +28,9 @@
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
     "ui": "vitest --ui --standalone --watch",
-    "update:dev": "yarn gen --env dev --installations 2",
-    "update:local": "yarn gen --env local --installations 2 --count 500",
-    "update:prod": "yarn gen --env production --installations 2",
+    "update:dev": "yarn gen --env dev --installations 2  --count 200",
+    "update:local": "yarn gen --env local --installations 2 --count 200",
+    "update:prod": "yarn gen --env production --installations 2  --count 200",
     "update:sdk": "node version-management/update-sdk.js",
     "versions": "tsx version-management/cli-versions.ts"
   },

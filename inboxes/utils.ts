@@ -25,32 +25,22 @@ const typedInboxes30 = newInboxes30 as InboxData[];
 
 function getInboxByInstallationCount(
   installationCount: number,
-  index?: number,
+  index: number = 200,
 ) {
   if (installationCount === 2) {
-    return index !== undefined ? typedInboxes2.slice(0, index) : typedInboxes2;
+    return typedInboxes2.slice(0, index);
   } else if (installationCount === 5) {
-    return index !== undefined ? typedInboxes5.slice(0, index) : typedInboxes5;
+    return typedInboxes5.slice(0, index);
   } else if (installationCount === 10) {
-    return index !== undefined
-      ? typedInboxes10.slice(0, index)
-      : typedInboxes10;
+    return typedInboxes10.slice(0, index);
   } else if (installationCount === 15) {
-    return index !== undefined
-      ? typedInboxes15.slice(0, index)
-      : typedInboxes15;
+    return typedInboxes15.slice(0, index);
   } else if (installationCount === 20) {
-    return index !== undefined
-      ? typedInboxes20.slice(0, index)
-      : typedInboxes20;
+    return typedInboxes20.slice(0, index);
   } else if (installationCount === 25) {
-    return index !== undefined
-      ? typedInboxes25.slice(0, index)
-      : typedInboxes25;
+    return typedInboxes25.slice(0, index);
   } else if (installationCount === 30) {
-    return index !== undefined
-      ? typedInboxes30.slice(0, index)
-      : typedInboxes30;
+    return typedInboxes30.slice(0, index);
   }
   return typedInboxes2;
 }
