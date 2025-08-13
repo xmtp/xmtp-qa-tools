@@ -206,7 +206,7 @@ function parseTestArgs(args: string[]): {
     fileLogging: false,
     vitestArgs: [],
     noFail: false,
-    verboseLogging: false, // Show terminal output by default
+    verboseLogging: true, // Show terminal output by default
     parallel: false,
     sendToDatadog: true,
     reportForkCount: false, // Report fork count after ansi:forks
@@ -247,6 +247,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--file":
         options.fileLogging = true;
+        options.verboseLogging = false;
         break;
       case "--winston":
         if (nextArg) {

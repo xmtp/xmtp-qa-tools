@@ -239,11 +239,6 @@ export const createTestLogger = (options: TestLogOptions) => {
 
     const logPath = path.join(logsDir, logFileName);
     logStream = fs.createWriteStream(logPath, { flags: "w" });
-  } else {
-    console.info(
-      "Warning: Logging is disabled. Test output will not be visible anywhere.",
-    );
-    console.info("Consider using --log warn --file to enable file logging.");
   }
 
   const processOutput = (data: Buffer) => {
