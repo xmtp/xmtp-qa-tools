@@ -47,4 +47,4 @@ Location: [`monitoring/networkchaos`](../monitoring/networkchaos)
 - **Performance Tests**: 1,440 writes/day (group creates, sends, updates, adds/removes across sizes)
 - **Delivery Tests**: 7,224 writes/day (group creates + 150 sends per run across 3 tests)
 - **Agents-DMs Tests**: 5,400 writes/day (DM creates + sends with retries per agent)
-- **Total Daily Writes**: ~14,064 (dominated by delivery at 51%; agents at 38%, performance at 10%)
+- **Total Daily Writes**: ~14,064
