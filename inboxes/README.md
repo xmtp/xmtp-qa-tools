@@ -56,7 +56,7 @@ yarn gen
 yarn gen --count 500 --installations 10 --env local
 
 # Multiple environments
-yarn gen --count 200 --installations 5 --env local,dev,production
+yarn gen  --installations 5 --env local,dev,production
 ```
 
 ## Parameters

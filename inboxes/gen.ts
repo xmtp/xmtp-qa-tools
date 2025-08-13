@@ -41,7 +41,7 @@ USAGE:
 
 OPTIONS:
   --count <number>       Number of inboxes to generate [default: 200]
-  --env <environments>  Comma-separated environments (local,dev,production) [default: production]
+  --env <environments>  Comma-separated environments (local,dev,production) [default: local]
   --installations <num>  Number of installations per inbox [default: 2]
   --log warn --file               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
