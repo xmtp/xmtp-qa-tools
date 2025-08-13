@@ -28,23 +28,18 @@ interface IWorkerManager {
   // Lifecycle Management
   terminateAll(deleteDbs?: boolean): Promise<void>;
 
-  // Worker Access & Retrieval
-  getLength(): number;
   getAll(): Worker[];
   get(baseName: string | number, installationId?: string): Worker | undefined;
   getRandomWorkers(count: number): Worker[];
   getRandomWorker(): Worker;
   getCreator(): Worker;
   getReceiver(): Worker;
-  getAllBut(excludeName: string): Worker[];
   getAllButCreator(): Worker[];
 
   // Worker Creation & Management
   addWorker(baseName: string, installationId: string, worker: Worker): void;
   createWorker(descriptor: string, apiUrl?: string): Promise<Worker>;
 
-  // Monitoring & Statistics
-  checkStatistics(): Promise<void>;
   checkForks(): Promise<void>;
   checkForksForGroup(groupId: string): Promise<bigint>;
   printWorkers(): Promise<void>;
@@ -141,17 +136,6 @@ export class WorkerManager implements IWorkerManager {
   }
 
   /**
-   * Gets the total number of workers
-   */
-  public getLength(): number {
-    let count = 0;
-    for (const baseName in this.workers) {
-      count += Object.keys(this.workers[baseName]).length;
-    }
-    return count;
-  }
-
-  /**
    * Gets a random subset of workers
    */
   public getRandomWorkers(count: number): Worker[] {
@@ -164,11 +148,6 @@ export class WorkerManager implements IWorkerManager {
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
   }
 
-  public async checkStatistics(): Promise<void> {
-    for (const worker of this.getAll()) {
-      await worker.worker.getStats();
-    }
-  }
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
@@ -292,10 +271,6 @@ export class WorkerManager implements IWorkerManager {
     return group as Group;
   }
 
-  getAllBut(excludeName: string): Worker[] {
-    const workers = this.getAll();
-    return workers.filter((worker) => worker.name !== excludeName);
-  }
   getAllButCreator(): Worker[] {
     const workers = this.getAll();
     const creator = this.getCreator();
@@ -371,6 +346,7 @@ export class WorkerManager implements IWorkerManager {
     const baseName = name.split("-")[0];
 
     if (baseName in this.keysCache) {
+      //They persist in memory in the same test run
       console.debug(`Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
