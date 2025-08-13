@@ -253,9 +253,7 @@ export const regressionClient = async (
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true });
-  }
+  if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
   const versionConfig = VersionList.find((v) => v.nodeSDK === nodeSDK);
   if (!versionConfig) {

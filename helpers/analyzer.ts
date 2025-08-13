@@ -12,6 +12,13 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "performance",
+      uniqueErrorLines: [
+        "FAIL  monitoring/performance.test.ts > performance > syncCumulative-50:perform cumulative sync operations on 50 member group",
+        "FAIL  monitoring/performance.test.ts > performance > syncAllCumulative-50:perform cumulative syncAll operations on 50 member group",
+      ],
+    },
+    {
       testName: "Browser",
       uniqueErrorLines: [
         "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream when creating the group",
