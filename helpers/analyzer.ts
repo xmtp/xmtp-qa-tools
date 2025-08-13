@@ -6,35 +6,9 @@ import { processLogFile, stripAnsi } from "./logger";
 export const PATTERNS = {
   KNOWN_ISSUES: [
     {
-      testName: "convos",
-      uniqueErrorLines: [
-        "FAIL  monitoring/functional/convos.test.ts > convos > fail on purpose",
-      ],
-    },
-    {
-      testName: "performance",
-      uniqueErrorLines: [
-        "FAIL  monitoring/performance.test.ts > performance > syncCumulative-50:perform cumulative sync operations on 50 member group",
-        "FAIL  monitoring/performance.test.ts > performance > syncAllCumulative-50:perform cumulative syncAll operations on 50 member group",
-      ],
-    },
-    {
       testName: "Browser",
       uniqueErrorLines: [
         "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream when creating the group",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  monitoring/functional/other.test.ts > sync > create a group",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  monitoring/functional/streams.test.ts > streams > metadata: group metadata updates",
-        "FAIL  monitoring/functional/streams.test.ts > streams > members: member addition to existing group",
       ],
     },
   ],

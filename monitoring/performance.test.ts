@@ -25,7 +25,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [5, 10];
+    : [5, 10, 50];
 
   let newGroup: Group;
 
@@ -219,8 +219,9 @@ describe(testName, () => {
     });
 
     it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      const singleSyncWorkers = await getWorkers(["randomA"]);
-      const clientSingleSync = singleSyncWorkers.get("randomA")!.client;
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
+      const singleSyncWorkers = await getWorkers([randomName]);
+      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
       const start = performance.now();
       await clientSingleSync.conversations.sync();
@@ -228,8 +229,9 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      const singleSyncWorkers = await getWorkers(["randomB"]);
-      const clientSingleSync = singleSyncWorkers.get("randomB")!.client;
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
+      const singleSyncWorkers = await getWorkers([randomName]);
+      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
       const start = performance.now();
       await clientSingleSync.conversations.syncAll();
@@ -238,8 +240,9 @@ describe(testName, () => {
     });
 
     it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
-      const singleSyncWorkers = await getWorkers(["randomC"]);
-      const clientSingleSync = singleSyncWorkers.get("randomC")!.client;
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
+      const singleSyncWorkers = await getWorkers([randomName]);
+      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       for (const group of cumulativeGroups) {
         await group.addMembers([clientSingleSync.inboxId]);
       }
@@ -249,8 +252,9 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
-      const singleSyncWorkers = await getWorkers(["randomD"]);
-      const clientSingleSync = singleSyncWorkers.get("randomD")!.client;
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
+      const singleSyncWorkers = await getWorkers([randomName]);
+      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       for (const group of cumulativeGroups) {
         await group.addMembers([clientSingleSync.inboxId]);
       }
