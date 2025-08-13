@@ -1,8 +1,7 @@
-import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Group } from "version-management/client-versions";
-import { describe, expect, it } from "vitest";
+import { type Group } from "version-management/client-versions";
+import { describe, it } from "vitest";
 
 const testName = "failtoverify";
 describe(testName, () => {
@@ -15,10 +14,6 @@ describe(testName, () => {
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
   let cumulativeGroups: Group[] = [];
-
-  setupDurationTracking({
-    testName,
-  });
 
   let workers: WorkerManager;
   let creator: Worker | undefined;
@@ -35,9 +30,8 @@ describe(testName, () => {
       allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
       allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
       console.log("allMembers", allMembers.length);
-      const membersToAdd = [...allMembers.map((a) => a.inboxId)];
       newGroup = (await creator!.client.conversations.newGroup(
-        membersToAdd,
+        allMembers.map((a) => a.inboxId),
       )) as Group;
 
       cumulativeGroups.push(newGroup);

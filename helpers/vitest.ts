@@ -106,12 +106,6 @@ export const setupDurationTracking = ({
 
   afterAll(async () => {
     await flushMetrics();
-    sendMetric("duration", performance.now() - start, {
-      metric_type: "test",
-      metric_subtype: "duration",
-      test: testName,
-      sdk: sdk || getActiveVersion().nodeSDK,
-    });
   });
 };
 interface ParsedTestName {
