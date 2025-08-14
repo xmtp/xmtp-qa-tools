@@ -125,7 +125,7 @@ describe(testName, () => {
 
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
-      allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
+      allMembersWithExtra = getInboxes(i - workers.getAll().length + 2, 2, i);
       allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
       extraMember = allMembersWithExtra.at(-1)!;
       const membersToAdd = [
