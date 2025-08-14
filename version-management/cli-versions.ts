@@ -47,7 +47,15 @@ function createBindingsSymlinks() {
       `node-bindings-${config.nodeBindings}`,
     );
 
-    if (!fs.existsSync(sdkDir) || !fs.existsSync(bindingsDir)) continue;
+    if (!fs.existsSync(sdkDir)) {
+      console.log(`⚠️  SDK directory not found: ${config.nodeSDK} (${sdkDir})`);
+      continue;
+    }
+    
+    if (!fs.existsSync(bindingsDir)) {
+      console.log(`⚠️  Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`);
+      continue;
+    }
 
     const sdkNodeModulesXmtpDir = path.join(sdkDir, "node_modules", "@xmtp");
     const symlinkTarget = path.join(sdkNodeModulesXmtpDir, "node-bindings");
