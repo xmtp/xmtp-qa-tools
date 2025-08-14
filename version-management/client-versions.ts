@@ -77,6 +77,12 @@ import {
   Dm as Dm403,
   Group as Group403,
 } from "@xmtp/node-sdk-4.0.3";
+import {
+  Client as Client410,
+  Conversation as Conversation410,
+  Dm as Dm410,
+  Group as Group410,
+} from "@xmtp/node-sdk-4.1.0rc1";
 
 export {
   Client,
@@ -94,9 +100,18 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.0.1";
+} from "@xmtp/node-sdk-4.1.0rc1";
 
 export const VersionList = [
+  {
+    Client: Client410,
+    Conversation: Conversation410,
+    Dm: Dm410,
+    Group: Group410,
+    nodeSDK: "4.1.0",
+    nodeBindings: "1.4.0",
+    auto: true,
+  },
   {
     Client: Client403,
     Conversation: Conversation403,
