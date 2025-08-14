@@ -251,6 +251,7 @@ export class playwright {
       .getByRole("main")
       .getByTestId("virtuoso-item-list")
       .locator("div")
+      .locator("div.mantine-Stack-root")
       .all();
 
     if (messageItems.length === 0) return "";
