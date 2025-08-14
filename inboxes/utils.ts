@@ -23,10 +23,7 @@ const typedInboxes25 = newInboxes25 as InboxData[];
 const typedInboxes15 = newInboxes15 as InboxData[];
 const typedInboxes30 = newInboxes30 as InboxData[];
 
-function getInboxByInstallationCount(
-  installationCount: number,
-  index: number = 200,
-) {
+function getInboxByInstallationCount(installationCount: number, index: number) {
   if (installationCount === 2) {
     return typedInboxes2.slice(0, index);
   } else if (installationCount === 5) {
@@ -45,8 +42,12 @@ function getInboxByInstallationCount(
   return typedInboxes2;
 }
 
-export function getInboxes(count: number, installationCount: number = 2) {
-  const pool = getInboxByInstallationCount(installationCount);
+export function getInboxes(
+  count: number,
+  installationCount: number = 2,
+  maxIndex: number = 200,
+) {
+  const pool = getInboxByInstallationCount(installationCount, maxIndex);
   return pool
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
