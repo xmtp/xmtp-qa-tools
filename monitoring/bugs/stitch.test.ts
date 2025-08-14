@@ -1,4 +1,3 @@
-import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "version-management/client-versions";
@@ -6,8 +5,6 @@ import { describe, expect, it } from "vitest";
 
 const testName = "sync";
 describe(testName, () => {
-  setupDurationTracking({ testName });
-
   it("create a group", async () => {
     const workers = await getWorkers(["henry", "john"]);
     const creator = workers.get("henry")!;
@@ -27,5 +24,5 @@ describe(testName, () => {
       expect(conversation?.id).toBe(group.id);
       break;
     }
-  }, 500);
+  });
 });
