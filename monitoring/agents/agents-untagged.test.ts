@@ -62,9 +62,8 @@ describe(testName, async () => {
         "hi",
       );
 
-      // If the agent didn't respond, log the timeout value instead of 0
-
-      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
+      // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
+      sendMetric("response", result?.averageEventTiming || streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
