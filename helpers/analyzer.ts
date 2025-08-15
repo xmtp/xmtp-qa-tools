@@ -8,7 +8,7 @@ export const PATTERNS = {
     {
       testName: "Browser",
       uniqueErrorLines: [
-        "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream when creating the group",
+        "FAIL  monitoring/browser/browser.test.ts > browser > conversation stream with message",
       ],
     },
   ],

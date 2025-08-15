@@ -51,9 +51,11 @@ function createBindingsSymlinks() {
       console.log(`⚠️  SDK directory not found: ${config.nodeSDK} (${sdkDir})`);
       continue;
     }
-    
+
     if (!fs.existsSync(bindingsDir)) {
-      console.log(`⚠️  Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`);
+      console.log(
+        `⚠️  Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`,
+      );
       continue;
     }
 
