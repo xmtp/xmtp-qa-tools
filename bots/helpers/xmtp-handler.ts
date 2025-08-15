@@ -118,16 +118,23 @@ export const initializeClient = async (
           strictCommandFiltering: option.strictCommandFiltering,
           codecs: option.codecs,
         };
-
+        console.log(
+          "entra1",
+          dbEncryptionKey,
+          env,
+          "debug",
+          getDbPath(`${env}-${signerIdentifier}`),
+          skillOptions.codecs,
+        );
         // @ts-expect-error - TODO: fix this
         const client = await getActiveVersion().Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
-          loggingLevel: option.loggingLevel,
+          loggingLevel: "debug",
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
           codecs: skillOptions.codecs ?? [],
         });
-
+        console.log("entra2", client);
         // @ts-expect-error - TODO: fix this
         clients.push(client);
 
