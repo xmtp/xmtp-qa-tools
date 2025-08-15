@@ -100,9 +100,9 @@ export const VersionList = [
     auto: true,
   },
 ];
-export const getActiveVersion = () => {
+export const getActiveVersion = (index = 0) => {
   checkNoNameContains(VersionList);
-  let nodesdk = getVersions()[0];
+  let nodesdk = getVersions()[index];
   if (process.env.NODE_VERSION) {
     nodesdk = getVersions(false).find(
       (v) => v.nodeSDK === process.env.NODE_VERSION,

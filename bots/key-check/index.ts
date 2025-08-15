@@ -13,7 +13,7 @@ import { initializeClient } from "../helpers/xmtp-skills";
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
 const xmtpSdkVersion =
-  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeSDK];
+  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion(1).nodeSDK];
 
 // Track when the bot started
 const startTime = new Date();
@@ -237,6 +237,7 @@ await initializeClient(processMessage, [
     networks: ["dev", "production"],
     welcomeMessage: "Send /kc help",
     commandPrefix: "/kc",
+    indexVersion: 1,
     acceptGroups: true,
   },
 ]);

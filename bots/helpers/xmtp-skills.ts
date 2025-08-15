@@ -17,6 +17,40 @@ import {
 } from "version-management/client-versions";
 import { generatePrivateKey } from "viem/accounts";
 
+/**
+ * Skill-related options for message processing
+ */
+export interface SkillOptions {
+  /** Whether to accept group conversations */
+  acceptGroups?: boolean;
+  /** Public key of the agent */
+  publicKey?: string;
+  /** Content types to accept (default: ['text']) */
+  acceptTypes?: string[];
+  /** Welcome message to send to the conversation */
+  welcomeMessage?: string;
+  /** Whether to send a welcome message to the conversation */
+  groupWelcomeMessage?: string;
+  /** Allowed commands that the agent will respond to */
+  allowedCommands?: string[];
+  /** Command prefix (default: "@") */
+  commandPrefix?: string;
+  /** Whether to strictly filter messages based on commands (default: false) */
+  strictCommandFiltering?: boolean;
+  /** Whether to send a welcome message to the conversation */
+  codecs?: any[];
+  /** Wallet key */
+  walletKey?: string;
+  /** DB encryption key */
+  dbEncryptionKey?: string;
+  /** Networks to connect to (default: ['dev', 'production']) */
+  networks?: string[];
+  /** Logging level */
+  loggingLevel?: LogLevel;
+  /** Index version */
+  indexVersion?: number;
+}
+
 export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
   acceptGroups: false,
   acceptTypes: ["text"],
@@ -25,15 +59,12 @@ export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
   allowedCommands: ["help"],
   commandPrefix: "",
   strictCommandFiltering: false,
-  codecs: [],
-};
-// Default options
-export const DEFAULT_CORE_OPTIONS = {
+  indexVersion: 0,
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
   loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
   networks: [process.env.XMTP_ENV || "production"] as string[],
-  ...DEFAULT_SKILL_OPTIONS,
+  codecs: [],
 };
 
 /**
@@ -79,20 +110,16 @@ export const initializeClient = async (
   messageHandler: MessageHandler,
   coreOptions: SkillOptions[],
 ): Promise<Client[]> => {
-  // Merge default options with the provided options
-  const mergedCoreOptions = coreOptions.map((opt) => ({
-    ...DEFAULT_CORE_OPTIONS,
-    ...opt,
-  }));
-
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
 
-  for (const option of mergedCoreOptions) {
-    for (const env of option.networks) {
+  for (const option of coreOptions) {
+    for (const env of option.networks ?? ["production"]) {
       try {
         const signer = createSigner(option.walletKey as string);
-        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
+        const dbEncryptionKey = getEncryptionKeyFromHex(
+          option.dbEncryptionKey || generateEncryptionKeyHex(),
+        );
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
         // Extract skill options from the client options
@@ -108,8 +135,10 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        // @ts-expect-error - TODO: fix this
-        const client = await getActiveVersion().Client.create(signer, {
+        const client = await getActiveVersion(
+          option.indexVersion,
+          // @ts-expect-error - TODO: fix this
+        ).Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
@@ -137,34 +166,6 @@ export const initializeClient = async (
   await logAgentDetails(clients);
   return clients;
 };
-
-/**
- * Skill-related options for message processing
- */
-export interface SkillOptions {
-  /** Whether to accept group conversations */
-  acceptGroups?: boolean;
-  /** Public key of the agent */
-  publicKey?: string;
-  /** Content types to accept (default: ['text']) */
-  acceptTypes?: string[];
-  /** Welcome message to send to the conversation */
-  welcomeMessage?: string;
-  /** Whether to send a welcome message to the conversation */
-  groupWelcomeMessage?: string;
-  /** Allowed commands that the agent will respond to */
-  allowedCommands?: string[];
-  /** Command prefix (default: "@") */
-  commandPrefix?: string;
-  /** Whether to strictly filter messages based on commands (default: false) */
-  strictCommandFiltering?: boolean;
-  /** Whether to send a welcome message to the conversation */
-  codecs?: any[];
-  /** Networks to connect to (default: ['dev', 'production']) */
-  networks?: string[];
-  /** Logging level */
-  loggingLevel?: LogLevel;
-}
 
 /**
  * Message context with analysis results
