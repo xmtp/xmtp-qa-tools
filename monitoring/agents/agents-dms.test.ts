@@ -54,7 +54,8 @@ describe(testName, async () => {
       );
       console.log(JSON.stringify(result, null, 2));
 
-      sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
+      // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
+      sendMetric("response", result?.averageEventTiming || streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
