@@ -237,8 +237,6 @@ await initializeClient(processMessage, [
     networks: ["dev", "production"],
     welcomeMessage: "Send /kc help",
     commandPrefix: "/kc",
-    walletKey: process.env.WALLET_KEY as `0x${string}`,
-    dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
     acceptGroups: true,
   },
 ]);

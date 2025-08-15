@@ -40,7 +40,6 @@ export {
   Client,
   ConsentState,
   type Signer,
-  type ClientOptions,
   type Conversation,
   IdentifierKind,
   type DecodedMessage,

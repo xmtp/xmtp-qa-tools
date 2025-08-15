@@ -20,21 +20,8 @@ import {
   type SkillOptions,
 } from "../helpers/xmtp-skills";
 
-/**
- * Core options for XMTP client initialization that includes skill options
- */
-export interface ClientOptions extends SkillOptions {
-  walletKey?: `0x${string}`;
-  /** Encryption key for the client */
-  dbEncryptionKey?: string;
-  /** Networks to connect to (default: ['dev', 'production']) */
-  networks?: string[];
-  /** Logging level */
-  loggingLevel?: LogLevel;
-}
-
 // Default options
-export const DEFAULT_CORE_OPTIONS: ClientOptions = {
+export const DEFAULT_CORE_OPTIONS = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
   loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
@@ -86,7 +73,7 @@ const handleStream = async (
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
-  coreOptions: ClientOptions[],
+  coreOptions: SkillOptions[],
 ): Promise<Client[]> => {
   // Merge default options with the provided options
   const mergedCoreOptions = coreOptions.map((opt) => ({
@@ -101,9 +88,7 @@ export const initializeClient = async (
     for (const env of option.networks) {
       try {
         const signer = createSigner(option.walletKey as string);
-        const dbEncryptionKey = getEncryptionKeyFromHex(
-          option.dbEncryptionKey as string,
-        );
+        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
         // Extract skill options from the client options

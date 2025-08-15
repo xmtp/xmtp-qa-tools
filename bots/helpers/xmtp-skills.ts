@@ -3,6 +3,7 @@ import {
   type Conversation,
   type DecodedMessage,
   type Group,
+  type LogLevel,
 } from "version-management/client-versions";
 
 /**
@@ -27,6 +28,10 @@ export interface SkillOptions {
   strictCommandFiltering?: boolean;
   /** Whether to send a welcome message to the conversation */
   codecs?: any[];
+  /** Networks to connect to (default: ['dev', 'production']) */
+  networks?: string[];
+  /** Logging level */
+  loggingLevel?: LogLevel;
 }
 
 /**
