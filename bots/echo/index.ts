@@ -3,7 +3,7 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "version-management/client-versions";
-import { initializeClient } from "../helpers/xmtp-handler";
+import { initializeClient } from "../helpers/xmtp-skills";
 
 let count = 0;
 const processMessage = async (
