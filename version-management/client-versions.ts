@@ -40,6 +40,7 @@ export {
   Client,
   ConsentState,
   type Signer,
+  type ClientOptions,
   type Conversation,
   IdentifierKind,
   type DecodedMessage,
@@ -51,7 +52,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.0.3";
+} from "@xmtp/node-sdk-4.1.0rc1";
 
 export const VersionList = [
   {
