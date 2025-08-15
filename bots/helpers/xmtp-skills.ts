@@ -1,3 +1,11 @@
+import "dotenv/config";
+import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@helpers/client";
 import {
   getActiveVersion,
   type Client,
@@ -7,14 +15,6 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "version-management/client-versions";
-import "dotenv/config";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPath,
-  getEncryptionKeyFromHex,
-  logAgentDetails,
-} from "@helpers/client";
 import { generatePrivateKey } from "viem/accounts";
 
 export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
@@ -456,9 +456,9 @@ export const processMessage = async (
       return;
     }
 
-    const conversation = (await client.conversations.getConversationById(
+    const conversation = await client.conversations.getConversationById(
       message.conversationId,
-    )) as Conversation;
+    );
 
     if (!conversation) {
       console.debug(`[${env}] Unable to find conversation, skipping`);
@@ -468,9 +468,9 @@ export const processMessage = async (
     console.debug(
       `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
     );
-    const isDm = (await conversation.metadata())?.conversationType === "dm";
+    const isDm = (await conversation.metadata()).conversationType === "dm";
     const isGroup =
-      (await conversation.metadata())?.conversationType === "group";
+      (await conversation.metadata()).conversationType === "group";
 
     const preMessageHandlerResult = await preMessageHandler(
       client,
@@ -551,9 +551,10 @@ export const addToGroupWithCustomCopy = async (
 ): Promise<boolean> => {
   try {
     // Get the group conversation
-    const group = (await client.conversations.getConversationById(
+    const group = await client.conversations.getConversationById(
       config.groupId,
-    )) as Group;
+    );
+
     if (!group) {
       console.debug(`Group not found in the db: ${config.groupId}`);
       const errorMessage =
@@ -571,12 +572,12 @@ export const addToGroupWithCustomCopy = async (
 
     console.debug(`Secret code received, processing group addition`);
 
-    await group.sync();
+    await (group as Group).sync();
     if (
-      (await conversation.metadata())?.conversationType === "dm" ||
-      (await conversation.metadata())?.conversationType === "group"
+      (await conversation.metadata()).conversationType === "dm" ||
+      (await conversation.metadata()).conversationType === "group"
     ) {
-      const members = await group.members();
+      const members = await (group as Group).members();
       const isMember = members.some(
         (member) =>
           member.inboxId.toLowerCase() === message.senderInboxId.toLowerCase(),
@@ -586,14 +587,14 @@ export const addToGroupWithCustomCopy = async (
         console.debug(
           `Adding member ${message.senderInboxId} to group ${config.groupId}`,
         );
-        await group.addMembers([message.senderInboxId]);
+        await (group as Group).addMembers([message.senderInboxId]);
 
         // Check if user should be admin
         if (config.adminInboxIds?.includes(message.senderInboxId)) {
           console.debug(
             `Adding admin ${message.senderInboxId} to group ${config.groupId}`,
           );
-          await group.addSuperAdmin(message.senderInboxId);
+          await (group as Group).addSuperAdmin(message.senderInboxId);
         }
 
         // Send success messages with optional delay
@@ -603,7 +604,9 @@ export const addToGroupWithCustomCopy = async (
         return true;
       } else {
         // User is already in group, check if they need admin privileges
-        const isAdminFromGroup = group.isSuperAdmin(message.senderInboxId);
+        const isAdminFromGroup = (group as Group).isSuperAdmin(
+          message.senderInboxId,
+        );
         if (
           !isAdminFromGroup &&
           config.adminInboxIds?.includes(message.senderInboxId)
@@ -611,7 +614,7 @@ export const addToGroupWithCustomCopy = async (
           console.debug(
             `Adding admin privileges to ${message.senderInboxId} in group ${config.groupId}`,
           );
-          await group.addSuperAdmin(message.senderInboxId);
+          await (group as Group).addSuperAdmin(message.senderInboxId);
         }
 
         console.debug(
