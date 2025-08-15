@@ -1,9 +1,10 @@
+import { streamTimeout } from "@helpers/client";
 import {
   sendMetric,
   type DeliveryMetricTags,
   type ResponseMetricTags,
 } from "@helpers/datadog";
-import { streamTimeout, verifyMessageStream } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
