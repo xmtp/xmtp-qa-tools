@@ -3,7 +3,7 @@ import {
   type DeliveryMetricTags,
   type ResponseMetricTags,
 } from "@helpers/datadog";
-import { verifyMessageStream } from "@helpers/streams";
+import { streamTimeout, verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -32,7 +32,7 @@ describe(testName, async () => {
       120 * 1000, // 120s timeout
     );
 
-    sendMetric("response", stats.averageEventTiming, {
+    sendMetric("response", stats.averageEventTiming || streamTimeout, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",

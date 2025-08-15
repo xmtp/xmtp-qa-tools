@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import {
   sendMetric,
   type DeliveryMetricTags,
@@ -189,12 +190,16 @@ describe(testName, () => {
         workers.getAllButCreator(),
       );
 
-      sendMetric("response", verifyResult.averageEventTiming, {
-        test: testName,
-        metric_type: "stream",
-        metric_subtype: "message",
-        sdk: workers.getCreator().sdk,
-      } as ResponseMetricTags);
+      sendMetric(
+        "response",
+        verifyResult?.averageEventTiming ?? streamTimeout,
+        {
+          test: testName,
+          metric_type: "stream",
+          metric_subtype: "message",
+          sdk: workers.getCreator().sdk,
+        } as ResponseMetricTags,
+      );
 
       sendMetric("delivery", verifyResult.receptionPercentage, {
         sdk: workers.getCreator().sdk,
