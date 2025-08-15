@@ -1,10 +1,142 @@
+import "dotenv/config";
 import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@helpers/client";
+import {
+  getActiveVersion,
   type Client,
   type Conversation,
   type DecodedMessage,
   type Group,
   type LogLevel,
+  type XmtpEnv,
 } from "version-management/client-versions";
+import { generatePrivateKey } from "viem/accounts";
+
+export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
+  acceptGroups: false,
+  acceptTypes: ["text"],
+  welcomeMessage: "",
+  groupWelcomeMessage: "",
+  allowedCommands: ["help"],
+  commandPrefix: "",
+  strictCommandFiltering: false,
+  codecs: [],
+};
+// Default options
+export const DEFAULT_CORE_OPTIONS = {
+  walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
+  dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
+  loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
+  networks: [process.env.XMTP_ENV || "production"] as string[],
+  ...DEFAULT_SKILL_OPTIONS,
+};
+
+/**
+ * Handle message streaming with onMessage callback
+ */
+const handleStream = async (
+  client: Client,
+  callBack: MessageHandler,
+  skillOpts: SkillOptions,
+): Promise<void> => {
+  const env = client.options?.env;
+
+  try {
+    console.log(`[${env}] Waiting for messages...`);
+    const stream = await client.conversations.streamAllMessages();
+
+    for await (const message of stream) {
+      // Process message asynchronously
+      void (async () => {
+        try {
+          await processMessage(
+            client,
+            message,
+            callBack,
+            skillOpts,
+            env || "unknown",
+          );
+        } catch (err: unknown) {
+          console.error(`[${env}] Error processing message:`, err);
+        }
+      })();
+    }
+  } catch (err: unknown) {
+    console.error(`[${env}] Error streaming messages:`, err);
+    throw err;
+  }
+};
+
+/**
+ * Initialize XMTP clients with error handling
+ */
+export const initializeClient = async (
+  messageHandler: MessageHandler,
+  coreOptions: SkillOptions[],
+): Promise<Client[]> => {
+  // Merge default options with the provided options
+  const mergedCoreOptions = coreOptions.map((opt) => ({
+    ...DEFAULT_CORE_OPTIONS,
+    ...opt,
+  }));
+
+  const clients: Client[] = [];
+  const streamPromises: Promise<void>[] = [];
+
+  for (const option of mergedCoreOptions) {
+    for (const env of option.networks) {
+      try {
+        const signer = createSigner(option.walletKey as string);
+        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
+        const signerIdentifier = (await signer.getIdentifier()).identifier;
+
+        // Extract skill options from the client options
+        const skillOptions: SkillOptions = {
+          acceptGroups: option.acceptGroups,
+          publicKey: option.publicKey,
+          acceptTypes: option.acceptTypes,
+          welcomeMessage: option.welcomeMessage,
+          groupWelcomeMessage: option.groupWelcomeMessage,
+          allowedCommands: option.allowedCommands,
+          commandPrefix: option.commandPrefix,
+          strictCommandFiltering: option.strictCommandFiltering,
+          codecs: option.codecs,
+        };
+
+        // @ts-expect-error - TODO: fix this
+        const client = await getActiveVersion().Client.create(signer, {
+          dbEncryptionKey,
+          env: env as XmtpEnv,
+          loggingLevel: option.loggingLevel,
+          dbPath: getDbPath(`${env}-${signerIdentifier}`),
+          codecs: skillOptions.codecs ?? [],
+        });
+
+        // @ts-expect-error - TODO: fix this
+        clients.push(client);
+
+        const streamPromise = handleStream(
+          // @ts-expect-error - TODO: fix this
+          client,
+          messageHandler,
+          skillOptions,
+        );
+
+        streamPromises.push(streamPromise);
+      } catch (error) {
+        console.error(`[${env}] Client initialization error:`, error);
+      }
+    }
+  }
+
+  await logAgentDetails(clients);
+  return clients;
+};
 
 /**
  * Skill-related options for message processing
@@ -55,17 +187,6 @@ export type MessageHandler = (
   message: DecodedMessage,
   messageContext: MessageContext,
 ) => Promise<void> | void;
-
-export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
-  acceptGroups: false,
-  acceptTypes: ["text"],
-  welcomeMessage: "",
-  groupWelcomeMessage: "",
-  allowedCommands: ["help"],
-  commandPrefix: "",
-  strictCommandFiltering: false,
-  codecs: [],
-};
 
 export const sendWelcomeMessage = async (
   client: Client,
@@ -335,9 +456,9 @@ export const processMessage = async (
       return;
     }
 
-    const conversation = (await client.conversations.getConversationById(
+    const conversation = await client.conversations.getConversationById(
       message.conversationId,
-    )) as Conversation;
+    );
 
     if (!conversation) {
       console.debug(`[${env}] Unable to find conversation, skipping`);
@@ -347,9 +468,9 @@ export const processMessage = async (
     console.debug(
       `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
     );
-    const isDm = (await conversation.metadata())?.conversationType === "dm";
+    const isDm = (await conversation.metadata()).conversationType === "dm";
     const isGroup =
-      (await conversation.metadata())?.conversationType === "group";
+      (await conversation.metadata()).conversationType === "group";
 
     const preMessageHandlerResult = await preMessageHandler(
       client,
@@ -430,9 +551,10 @@ export const addToGroupWithCustomCopy = async (
 ): Promise<boolean> => {
   try {
     // Get the group conversation
-    const group = (await client.conversations.getConversationById(
+    const group = await client.conversations.getConversationById(
       config.groupId,
-    )) as Group;
+    );
+
     if (!group) {
       console.debug(`Group not found in the db: ${config.groupId}`);
       const errorMessage =
@@ -450,12 +572,12 @@ export const addToGroupWithCustomCopy = async (
 
     console.debug(`Secret code received, processing group addition`);
 
-    await group.sync();
+    await (group as Group).sync();
     if (
-      (await conversation.metadata())?.conversationType === "dm" ||
-      (await conversation.metadata())?.conversationType === "group"
+      (await conversation.metadata()).conversationType === "dm" ||
+      (await conversation.metadata()).conversationType === "group"
     ) {
-      const members = await group.members();
+      const members = await (group as Group).members();
       const isMember = members.some(
         (member) =>
           member.inboxId.toLowerCase() === message.senderInboxId.toLowerCase(),
@@ -465,14 +587,14 @@ export const addToGroupWithCustomCopy = async (
         console.debug(
           `Adding member ${message.senderInboxId} to group ${config.groupId}`,
         );
-        await group.addMembers([message.senderInboxId]);
+        await (group as Group).addMembers([message.senderInboxId]);
 
         // Check if user should be admin
         if (config.adminInboxIds?.includes(message.senderInboxId)) {
           console.debug(
             `Adding admin ${message.senderInboxId} to group ${config.groupId}`,
           );
-          await group.addSuperAdmin(message.senderInboxId);
+          await (group as Group).addSuperAdmin(message.senderInboxId);
         }
 
         // Send success messages with optional delay
@@ -482,7 +604,9 @@ export const addToGroupWithCustomCopy = async (
         return true;
       } else {
         // User is already in group, check if they need admin privileges
-        const isAdminFromGroup = group.isSuperAdmin(message.senderInboxId);
+        const isAdminFromGroup = (group as Group).isSuperAdmin(
+          message.senderInboxId,
+        );
         if (
           !isAdminFromGroup &&
           config.adminInboxIds?.includes(message.senderInboxId)
@@ -490,7 +614,7 @@ export const addToGroupWithCustomCopy = async (
           console.debug(
             `Adding admin privileges to ${message.senderInboxId} in group ${config.groupId}`,
           );
-          await group.addSuperAdmin(message.senderInboxId);
+          await (group as Group).addSuperAdmin(message.senderInboxId);
         }
 
         console.debug(
