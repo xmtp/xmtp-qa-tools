@@ -121,7 +121,6 @@ describe(testName, () => {
     await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
     await sleep(); // Give time for member addition to sync
     for await (const conversation of await conversationStream) {
-      console.log("conversation stream", conversation);
       if (conversation?.id === groupId) {
         console.log("conversation found", conversation?.id);
         expect(conversation.id).toBe(groupId);
