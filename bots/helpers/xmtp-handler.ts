@@ -38,7 +38,7 @@ export const DEFAULT_CORE_OPTIONS: ClientOptions = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
   loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
-  networks: [process.env.XMTP_ENV || "production"],
+  networks: [process.env.XMTP_ENV || "production"] as string[],
   ...DEFAULT_SKILL_OPTIONS,
 };
 
@@ -98,7 +98,7 @@ export const initializeClient = async (
   const streamPromises: Promise<void>[] = [];
 
   for (const option of mergedCoreOptions) {
-    for (const env of option.networks ?? []) {
+    for (const env of option.networks) {
       try {
         const signer = createSigner(option.walletKey as string);
         const dbEncryptionKey = getEncryptionKeyFromHex(

@@ -4,54 +4,6 @@ import { createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
-  Client as Client209,
-  Conversation as Conversation209,
-  Dm as Dm209,
-  Group as Group209,
-} from "@xmtp/node-sdk-2.0.9";
-import {
-  Client as Client210,
-  Conversation as Conversation210,
-  Dm as Dm210,
-  Group as Group210,
-} from "@xmtp/node-sdk-2.1.0";
-import {
-  Client as Client220,
-  Conversation as Conversation220,
-  Dm as Dm220,
-  Group as Group220,
-} from "@xmtp/node-sdk-2.2.1";
-import {
-  Client as Client300,
-  Conversation as Conversation300,
-  Dm as Dm300,
-  Group as Group300,
-} from "@xmtp/node-sdk-3.0.1";
-import {
-  Client as Client310,
-  Conversation as Conversation310,
-  Dm as Dm310,
-  Group as Group310,
-} from "@xmtp/node-sdk-3.1.1";
-import {
-  Client as Client312,
-  Conversation as Conversation312,
-  Dm as Dm312,
-  Group as Group312,
-} from "@xmtp/node-sdk-3.1.2";
-import {
-  Client as Client320,
-  Conversation as Conversation320,
-  Dm as Dm320,
-  Group as Group320,
-} from "@xmtp/node-sdk-3.2.0";
-import {
-  Client as Client321,
-  Conversation as Conversation321,
-  Dm as Dm321,
-  Group as Group321,
-} from "@xmtp/node-sdk-3.2.1";
-import {
   Client as Client322,
   Conversation as Conversation322,
   Dm as Dm322,
@@ -100,7 +52,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.1.0rc1";
+} from "@xmtp/node-sdk-4.0.3";
 
 export const VersionList = [
   {
@@ -146,78 +98,6 @@ export const VersionList = [
     Group: Group322,
     nodeSDK: "3.2.2",
     nodeBindings: "1.3.3",
-    auto: true,
-  },
-  {
-    Client: Client321,
-    Conversation: Conversation321,
-    Dm: Dm321,
-    Group: Group321,
-    nodeSDK: "3.2.1",
-    nodeBindings: "1.3.1",
-    auto: true,
-  },
-  {
-    Client: Client320,
-    Conversation: Conversation320,
-    Dm: Dm320,
-    Group: Group320,
-    nodeSDK: "3.2.0",
-    nodeBindings: "1.3.0",
-    auto: true,
-  },
-  {
-    Client: Client312,
-    Conversation: Conversation312,
-    Dm: Dm312,
-    Group: Group312,
-    nodeSDK: "3.1.2",
-    nodeBindings: "1.2.8",
-    auto: true,
-  },
-  {
-    Client: Client310,
-    Conversation: Conversation310,
-    Dm: Dm310,
-    Group: Group310,
-    nodeSDK: "3.1.1",
-    nodeBindings: "1.2.7",
-    auto: true,
-  },
-  {
-    Client: Client300,
-    Conversation: Conversation300,
-    Dm: Dm300,
-    Group: Group300,
-    nodeSDK: "3.0.1",
-    nodeBindings: "1.2.5",
-    auto: true,
-  },
-  {
-    Client: Client220,
-    Conversation: Conversation220,
-    Dm: Dm220,
-    Group: Group220,
-    nodeSDK: "2.2.1",
-    nodeBindings: "1.2.2",
-    auto: true,
-  },
-  {
-    Client: Client210,
-    Conversation: Conversation210,
-    Dm: Dm210,
-    Group: Group210,
-    nodeSDK: "2.1.0",
-    nodeBindings: "1.2.0",
-    auto: true,
-  },
-  {
-    Client: Client209,
-    Conversation: Conversation209,
-    Dm: Dm209,
-    Group: Group209,
-    nodeSDK: "2.0.9",
-    nodeBindings: "1.1.8",
     auto: true,
   },
 ];
