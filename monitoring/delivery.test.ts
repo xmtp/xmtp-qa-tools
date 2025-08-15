@@ -1,3 +1,4 @@
+import { streamTimeout } from "@helpers/client";
 import {
   sendMetric,
   type DeliveryMetricTags,
@@ -32,7 +33,7 @@ describe(testName, async () => {
       120 * 1000, // 120s timeout
     );
 
-    sendMetric("response", stats.averageEventTiming, {
+    sendMetric("response", stats.averageEventTiming || streamTimeout, {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
