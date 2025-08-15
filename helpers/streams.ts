@@ -542,7 +542,7 @@ export async function verifyAgentMessageStream(
       membersForStats: receivers,
     });
 
-    if (result.averageEventTiming !== undefined) {
+    if (result && result.averageEventTiming !== undefined) {
       // Check if averageEventTiming is defined
       return result;
     }
