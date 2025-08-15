@@ -20,8 +20,7 @@ const processMessage = async (
 // Initialize the client with the message processor
 await initializeClient(processMessage, [
   {
-    walletKey: process.env.WALLET_KEY as `0x${string}`,
-    dbEncryptionKey: process.env.ENCRYPTION_KEY as `0x${string}`,
+    networks: ["dev"],
     acceptGroups: true,
   },
 ]);

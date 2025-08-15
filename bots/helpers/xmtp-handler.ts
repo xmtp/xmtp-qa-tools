@@ -1,4 +1,5 @@
 import {
+  getActiveVersion,
   type Client,
   type LogLevel,
   type XmtpEnv,
@@ -11,7 +12,6 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
 } from "@helpers/client";
-import { getActiveVersion } from "version-management/client-versions";
 import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -20,25 +20,12 @@ import {
   type SkillOptions,
 } from "../helpers/xmtp-skills";
 
-/**
- * Core options for XMTP client initialization that includes skill options
- */
-export interface ClientOptions extends SkillOptions {
-  walletKey?: `0x${string}`;
-  /** Encryption key for the client */
-  dbEncryptionKey?: string;
-  /** Networks to connect to (default: ['dev', 'production']) */
-  networks?: string[];
-  /** Logging level */
-  loggingLevel?: LogLevel;
-}
-
 // Default options
-export const DEFAULT_CORE_OPTIONS: ClientOptions = {
+export const DEFAULT_CORE_OPTIONS = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
   loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
-  networks: [process.env.XMTP_ENV || "production"],
+  networks: [process.env.XMTP_ENV || "production"] as string[],
   ...DEFAULT_SKILL_OPTIONS,
 };
 
@@ -53,9 +40,6 @@ const handleStream = async (
   const env = client.options?.env;
 
   try {
-    console.log(`[${env}] Syncing conversations...`);
-    await client.conversations.sync();
-
     console.log(`[${env}] Waiting for messages...`);
     const stream = await client.conversations.streamAllMessages();
 
@@ -86,7 +70,7 @@ const handleStream = async (
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
-  coreOptions: ClientOptions[],
+  coreOptions: SkillOptions[],
 ): Promise<Client[]> => {
   // Merge default options with the provided options
   const mergedCoreOptions = coreOptions.map((opt) => ({
@@ -98,12 +82,11 @@ export const initializeClient = async (
   const streamPromises: Promise<void>[] = [];
 
   for (const option of mergedCoreOptions) {
-    for (const env of option.networks ?? []) {
+    for (const env of option.networks) {
       try {
+        console.log("entra1", env);
         const signer = createSigner(option.walletKey as string);
-        const dbEncryptionKey = getEncryptionKeyFromHex(
-          option.dbEncryptionKey as string,
-        );
+        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
         // Extract skill options from the client options
