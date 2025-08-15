@@ -20,6 +20,7 @@ const processMessage = async (
 // Initialize the client with the message processor
 await initializeClient(processMessage, [
   {
+    networks: ["dev"],
     acceptGroups: true,
   },
 ]);

@@ -1,4 +1,5 @@
 import {
+  getActiveVersion,
   type Client,
   type LogLevel,
   type XmtpEnv,
@@ -11,7 +12,6 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
 } from "@helpers/client";
-import { getActiveVersion } from "version-management/client-versions";
 import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -40,9 +40,6 @@ const handleStream = async (
   const env = client.options?.env;
 
   try {
-    console.log(`[${env}] Syncing conversations...`);
-    await client.conversations.sync();
-
     console.log(`[${env}] Waiting for messages...`);
     const stream = await client.conversations.streamAllMessages();
 
@@ -87,6 +84,7 @@ export const initializeClient = async (
   for (const option of mergedCoreOptions) {
     for (const env of option.networks) {
       try {
+        console.log("entra1", env);
         const signer = createSigner(option.walletKey as string);
         const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
         const signerIdentifier = (await signer.getIdentifier()).identifier;
