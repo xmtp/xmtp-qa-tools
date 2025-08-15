@@ -14,7 +14,8 @@ import {
  * Configuration for test retry behavior and logging
  */
 interface TestOptions {
-  attempts: number; // Maximum retry attempts (default: 1)
+  attempts: number; // Always run N times regardless of success/failure (default: 1)
+  maxRetry: number; // Only retry if test fails, exit early on success (default: 1)
   retryDelay: number; // Delay between retries (seconds)
   fileLogging: boolean; // Enable file logging
   vitestArgs: string[]; // Additional vitest arguments
@@ -37,7 +38,8 @@ ARGUMENTS:
 
 OPTIONS:
   --env <environment>    XMTP environment (local, dev, production) [default: production]
-  --attempts <number>    Maximum retry attempts [default: 3]
+  --attempts <number>    Always run N times regardless of success/failure [default: 1]
+  --max-retry <number>   Only retry if test fails, exit early on success [default: 1]
   --log <level>         Set logging level (debug, info, warn, error) [default: warn]
   --winston <level>     Set winston logging level (debug, info, warn, error) [default: warn]
   --file                Enable file logging (saves to logs/ directory)
@@ -202,6 +204,7 @@ function parseTestArgs(args: string[]): {
   let testName = "functional";
   const options: TestOptions = {
     attempts: 1, // Default to 1 attempt (no retry)
+    maxRetry: 1, // Default to 1 retry (no retry)
     retryDelay: 1,
     fileLogging: false,
     vitestArgs: [],
@@ -233,6 +236,17 @@ function parseTestArgs(args: string[]): {
             options.attempts = val;
           } else {
             console.warn(`Invalid value for --attempts: ${nextArg}`);
+          }
+          i++;
+        }
+        break;
+      case "--max-retry":
+        if (nextArg) {
+          const val = parseInt(nextArg, 10);
+          if (!isNaN(val) && val > 0) {
+            options.maxRetry = val;
+          } else {
+            console.warn(`Invalid value for --max-retry: ${nextArg}`);
           }
           i++;
         }
@@ -377,7 +391,8 @@ async function runCommand(
 function logDetails(testName: string, options: TestOptions) {
   console.info(`Test Suite: ${testName}`);
   console.info(`Env: ${process.env.XMTP_ENV || "local"}`);
-  console.info(`Max Attempts: ${options.attempts}`);
+  console.info(`Attempts: ${options.attempts} (always run N times)`);
+  console.info(`Max Retry: ${options.maxRetry} (retry only on failure)`);
   console.info(`Sync Strategy: ${process.env.SYNC_STRATEGY}`);
   console.info(`Batch Size: ${process.env.BATCH_SIZE}`);
   console.info(`Populate Size: ${process.env.POPULATE_SIZE}`);
@@ -395,8 +410,20 @@ function logDetails(testName: string, options: TestOptions) {
 }
 async function runTest(testName: string, options: TestOptions): Promise<void> {
   logDetails(testName, options);
-  for (let attempt = 1; attempt <= options.attempts; attempt++) {
-    console.info(`\nAttempt ${attempt} of ${options.attempts}...`);
+
+  // Determine which retry mode to use
+  const useMaxRetry = options.maxRetry > 1;
+  const maxAttempts = useMaxRetry ? options.maxRetry : options.attempts;
+  const retryMode = useMaxRetry ? "max-retry" : "attempts";
+
+  console.info(
+    `Using ${retryMode} mode: ${maxAttempts} ${
+      useMaxRetry ? "retries" : "attempts"
+    }`,
+  );
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    console.info(`\nAttempt ${attempt} of ${maxAttempts}...`);
 
     if (attempt > 1) {
       console.info(`Retry delay: ${options.retryDelay} seconds`);
@@ -424,9 +451,18 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
 
       await cleanSpecificLogFile(logger.logFileName);
 
+      // If using max-retry mode and test passed, exit successfully
+      if (useMaxRetry && exitCode === 0) {
+        console.info(`Test suite passed on attempt ${attempt} ✅`);
+        console.info(`Log File: ${logger.logFileName}`);
+        return;
+      }
+
       // Check if this was the last attempt
-      if (attempt === options.attempts) {
-        console.info(`Completed ${options.attempts} attempts`);
+      if (attempt === maxAttempts) {
+        console.info(
+          `Completed ${maxAttempts} ${useMaxRetry ? "retries" : "attempts"}`,
+        );
         console.info(`Log File: ${logger.logFileName}`);
 
         const errorLogs = extractErrorLogs(testName);
@@ -444,13 +480,6 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
         } else {
           console.info(`Found ${fail_lines.length} failed lines:`);
           console.error(fail_lines);
-        }
-
-        // Handle failed attempt (only for non-final attempts)
-        if (attempt < options.attempts && exitCode !== 0) {
-          console.error(
-            `\nTest suite "${testName}" failed on attempt ${attempt} of ${options.attempts}.`,
-          );
         }
 
         if (options.reportForkCount) {
@@ -471,16 +500,21 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
         }
       }
 
-      if (options.retryDelay > 0) {
-        console.info(`\nRetrying in ${options.retryDelay} seconds...`);
-        Atomics.wait(
-          new Int32Array(new SharedArrayBuffer(4)),
-          0,
-          0,
-          options.retryDelay * 1000,
-        );
-      } else {
-        console.info("\nRetrying immediately...");
+      // Only retry if using max-retry mode and test failed, or if using attempts mode
+      const shouldRetry = useMaxRetry ? exitCode !== 0 : true;
+
+      if (shouldRetry && attempt < maxAttempts) {
+        if (options.retryDelay > 0) {
+          console.info(`\nRetrying in ${options.retryDelay} seconds...`);
+          Atomics.wait(
+            new Int32Array(new SharedArrayBuffer(4)),
+            0,
+            0,
+            options.retryDelay * 1000,
+          );
+        } else {
+          console.info("\nRetrying immediately...");
+        }
       }
     } catch (error) {
       console.error(`\nAttempt ${attempt} failed with exception:`);
@@ -517,9 +551,12 @@ async function main(): Promise<void> {
         const { testName, options } = parseTestArgs(testArgs);
 
         // Check if this is a simple test run (no retry options)
-        // Simple run: single attempt, no file logging, no noFail flag
+        // Simple run: single attempt, single maxRetry, no file logging, no noFail flag
         const isSimpleRun =
-          options.attempts === 1 && !options.fileLogging && !options.noFail;
+          options.attempts === 1 &&
+          options.maxRetry === 1 &&
+          !options.fileLogging &&
+          !options.noFail;
 
         if (isSimpleRun) {
           // Run test directly without logger for native terminal output
