@@ -11,7 +11,7 @@ import {
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
-  averageEventTiming: number;
+  averageEventTiming: number | undefined;
   receptionPercentage: number;
   orderPercentage: number;
 };
@@ -193,7 +193,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
 
   const allResults = {
-    averageEventTiming,
+    averageEventTiming:
+      averageEventTiming === 0 ? undefined : averageEventTiming,
     receptionPercentage: stats?.receptionPercentage,
     orderPercentage: stats?.orderPercentage,
   };
@@ -541,7 +542,7 @@ export async function verifyAgentMessageStream(
       membersForStats: receivers,
     });
 
-    if (result.averageEventTiming !== undefined) {
+    if (result && result.averageEventTiming !== undefined) {
       // Check if averageEventTiming is defined
       return result;
     }
