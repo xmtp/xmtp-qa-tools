@@ -3,7 +3,7 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "version-management/client-versions";
-import { initializeClient } from "../helpers/xmtp-skills";
+import { initializeClient } from "../xmtp-skills";
 
 let count = 0;
 const processMessage = async (
@@ -21,6 +21,7 @@ const processMessage = async (
 await initializeClient(processMessage, [
   {
     networks: ["local"],
+    indexVersion: 1,
     acceptGroups: true,
   },
 ]);

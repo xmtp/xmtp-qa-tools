@@ -21,51 +21,20 @@ import { generatePrivateKey } from "viem/accounts";
  * Skill-related options for message processing
  */
 export interface SkillOptions {
-  /** Whether to accept group conversations */
   acceptGroups?: boolean;
-  /** Public key of the agent */
-  publicKey?: string;
-  /** Content types to accept (default: ['text']) */
   acceptTypes?: string[];
-  /** Welcome message to send to the conversation */
   welcomeMessage?: string;
-  /** Whether to send a welcome message to the conversation */
   groupWelcomeMessage?: string;
-  /** Allowed commands that the agent will respond to */
   allowedCommands?: string[];
-  /** Command prefix (default: "@") */
   commandPrefix?: string;
-  /** Whether to strictly filter messages based on commands (default: false) */
   strictCommandFiltering?: boolean;
-  /** Whether to send a welcome message to the conversation */
   codecs?: any[];
-  /** Wallet key */
   walletKey?: string;
-  /** DB encryption key */
   dbEncryptionKey?: string;
-  /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
-  /** Logging level */
   loggingLevel?: LogLevel;
-  /** Index version */
-  indexVersion?: number;
+  indexVersion: number;
 }
-
-export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
-  acceptGroups: false,
-  acceptTypes: ["text"],
-  welcomeMessage: "",
-  groupWelcomeMessage: "",
-  allowedCommands: ["help"],
-  commandPrefix: "",
-  strictCommandFiltering: false,
-  indexVersion: 0,
-  walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
-  dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
-  loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
-  networks: [process.env.XMTP_ENV || "production"] as string[],
-  codecs: [],
-};
 
 /**
  * Handle message streaming with onMessage callback
@@ -113,10 +82,28 @@ export const initializeClient = async (
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
 
-  for (const option of coreOptions) {
-    for (const env of option.networks ?? ["production"]) {
+  // Merge default options with the provided options
+  const mergedCoreOptions = coreOptions.map((opt) => ({
+    acceptGroups: false,
+    acceptTypes: ["text"],
+    welcomeMessage: "",
+    groupWelcomeMessage: "",
+    allowedCommands: ["help"],
+    commandPrefix: "",
+    strictCommandFiltering: false,
+    walletKey: (process.env.WALLET_KEY ??
+      generatePrivateKey()) as `0x${string}`,
+    dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
+    loggingLevel: (process.env.LOGGING_LEVEL || "warn") as LogLevel,
+    networks: [process.env.XMTP_ENV || "production"] as string[],
+    codecs: [],
+    ...opt,
+  }));
+
+  for (const option of mergedCoreOptions) {
+    for (const env of option.networks) {
       try {
-        const signer = createSigner(option.walletKey as string);
+        const signer = createSigner(option.walletKey);
         const dbEncryptionKey = getEncryptionKeyFromHex(
           option.dbEncryptionKey || generateEncryptionKeyHex(),
         );
@@ -125,7 +112,7 @@ export const initializeClient = async (
         // Extract skill options from the client options
         const skillOptions: SkillOptions = {
           acceptGroups: option.acceptGroups,
-          publicKey: option.publicKey,
+          indexVersion: option.indexVersion,
           acceptTypes: option.acceptTypes,
           welcomeMessage: option.welcomeMessage,
           groupWelcomeMessage: option.groupWelcomeMessage,
