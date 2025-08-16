@@ -49,7 +49,12 @@ describe(testName, () => {
         message: string;
       };
 
-      sendMetric("response", result.responseTime ?? streamTimeout, {
+      const responseTime = Math.abs(result?.responseTime ?? streamTimeout);
+      console.log("result.responseTime", result?.responseTime);
+      console.log("streamTimeout", streamTimeout);
+      console.log("responseTime", responseTime);
+
+      sendMetric("response", responseTime, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",

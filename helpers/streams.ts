@@ -194,7 +194,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
 
   const allResults = {
     averageEventTiming:
-      averageEventTiming === 0 ? undefined : Math.abs(averageEventTiming),
+      averageEventTiming === 0 ? undefined : averageEventTiming,
     receptionPercentage: stats?.receptionPercentage,
     orderPercentage: stats?.orderPercentage,
   };
