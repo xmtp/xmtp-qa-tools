@@ -122,10 +122,8 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        const client = await getActiveVersion(
-          option.indexVersion,
-          // @ts-expect-error - TODO: fix this
-        ).Client.create(signer, {
+        // @ts-expect-error - TODO: fix this
+        const client = await getActiveVersion().Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
