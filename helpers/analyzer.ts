@@ -379,3 +379,16 @@ export function extractfail_lines(errorLogs: Set<string>): string[] {
 export function sanitizeLogs(logs: string): string {
   return logs.replaceAll(/```/g, "'''");
 }
+
+/**
+ * Decode HTML entities for Slack compatibility
+ */
+export function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
+}
