@@ -13,7 +13,7 @@ import { initializeClient } from "../xmtp-skills";
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
 const xmtpSdkVersion =
-  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion(1).nodeSDK];
+  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeSDK];
 
 // Track when the bot started
 const startTime = new Date();
