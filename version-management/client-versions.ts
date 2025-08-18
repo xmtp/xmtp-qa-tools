@@ -34,7 +34,7 @@ import {
   Conversation as Conversation410,
   Dm as Dm410,
   Group as Group410,
-} from "@xmtp/node-sdk-4.1.0rc1";
+} from "@xmtp/node-sdk-4.1.0";
 
 export {
   Client,
