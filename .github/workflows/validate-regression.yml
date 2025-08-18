@@ -38,12 +38,12 @@ jobs:
           key: deps-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             deps-
-      - name: Install dependencies
-        run: yarn
-      - name: Build
-        run: yarn build
+
+      - name: Run script version
+        run: yarn versions
+
       - name: Run regression tests
-        run: yarn regression
+        run: yarn regression --env dev --sync all --versions 3 --size 10-100 && yarn test bugs
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
