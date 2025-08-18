@@ -156,7 +156,7 @@ export function sendMetric(
 ): void {
   try {
     if (metricValue <= 0) {
-      console.error(`❌ Metric value is 0 or negative: ${metricName}`);
+      console.error(`${metricName} Metric value is ${metricValue}`);
       return;
     }
     const enrichedTags = enrichTags(tags);
@@ -217,9 +217,7 @@ export function sendHistogramMetric(
 ): void {
   try {
     if (metricValue <= 0) {
-      console.error(
-        `❌ Histogram metric value is 0 or negative: ${metricName}`,
-      );
+      console.error(`${metricName} Histogram metric value is ${metricValue}`);
       return;
     }
     const enrichedTags = enrichTags(tags);
