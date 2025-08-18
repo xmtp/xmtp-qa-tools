@@ -66,10 +66,13 @@ jobs:
       - name: Run script version
         run: yarn versions
 
+      - name: Run yarn
+        run: yarn
+
       - name: Show current active version
         run: |
-          node -e "
-            const { getActiveVersion } = require('./version-management/client-versions.ts');
+          tsx -e "
+            const { getActiveVersion } = await import('./version-management/client-versions.ts');
             console.log('Current active SDK version:', getActiveVersion().nodeSDK);
           "
 
