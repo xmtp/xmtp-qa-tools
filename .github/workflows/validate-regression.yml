@@ -1,20 +1,50 @@
 name: Regression testing
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
     paths:
       - "package.json"
+      - "version-management/client-versions.ts"
+  workflow_dispatch:
 
 jobs:
-  validate-regression:
-    timeout-minutes: 30
+  detect-version-bump:
     runs-on: ubuntu-latest
-    if: contains(github.event.pull_request.files.*.name, 'version-management/client-versions.ts') || github.event_name == 'workflow_dispatch'
+    outputs:
+      version_changed: ${{ steps.check-version.outputs.version_changed }}
+      new_version: ${{ steps.extract-version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Check for version changes
+        id: check-version
+        run: |
+          git diff HEAD^ HEAD -- package.json lerna.json */package.json | grep -q '"version"' && \
+          echo "version_changed=true" >> $GITHUB_OUTPUT || \
+          echo "version_changed=false" >> $GITHUB_OUTPUT
+
+      - name: Extract new version
+        id: extract-version
+        if: steps.check-version.outputs.version_changed == 'true'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+  validate-regression:
+    needs: detect-version-bump
+    runs-on: ubuntu-latest
     env:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,6 +66,9 @@ jobs:
 
       - name: Run script version
         run: yarn versions
+
+      - name: Run yarn
+        run: yarn
 
       - name: Run regression tests
         run: yarn regression
