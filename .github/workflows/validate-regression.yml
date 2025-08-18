@@ -1,0 +1,48 @@
+name: Regression testing
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "package.json"
+
+jobs:
+  validate-regression:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.files.*.name, 'version-management/client-versions.ts') || github.event_name == 'workflow_dispatch'
+    env:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      REGION: ${{ vars.REGION }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+          key: deps-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            deps-
+
+      - name: Run script version
+        run: yarn versions
+
+      - name: Run regression tests
+        run: yarn regression
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Regression testing"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
