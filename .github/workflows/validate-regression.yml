@@ -71,7 +71,7 @@ jobs:
 
       - name: Show current active version
         run: |
-          tsx -e "
+          yarn tsx -e "
             const { getActiveVersion } = await import('./version-management/client-versions.ts');
             console.log('Current active SDK version:', getActiveVersion().nodeSDK);
           "
