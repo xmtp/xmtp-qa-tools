@@ -39,7 +39,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   validate-regression:
-    timeout-minutes: 30
+    needs: detect-version-bump
     runs-on: ubuntu-latest
     env:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
