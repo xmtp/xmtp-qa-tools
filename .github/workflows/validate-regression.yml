@@ -69,13 +69,6 @@ jobs:
       - name: Run yarn
         run: yarn
 
-      - name: Show current active version
-        run: |
-          yarn tsx -e "
-            const { getActiveVersion } = await import('./version-management/client-versions.ts');
-            console.log('Current active SDK version:', getActiveVersion().nodeSDK);
-          "
-
       - name: Run regression tests
         run: yarn regression
 
