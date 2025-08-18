@@ -1,16 +1,11 @@
 name: Regression testing
 
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths:
-      - "version-management/client-versions.ts"
       - "package.json"
-      - "yarn.lock"
-      - "**/*.ts"
-      - "**/*.js"
-  workflow_dispatch:
 
 jobs:
   validate-regression:
@@ -43,7 +38,7 @@ jobs:
         run: yarn versions
 
       - name: Run regression tests
-        run: yarn regression --env dev --sync all --versions 3 --size 10-100 && yarn test bugs
+        run: yarn regression
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
