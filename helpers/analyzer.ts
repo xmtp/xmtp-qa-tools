@@ -17,6 +17,7 @@ export const PATTERNS = {
   max_error_logs: 20,
 
   DEDUPE: [
+    "xmtp_mls::groups::commit_log_key",
     "sqlcipher_mlock",
     "Collector timed out.",
     "KeyPackageCleaner worker error:",
