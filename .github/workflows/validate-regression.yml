@@ -63,15 +63,15 @@ jobs:
           restore-keys: |
             deps-
 
+      - name: Run script version
+        run: yarn versions
+
       - name: Show current active version
         run: |
           node -e "
             const { getActiveVersion } = require('./version-management/client-versions.ts');
             console.log('Current active SDK version:', getActiveVersion().nodeSDK);
           "
-
-      - name: Run script version
-        run: yarn versions
 
       - name: Run regression tests
         run: yarn regression
