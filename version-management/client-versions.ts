@@ -53,6 +53,7 @@ export {
   type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.1.0";
+
 export const VersionList = [
   {
     Client: Client410,

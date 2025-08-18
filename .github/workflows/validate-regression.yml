@@ -1,9 +1,6 @@
 name: Regression testing
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
     branches:
       - main
@@ -51,6 +48,7 @@ jobs:
         with:
           node-version-file: ".node-version"
 
+      # hi
       - name: Enable Corepack
         run: corepack enable
 
