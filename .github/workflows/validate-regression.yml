@@ -63,7 +63,7 @@ jobs:
           restore-keys: |
             deps-
 
-            - name: Show current active version
+      - name: Show current active version
         run: |
           node -e "
             const { getActiveVersion } = require('./version-management/client-versions.ts');
