@@ -24,7 +24,7 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "permissions": "tsx cli/permissions.ts",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "regression": "yarn test performance --env dev --log off --sync all --versions 3 --size 10-100 && yarn test bugs",
+    "regression": "yarn test performance --env dev --log off --winston info --sync all --versions 3 --size 10-100 && yarn test bugs",
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
