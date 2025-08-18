@@ -18,10 +18,6 @@ jobs:
     outputs:
       version_changed: ${{ steps.check-version.outputs.version_changed }}
       new_version: ${{ steps.extract-version.outputs.version }}
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      REGION: ${{ vars.REGION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -46,8 +42,9 @@ jobs:
     needs: detect-version-bump
     runs-on: ubuntu-latest
     env:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
