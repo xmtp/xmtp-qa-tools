@@ -62,7 +62,7 @@ export const VersionList = [
     Group: Group410,
     nodeSDK: "4.1.0",
     nodeBindings: "1.4.0rc2",
-    auto: true,
+    auto: false,
   },
   {
     Client: Client403,
