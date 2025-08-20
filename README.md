@@ -32,7 +32,7 @@ flowchart LR
     swiftSDK["Swift SDK"]
     kotlinSDK["Kotlin SDK"]
     reactNativeSDK["React Native SDK"]
-    nodesdk["Node SDK"]
+    nodeBindings["Node SDK"]
   end
 
   subgraph Applications["Applications"]
@@ -61,9 +61,9 @@ flowchart LR
 
   swiftSDK --- mobileApps
 
-  napi --- nodesdk
-  nodesdk --- botAgents
-  nodesdk --- backendServices
+  napi --- nodeBindings
+  nodeBindings --- botAgents
+  nodeBindings --- backendServices
 
   reactNativeSDK --- messagingApps
   napi -.- reactNativeSDK

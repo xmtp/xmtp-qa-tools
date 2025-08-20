@@ -5,8 +5,8 @@ import { createSigner } from "@helpers/client";
 import { Client, type XmtpEnv } from "version-management/client-versions";
 
 // Check Node.js version
-const nodeSDK = process.versions.node;
-const [major] = nodeSDK.split(".").map(Number);
+const nodeBindings = process.versions.node;
+const [major] = nodeBindings.split(".").map(Number);
 if (major < 20) {
   console.error("Error: Node.js version 20 or higher is required");
   process.exit(1);

@@ -159,7 +159,9 @@ export const logAgentDetails = async (
     dependencies: Record<string, string>;
   };
   const xmtpSdkVersion =
-    packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeSDK];
+    packageJson.dependencies[
+      "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
+    ];
   const bindingVersion = (
     require(
       "../node_modules/@xmtp/node-bindings-" +

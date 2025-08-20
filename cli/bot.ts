@@ -9,7 +9,7 @@ const __dirname = join(__filename, "..");
 interface Config {
   botName: string;
   env: string;
-  nodeSDK: string;
+  nodeBindings: string;
   logLevel: string;
 }
 
@@ -25,7 +25,7 @@ ARGUMENTS:
 
 OPTIONS:
   --env <environment>   XMTP environment (local, dev, production) [default: production]
-  --nodeSDK <version>   XMTP Node SDK version to use [default: latest]
+  --nodeBindings <version>   XMTP Node SDK version to use [default: latest]
   --log <level>         Logging level (info, warn, error) [default: info]
   -h, --help           Show this help message
 
@@ -61,7 +61,7 @@ function parseArgs(): Config {
     } else if (arg === "--env" && nextArg) {
       process.env.XMTP_ENV = nextArg;
       i++;
-    } else if (arg === "--nodeSDK" && nextArg) {
+    } else if (arg === "--nodeBindings" && nextArg) {
       process.env.NODE_VERSION = nextArg;
       i++;
     } else if (arg === "--log" && nextArg) {
@@ -76,7 +76,7 @@ function parseArgs(): Config {
   return {
     botName,
     env: process.env.XMTP_ENV as string,
-    nodeSDK: process.env.NODE_VERSION as string,
+    nodeBindings: process.env.NODE_VERSION as string,
     logLevel: process.env.LOGGING_LEVEL as string,
   };
 }
@@ -114,7 +114,7 @@ async function main() {
 
     console.log(`Starting bot: ${config.botName}`);
     console.log(`Environment: ${config.env}`);
-    console.log(`Node SDK: ${config.nodeSDK}`);
+    console.log(`Node SDK: ${config.nodeBindings}`);
     console.log(`Path: ${botPath}`);
 
     // Run the bot using tsx with environment variable
@@ -124,7 +124,7 @@ async function main() {
       env: {
         ...process.env,
         XMTP_ENV: config.env,
-        XMTP_NODE_SDK: config.nodeSDK,
+        XMTP_NODE_SDK: config.nodeBindings,
         LOGGING_LEVEL: config.logLevel,
       },
     });

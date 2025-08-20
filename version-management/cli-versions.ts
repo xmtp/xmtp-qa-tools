@@ -41,14 +41,16 @@ function createBindingsSymlinks() {
   for (const config of VersionList) {
     if (!config.nodeBindings) continue;
 
-    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
+    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeBindings}`);
     const bindingsDir = path.join(
       xmtpDir,
       `node-bindings-${config.nodeBindings}`,
     );
 
     if (!fs.existsSync(sdkDir)) {
-      console.log(`⚠️  SDK directory not found: ${config.nodeSDK} (${sdkDir})`);
+      console.log(
+        `⚠️  SDK directory not found: ${config.nodeBindings} (${sdkDir})`,
+      );
       continue;
     }
 
@@ -79,9 +81,9 @@ function createBindingsSymlinks() {
         bindingsDir,
       );
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`${config.nodeSDK} -> ${config.nodeBindings}`);
+      console.log(`${config.nodeBindings} -> ${config.nodeBindings}`);
     } catch (error) {
-      console.error(`Error linking ${config.nodeSDK}: ${String(error)}`);
+      console.error(`Error linking ${config.nodeBindings}: ${String(error)}`);
     }
   }
 }

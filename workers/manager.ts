@@ -402,19 +402,19 @@ export class WorkerManager implements IWorkerManager {
    */
   public async createWorker(
     descriptor: string,
-    nodeSDK?: string,
+    nodeBindings?: string,
     apiUrl?: string,
   ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = nodeSDK || getActiveVersion().nodeSDK;
+    let defaultSdk = nodeBindings || getActiveVersion().nodeBindings;
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && VersionList.some((v) => v.nodeSDK === lastPart)) {
+      if (lastPart && VersionList.some((v) => v.nodeBindings === lastPart)) {
         defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
@@ -492,22 +492,22 @@ export async function getWorkers(
   workers: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
-    nodeSDK?: string;
+    nodeBindings?: string;
     randomNames?: boolean;
   } = {
     env: undefined,
     randomNames: true,
-    nodeSDK: undefined,
+    nodeBindings: undefined,
   },
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-  let sdkVersions = [options.nodeSDK || getActiveVersion().nodeSDK];
+  let sdkVersions = [options.nodeBindings || getActiveVersion().nodeBindings];
   if (process.env.TEST_VERSIONS) {
     sdkVersions = getVersions()
       .slice(0, parseInt(process.env.TEST_VERSIONS))
-      .map((v) => v.nodeSDK);
+      .map((v) => v.nodeBindings);
   }
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];

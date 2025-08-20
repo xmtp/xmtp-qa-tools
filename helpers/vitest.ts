@@ -66,7 +66,7 @@ export const setupDurationTracking = ({
         operation: operationName,
         conversation_count,
         test: testNameExtracted,
-        sdk: sdk || getActiveVersion().nodeSDK,
+        sdk: sdk || getActiveVersion().nodeBindings,
         installations: members,
         members,
       } as DurationMetricTags);
@@ -93,7 +93,7 @@ export const setupDurationTracking = ({
           metric_type: "network",
           metric_subtype: "phase",
           network_phase: networkPhase,
-          sdk: sdk || getActiveVersion().nodeSDK,
+          sdk: sdk || getActiveVersion().nodeBindings,
           operation: operationName,
           test: testNameExtracted,
         };
