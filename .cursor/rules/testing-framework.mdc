@@ -475,7 +475,7 @@ const group = await workers
 
 ```typescript
 // Test with specific SDK version
-const workers = await getWorkers(1, { nodeSDK: "3.1.1" });
+const workers = await getWorkers(1, { nodeBindings: "3.1.1" });
 
 // Multi-version testing
 const workers = await getWorkers(3, {});
@@ -483,7 +483,7 @@ const workers = await getWorkers(3, {});
 // Regression testing pattern
 const versions = getVersions().slice(0, 3);
 for (const version of versions) {
-  const workers = await getWorkers([`alice-a-${version.nodeSDK}`]);
+  const workers = await getWorkers([`alice-a-${version.nodeBindings}`]);
 }
 
 // Version comparison

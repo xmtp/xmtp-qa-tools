@@ -306,13 +306,13 @@ function parseTestArgs(args: string[]): {
           console.warn("--log flag requires a value (e.g., --log debug)");
         }
         break;
-      case "--nodeSDK":
+      case "--nodeBindings":
         if (nextArg) {
           process.env.NODE_VERSION = nextArg;
           i++;
         } else {
           console.warn(
-            "--nodeSDK flag requires a value (e.g., --nodeSDK 3.1.1)",
+            "--nodeBindings flag requires a value (e.g., --nodeBindings 3.1.1)",
           );
         }
         break;

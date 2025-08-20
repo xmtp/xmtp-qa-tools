@@ -103,16 +103,16 @@ export const VersionList = [
 ];
 export const getActiveVersion = (index = 0) => {
   checkNoNameContains(VersionList);
-  let nodesdk = getVersions()[index];
+  let latestVersion = getVersions()[index];
   if (process.env.NODE_VERSION) {
-    nodesdk = getVersions(false).find(
-      (v) => v.nodeSDK === process.env.NODE_VERSION,
+    latestVersion = getVersions(false).find(
+      (v) => v.nodeBindings === process.env.NODE_VERSION,
     ) as (typeof VersionList)[number];
-    if (!nodesdk) {
+    if (!latestVersion) {
       throw new Error(`Node version ${process.env.NODE_VERSION} not found`);
     }
   }
-  return nodesdk;
+  return latestVersion;
 };
 export const getVersions = (filterAuto: boolean = true) => {
   checkNoNameContains(VersionList);
@@ -131,7 +131,7 @@ export const checkNoNameContains = (versionList: typeof VersionList) => {
 };
 
 export const regressionClient = async (
-  nodeSDK: string,
+  nodeBindings: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
@@ -142,7 +142,7 @@ export const regressionClient = async (
   const apiUrl = apiURL;
   if (apiUrl) {
     console.debug(
-      `Creating API client with: SDK version: ${nodeSDK} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+      `Creating API client with: SDK version: ${nodeBindings} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
 
@@ -150,9 +150,11 @@ export const regressionClient = async (
   const dbDir = path.dirname(dbPath);
   if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
 
-  const versionConfig = VersionList.find((v) => v.nodeSDK === nodeSDK);
+  const versionConfig = VersionList.find(
+    (v) => v.nodeBindings === nodeBindings,
+  );
   if (!versionConfig) {
-    throw new Error(`SDK version ${nodeSDK} not found in VersionList`);
+    throw new Error(`SDK version ${nodeBindings} not found in VersionList`);
   }
   const ClientClass = versionConfig.Client;
   let client = null;
@@ -201,7 +203,7 @@ export const regressionClient = async (
   }
 
   if (!client) {
-    throw new Error(`Failed to create client for SDK version ${nodeSDK}`);
+    throw new Error(`Failed to create client for SDK version ${nodeBindings}`);
   }
 
   return client;

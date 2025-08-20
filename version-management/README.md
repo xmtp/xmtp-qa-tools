@@ -8,17 +8,17 @@ How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
 
 flowchart TD
-  nodeSDK["SDK<br/>@xmtp/node-sdk 3.2.2"]
+  nodeBindings["SDK<br/>@xmtp/node-sdk 3.2.2"]
   nodeBindings["Bindings<br/>@xmtp/node-bindings 1.3.3"]
   libxmtp["libxmtp Rust Library<br/>(specific commit/version)"]
 
-  nodeSDK --> |depends on| nodeBindings
+  nodeBindings --> |depends on| nodeBindings
   nodeBindings --> |compiled from| libxmtp
 
   classDef default fill:#161b22,stroke:#30363d,stroke-width:2px,color:#c9d1d9;
 ```
 
-- **[NodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
+- **[nodeBindings](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
 - **[Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions)**: Compiled Rust code and native bindings
 - **[libxmtp](https://github.com/xmtp/libxmtp)**: Core cryptographic and networking logic
 
@@ -33,7 +33,7 @@ export const VersionList = [
     Conversation: Conversation322,
     Dm: Dm322,
     Group: Group322,
-    nodeSDK: "3.2.2", // SDK version
+    nodeBindings: "3.2.2", // SDK version
     nodeBindings: "1.3.3", // Bindings version
     auto: true, // Include in automated testing
   },
@@ -83,7 +83,7 @@ If your libxmtp version is already compiled:
 
 ```bash
 {
-  "nodeSDK": "3.2.2",
+  "nodeBindings": "3.2.2",
   "nodeBindings": "1.3.1", // Use existing bindings
   "auto": false // Manual testing only
 }
@@ -108,7 +108,7 @@ yarn versions
 
 ```bash
 yarn test functional --versions 3  # Test latest 3 auto-enabled versions
-yarn test functional --nodeSDK 3.2.2 # custom version
+yarn test functional --nodeBindings 3.2.2 # custom version
 yarn regression  # Vibe check on latest version
 ```
 

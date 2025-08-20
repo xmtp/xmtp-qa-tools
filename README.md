@@ -32,7 +32,7 @@ flowchart LR
     swiftSDK["Swift SDK"]
     kotlinSDK["Kotlin SDK"]
     reactNativeSDK["React Native SDK"]
-    nodesdk["Node SDK"]
+    nodeBindings["Node SDK"]
   end
 
   subgraph Applications["Applications"]
@@ -61,9 +61,9 @@ flowchart LR
 
   swiftSDK --- mobileApps
 
-  napi --- nodesdk
-  nodesdk --- botAgents
-  nodesdk --- backendServices
+  napi --- nodeBindings
+  nodeBindings --- botAgents
+  nodeBindings --- backendServices
 
   reactNativeSDK --- messagingApps
   napi -.- reactNativeSDK
@@ -163,8 +163,6 @@ yarn test functional --no-fail --log warn --file
 - Networks: Work in [local](/dev/) or [multinode](/dev/multinode) network
 - Workers: Worker for testing with CLI - [see section](/workers/)
 - Helpers: Coding helpers - [see section](/helpers/)
-- Scripts: Monorepo scripts & cli's - [see section](/cli/)
-- Introduction: Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
 
 ##### Rate limits
 

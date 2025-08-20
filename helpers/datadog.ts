@@ -336,7 +336,7 @@ export async function sendDatadogLog(
       GEO_TO_COUNTRY_CODE[
         process.env.REGION as keyof typeof GEO_TO_COUNTRY_CODE
       ],
-    sdk: getActiveVersion().nodeSDK,
+    sdk: getActiveVersion().nodeBindings,
     node_bindings: getActiveVersion().nodeBindings,
   };
 

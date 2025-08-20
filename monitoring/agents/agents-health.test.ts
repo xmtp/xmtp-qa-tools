@@ -62,7 +62,7 @@ describe(testName, () => {
         slackChannel: agent.slackChannel,
         agent: agent.name,
         address: agent.address,
-        sdk: getActiveVersion().nodeSDK,
+        sdk: getActiveVersion().nodeBindings,
       } as ResponseMetricTags);
       expect(result.success).toBe(true);
     });
