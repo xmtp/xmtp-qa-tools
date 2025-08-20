@@ -123,7 +123,7 @@ export const initializeClient = async (
         };
 
         // @ts-expect-error - TODO: fix this
-        const client = await getActiveVersion().Client.create(signer, {
+        const client = await getActiveVersion(1).Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
