@@ -124,7 +124,6 @@ export const processMessage = async (
   client: Client,
   conversation: Conversation,
   message: DecodedMessage,
-  _messageContext: MessageContext,
 ): Promise<void> => {
   const groupConfig = config.find(
     (group) =>
@@ -176,6 +175,7 @@ const configs: SkillOptions[] = config.map((group: GroupConfig) => ({
   commandPrefix: "",
   strictCommandFiltering: false,
   codecs: [],
+  indexVersion: 0,
 }));
 
 await initializeClient(processMessage, configs);
