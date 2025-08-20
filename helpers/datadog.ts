@@ -2,6 +2,7 @@ import "dotenv/config";
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
+import { getActiveVersion } from "../version-management/client-versions";
 
 // Consolidated interfaces
 interface MetricData {
@@ -63,6 +64,8 @@ interface LogPayload {
   source: string;
   branch: string;
   message: string;
+  sdk: string;
+  node_bindings: string;
   error_count: number;
   fail_lines: number;
   test: string;
@@ -333,6 +336,8 @@ export async function sendDatadogLog(
       GEO_TO_COUNTRY_CODE[
         process.env.REGION as keyof typeof GEO_TO_COUNTRY_CODE
       ],
+    sdk: getActiveVersion().nodeSDK,
+    node_bindings: getActiveVersion().nodeBindings,
   };
 
   try {

@@ -111,6 +111,24 @@ async function cleanSpecificLogFile(
   logFileName: string,
   pattern?: string,
 ): Promise<void> {
+  // Validate input
+  if (!logFileName || logFileName.trim() === "") {
+    console.info("No log filename provided, skipping file cleaning");
+    return;
+  }
+
+  // Ensure the filename doesn't contain directory separators
+  if (
+    logFileName.includes(path.sep) ||
+    logFileName.includes("/") ||
+    logFileName.includes("\\")
+  ) {
+    console.info(
+      `Invalid log filename (contains directory separators): ${logFileName}`,
+    );
+    return;
+  }
+
   const logsDir = path.join(process.cwd(), "logs");
   let outputPath: string;
   const rawFilePath = path.join(logsDir, logFileName);
@@ -118,6 +136,13 @@ async function cleanSpecificLogFile(
   // Check if the raw file exists
   if (!fs.existsSync(rawFilePath)) {
     console.info(`Raw log file not found: ${rawFilePath}`);
+    return;
+  }
+
+  // Check if the path is actually a file, not a directory
+  const stats = fs.statSync(rawFilePath);
+  if (!stats.isFile()) {
+    console.info(`Path is not a file: ${rawFilePath}`);
     return;
   }
 
@@ -449,12 +474,17 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
       // Close logger for this attempt
       logger?.close();
 
-      await cleanSpecificLogFile(logger.logFileName);
+      // Only clean log file if file logging was enabled
+      if (options.fileLogging && logger.logFileName) {
+        await cleanSpecificLogFile(logger.logFileName);
+      }
 
       // If using max-retry mode and test passed, exit successfully
       if (useMaxRetry && exitCode === 0) {
         console.info(`Test suite passed on attempt ${attempt} ✅`);
-        console.info(`Log File: ${logger.logFileName}`);
+        if (options.fileLogging && logger.logFileName) {
+          console.info(`Log File: ${logger.logFileName}`);
+        }
         return;
       }
 
@@ -463,7 +493,9 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
         console.info(
           `Completed ${maxAttempts} ${useMaxRetry ? "retries" : "attempts"}`,
         );
-        console.info(`Log File: ${logger.logFileName}`);
+        if (options.fileLogging && logger.logFileName) {
+          console.info(`Log File: ${logger.logFileName}`);
+        }
 
         const errorLogs = extractErrorLogs(testName);
         const fail_lines = extractfail_lines(errorLogs);
