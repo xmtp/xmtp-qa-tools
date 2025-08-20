@@ -118,8 +118,14 @@ async function cleanSpecificLogFile(
   }
 
   // Ensure the filename doesn't contain directory separators
-  if (logFileName.includes(path.sep) || logFileName.includes("/") || logFileName.includes("\\")) {
-    console.info(`Invalid log filename (contains directory separators): ${logFileName}`);
+  if (
+    logFileName.includes(path.sep) ||
+    logFileName.includes("/") ||
+    logFileName.includes("\\")
+  ) {
+    console.info(
+      `Invalid log filename (contains directory separators): ${logFileName}`,
+    );
     return;
   }
 
