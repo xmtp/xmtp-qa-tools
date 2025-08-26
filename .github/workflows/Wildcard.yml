@@ -2,7 +2,7 @@ name: Wildcard
 description: "Manual PR verification workflow - supports functional and performance tests"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "0 0 1 1 *"
   workflow_dispatch:
@@ -30,9 +30,6 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
         with:
           cache-data: true
-
-      # - name: Run script version
-      #   run: yarn versions
 
       - name: Run tests
         run: yarn test ${{ matrix.test }} --env ${{ matrix.env }}
