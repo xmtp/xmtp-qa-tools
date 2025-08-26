@@ -31,7 +31,6 @@
     "update:dev": "yarn gen --env dev --installations 2 ",
     "update:local": "yarn gen --env local --installations 2",
     "update:prod": "yarn gen --env production --installations 2 ",
-    "update:sdk": "node version-management/update-sdk.js",
     "versions": "tsx version-management/cli-versions.ts"
   },
   "dependencies": {
