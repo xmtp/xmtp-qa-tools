@@ -62,11 +62,11 @@ jobs:
           restore-keys: |
             deps-
 
-      - name: Run script version
-        run: yarn versions
-
       - name: Run yarn
         run: yarn
+
+      - name: Run script version
+        run: yarn versions
 
       - name: Run regression tests
         run: yarn regression
