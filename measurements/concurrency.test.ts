@@ -1,7 +1,11 @@
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { Client, type XmtpEnv } from "version-management/client-versions";
+import {
+  APP_VERSION,
+  Client,
+  type XmtpEnv,
+} from "version-management/client-versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {
@@ -37,6 +41,7 @@ describe(testName, () => {
     primaryClient = await Client.create(primarySigner, {
       dbEncryptionKey: primaryEncryptionKey,
       env: env.XMTP_ENV as XmtpEnv,
+      appVersion: APP_VERSION,
     });
 
     // Create secondary client with a different key
@@ -46,6 +51,7 @@ describe(testName, () => {
     secondaryClient = await Client.create(secondarySigner, {
       dbEncryptionKey: secondaryEncryptionKey,
       env: env.XMTP_ENV as XmtpEnv,
+      appVersion: APP_VERSION,
     });
 
     console.log(`Primary client inbox ID: ${primaryClient.inboxId}`);

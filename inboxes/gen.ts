@@ -1,7 +1,11 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import { ProgressBar } from "@helpers/logger";
-import { Client, type XmtpEnv } from "version-management/client-versions";
+import {
+  APP_VERSION,
+  Client,
+  type XmtpEnv,
+} from "version-management/client-versions";
 import {
   createSigner,
   generateEncryptionKeyHex,
@@ -292,6 +296,7 @@ async function smartUpdate({
           const client = await Client.create(signer, {
             dbEncryptionKey,
             dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
+            appVersion: APP_VERSION,
             env,
           });
           const { currentInstallations } = await checkInstallations(
@@ -308,6 +313,7 @@ async function smartUpdate({
                   dbEncryptionKey,
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
                   env,
+                  appVersion: APP_VERSION,
                 });
                 if (debugMode) {
                   process.stdout.write(
@@ -329,6 +335,7 @@ async function smartUpdate({
                   dbEncryptionKey,
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
                   env,
+                  appVersion: APP_VERSION,
                 });
                 if (debugMode) {
                   process.stdout.write(
@@ -374,6 +381,7 @@ async function smartUpdate({
                 dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
                 dbPath: `${LOGPATH}/${env}-${accountAddress}-install-${j}`,
                 env,
+                appVersion: APP_VERSION,
               });
               if (j === 0 && env === envs[0]) inboxId = client.inboxId;
               totalCreated++;

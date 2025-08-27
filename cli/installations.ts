@@ -1,4 +1,5 @@
 import {
+  APP_VERSION,
   IdentifierKind,
   type XmtpEnv,
 } from "version-management/client-versions";
@@ -158,6 +159,7 @@ async function createInstallation(config: Config): Promise<void> {
   const client = await Client.create(signer, {
     dbEncryptionKey,
     env: config.env as XmtpEnv,
+    appVersion: APP_VERSION,
   });
 
   const identifier = await signer.getIdentifier();
@@ -304,6 +306,7 @@ async function loadInstallation(config: Config): Promise<Client> {
     return await Client.create(signer, {
       dbEncryptionKey,
       env: data.env as XmtpEnv,
+      appVersion: APP_VERSION,
     });
   } else if (config.walletKey && config.encryptionKey) {
     // Load from provided keys
@@ -315,6 +318,7 @@ async function loadInstallation(config: Config): Promise<Client> {
     return await Client.create(signer, {
       dbEncryptionKey,
       env: config.env as XmtpEnv,
+      appVersion: APP_VERSION,
     });
   } else {
     throw new Error(
