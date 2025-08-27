@@ -18,7 +18,6 @@ jobs:
         test: [browser] # performance test with more large groups
         # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
-        # test: [dms] # health check
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

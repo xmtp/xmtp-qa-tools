@@ -33,10 +33,12 @@ function createBindingsSymlinks() {
 
   if (!fs.existsSync(xmtpDir)) {
     console.error("@xmtp directory not found");
-    return;
+    process.exit(1);
   }
 
   console.log("Creating bindings symlinks...");
+
+  let hasErrors = false;
 
   for (const config of VersionList) {
     if (!config.nodeSDK) continue;
@@ -48,16 +50,18 @@ function createBindingsSymlinks() {
     );
 
     if (!fs.existsSync(sdkDir)) {
-      console.log(
-        `⚠️  SDK directory not found: ${config.nodeBindings} (${sdkDir})`,
+      console.error(
+        `❌ SDK directory not found: ${config.nodeSDK} (${sdkDir})`,
       );
+      hasErrors = true;
       continue;
     }
 
     if (!fs.existsSync(bindingsDir)) {
-      console.log(
-        `⚠️  Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`,
+      console.error(
+        `❌ Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`,
       );
+      hasErrors = true;
       continue;
     }
 
@@ -81,10 +85,16 @@ function createBindingsSymlinks() {
         bindingsDir,
       );
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`${config.nodeBindings} -> ${config.nodeBindings}`);
+      console.log(`${config.nodeSDK} -> ${config.nodeBindings}`);
     } catch (error) {
-      console.error(`Error linking ${config.nodeBindings}: ${String(error)}`);
+      console.error(`Error linking ${config.nodeSDK}: ${String(error)}`);
+      hasErrors = true;
     }
+  }
+
+  if (hasErrors) {
+    console.error("❌ Failed to create all required symlinks");
+    process.exit(1);
   }
 }
 
