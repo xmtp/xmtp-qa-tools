@@ -215,6 +215,7 @@ export const logAgentDetails = async (
     • Bindings: ${bindingVersion}
     • Version: ${Client.version}
     • Address: ${address}
+    • appVersion: ${firstClient.options?.appVersion}
     • Conversations: ${conversations.length}
     • Installations: ${inboxState.installations.length}
     • InstallationId: ${installationId}
