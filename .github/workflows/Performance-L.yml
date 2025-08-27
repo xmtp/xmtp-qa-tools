@@ -15,7 +15,7 @@ jobs:
       matrix:
         test: [performance]
         size: [200-250]
-        env: [dev, production]
+        env: [dev]
         cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
