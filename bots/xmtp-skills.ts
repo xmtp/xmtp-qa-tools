@@ -92,7 +92,6 @@ export const initializeClient = async (
     groupWelcomeMessage: "",
     allowedCommands: ["help"],
     commandPrefix: "",
-    appVersion: APP_VERSION,
     strictCommandFiltering: false,
     walletKey: (process.env.WALLET_KEY ??
       generatePrivateKey()) as `0x${string}`,
@@ -112,27 +111,14 @@ export const initializeClient = async (
         );
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
-        // Extract skill options from the client options
-        const skillOptions: SkillOptions = {
-          acceptGroups: option.acceptGroups,
-          indexVersion: option.indexVersion,
-          acceptTypes: option.acceptTypes,
-          welcomeMessage: option.welcomeMessage,
-          groupWelcomeMessage: option.groupWelcomeMessage,
-          allowedCommands: option.allowedCommands,
-          commandPrefix: option.commandPrefix,
-          strictCommandFiltering: option.strictCommandFiltering,
-          codecs: option.codecs,
-        };
-
         // @ts-expect-error - TODO: fix this
         const client = await getActiveVersion(1).Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
-          codecs: skillOptions.codecs ?? [],
-          appVersion: skillOptions.appVersion ?? APP_VERSION,
+          codecs: option.codecs ?? [],
+          appVersion: option.appVersion ?? APP_VERSION,
         });
 
         // @ts-expect-error - TODO: fix this
@@ -142,7 +128,7 @@ export const initializeClient = async (
           // @ts-expect-error - TODO: fix this
           client,
           messageHandler,
-          skillOptions,
+          option,
         );
 
         streamPromises.push(streamPromise);
