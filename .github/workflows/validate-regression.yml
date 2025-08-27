@@ -64,9 +64,6 @@ jobs:
           restore-keys: |
             deps-
 
-      - name: Run yarn
-        run: yarn
-
       - name: Run script version
         run: yarn versions
 
