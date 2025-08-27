@@ -39,9 +39,9 @@ function createBindingsSymlinks() {
   console.log("Creating bindings symlinks...");
 
   for (const config of VersionList) {
-    if (!config.nodeBindings) continue;
+    if (!config.nodeSDK) continue;
 
-    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeBindings}`);
+    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
     const bindingsDir = path.join(
       xmtpDir,
       `node-bindings-${config.nodeBindings}`,
