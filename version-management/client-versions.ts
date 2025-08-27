@@ -101,6 +101,9 @@ export const VersionList = [
     auto: true,
   },
 ];
+
+export const APP_VERSION = "xmtp-qa-tools/1.0.0";
+
 export const getActiveVersion = (index = 0) => {
   checkNoNameContains(VersionList);
   let latestVersion = getVersions()[index];
@@ -169,6 +172,7 @@ export const regressionClient = async (
       env,
       loggingLevel,
       apiUrl,
+      appVersion: APP_VERSION,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } catch (error) {
@@ -195,6 +199,7 @@ export const regressionClient = async (
         env,
         loggingLevel,
         apiUrl,
+        appVersion: APP_VERSION,
         codecs: [new ReactionCodec(), new ReplyCodec()],
       });
     } else {

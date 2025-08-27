@@ -2,6 +2,7 @@ import "dotenv/config";
 import fs from "node:fs";
 import { fromString } from "uint8arrays";
 import {
+  APP_VERSION,
   Client,
   IdentifierKind,
   type LogLevel,
@@ -62,6 +63,7 @@ const initClient = async (network: XmtpEnv = "dev") => {
     env: network,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     dbPath: getDbPath(`ping-api-${network}`),
+    appVersion: APP_VERSION,
   });
 
   clients.set(network, client);

@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import {
+  APP_VERSION,
   getActiveVersion,
   IdentifierKind,
   type Client,
@@ -36,6 +37,7 @@ class MockXmtpAgent {
     this.client = await getActiveVersion().Client.create(signer, {
       dbEncryptionKey,
       env: this.env,
+      appVersion: APP_VERSION,
     });
 
     console.log(`📖 Initialized XMTP client: ${this.client?.inboxId}`);

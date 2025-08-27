@@ -7,6 +7,7 @@ import {
   logAgentDetails,
 } from "@helpers/client";
 import {
+  APP_VERSION,
   getActiveVersion,
   type Client,
   type Conversation,
@@ -129,6 +130,7 @@ export const initializeClient = async (
           loggingLevel: option.loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
           codecs: skillOptions.codecs ?? [],
+          appVersion: APP_VERSION,
         });
 
         // @ts-expect-error - TODO: fix this
