@@ -172,6 +172,7 @@ const configs: SkillOptions[] = config.map((group: GroupConfig) => ({
   acceptGroups: false,
   acceptTypes: ["text"],
   allowedCommands: ["help"],
+  appVersion: "groups/1.0.0",
   commandPrefix: "",
   strictCommandFiltering: false,
   codecs: [],

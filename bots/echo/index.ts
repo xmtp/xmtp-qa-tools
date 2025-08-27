@@ -22,6 +22,7 @@ await initializeClient(processMessage, [
   {
     networks: ["local"],
     indexVersion: 1,
+    appVersion: "echo/1.0.0",
     acceptGroups: true,
   },
 ]);
