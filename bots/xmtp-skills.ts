@@ -28,6 +28,7 @@ export interface SkillOptions {
   groupWelcomeMessage?: string;
   allowedCommands?: string[];
   commandPrefix?: string;
+  appVersion?: string;
   strictCommandFiltering?: boolean;
   codecs?: any[];
   walletKey?: string;
@@ -91,6 +92,7 @@ export const initializeClient = async (
     groupWelcomeMessage: "",
     allowedCommands: ["help"],
     commandPrefix: "",
+    appVersion: APP_VERSION,
     strictCommandFiltering: false,
     walletKey: (process.env.WALLET_KEY ??
       generatePrivateKey()) as `0x${string}`,
@@ -130,7 +132,7 @@ export const initializeClient = async (
           loggingLevel: option.loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
           codecs: skillOptions.codecs ?? [],
-          appVersion: APP_VERSION,
+          appVersion: skillOptions.appVersion ?? APP_VERSION,
         });
 
         // @ts-expect-error - TODO: fix this

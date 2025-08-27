@@ -238,6 +238,7 @@ await initializeClient(processMessage, [
     welcomeMessage: "Send /kc help",
     commandPrefix: "/kc",
     indexVersion: 1,
+    appVersion: "key-check/1.0.0",
     acceptGroups: true,
   },
 ]);
