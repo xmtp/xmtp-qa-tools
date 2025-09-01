@@ -508,6 +508,7 @@ export async function verifyAgentMessageStream(
   receivers: Worker[],
   triggerMessage: string,
   maxRetries: number = 1,
+  types: string[] = ["text", "reply", "reaction", "actions"],
   customTimeout?: number,
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
@@ -524,7 +525,7 @@ export async function verifyAgentMessageStream(
         r.worker.collectMessages(
           group.id,
           1,
-          ["text", "reply", "reaction", "actions"],
+          types,
           customTimeout ?? undefined,
         ),
       // @ts-expect-error - TODO: fix this
