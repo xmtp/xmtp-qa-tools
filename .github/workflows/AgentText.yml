@@ -2,7 +2,7 @@ name: Agent health
 description: "health of the agents"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "*/30 * * * *" # Runs every  30 minutes for agents-text
   workflow_dispatch:
