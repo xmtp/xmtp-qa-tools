@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents-dms";
+const testName = "agents-text";
 describe(testName, async () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
@@ -57,6 +57,9 @@ describe(testName, async () => {
       const responseTime = Math.abs(
         result?.averageEventTiming ?? streamTimeout,
       );
+      console.log("responseTime", responseTime);
+      console.log("streamTimeout", streamTimeout);
+      console.log("responseTime", responseTime);
 
       // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
       sendMetric("response", responseTime, {

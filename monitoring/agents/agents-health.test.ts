@@ -50,7 +50,7 @@ describe(testName, () => {
       };
 
       const responseTime = Math.abs(result?.responseTime ?? streamTimeout);
-      console.log("result.responseTime", result?.responseTime);
+      console.log("responseTime", responseTime);
       console.log("streamTimeout", streamTimeout);
       console.log("responseTime", responseTime);
 
