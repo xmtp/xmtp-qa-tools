@@ -56,7 +56,7 @@ describe(testName, async () => {
       const responseTime = Math.abs(
         result?.averageEventTiming ?? streamTimeout,
       );
-      console.log("result.averageEventTiming", result?.averageEventTiming);
+      console.log("averageEventTiming", result?.averageEventTiming);
       console.log("streamTimeout", streamTimeout);
       console.log("responseTime", responseTime);
 

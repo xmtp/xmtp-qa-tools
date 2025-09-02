@@ -983,15 +983,15 @@ export class WorkerClient extends Worker implements IWorkerClient {
     types: string[] = ["text"],
     customTimeout?: number,
   ): Promise<StreamTextMessage[]> {
-    // console.debug(
-    //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
-    // );
+    console.debug(
+      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+    );
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
-        // console.debug(
-        //   `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
-        // );
+        console.debug(
+          `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
+        );
 
         if (msg.type !== StreamCollectorType.Message) {
           return false;
@@ -1001,8 +1001,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
-        const typeIsText = types.includes(contentType?.typeId as string);
-        const shouldAccept = idsMatch && typeIsText;
+        const typeIsMatch = types.includes(contentType?.typeId as string);
+        console.warn(typeIsMatch, types, contentType?.typeId);
+        const shouldAccept = idsMatch && typeIsMatch;
         return shouldAccept;
       },
       count,
