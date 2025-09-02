@@ -1,4 +1,4 @@
-name: Agent health
+name: Agent text health
 description: "health of the agents"
 
 on:
