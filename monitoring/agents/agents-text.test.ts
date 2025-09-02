@@ -51,7 +51,7 @@ describe(testName, async () => {
         [workers.getCreator()],
         agent.sendMessage,
         3,
-        ["text", "reply"],
+        ["text", "reply", "actions", "intent"],
       );
 
       const responseTime = Math.abs(
@@ -63,6 +63,7 @@ describe(testName, async () => {
         test: testName,
         metric_type: "agent",
         metric_subtype: "text",
+        live: agent.live ? "true" : "false",
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,

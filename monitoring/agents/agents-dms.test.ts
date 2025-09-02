@@ -66,8 +66,6 @@ describe(testName, async () => {
         metric_type: "agent",
         metric_subtype: "dm",
         live: agent.live ? "true" : "false",
-
-        slackChannel: agent.slackChannel,
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
