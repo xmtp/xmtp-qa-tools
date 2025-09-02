@@ -9,7 +9,6 @@ import {
   addToGroupWithCustomCopy,
   createAddToGroupConfig,
   initializeClient,
-  type MessageContext,
   type SkillOptions,
 } from "../xmtp-skills";
 

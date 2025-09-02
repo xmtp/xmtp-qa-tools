@@ -18,6 +18,7 @@ interface MetricTags {
   env?: string;
   region?: string;
   sdk: string;
+  timestamp?: string;
   operation?: string;
   test?: string;
   country_iso_code?: string;
@@ -111,6 +112,7 @@ function enrichTags(tags: MetricTags): MetricTags {
     ...tags,
     env: tags.env || process.env.XMTP_ENV,
     region: tags.region || process.env.REGION,
+    timestamp: new Date().toISOString(), // Date in ISO format
     country_iso_code:
       tags.country_iso_code ||
       GEO_TO_COUNTRY_CODE[
