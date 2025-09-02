@@ -50,7 +50,7 @@ describe(testName, async () => {
         conversation as Conversation,
         [workers.getCreator()],
         agent.sendMessage,
-        3,
+        1,
         ["text", "reply", "actions", "intent"],
       );
 
