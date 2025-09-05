@@ -104,7 +104,7 @@
   {
     "name": "bracky",
     "baseName": "bracky.base.eth",
-    "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    "address": "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     "sendMessage": "hi",
     "live": true,
     "networks": ["production"]
