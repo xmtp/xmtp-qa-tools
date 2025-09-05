@@ -94,3 +94,41 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 ```
 
 See agents [configuration](agents.json)
+
+### Agent uptime SLOs
+
+Individual agent uptime performance tracking over 7-day periods.
+
+| Agent Name | Target | Status   | Error Budget Left | Tags                   |
+| ---------- | ------ | -------- | ----------------- | ---------------------- |
+| Bitte      | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Mamo       | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Flaunchy   | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Elsa       | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Byte       | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Arma       | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Bankr      | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Onit       | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Squabble   | 99%    | 100.000% | 100%              | qa-agents, reliability |
+| Clanker    | 99%    | 100.000% | 100%              | qa-agents, reliability |
+
+_Note: All agent uptime SLOs are performing optimally with 100% uptime and full error budget remaining._
+
+### Agent response time SLOs
+
+Individual agent response time performance tracking over 7-day periods.
+
+| Agent Name | Target | Status   | Error Budget Left | Tags      |
+| ---------- | ------ | -------- | ----------------- | --------- |
+| Byte       | 99%    | 100.000% | 100%              | performan |
+| Squabble   | 99%    | 99.950%  | 95%               | performan |
+| Arma       | 99%    | 99.900%  | 90%               | performan |
+| Bitte      | 99%    | 99.751%  | 75%               | performan |
+| Onit       | 99%    | 99.503%  | 50%               | performan |
+| Elsa       | 99%    | 99.355%  | 36%               | performan |
+| Bankr      | 99%    | 94.097%  | -490%             | performan |
+| Mamo       | 99%    | 91.617%  | -738%             | performan |
+| Clanker    | 99%    | 77.083%  | -2192%            | performan |
+| Flaunchy   | 99%    | 64.682%  | -3432%            | performan |
+
+_Note: Top 6 agents are meeting or close to target, while bottom 4 agents show significant performance degradation with negative error budgets._
