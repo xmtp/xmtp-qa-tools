@@ -6,6 +6,8 @@
     "declaration": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "lib": ["ESNext"],
     "module": "ESNext",
     "baseUrl": ".",

@@ -36,18 +36,31 @@ runs:
         path: |
           node_modules
           .yarn/cache
-        key: deps-${{ hashFiles('yarn.lock') }}
+        key: deps-v2-${{ hashFiles('yarn.lock', 'package.json') }}
         restore-keys: |
-          deps-
+          deps-v2-${{ hashFiles('yarn.lock') }}
+          deps-v2-
+
+    - name: Cache TypeScript build
+      uses: actions/cache@v4
+      with:
+        path: |
+          .tsbuildinfo
+          dist
+        key: tsc-${{ hashFiles('tsconfig.json', 'package.json', 'yarn.lock') }}-${{ hashFiles('**/*.ts', '!node_modules/**') }}
+        restore-keys: |
+          tsc-${{ hashFiles('tsconfig.json', 'package.json', 'yarn.lock') }}
+          tsc-
 
     - name: Cache Playwright browsers
       uses: actions/cache@v4
       with:
         path: |
-          .playwright-cache
           ~/.cache/ms-playwright
-        key: playwright-${{ hashFiles('package.json') }}
+          .playwright-cache
+        key: playwright-v2-${{ hashFiles('package.json', 'yarn.lock') }}
         restore-keys: |
+          playwright-v2-
           playwright-
 
     - name: Cache test data

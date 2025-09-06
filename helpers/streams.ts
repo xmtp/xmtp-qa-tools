@@ -233,7 +233,7 @@ export async function verifyMessageStream(
 
         // Add small delay between messages to prevent overwhelming
         if (i < count - 1) {
-          await sleep(50); // 50ms delay between messages
+          await sleep(10); // Reduced from 50ms to 10ms for faster tests
         }
       }
       return sent;

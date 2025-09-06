@@ -21,9 +21,9 @@ export default defineConfig({
     reporters: isUIMode ? [["default", { summary: false }]] : ["default"],
     environment: "node",
     watch: false,
-    // Reduce timeouts for UI mode to prevent hanging
-    testTimeout: isUIMode ? 300000 : 6000000, // 5min vs 100min
-    hookTimeout: isUIMode ? 60000 : 6000000, // 1min vs 100min
+    // Optimize test timeouts - reduce from 100 minutes for better feedback
+    testTimeout: isUIMode ? 300000 : 3600000, // 5min vs 60min (was 100min)
+    hookTimeout: isUIMode ? 60000 : 3600000, // 1min vs 60min (was 100min)
     pool: "threads",
     poolOptions: {
       singleThread: true,
