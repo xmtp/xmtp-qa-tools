@@ -14,7 +14,7 @@ export const PATTERNS = {
   ],
   min_line_length: 40,
   max_line_length: 150,
-  enable_dedupe: false,
+  enable_dedupe: true,
   max_error_logs: 20,
 
   DEDUPE: [
