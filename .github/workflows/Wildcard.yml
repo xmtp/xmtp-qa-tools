@@ -32,7 +32,7 @@ jobs:
           cache-data: true
 
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }} --size ${{ matrix.size }} --versions ${{ matrix.versions }}
+        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }}
 
       - name: Cleanup and upload artifacts
         if: always()
