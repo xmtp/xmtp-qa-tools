@@ -311,7 +311,7 @@ export function extractErrorLogs(testName: string): Set<string> {
 
         // Check for pattern deduplication (only if enabled)
         let isDuplicate = false;
-        if (enableDedupe) {
+        if (PATTERNS.enable_dedupe) {
           isDuplicate = PATTERNS.DEDUPE.some((pattern) => {
             if (cleanLine.includes(pattern)) {
               if (seenPatterns.has(pattern)) {
@@ -347,7 +347,7 @@ export function extractErrorLogs(testName: string): Set<string> {
     // Return empty set if it's a known pattern or exact known issue match (only if dedupe is enabled)
     if (errorLines.length === 1) {
       const hasKnownPattern =
-        enableDedupe &&
+        PATTERNS.enable_dedupe &&
         PATTERNS.DEDUPE.some((pattern) => errorLines[0]?.includes(pattern));
       if (hasKnownPattern || hasKnownIssue) {
         return new Set();
