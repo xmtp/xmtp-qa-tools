@@ -282,7 +282,10 @@ export function checkForCriticalErrors(
 /**
  * Extract error logs from log files with deduplication
  */
-export function extractErrorLogs(testName: string, enableDedupe: boolean = true): Set<string> {
+export function extractErrorLogs(
+  testName: string,
+  enableDedupe: boolean = true,
+): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
@@ -308,16 +311,19 @@ export function extractErrorLogs(testName: string, enableDedupe: boolean = true)
         const { cleanLine, shouldSkip } = processErrorLine(line);
         if (shouldSkip) continue;
 
-        // Check for pattern deduplication
-        const isDuplicate = PATTERNS.DEDUPE.some((pattern) => {
-          if (cleanLine.includes(pattern)) {
-            if (seenPatterns.has(pattern)) {
-              return true;
+        // Check for pattern deduplication (only if enabled)
+        let isDuplicate = false;
+        if (enableDedupe) {
+          isDuplicate = PATTERNS.DEDUPE.some((pattern) => {
+            if (cleanLine.includes(pattern)) {
+              if (seenPatterns.has(pattern)) {
+                return true;
+              }
+              seenPatterns.add(pattern);
             }
-            seenPatterns.add(pattern);
-          }
-          return false;
-        });
+            return false;
+          });
+        }
 
         if (!isDuplicate) {
           errorLines.push(cleanLine);
@@ -340,11 +346,11 @@ export function extractErrorLogs(testName: string, enableDedupe: boolean = true)
       );
     });
 
-    // Return empty set if it's a known pattern or exact known issue match
+    // Return empty set if it's a known pattern or exact known issue match (only if dedupe is enabled)
     if (errorLines.length === 1) {
-      const hasKnownPattern = PATTERNS.DEDUPE.some((pattern) =>
-        errorLines[0]?.includes(pattern),
-      );
+      const hasKnownPattern =
+        enableDedupe &&
+        PATTERNS.DEDUPE.some((pattern) => errorLines[0]?.includes(pattern));
       if (hasKnownPattern || hasKnownIssue) {
         return new Set();
       }
