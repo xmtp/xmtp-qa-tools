@@ -14,6 +14,7 @@ export const PATTERNS = {
   ],
   min_line_length: 40,
   max_line_length: 150,
+  enable_dedupe: false,
   max_error_logs: 20,
 
   DEDUPE: [
@@ -282,10 +283,7 @@ export function checkForCriticalErrors(
 /**
  * Extract error logs from log files with deduplication
  */
-export function extractErrorLogs(
-  testName: string,
-  enableDedupe: boolean = true,
-): Set<string> {
+export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
