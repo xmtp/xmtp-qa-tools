@@ -282,7 +282,7 @@ export function checkForCriticalErrors(
 /**
  * Extract error logs from log files with deduplication
  */
-export function extractErrorLogs(testName: string): Set<string> {
+export function extractErrorLogs(testName: string, enableDedupe: boolean = true): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
