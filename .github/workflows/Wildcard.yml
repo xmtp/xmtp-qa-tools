@@ -17,7 +17,7 @@ jobs:
         test: [performance]
         size: [5-10-50]
         versions: [3]
-        env: [dev, production]
+        env: [production]
         cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
