@@ -57,8 +57,11 @@ Functions: Multi-version SDK support, signer creation, database management, envi
 Log analysis and error detection capabilities for identifying test failures and patterns.
 
 ```typescript
-// Extract error logs from test output
-const errorLogs = extractErrorLogs(testName, 50);
+// Extract error logs from test output with deduplication (default)
+const errorLogs = extractErrorLogs(testName);
+
+// Extract error logs without deduplication
+const errorLogsNoDedupe = extractErrorLogs(testName, false);
 
 // Check if test failures match known issues
 const shouldFilter = shouldFilterOutTest(errorLogs);
