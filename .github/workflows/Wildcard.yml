@@ -18,7 +18,6 @@ jobs:
         size: [5-10-50]
         versions: [3]
         env: [production]
-        cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
