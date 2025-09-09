@@ -300,11 +300,12 @@ async function checkKeyPackageStatusesByInboxId(
   ).length;
   const invalidInstallations = totalInstallations - validInstallations;
 
-  console.warn ({
+  console.warn({
     inboxId,
     installationIds,
     totalInstallations,
     validInstallations,
-    invalidInstallations, status,
-  );
+    invalidInstallations,
+    status,
+  });
 }
