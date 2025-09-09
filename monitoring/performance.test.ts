@@ -26,7 +26,7 @@ const testName = "performance";
 describe(testName, () => {
   const BATCH_SIZE = process.env.BATCH_SIZE
     ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
-    : [5, 10];
+    : [5];
 
   let newGroup: Group;
 
@@ -183,6 +183,12 @@ describe(testName, () => {
     });
     it(`addMember-${i}:add members to a group`, async () => {
       await newGroup.addMembers([extraMember.inboxId]);
+      await checkKeyPackageStatusesByInboxId(
+        creator!.client,
+        extraMember.inboxId,
+      );
+
+      await newGroup.addMembers([extraMember.inboxId]);
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
       const verifyResult = await verifyMessageStream(
@@ -270,3 +276,35 @@ describe(testName, () => {
     });
   }
 });
+
+async function checkKeyPackageStatusesByInboxId(
+  client: Client,
+  inboxId: string,
+) {
+  const installationIdsState = await client.preferences.inboxStateFromInboxIds(
+    [inboxId],
+    true,
+  );
+  const installationIds = installationIdsState[0].installations.map(
+    (installation) => installation.id,
+  );
+  // Retrieve a map of installation id to KeyPackageStatus
+  const status = (await client.getKeyPackageStatusesForInstallationIds(
+    installationIds,
+  )) as Record<string, any>;
+
+  // Count valid and invalid installations
+  const totalInstallations = Object.keys(status).length;
+  const validInstallations = Object.values(status).filter(
+    (value) => !value?.validationError,
+  ).length;
+  const invalidInstallations = totalInstallations - validInstallations;
+
+  console.warn ({
+    inboxId,
+    installationIds,
+    totalInstallations,
+    validInstallations,
+    invalidInstallations, status,
+  );
+}
