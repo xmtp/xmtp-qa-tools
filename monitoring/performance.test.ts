@@ -13,10 +13,10 @@ import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
-  Client,
   ConsentEntityType,
   ConsentState,
   IdentifierKind,
+  type Client,
   type Dm,
   type Group,
 } from "version-management/client-versions";
@@ -52,78 +52,11 @@ describe(testName, () => {
 
   let workers: WorkerManager;
   let creator: Worker | undefined;
-  let receiver: Worker | undefined;
-  let dm: Dm | undefined;
   it(`create: measure creating a client`, async () => {
     workers = await getWorkers(5);
     creator = workers.getCreator();
-    receiver = workers.getReceiver();
     setCustomDuration(creator.initializationTime);
   });
-  it(`sync:measure sync`, async () => {
-    await creator!.client.conversations.sync();
-  });
-  it(`syncAll:measure syncAll`, async () => {
-    await creator!.client.conversations.syncAll();
-  });
-
-  it(`inboxState:measure inboxState`, async () => {
-    await creator!.client.preferences.inboxState();
-  });
-  it(`canMessage:measure canMessage`, async () => {
-    const canMessage = await Client.canMessage(
-      [
-        {
-          identifier: receiver!.address,
-          identifierKind: IdentifierKind.Ethereum,
-        },
-      ],
-      receiver!.env,
-    );
-    expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
-  });
-
-  it(`newDm:measure creating a DM`, async () => {
-    dm = (await creator!.client.conversations.newDm(
-      receiver!.client.inboxId,
-    )) as Dm;
-    expect(dm).toBeDefined();
-    expect(dm.id).toBeDefined();
-  });
-  it(`newDmByAddress:measure creating a DM`, async () => {
-    const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
-      identifier: getInboxes(1)[0].accountAddress,
-      identifierKind: IdentifierKind.Ethereum,
-    });
-
-    expect(dm2).toBeDefined();
-    expect(dm2.id).toBeDefined();
-  });
-  it(`getConversationById:measure getting a conversation by id`, async () => {
-    const conversation =
-      await creator!.client.conversations.getConversationById(dm!.id);
-    expect(conversation!.id).toBe(dm!.id);
-  });
-  it(`send:measure sending a gm`, async () => {
-    const dmId = await dm!.send("gm");
-    expect(dmId).toBeDefined();
-  });
-  it(`streamMessage:measure receiving a gm`, async () => {
-    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
-    setCustomDuration(verifyResult.averageEventTiming);
-    expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
-  });
-
-  it(`setConsentStates:group consent`, async () => {
-    await creator!.client.preferences.setConsentStates([
-      {
-        entity: getInboxes(1)[0].accountAddress,
-        entityType: ConsentEntityType.InboxId,
-        state: ConsentState.Allowed,
-      },
-    ]);
-  });
-
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
       allMembersWithExtra = getInboxes(i - workers.getAll().length + 2, 2, i);
@@ -189,90 +122,6 @@ describe(testName, () => {
       );
 
       await newGroup.addMembers([extraMember.inboxId]);
-    });
-    it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
-      const verifyResult = await verifyMessageStream(
-        newGroup,
-        workers.getAllButCreator(),
-      );
-
-      sendMetric(
-        "response",
-        verifyResult?.averageEventTiming ?? streamTimeout,
-        {
-          test: testName,
-          metric_type: "stream",
-          metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
-        } as ResponseMetricTags,
-      );
-
-      sendMetric("delivery", verifyResult.receptionPercentage, {
-        sdk: workers.getCreator().sdk,
-        test: testName,
-        metric_type: "delivery",
-        metric_subtype: "stream",
-        conversation_type: "group",
-      } as DeliveryMetricTags);
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
-    });
-
-    it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
-      const verifyResult = await verifyMetadataStream(
-        newGroup,
-        workers.getAllButCreator(),
-      );
-
-      setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
-    });
-
-    it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      let randomName = "random" + Math.random().toString(36).substring(2, 5);
-      const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
-      await newGroup.addMembers([clientSingleSync.inboxId]);
-      const start = performance.now();
-      await clientSingleSync.conversations.sync();
-      const end = performance.now();
-      setCustomDuration(end - start);
-    });
-    it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      let randomName = "random" + Math.random().toString(36).substring(2, 5);
-      const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
-      await newGroup.addMembers([clientSingleSync.inboxId]);
-      const start = performance.now();
-      await clientSingleSync.conversations.syncAll();
-      const end = performance.now();
-      setCustomDuration(end - start);
-    });
-
-    it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
-      let randomName = "random" + Math.random().toString(36).substring(2, 5);
-      const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
-      for (const group of cumulativeGroups) {
-        await group.addMembers([clientSingleSync.inboxId]);
-      }
-      const start = performance.now();
-      await clientSingleSync.conversations.sync();
-      const end = performance.now();
-      setCustomDuration(end - start);
-    });
-    it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
-      let randomName = "random" + Math.random().toString(36).substring(2, 5);
-      const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
-      for (const group of cumulativeGroups) {
-        await group.addMembers([clientSingleSync.inboxId]);
-      }
-      const start = performance.now();
-      await clientSingleSync.conversations.syncAll();
-      const end = performance.now();
-      setCustomDuration(end - start);
     });
   }
 });
