@@ -4,10 +4,9 @@ import { Agent, createSigner, createUser, getTestUrl } from "@xmtp/agent-sdk";
 // 2. Spin up the agent
 const agent = await Agent.create(createSigner(createUser()), {
   env: process.env.XMTP_ENV as "local" | "dev" | "production", // or 'production'
-  dbPath: getDbPath(`echo-${process.env.XMTP_ENV}`),
+  dbPath: getDbPath(`echo-bot`),
+  appVersion: "echo/1.0.0",
 });
-
-let count = 0;
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 agent.on("text", async (ctx) => {
@@ -16,7 +15,6 @@ agent.on("text", async (ctx) => {
   console.log(`🔗${getTestUrl(agent)}`);
 
   await ctx.conversation.send(`echo: ${ctx.message.content}`);
-  count++;
 });
 
 // 4. Log when we're ready
