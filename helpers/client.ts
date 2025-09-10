@@ -576,23 +576,12 @@ export async function checkKeyPackageStatusesByInboxId(
       }
       let createdDate = new Date();
       let expiryDate = new Date();
-
-      // Extract key package status for the specific installation
-      const keyPackageStatus = status[installationId];
-      if (keyPackageStatus.lifetime) {
+      if (installationStatus?.lifetime) {
         createdDate = new Date(
-          Number(keyPackageStatus.lifetime.notBefore) * 1000,
+          Number(installationStatus.lifetime.notBefore) * 1000,
         );
         expiryDate = new Date(
-          Number(keyPackageStatus.lifetime.notAfter) * 1000,
-        );
-      }
-      if (keyPackageStatus?.lifetime) {
-        const createdDate = new Date(
-          Number(keyPackageStatus.lifetime.notBefore) * 1000,
-        );
-        const expiryDate = new Date(
-          Number(keyPackageStatus.lifetime.notAfter) * 1000,
+          Number(installationStatus.lifetime.notAfter) * 1000,
         );
 
         details.createdDate = createdDate.toISOString();

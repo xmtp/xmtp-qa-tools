@@ -490,7 +490,7 @@ async function main() {
       console.log(`\n--- Running for --installations ${inst} ---`);
       try {
         await runWithRetry(
-          () => smartUpdate({ count, envs, installations: inst }),
+          () => smartUpdate({ count, envs, installations: inst, restart }),
           `installation ${inst}`,
         );
       } catch (error) {
@@ -506,7 +506,8 @@ async function main() {
       ? parseInt(installations, 10)
       : DEFAULT_INSTALLATIONS;
     await runWithRetry(
-      () => smartUpdate({ count, envs, installations: installationCount }),
+      () =>
+        smartUpdate({ count, envs, installations: installationCount, restart }),
       "smart update",
     );
   }
