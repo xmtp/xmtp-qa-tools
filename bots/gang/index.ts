@@ -32,9 +32,14 @@ const messages = {
   error: "Error processing your request. Please try again.",
 };
 
+const signer = createSigner(
+  createUser(process.env.XMTP_WALLET_KEY as `0x${string}`),
+);
+const signerIdentifier = (await signer.getIdentifier()).identifier;
+
 const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  dbPath: getDbPath(`gang-group`),
+  dbPath: getDbPath(`${process.env.XMTP_ENV}-${signerIdentifier}`),
   appVersion: "gang-group/0",
 });
 
