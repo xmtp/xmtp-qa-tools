@@ -541,3 +541,35 @@ export const getMessageByMb = (mb: number) => {
   console.log(`Message size: ${formatBytes(message.length)}`);
   return message;
 };
+export async function checkKeyPackageStatusesByInboxId(
+  client: Client,
+  inboxId: string,
+) {
+  const installationIdsState = await client.preferences.inboxStateFromInboxIds(
+    [inboxId],
+    true,
+  );
+  const installationIds = installationIdsState[0].installations.map(
+    (installation) => installation.id,
+  );
+  // Retrieve a map of installation id to KeyPackageStatus
+  const status = (await client.getKeyPackageStatusesForInstallationIds(
+    installationIds,
+  )) as Record<string, any>;
+
+  // Count valid and invalid installations
+  const totalInstallations = Object.keys(status).length;
+  const validInstallations = Object.values(status).filter(
+    (value) => !value?.validationError,
+  ).length;
+  const invalidInstallations = totalInstallations - validInstallations;
+
+  console.warn({
+    inboxId,
+    installationIds,
+    totalInstallations,
+    validInstallations,
+    invalidInstallations,
+    status,
+  });
+}
