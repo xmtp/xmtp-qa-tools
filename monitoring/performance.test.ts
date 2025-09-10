@@ -1,4 +1,7 @@
-import { streamTimeout } from "@helpers/client";
+import {
+  checkKeyPackageStatusesByInboxId,
+  streamTimeout,
+} from "@helpers/client";
 import {
   sendMetric,
   type DeliveryMetricTags,
@@ -168,7 +171,10 @@ describe(testName, () => {
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-      console.log("extraMember", extraMember.inboxId);
+      console.log(
+        "extraMember",
+        checkKeyPackageStatusesByInboxId(creator!.client, extraMember.inboxId),
+      );
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),
@@ -182,6 +188,10 @@ describe(testName, () => {
       await newGroup.removeMembers([extraMember.inboxId]);
     });
     it(`addMember-${i}:add members to a group`, async () => {
+      console.log(
+        "extraMember",
+        checkKeyPackageStatusesByInboxId(creator!.client, extraMember.inboxId),
+      );
       await newGroup.addMembers([extraMember.inboxId]);
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {

@@ -1002,7 +1002,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
         const typeIsMatch = types.includes(contentType?.typeId as string);
-        console.warn(typeIsMatch, types, contentType?.typeId);
         const shouldAccept = idsMatch && typeIsMatch;
         return shouldAccept;
       },

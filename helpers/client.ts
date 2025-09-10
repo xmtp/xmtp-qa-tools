@@ -541,3 +541,70 @@ export const getMessageByMb = (mb: number) => {
   console.log(`Message size: ${formatBytes(message.length)}`);
   return message;
 };
+export async function checkKeyPackageStatusesByInboxId(
+  client: Client,
+  inboxId: string,
+) {
+  const installationIdsState = await client.preferences.inboxStateFromInboxIds(
+    [inboxId],
+    true,
+  );
+  const installationIds = installationIdsState[0].installations.map(
+    (installation) => installation.id,
+  );
+  // Retrieve a map of installation id to KeyPackageStatus
+  const status = (await client.getKeyPackageStatusesForInstallationIds(
+    installationIds,
+  )) as Record<string, any>;
+
+  // Count valid and invalid installations
+  const totalInstallations = Object.keys(status).length;
+  const validInstallations = Object.values(status).filter(
+    (value) => !value?.validationError,
+  ).length;
+  const invalidInstallations = totalInstallations - validInstallations;
+
+  // Extract key package dates for each installation
+  const installationDetails = Object.entries(status).map(
+    ([installationId, installationStatus]) => {
+      const details: any = {
+        installationId,
+      };
+
+      if (installationStatus?.validationError) {
+        details.validationError = installationStatus.validationError;
+      }
+      let createdDate = new Date();
+      let expiryDate = new Date();
+      if (installationStatus?.lifetime) {
+        createdDate = new Date(
+          Number(installationStatus.lifetime.notBefore) * 1000,
+        );
+        expiryDate = new Date(
+          Number(installationStatus.lifetime.notAfter) * 1000,
+        );
+
+        details.createdDate = createdDate.toISOString();
+        details.expiryDate = expiryDate.toISOString();
+        details.createdDateFormatted = createdDate.toLocaleString();
+        details.expiryDateFormatted = expiryDate.toLocaleString();
+      } else {
+        details.lifetimeAvailable = false;
+        details.reason = installationStatus?.validationError
+          ? "Lifetime not available due to validation error"
+          : "No lifetime data found";
+      }
+
+      return details;
+    },
+  );
+
+  console.warn({
+    inboxId,
+    installationIds,
+    totalInstallations,
+    validInstallations,
+    invalidInstallations,
+    installationDetails,
+  });
+}

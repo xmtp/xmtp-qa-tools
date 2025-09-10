@@ -18,6 +18,8 @@
     "format": "prettier -w .",
     "gen": "tsx inboxes/gen.ts",
     "groups": "tsx cli/groups.ts",
+    "inboxes:restart": "yarn gen --installations 2 --restart",
+    "inboxes:update": "yarn gen --installations 2",
     "installations": "tsx cli/installations.ts",
     "lint": "eslint .",
     "mock": "tsx cli/mock-client.ts",
@@ -28,13 +30,11 @@
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "update:dev": "yarn gen --env dev --installations 2 ",
-    "update:local": "yarn gen --env local --installations 2",
-    "update:prod": "yarn gen --env production --installations 2 ",
     "versions": "tsx version-management/cli-versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
+    "@xmtp/agent-sdk": "^0.0.9",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
     "@xmtp/node-bindings-1.3.3": "npm:@xmtp/node-bindings@1.3.3",
