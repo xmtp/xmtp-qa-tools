@@ -8,12 +8,16 @@ const agent = await Agent.create(createSigner(createUser()), {
   appVersion: "echo/1.0.0",
 });
 
+let count = 0;
+
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 agent.on("text", async (ctx) => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 
+  count++;
+  console.log(`Count: ${count}`);
   await ctx.conversation.send(`echo: ${ctx.message.content}`);
 });
 

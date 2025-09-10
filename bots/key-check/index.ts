@@ -1,4 +1,6 @@
+import fs from "fs";
 import { createRequire } from "node:module";
+import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
 import {
   getActiveVersion,
   IdentifierKind,
@@ -17,13 +19,17 @@ const xmtpSdkVersion =
 // Track when the bot started
 const startTime = new Date();
 
-const processMessage = async (
-  client: Client,
-  conversation: Conversation,
-  message: DecodedMessage,
-) => {
+// 2. Spin up the agent
+const agent = (await Agent.createFromEnv({
+  appVersion: "gm-bot/1.0.0",
+  loggingLevel: "warn" as LogLevel,
+  dbPath: getDbPath("gm-bot-" + (process.env.XMTP_ENV ?? "")),
+})) as Agent<any>;
+
+agent.on("text", async (ctx) => {
+  const message = ctx.message;
   // Get the message content
-  const content = message.content as string;
+  const content = message.content;
   if (!content.trim().startsWith("/kc")) {
     return;
   }
@@ -48,21 +54,21 @@ const processMessage = async (
       "/kc debug - Show debug information for the key-check bot\n" +
       "/kc help - Show this help message";
 
-    await conversation.send(helpText);
+    await ctx.conversation.send(helpText);
     console.log("Sent help information");
     return;
   }
 
   // Handle groupid command
   if (command === "groupid") {
-    await conversation.send(`Conversation ID: "${message.conversationId}"`);
+    await ctx.conversation.send(`Conversation ID: "${message.conversationId}"`);
     console.log(`Sent conversation ID: ${message.conversationId}`);
     return;
   }
 
   // Handle version command
   if (command === "version") {
-    await conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
+    await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
     console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
     return;
   }
@@ -84,31 +90,31 @@ const processMessage = async (
       `Bot started at: ${startTime.toLocaleString()}\n` +
       `Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    await conversation.send(uptimeText);
+    await ctx.conversation.send(uptimeText);
     console.log(`Sent uptime information: ${uptimeText}`);
     return;
   }
 
   // Handle debug command
   if (command === "debug") {
-    let conversations = await client.conversations.list();
+    let conversations = await ctx.client.conversations.list();
     // Print the list of conversations ids to console:
     console.log(
       "Conversations:",
-      conversations.map((conversation) => conversation.id),
+      conversations.map((conversation: any) => conversation.id),
     );
     await conversation.send(
-      `key-check conversations: \n${conversations.map((conversation) => conversation.id).join("\n")}`,
+      `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
     return;
   }
 
   // Handle members command
   if (command === "members") {
-    const members: GroupMember[] = await conversation.members();
+    const members: GroupMember[] = await ctx.conversation.members();
 
     if (!members || members.length === 0) {
-      await conversation.send("No members found in this conversation.");
+      await ctx.conversation.send("No members found in this conversation.");
       console.log("No members found in the conversation");
       return;
     }
@@ -117,7 +123,7 @@ const processMessage = async (
 
     for (const member of members) {
       const isBot =
-        member.inboxId.toLowerCase() === client.inboxId.toLowerCase();
+        member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
       let marker = isBot ? "~" : " ";
       const isSender =
         member.inboxId.toLowerCase() === message.senderInboxId.toLowerCase();
@@ -128,7 +134,7 @@ const processMessage = async (
     membersList += "\n ~indicates key-check bot's inbox ID~";
     membersList += "\n *indicates who prompted the key-check command*";
 
-    await conversation.send(membersList);
+    await ctx.conversation.send(membersList);
     console.log(`Sent list of ${members.length} members`);
     return;
   }
@@ -229,18 +235,26 @@ const processMessage = async (
   }
 
   console.log("Waiting for messages...");
-};
+});
 
-await initializeClient(processMessage, [
-  {
-    networks: ["dev", "production"],
-    welcomeMessage: "Send /kc help",
-    commandPrefix: "/kc",
-    indexVersion: 1,
-    appVersion: "key-check/1.0.0",
-    acceptGroups: true,
-  },
-]);
+// 4. Log when we're ready
+agent.on("start", () => {
+  console.log(`Waiting for messages...`);
+  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`🔗${getTestUrl(agent)}`);
+});
+
+await agent.start();
+
+function getDbPath(description: string = "xmtp") {
+  //Checks if the environment is a Railway deployment
+  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
+  // Create database directory if it doesn't exist
+  if (!fs.existsSync(volumePath)) {
+    fs.mkdirSync(volumePath, { recursive: true });
+  }
+  return `${volumePath}/${process.env.XMTP_ENV}-${description}.db3`;
+}
 
 // const siletnDebug = async (
 //   client: Client,
