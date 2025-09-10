@@ -3,7 +3,6 @@ import {
   Agent,
   createSigner,
   createUser,
-  getEncryptionKeyFromHex,
   getTestUrl,
   type Group,
 } from "@xmtp/agent-sdk";

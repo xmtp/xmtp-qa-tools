@@ -2,7 +2,7 @@ import { Agent, getTestUrl } from "@xmtp/agent-sdk";
 
 const agent = (await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  appVersion: "echo/0",
+  appVersion: "echo-agent/0",
 })) as Agent<any>;
 
 let count = 0;
