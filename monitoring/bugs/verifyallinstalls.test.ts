@@ -16,7 +16,7 @@ describe(testName, () => {
 
   let newGroup: Group;
 
-  let extraMember: InboxData;
+  let extraMember: string;
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
   let cumulativeGroups: Group[] = [];
@@ -26,7 +26,6 @@ describe(testName, () => {
   it(`create: measure creating a client`, async () => {
     workers = await getWorkers(5);
     creator = workers.getCreator();
-    setCustomDuration(creator.initializationTime);
   });
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
@@ -55,12 +54,9 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`addMember-${i}:add members to a group`, async () => {
-      await checkKeyPackageStatusesByInboxId(
-        creator!.client,
-        extraMember.inboxId,
-      );
+      await checkKeyPackageStatusesByInboxId(creator!.client, extraMember);
 
-      await newGroup.addMembers([extraMember.inboxId]);
+      await newGroup.addMembers([extraMember]);
     });
   }
 });
