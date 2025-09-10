@@ -3,14 +3,14 @@ import {
   Agent,
   createSigner,
   createUser,
+  getEncryptionKeyFromHex,
   getTestUrl,
   type Group,
 } from "@xmtp/agent-sdk";
 
 const groupId = {
-  production: process.env.GROUP_ID_PRODUCTION as string,
-  dev: process.env.GROUP_ID_DEV as string,
-  local: process.env.GROUP_ID_LOCAL as string,
+  production: process.env.GROUP_ID_PRODUCTION_CSX as string,
+  dev: process.env.GROUP_ID_DEV_CSX as string,
 };
 
 const isAdmin = [
@@ -32,13 +32,16 @@ const messages = {
 };
 
 const signer = createSigner(
-  createUser(process.env.XMTP_WALLET_KEY as `0x${string}`),
+  createUser(process.env.XMTP_WALLET_KEY_CSX as `0x${string}`),
 );
 const signerIdentifier = (await signer.getIdentifier()).identifier;
 
-const agent = await Agent.createFromEnv({
-  env: process.env.XMTP_ENV as "local" | "dev" | "production",
+const agent = await Agent.create(signer, {
+  env: process.env.XMTP_ENV as "dev" | "production",
   dbPath: getDbPath(`${process.env.XMTP_ENV}-${signerIdentifier}`),
+  dbEncryptionKey: getEncryptionKeyFromHex(
+    process.env.XMTP_DB_ENCRYPTION_KEY_CSX as string,
+  ),
   appVersion: "csx-group/0",
 });
 
@@ -48,9 +51,9 @@ agent.on("unhandledError", (error) => {
 });
 
 agent.on("text", async (ctx) => {
-  const env = ctx.client.options?.env as "local" | "dev" | "production";
+  const env = ctx.client.options?.env as "dev" | "production";
   const currentGroupId = groupId[env];
-  const currentGroupCode = process.env.XMTP_GROUP_CODE as string;
+  const currentGroupCode = process.env.XMTP_GROUP_CODE_CSX as string;
 
   // Get the group conversation
   const group =
