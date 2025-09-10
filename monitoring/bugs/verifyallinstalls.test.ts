@@ -1,11 +1,8 @@
 import "@helpers/datadog";
+import { checkKeyPackageStatusesByInboxId } from "@helpers/client";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import {
-  IdentifierKind,
-  type Client,
-  type Group,
-} from "version-management/client-versions";
+import { IdentifierKind, type Group } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";
@@ -60,38 +57,3 @@ describe(testName, () => {
     });
   }
 });
-
-async function checkKeyPackageStatusesByInboxId(
-  client: Client,
-  inboxId: string,
-) {
-  const installationIdsState = await client.preferences.inboxStateFromInboxIds(
-    [inboxId],
-    true,
-  );
-  const installationIds = installationIdsState[0].installations.map(
-    (installation) => installation.id,
-  );
-  // Retrieve a map of installation id to KeyPackageStatus
-  const status = (await client.getKeyPackageStatusesForInstallationIds(
-    installationIds,
-  )) as Record<string, any>;
-
-  // Count valid and invalid installations
-  const totalInstallations = Object.keys(status).length;
-  const validInstallations = Object.values(status).filter(
-    (value) => !value?.validationError,
-  ).length;
-  const invalidInstallations = totalInstallations - validInstallations;
-
-  const statusString = {
-    inboxId,
-    installationIds,
-    totalInstallations,
-    validInstallations,
-    invalidInstallations,
-    status,
-  };
-
-  console.warn(JSON.stringify(statusString, null, 2));
-}
