@@ -1,28 +1,27 @@
-import {
-  type Client,
-  type Conversation,
-  type DecodedMessage,
-} from "version-management/client-versions";
-import { initializeClient } from "../xmtp-skills";
+import { getDbPath } from "@helpers/client";
+import { Agent, createSigner, createUser, getTestUrl } from "@xmtp/agent-sdk";
+
+// 2. Spin up the agent
+const agent = await Agent.create(createSigner(createUser()), {
+  env: process.env.XMTP_ENV as "local" | "dev" | "production", // or 'production'
+  dbPath: getDbPath(`echo-${process.env.XMTP_ENV}`),
+});
 
 let count = 0;
-const processMessage = async (
-  client: Client,
-  conversation: Conversation,
-  message: DecodedMessage,
-) => {
-  console.log(`${count} Received message`);
 
-  await conversation.send(`echo: ${message.content as string}`);
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+agent.on("text", async (ctx) => {
+  console.log(`Waiting for messages...`);
+  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`🔗${getTestUrl(agent)}`);
+
+  await ctx.conversation.send(`echo: ${ctx.message.content}`);
   count++;
-};
+});
 
-// Initialize the client with the message processor
-await initializeClient(processMessage, [
-  {
-    networks: ["local"],
-    indexVersion: 1,
-    appVersion: "echo/1.0.0",
-    acceptGroups: true,
-  },
-]);
+// 4. Log when we're ready
+agent.on("start", () => {
+  console.log(`We are online: ${getTestUrl(agent)}`);
+});
+
+await agent.start();
