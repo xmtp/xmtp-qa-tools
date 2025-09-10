@@ -18,9 +18,9 @@ const startTime = new Date();
 
 // 2. Spin up the agent
 const agent = (await Agent.createFromEnv({
-  appVersion: "gm-bot/1.0.0",
+  appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
-  dbPath: getDbPath("gm-bot-" + (process.env.XMTP_ENV ?? "")),
+  dbPath: getDbPath("key-check-" + (process.env.XMTP_ENV ?? "")),
 })) as Agent<any>;
 
 agent.on("text", async (ctx) => {

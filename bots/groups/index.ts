@@ -3,6 +3,7 @@ import {
   Agent,
   createSigner,
   createUser,
+  getEncryptionKeyFromHex,
   getTestUrl,
   type AgentContext,
   type Group,
@@ -150,10 +151,33 @@ export const processMessage = async (ctx: AgentContext): Promise<void> => {
 };
 
 // 2. Spin up the agent
-const csx = await Agent.create(createSigner(createUser()), {
-  env: process.env.XMTP_ENV as "local" | "dev" | "production", // or 'production'
-  dbPath: getDbPath(`groups-bot`),
-  appVersion: "groups/1.0.0",
+const csx = await Agent.create(
+  createSigner(createUser(process.env.XMTP_WALLET_KEY_CSX as `0x${string}`)),
+  {
+    env: process.env.XMTP_ENV as "local" | "dev" | "production", // or 'production'
+    dbPath: getDbPath(`groups-bot`),
+    dbEncryptionKey: getEncryptionKeyFromHex(
+      process.env.XMTP_DB_ENCRYPTION_KEY_CSX as string,
+    ),
+    appVersion: "csx-group/0",
+  },
+);
+
+const gang = await Agent.create(
+  createSigner(createUser(process.env.XMTP_WALLET_KEY_GANG as `0x${string}`)),
+  {
+    env: process.env.XMTP_ENV as "local" | "dev" | "production",
+    dbPath: getDbPath(`groups-bot`),
+    dbEncryptionKey: getEncryptionKeyFromHex(
+      process.env.XMTP_DB_ENCRYPTION_KEY_GANG as string,
+    ),
+    appVersion: "gang-group/0",
+  },
+);
+
+// Handle uncaught errors
+csx.on("unhandledError", (error) => {
+  console.error("Agent error", error);
 });
 
 csx.on("text", async (ctx) => {
@@ -166,6 +190,19 @@ csx.on("start", () => {
 
 await csx.start();
 
+gang.on("unhandledError", (error) => {
+  console.error("Gang agent error", error);
+});
+
+gang.on("text", async (ctx) => {
+  await processMessage(ctx);
+});
+
+gang.on("start", () => {
+  console.log(`Gang is online: ${getTestUrl(gang)}`);
+});
+
+await gang.start();
 /**
  * Add a user to a group with customizable copy
  * @param client The XMTP client
