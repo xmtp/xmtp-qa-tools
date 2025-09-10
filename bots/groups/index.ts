@@ -156,7 +156,6 @@ const csx = await Agent.create(createSigner(createUser()), {
   appVersion: "groups/1.0.0",
 });
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 csx.on("text", async (ctx) => {
   await processMessage(ctx);
 });
