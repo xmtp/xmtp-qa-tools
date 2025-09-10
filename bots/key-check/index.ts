@@ -4,9 +4,6 @@ import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
 import {
   getActiveVersion,
   IdentifierKind,
-  type Client,
-  type Conversation,
-  type DecodedMessage,
   type GroupMember,
 } from "version-management/client-versions";
 
@@ -103,7 +100,7 @@ agent.on("text", async (ctx) => {
       "Conversations:",
       conversations.map((conversation: any) => conversation.id),
     );
-    await conversation.send(
+    await ctx.conversation.send(
       `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
     return;
@@ -152,31 +149,33 @@ agent.on("text", async (ctx) => {
 
     // Need to find the inbox ID for this address
     try {
-      const inboxId = await client.getInboxIdByIdentifier({
+      const inboxId = await ctx.client.getInboxIdByIdentifier({
         identifier: targetAddress,
         identifierKind: IdentifierKind.Ethereum,
       });
       if (!inboxId) {
-        await conversation.send(`No inbox found for address ${targetAddress}`);
+        await ctx.conversation.send(
+          `No inbox found for address ${targetAddress}`,
+        );
         return;
       }
       targetInboxId = inboxId;
     } catch (error) {
       console.error(`Error resolving address ${targetAddress}:`, error);
-      await conversation.send(`Error resolving address ${targetAddress}`);
+      await ctx.conversation.send(`Error resolving address ${targetAddress}`);
       return;
     }
   }
 
   // Get inbox state for the target inbox ID
   try {
-    const inboxState = await client.preferences.inboxStateFromInboxIds(
+    const inboxState = await ctx.client.preferences.inboxStateFromInboxIds(
       [targetInboxId],
       true,
     );
 
     if (!inboxState || inboxState.length === 0) {
-      await conversation.send(`No inbox state found for ${targetInboxId}`);
+      await ctx.conversation.send(`No inbox state found for ${targetInboxId}`);
       return;
     }
 
@@ -184,11 +183,11 @@ agent.on("text", async (ctx) => {
 
     // Retrieve all the installation ids for the target
     const installationIds = inboxState[0].installations.map(
-      (installation) => installation.id,
+      (installation: { id: string }) => installation.id,
     );
 
     // Retrieve a map of installation id to KeyPackageStatus
-    const status = (await client.getKeyPackageStatusesForInstallationIds(
+    const status = (await ctx.client.getKeyPackageStatusesForInstallationIds(
       installationIds,
     )) as Record<string, any>;
     console.log(status);
@@ -225,11 +224,11 @@ agent.on("text", async (ctx) => {
         summaryText += `- validationError: '${installationStatus.validationError}'\n\n`;
       }
     }
-    await conversation.send(summaryText);
+    await ctx.conversation.send(summaryText);
     console.log(`Sent key status for ${targetInboxId}`);
   } catch (error) {
     console.error(`Error processing key-check for ${targetInboxId}:`, error);
-    await conversation.send(
+    await ctx.conversation.send(
       `Error processing key-check: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
