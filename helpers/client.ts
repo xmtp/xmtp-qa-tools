@@ -569,25 +569,41 @@ export async function checkKeyPackageStatusesByInboxId(
     ([installationId, installationStatus]) => {
       const details: any = {
         installationId,
-        hasValidationError: !!installationStatus?.validationError,
       };
 
       if (installationStatus?.validationError) {
         details.validationError = installationStatus.validationError;
       }
+      let createdDate = new Date();
+      let expiryDate = new Date();
 
-      if (installationStatus?.lifetime) {
+      // Extract key package status for the specific installation
+      const keyPackageStatus = status[installationId];
+      if (keyPackageStatus.lifetime) {
+        createdDate = new Date(
+          Number(keyPackageStatus.lifetime.notBefore) * 1000,
+        );
+        expiryDate = new Date(
+          Number(keyPackageStatus.lifetime.notAfter) * 1000,
+        );
+      }
+      if (keyPackageStatus?.lifetime) {
         const createdDate = new Date(
-          Number(installationStatus.lifetime.notBefore) * 1000,
+          Number(keyPackageStatus.lifetime.notBefore) * 1000,
         );
         const expiryDate = new Date(
-          Number(installationStatus.lifetime.notAfter) * 1000,
+          Number(keyPackageStatus.lifetime.notAfter) * 1000,
         );
 
         details.createdDate = createdDate.toISOString();
         details.expiryDate = expiryDate.toISOString();
         details.createdDateFormatted = createdDate.toLocaleString();
         details.expiryDateFormatted = expiryDate.toLocaleString();
+      } else {
+        details.lifetimeAvailable = false;
+        details.reason = installationStatus?.validationError
+          ? "Lifetime not available due to validation error"
+          : "No lifetime data found";
       }
 
       return details;
