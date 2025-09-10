@@ -52,7 +52,6 @@ describe(testName, () => {
     });
     it(`addMember-${i}:add members to a group`, async () => {
       await checkKeyPackageStatusesByInboxId(creator!.client, extraMember);
-
       await newGroup.addMembers([extraMember]);
     });
   }
