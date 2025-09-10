@@ -564,12 +564,42 @@ export async function checkKeyPackageStatusesByInboxId(
   ).length;
   const invalidInstallations = totalInstallations - validInstallations;
 
+  // Extract key package dates for each installation
+  const installationDetails = Object.entries(status).map(
+    ([installationId, installationStatus]) => {
+      const details: any = {
+        installationId,
+        hasValidationError: !!installationStatus?.validationError,
+      };
+
+      if (installationStatus?.validationError) {
+        details.validationError = installationStatus.validationError;
+      }
+
+      if (installationStatus?.lifetime) {
+        const createdDate = new Date(
+          Number(installationStatus.lifetime.notBefore) * 1000,
+        );
+        const expiryDate = new Date(
+          Number(installationStatus.lifetime.notAfter) * 1000,
+        );
+
+        details.createdDate = createdDate.toISOString();
+        details.expiryDate = expiryDate.toISOString();
+        details.createdDateFormatted = createdDate.toLocaleString();
+        details.expiryDateFormatted = expiryDate.toLocaleString();
+      }
+
+      return details;
+    },
+  );
+
   console.warn({
     inboxId,
     installationIds,
     totalInstallations,
     validInstallations,
     invalidInstallations,
-    status,
+    installationDetails,
   });
 }
