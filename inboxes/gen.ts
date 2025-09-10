@@ -47,6 +47,7 @@ OPTIONS:
   --count <number>       Number of inboxes to generate [default: 200]
   --env <environments>  Comma-separated environments (local,dev,production) [default: local]
   --installations <num>  Number of installations per inbox [default: 2]
+  --restart             Force restart existing installations (revokes and recreates)
   --log warn --file               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
   -h, --help            Show this help message
@@ -59,12 +60,14 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn gen --count 500 --env local
   yarn gen --env local,dev --installations 3
+  yarn gen --restart --env production --installations 2
   yarn gen --clean --log warn --file
   yarn gen --help
 
 PRESET COMMANDS:
   yarn update:local      Update 500 inboxes for local testing
   yarn update:prod       Update inboxes for production testing
+  yarn restart:prod      Restart production installations (force recreate)
 
 For more information, see: cli/readme.md
 `);
@@ -222,7 +225,11 @@ function showFileStats(
   console.log(`\n🎉 Analysis & deduplication complete!`);
 }
 
-async function checkInstallations(client: Client, installationCount: number) {
+async function checkInstallations(
+  client: Client,
+  installationCount: number,
+  forceRestart: boolean = false,
+) {
   debugLog(`\n🔍 Checking installations for inbox: ${client.inboxId}`);
   const state = await client.preferences.inboxStateFromInboxIds(
     [client.inboxId],
@@ -230,19 +237,33 @@ async function checkInstallations(client: Client, installationCount: number) {
   );
   let current = state?.[0]?.installations.length || 0;
   debugLog(`📊 Current installations: ${current}/${installationCount}`);
-  const surplus = current - installationCount;
-  if (surplus > 0) {
-    debugLog(`🔄 Revoking ${surplus} surplus installations`);
+
+  if (forceRestart && current > 0) {
+    debugLog(`🔄 Force restart: Revoking ALL ${current} installations`);
     const all = state?.[0]?.installations || [];
-    const toRevoke = all
-      .slice(installationCount)
-      .map(
-        (inst) =>
-          new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
-      );
+    const toRevoke = all.map(
+      (inst) => new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
+    );
     if (toRevoke.length) await client.revokeInstallations(toRevoke);
-    debugLog(`✅ Successfully revoked ${toRevoke.length} installations`);
-    current = installationCount;
+    debugLog(
+      `✅ Successfully revoked ${toRevoke.length} installations for restart`,
+    );
+    current = 0; // Reset to 0 since we revoked all
+  } else {
+    const surplus = current - installationCount;
+    if (surplus > 0) {
+      debugLog(`🔄 Revoking ${surplus} surplus installations`);
+      const all = state?.[0]?.installations || [];
+      const toRevoke = all
+        .slice(installationCount)
+        .map(
+          (inst) =>
+            new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
+        );
+      if (toRevoke.length) await client.revokeInstallations(toRevoke);
+      debugLog(`✅ Successfully revoked ${toRevoke.length} installations`);
+      current = installationCount;
+    }
   }
   return { client, currentInstallations: current };
 }
@@ -251,16 +272,18 @@ async function smartUpdate({
   count,
   envs,
   installations,
+  restart,
 }: {
   count?: number;
   envs?: XmtpEnv[];
   installations?: number;
+  restart?: boolean;
 }) {
   envs = envs || ["local"];
   const installationCount = installations || 2;
   if (envs.includes("local")) loadEnv("smart-update");
   debugLog(
-    `\nConfiguration:\n- Environments: ${envs.join(", ")}\n- Installations per account: ${installationCount}\n- Target accounts: ${count || "all existing"}`,
+    `\nConfiguration:\n- Environments: ${envs.join(", ")}\n- Installations per account: ${installationCount}\n- Target accounts: ${count || "all existing"}\n- Restart mode: ${restart ? "enabled (force recreate)" : "disabled"}`,
   );
   const targetFileName = `${installationCount}.json`;
   const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
@@ -302,6 +325,7 @@ async function smartUpdate({
           const { currentInstallations } = await checkInstallations(
             client,
             installationCount,
+            restart || false,
           );
           if (debugMode) {
             const installProgress = new ProgressBar(
@@ -431,7 +455,8 @@ async function main() {
   // Parse arguments
   let count: number | undefined = undefined,
     envs: XmtpEnv[] | undefined = undefined,
-    installations: string | undefined = undefined;
+    installations: string | undefined = undefined,
+    restart = false;
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -440,6 +465,7 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = args[i + 1];
+    if (arg === "--restart") restart = true;
     if (arg === "--log warn --file") debugMode = true;
   });
 
