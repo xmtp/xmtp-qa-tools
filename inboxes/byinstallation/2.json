@@ -1,5 +1,12 @@
 [
   {
+    "accountAddress": "0xe8eea3d70651402f3a15e981bba25ee5a76fbf74",
+    "inboxId": "b164a6401398ac50ad9c80f1530201d4dbd2b0771ea26d697c0e43a358b79f59",
+    "walletKey": "0xa7b565936cf427921e2406976701240ca9f112aa3252d050aef9e5eaec5a6fda",
+    "dbEncryptionKey": "5fb5beea14c91aa3def967930cae529720f4fa2b2df896adadde603c8684ec74",
+    "installations": 2
+  },
+  {
     "accountAddress": "0xcd50b4aed21e3adfa411106737e97de431e2eddf",
     "inboxId": "a5402cdaea8ca241516574d4b855dbb82cfedd29e5f3ba2b997f6bee321879fe",
     "walletKey": "0x9fb73f84b3f6ac457f48ee0ea8ff1b757e00f11c60389eaf166bdcb64ce2b11f",
@@ -18,13 +25,6 @@
     "inboxId": "cb7213baf2dc77488a597f2ad47136fe1612fb686221903d7f09f155fe1cf2f5",
     "walletKey": "0xc2363a6733eee112980ee9739c1a2259d56e600b1788ea247fc90f2ae5b39098",
     "dbEncryptionKey": "bb6827de9cd16828a072d55b05754f85dd5932f63b938086806c6bf8200b5e85",
-    "installations": 2
-  },
-  {
-    "accountAddress": "0xe8eea3d70651402f3a15e981bba25ee5a76fbf74",
-    "inboxId": "b164a6401398ac50ad9c80f1530201d4dbd2b0771ea26d697c0e43a358b79f59",
-    "walletKey": "0xa7b565936cf427921e2406976701240ca9f112aa3252d050aef9e5eaec5a6fda",
-    "dbEncryptionKey": "5fb5beea14c91aa3def967930cae529720f4fa2b2df896adadde603c8684ec74",
     "installations": 2
   },
   {
