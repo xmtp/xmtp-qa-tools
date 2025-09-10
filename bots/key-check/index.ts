@@ -7,7 +7,6 @@ import {
   type DecodedMessage,
   type GroupMember,
 } from "version-management/client-versions";
-import { initializeClient } from "../xmtp-skills";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
