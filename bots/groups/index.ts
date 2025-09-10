@@ -182,13 +182,11 @@ export const addToGroupWithCustomCopy = async (
   try {
     // Get the group conversation
     const group = await ctx.client.conversations.getConversationById(
-      config.groupId[ctx.client.options?.env as XmtpEnv],
+      config.groupId,
     );
 
     if (!group) {
-      console.debug(
-        `Group not found in the db: ${config.groupId[ctx.client.options?.env as XmtpEnv]}`,
-      );
+      console.debug(`Group not found in the db: ${config.groupId}`);
       const errorMessage =
         config.messages.groupNotFound ||
         "Group not found in the db, contact the admin";
@@ -218,14 +216,14 @@ export const addToGroupWithCustomCopy = async (
 
       if (!isMember) {
         console.debug(
-          `Adding member ${ctx.message.senderInboxId} to group ${config.groupId[ctx.client.options?.env as XmtpEnv]}`,
+          `Adding member ${ctx.message.senderInboxId} to group ${config.groupId}`,
         );
         await (group as Group).addMembers([ctx.message.senderInboxId]);
 
         // Check if user should be admin
         if (config.adminInboxIds?.includes(ctx.message.senderInboxId)) {
           console.debug(
-            `Adding admin ${ctx.message.senderInboxId} to group ${config.groupId[ctx.client.options?.env as XmtpEnv]}`,
+            `Adding admin ${ctx.message.senderInboxId} to group ${config.groupId}`,
           );
           await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
         }
@@ -245,13 +243,13 @@ export const addToGroupWithCustomCopy = async (
           config.adminInboxIds?.includes(ctx.message.senderInboxId)
         ) {
           console.debug(
-            `Adding admin privileges to ${ctx.message.senderInboxId} in group ${config.groupId[ctx.client.options?.env as XmtpEnv]}`,
+            `Adding admin privileges to ${ctx.message.senderInboxId} in group ${config.groupId}`,
           );
           await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
         }
 
         console.debug(
-          `Member ${ctx.message.senderInboxId} already in group ${config.groupId[ctx.client.options?.env as XmtpEnv]}`,
+          `Member ${ctx.message.senderInboxId} already in group ${config.groupId}`,
         );
         await ctx.conversation.send(config.messages.alreadyInGroup);
         return false;
