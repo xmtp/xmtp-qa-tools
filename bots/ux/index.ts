@@ -1,20 +1,18 @@
 import { Agent, getTestUrl } from "@xmtp/agent-sdk";
 
-const agent = (await Agent.createFromEnv({
+const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
   appVersion: "ux-agent/0",
-})) as Agent<any>;
-
-let count = 0;
+});
 
 agent.on("text", async (ctx) => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 
-  count++;
-  console.log(`Count: ${count}`);
-  await ctx.conversation.send(`echo: ${ctx.message.content}`);
+  await ctx.conversation.send(`Text message`);
+  await ctx.conversation.send(`Reaction message`);
+  await ctx.conversation.send(`Reply message`);
 });
 
 // Handle uncaught errors
