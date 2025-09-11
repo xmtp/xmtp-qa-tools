@@ -130,7 +130,7 @@ export const createLogger = () => {
   );
 
   const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || "silly",
+    level: process.env.LOG_LEVEL || "info",
     format: combinedFormat,
     transports: [new winston.transports.Console()],
   });
