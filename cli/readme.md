@@ -192,10 +192,7 @@ All commands support:
 
 ## Environment Variables
 
-- `TARGET` - Default target address
 - `XMTP_ENV` - Default environment (local/dev/production)
-- `LOG_LEVEL` - JS logger level (default: info)
-- `LOGGING_LEVEL` - Rust library logger level (default: off)
 - `WALLET_KEY` - Wallet private key (for revoke)
 - `ENCRYPTION_KEY` - Encryption key (for revoke)
 

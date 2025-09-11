@@ -132,7 +132,7 @@ yarn install
 ```bash
 XMTP_ENV="dev" #  environment (dev, production, local, multinode)
 LOGGING_LEVEL="error" # Rust library logs
-LOG_LEVEL="debug" # JS logs level
+LOG_LEVEL="info" # JS logs level
 ```
 
 ### Running tests
