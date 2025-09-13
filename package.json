@@ -18,7 +18,7 @@
     "format": "prettier -w .",
     "gen": "tsx inboxes/gen.ts",
     "groups": "tsx cli/groups.ts",
-    "inboxes:restart": "yarn gen --installations 2 --restart",
+    "inboxes:restart": "yarn gen --installations 2 --count 200 --restart",
     "inboxes:update": "yarn gen --installations 2",
     "installations": "tsx cli/installations.ts",
     "lint": "eslint .",
