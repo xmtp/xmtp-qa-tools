@@ -84,7 +84,7 @@
     "baseName": "bracky.base.eth",
     "address": "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     "sendMessage": "hi",
-    "live": true,
+    "live": false,
     "networks": ["production"]
   },
   {
