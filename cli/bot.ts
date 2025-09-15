@@ -36,12 +36,12 @@ ENVIRONMENTS:
 
 AVAILABLE BOTS:
   echo        Echo bot - responds to messages
-  key-check   Key validation bot
+  key-check   Key validation, fork detection, and UX demo bot
 
 EXAMPLES:
   yarn bot echo --env dev
   yarn bot key-check --env local
-  yarn bot echo --help
+  yarn bot key-check --help
 
 For more information, see: cli/readme.md
 `);

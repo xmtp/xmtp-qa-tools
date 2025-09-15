@@ -1,32 +1,41 @@
-import fs from "fs";
 import { createRequire } from "node:module";
 import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
-import {
-  getActiveVersion,
-  IdentifierKind,
-  type GroupMember,
-} from "version-management/client-versions";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { ReplyCodec } from "@xmtp/content-type-reply";
+import { getActiveVersion } from "version-management/client-versions";
+import { COMMANDS, HELP_TEXT, parseCommand, UX_HELP_TEXT } from "./commands";
+import { CommandHandlers } from "./handlers";
+import { getDbPath } from "./utils";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
 const packageJson = require("../../package.json");
-const xmtpSdkVersion =
-  packageJson.dependencies["@xmtp/node-sdk-" + getActiveVersion().nodeBindings];
+const xmtpSdkVersion: string =
+  packageJson.dependencies[
+    "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
+  ] ?? "unknown";
 
 // Track when the bot started
 const startTime = new Date();
 
-// 2. Spin up the agent
+// Initialize command handlers
+const handlers = new CommandHandlers(startTime, xmtpSdkVersion);
+
+// 2. Spin up the agent with UX demo codecs
 const agent = (await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
   dbPath: getDbPath("key-check-" + (process.env.XMTP_ENV ?? "")),
+  codecs: [new ReactionCodec(), new ReplyCodec()],
 })) as Agent<any>;
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
-  // Get the message content
   const content = message.content;
+
+  // Update the last received message for UX demo functionality
+  handlers.updateLastMessage(message);
+
   if (!content.trim().startsWith("/kc")) {
     return;
   }
@@ -34,203 +43,83 @@ agent.on("text", async (ctx) => {
   console.log(`Received command: ${content}`);
 
   // Parse the command
-  const parts = content.trim().split(/\s+/);
-  const command = parts.length > 1 ? parts[1] : "";
+  const { command, parts } = parseCommand(content);
 
-  if (command === "help") {
-    // Send help information
-    const helpText =
-      "Available commands:\n" +
-      "/kc - Check key package status for the sender\n" +
-      "/kc inboxid <INBOX_ID> - Check key package status for a specific inbox ID\n" +
-      "/kc address <ADDRESS> - Check key package status for a specific address\n" +
-      "/kc groupid - Show the current conversation ID\n" +
-      "/kc members - List all members' inbox IDs in the current conversation\n" +
-      "/kc version - Show XMTP SDK version information\n" +
-      "/kc uptime - Show when the bot started and how long it has been running\n" +
-      "/kc debug - Show debug information for the key-check bot\n" +
-      "/kc help - Show this help message";
+  // Route to appropriate handler
+  switch (command) {
+    case COMMANDS.HELP:
+      await handlers.handleHelp(ctx, HELP_TEXT);
+      break;
 
-    await ctx.conversation.send(helpText);
-    console.log("Sent help information");
-    return;
-  }
+    case COMMANDS.GROUP_ID:
+      await handlers.handleGroupId(ctx);
+      break;
 
-  // Handle groupid command
-  if (command === "groupid") {
-    await ctx.conversation.send(`Conversation ID: "${message.conversationId}"`);
-    console.log(`Sent conversation ID: ${message.conversationId}`);
-    return;
-  }
+    case COMMANDS.VERSION:
+      await handlers.handleVersion(ctx);
+      break;
 
-  // Handle version command
-  if (command === "version") {
-    await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
-    console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
-    return;
-  }
+    case COMMANDS.UPTIME:
+      await handlers.handleUptime(ctx);
+      break;
 
-  // Handle uptime command
-  if (command === "uptime") {
-    const currentTime = new Date();
-    const uptimeMs = currentTime.getTime() - startTime.getTime();
+    case COMMANDS.DEBUG:
+      await handlers.handleDebug(ctx);
+      break;
 
-    // Convert milliseconds to days, hours, minutes, seconds
-    const days = Math.floor(uptimeMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(
-      (uptimeMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-    );
-    const minutes = Math.floor((uptimeMs % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((uptimeMs % (1000 * 60)) / 1000);
+    case COMMANDS.MEMBERS:
+      await handlers.handleMembers(ctx);
+      break;
 
-    const uptimeText =
-      `Bot started at: ${startTime.toLocaleString()}\n` +
-      `Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-    await ctx.conversation.send(uptimeText);
-    console.log(`Sent uptime information: ${uptimeText}`);
-    return;
-  }
-
-  // Handle debug command
-  if (command === "debug") {
-    let conversations = await ctx.client.conversations.list();
-    // Print the list of conversations ids to console:
-    console.log(
-      "Conversations:",
-      conversations.map((conversation: any) => conversation.id),
-    );
-    await ctx.conversation.send(
-      `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
-    );
-    return;
-  }
-
-  // Handle members command
-  if (command === "members") {
-    const members: GroupMember[] = await ctx.conversation.members();
-
-    if (!members || members.length === 0) {
-      await ctx.conversation.send("No members found in this conversation.");
-      console.log("No members found in the conversation");
-      return;
-    }
-
-    let membersList = "Group members:\n\n";
-
-    for (const member of members) {
-      const isBot =
-        member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
-      let marker = isBot ? "~" : " ";
-      const isSender =
-        member.inboxId.toLowerCase() === message.senderInboxId.toLowerCase();
-      marker = isSender ? "*" : marker;
-      membersList += `${marker}${member.inboxId}${marker}\n\n`;
-    }
-
-    membersList += "\n ~indicates key-check bot's inbox ID~";
-    membersList += "\n *indicates who prompted the key-check command*";
-
-    await ctx.conversation.send(membersList);
-    console.log(`Sent list of ${members.length} members`);
-    return;
-  }
-
-  let targetInboxId = message.senderInboxId;
-  let targetAddress = "";
-
-  // Handle specific inbox ID or address lookup
-  if (command === "inboxid" && parts.length > 2) {
-    targetInboxId = parts[2];
-    console.log(`Looking up inbox ID: ${targetInboxId}`);
-  } else if (command === "address" && parts.length > 2) {
-    targetAddress = parts[2];
-    console.log(`Looking up address: ${targetAddress}`);
-
-    // Need to find the inbox ID for this address
-    try {
-      const inboxId = await ctx.client.getInboxIdByIdentifier({
-        identifier: targetAddress,
-        identifierKind: IdentifierKind.Ethereum,
-      });
-      if (!inboxId) {
-        await ctx.conversation.send(
-          `No inbox found for address ${targetAddress}`,
-        );
-        return;
+    case COMMANDS.INBOX_ID:
+      if (parts.length > 2) {
+        const targetInboxId = parts[2];
+        console.log(`Looking up inbox ID: ${targetInboxId}`);
+        await handlers.handleKeyPackageCheck(ctx, targetInboxId);
       }
-      targetInboxId = inboxId;
-    } catch (error) {
-      console.error(`Error resolving address ${targetAddress}:`, error);
-      await ctx.conversation.send(`Error resolving address ${targetAddress}`);
-      return;
-    }
-  }
+      break;
 
-  // Get inbox state for the target inbox ID
-  try {
-    const inboxState = await ctx.client.preferences.inboxStateFromInboxIds(
-      [targetInboxId],
-      true,
-    );
-
-    if (!inboxState || inboxState.length === 0) {
-      await ctx.conversation.send(`No inbox state found for ${targetInboxId}`);
-      return;
-    }
-
-    const addressFromInboxId = inboxState[0].identifiers[0].identifier;
-
-    // Retrieve all the installation ids for the target
-    const installationIds = inboxState[0].installations.map(
-      (installation: { id: string }) => installation.id,
-    );
-
-    // Retrieve a map of installation id to KeyPackageStatus
-    const status = (await ctx.client.getKeyPackageStatusesForInstallationIds(
-      installationIds,
-    )) as Record<string, any>;
-    console.log(status);
-
-    // Count valid and invalid installations
-    const totalInstallations = Object.keys(status).length;
-    const validInstallations = Object.values(status).filter(
-      (value) => !value?.validationError,
-    ).length;
-    const invalidInstallations = totalInstallations - validInstallations;
-
-    // Create and send a human-readable summary with abbreviated IDs
-    let summaryText = `InboxID: \n"${targetInboxId}" \nAddress: \n"${addressFromInboxId}" \n You have ${totalInstallations} installations, ${validInstallations} of them are valid and ${invalidInstallations} of them are invalid.\n\n`;
-    for (const [installationId, installationStatus] of Object.entries(status)) {
-      // Abbreviate the installation ID (first 4 and last 4 characters)
-      const shortId =
-        installationId.length > 8
-          ? `${installationId.substring(0, 4)}...${installationId.substring(installationId.length - 4)}`
-          : installationId;
-
-      if (installationStatus?.lifetime) {
-        const createdDate = new Date(
-          Number(installationStatus.lifetime.notBefore) * 1000,
-        );
-        const expiryDate = new Date(
-          Number(installationStatus.lifetime.notAfter) * 1000,
-        );
-
-        summaryText += `✅ '${shortId}':\n`;
-        summaryText += `- created: ${createdDate.toLocaleString()}\n`;
-        summaryText += `- valid until: ${expiryDate.toLocaleString()}\n\n`;
-      } else if (installationStatus?.validationError) {
-        summaryText += `❌ '${shortId}':\n`;
-        summaryText += `- validationError: '${installationStatus.validationError}'\n\n`;
+    case COMMANDS.ADDRESS:
+      if (parts.length > 2) {
+        const targetAddress = parts[2];
+        console.log(`Looking up address: ${targetAddress}`);
+        await handlers.handleKeyPackageCheck(ctx, "", targetAddress);
       }
-    }
-    await ctx.conversation.send(summaryText);
-    console.log(`Sent key status for ${targetInboxId}`);
-  } catch (error) {
-    console.error(`Error processing key-check for ${targetInboxId}:`, error);
-    await ctx.conversation.send(
-      `Error processing key-check: ${error instanceof Error ? error.message : "Unknown error"}`,
-    );
+      break;
+
+    case COMMANDS.FORK:
+      await handlers.handleForkDetection(ctx);
+      break;
+
+    // UX Demo commands
+    case COMMANDS.UX_HELP:
+      await handlers.handleUxHelp(ctx, UX_HELP_TEXT);
+      break;
+
+    case COMMANDS.UX_REACTION:
+      await handlers.handleUxReaction(ctx);
+      break;
+
+    case COMMANDS.UX_REPLY:
+      await handlers.handleUxReply(ctx);
+      break;
+
+    case COMMANDS.UX_ATTACHMENT:
+      await handlers.handleUxAttachment(ctx);
+      break;
+
+    case COMMANDS.UX_TEXT:
+      await handlers.handleUxText(ctx);
+      break;
+
+    case COMMANDS.UX_ALL:
+      await handlers.handleUxAll(ctx);
+      break;
+
+    default:
+      // Default key package check for sender
+      await handlers.handleKeyPackageCheck(ctx, message.senderInboxId);
+      break;
   }
 
   console.log("Waiting for messages...");
@@ -238,100 +127,12 @@ agent.on("text", async (ctx) => {
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log(`Waiting for messages...`);
+  console.log("🔧 Key-Check Bot with UX Demo started!");
+  console.log(
+    "Features: Key package validation, fork detection, and UX message type demos",
+  );
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 });
 
 await agent.start();
-
-function getDbPath(description: string = "xmtp") {
-  //Checks if the environment is a Railway deployment
-  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  // Create database directory if it doesn't exist
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  return `${volumePath}/${process.env.XMTP_ENV}-${description}.db3`;
-}
-
-// const siletnDebug = async (
-//   client: Client,
-//   conversation: Conversation,
-//   message: DecodedMessage,
-// ) => {
-//   const senderAddress = await getSenderAddress(
-//     client,
-//     message.senderInboxId as string,
-//   );
-//   const debugInfo = await conversation.debugInfo();
-//   const members = await conversation.members();
-//   const group = conversation as Group;
-
-//   console.log("=== MESSAGE RECEIVED ===");
-//   console.log(
-//     `Content: ${message.content as string} | Sender: ${senderAddress} | ID: ${message.id} | Sent: ${message.sentAt.toISOString()}`,
-//   );
-//   console.log(
-//     `Conversation: ${conversation.id} | Created: ${conversation.createdAt.toISOString()}`,
-//   );
-//   console.log(
-//     `Debug: epoch=${debugInfo.epoch}, maybeForked=${debugInfo.maybeForked}`,
-//   );
-
-//   console.log("=== MEMBERS INFO ===");
-//   console.log(`Total members: ${members.length}`);
-//   for (let i = 0; i < members.length; i++) {
-//     const member = members[i];
-//     const memberAddress = await getSenderAddress(client, member.inboxId).catch(
-//       () => "Failed to resolve",
-//     );
-//     console.log(
-//       `Member ${i + 1}: ${memberAddress} | InboxId: ${member.inboxId} | Installations: ${member.installationIds} | Permission: ${member.permissionLevel}`,
-//     );
-//   }
-
-//   console.log("=== GROUP INFO ===");
-//   console.log(
-//     `Name: ${group.name || "undefined"} | Description: ${group.description || "undefined"} | Image: ${group.imageUrl || "undefined"}`,
-//   );
-//   console.log(
-//     `Admins: ${group.admins} | SuperAdmins: ${group.superAdmins} | Active: ${group.isActive} | AddedBy: ${group.addedByInboxId || "undefined"}`,
-//   );
-
-//   console.log("=== CLIENT INFO ===");
-//   console.log(
-//     `InboxId: ${client.inboxId} | InstallationId: ${client.installationId}`,
-//   );
-
-//   console.log("=== POST-SYNC STATE ===");
-//   try {
-//     await conversation.sync();
-//     const postSyncDebugInfo = await conversation.debugInfo();
-//     console.log(
-//       `Post-sync: epoch=${postSyncDebugInfo.epoch}, maybeForked=${postSyncDebugInfo.maybeForked}`,
-//     );
-//     if (postSyncDebugInfo.epoch !== debugInfo.epoch) {
-//       console.log(
-//         `⚠️  EPOCH CHANGED: ${debugInfo.epoch} → ${postSyncDebugInfo.epoch}`,
-//       );
-//     }
-//   } catch (error) {
-//     console.log(`Failed to sync conversation:`, error);
-//   }
-
-//   console.log("=== MESSAGE HISTORY ===");
-//   try {
-//     const messages = await conversation.messages();
-//     console.log(`Total messages: ${messages.length}`);
-//     if (messages.length > 0) {
-//       console.log(
-//         `First: ${messages[messages.length - 1].sentAt.toISOString()} | Last: ${messages[0].sentAt.toISOString()}`,
-//       );
-//     }
-//   } catch (error) {
-//     console.log(`Failed to get message history:`, error);
-//   }
-
-//   console.log("=== END OF DEBUG LOG ===\n");
-// };

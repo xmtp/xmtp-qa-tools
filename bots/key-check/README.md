@@ -1,20 +1,35 @@
-# Key Check Agent
+# Key Check Agent with UX Demo
 
-This agent helps you check the status of XMTP key packages for yourself or other addresses.
+This comprehensive agent provides key package validation, fork detection, and UX message type demonstrations all in one bot.
+
+## Commands
 
 Once the agent is running, you can interact with it using the following commands:
+
+### Key Package Checks
 
 - `/kc` - Check key package status for the sender
 - `/kc inboxid <INBOX_ID>` - Check key package status for a specific inbox ID
 - `/kc address <ADDRESS>` - Check key package status for a specific address
+
+### Conversation Analysis
+
 - `/kc groupid` - Show the current conversation ID
 - `/kc members` - List all members' inbox IDs in the current conversation
+- `/kc fork` - **NEW!** Detect potential conversation forks and show detailed debug info
+
+### Bot Information
+
 - `/kc version` - Show XMTP SDK version information
+- `/kc uptime` - Show when the bot started and how long it has been running
+- `/kc debug` - Show debug information for the key-check bot
 - `/kc help` - Show the help message with available commands
 
-The agent will respond with information about the key packages, including:
+### UX Demo Commands
 
-- Total number of installations
-- Number of valid and invalid installations
-- Creation and expiry dates for valid installations
-- Error messages for invalid installations
+- `/kc ux` - Show UX demo help and available message types
+- `/kc ux-reaction` - Send a reaction to the last message
+- `/kc ux-reply` - Send a reply to the last message
+- `/kc ux-attachment` - Show attachment implementation demo
+- `/kc ux-text` - Send a regular text message
+- `/kc ux-all` - Send one of each message type (comprehensive demo)
