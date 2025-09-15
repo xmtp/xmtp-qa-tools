@@ -1,20 +1,60 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
+import { getDbPath } from "@helpers/client";
 import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { getActiveVersion } from "version-management/client-versions";
-import { COMMANDS, HELP_TEXT, parseCommand } from "./commands";
 import { CommandHandlers } from "./handlers";
 
-export function getDbPath(description: string = "xmtp"): string {
-  // Checks if the environment is a Railway deployment
-  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  // Create database directory if it doesn't exist
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  return `${volumePath}/${process.env.XMTP_ENV}-${description}.db3`;
+// Command definitions and help text for key-check bot
+const COMMANDS = {
+  HELP: "help",
+  GROUP_ID: "groupid",
+  VERSION: "version",
+  UPTIME: "uptime",
+  DEBUG: "debug",
+  MEMBERS: "members",
+  INBOX_ID: "inboxid",
+  ADDRESS: "address",
+  FORK: "fork",
+  // UX Demo commands
+  UX_HELP: "ux",
+  UX_REACTION: "ux-reaction",
+  UX_REPLY: "ux-reply",
+  UX_ATTACHMENT: "ux-attachment",
+  UX_TEXT: "ux-text",
+} as const;
+
+const HELP_TEXT =
+  "Available commands:\n\n" +
+  "**Key Package & Fork Detection:**\n" +
+  "/kc - Check key package status for the sender\n" +
+  "/kc inboxid <INBOX_ID> - Check key package status for a specific inbox ID\n" +
+  "/kc address <ADDRESS> - Check key package status for a specific address\n" +
+  "/kc fork - Detect potential conversation forks and show detailed debug info\n\n" +
+  "**Conversation Info:**\n" +
+  "/kc groupid - Show the current conversation ID\n" +
+  "/kc members - List all members' inbox IDs in the current conversation\n\n" +
+  "**UX Demo - Message Types:**\n" +
+  "/kc ux - Send one of each message type (text, reply, reaction, attachment demo)\n" +
+  "/kc ux-reaction - Send a reaction to the last message\n" +
+  "/kc ux-reply - Send a reply to the last message\n" +
+  "/kc ux-attachment - Show attachment implementation demo\n" +
+  "/kc ux-text - Send a regular text message\n\n" +
+  "**Bot Info:**\n" +
+  "/kc version - Show XMTP SDK version information\n" +
+  "/kc uptime - Show when the bot started and how long it has been running\n" +
+  "/kc debug - Show debug information for the key-check bot\n" +
+  "/kc help - Show this help message";
+
+function parseCommand(content: string): {
+  command: string;
+  parts: string[];
+} {
+  const parts = content.trim().split(/\s+/);
+  const command = parts.length > 1 ? parts[1] : "";
+  return { command, parts };
 }
 
 // Get XMTP SDK version from package.json
@@ -35,13 +75,16 @@ const handlers = new CommandHandlers(startTime, xmtpSdkVersion);
 const agent = (await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
-  dbPath: getDbPath("key-check-" + (process.env.XMTP_ENV ?? "")),
+  dbPath: getDbPath(`key-check`),
   codecs: [new ReactionCodec(), new ReplyCodec()],
 })) as Agent<any>;
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
+
+  // Update the last received message for UX demo functionality
+  handlers.updateLastMessage(message);
 
   if (!content.trim().startsWith("/kc")) {
     return;
@@ -98,6 +141,27 @@ agent.on("text", async (ctx) => {
       await handlers.handleForkDetection(ctx);
       break;
 
+    // UX Demo commands
+    case COMMANDS.UX_HELP:
+      await handlers.handleUxAll(ctx);
+      break;
+
+    case COMMANDS.UX_REACTION:
+      await handlers.handleUxReaction(ctx);
+      break;
+
+    case COMMANDS.UX_REPLY:
+      await handlers.handleUxReply(ctx);
+      break;
+
+    case COMMANDS.UX_ATTACHMENT:
+      await handlers.handleUxAttachment(ctx);
+      break;
+
+    case COMMANDS.UX_TEXT:
+      await handlers.handleUxText(ctx);
+      break;
+
     default:
       // Default key package check for sender
       await handlers.handleKeyPackageCheck(ctx, message.senderInboxId);
@@ -109,8 +173,10 @@ agent.on("text", async (ctx) => {
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log("🔧 Key-Check Bot started!");
-  console.log("Features: Key package validation and fork detection");
+  console.log("🔧 Key-Check Bot with UX Demo started!");
+  console.log(
+    "Features: Key package validation, fork detection, and UX message type demos",
+  );
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 });

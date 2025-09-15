@@ -1,17 +1,5 @@
 import { getDbPath } from "@helpers/client";
-import {
-  Agent,
-  createSigner,
-  createUser,
-  getEncryptionKeyFromHex,
-  getTestUrl,
-  type Group,
-} from "@xmtp/agent-sdk";
-
-const groupId = {
-  production: process.env.GROUP_ID_PRODUCTION_GANG as string,
-  dev: process.env.GROUP_ID_DEV_GANG as string,
-};
+import { Agent, getTestUrl, type Group } from "@xmtp/agent-sdk";
 
 const isAdmin = [
   "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
@@ -31,17 +19,9 @@ const messages = {
   error: "Error processing your request. Please try again.",
 };
 
-const signer = createSigner(
-  createUser(process.env.XMTP_WALLET_KEY_GANG as `0x${string}`),
-);
-const signerIdentifier = (await signer.getIdentifier()).identifier;
-
-const agent = await Agent.create(signer, {
+const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  dbEncryptionKey: getEncryptionKeyFromHex(
-    process.env.XMTP_DB_ENCRYPTION_KEY_GANG as string,
-  ),
-  dbPath: getDbPath(`${process.env.XMTP_ENV}-${signerIdentifier}`),
+  dbPath: getDbPath(`${process.env.XMTP_ENV}-gang`),
   appVersion: "gang-group/0",
 });
 
@@ -51,8 +31,7 @@ agent.on("unhandledError", (error) => {
 });
 
 agent.on("text", async (ctx) => {
-  const env = ctx.client.options?.env as "dev" | "production";
-  const currentGroupId = groupId[env];
+  const currentGroupId = process.env.GROUP_ID_GANG as string;
   const currentGroupCode = process.env.XMTP_GROUP_CODE_GANG as string;
 
   // Get the group conversation
