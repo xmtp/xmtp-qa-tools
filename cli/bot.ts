@@ -21,7 +21,7 @@ USAGE:
   yarn bot <bot-name> [options]
 
 ARGUMENTS:
-  bot-name              Name of the bot to run (echo, key-check)
+  bot-name              Name of the bot to run (echo, key-check, ux)
 
 OPTIONS:
   --env <environment>   XMTP environment (local, dev, production) [default: production]
@@ -36,12 +36,13 @@ ENVIRONMENTS:
 
 AVAILABLE BOTS:
   echo        Echo bot - responds to messages
-  key-check   Key validation, fork detection, and UX demo bot
+  key-check   Key validation and fork detection bot
+  ux          UX demo bot - showcases all XMTP content types
 
 EXAMPLES:
   yarn bot echo --env dev
   yarn bot key-check --env local
-  yarn bot key-check --help
+  yarn bot ux --env production
 
 For more information, see: cli/readme.md
 `);
@@ -100,7 +101,7 @@ async function main() {
 
     if (!fs.existsSync(botDir)) {
       console.error(`Error: Bot '${config.botName}' not found`);
-      console.error("Available bots: echo, key-check");
+      console.error("Available bots: echo, key-check, ux");
       console.error("Run 'yarn bot --help' for more information");
       process.exit(1);
     }

@@ -1,11 +1,21 @@
+import fs from "node:fs";
 import { createRequire } from "node:module";
 import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { getActiveVersion } from "version-management/client-versions";
-import { COMMANDS, HELP_TEXT, parseCommand, UX_HELP_TEXT } from "./commands";
+import { COMMANDS, HELP_TEXT, parseCommand } from "./commands";
 import { CommandHandlers } from "./handlers";
-import { getDbPath } from "./utils";
+
+export function getDbPath(description: string = "xmtp"): string {
+  // Checks if the environment is a Railway deployment
+  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
+  // Create database directory if it doesn't exist
+  if (!fs.existsSync(volumePath)) {
+    fs.mkdirSync(volumePath, { recursive: true });
+  }
+  return `${volumePath}/${process.env.XMTP_ENV}-${description}.db3`;
+}
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -32,9 +42,6 @@ const agent = (await Agent.createFromEnv({
 agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
-
-  // Update the last received message for UX demo functionality
-  handlers.updateLastMessage(message);
 
   if (!content.trim().startsWith("/kc")) {
     return;
@@ -91,31 +98,6 @@ agent.on("text", async (ctx) => {
       await handlers.handleForkDetection(ctx);
       break;
 
-    // UX Demo commands
-    case COMMANDS.UX_HELP:
-      await handlers.handleUxHelp(ctx, UX_HELP_TEXT);
-      break;
-
-    case COMMANDS.UX_REACTION:
-      await handlers.handleUxReaction(ctx);
-      break;
-
-    case COMMANDS.UX_REPLY:
-      await handlers.handleUxReply(ctx);
-      break;
-
-    case COMMANDS.UX_ATTACHMENT:
-      await handlers.handleUxAttachment(ctx);
-      break;
-
-    case COMMANDS.UX_TEXT:
-      await handlers.handleUxText(ctx);
-      break;
-
-    case COMMANDS.UX_ALL:
-      await handlers.handleUxAll(ctx);
-      break;
-
     default:
       // Default key package check for sender
       await handlers.handleKeyPackageCheck(ctx, message.senderInboxId);
@@ -127,10 +109,8 @@ agent.on("text", async (ctx) => {
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log("🔧 Key-Check Bot with UX Demo started!");
-  console.log(
-    "Features: Key package validation, fork detection, and UX message type demos",
-  );
+  console.log("🔧 Key-Check Bot started!");
+  console.log("Features: Key package validation and fork detection");
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 });
