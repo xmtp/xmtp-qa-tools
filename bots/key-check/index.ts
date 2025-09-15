@@ -1,61 +1,27 @@
-import fs from "node:fs";
 import { createRequire } from "node:module";
 import { getDbPath } from "@helpers/client";
-import { Agent, getTestUrl, type LogLevel } from "@xmtp/agent-sdk";
+import {
+  Agent,
+  getTestUrl,
+  type LogLevel,
+  type MessageContext,
+} from "@xmtp/agent-sdk";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { getActiveVersion } from "version-management/client-versions";
-import { CommandHandlers } from "./handlers";
+import {
+  ActionBuilder,
+  inlineActionsMiddleware,
+  registerAction,
+  sendActions,
+} from "../utils/inline-actions/inline-actions";
+import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
+import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
+import { DebugHandlers } from "./handlers/debug";
+import { ForksHandlers } from "./handlers/forks";
+import { UxHandlers } from "./handlers/ux";
 
-// Command definitions and help text for key-check bot
-const COMMANDS = {
-  HELP: "help",
-  GROUP_ID: "groupid",
-  VERSION: "version",
-  UPTIME: "uptime",
-  DEBUG: "debug",
-  MEMBERS: "members",
-  INBOX_ID: "inboxid",
-  ADDRESS: "address",
-  FORK: "fork",
-  // UX Demo commands
-  UX_HELP: "ux",
-  UX_REACTION: "ux-reaction",
-  UX_REPLY: "ux-reply",
-  UX_ATTACHMENT: "ux-attachment",
-  UX_TEXT: "ux-text",
-} as const;
-
-const HELP_TEXT =
-  "Available commands:\n\n" +
-  "**Key Package & Fork Detection:**\n" +
-  "/kc - Check key package status for the sender\n" +
-  "/kc inboxid <INBOX_ID> - Check key package status for a specific inbox ID\n" +
-  "/kc address <ADDRESS> - Check key package status for a specific address\n" +
-  "/kc fork - Detect potential conversation forks and show detailed debug info\n\n" +
-  "**Conversation Info:**\n" +
-  "/kc groupid - Show the current conversation ID\n" +
-  "/kc members - List all members' inbox IDs in the current conversation\n\n" +
-  "**UX Demo - Message Types:**\n" +
-  "/kc ux - Send one of each message type (text, reply, reaction, attachment demo)\n" +
-  "/kc ux-reaction - Send a reaction to the last message\n" +
-  "/kc ux-reply - Send a reply to the last message\n" +
-  "/kc ux-attachment - Show attachment implementation demo\n" +
-  "/kc ux-text - Send a regular text message\n\n" +
-  "**Bot Info:**\n" +
-  "/kc version - Show XMTP SDK version information\n" +
-  "/kc uptime - Show when the bot started and how long it has been running\n" +
-  "/kc debug - Show debug information for the key-check bot\n" +
-  "/kc help - Show this help message";
-
-function parseCommand(content: string): {
-  command: string;
-  parts: string[];
-} {
-  const parts = content.trim().split(/\s+/);
-  const command = parts.length > 1 ? parts[1] : "";
-  return { command, parts };
-}
+// Key-check bot now uses inline actions instead of text commands
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -68,115 +34,173 @@ const xmtpSdkVersion: string =
 // Track when the bot started
 const startTime = new Date();
 
-// Initialize command handlers
-const handlers = new CommandHandlers(startTime, xmtpSdkVersion);
+// Initialize handler instances
+const uxHandlers = new UxHandlers();
+const forksHandlers = new ForksHandlers();
+const debugHandlers = new DebugHandlers(startTime, xmtpSdkVersion);
 
-// 2. Spin up the agent with UX demo codecs
+// Register all action handlers
+registerAction("help", async (ctx) => {
+  await showMainMenu(ctx);
+});
+
+registerAction("groupid", async (ctx) => {
+  await debugHandlers.handleGroupId(ctx);
+});
+
+registerAction("version", async (ctx) => {
+  await debugHandlers.handleVersion(ctx);
+});
+
+registerAction("uptime", async (ctx) => {
+  await debugHandlers.handleUptime(ctx);
+});
+
+registerAction("debug", async (ctx) => {
+  await debugHandlers.handleDebug(ctx);
+});
+
+registerAction("members", async (ctx) => {
+  await debugHandlers.handleMembers(ctx);
+});
+
+registerAction("keycheck-sender", async (ctx) => {
+  await debugHandlers.handleKeyPackageCheck(ctx, ctx.message.senderInboxId);
+});
+
+registerAction("keycheck-inbox", async (ctx) => {
+  // Show input menu for inbox ID
+  await showInboxInputMenu(ctx);
+});
+
+registerAction("keycheck-address", async (ctx) => {
+  // Show input menu for address
+  await showAddressInputMenu(ctx);
+});
+
+registerAction("fork", async (ctx) => {
+  await forksHandlers.handleForkDetection(ctx);
+});
+
+// UX Demo actions
+registerAction("ux-all", async (ctx) => {
+  await uxHandlers.handleUxAll(ctx);
+});
+
+registerAction("ux-reaction", async (ctx) => {
+  await uxHandlers.handleUxReaction(ctx);
+});
+
+registerAction("ux-reply", async (ctx) => {
+  await uxHandlers.handleUxReply(ctx);
+});
+
+registerAction("ux-attachment", async (ctx) => {
+  await uxHandlers.handleUxAttachment(ctx);
+});
+
+registerAction("ux-text", async (ctx) => {
+  await uxHandlers.handleUxText(ctx);
+});
+
+// Helper functions for menus
+async function showMainMenu(ctx: MessageContext) {
+  const mainMenu = ActionBuilder.create(
+    "main-menu",
+    "🔧 Key-Check Bot - Choose an option:",
+  )
+    .add("keycheck-sender", "🔑 Check My Key Package", "primary")
+    .add("keycheck-inbox", "🔍 Check by Inbox ID")
+    .add("keycheck-address", "📧 Check by Address")
+    .add("fork", "🔀 Detect Forks", "danger")
+    .add("groupid", "🆔 Show Group ID")
+    .add("members", "👥 List Members")
+    .add("ux-all", "🎨 UX Demo - All Types")
+    .add("version", "📦 SDK Version")
+    .add("uptime", "⏰ Bot Uptime")
+    .add("debug", "🐛 Debug Info")
+    .build();
+
+  await sendActions(ctx, mainMenu);
+}
+
+async function showInboxInputMenu(ctx: MessageContext) {
+  await ctx.conversation.send(
+    "Please send the Inbox ID you want to check as a regular text message.",
+  );
+}
+
+async function showAddressInputMenu(ctx: MessageContext) {
+  await ctx.conversation.send(
+    "Please send the Ethereum address you want to check as a regular text message.",
+  );
+}
+
+// 2. Spin up the agent with UX demo codecs and inline actions
 const agent = (await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
   dbPath: getDbPath(`key-check`),
-  codecs: [new ReactionCodec(), new ReplyCodec()],
+  codecs: [
+    new ReactionCodec(),
+    new ReplyCodec(),
+    new ActionsCodec(),
+    new IntentCodec(),
+  ],
 })) as Agent<any>;
+
+// Add inline actions middleware
+agent.use(inlineActionsMiddleware);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
 
   // Update the last received message for UX demo functionality
-  handlers.updateLastMessage(message);
+  uxHandlers.updateLastMessage(message);
 
-  if (!content.trim().startsWith("/kc")) {
+  // Check if this is a command to show the main menu
+  if (
+    content.trim().startsWith("/kc") ||
+    content.trim().toLowerCase() === "help" ||
+    content.trim().toLowerCase() === "menu"
+  ) {
+    console.log(`Showing main menu for: ${content}`);
+    await showMainMenu(ctx);
     return;
   }
 
-  console.log(`Received command: ${content}`);
-
-  // Parse the command
-  const { command, parts } = parseCommand(content);
-
-  // Route to appropriate handler
-  switch (command) {
-    case COMMANDS.HELP:
-      await handlers.handleHelp(ctx, HELP_TEXT);
-      break;
-
-    case COMMANDS.GROUP_ID:
-      await handlers.handleGroupId(ctx);
-      break;
-
-    case COMMANDS.VERSION:
-      await handlers.handleVersion(ctx);
-      break;
-
-    case COMMANDS.UPTIME:
-      await handlers.handleUptime(ctx);
-      break;
-
-    case COMMANDS.DEBUG:
-      await handlers.handleDebug(ctx);
-      break;
-
-    case COMMANDS.MEMBERS:
-      await handlers.handleMembers(ctx);
-      break;
-
-    case COMMANDS.INBOX_ID:
-      if (parts.length > 2) {
-        const targetInboxId = parts[2];
-        console.log(`Looking up inbox ID: ${targetInboxId}`);
-        await handlers.handleKeyPackageCheck(ctx, targetInboxId);
-      }
-      break;
-
-    case COMMANDS.ADDRESS:
-      if (parts.length > 2) {
-        const targetAddress = parts[2];
-        console.log(`Looking up address: ${targetAddress}`);
-        await handlers.handleKeyPackageCheck(ctx, "", targetAddress);
-      }
-      break;
-
-    case COMMANDS.FORK:
-      await handlers.handleForkDetection(ctx);
-      break;
-
-    // UX Demo commands
-    case COMMANDS.UX_HELP:
-      await handlers.handleUxAll(ctx);
-      break;
-
-    case COMMANDS.UX_REACTION:
-      await handlers.handleUxReaction(ctx);
-      break;
-
-    case COMMANDS.UX_REPLY:
-      await handlers.handleUxReply(ctx);
-      break;
-
-    case COMMANDS.UX_ATTACHMENT:
-      await handlers.handleUxAttachment(ctx);
-      break;
-
-    case COMMANDS.UX_TEXT:
-      await handlers.handleUxText(ctx);
-      break;
-
-    default:
-      // Default key package check for sender
-      await handlers.handleKeyPackageCheck(ctx, message.senderInboxId);
-      break;
+  // Check if this might be an inbox ID (64 hex chars without 0x prefix)
+  const inboxIdPattern = /^[a-fA-F0-9]{64}$/;
+  if (inboxIdPattern.test(content.trim())) {
+    console.log(`Detected inbox ID: ${content.trim()}`);
+    await debugHandlers.handleKeyPackageCheck(ctx, content.trim());
+    return;
   }
 
-  console.log("Waiting for messages...");
+  // Check if this might be an Ethereum address (0x + 40 hex chars)
+  const addressPattern = /^0x[a-fA-F0-9]{40}$/;
+  if (addressPattern.test(content.trim())) {
+    console.log(`Detected Ethereum address: ${content.trim()}`);
+    await debugHandlers.handleKeyPackageCheck(ctx, "", content.trim());
+    return;
+  }
+
+  // If it's not a recognized pattern, show the main menu as a fallback
+  console.log(`Unrecognized input, showing main menu: ${content}`);
+  await showMainMenu(ctx);
 });
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log("🔧 Key-Check Bot with UX Demo started!");
+  console.log("🔧 Key-Check Bot with Inline Actions started!");
   console.log(
-    "Features: Key package validation, fork detection, and UX message type demos",
+    "Features: Interactive key package validation, fork detection, and UX message type demos",
   );
+  console.log(
+    "Usage: Send '/kc', 'help', or 'menu' to see interactive options",
+  );
+  console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
 });
