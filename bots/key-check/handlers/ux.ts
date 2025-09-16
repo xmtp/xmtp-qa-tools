@@ -1,4 +1,10 @@
-import { createRemoteAttachmentFromData } from "@bots/utils/atttachment";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import {
+  createRemoteAttachmentFromData,
+  createRemoteAttachmentFromFile,
+  encryptAttachment,
+} from "@bots/utils/atttachment";
 import { USDCHandler } from "@bots/utils/usdc";
 import { type MessageContext } from "@xmtp/agent-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
@@ -10,6 +16,12 @@ import { ContentTypeRemoteAttachment } from "@xmtp/content-type-remote-attachmen
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
+import axios from "axios";
+import FormData from "form-data";
+
+const DEFAULT_IMAGE_PATH = "./logo.png";
+const PINATA_API_KEY = process.env.PINATA_API_KEY || "";
+const PINATA_SECRET_KEY = process.env.PINATA_SECRET_KEY || "";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
@@ -20,39 +32,32 @@ export class UxHandlers {
 
   async handleUxAttachment(ctx: MessageContext): Promise<void> {
     try {
-      await ctx.conversation.send(
-        "📎 Preparing to send real image attachment...",
-      );
+      const senderAddress = await ctx.getSenderAddress();
 
-      // Create a simple test image (1x1 pixel PNG)
-      const testImageData = new Uint8Array([
-        137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0,
-        1, 0, 0, 0, 1, 8, 2, 0, 0, 0, 144, 119, 83, 222, 0, 0, 0, 12, 73, 68,
-        65, 84, 8, 215, 99, 248, 15, 0, 0, 1, 0, 1, 0, 24, 221, 141, 219, 0, 0,
-        0, 0, 73, 69, 78, 68, 174, 66, 96, 130,
-      ]);
+      console.log(`Preparing attachment for ${senderAddress}...`);
+      await ctx.conversation.send(`I'll send you an attachment now...`);
 
-      // For demo purposes, we'll use a mock file URL (in production, you'd upload to a real service)
-      const mockFileUrl = "https://example.com/test-image.png";
-
-      // Create remote attachment using the utility
-      const remoteAttachment = await createRemoteAttachmentFromData(
-        testImageData,
-        "test-image.png",
+      const encrypted = await encryptAttachment(
+        new Uint8Array(await readFile(DEFAULT_IMAGE_PATH)),
+        "logo.png",
         "image/png",
-        mockFileUrl,
+      );
+      const fileUrl = await uploadToPinata(
+        encrypted.encryptedData,
+        encrypted.filename,
       );
 
-      // Send the attachment
+      const remoteAttachment = await createRemoteAttachmentFromFile(
+        DEFAULT_IMAGE_PATH,
+        fileUrl,
+        "image/png",
+      );
       await ctx.conversation.send(
         remoteAttachment,
         ContentTypeRemoteAttachment,
       );
 
-      await ctx.conversation.send(
-        "✅ Real image attachment sent successfully!",
-      );
-      console.log("📎 Sent real image attachment");
+      console.log("Remote attachment sent successfully");
     } catch (error) {
       console.error("❌ Error sending real attachment:", error);
       await ctx.conversation.send("❌ Failed to send real attachment");
@@ -171,4 +176,41 @@ function greet(name) {
     console.log("Replied with wallet sendcall");
     await ctx.conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
   }
+}
+
+export async function uploadToPinata(
+  fileData: Uint8Array,
+  filename: string,
+): Promise<string> {
+  console.log(`Uploading ${filename}, size: ${fileData.byteLength} bytes`);
+
+  const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+
+  const data = new FormData();
+  data.append("file", Buffer.from(fileData), {
+    filename,
+    contentType: "application/octet-stream",
+  });
+
+  // Using type assertion for FormData with _boundary property
+  const response = await axios.post(url, data, {
+    maxContentLength: Infinity,
+    headers: {
+      "Content-Type": `multipart/form-data; boundary=${(data as FormData & { _boundary: string })._boundary}`,
+      pinata_api_key: PINATA_API_KEY,
+      pinata_secret_api_key: PINATA_SECRET_KEY,
+    },
+  });
+
+  interface PinataResponse {
+    IpfsHash: string;
+    PinSize: number;
+    Timestamp: string;
+  }
+
+  const ipfsHash = (response.data as PinataResponse).IpfsHash;
+  const fileUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+  console.log("File URL:", fileUrl);
+
+  return fileUrl;
 }

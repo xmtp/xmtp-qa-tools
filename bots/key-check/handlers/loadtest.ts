@@ -23,7 +23,7 @@ export class LoadTestHandlers {
         try {
           // Create group with sender as the only member initially
           const group = await this.agent.client.conversations.newGroup(
-            [], // Start with empty member list, sender is automatically included
+            [ctx.message.senderInboxId],
             {
               groupName,
               groupDescription: `Load test group ${groupIndex + 1}/10 created for testing purposes`,
@@ -45,7 +45,7 @@ export class LoadTestHandlers {
           }
 
           await ctx.conversation.send(
-            `✅ Completed ${groupName} (10 messages sent)`,
+            `Completed ${groupName} (10 messages sent)`,
           );
         } catch (groupError) {
           console.error(
@@ -103,7 +103,7 @@ export class LoadTestHandlers {
         try {
           // Create group with sender as the only member initially
           const group = await this.agent.client.conversations.newGroup(
-            [], // Start with empty member list, sender is automatically included
+            [ctx.message.senderInboxId],
             {
               groupName,
               groupDescription: `Load test group ${groupIndex + 1}/50 created for testing purposes`,
@@ -186,7 +186,7 @@ export class LoadTestHandlers {
       try {
         // Create group with sender as the only member initially
         const group = await this.agent.client.conversations.newGroup(
-          [], // Start with empty member list, sender is automatically included
+          [ctx.message.senderInboxId],
           {
             groupName,
             groupDescription: `Single load test group created for high-volume message testing`,
