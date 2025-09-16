@@ -12,16 +12,15 @@ import {
   ContentTypeReaction,
   type Reaction,
 } from "@xmtp/content-type-reaction";
-import { ContentTypeRemoteAttachment } from "@xmtp/content-type-remote-attachment";
+import {
+  ContentTypeRemoteAttachment,
+  type RemoteAttachment,
+} from "@xmtp/content-type-remote-attachment";
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
-import axios from "axios";
-import FormData from "form-data";
 
 const DEFAULT_IMAGE_PATH = "./logo.png";
-const PINATA_API_KEY = process.env.PINATA_API_KEY || "";
-const PINATA_SECRET_KEY = process.env.PINATA_SECRET_KEY || "";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
@@ -37,23 +36,8 @@ export class UxHandlers {
       console.log(`Preparing attachment for ${senderAddress}...`);
       await ctx.conversation.send(`I'll send you an attachment now...`);
 
-      const encrypted = await encryptAttachment(
-        new Uint8Array(await readFile(DEFAULT_IMAGE_PATH)),
-        "logo.png",
-        "image/png",
-      );
-      const fileUrl = await uploadToPinata(
-        encrypted.encryptedData,
-        encrypted.filename,
-      );
-
-      const remoteAttachment = await createRemoteAttachmentFromFile(
-        DEFAULT_IMAGE_PATH,
-        fileUrl,
-        "image/png",
-      );
       await ctx.conversation.send(
-        remoteAttachment,
+        parseSavedAttachment(),
         ContentTypeRemoteAttachment,
       );
 
@@ -178,39 +162,117 @@ function greet(name) {
   }
 }
 
-export async function uploadToPinata(
-  fileData: Uint8Array,
-  filename: string,
-): Promise<string> {
-  console.log(`Uploading ${filename}, size: ${fileData.byteLength} bytes`);
-
-  const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
-
-  const data = new FormData();
-  data.append("file", Buffer.from(fileData), {
-    filename,
-    contentType: "application/octet-stream",
-  });
-
-  // Using type assertion for FormData with _boundary property
-  const response = await axios.post(url, data, {
-    maxContentLength: Infinity,
-    headers: {
-      "Content-Type": `multipart/form-data; boundary=${(data as FormData & { _boundary: string })._boundary}`,
-      pinata_api_key: PINATA_API_KEY,
-      pinata_secret_api_key: PINATA_SECRET_KEY,
+function parseSavedAttachment(): RemoteAttachment {
+  const parsedData = {
+    url: "https://gateway.pinata.cloud/ipfs/QmUdfykA79R5Gsho1RjjEsBn7Q5Tt7vkkfHh35eW5BssoH",
+    contentDigest:
+      "3c80f5f3690856fce031f6de6bd1081f6136ad9b0d453961f89fedeb2594e6b7",
+    salt: {
+      "0": 125,
+      "1": 178,
+      "2": 5,
+      "3": 113,
+      "4": 110,
+      "5": 19,
+      "6": 129,
+      "7": 248,
+      "8": 78,
+      "9": 87,
+      "10": 78,
+      "11": 178,
+      "12": 25,
+      "13": 55,
+      "14": 24,
+      "15": 103,
+      "16": 244,
+      "17": 207,
+      "18": 216,
+      "19": 186,
+      "20": 131,
+      "21": 45,
+      "22": 94,
+      "23": 235,
+      "24": 26,
+      "25": 223,
+      "26": 91,
+      "27": 91,
+      "28": 59,
+      "29": 200,
+      "30": 83,
+      "31": 21,
     },
-  });
+    nonce: {
+      "0": 207,
+      "1": 135,
+      "2": 145,
+      "3": 166,
+      "4": 63,
+      "5": 217,
+      "6": 122,
+      "7": 160,
+      "8": 18,
+      "9": 129,
+      "10": 41,
+      "11": 128,
+    },
+    secret: {
+      "0": 118,
+      "1": 41,
+      "2": 4,
+      "3": 249,
+      "4": 170,
+      "5": 168,
+      "6": 195,
+      "7": 109,
+      "8": 117,
+      "9": 189,
+      "10": 162,
+      "11": 199,
+      "12": 198,
+      "13": 17,
+      "14": 242,
+      "15": 245,
+      "16": 228,
+      "17": 96,
+      "18": 132,
+      "19": 78,
+      "20": 58,
+      "21": 188,
+      "22": 104,
+      "23": 28,
+      "24": 58,
+      "25": 171,
+      "26": 16,
+      "27": 153,
+      "28": 93,
+      "29": 10,
+      "30": 220,
+      "31": 234,
+    },
+    scheme: "https://",
+    filename: "logo.png",
+    contentLength: 21829,
+  } as SavedAttachmentData;
 
-  interface PinataResponse {
-    IpfsHash: string;
-    PinSize: number;
-    Timestamp: string;
-  }
-
-  const ipfsHash = (response.data as PinataResponse).IpfsHash;
-  const fileUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
-  console.log("File URL:", fileUrl);
-
-  return fileUrl;
+  // Convert the saved object back to proper Uint8Array format
+  return {
+    url: parsedData.url,
+    contentDigest: parsedData.contentDigest,
+    salt: new Uint8Array(Object.values(parsedData.salt)),
+    nonce: new Uint8Array(Object.values(parsedData.nonce)),
+    secret: new Uint8Array(Object.values(parsedData.secret)),
+    scheme: parsedData.scheme,
+    filename: parsedData.filename,
+    contentLength: parsedData.contentLength,
+  } as RemoteAttachment;
+}
+interface SavedAttachmentData {
+  url: string;
+  contentDigest: string;
+  salt: Record<string, number>;
+  nonce: Record<string, number>;
+  secret: Record<string, number>;
+  scheme: string;
+  filename: string;
+  contentLength: number;
 }
