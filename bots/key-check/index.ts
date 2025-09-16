@@ -181,7 +181,7 @@ const appConfig: AppConfig = {
       actions: [
         {
           id: "ux-text-reply-reaction",
-          label: "📝🎨💬👍 Basics",
+          label: "💬👍 Basics",
 
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
