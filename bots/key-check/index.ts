@@ -198,7 +198,7 @@ const appConfig: AppConfig = {
         },
         {
           id: "ux-attachment",
-          label: "📎 File",
+          label: "🎇 Image",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxAttachment(ctx);
@@ -206,7 +206,7 @@ const appConfig: AppConfig = {
         },
         {
           id: "ux-usdc",
-          label: "💰 USDC",
+          label: "💰 Transaction",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleTransaction(ctx);
@@ -362,11 +362,13 @@ agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
 
+  const isDm = (await ctx.conversation.metadata()).conversationType === "dm";
   // Check if this is a command to show the main menu
   if (
-    content.trim().startsWith("/kc") ||
-    content.trim().toLowerCase() === "help" ||
-    content.trim().toLowerCase() === "menu"
+    (isDm &&
+      (content.trim().toLowerCase() === "help" ||
+        content.trim().startsWith("/kc"))) ||
+    (!isDm && content.trim().startsWith("@kc"))
   ) {
     console.log(`Showing main menu for: ${content}`);
     await showMenu(ctx, appConfig, "main-menu");

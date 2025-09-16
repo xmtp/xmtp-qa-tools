@@ -127,7 +127,7 @@ function greet(name) {
       const textMessage = await ctx.conversation.send(
         "📝 This is a text message that will be replied to and reacted to!",
       );
-      console.log("Sent text message for basics demo");
+      console.log("Sent text message for basics demo", textMessage);
 
       await ctx.conversation.send(
         {
