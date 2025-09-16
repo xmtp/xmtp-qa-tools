@@ -1,15 +1,23 @@
+import { createRequire } from "node:module";
 import {
+  getActiveVersion,
   IdentifierKind,
   type GroupMember,
 } from "version-management/client-versions";
 
+// Get XMTP SDK version from package.json
+const require = createRequire(import.meta.url);
+const packageJson = require("../../../package.json");
+const xmtpSdkVersion: string =
+  packageJson.dependencies[
+    "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
+  ] ?? "unknown";
+
 export class DebugHandlers {
   private startTime: Date;
-  private xmtpSdkVersion: string;
 
-  constructor(startTime: Date, xmtpSdkVersion: string) {
-    this.startTime = startTime;
-    this.xmtpSdkVersion = xmtpSdkVersion;
+  constructor() {
+    this.startTime = new Date();
   }
 
   async handleHelp(ctx: any, helpText: string): Promise<void> {
