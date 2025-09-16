@@ -299,28 +299,9 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 }
 
 // 2. Spin up the agent with UX demo codecs and inline actions
-const agentProduction = await Agent.createFromEnv({
+const agent = await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
-  env: "production",
-  dbPath: getDbPath(`key-check`),
-  codecs: [
-    new MarkdownCodec(),
-    new ReactionCodec(),
-    new ReplyCodec(),
-    new RemoteAttachmentCodec(),
-    new AttachmentCodec(),
-    new WalletSendCallsCodec(),
-    new ActionsCodec(),
-    new IntentCodec(),
-  ],
-});
-
-// 2. Spin up the agent with UX demo codecs and inline actions
-const agentDev = await Agent.createFromEnv({
-  appVersion: "key-check/0",
-  loggingLevel: "warn" as LogLevel,
-  env: "dev",
   dbPath: getDbPath(`key-check`),
   codecs: [
     new MarkdownCodec(),
@@ -335,12 +316,10 @@ const agentDev = await Agent.createFromEnv({
 });
 
 // Add inline actions middleware
-agentProduction.use(inlineActionsMiddleware);
-agentDev.use(inlineActionsMiddleware);
+agent.use(inlineActionsMiddleware);
 
 // Initialize load test handlers now that agent is available
-const loadTestHandlers = new LoadTestHandlers(agentProduction);
-const loadTestHandlersDev = new LoadTestHandlers(agentDev);
+const loadTestHandlers = new LoadTestHandlers(agent);
 
 // Add load test handlers to the app config
 appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
@@ -355,13 +334,13 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
       case "load-test-50x10":
         action.showNavigationOptions = true;
         action.handler = async (ctx: MessageContext) => {
-          await loadTestHandlersDev.handleLoadTest50Groups10Messages(ctx);
+          await loadTestHandlers.handleLoadTest50Groups10Messages(ctx);
         };
         break;
       case "load-test-1x100":
         action.showNavigationOptions = true;
         action.handler = async (ctx: MessageContext) => {
-          await loadTestHandlersDev.handleLoadTest1Group100Messages(ctx);
+          await loadTestHandlers.handleLoadTest1Group100Messages(ctx);
         };
         break;
       case "load-test-custom":
@@ -376,14 +355,7 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 // Initialize the app from config - this registers all handlers
 initializeAppFromConfig(appConfig);
 
-agentProduction.on("text", async (ctx) => {
-  await handle(ctx);
-});
-agentDev.on("text", async (ctx) => {
-  await handle(ctx);
-});
-
-async function handle(ctx: MessageContext) {
+agent.on("text", async (ctx) => {
   const message = ctx.message;
   await ctx.sendReaction("❤️");
   const content = message.content;
@@ -431,7 +403,7 @@ async function handle(ctx: MessageContext) {
 
     // Validate reasonable limits
     if (groups > 0 && messages > 0 && groups <= 1000 && messages <= 1000) {
-      await loadTestHandlersDev.handleLoadTestCustom(ctx, groups, messages);
+      await loadTestHandlers.handleLoadTestCustom(ctx, groups, messages);
       await showNavigationOptions(
         ctx,
         appConfig,
@@ -456,9 +428,10 @@ async function handle(ctx: MessageContext) {
   // If it's not a recognized pattern, show the main menu as a fallback
   console.log(`Unrecognized input, showing main menu: ${content}`);
   await showMenu(ctx, appConfig, "main-menu");
-}
+});
+
 // 4. Log when we're ready
-agentProduction.on("start", () => {
+agent.on("start", () => {
   console.log("🔧 Key-Check Bot with Inline Actions started!");
   console.log(
     "Features: Interactive key package validation, fork detection, and UX message type demos",
@@ -467,31 +440,11 @@ agentProduction.on("start", () => {
     "Usage: Send '/kc', 'help', or 'menu' to see interactive options",
   );
   console.log("Or directly send an Inbox ID or Ethereum address to check");
-  console.log(
-    `Address: ${agentProduction.client.accountIdentifier?.identifier}`,
-  );
-  console.log(`🔗${getTestUrl(agentProduction)}`);
+  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`🔗${getTestUrl(agent)}`);
 
   // Debug: Log all registered actions
   console.log("🔍 Registered actions:", getRegisteredActions());
 });
 
-agentDev.on("start", () => {
-  console.log("🔧 Key-Check Bot with Inline Actions started!");
-  console.log(
-    "Features: Interactive key package validation, fork detection, and UX message type demos",
-  );
-  console.log(
-    "Usage: Send '/kc', 'help', or 'menu' to see interactive options",
-  );
-  console.log("Or directly send an Inbox ID or Ethereum address to check");
-  console.log(
-    `Address: ${agentProduction.client.accountIdentifier?.identifier}`,
-  );
-  console.log(`🔗${getTestUrl(agentProduction)}`);
-
-  // Debug: Log all registered actions
-  console.log("🔍 Registered actions:", getRegisteredActions());
-});
-await agentProduction.start();
-await agentDev.start();
+await agent.start();
