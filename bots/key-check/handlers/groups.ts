@@ -1,7 +1,6 @@
 import {
   IdentifierKind,
   type GroupMember,
-  type PermissionLevel,
 } from "version-management/client-versions";
 
 export class GroupHandlers {

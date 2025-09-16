@@ -180,60 +180,12 @@ const appConfig: AppConfig = {
       title: "🎨 UX Demo",
       actions: [
         {
-          id: "ux-all",
-          label: "🚀 Demo All",
-          style: "primary",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            // Update the current action message for demo functionality
-            const actionMessage = getLastSentActionMessage();
-            if (actionMessage) {
-              uxHandlers.updateCurrentActionMessage(actionMessage);
-            }
-            await uxHandlers.handleUxAll(ctx);
-          },
-        },
-        {
-          id: "ux-text",
-          label: "📝 Text",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            await uxHandlers.handleUxText(ctx);
-          },
-        },
-        {
           id: "ux-text-reply-reaction",
-          label: "📝💬👍 Text+Reply+Reaction",
+          label: "📝💬👍 Basics",
           style: "primary",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxTextReplyReaction(ctx);
-          },
-        },
-        {
-          id: "ux-reaction",
-          label: "👍 Reaction",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            // Update the current action message for reaction functionality
-            const actionMessage = getLastSentActionMessage();
-            if (actionMessage) {
-              uxHandlers.updateCurrentActionMessage(actionMessage);
-            }
-            await uxHandlers.handleUxReaction(ctx);
-          },
-        },
-        {
-          id: "ux-reply",
-          label: "💬 Reply",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            // Update the current action message for reply functionality
-            const actionMessage = getLastSentActionMessage();
-            if (actionMessage) {
-              uxHandlers.updateCurrentActionMessage(actionMessage);
-            }
-            await uxHandlers.handleUxReply(ctx);
           },
         },
         {
@@ -343,7 +295,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 }
 
 // 2. Spin up the agent with UX demo codecs and inline actions
-const agent = (await Agent.createFromEnv({
+const agent = await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
   dbPath: getDbPath(`key-check`),
@@ -356,7 +308,7 @@ const agent = (await Agent.createFromEnv({
     new ActionsCodec(),
     new IntentCodec(),
   ],
-})) as Agent<any>;
+});
 
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
@@ -401,9 +353,6 @@ initializeAppFromConfig(appConfig);
 agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
-
-  // Update the last received message for UX demo functionality
-  uxHandlers.updateLastMessage(message);
 
   // Check if this is a command to show the main menu
   if (
