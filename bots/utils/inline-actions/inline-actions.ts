@@ -25,10 +25,7 @@ export type SimpleActionHandler = () => Promise<void>;
 export function withCtx(
   handler: (ctx: MessageContext) => Promise<void>,
 ): ActionHandler {
-  return async (
-    ctx: MessageContext,
-    metadata?: Record<string, string | number | boolean | null>,
-  ) => {
+  return async (ctx: MessageContext) => {
     await handler(ctx);
   };
 }
@@ -284,6 +281,369 @@ export function validateRegisteredActions(requiredActions: string[]): {
  */
 export function getRegisteredActions(): string[] {
   return globalActionRegistry.getAll();
+}
+
+/**
+ * Fluent Menu Builder - Simplifies creating interactive menus
+ */
+export class MenuBuilder {
+  private menu: Menu;
+
+  constructor(id: string, title: string) {
+    this.menu = {
+      id,
+      title,
+      actions: [],
+    };
+  }
+
+  static create(id: string, title: string): MenuBuilder {
+    return new MenuBuilder(id, title);
+  }
+
+  /**
+   * Add an action with inline handler
+   */
+  action(
+    id: string,
+    label: string,
+    handler: ActionHandler,
+    style?: "primary" | "secondary" | "danger",
+  ): this {
+    this.menu.actions.push({ id, label, style, handler });
+    return this;
+  }
+
+  /**
+   * Add a simple action without handler (for navigation)
+   */
+  nav(
+    id: string,
+    label: string,
+    style?: "primary" | "secondary" | "danger",
+  ): this {
+    this.menu.actions.push({ id, label, style });
+    return this;
+  }
+
+  /**
+   * Add a back button
+   */
+  back(targetMenuId: string = "main-menu", label: string = "⬅️ Back"): this {
+    this.menu.actions.push({ id: targetMenuId, label });
+    return this;
+  }
+
+  /**
+   * Build and auto-register all handlers
+   */
+  build(): Menu {
+    // Auto-register handlers
+    this.menu.actions.forEach((action) => {
+      if (action.handler) {
+        registerAction(action.id, action.handler);
+      }
+    });
+    return this.menu;
+  }
+
+  /**
+   * Build, register, and immediately show the menu
+   */
+  async show(ctx: MessageContext): Promise<void> {
+    const menu = this.build();
+    const timestamp = Date.now();
+    const builder = ActionBuilder.create(`${menu.id}-${timestamp}`, menu.title);
+
+    menu.actions.forEach((action) => {
+      builder.add(action.id, action.label, action.style);
+    });
+
+    await sendActions(ctx, builder.build());
+  }
+}
+
+/**
+ * Navigation utilities to reduce repetitive navigation code
+ */
+export class NavigationHelper {
+  /**
+   * Show navigation options after an action completes
+   */
+  static async showAfterAction(
+    ctx: MessageContext,
+    message: string,
+    options?: {
+      showMainMenu?: boolean;
+      showBackButton?: boolean;
+      customActions?: Array<{
+        id: string;
+        label: string;
+        style?: "primary" | "secondary" | "danger";
+      }>;
+    },
+  ): Promise<void> {
+    const {
+      showMainMenu = true,
+      showBackButton = false,
+      customActions = [],
+    } = options || {};
+
+    const builder = MenuBuilder.create(`navigation-${Date.now()}`, message);
+
+    // Add custom actions first
+    customActions.forEach((action) => {
+      builder.nav(action.id, action.label, action.style);
+    });
+
+    // Add standard navigation
+    if (showBackButton) {
+      builder.back();
+    }
+    if (showMainMenu) {
+      builder.nav("main-menu", "🏠 Main Menu");
+    }
+
+    await builder.show(ctx);
+  }
+
+  /**
+   * Quick helper for common "action completed" navigation
+   */
+  static async afterAction(
+    ctx: MessageContext,
+    actionName: string,
+  ): Promise<void> {
+    await this.showAfterAction(ctx, `${actionName} completed!`);
+  }
+}
+
+/**
+ * Input handling utilities for common scenarios
+ */
+export class InputHelper {
+  /**
+   * Create an input prompt with validation
+   */
+  static async promptFor(
+    ctx: MessageContext,
+    config: {
+      title: string;
+      prompt: string;
+      validator?: (input: string) => { valid: boolean; error?: string };
+      examples?: string[];
+      backAction?: string;
+    },
+  ): Promise<void> {
+    const { title, prompt, examples = [], backAction = "main-menu" } = config;
+
+    let fullPrompt = prompt;
+
+    if (examples.length > 0) {
+      fullPrompt +=
+        "\n\nExamples:\n" + examples.map((ex) => `• ${ex}`).join("\n");
+    }
+
+    const builder = MenuBuilder.create(`input-${Date.now()}`, title).nav(
+      backAction,
+      "⬅️ Back",
+    );
+
+    await builder.show(ctx);
+    await ctx.conversation.send(fullPrompt);
+  }
+
+  /**
+   * Common validators
+   */
+  static validators = {
+    inboxId: (input: string) => {
+      const pattern = /^[a-fA-F0-9]{64}$/;
+      return pattern.test(input.trim())
+        ? { valid: true }
+        : {
+            valid: false,
+            error: "Invalid Inbox ID format (must be 64 hex characters)",
+          };
+    },
+
+    ethereumAddress: (input: string) => {
+      const pattern = /^0x[a-fA-F0-9]{40}$/;
+      return pattern.test(input.trim())
+        ? { valid: true }
+        : {
+            valid: false,
+            error:
+              "Invalid Ethereum address format (must be 0x + 40 hex characters)",
+          };
+    },
+
+    positiveNumbers: (input: string) => {
+      const match = input.trim().match(/^(\d+)\s+(\d+)$/);
+      if (!match) {
+        return {
+          valid: false,
+          error: "Format should be: number number (e.g., '10 20')",
+        };
+      }
+      const [, num1, num2] = match;
+      const n1 = parseInt(num1);
+      const n2 = parseInt(num2);
+      if (n1 <= 0 || n2 <= 0 || n1 > 1000 || n2 > 1000) {
+        return { valid: false, error: "Numbers must be between 1-1000" };
+      }
+      return { valid: true };
+    },
+  };
+
+  /**
+   * Common regex patterns for text matching
+   */
+  static patterns = {
+    inboxId: /^[a-fA-F0-9]{64}$/,
+    ethereumAddress: /^0x[a-fA-F0-9]{40}$/,
+    positiveNumbers: /^(\d+)\s+(\d+)$/,
+  };
+}
+
+/**
+ * Quick confirmation patterns
+ */
+export class ConfirmationHelper {
+  /**
+   * Show a yes/no confirmation dialog
+   */
+  static async confirm(
+    ctx: MessageContext,
+    message: string,
+    onYes: ActionHandler,
+    onNo?: ActionHandler,
+  ): Promise<void> {
+    const timestamp = Date.now();
+    const yesId = `confirm-yes-${timestamp}`;
+    const noId = `confirm-no-${timestamp}`;
+
+    // Register handlers
+    registerAction(yesId, onYes);
+    if (onNo) {
+      registerAction(noId, onNo);
+    } else {
+      registerAction(noId, async (ctx) => {
+        await ctx.conversation.send("❌ Cancelled");
+        await NavigationHelper.afterAction(ctx, "Action cancelled");
+      });
+    }
+
+    const builder = MenuBuilder.create(`confirmation-${timestamp}`, message)
+      .nav(yesId, "✅ Yes", "primary")
+      .nav(noId, "❌ No", "danger");
+
+    await builder.show(ctx);
+  }
+
+  /**
+   * Show a dangerous action confirmation
+   */
+  static async confirmDangerous(
+    ctx: MessageContext,
+    message: string,
+    warningText: string,
+    onConfirm: ActionHandler,
+  ): Promise<void> {
+    await ctx.conversation.send(`⚠️ ${warningText}`);
+    await this.confirm(ctx, message, onConfirm);
+  }
+}
+
+/**
+ * Simplified App class that ties everything together
+ */
+export class InlineActionsApp {
+  private menus: Map<string, Menu> = new Map();
+  private textHandlers: Array<{
+    pattern: RegExp | string;
+    handler: ActionHandler;
+  }> = [];
+
+  constructor(public name: string) {}
+
+  /**
+   * Add a menu to the app
+   */
+  addMenu(menu: Menu): this {
+    this.menus.set(menu.id, menu);
+    return this;
+  }
+
+  /**
+   * Add a text pattern handler
+   */
+  onText(pattern: RegExp | string, handler: ActionHandler): this {
+    this.textHandlers.push({ pattern, handler });
+    return this;
+  }
+
+  /**
+   * Initialize the app - registers all handlers
+   */
+  init(): void {
+    console.log(`🚀 Initializing ${this.name}`);
+
+    // Register menu handlers
+    this.menus.forEach((menu) => {
+      menu.actions.forEach((action) => {
+        if (action.handler) {
+          registerAction(action.id, action.handler);
+          console.log(`✅ Registered handler for action: ${action.id}`);
+        }
+      });
+    });
+  }
+
+  /**
+   * Handle text messages
+   */
+  async handleText(ctx: MessageContext): Promise<boolean> {
+    const content = String(ctx.message.content).trim();
+
+    for (const { pattern, handler } of this.textHandlers) {
+      let matches = false;
+
+      if (typeof pattern === "string") {
+        matches = content.toLowerCase().includes(pattern.toLowerCase());
+      } else {
+        matches = pattern.test(content);
+      }
+
+      if (matches) {
+        await handler(ctx);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Show a specific menu
+   */
+  async showMenu(ctx: MessageContext, menuId: string): Promise<void> {
+    const menu = this.menus.get(menuId);
+    if (!menu) {
+      console.error(`❌ Menu not found: ${menuId}`);
+      await ctx.conversation.send(`❌ Menu not found: ${menuId}`);
+      return;
+    }
+
+    const timestamp = Date.now();
+    const builder = ActionBuilder.create(`${menuId}-${timestamp}`, menu.title);
+
+    menu.actions.forEach((action) => {
+      builder.add(action.id, action.label, action.style);
+    });
+
+    await sendActions(ctx, builder.build());
+  }
 }
 
 /**
