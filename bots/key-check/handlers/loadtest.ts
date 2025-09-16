@@ -1,7 +1,9 @@
+import { type MessageContext } from "@xmtp/agent-sdk";
+
 export class LoadTestHandlers {
   constructor(private agent: any) {}
 
-  async handleLoadTest10Groups10Messages(ctx: any): Promise<void> {
+  async handleLoadTest10Groups10Messages(ctx: MessageContext): Promise<void> {
     await ctx.conversation.send(
       "🚀 Starting Load Test: 10 groups × 10 messages",
     );
@@ -81,7 +83,7 @@ export class LoadTestHandlers {
     }
   }
 
-  async handleLoadTest50Groups10Messages(ctx: any): Promise<void> {
+  async handleLoadTest50Groups10Messages(ctx: MessageContext): Promise<void> {
     await ctx.conversation.send(
       "🚀 Starting Load Test: 50 groups × 10 messages",
     );
@@ -165,7 +167,7 @@ export class LoadTestHandlers {
     }
   }
 
-  async handleLoadTest1Group100Messages(ctx: any): Promise<void> {
+  async handleLoadTest1Group100Messages(ctx: MessageContext): Promise<void> {
     await ctx.conversation.send(
       "🚀 Starting Load Test: 1 group × 100 messages",
     );
@@ -245,7 +247,7 @@ export class LoadTestHandlers {
   }
 
   async handleLoadTestCustom(
-    ctx: any,
+    ctx: MessageContext,
     groups: number,
     messagesPerGroup: number,
   ): Promise<void> {

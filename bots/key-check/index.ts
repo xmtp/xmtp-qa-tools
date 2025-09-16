@@ -69,7 +69,7 @@ const appConfig: AppConfig = {
         {
           id: "keycheck-sender",
           label: "🔑 Check Mine",
-          style: "primary",
+
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleKeyPackageCheck(
@@ -102,7 +102,7 @@ const appConfig: AppConfig = {
         {
           id: "group-members",
           label: "👥 Members List",
-          style: "primary",
+
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await groupHandlers.handleGroupMembers(ctx);
@@ -182,10 +182,10 @@ const appConfig: AppConfig = {
         {
           id: "ux-text-reply-reaction",
           label: "📝🎨💬👍 Basics",
-          style: "primary",
+
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
-            await uxHandlers.handleUxTextReplyReaction(ctx);
+            await uxHandlers.handleBasics(ctx);
           },
         },
         {
@@ -209,7 +209,7 @@ const appConfig: AppConfig = {
           label: "💰 USDC",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
-            await uxHandlers.handleUxUsdc(ctx);
+            await uxHandlers.handleTransaction(ctx);
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -222,7 +222,6 @@ const appConfig: AppConfig = {
         {
           id: "load-test-10x10",
           label: "🔥 10 Groups × 10 Messages",
-          style: "primary",
         },
         {
           id: "load-test-50x10",

@@ -1,5 +1,7 @@
+import { type Group, type MessageContext } from "@xmtp/agent-sdk";
+
 export class ForksHandlers {
-  async handleForkDetection(ctx: any): Promise<void> {
+  async handleForkDetection(ctx: MessageContext): Promise<void> {
     const message = ctx.message;
     const client = ctx.client;
     const conversation = ctx.conversation;
@@ -13,7 +15,7 @@ export class ForksHandlers {
       // Get conversation debug info
       const debugInfo = await conversation.debugInfo();
       const members = await conversation.members();
-      const group = conversation;
+      const group = conversation as Group;
 
       let debugReport = "🔍 **Fork Detection Report**\n\n";
 
@@ -46,13 +48,21 @@ export class ForksHandlers {
       debugReport += "\n";
 
       // Group info (if applicable)
-      if (group.name || group.description || group.imageUrl) {
+      if (
+        group.name ||
+        group.description ||
+        group.imageUrl ||
+        group.admins ||
+        group.superAdmins ||
+        group.isActive ||
+        group.addedByInboxId
+      ) {
         debugReport += "**🏷️ Group Info:**\n";
         debugReport += `• Name: ${group.name || "undefined"}\n`;
         debugReport += `• Description: ${group.description || "undefined"}\n`;
         debugReport += `• Image: ${group.imageUrl || "undefined"}\n`;
-        debugReport += `• Admins: ${group.admins || "undefined"}\n`;
-        debugReport += `• Super Admins: ${group.superAdmins || "undefined"}\n`;
+        debugReport += `• Admins: ${group.admins.join(", ") || "undefined"}\n`;
+        debugReport += `• Super Admins: ${group.superAdmins.join(", ") || "undefined"}\n`;
         debugReport += `• Active: ${group.isActive}\n`;
         debugReport += `• Added By: ${group.addedByInboxId || "undefined"}\n\n`;
       }

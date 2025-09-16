@@ -1,10 +1,15 @@
 import {
+  type Group,
+  type MessageContext,
+  type PermissionLevel,
+} from "@xmtp/agent-sdk";
+import {
   IdentifierKind,
   type GroupMember,
 } from "version-management/client-versions";
 
 export class GroupHandlers {
-  async handleGroupMembers(ctx: any): Promise<void> {
+  async handleGroupMembers(ctx: MessageContext): Promise<void> {
     try {
       const members: GroupMember[] = await ctx.conversation.members();
 
@@ -58,11 +63,12 @@ export class GroupHandlers {
     }
   }
 
-  async handleGroupInfo(ctx: any): Promise<void> {
+  async handleGroupInfo(ctx: MessageContext): Promise<void> {
     try {
+      const group = ctx.conversation as Group;
       // Get basic group information using properties, not async methods
-      const groupName = ctx.conversation.name;
-      const groupDescription = ctx.conversation.description;
+      const groupName = group.name;
+      const groupDescription = group.description;
       const groupId = ctx.message.conversationId;
 
       let infoText = "ℹ️ **Group Information:**\n\n";
@@ -93,7 +99,7 @@ export class GroupHandlers {
     }
   }
 
-  async handleGroupAdmins(ctx: any): Promise<void> {
+  async handleGroupAdmins(ctx: MessageContext): Promise<void> {
     try {
       const members: GroupMember[] = await ctx.conversation.members();
 
@@ -110,6 +116,7 @@ export class GroupHandlers {
       for (const member of members) {
         if (
           member.permissionLevel === (1 as PermissionLevel) ||
+          member.permissionLevel === (0 as PermissionLevel) ||
           member.permissionLevel === (2 as PermissionLevel)
         ) {
           try {
@@ -174,11 +181,12 @@ export class GroupHandlers {
     }
   }
 
-  async handleGroupPermissions(ctx: any): Promise<void> {
+  async handleGroupPermissions(ctx: MessageContext): Promise<void> {
     try {
       // Get group admin information using Group class methods
-      const admins = ctx.conversation.admins;
-      const superAdmins = ctx.conversation.superAdmins;
+      const group = ctx.conversation as Group;
+      const admins = group.admins;
+      const superAdmins = group.superAdmins;
       const members = await ctx.conversation.members();
 
       let permissionsText = "🔐 **Group Permissions:**\n\n";

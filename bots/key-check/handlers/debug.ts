@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { type MessageContext } from "@xmtp/agent-sdk";
 import {
   getActiveVersion,
   IdentifierKind,
@@ -19,17 +20,17 @@ export class DebugHandlers {
     this.startTime = new Date();
   }
 
-  async handleHelp(ctx: any, helpText: string): Promise<void> {
+  async handleHelp(ctx: MessageContext, helpText: string): Promise<void> {
     await ctx.conversation.send(helpText);
     console.log("Sent help information");
   }
 
-  async handleVersion(ctx: any): Promise<void> {
+  async handleVersion(ctx: MessageContext): Promise<void> {
     await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
     console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
   }
 
-  async handleUptime(ctx: any): Promise<void> {
+  async handleUptime(ctx: MessageContext): Promise<void> {
     const currentTime = new Date();
     const uptimeMs = currentTime.getTime() - this.startTime.getTime();
 
@@ -49,7 +50,7 @@ export class DebugHandlers {
     console.log(`Sent uptime information: ${uptimeText}`);
   }
 
-  async handleDebug(ctx: any): Promise<void> {
+  async handleDebug(ctx: MessageContext): Promise<void> {
     let conversations = await ctx.client.conversations.list();
     // Print the list of conversations ids to console:
     console.log(
@@ -62,7 +63,7 @@ export class DebugHandlers {
   }
 
   async handleKeyPackageCheck(
-    ctx: any,
+    ctx: MessageContext,
     targetInboxId: string,
     targetAddress?: string,
   ): Promise<void> {

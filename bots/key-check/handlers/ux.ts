@@ -1,10 +1,14 @@
 import { createRemoteAttachmentFromData } from "@bots/utils/atttachment";
 import { USDCHandler } from "@bots/utils/usdc";
+import { type MessageContext } from "@xmtp/agent-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import { ReactionCodec } from "@xmtp/content-type-reaction";
-import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
+import {
+  ContentTypeReaction,
+  type Reaction,
+} from "@xmtp/content-type-reaction";
+import { ContentTypeRemoteAttachment } from "@xmtp/content-type-remote-attachment";
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
-import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
@@ -13,7 +17,7 @@ export class UxHandlers {
     this.usdcHandler = new USDCHandler("base-sepolia");
   }
 
-  async handleUxAttachment(ctx: any): Promise<void> {
+  async handleUxAttachment(ctx: MessageContext): Promise<void> {
     try {
       await ctx.conversation.send(
         "📎 Preparing to send real image attachment...",
@@ -39,9 +43,10 @@ export class UxHandlers {
       );
 
       // Send the attachment
-      await ctx.conversation.send(remoteAttachment, {
-        contentType: new RemoteAttachmentCodec().contentType,
-      });
+      await ctx.conversation.send(
+        remoteAttachment,
+        ContentTypeRemoteAttachment,
+      );
 
       await ctx.conversation.send(
         "✅ Real image attachment sent successfully!",
@@ -53,7 +58,7 @@ export class UxHandlers {
     }
   }
 
-  async handleUxMarkdown(ctx: any): Promise<void> {
+  async handleUxMarkdown(ctx: MessageContext): Promise<void> {
     try {
       const markdownContent = `# 🎨 Markdown Demo
 
@@ -104,11 +109,7 @@ function greet(name) {
 
 **This demonstrates the full power of markdown formatting in XMTP messages!**`;
 
-      await ctx.conversation.send(markdownContent, {
-        contentType: ContentTypeMarkdown,
-        contentFallback:
-          "🎨 Markdown Demo\n\nThis is a markdown formatted message demonstrating various formatting options including text formatting, lists, code blocks, links, blockquotes, and tables. This demonstrates the full power of markdown formatting in XMTP messages!",
-      });
+      await ctx.conversation.send(markdownContent, ContentTypeMarkdown);
 
       await ctx.conversation.send(
         "✅ Markdown message sent successfully! Check how it renders in your client.",
@@ -120,7 +121,7 @@ function greet(name) {
     }
   }
 
-  async handleUxTextReplyReaction(ctx: any): Promise<void> {
+  async handleBasics(ctx: MessageContext): Promise<void> {
     try {
       // First, send a text message
       const textMessage = await ctx.conversation.send(
@@ -128,67 +129,33 @@ function greet(name) {
       );
       console.log("Sent text message for basics demo");
 
-      // Small delay to ensure message is processed
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Send a markdown message
-      const markdownContent = `# 🎨 Markdown Message
-
-This is a **markdown formatted** message with:
-
-- **Bold text**
-- *Italic text*
-- \`Code snippets\`
-- [Links](https://xmtp.org)
-
-> This demonstrates rich text formatting!`;
-
-      await ctx.conversation.send(markdownContent, {
-        contentType: ContentTypeMarkdown,
-        contentFallback:
-          "🎨 Markdown Message\n\nThis is a markdown formatted message with bold text, italic text, code snippets, and links. This demonstrates rich text formatting!",
-      });
-      console.log("Sent markdown message");
-
-      // Small delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Then send a reply to the original text message
-      const replyContent: Reply = {
-        reference: textMessage.id,
-        content: "💬 This is a reply to the text message!",
-        contentType: ContentTypeReply,
-      };
-
-      await ctx.conversation.send(replyContent, ContentTypeReply);
+      await ctx.conversation.send(
+        {
+          reference: textMessage,
+          content: "💬 This is a reply to the text message!",
+          contentType: ContentTypeReply,
+        } as Reply,
+        ContentTypeReply,
+      );
       console.log("Sent reply to text message");
 
-      // Small delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Finally, send a reaction to the same text message
-      const reactionContent = {
-        reference: textMessage.id,
-        action: "added",
-        schema: "unicode",
-        content: "👍",
-      };
-
-      await ctx.conversation.send(reactionContent, {
-        contentType: new ReactionCodec().contentType,
-      });
-
+      // Step 1: Add thinking emoji reaction
       await ctx.conversation.send(
-        "✅ Successfully sent text, markdown, reply, and reaction messages!",
+        {
+          action: "added",
+          content: "⏳",
+          reference: ctx.message.id,
+          schema: "shortcode",
+        } as Reaction,
+        ContentTypeReaction,
       );
-      console.log("Sent reaction to text message");
     } catch (error) {
       console.error("Error in basics demo:", error);
       await ctx.conversation.send("❌ Failed to complete basics demo");
     }
   }
 
-  async handleUxUsdc(ctx: any): Promise<void> {
+  async handleTransaction(ctx: MessageContext): Promise<void> {
     try {
       await ctx.conversation.send("💰 Preparing USDC transaction...");
 
@@ -205,9 +172,7 @@ This is a **markdown formatted** message with:
       );
 
       // Send the wallet send calls
-      await ctx.conversation.send(transferCalls, {
-        contentType: new WalletSendCallsCodec().contentType,
-      });
+      await ctx.conversation.send(transferCalls, ContentTypeWalletSendCalls);
 
       await ctx.conversation.send(
         `✅ USDC transaction request sent!\n` +
