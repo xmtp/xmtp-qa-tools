@@ -357,6 +357,7 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
+  await ctx.sendReaction("❤️");
   const content = message.content;
 
   const isDm = (await ctx.conversation.metadata()).conversationType === "dm";
