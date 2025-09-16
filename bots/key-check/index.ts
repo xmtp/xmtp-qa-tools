@@ -27,6 +27,7 @@ import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
+import { GroupHandlers } from "./handlers/groups";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
@@ -34,6 +35,7 @@ import { UxHandlers } from "./handlers/ux";
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers();
+const groupHandlers = new GroupHandlers();
 
 // Helper function for navigation after actions
 async function showNavigationOptions(ctx: MessageContext, message: string) {
@@ -43,6 +45,7 @@ async function showNavigationOptions(ctx: MessageContext, message: string) {
     message,
   )
     .add("key-packages-menu", "🔑 Key Packages")
+    .add("group-tools-menu", "👥 Group Tools")
     .add("debug-tools-menu", "🛠️ Debug Tools")
     .add("load-test-menu", "🧪 Load Testing")
     .add("ux-demo-menu", "🎨 UX Demo")
@@ -61,6 +64,7 @@ const appConfig: AppConfig = {
       title: "🔧 Key-Check Bot",
       actions: [
         { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
+        { id: "group-tools-menu", label: "👥 Group Tools" },
         { id: "debug-tools-menu", label: "🛠️ Debug Tools" },
         { id: "load-test-menu", label: "🧪 Load Testing" },
         { id: "ux-demo-menu", label: "🎨 UX Demo" },
@@ -97,6 +101,54 @@ const appConfig: AppConfig = {
           label: "📧 By Address",
           handler: async (ctx: MessageContext) => {
             await showAddressInputMenu(ctx);
+          },
+        },
+        { id: "main-menu", label: "⬅️ Back" },
+      ],
+    },
+    "group-tools-menu": {
+      id: "group-tools-menu",
+      title: "👥 Group Tools",
+      actions: [
+        {
+          id: "group-summary",
+          label: "📊 Group Summary",
+          style: "primary",
+          handler: async (ctx: MessageContext) => {
+            await groupHandlers.handleGroupSummary(ctx);
+            await showNavigationOptions(ctx, "Group summary displayed!");
+          },
+        },
+        {
+          id: "group-members",
+          label: "👥 Members List",
+          handler: async (ctx: MessageContext) => {
+            await groupHandlers.handleGroupMembers(ctx);
+            await showNavigationOptions(ctx, "Group members displayed!");
+          },
+        },
+        {
+          id: "group-info",
+          label: "ℹ️ Group Info",
+          handler: async (ctx: MessageContext) => {
+            await groupHandlers.handleGroupInfo(ctx);
+            await showNavigationOptions(ctx, "Group info displayed!");
+          },
+        },
+        {
+          id: "group-admins",
+          label: "👑 Administrators",
+          handler: async (ctx: MessageContext) => {
+            await groupHandlers.handleGroupAdmins(ctx);
+            await showNavigationOptions(ctx, "Group administrators displayed!");
+          },
+        },
+        {
+          id: "group-permissions",
+          label: "🔐 Permissions",
+          handler: async (ctx: MessageContext) => {
+            await groupHandlers.handleGroupPermissions(ctx);
+            await showNavigationOptions(ctx, "Group permissions displayed!");
           },
         },
         { id: "main-menu", label: "⬅️ Back" },

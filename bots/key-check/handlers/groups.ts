@@ -20,25 +20,33 @@ export class GroupHandlers {
       for (const member of members) {
         try {
           // Get the address from the member's inbox state
-          const inboxState = await ctx.client.preferences.inboxStateFromInboxIds(
-            [member.inboxId],
-            true,
-          );
-          
-          const address = inboxState?.[0]?.identifiers?.[0]?.identifier || "Unknown";
-          
+          const inboxState =
+            await ctx.client.preferences.inboxStateFromInboxIds(
+              [member.inboxId],
+              true,
+            );
+
+          const address =
+            inboxState?.[0]?.identifiers?.[0]?.identifier || "Unknown";
+
           // Check if this is the bot
-          const isBot = member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
-          const isSender = member.inboxId.toLowerCase() === ctx.message.senderInboxId.toLowerCase();
-          
+          const isBot =
+            member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
+          const isSender =
+            member.inboxId.toLowerCase() ===
+            ctx.message.senderInboxId.toLowerCase();
+
           let marker = "";
           if (isBot) marker += "🤖 ";
           if (isSender) marker += "👤 ";
-          
+
           membersList += `${marker}**${address}**\n`;
           membersList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
         } catch (error) {
-          console.error(`Error getting address for member ${member.inboxId}:`, error);
+          console.error(
+            `Error getting address for member ${member.inboxId}:`,
+            error,
+          );
           membersList += `❓ **Unknown Address**\n`;
           membersList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
         }
@@ -61,23 +69,23 @@ export class GroupHandlers {
       const groupName = await ctx.conversation.groupName();
       const groupDescription = await ctx.conversation.groupDescription();
       const groupId = ctx.message.conversationId;
-      
+
       let infoText = "ℹ️ **Group Information:**\n\n";
-      
+
       // Group Name
       if (groupName && groupName.trim()) {
         infoText += `📝 **Name:** ${groupName}\n\n`;
       } else {
         infoText += `📝 **Name:** *No name set*\n\n`;
       }
-      
-      // Group Description  
+
+      // Group Description
       if (groupDescription && groupDescription.trim()) {
         infoText += `📄 **Description:** ${groupDescription}\n\n`;
       } else {
         infoText += `📄 **Description:** *No description set*\n\n`;
       }
-      
+
       // Group ID (abbreviated)
       infoText += `🆔 **Group ID:** \`${groupId.substring(0, 8)}...${groupId.substring(groupId.length - 8)}\`\n\n`;
 
@@ -104,19 +112,27 @@ export class GroupHandlers {
       let adminsList = "👑 **Group Administrators:**\n\n";
 
       for (const member of members) {
-        if (member.permissionLevel === "admin" || member.permissionLevel === "super_admin") {
+        if (
+          member.permissionLevel === "admin" ||
+          member.permissionLevel === "super_admin"
+        ) {
           try {
             // Get the address from the member's inbox state
-            const inboxState = await ctx.client.preferences.inboxStateFromInboxIds(
-              [member.inboxId],
-              true,
-            );
-            
-            const address = inboxState?.[0]?.identifiers?.[0]?.identifier || "Unknown";
-            
-            const isBot = member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
-            const isSender = member.inboxId.toLowerCase() === ctx.message.senderInboxId.toLowerCase();
-            
+            const inboxState =
+              await ctx.client.preferences.inboxStateFromInboxIds(
+                [member.inboxId],
+                true,
+              );
+
+            const address =
+              inboxState?.[0]?.identifiers?.[0]?.identifier || "Unknown";
+
+            const isBot =
+              member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
+            const isSender =
+              member.inboxId.toLowerCase() ===
+              ctx.message.senderInboxId.toLowerCase();
+
             let marker = "";
             if (isBot) marker += "🤖 ";
             if (isSender) marker += "👤 ";
@@ -128,10 +144,13 @@ export class GroupHandlers {
               adminsList += `${marker}🔧 **${address}** *(Admin)*\n`;
               adminCount++;
             }
-            
+
             adminsList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
           } catch (error) {
-            console.error(`Error getting address for admin ${member.inboxId}:`, error);
+            console.error(
+              `Error getting address for admin ${member.inboxId}:`,
+              error,
+            );
             if (member.permissionLevel === "super_admin") {
               adminsList += `❓ **Unknown Address** *(Super Admin)*\n`;
               superAdminCount++;
@@ -154,7 +173,9 @@ export class GroupHandlers {
       adminsList += `📈 Total Administrators: ${adminCount + superAdminCount}`;
 
       await ctx.conversation.send(adminsList);
-      console.log(`Sent group admins list (${superAdminCount} super admins, ${adminCount} admins)`);
+      console.log(
+        `Sent group admins list (${superAdminCount} super admins, ${adminCount} admins)`,
+      );
     } catch (error) {
       console.error("Error getting group admins:", error);
       await ctx.conversation.send("❌ Failed to retrieve group administrators");
@@ -165,44 +186,44 @@ export class GroupHandlers {
     try {
       // Get group permissions
       const groupPermissions = await ctx.conversation.groupPermissions();
-      
+
       let permissionsText = "🔐 **Group Permissions:**\n\n";
-      
+
       if (groupPermissions) {
         // Display permission policies
         if (groupPermissions.policyType) {
           permissionsText += `📋 **Policy Type:** ${groupPermissions.policyType}\n\n`;
         }
-        
+
         // Add message permissions
         if (groupPermissions.policySet?.addMemberPolicy) {
           permissionsText += `➕ **Add Members:** ${this.formatPermissionPolicy(groupPermissions.policySet.addMemberPolicy)}\n`;
         }
-        
+
         if (groupPermissions.policySet?.removeMemberPolicy) {
           permissionsText += `➖ **Remove Members:** ${this.formatPermissionPolicy(groupPermissions.policySet.removeMemberPolicy)}\n`;
         }
-        
+
         if (groupPermissions.policySet?.updateGroupNamePolicy) {
           permissionsText += `✏️ **Update Group Name:** ${this.formatPermissionPolicy(groupPermissions.policySet.updateGroupNamePolicy)}\n`;
         }
-        
+
         if (groupPermissions.policySet?.updateGroupDescriptionPolicy) {
           permissionsText += `📝 **Update Description:** ${this.formatPermissionPolicy(groupPermissions.policySet.updateGroupDescriptionPolicy)}\n`;
         }
-        
+
         if (groupPermissions.policySet?.updateGroupImageUrlSquarePolicy) {
           permissionsText += `🖼️ **Update Group Image:** ${this.formatPermissionPolicy(groupPermissions.policySet.updateGroupImageUrlSquarePolicy)}\n`;
         }
-        
+
         if (groupPermissions.policySet?.updateGroupPinnedFrameUrlPolicy) {
           permissionsText += `📌 **Update Pinned Frame:** ${this.formatPermissionPolicy(groupPermissions.policySet.updateGroupPinnedFrameUrlPolicy)}\n`;
         }
-        
       } else {
-        permissionsText += "*No specific permissions configured or unable to retrieve permissions.*\n";
+        permissionsText +=
+          "*No specific permissions configured or unable to retrieve permissions.*\n";
       }
-      
+
       await ctx.conversation.send(permissionsText);
       console.log("Sent group permissions information");
     } catch (error) {
@@ -213,7 +234,7 @@ export class GroupHandlers {
 
   private formatPermissionPolicy(policy: any): string {
     if (!policy) return "Not set";
-    
+
     if (policy.type === "allow") {
       return "✅ Allow All";
     } else if (policy.type === "deny") {

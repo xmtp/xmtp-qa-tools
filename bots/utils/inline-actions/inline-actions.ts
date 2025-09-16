@@ -156,3 +156,102 @@ export const patterns = {
   inboxId: /^[a-fA-F0-9]{64}$/,
   ethereumAddress: /^0x[a-fA-F0-9]{40}$/,
 };
+
+// Additional types needed by index.ts
+export type MenuAction = {
+  id: string;
+  label: string;
+  style?: "primary" | "secondary" | "danger";
+  handler?: ActionHandler;
+};
+
+export type Menu = {
+  id: string;
+  title: string;
+  actions: MenuAction[];
+};
+
+export type AppConfig = {
+  name: string;
+  menus: Record<string, Menu>;
+};
+
+// Utility functions needed by index.ts
+export function getRegisteredActions(): string[] {
+  return Array.from(actionHandlers.keys());
+}
+
+export async function showMenu(
+  ctx: MessageContext,
+  config: AppConfig,
+  menuId: string,
+): Promise<void> {
+  const menu = config.menus[menuId];
+  if (!menu) {
+    console.error(`❌ Menu not found: ${menuId}`);
+    await ctx.conversation.send(`❌ Menu not found: ${menuId}`);
+    return;
+  }
+
+  const timestamp = Date.now();
+  const builder = ActionBuilder.create(`${menuId}-${timestamp}`, menu.title);
+
+  menu.actions.forEach((action) => {
+    builder.add(action.id, action.label, action.style);
+  });
+
+  await builder.send(ctx);
+}
+
+export function initializeAppFromConfig(
+  config: AppConfig,
+  options?: {
+    deferredHandlers?: Record<string, ActionHandler>;
+  },
+): void {
+  console.log(`🚀 Initializing app: ${config.name}`);
+
+  // Register all handlers from menu actions
+  Object.values(config.menus).forEach((menu) => {
+    menu.actions.forEach((action) => {
+      if (action.handler) {
+        registerAction(action.id, action.handler);
+        console.log(`✅ Registered handler for action: ${action.id}`);
+      }
+    });
+  });
+
+  // Register any deferred handlers
+  if (options?.deferredHandlers) {
+    Object.entries(options.deferredHandlers).forEach(([actionId, handler]) => {
+      registerAction(actionId, handler);
+      console.log(`✅ Registered deferred handler for action: ${actionId}`);
+    });
+  }
+
+  // Auto-register menu navigation actions (for actions without handlers that match menu IDs)
+  Object.values(config.menus).forEach((menu) => {
+    menu.actions.forEach((action) => {
+      if (!action.handler && config.menus[action.id]) {
+        // This action navigates to another menu
+        registerAction(action.id, async (ctx: MessageContext) => {
+          await showMenu(ctx, config, action.id);
+        });
+        console.log(`✅ Auto-registered navigation for menu: ${action.id}`);
+      }
+    });
+  });
+
+  // Auto-register common navigation actions
+  registerAction("main-menu", async (ctx: MessageContext) => {
+    await showMenu(ctx, config, "main-menu");
+  });
+
+  registerAction("help", async (ctx: MessageContext) => {
+    await showMenu(ctx, config, "main-menu");
+  });
+
+  registerAction("back-to-main", async (ctx: MessageContext) => {
+    await showMenu(ctx, config, "main-menu");
+  });
+}
