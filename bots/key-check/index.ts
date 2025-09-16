@@ -18,7 +18,6 @@ import {
   getRegisteredActions,
   initializeAppFromConfig,
   inlineActionsMiddleware,
-  registerAction,
   sendActions,
   showMenu,
   showNavigationOptions,
@@ -149,27 +148,12 @@ const appConfig: AppConfig = {
           },
         },
         {
-          id: "version",
-          label: "📦 Version",
+          id: "debug-info",
+          label: "🔧 Debug Info",
+          style: "primary",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleVersion(ctx);
-          },
-        },
-        {
-          id: "uptime",
-          label: "⏰ Uptime",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleUptime(ctx);
-          },
-        },
-        {
-          id: "debug",
-          label: "🐛 Debug",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleDebug(ctx);
+            await debugHandlers.handleDebugInfo(ctx);
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -236,20 +220,8 @@ const appConfig: AppConfig = {
   },
 };
 
-// Register additional actions that need navigation back to main
-registerAction("help", async (ctx: MessageContext) => {
-  await showMenu(ctx, appConfig, "main-menu");
-});
-
-registerAction("back-to-main", async (ctx: MessageContext) => {
-  console.log("🔍 back-to-main action triggered");
-  await showMenu(ctx, appConfig, "main-menu");
-});
-
-// Actions that show menus (these will be auto-registered from appConfig)
-registerAction("main-menu", async (ctx: MessageContext) => {
-  await showMenu(ctx, appConfig, "main-menu");
-});
+// Note: Common actions like "help", "back-to-main", and "main-menu"
+// are automatically registered by initializeAppFromConfig()
 
 async function showInboxInputMenu(ctx: MessageContext) {
   const inputMenu = ActionBuilder.create(
