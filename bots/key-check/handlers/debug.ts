@@ -25,12 +25,6 @@ export class DebugHandlers {
     console.log("Sent help information");
   }
 
-  async handleGroupId(ctx: any): Promise<void> {
-    await ctx.conversation.send(`Conversation ID`);
-    await ctx.conversation.send(`${ctx.message.conversationId}`);
-    console.log(`Sent conversation ID: ${ctx.message.conversationId}`);
-  }
-
   async handleVersion(ctx: any): Promise<void> {
     await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
     console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
@@ -66,35 +60,6 @@ export class DebugHandlers {
     await ctx.conversation.send(
       `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
-  }
-
-  async handleMembers(ctx: any): Promise<void> {
-    const members: GroupMember[] = await ctx.conversation.members();
-
-    if (!members || members.length === 0) {
-      await ctx.conversation.send("No members found in this conversation.");
-      console.log("No members found in the conversation");
-      return;
-    }
-
-    let membersList = "Group members:\n\n";
-
-    for (const member of members) {
-      const isBot =
-        member.inboxId.toLowerCase() === ctx.client.inboxId.toLowerCase();
-      let marker = isBot ? "~" : " ";
-      const isSender =
-        member.inboxId.toLowerCase() ===
-        ctx.message.senderInboxId.toLowerCase();
-      marker = isSender ? "*" : marker;
-      membersList += `${marker}${member.inboxId}${marker}\n\n`;
-    }
-
-    membersList += "\n ~indicates key-check bot's inbox ID~";
-    membersList += "\n *indicates who prompted the key-check command*";
-
-    await ctx.conversation.send(membersList);
-    console.log(`Sent list of ${members.length} members`);
   }
 
   async handleKeyPackageCheck(

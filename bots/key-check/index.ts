@@ -14,12 +14,14 @@ import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import {
   ActionBuilder,
+  getLastSentActionMessage,
   getRegisteredActions,
   initializeAppFromConfig,
   inlineActionsMiddleware,
   registerAction,
   sendActions,
   showMenu,
+  showNavigationOptions,
   type AppConfig,
   type MenuAction,
 } from "../utils/inline-actions/inline-actions";
@@ -37,27 +39,17 @@ const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers();
 const groupHandlers = new GroupHandlers();
 
-// Helper function for navigation after actions
-async function showNavigationOptions(ctx: MessageContext, message: string) {
-  const timestamp = Date.now();
-  const navigationMenu = ActionBuilder.create(
-    `navigation-options-${timestamp}`,
-    message,
-  )
-    .add("key-packages-menu", "🔑 Key Packages")
-    .add("group-tools-menu", "👥 Group Tools")
-    .add("debug-tools-menu", "🛠️ Debug Tools")
-    .add("load-test-menu", "🧪 Load Testing")
-    .add("ux-demo-menu", "🎨 UX Demo")
-    .add("main-menu", "⬅️ Main Menu")
-    .build();
-
-  await sendActions(ctx, navigationMenu);
-}
+// Configuration for auto-showing menu after actions
+// Set to false to disable automatic menu display after actions
+const AUTO_SHOW_MENU_AFTER_ACTION = true;
 
 // Ultra-simple app config with handlers DIRECTLY inline
 const appConfig: AppConfig = {
   name: "key-check",
+  options: {
+    autoShowMenuAfterAction: AUTO_SHOW_MENU_AFTER_ACTION,
+    defaultNavigationMessage: "Action completed! Choose your next option:",
+  },
   menus: {
     "main-menu": {
       id: "main-menu",
@@ -78,14 +70,11 @@ const appConfig: AppConfig = {
           id: "keycheck-sender",
           label: "🔑 Check Mine",
           style: "primary",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleKeyPackageCheck(
               ctx,
               ctx.message.senderInboxId,
-            );
-            await showNavigationOptions(
-              ctx,
-              "Your key package check completed!",
             );
           },
         },
@@ -111,44 +100,36 @@ const appConfig: AppConfig = {
       title: "👥 Group Tools",
       actions: [
         {
-          id: "group-summary",
-          label: "📊 Group Summary",
-          style: "primary",
-          handler: async (ctx: MessageContext) => {
-            await groupHandlers.handleGroupSummary(ctx);
-            await showNavigationOptions(ctx, "Group summary displayed!");
-          },
-        },
-        {
           id: "group-members",
           label: "👥 Members List",
+          style: "primary",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await groupHandlers.handleGroupMembers(ctx);
-            await showNavigationOptions(ctx, "Group members displayed!");
           },
         },
         {
           id: "group-info",
           label: "ℹ️ Group Info",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await groupHandlers.handleGroupInfo(ctx);
-            await showNavigationOptions(ctx, "Group info displayed!");
           },
         },
         {
           id: "group-admins",
           label: "👑 Administrators",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await groupHandlers.handleGroupAdmins(ctx);
-            await showNavigationOptions(ctx, "Group administrators displayed!");
           },
         },
         {
           id: "group-permissions",
           label: "🔐 Permissions",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await groupHandlers.handleGroupPermissions(ctx);
-            await showNavigationOptions(ctx, "Group permissions displayed!");
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -162,49 +143,33 @@ const appConfig: AppConfig = {
           id: "fork",
           label: "🔀 Detect Forks",
           style: "danger",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await forksHandlers.handleForkDetection(ctx);
-            await showNavigationOptions(ctx, "Fork detection completed!");
-          },
-        },
-        {
-          id: "groupid",
-          label: "🆔 Group ID",
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleGroupId(ctx);
-            await showNavigationOptions(ctx, "Group ID displayed!");
-          },
-        },
-        {
-          id: "members",
-          label: "👥 Members",
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleMembers(ctx);
-            await showNavigationOptions(ctx, "Members list displayed!");
           },
         },
         {
           id: "version",
           label: "📦 Version",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleVersion(ctx);
-            await showNavigationOptions(ctx, "Version info displayed!");
           },
         },
         {
           id: "uptime",
           label: "⏰ Uptime",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleUptime(ctx);
-            await showNavigationOptions(ctx, "Uptime info displayed!");
           },
         },
         {
           id: "debug",
           label: "🐛 Debug",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleDebug(ctx);
-            await showNavigationOptions(ctx, "Debug info displayed!");
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -218,49 +183,73 @@ const appConfig: AppConfig = {
           id: "ux-all",
           label: "🚀 Demo All",
           style: "primary",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
+            // Update the current action message for demo functionality
+            const actionMessage = getLastSentActionMessage();
+            if (actionMessage) {
+              uxHandlers.updateCurrentActionMessage(actionMessage);
+            }
             await uxHandlers.handleUxAll(ctx);
-            await showNavigationOptions(ctx, "UX demo completed!");
           },
         },
         {
           id: "ux-text",
           label: "📝 Text",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxText(ctx);
-            await showNavigationOptions(ctx, "Text demo completed!");
+          },
+        },
+        {
+          id: "ux-text-reply-reaction",
+          label: "📝💬👍 Text+Reply+Reaction",
+          style: "primary",
+          showNavigationOptions: true,
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxTextReplyReaction(ctx);
           },
         },
         {
           id: "ux-reaction",
           label: "👍 Reaction",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
+            // Update the current action message for reaction functionality
+            const actionMessage = getLastSentActionMessage();
+            if (actionMessage) {
+              uxHandlers.updateCurrentActionMessage(actionMessage);
+            }
             await uxHandlers.handleUxReaction(ctx);
-            await showNavigationOptions(ctx, "Reaction demo completed!");
           },
         },
         {
           id: "ux-reply",
           label: "💬 Reply",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
+            // Update the current action message for reply functionality
+            const actionMessage = getLastSentActionMessage();
+            if (actionMessage) {
+              uxHandlers.updateCurrentActionMessage(actionMessage);
+            }
             await uxHandlers.handleUxReply(ctx);
-            await showNavigationOptions(ctx, "Reply demo completed!");
           },
         },
         {
           id: "ux-attachment",
           label: "📎 File",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxAttachment(ctx);
-            await showNavigationOptions(ctx, "Attachment demo completed!");
           },
         },
         {
           id: "ux-usdc",
           label: "💰 USDC",
+          showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxUsdc(ctx);
-            await showNavigationOptions(ctx, "USDC transaction completed!");
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -380,21 +369,21 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
   if (!action.handler) {
     switch (action.id) {
       case "load-test-10x10":
+        action.showNavigationOptions = true;
         action.handler = async (ctx: MessageContext) => {
           await loadTestHandlers.handleLoadTest10Groups10Messages(ctx);
-          await showNavigationOptions(ctx, "Load test 10×10 completed!");
         };
         break;
       case "load-test-50x10":
+        action.showNavigationOptions = true;
         action.handler = async (ctx: MessageContext) => {
           await loadTestHandlers.handleLoadTest50Groups10Messages(ctx);
-          await showNavigationOptions(ctx, "Load test 50×10 completed!");
         };
         break;
       case "load-test-1x100":
+        action.showNavigationOptions = true;
         action.handler = async (ctx: MessageContext) => {
           await loadTestHandlers.handleLoadTest1Group100Messages(ctx);
-          await showNavigationOptions(ctx, "Load test 1×100 completed!");
         };
         break;
       case "load-test-custom":
@@ -432,7 +421,7 @@ agent.on("text", async (ctx) => {
   if (inboxIdPattern.test(content.trim())) {
     console.log(`Detected inbox ID: ${content.trim()}`);
     await debugHandlers.handleKeyPackageCheck(ctx, content.trim());
-    await showNavigationOptions(ctx, "Key package check completed!");
+    await showNavigationOptions(ctx, appConfig, "Key package check completed!");
     return;
   }
 
@@ -441,7 +430,7 @@ agent.on("text", async (ctx) => {
   if (addressPattern.test(content.trim())) {
     console.log(`Detected Ethereum address: ${content.trim()}`);
     await debugHandlers.handleKeyPackageCheck(ctx, "", content.trim());
-    await showNavigationOptions(ctx, "Key package check completed!");
+    await showNavigationOptions(ctx, appConfig, "Key package check completed!");
     return;
   }
 
@@ -458,7 +447,11 @@ agent.on("text", async (ctx) => {
     // Validate reasonable limits
     if (groups > 0 && messages > 0 && groups <= 1000 && messages <= 1000) {
       await loadTestHandlers.handleLoadTestCustom(ctx, groups, messages);
-      await showNavigationOptions(ctx, "Custom load test completed!");
+      await showNavigationOptions(
+        ctx,
+        appConfig,
+        "Custom load test completed!",
+      );
     } else {
       await ctx.conversation.send(
         "❌ Invalid parameters! Please use reasonable values:\n" +
@@ -468,6 +461,7 @@ agent.on("text", async (ctx) => {
       );
       await showNavigationOptions(
         ctx,
+        appConfig,
         "Please try again with valid parameters.",
       );
     }

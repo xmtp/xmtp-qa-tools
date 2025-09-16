@@ -22,7 +22,7 @@
       "@helpers/*": ["./helpers/*"],
       "@workers/*": ["./workers/*"],
       "@inboxes/*": ["./inboxes/*"],
-      "@bots/*": ["./bots/helpers/*"]
+      "@bots/*": ["./bots/*"]
     }
   },
   "include": ["**/*.ts", "vitest.config.ts", "vite.config.js"]

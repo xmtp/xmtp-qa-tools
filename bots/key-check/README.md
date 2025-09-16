@@ -1,34 +1,72 @@
-# Key Check Agent with UX Demo
+# Key-Check Bot
 
-This comprehensive agent provides key package validation, fork detection, and UX message type demonstrations all in one bot.
+A configurable XMTP bot for testing key packages, group functionality, and UX demos.
 
-## Commands
+## Features
 
-Once the agent is running, you can interact with it using the following commands:
+- **Configurable Menu Display**: Control whether the menu is shown after each action
+- Interactive key package validation
+- Fork detection
+- Group management tools
+- UX message type demos
+- Load testing capabilities
 
-### Key Package Checks
+## Configuration
 
-- `/kc` - Check key package status for the sender
-- `/kc inboxid <INBOX_ID>` - Check key package status for a specific inbox ID
-- `/kc address <ADDRESS>` - Check key package status for a specific address
+### Auto-Show Menu After Actions
 
-### Conversation Analysis
+You can control whether the menu is automatically displayed after each action by modifying the `AUTO_SHOW_MENU_AFTER_ACTION` constant in `index.ts`:
 
-- `/kc groupid` - Show the current conversation ID
-- `/kc members` - List all members' inbox IDs in the current conversation
-- `/kc fork` - **NEW!** Detect potential conversation forks and show detailed debug info
+```typescript
+// Configuration for auto-showing menu after actions
+// Set to false to disable automatic menu display after actions
+const AUTO_SHOW_MENU_AFTER_ACTION = true; // or false
+```
 
-### Bot Information
+When `AUTO_SHOW_MENU_AFTER_ACTION` is:
 
-- `/kc version` - Show XMTP SDK version information
-- `/kc uptime` - Show when the bot started and how long it has been running
-- `/kc debug` - Show debug information for the key-check bot
-- `/kc help` - Show the help message with available commands
+- **`true`** (default): After each action completes, the bot will show the navigation menu with all available options
+- **`false`**: After each action completes, the bot will only send a completion message without showing the menu
 
-### UX Demo Commands
+### Example Usage
 
-- `/kc ux` - Send one of each message type (comprehensive demo)
-- `/kc ux-reaction` - Send a reaction to the last message
-- `/kc ux-reply` - Send a reply to the last message
-- `/kc ux-attachment` - Show attachment implementation demo
-- `/kc ux-text` - Send a regular text message
+1. **With menu display enabled** (default):
+
+   ```
+   User: /kc
+   Bot: [Shows main menu]
+   User: [Clicks "🔑 Key Packages" → "🔑 Check Mine"]
+   Bot: [Shows key package results]
+   Bot: [Shows navigation menu again]
+   ```
+
+2. **With menu display disabled**:
+   ```
+   User: /kc
+   Bot: [Shows main menu]
+   User: [Clicks "🔑 Key Packages" → "🔑 Check Mine"]
+   Bot: [Shows key package results]
+   Bot: "Your key package check completed!"
+   ```
+
+## Usage
+
+Send any of these commands to interact with the bot:
+
+- `/kc` - Show main menu
+- `help` - Show main menu
+- `menu` - Show main menu
+- Send an Inbox ID (64 hex chars) to check key packages
+- Send an Ethereum address (0x + 40 hex chars) to check key packages
+- Send custom load test parameters (e.g., "5 20" for 5 groups × 20 messages)
+
+## Architecture
+
+The bot uses a configurable inline actions system that allows for:
+
+- Dynamic menu generation
+- Configurable post-action behavior
+- Extensible handler system
+- Consistent navigation patterns
+
+The configuration is handled through the `AppConfig` type in the inline-actions utility, making it easy to customize behavior across different bots.

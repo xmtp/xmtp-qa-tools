@@ -12,8 +12,26 @@ export type ActionHandler = (ctx: MessageContext) => Promise<void>;
 // Action registry
 const actionHandlers = new Map<string, ActionHandler>();
 
+// Track the last sent action message for reply functionality
+let lastSentActionMessage: any = null;
+
+// Track the last shown menu for automatic navigation
+let lastShownMenu: { config: AppConfig; menuId: string } | null = null;
+
 export function registerAction(actionId: string, handler: ActionHandler): void {
   actionHandlers.set(actionId, handler);
+}
+
+// Get the last sent action message for reply functionality
+export function getLastSentActionMessage(): any {
+  return lastSentActionMessage;
+}
+
+// Show the last shown menu
+export async function showLastMenu(ctx: MessageContext): Promise<void> {
+  if (lastShownMenu) {
+    await showMenu(ctx, lastShownMenu.config, lastShownMenu.menuId);
+  }
 }
 
 // Middleware
@@ -74,7 +92,11 @@ export class ActionBuilder {
   }
 
   async send(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(this.build(), ContentTypeActions);
+    const message = await ctx.conversation.send(
+      this.build(),
+      ContentTypeActions,
+    );
+    lastSentActionMessage = message;
   }
 }
 
@@ -83,7 +105,11 @@ export async function sendActions(
   ctx: MessageContext,
   actionsContent: ActionsContent,
 ): Promise<void> {
-  await ctx.conversation.send(actionsContent, ContentTypeActions);
+  const message = await ctx.conversation.send(
+    actionsContent,
+    ContentTypeActions,
+  );
+  lastSentActionMessage = message;
 }
 
 export async function sendConfirmation(
@@ -163,6 +189,7 @@ export type MenuAction = {
   label: string;
   style?: "primary" | "secondary" | "danger";
   handler?: ActionHandler;
+  showNavigationOptions?: boolean;
 };
 
 export type Menu = {
@@ -174,6 +201,10 @@ export type Menu = {
 export type AppConfig = {
   name: string;
   menus: Record<string, Menu>;
+  options?: {
+    autoShowMenuAfterAction?: boolean;
+    defaultNavigationMessage?: string;
+  };
 };
 
 // Utility functions needed by index.ts
@@ -193,6 +224,9 @@ export async function showMenu(
     return;
   }
 
+  // Track the last shown menu
+  lastShownMenu = { config, menuId };
+
   const timestamp = Date.now();
   const builder = ActionBuilder.create(`${menuId}-${timestamp}`, menu.title);
 
@@ -203,6 +237,50 @@ export async function showMenu(
   await builder.send(ctx);
 }
 
+// Configurable navigation helper
+export async function showNavigationOptions(
+  ctx: MessageContext,
+  config: AppConfig,
+  message: string,
+  customActions?: Array<{
+    id: string;
+    label: string;
+    style?: "primary" | "secondary" | "danger";
+  }>,
+): Promise<void> {
+  // Check if auto-show menu is enabled (default: true for backward compatibility)
+  const autoShowMenu = config.options?.autoShowMenuAfterAction !== false;
+
+  if (!autoShowMenu) {
+    // If auto-show is disabled, just send the message without showing menu
+    await ctx.conversation.send(message);
+    return;
+  }
+
+  const timestamp = Date.now();
+  const navigationMenu = ActionBuilder.create(
+    `navigation-options-${timestamp}`,
+    message,
+  );
+
+  // Add custom actions if provided
+  if (customActions) {
+    customActions.forEach((action) => {
+      navigationMenu.add(action.id, action.label, action.style);
+    });
+  } else {
+    // Default navigation options - show all main menu items
+    const mainMenu = config.menus["main-menu"];
+    if (mainMenu) {
+      mainMenu.actions.forEach((action) => {
+        navigationMenu.add(action.id, action.label, action.style);
+      });
+    }
+  }
+
+  await navigationMenu.send(ctx);
+}
+
 export function initializeAppFromConfig(
   config: AppConfig,
   options?: {
@@ -211,12 +289,26 @@ export function initializeAppFromConfig(
 ): void {
   console.log(`🚀 Initializing app: ${config.name}`);
 
+  // Log configuration options
+  if (config.options) {
+    console.log(`📋 App options:`, config.options);
+  }
+
   // Register all handlers from menu actions
   Object.values(config.menus).forEach((menu) => {
     menu.actions.forEach((action) => {
       if (action.handler) {
-        registerAction(action.id, action.handler);
-        console.log(`✅ Registered handler for action: ${action.id}`);
+        // Wrap handler to automatically show last menu if showNavigationOptions is true
+        const wrappedHandler = async (ctx: MessageContext) => {
+          await action.handler!(ctx);
+          if (action.showNavigationOptions) {
+            await showLastMenu(ctx);
+          }
+        };
+        registerAction(action.id, wrappedHandler);
+        console.log(
+          `✅ Registered handler for action: ${action.id}${action.showNavigationOptions ? " (with auto-navigation)" : ""}`,
+        );
       }
     });
   });
