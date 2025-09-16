@@ -51,7 +51,7 @@ export class LoadTestHandlers {
             groupError,
           );
           await ctx.conversation.send(
-            `❌ Failed to create group ${groupIndex + 1}: ${groupError}`,
+            `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
       }
@@ -77,7 +77,7 @@ export class LoadTestHandlers {
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${error}`);
+      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
     }
   }
 
@@ -134,7 +134,7 @@ export class LoadTestHandlers {
             groupError,
           );
           await ctx.conversation.send(
-            `❌ Failed to create group ${groupIndex + 1}: ${groupError}`,
+            `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
       }
@@ -161,7 +161,7 @@ export class LoadTestHandlers {
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${error}`);
+      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
     }
   }
 
@@ -213,7 +213,9 @@ export class LoadTestHandlers {
         }
       } catch (groupError) {
         console.error(`Failed to create group:`, groupError);
-        await ctx.conversation.send(`❌ Failed to create group: ${groupError}`);
+        await ctx.conversation.send(
+          `❌ Failed to create group: ${String(groupError)}`,
+        );
         return;
       }
 
@@ -238,7 +240,7 @@ export class LoadTestHandlers {
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${error}`);
+      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
     }
   }
 
@@ -307,7 +309,7 @@ export class LoadTestHandlers {
             groupError,
           );
           await ctx.conversation.send(
-            `❌ Failed to create group ${groupIndex + 1}: ${groupError}`,
+            `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
       }
@@ -334,7 +336,9 @@ export class LoadTestHandlers {
       console.log("Custom load test completed:", summary);
     } catch (error) {
       console.error("Custom load test failed:", error);
-      await ctx.conversation.send(`❌ Custom load test failed: ${error}`);
+      await ctx.conversation.send(
+        `❌ Custom load test failed: ${String(error)}`,
+      );
     }
   }
 }

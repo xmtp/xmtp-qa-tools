@@ -366,11 +366,11 @@ export class MenuBuilder {
 /**
  * Navigation utilities to reduce repetitive navigation code
  */
-export class NavigationHelper {
+export const NavigationHelper = {
   /**
    * Show navigation options after an action completes
    */
-  static async showAfterAction(
+  async showAfterAction(
     ctx: MessageContext,
     message: string,
     options?: {
@@ -405,27 +405,24 @@ export class NavigationHelper {
     }
 
     await builder.show(ctx);
-  }
+  },
 
   /**
    * Quick helper for common "action completed" navigation
    */
-  static async afterAction(
-    ctx: MessageContext,
-    actionName: string,
-  ): Promise<void> {
+  async afterAction(ctx: MessageContext, actionName: string): Promise<void> {
     await this.showAfterAction(ctx, `${actionName} completed!`);
-  }
-}
+  },
+};
 
 /**
  * Input handling utilities for common scenarios
  */
-export class InputHelper {
+export const InputHelper = {
   /**
    * Create an input prompt with validation
    */
-  static async promptFor(
+  async promptFor(
     ctx: MessageContext,
     config: {
       title: string;
@@ -451,12 +448,12 @@ export class InputHelper {
 
     await builder.show(ctx);
     await ctx.conversation.send(fullPrompt);
-  }
+  },
 
   /**
    * Common validators
    */
-  static validators = {
+  validators: {
     inboxId: (input: string) => {
       const pattern = /^[a-fA-F0-9]{64}$/;
       return pattern.test(input.trim())
@@ -494,26 +491,26 @@ export class InputHelper {
       }
       return { valid: true };
     },
-  };
+  },
 
   /**
    * Common regex patterns for text matching
    */
-  static patterns = {
+  patterns: {
     inboxId: /^[a-fA-F0-9]{64}$/,
     ethereumAddress: /^0x[a-fA-F0-9]{40}$/,
     positiveNumbers: /^(\d+)\s+(\d+)$/,
-  };
-}
+  },
+};
 
 /**
  * Quick confirmation patterns
  */
-export class ConfirmationHelper {
+export const ConfirmationHelper = {
   /**
    * Show a yes/no confirmation dialog
    */
-  static async confirm(
+  async confirm(
     ctx: MessageContext,
     message: string,
     onYes: ActionHandler,
@@ -539,12 +536,12 @@ export class ConfirmationHelper {
       .nav(noId, "❌ No", "danger");
 
     await builder.show(ctx);
-  }
+  },
 
   /**
    * Show a dangerous action confirmation
    */
-  static async confirmDangerous(
+  async confirmDangerous(
     ctx: MessageContext,
     message: string,
     warningText: string,
@@ -552,8 +549,8 @@ export class ConfirmationHelper {
   ): Promise<void> {
     await ctx.conversation.send(`⚠️ ${warningText}`);
     await this.confirm(ctx, message, onConfirm);
-  }
-}
+  },
+};
 
 /**
  * Simplified App class that ties everything together

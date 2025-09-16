@@ -132,8 +132,6 @@ export class UxHandlers {
     try {
       await ctx.conversation.send("💰 Preparing USDC transaction...");
 
-      // Get sender address from the message context
-      const senderAddress = ctx.message.senderInboxId; // This would need to be converted to address
       // For demo, using a mock address
       const mockSenderAddress = "0x1234567890123456789012345678901234567890";
       const recipientAddress = "0x0987654321098765432109876543210987654321";
