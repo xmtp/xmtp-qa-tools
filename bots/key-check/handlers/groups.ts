@@ -185,8 +185,8 @@ export class GroupHandlers {
     try {
       // Get group admin information using Group class methods
       const group = ctx.conversation as Group;
-      const admins = group.admins;
-      const superAdmins = group.superAdmins;
+      const admins = group.admins || [];
+      const superAdmins = group.superAdmins || [];
       const members = await ctx.conversation.members();
 
       let permissionsText = "🔐 **Group Permissions:**\n\n";

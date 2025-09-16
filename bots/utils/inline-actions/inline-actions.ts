@@ -19,6 +19,10 @@ let lastSentActionMessage: any = null;
 let lastShownMenu: { config: AppConfig; menuId: string } | null = null;
 
 export function registerAction(actionId: string, handler: ActionHandler): void {
+  // Prevent overwriting existing handlers unless explicitly intended
+  if (actionHandlers.has(actionId)) {
+    console.warn(`⚠️ Action ${actionId} already registered, overwriting...`);
+  }
   actionHandlers.set(actionId, handler);
 }
 
@@ -27,10 +31,21 @@ export function getLastSentActionMessage(): any {
   return lastSentActionMessage;
 }
 
+// Clear all registered actions (useful for debugging)
+export function clearAllActions(): void {
+  actionHandlers.clear();
+  console.log("🧹 Cleared all registered actions");
+}
+
 // Show the last shown menu
 export async function showLastMenu(ctx: MessageContext): Promise<void> {
   if (lastShownMenu) {
+    console.log(`🔄 Showing last menu: ${lastShownMenu.menuId}`);
     await showMenu(ctx, lastShownMenu.config, lastShownMenu.menuId);
+  } else {
+    console.warn("⚠️ No last menu to show, falling back to main menu");
+    // Fallback to main menu if no last menu is tracked
+    await ctx.conversation.send("Returning to main menu...");
   }
 }
 
@@ -227,8 +242,8 @@ export async function showMenu(
   // Track the last shown menu
   lastShownMenu = { config, menuId };
 
-  const timestamp = Date.now();
-  const builder = ActionBuilder.create(`${menuId}-${timestamp}`, menu.title);
+  // Use a stable action ID without timestamp to prevent conflicts
+  const builder = ActionBuilder.create(menuId, menu.title);
 
   menu.actions.forEach((action) => {
     builder.add(action.id, action.label, action.style);
@@ -257,11 +272,8 @@ export async function showNavigationOptions(
     return;
   }
 
-  const timestamp = Date.now();
-  const navigationMenu = ActionBuilder.create(
-    `navigation-options-${timestamp}`,
-    message,
-  );
+  // Use a stable action ID to prevent conflicts
+  const navigationMenu = ActionBuilder.create("navigation-options", message);
 
   // Add custom actions if provided
   if (customActions) {

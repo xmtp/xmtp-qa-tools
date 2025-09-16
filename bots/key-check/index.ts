@@ -252,9 +252,8 @@ registerAction("main-menu", async (ctx: MessageContext) => {
 });
 
 async function showInboxInputMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
   const inputMenu = ActionBuilder.create(
-    `inbox-input-menu-${timestamp}`,
+    "inbox-input-menu",
     "🔍 Check by Inbox ID",
   )
     .add("back-to-main", "⬅️ Back to Main Menu")
@@ -267,9 +266,8 @@ async function showInboxInputMenu(ctx: MessageContext) {
 }
 
 async function showAddressInputMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
   const inputMenu = ActionBuilder.create(
-    `address-input-menu-${timestamp}`,
+    "address-input-menu",
     "📧 Check by Address",
   )
     .add("back-to-main", "⬅️ Back to Main Menu")
@@ -282,9 +280,8 @@ async function showAddressInputMenu(ctx: MessageContext) {
 }
 
 async function showCustomLoadTestMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
   const customMenu = ActionBuilder.create(
-    `custom-load-test-menu-${timestamp}`,
+    "custom-load-test-menu",
     "⚙️ Custom Load Test",
   )
     .add("back-to-main", "⬅️ Back to Main Menu")
