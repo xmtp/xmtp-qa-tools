@@ -24,10 +24,8 @@ export class DebugHandlers {
   }
 
   async handleVersion(ctx: any): Promise<void> {
-    await ctx.conversation.send(
-      `XMTP node-sdk Version: ${this.xmtpSdkVersion}`,
-    );
-    console.log(`Sent XMTP node-sdk version: ${this.xmtpSdkVersion}`);
+    await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
+    console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
   }
 
   async handleUptime(ctx: any): Promise<void> {

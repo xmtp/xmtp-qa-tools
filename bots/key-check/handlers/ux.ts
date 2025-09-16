@@ -1,10 +1,5 @@
-import { readFile } from "node:fs/promises";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
-import {
-  AttachmentCodec,
-  RemoteAttachmentCodec,
-  type RemoteAttachment,
-} from "@xmtp/content-type-remote-attachment";
+import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import { createRemoteAttachmentFromData } from "../../utils/atttachment";

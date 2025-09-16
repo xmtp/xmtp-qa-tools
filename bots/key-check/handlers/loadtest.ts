@@ -337,24 +337,4 @@ export class LoadTestHandlers {
       await ctx.conversation.send(`❌ Custom load test failed: ${error}`);
     }
   }
-
-  async handleLoadTestHelp(ctx: any): Promise<void> {
-    const helpText =
-      `🧪 Load Testing Help\n\n` +
-      `Available load test scenarios:\n\n` +
-      `🔹 10 Groups × 10 Messages (100 total)\n` +
-      `   - Quick test for basic load handling\n\n` +
-      `🔹 50 Groups × 10 Messages (500 total)\n` +
-      `   - Medium load test for group creation\n\n` +
-      `🔹 1 Group × 100 Messages (100 total)\n` +
-      `   - High message volume in single group\n\n` +
-      `🔹 Custom (Groups × Messages)\n` +
-      `   - Specify your own parameters\n` +
-      `   - Format: "10 5" for 10 groups × 5 messages\n\n` +
-      `✅ Note: These load tests create real XMTP groups.\n` +
-      `Each group includes the sender and has a descriptive name.`;
-
-    await ctx.conversation.send(helpText);
-    console.log("Sent load testing help information");
-  }
 }

@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import { getDbPath } from "@helpers/client";
 import {
   Agent,
@@ -13,7 +12,6 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import { getActiveVersion } from "version-management/client-versions";
 import {
   ActionBuilder,
   getRegisteredActions,
@@ -32,24 +30,10 @@ import { ForksHandlers } from "./handlers/forks";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
-// Key-check bot now uses inline actions instead of text commands
-
-// Get XMTP SDK version from package.json
-const require = createRequire(import.meta.url);
-const packageJson = require("../../package.json");
-const xmtpSdkVersion: string =
-  packageJson.dependencies[
-    "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
-  ] ?? "unknown";
-
-// Track when the bot started
-const startTime = new Date();
-
 // Initialize handler instances
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
-const debugHandlers = new DebugHandlers(startTime, xmtpSdkVersion);
-// LoadTestHandlers will be initialized after agent is created
+const debugHandlers = new DebugHandlers();
 
 // Helper function for navigation after actions
 async function showNavigationOptions(ctx: MessageContext, message: string) {
@@ -246,7 +230,6 @@ const appConfig: AppConfig = {
         },
         { id: "load-test-1x100", label: "⚡ 1 Group × 100 Messages" },
         { id: "load-test-custom", label: "⚙️ Custom Parameters" },
-        { id: "load-test-help", label: "❓ Help & Info" },
         { id: "main-menu", label: "⬅️ Back" },
       ],
     },
@@ -365,12 +348,6 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
       case "load-test-custom":
         action.handler = async (ctx: MessageContext) => {
           await showCustomLoadTestMenu(ctx);
-        };
-        break;
-      case "load-test-help":
-        action.handler = async (ctx: MessageContext) => {
-          await loadTestHandlers.handleLoadTestHelp(ctx);
-          await showNavigationOptions(ctx, "Load testing help displayed!");
         };
         break;
     }
