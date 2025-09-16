@@ -236,20 +236,8 @@ const appConfig: AppConfig = {
   },
 };
 
-// Register additional actions that need navigation back to main
-registerAction("help", async (ctx: MessageContext) => {
-  await showMenu(ctx, appConfig, "main-menu");
-});
-
-registerAction("back-to-main", async (ctx: MessageContext) => {
-  console.log("🔍 back-to-main action triggered");
-  await showMenu(ctx, appConfig, "main-menu");
-});
-
-// Actions that show menus (these will be auto-registered from appConfig)
-registerAction("main-menu", async (ctx: MessageContext) => {
-  await showMenu(ctx, appConfig, "main-menu");
-});
+// Note: Common actions like "help", "back-to-main", and "main-menu"
+// are automatically registered by initializeAppFromConfig()
 
 async function showInboxInputMenu(ctx: MessageContext) {
   const inputMenu = ActionBuilder.create(

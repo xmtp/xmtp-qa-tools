@@ -44,8 +44,8 @@ For full list of commands, see [CLI README](./cli/readme.md).
 
 ## XMTP Networks
 
-- `local`, `dev`, `production`
 - `production` is the default network
+- Only `local`, `dev`, `production` are allowed
 
 ## XMTP Identifiers
 

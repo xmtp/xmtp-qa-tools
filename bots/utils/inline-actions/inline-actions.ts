@@ -334,22 +334,30 @@ export function initializeAppFromConfig(
   }
 
   // Auto-register menu navigation actions (for actions without handlers that match menu IDs)
+  const registeredMenuActions = new Set<string>();
   Object.values(config.menus).forEach((menu) => {
     menu.actions.forEach((action) => {
-      if (!action.handler && config.menus[action.id]) {
+      if (
+        !action.handler &&
+        config.menus[action.id] &&
+        !registeredMenuActions.has(action.id)
+      ) {
         // This action navigates to another menu
         registerAction(action.id, async (ctx: MessageContext) => {
           await showMenu(ctx, config, action.id);
         });
+        registeredMenuActions.add(action.id);
         console.log(`✅ Auto-registered navigation for menu: ${action.id}`);
       }
     });
   });
 
-  // Auto-register common navigation actions
-  registerAction("main-menu", async (ctx: MessageContext) => {
-    await showMenu(ctx, config, "main-menu");
-  });
+  // Auto-register common navigation actions (only if not already registered)
+  if (!registeredMenuActions.has("main-menu")) {
+    registerAction("main-menu", async (ctx: MessageContext) => {
+      await showMenu(ctx, config, "main-menu");
+    });
+  }
 
   registerAction("help", async (ctx: MessageContext) => {
     await showMenu(ctx, config, "main-menu");
