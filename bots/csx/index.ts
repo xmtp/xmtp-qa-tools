@@ -1,5 +1,10 @@
 import { getDbPath } from "@helpers/client";
-import { Agent, getTestUrl, type Group } from "@xmtp/agent-sdk";
+import {
+  Agent,
+  getTestUrl,
+  type Group,
+  type MessageContext,
+} from "@xmtp/agent-sdk";
 
 const isAdmin = [
   "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
@@ -30,7 +35,7 @@ agent.on("unhandledError", (error) => {
   console.error("CSX agent error", error);
 });
 
-agent.on("text", async (ctx) => {
+agent.on("text", async (ctx: MessageContext) => {
   const currentGroupId = process.env.GROUP_ID_CSX as string;
   const currentGroupCode = process.env.XMTP_GROUP_CODE_CSX as string;
 
