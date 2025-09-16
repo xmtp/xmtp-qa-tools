@@ -18,7 +18,6 @@ import {
   getRegisteredActions,
   initializeAppFromConfig,
   inlineActionsMiddleware,
-  registerAction,
   sendActions,
   showMenu,
   showNavigationOptions,
@@ -149,27 +148,12 @@ const appConfig: AppConfig = {
           },
         },
         {
-          id: "version",
-          label: "📦 Version",
+          id: "debug-info",
+          label: "🔧 Debug Info",
+          style: "primary",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleVersion(ctx);
-          },
-        },
-        {
-          id: "uptime",
-          label: "⏰ Uptime",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleUptime(ctx);
-          },
-        },
-        {
-          id: "debug",
-          label: "🐛 Debug",
-          showNavigationOptions: true,
-          handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleDebug(ctx);
+            await debugHandlers.handleDebugInfo(ctx);
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
