@@ -20,8 +20,6 @@ import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
 
-const DEFAULT_IMAGE_PATH = "./logo.png";
-
 export class UxHandlers {
   private usdcHandler: USDCHandler;
 
