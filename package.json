@@ -34,9 +34,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
-    "@xmtp/agent-sdk": "^0.0.9",
+    "@xmtp/agent-sdk": "^0.0.12",
+    "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
+    "@xmtp/content-type-wallet-send-calls": "^2.0.0",
     "@xmtp/node-bindings-1.3.3": "npm:@xmtp/node-bindings@1.3.3",
     "@xmtp/node-bindings-1.3.4": "npm:@xmtp/node-bindings@1.3.4",
     "@xmtp/node-bindings-1.3.5": "npm:@xmtp/node-bindings@1.3.5",

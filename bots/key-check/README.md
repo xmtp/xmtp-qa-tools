@@ -1,20 +1,72 @@
-# Key Check Agent
+# Key-Check Bot
 
-This agent helps you check the status of XMTP key packages for yourself or other addresses.
+A configurable XMTP bot for testing key packages, group functionality, and UX demos.
 
-Once the agent is running, you can interact with it using the following commands:
+## Features
 
-- `/kc` - Check key package status for the sender
-- `/kc inboxid <INBOX_ID>` - Check key package status for a specific inbox ID
-- `/kc address <ADDRESS>` - Check key package status for a specific address
-- `/kc groupid` - Show the current conversation ID
-- `/kc members` - List all members' inbox IDs in the current conversation
-- `/kc version` - Show XMTP SDK version information
-- `/kc help` - Show the help message with available commands
+- **Configurable Menu Display**: Control whether the menu is shown after each action
+- Interactive key package validation
+- Fork detection
+- Group management tools
+- UX message type demos
+- Load testing capabilities
 
-The agent will respond with information about the key packages, including:
+## Configuration
 
-- Total number of installations
-- Number of valid and invalid installations
-- Creation and expiry dates for valid installations
-- Error messages for invalid installations
+### Auto-Show Menu After Actions
+
+You can control whether the menu is automatically displayed after each action by modifying the `AUTO_SHOW_MENU_AFTER_ACTION` constant in `index.ts`:
+
+```typescript
+// Configuration for auto-showing menu after actions
+// Set to false to disable automatic menu display after actions
+const AUTO_SHOW_MENU_AFTER_ACTION = true; // or false
+```
+
+When `AUTO_SHOW_MENU_AFTER_ACTION` is:
+
+- **`true`** (default): After each action completes, the bot will show the navigation menu with all available options
+- **`false`**: After each action completes, the bot will only send a completion message without showing the menu
+
+### Example Usage
+
+1. **With menu display enabled** (default):
+
+   ```
+   User: /kc
+   Bot: [Shows main menu]
+   User: [Clicks "🔑 Key Packages" → "🔑 Check Mine"]
+   Bot: [Shows key package results]
+   Bot: [Shows navigation menu again]
+   ```
+
+2. **With menu display disabled**:
+   ```
+   User: /kc
+   Bot: [Shows main menu]
+   User: [Clicks "🔑 Key Packages" → "🔑 Check Mine"]
+   Bot: [Shows key package results]
+   Bot: "Your key package check completed!"
+   ```
+
+## Usage
+
+Send any of these commands to interact with the bot:
+
+- `/kc` - Show main menu
+- `help` - Show main menu
+- `menu` - Show main menu
+- Send an Inbox ID (64 hex chars) to check key packages
+- Send an Ethereum address (0x + 40 hex chars) to check key packages
+- Send custom load test parameters (e.g., "5 20" for 5 groups × 20 messages)
+
+## Architecture
+
+The bot uses a configurable inline actions system that allows for:
+
+- Dynamic menu generation
+- Configurable post-action behavior
+- Extensible handler system
+- Consistent navigation patterns
+
+The configuration is handled through the `AppConfig` type in the inline-actions utility, making it easy to customize behavior across different bots.
