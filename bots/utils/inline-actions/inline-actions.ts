@@ -15,6 +15,25 @@ export type ActionHandler = (
 ) => Promise<void>;
 
 /**
+ * Simplified action handler that automatically receives ctx
+ */
+export type SimpleActionHandler = () => Promise<void>;
+
+/**
+ * Wrapper function that automatically provides MessageContext to handlers
+ */
+export function withCtx(
+  handler: (ctx: MessageContext) => Promise<void>,
+): ActionHandler {
+  return async (
+    ctx: MessageContext,
+    metadata?: Record<string, string | number | boolean | null>,
+  ) => {
+    await handler(ctx);
+  };
+}
+
+/**
  * Menu action definition with inline handler
  */
 export type MenuAction = {
