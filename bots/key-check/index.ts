@@ -17,9 +17,13 @@ import { getActiveVersion } from "version-management/client-versions";
 import {
   ActionBuilder,
   getRegisteredActions,
+  initializeAppFromConfig,
   inlineActionsMiddleware,
   registerAction,
   sendActions,
+  showMenu,
+  type AppConfig,
+  type MenuAction,
 } from "../utils/inline-actions/inline-actions";
 import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
@@ -47,193 +51,222 @@ const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers(startTime, xmtpSdkVersion);
 // LoadTestHandlers will be initialized after agent is created
 
-// Register all action handlers
-
-// Main menu
-registerAction("help", async (ctx) => {
-  await showMainMenu(ctx);
-});
-
-registerAction("back-to-main", async (ctx) => {
-  console.log("🔍 back-to-main action triggered");
-  await showMainMenu(ctx);
-});
-
-// Key Packages Section
-registerAction("key-packages-menu", async (ctx) => {
-  await showKeyPackagesMenu(ctx);
-});
-
-registerAction("keycheck-sender", async (ctx) => {
-  await debugHandlers.handleKeyPackageCheck(ctx, ctx.message.senderInboxId);
-  await showNavigationOptions(ctx, "Your key package check completed!");
-});
-
-registerAction("keycheck-inbox", async (ctx) => {
-  await showInboxInputMenu(ctx);
-});
-
-registerAction("keycheck-address", async (ctx) => {
-  await showAddressInputMenu(ctx);
-});
-
-// Debug Tools Section
-registerAction("debug-tools-menu", async (ctx) => {
-  await showDebugToolsMenu(ctx);
-});
-
-registerAction("fork", async (ctx) => {
-  await forksHandlers.handleForkDetection(ctx);
-  await showNavigationOptions(ctx, "Fork detection completed!");
-});
-
-registerAction("groupid", async (ctx) => {
-  await debugHandlers.handleGroupId(ctx);
-  await showNavigationOptions(ctx, "Group ID displayed!");
-});
-
-registerAction("version", async (ctx) => {
-  await debugHandlers.handleVersion(ctx);
-  await showNavigationOptions(ctx, "Version info displayed!");
-});
-
-registerAction("uptime", async (ctx) => {
-  await debugHandlers.handleUptime(ctx);
-  await showNavigationOptions(ctx, "Uptime info displayed!");
-});
-
-registerAction("debug", async (ctx) => {
-  await debugHandlers.handleDebug(ctx);
-  await showNavigationOptions(ctx, "Debug info displayed!");
-});
-
-registerAction("members", async (ctx) => {
-  await debugHandlers.handleMembers(ctx);
-  await showNavigationOptions(ctx, "Members list displayed!");
-});
-
-// UX Demo Section
-registerAction("ux-demo-menu", async (ctx) => {
-  await showUxDemoMenu(ctx);
-});
-
-registerAction("ux-all", async (ctx) => {
-  await uxHandlers.handleUxAll(ctx);
-  await showNavigationOptions(ctx, "UX demo completed!");
-});
-
-registerAction("ux-reaction", async (ctx) => {
-  await uxHandlers.handleUxReaction(ctx);
-  await showNavigationOptions(ctx, "Reaction demo completed!");
-});
-
-registerAction("ux-reply", async (ctx) => {
-  await uxHandlers.handleUxReply(ctx);
-  await showNavigationOptions(ctx, "Reply demo completed!");
-});
-
-registerAction("ux-attachment", async (ctx) => {
-  await uxHandlers.handleUxAttachment(ctx);
-  await showNavigationOptions(ctx, "Attachment demo completed!");
-});
-
-registerAction("ux-text", async (ctx) => {
-  await uxHandlers.handleUxText(ctx);
-  await showNavigationOptions(ctx, "Text demo completed!");
-});
-
-registerAction("ux-usdc", async (ctx) => {
-  await uxHandlers.handleUxUsdc(ctx);
-  await showNavigationOptions(ctx, "USDC transaction completed!");
-});
-
-// Load Testing Section - will be registered after agent creation
-
-// Helper functions for menus
-async function showMainMenu(ctx: MessageContext) {
-  console.log("🔍 showMainMenu called");
+// Helper function for navigation after actions
+async function showNavigationOptions(ctx: MessageContext, message: string) {
   const timestamp = Date.now();
-  const mainMenu = ActionBuilder.create(
-    `main-menu-${timestamp}`,
-    "🔧 Key-Check Bot - Choose a section:",
+  const navigationMenu = ActionBuilder.create(
+    `navigation-options-${timestamp}`,
+    message,
   )
-    .add("key-packages-menu", "🔑 Key Packages", "primary")
+    .add("key-packages-menu", "🔑 Key Packages")
     .add("debug-tools-menu", "🛠️ Debug Tools")
     .add("load-test-menu", "🧪 Load Testing")
     .add("ux-demo-menu", "🎨 UX Demo")
+    .add("main-menu", "⬅️ Main Menu")
     .build();
 
-  console.log("🔍 Sending main menu actions:", mainMenu);
-  await sendActions(ctx, mainMenu);
+  await sendActions(ctx, navigationMenu);
 }
 
-async function showKeyPackagesMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
-  const keyPackagesMenu = ActionBuilder.create(
-    `key-packages-menu-${timestamp}`,
-    "🔑 Key Packages - Choose an option:",
-  )
-    .add("keycheck-sender", "🔑 Check My Key Package", "primary")
-    .add("keycheck-inbox", "🔍 Check by Inbox ID")
-    .add("keycheck-address", "📧 Check by Address")
-    .add("back-to-main", "⬅️ Back to Main Menu")
-    .build();
+// Ultra-simple app config with handlers DIRECTLY inline
+const appConfig: AppConfig = {
+  name: "key-check",
+  menus: {
+    "main-menu": {
+      id: "main-menu",
+      title: "🔧 Key-Check Bot",
+      actions: [
+        { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
+        { id: "debug-tools-menu", label: "🛠️ Debug Tools" },
+        { id: "load-test-menu", label: "🧪 Load Testing" },
+        { id: "ux-demo-menu", label: "🎨 UX Demo" },
+      ],
+    },
+    "key-packages-menu": {
+      id: "key-packages-menu",
+      title: "🔑 Key Packages",
+      actions: [
+        {
+          id: "keycheck-sender",
+          label: "🔑 Check Mine",
+          style: "primary",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleKeyPackageCheck(
+              ctx,
+              ctx.message.senderInboxId,
+            );
+            await showNavigationOptions(
+              ctx,
+              "Your key package check completed!",
+            );
+          },
+        },
+        {
+          id: "keycheck-inbox",
+          label: "🔍 By Inbox ID",
+          handler: async (ctx: MessageContext) => {
+            await showInboxInputMenu(ctx);
+          },
+        },
+        {
+          id: "keycheck-address",
+          label: "📧 By Address",
+          handler: async (ctx: MessageContext) => {
+            await showAddressInputMenu(ctx);
+          },
+        },
+        { id: "main-menu", label: "⬅️ Back" },
+      ],
+    },
+    "debug-tools-menu": {
+      id: "debug-tools-menu",
+      title: "🛠️ Debug Tools",
+      actions: [
+        {
+          id: "fork",
+          label: "🔀 Detect Forks",
+          style: "danger",
+          handler: async (ctx: MessageContext) => {
+            await forksHandlers.handleForkDetection(ctx);
+            await showNavigationOptions(ctx, "Fork detection completed!");
+          },
+        },
+        {
+          id: "groupid",
+          label: "🆔 Group ID",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleGroupId(ctx);
+            await showNavigationOptions(ctx, "Group ID displayed!");
+          },
+        },
+        {
+          id: "members",
+          label: "👥 Members",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleMembers(ctx);
+            await showNavigationOptions(ctx, "Members list displayed!");
+          },
+        },
+        {
+          id: "version",
+          label: "📦 Version",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleVersion(ctx);
+            await showNavigationOptions(ctx, "Version info displayed!");
+          },
+        },
+        {
+          id: "uptime",
+          label: "⏰ Uptime",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleUptime(ctx);
+            await showNavigationOptions(ctx, "Uptime info displayed!");
+          },
+        },
+        {
+          id: "debug",
+          label: "🐛 Debug",
+          handler: async (ctx: MessageContext) => {
+            await debugHandlers.handleDebug(ctx);
+            await showNavigationOptions(ctx, "Debug info displayed!");
+          },
+        },
+        { id: "main-menu", label: "⬅️ Back" },
+      ],
+    },
+    "ux-demo-menu": {
+      id: "ux-demo-menu",
+      title: "🎨 UX Demo",
+      actions: [
+        {
+          id: "ux-all",
+          label: "🚀 Demo All",
+          style: "primary",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxAll(ctx);
+            await showNavigationOptions(ctx, "UX demo completed!");
+          },
+        },
+        {
+          id: "ux-text",
+          label: "📝 Text",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxText(ctx);
+            await showNavigationOptions(ctx, "Text demo completed!");
+          },
+        },
+        {
+          id: "ux-reaction",
+          label: "👍 Reaction",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxReaction(ctx);
+            await showNavigationOptions(ctx, "Reaction demo completed!");
+          },
+        },
+        {
+          id: "ux-reply",
+          label: "💬 Reply",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxReply(ctx);
+            await showNavigationOptions(ctx, "Reply demo completed!");
+          },
+        },
+        {
+          id: "ux-attachment",
+          label: "📎 File",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxAttachment(ctx);
+            await showNavigationOptions(ctx, "Attachment demo completed!");
+          },
+        },
+        {
+          id: "ux-usdc",
+          label: "💰 USDC",
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxUsdc(ctx);
+            await showNavigationOptions(ctx, "USDC transaction completed!");
+          },
+        },
+        { id: "main-menu", label: "⬅️ Back" },
+      ],
+    },
+    "load-test-menu": {
+      id: "load-test-menu",
+      title: "🧪 Load Testing",
+      actions: [
+        {
+          id: "load-test-10x10",
+          label: "🔥 10 Groups × 10 Messages",
+          style: "primary",
+        },
+        {
+          id: "load-test-50x10",
+          label: "🚀 50 Groups × 10 Messages",
+          style: "danger",
+        },
+        { id: "load-test-1x100", label: "⚡ 1 Group × 100 Messages" },
+        { id: "load-test-custom", label: "⚙️ Custom Parameters" },
+        { id: "load-test-help", label: "❓ Help & Info" },
+        { id: "main-menu", label: "⬅️ Back" },
+      ],
+    },
+  },
+};
 
-  await sendActions(ctx, keyPackagesMenu);
-}
+// Register additional actions that need navigation back to main
+registerAction("help", async (ctx: MessageContext) => {
+  await showMenu(ctx, appConfig, "main-menu");
+});
 
-async function showDebugToolsMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
-  const debugToolsMenu = ActionBuilder.create(
-    `debug-tools-menu-${timestamp}`,
-    "🛠️ Debug Tools - Choose an option:",
-  )
-    .add("fork", "🔀 Detect Forks", "danger")
-    .add("groupid", "🆔 Show Group ID")
-    .add("members", "👥 List Members")
-    .add("version", "📦 SDK Version")
-    .add("uptime", "⏰ Bot Uptime")
-    .add("debug", "🐛 Debug Info")
-    .add("back-to-main", "⬅️ Back to Main Menu")
-    .build();
+registerAction("back-to-main", async (ctx: MessageContext) => {
+  console.log("🔍 back-to-main action triggered");
+  await showMenu(ctx, appConfig, "main-menu");
+});
 
-  await sendActions(ctx, debugToolsMenu);
-}
-
-async function showLoadTestMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
-  const loadTestMenu = ActionBuilder.create(
-    `load-test-menu-${timestamp}`,
-    "🧪 Load Testing - Choose a test scenario:",
-  )
-    .add("load-test-10x10", "🔥 10 Groups × 10 Messages", "primary")
-    .add("load-test-50x10", "🚀 50 Groups × 10 Messages", "danger")
-    .add("load-test-1x100", "⚡ 1 Group × 100 Messages")
-    .add("load-test-custom", "⚙️ Custom Parameters")
-    .add("load-test-help", "❓ Help & Info")
-    .add("back-to-main", "⬅️ Back to Main Menu")
-    .build();
-
-  await sendActions(ctx, loadTestMenu);
-}
-
-async function showUxDemoMenu(ctx: MessageContext) {
-  const timestamp = Date.now();
-  const uxDemoMenu = ActionBuilder.create(
-    `ux-demo-menu-${timestamp}`,
-    "🎨 UX Demo - Choose an option:",
-  )
-    .add("ux-all", "🚀 Demo All Types", "primary")
-    .add("ux-text", "📝 Text Message")
-    .add("ux-reaction", "👍 Reaction")
-    .add("ux-reply", "💬 Reply")
-    .add("ux-attachment", "📎 Real Attachment")
-    .add("ux-usdc", "💰 USDC Transaction")
-    .add("back-to-main", "⬅️ Back to Main Menu")
-    .build();
-
-  await sendActions(ctx, uxDemoMenu);
-}
+// Actions that show menus (these will be auto-registered from appConfig)
+registerAction("main-menu", async (ctx: MessageContext) => {
+  await showMenu(ctx, appConfig, "main-menu");
+});
 
 async function showInboxInputMenu(ctx: MessageContext) {
   const timestamp = Date.now();
@@ -285,24 +318,6 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
   );
 }
 
-async function showNavigationOptions(ctx: MessageContext, message: string) {
-  const timestamp = Date.now();
-  const navigationMenu = ActionBuilder.create(
-    `navigation-options-${timestamp}`,
-    message,
-  )
-    .add("key-packages-menu", "🔑 Key Packages")
-    .add("debug-tools-menu", "🛠️ Debug Tools")
-    .add("load-test-menu", "🧪 Load Testing")
-    .add("ux-demo-menu", "🎨 UX Demo")
-    .add("ux-attachment", "📎 Real Attachment")
-    .add("ux-usdc", "💰 USDC Transaction")
-    .add("back-to-main", "⬅️ Main Menu")
-    .build();
-
-  await sendActions(ctx, navigationMenu);
-}
-
 // 2. Spin up the agent with UX demo codecs and inline actions
 const agent = (await Agent.createFromEnv({
   appVersion: "key-check/0",
@@ -325,34 +340,45 @@ agent.use(inlineActionsMiddleware);
 // Initialize load test handlers now that agent is available
 const loadTestHandlers = new LoadTestHandlers(agent);
 
-// Register load testing actions
-registerAction("load-test-menu", async (ctx) => {
-  await showLoadTestMenu(ctx);
+// Add load test handlers to the app config
+appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
+  if (!action.handler) {
+    switch (action.id) {
+      case "load-test-10x10":
+        action.handler = async (ctx: MessageContext) => {
+          await loadTestHandlers.handleLoadTest10Groups10Messages(ctx);
+          await showNavigationOptions(ctx, "Load test 10×10 completed!");
+        };
+        break;
+      case "load-test-50x10":
+        action.handler = async (ctx: MessageContext) => {
+          await loadTestHandlers.handleLoadTest50Groups10Messages(ctx);
+          await showNavigationOptions(ctx, "Load test 50×10 completed!");
+        };
+        break;
+      case "load-test-1x100":
+        action.handler = async (ctx: MessageContext) => {
+          await loadTestHandlers.handleLoadTest1Group100Messages(ctx);
+          await showNavigationOptions(ctx, "Load test 1×100 completed!");
+        };
+        break;
+      case "load-test-custom":
+        action.handler = async (ctx: MessageContext) => {
+          await showCustomLoadTestMenu(ctx);
+        };
+        break;
+      case "load-test-help":
+        action.handler = async (ctx: MessageContext) => {
+          await loadTestHandlers.handleLoadTestHelp(ctx);
+          await showNavigationOptions(ctx, "Load testing help displayed!");
+        };
+        break;
+    }
+  }
 });
 
-registerAction("load-test-10x10", async (ctx) => {
-  await loadTestHandlers.handleLoadTest10Groups10Messages(ctx);
-  await showNavigationOptions(ctx, "Load test 10×10 completed!");
-});
-
-registerAction("load-test-50x10", async (ctx) => {
-  await loadTestHandlers.handleLoadTest50Groups10Messages(ctx);
-  await showNavigationOptions(ctx, "Load test 50×10 completed!");
-});
-
-registerAction("load-test-1x100", async (ctx) => {
-  await loadTestHandlers.handleLoadTest1Group100Messages(ctx);
-  await showNavigationOptions(ctx, "Load test 1×100 completed!");
-});
-
-registerAction("load-test-custom", async (ctx) => {
-  await showCustomLoadTestMenu(ctx);
-});
-
-registerAction("load-test-help", async (ctx) => {
-  await loadTestHandlers.handleLoadTestHelp(ctx);
-  await showNavigationOptions(ctx, "Load testing help displayed!");
-});
+// Initialize the app from config - this registers all handlers
+initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
@@ -368,7 +394,7 @@ agent.on("text", async (ctx) => {
     content.trim().toLowerCase() === "menu"
   ) {
     console.log(`Showing main menu for: ${content}`);
-    await showMainMenu(ctx);
+    await showMenu(ctx, appConfig, "main-menu");
     return;
   }
 
@@ -421,7 +447,7 @@ agent.on("text", async (ctx) => {
 
   // If it's not a recognized pattern, show the main menu as a fallback
   console.log(`Unrecognized input, showing main menu: ${content}`);
-  await showMainMenu(ctx);
+  await showMenu(ctx, appConfig, "main-menu");
 });
 
 // 4. Log when we're ready

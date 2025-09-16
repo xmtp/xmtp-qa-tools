@@ -15,6 +15,33 @@ export type ActionHandler = (
 ) => Promise<void>;
 
 /**
+ * Menu action definition with inline handler
+ */
+export type MenuAction = {
+  id: string;
+  label: string;
+  style?: "primary" | "secondary" | "danger";
+  handler?: ActionHandler;
+};
+
+/**
+ * Menu definition
+ */
+export type Menu = {
+  id: string;
+  title: string;
+  actions: MenuAction[];
+};
+
+/**
+ * App configuration with menus and handlers directly inline
+ */
+export type AppConfig = {
+  name: string;
+  menus: Record<string, Menu>;
+};
+
+/**
  * Action registry to store action handlers
  */
 class ActionRegistry {
@@ -238,4 +265,46 @@ export function validateRegisteredActions(requiredActions: string[]): {
  */
 export function getRegisteredActions(): string[] {
   return globalActionRegistry.getAll();
+}
+
+/**
+ * Initialize app from config - registers all handlers from menus
+ */
+export function initializeAppFromConfig(config: AppConfig): void {
+  console.log(`🚀 Initializing app: ${config.name}`);
+
+  // Register all handlers from menu actions
+  Object.values(config.menus).forEach((menu) => {
+    menu.actions.forEach((action) => {
+      if (action.handler) {
+        registerAction(action.id, action.handler);
+        console.log(`✅ Registered handler for action: ${action.id}`);
+      }
+    });
+  });
+}
+
+/**
+ * Show a menu from the app config
+ */
+export async function showMenu(
+  ctx: MessageContext,
+  config: AppConfig,
+  menuId: string,
+): Promise<void> {
+  const menu = config.menus[menuId];
+  if (!menu) {
+    console.error(`❌ Menu not found: ${menuId}`);
+    await ctx.conversation.send(`❌ Menu not found: ${menuId}`);
+    return;
+  }
+
+  const timestamp = Date.now();
+  const builder = ActionBuilder.create(`${menuId}-${timestamp}`, menu.title);
+
+  menu.actions.forEach((action) => {
+    builder.add(action.id, action.label, action.style);
+  });
+
+  await sendActions(ctx, builder.build());
 }
