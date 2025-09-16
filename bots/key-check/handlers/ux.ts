@@ -1,5 +1,6 @@
 import { createRemoteAttachmentFromData } from "@bots/utils/atttachment";
 import { USDCHandler } from "@bots/utils/usdc";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { RemoteAttachmentCodec } from "@xmtp/content-type-remote-attachment";
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
@@ -52,18 +53,107 @@ export class UxHandlers {
     }
   }
 
+  async handleUxMarkdown(ctx: any): Promise<void> {
+    try {
+      const markdownContent = `# 🎨 Markdown Demo
+
+This is a **markdown formatted** message demonstrating various formatting options:
+
+## Text Formatting
+- **Bold text** for emphasis
+- *Italic text* for subtle emphasis
+- \`Inline code\` for technical terms
+- ~~Strikethrough~~ for corrections
+
+## Lists
+### Unordered List
+- First item
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
+### Ordered List
+1. First step
+2. Second step
+3. Third step
+
+## Code Blocks
+\`\`\`javascript
+function greet(name) {
+  return \`Hello, \${name}!\`;
+}
+\`\`\`
+
+## Links and References
+- [XMTP Documentation](https://docs.xmtp.org)
+- [XMTP GitHub](https://github.com/xmtp)
+
+## Blockquotes
+> This is a blockquote demonstrating how to highlight important information or quotes.
+
+## Tables
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Text | ✅ | Basic text messages |
+| Markdown | ✅ | Rich text formatting |
+| Reactions | ✅ | Emoji reactions |
+| Replies | ✅ | Threaded conversations |
+
+---
+
+**This demonstrates the full power of markdown formatting in XMTP messages!**`;
+
+      await ctx.conversation.send(markdownContent, {
+        contentType: ContentTypeMarkdown,
+        contentFallback:
+          "🎨 Markdown Demo\n\nThis is a markdown formatted message demonstrating various formatting options including text formatting, lists, code blocks, links, blockquotes, and tables. This demonstrates the full power of markdown formatting in XMTP messages!",
+      });
+
+      await ctx.conversation.send(
+        "✅ Markdown message sent successfully! Check how it renders in your client.",
+      );
+      console.log("Sent comprehensive markdown demo");
+    } catch (error) {
+      console.error("Error sending markdown demo:", error);
+      await ctx.conversation.send("❌ Failed to send markdown demo");
+    }
+  }
+
   async handleUxTextReplyReaction(ctx: any): Promise<void> {
     try {
       // First, send a text message
       const textMessage = await ctx.conversation.send(
         "📝 This is a text message that will be replied to and reacted to!",
       );
-      console.log("Sent text message for reply/reaction demo");
+      console.log("Sent text message for basics demo");
 
       // Small delay to ensure message is processed
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // Then send a reply to that same text message
+      // Send a markdown message
+      const markdownContent = `# 🎨 Markdown Message
+
+This is a **markdown formatted** message with:
+
+- **Bold text**
+- *Italic text*
+- \`Code snippets\`
+- [Links](https://xmtp.org)
+
+> This demonstrates rich text formatting!`;
+
+      await ctx.conversation.send(markdownContent, {
+        contentType: ContentTypeMarkdown,
+        contentFallback:
+          "🎨 Markdown Message\n\nThis is a markdown formatted message with bold text, italic text, code snippets, and links. This demonstrates rich text formatting!",
+      });
+      console.log("Sent markdown message");
+
+      // Small delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // Then send a reply to the original text message
       const replyContent: Reply = {
         reference: textMessage.id,
         content: "💬 This is a reply to the text message!",
@@ -89,14 +179,12 @@ export class UxHandlers {
       });
 
       await ctx.conversation.send(
-        "✅ Successfully sent text message, reply, and reaction to the same message!",
+        "✅ Successfully sent text, markdown, reply, and reaction messages!",
       );
       console.log("Sent reaction to text message");
     } catch (error) {
-      console.error("Error in text+reply+reaction demo:", error);
-      await ctx.conversation.send(
-        "❌ Failed to complete text+reply+reaction demo",
-      );
+      console.error("Error in basics demo:", error);
+      await ctx.conversation.send("❌ Failed to complete basics demo");
     }
   }
 

@@ -300,7 +300,7 @@ export function initializeAppFromConfig(
       if (action.handler) {
         // Wrap handler to automatically show last menu if showNavigationOptions is true
         const wrappedHandler = async (ctx: MessageContext) => {
-          await action.handler!(ctx);
+          await action.handler?.(ctx);
           if (action.showNavigationOptions) {
             await showLastMenu(ctx);
           }

@@ -2,7 +2,6 @@ import { createRequire } from "node:module";
 import {
   getActiveVersion,
   IdentifierKind,
-  type GroupMember,
 } from "version-management/client-versions";
 
 // Get XMTP SDK version from package.json

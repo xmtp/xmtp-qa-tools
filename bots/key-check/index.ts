@@ -5,6 +5,7 @@ import {
   type LogLevel,
   type MessageContext,
 } from "@xmtp/agent-sdk";
+import { MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import {
   AttachmentCodec,
@@ -14,7 +15,6 @@ import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import {
   ActionBuilder,
-  getLastSentActionMessage,
   getRegisteredActions,
   initializeAppFromConfig,
   inlineActionsMiddleware,
@@ -181,11 +181,19 @@ const appConfig: AppConfig = {
       actions: [
         {
           id: "ux-text-reply-reaction",
-          label: "📝💬👍 Basics",
+          label: "📝🎨💬👍 Basics",
           style: "primary",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await uxHandlers.handleUxTextReplyReaction(ctx);
+          },
+        },
+        {
+          id: "ux-markdown",
+          label: "🎨 Markdown",
+          showNavigationOptions: true,
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxMarkdown(ctx);
           },
         },
         {
@@ -300,6 +308,7 @@ const agent = await Agent.createFromEnv({
   loggingLevel: "warn" as LogLevel,
   dbPath: getDbPath(`key-check`),
   codecs: [
+    new MarkdownCodec(),
     new ReactionCodec(),
     new ReplyCodec(),
     new RemoteAttachmentCodec(),

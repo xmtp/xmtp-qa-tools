@@ -1386,6 +1386,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/content-type-markdown@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@xmtp/content-type-markdown@npm:1.0.0"
+  dependencies:
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+  checksum: 10/04cc9d51a0b2f4c5e922a9bf9fb489a56438cb53241a04ec841df094c4b0e646dc466e5f5091282d04e43c9e832af37a98eefc62c7c6a1df8b949fa1c7e7147d
+  languageName: node
+  linkType: hard
+
 "@xmtp/content-type-primitives@npm:^2.0.2":
   version: 2.0.2
   resolution: "@xmtp/content-type-primitives@npm:2.0.2"
@@ -4613,6 +4622,7 @@ __metadata:
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
     "@xmtp/agent-sdk": "npm:^0.0.12"
+    "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
