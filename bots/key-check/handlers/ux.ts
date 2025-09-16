@@ -129,26 +129,25 @@ function greet(name) {
       );
       console.log("Sent text message for basics demo", textMessage);
 
-      await ctx.conversation.send(
-        {
-          reference: textMessage,
-          content: "💬 This is a reply to the text message!",
-          contentType: ContentTypeReply,
-        } as Reply,
-        ContentTypeReply,
-      );
-      console.log("Sent reply to text message");
-
       // Step 1: Add thinking emoji reaction
       await ctx.conversation.send(
         {
           action: "added",
-          content: "⏳",
-          reference: ctx.message.id,
+          content: "❤️",
+          reference: textMessage,
           schema: "shortcode",
         } as Reaction,
         ContentTypeReaction,
       );
+
+      await ctx.conversation.send(
+        {
+          reference: textMessage,
+          content: "💬 This is a reply to the text message!",
+        } as Reply,
+        ContentTypeReply,
+      );
+      console.log("Sent reply to text message");
     } catch (error) {
       console.error("Error in basics demo:", error);
       await ctx.conversation.send("❌ Failed to complete basics demo");
@@ -156,39 +155,18 @@ function greet(name) {
   }
 
   async handleTransaction(ctx: MessageContext): Promise<void> {
-    try {
-      await ctx.conversation.send("💰 Preparing USDC transaction...");
+    const agentAddress = ctx.client.accountIdentifier?.identifier || "";
+    const senderAddress = await ctx.getSenderAddress();
 
-      // For demo, using a mock address
-      const mockSenderAddress = "0x1234567890123456789012345678901234567890";
-      const recipientAddress = "0x0987654321098765432109876543210987654321";
-      const amount = 1000000; // 1 USDC (6 decimals)
+    // Convert amount to USDC decimals (6 decimal places)
+    const amountInDecimals = Math.floor(0.1 * Math.pow(10, 6));
 
-      // Create USDC transfer calls using the utility
-      const transferCalls = this.usdcHandler.createUSDCTransferCalls(
-        mockSenderAddress,
-        recipientAddress,
-        amount,
-      );
-
-      // Send the wallet send calls
-      await ctx.conversation.send(transferCalls, ContentTypeWalletSendCalls);
-
-      await ctx.conversation.send(
-        `✅ USDC transaction request sent!\n` +
-          `💰 Amount: ${amount / 1000000} USDC\n` +
-          `📍 Network: ${this.usdcHandler.getNetworkConfig().networkName}\n` +
-          `🎯 To: ${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`,
-      );
-
-      console.log("💰 Sent USDC transaction request:", {
-        amount: amount / 1000000,
-        network: this.usdcHandler.getNetworkConfig().networkName,
-        to: recipientAddress,
-      });
-    } catch (error) {
-      console.error("❌ Error sending USDC transaction:", error);
-      await ctx.conversation.send("❌ Failed to send USDC transaction");
-    }
+    const walletSendCalls = this.usdcHandler.createUSDCTransferCalls(
+      senderAddress,
+      agentAddress,
+      amountInDecimals,
+    );
+    console.log("Replied with wallet sendcall");
+    await ctx.conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
   }
 }
