@@ -1,4 +1,4 @@
-import type { MessageContext, AgentMiddleware } from "@xmtp/agent-sdk";
+import type { AgentMiddleware, MessageContext } from "@xmtp/agent-sdk";
 import {
   ContentTypeActions,
   type Action,
@@ -55,6 +55,16 @@ export const inlineActionsMiddleware: AgentMiddleware = async (ctx, next) => {
     const intentContent = message.content as IntentContent;
     const handler = globalActionRegistry.get(intentContent.actionId);
 
+    // Log transaction reference intent when it gets back
+    console.log("🎯 Transaction Intent Received:", {
+      id: intentContent.id,
+      actionId: intentContent.actionId,
+      timestamp: new Date().toISOString(),
+      messageId: ctx.message.id,
+    });
+
+    // Simplified logging - just process the action without verbose output
+
     if (handler) {
       console.log(`🎯 Found handler for action: ${intentContent.actionId}`);
       try {
@@ -90,7 +100,6 @@ export const inlineActionsMiddleware: AgentMiddleware = async (ctx, next) => {
  */
 export function registerAction(actionId: string, handler: ActionHandler): void {
   globalActionRegistry.register(actionId, handler);
-  console.log(`✅ Registered action handler: ${actionId}`);
 }
 
 /**

@@ -1,8 +1,23 @@
+import { readFile } from "node:fs/promises";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
+import {
+  AttachmentCodec,
+  RemoteAttachmentCodec,
+  type RemoteAttachment,
+} from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { createRemoteAttachmentFromData } from "../../utils/atttachment";
+import { USDCHandler } from "../../utils/usdc";
 
 export class UxHandlers {
   private lastReceivedMessage: any = null;
+  private usdcHandler: USDCHandler;
+
+  constructor() {
+    // Initialize USDC handler for Base Sepolia testnet
+    this.usdcHandler = new USDCHandler("base-sepolia");
+  }
 
   // Update the last received message for UX demo functionality
   updateLastMessage(message: any): void {
@@ -72,19 +87,43 @@ export class UxHandlers {
   }
 
   async handleUxAttachment(ctx: any): Promise<void> {
-    // Note: Real attachment implementation would require RemoteAttachmentCodec
-    // and proper file handling. This is a demonstration.
-    const attachmentDemo =
-      "📎 Attachment Demo\n\n" +
-      "This would send an attachment if properly configured.\n" +
-      "XMTP attachments require:\n" +
-      "• RemoteAttachmentCodec\n" +
-      "• File upload service\n" +
-      "• Proper content encryption\n\n" +
-      "See: https://github.com/ephemeraHQ/xmtp-agent-examples/tree/agent-sdk/examples/xmtp-attachments";
+    try {
+      await ctx.conversation.send(
+        "📎 Preparing to send real image attachment...",
+      );
 
-    await ctx.conversation.send(attachmentDemo);
-    console.log("Sent attachment demo message");
+      // Create a simple test image (1x1 pixel PNG)
+      const testImageData = new Uint8Array([
+        137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0,
+        1, 0, 0, 0, 1, 8, 2, 0, 0, 0, 144, 119, 83, 222, 0, 0, 0, 12, 73, 68,
+        65, 84, 8, 215, 99, 248, 15, 0, 0, 1, 0, 1, 0, 24, 221, 141, 219, 0, 0,
+        0, 0, 73, 69, 78, 68, 174, 66, 96, 130,
+      ]);
+
+      // For demo purposes, we'll use a mock file URL (in production, you'd upload to a real service)
+      const mockFileUrl = "https://example.com/test-image.png";
+
+      // Create remote attachment using the utility
+      const remoteAttachment = await createRemoteAttachmentFromData(
+        testImageData,
+        "test-image.png",
+        "image/png",
+        mockFileUrl,
+      );
+
+      // Send the attachment
+      await ctx.conversation.send(remoteAttachment, {
+        contentType: new RemoteAttachmentCodec().contentType,
+      });
+
+      await ctx.conversation.send(
+        "✅ Real image attachment sent successfully!",
+      );
+      console.log("📎 Sent real image attachment");
+    } catch (error) {
+      console.error("❌ Error sending real attachment:", error);
+      await ctx.conversation.send("❌ Failed to send real attachment");
+    }
   }
 
   async handleUxText(ctx: any): Promise<void> {
@@ -92,6 +131,47 @@ export class UxHandlers {
       "📝 This is a regular text message from the Key-Check bot's UX demo!",
     );
     console.log("Sent UX demo text message");
+  }
+
+  async handleUxUsdc(ctx: any): Promise<void> {
+    try {
+      await ctx.conversation.send("💰 Preparing USDC transaction...");
+
+      // Get sender address from the message context
+      const senderAddress = ctx.message.senderInboxId; // This would need to be converted to address
+      // For demo, using a mock address
+      const mockSenderAddress = "0x1234567890123456789012345678901234567890";
+      const recipientAddress = "0x0987654321098765432109876543210987654321";
+      const amount = 1000000; // 1 USDC (6 decimals)
+
+      // Create USDC transfer calls using the utility
+      const transferCalls = this.usdcHandler.createUSDCTransferCalls(
+        mockSenderAddress,
+        recipientAddress,
+        amount,
+      );
+
+      // Send the wallet send calls
+      await ctx.conversation.send(transferCalls, {
+        contentType: new WalletSendCallsCodec().contentType,
+      });
+
+      await ctx.conversation.send(
+        `✅ USDC transaction request sent!\n` +
+          `💰 Amount: ${amount / 1000000} USDC\n` +
+          `📍 Network: ${this.usdcHandler.getNetworkConfig().networkName}\n` +
+          `🎯 To: ${recipientAddress.slice(0, 6)}...${recipientAddress.slice(-4)}`,
+      );
+
+      console.log("💰 Sent USDC transaction request:", {
+        amount: amount / 1000000,
+        network: this.usdcHandler.getNetworkConfig().networkName,
+        to: recipientAddress,
+      });
+    } catch (error) {
+      console.error("❌ Error sending USDC transaction:", error);
+      await ctx.conversation.send("❌ Failed to send USDC transaction");
+    }
   }
 
   async handleUxAll(ctx: any): Promise<void> {
@@ -104,11 +184,10 @@ export class UxHandlers {
     // Small delay between messages
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // 2. Attachment demo
-    await ctx.conversation.send(
-      "2️⃣ Attachment demo - See https://github.com/ephemeraHQ/xmtp-agent-examples/tree/agent-sdk/examples/xmtp-attachments for implementation",
-    );
-    console.log("Sent attachment demo in sequence");
+    // 2. Real attachment
+    await ctx.conversation.send("2️⃣ Sending real attachment...");
+    await this.handleUxAttachment(ctx);
+    console.log("Sent real attachment in sequence");
 
     // Small delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -162,8 +241,16 @@ export class UxHandlers {
       );
     }
 
+    // Small delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // 5. USDC Transaction
+    await ctx.conversation.send("5️⃣ Sending USDC transaction...");
+    await this.handleUxUsdc(ctx);
+    console.log("Sent USDC transaction in sequence");
+
     await ctx.conversation.send(
-      "✅ UX Demo complete! All message types demonstrated.",
+      "✅ UX Demo complete! All message types demonstrated including real attachment and USDC transaction.",
     );
     console.log("Completed UX demo sequence");
   }

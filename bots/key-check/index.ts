@@ -7,10 +7,16 @@ import {
   type MessageContext,
 } from "@xmtp/agent-sdk";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
+import {
+  AttachmentCodec,
+  RemoteAttachmentCodec,
+} from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import { getActiveVersion } from "version-management/client-versions";
 import {
   ActionBuilder,
+  getRegisteredActions,
   inlineActionsMiddleware,
   registerAction,
   sendActions,
@@ -19,6 +25,7 @@ import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
+import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
 // Key-check bot now uses inline actions instead of text commands
@@ -38,6 +45,7 @@ const startTime = new Date();
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers(startTime, xmtpSdkVersion);
+// LoadTestHandlers will be initialized after agent is created
 
 // Register all action handlers
 
@@ -47,6 +55,7 @@ registerAction("help", async (ctx) => {
 });
 
 registerAction("back-to-main", async (ctx) => {
+  console.log("🔍 back-to-main action triggered");
   await showMainMenu(ctx);
 });
 
@@ -133,8 +142,16 @@ registerAction("ux-text", async (ctx) => {
   await showNavigationOptions(ctx, "Text demo completed!");
 });
 
+registerAction("ux-usdc", async (ctx) => {
+  await uxHandlers.handleUxUsdc(ctx);
+  await showNavigationOptions(ctx, "USDC transaction completed!");
+});
+
+// Load Testing Section - will be registered after agent creation
+
 // Helper functions for menus
 async function showMainMenu(ctx: MessageContext) {
+  console.log("🔍 showMainMenu called");
   const timestamp = Date.now();
   const mainMenu = ActionBuilder.create(
     `main-menu-${timestamp}`,
@@ -142,9 +159,11 @@ async function showMainMenu(ctx: MessageContext) {
   )
     .add("key-packages-menu", "🔑 Key Packages", "primary")
     .add("debug-tools-menu", "🛠️ Debug Tools")
+    .add("load-test-menu", "🧪 Load Testing")
     .add("ux-demo-menu", "🎨 UX Demo")
     .build();
 
+  console.log("🔍 Sending main menu actions:", mainMenu);
   await sendActions(ctx, mainMenu);
 }
 
@@ -181,6 +200,23 @@ async function showDebugToolsMenu(ctx: MessageContext) {
   await sendActions(ctx, debugToolsMenu);
 }
 
+async function showLoadTestMenu(ctx: MessageContext) {
+  const timestamp = Date.now();
+  const loadTestMenu = ActionBuilder.create(
+    `load-test-menu-${timestamp}`,
+    "🧪 Load Testing - Choose a test scenario:",
+  )
+    .add("load-test-10x10", "🔥 10 Groups × 10 Messages", "primary")
+    .add("load-test-50x10", "🚀 50 Groups × 10 Messages", "danger")
+    .add("load-test-1x100", "⚡ 1 Group × 100 Messages")
+    .add("load-test-custom", "⚙️ Custom Parameters")
+    .add("load-test-help", "❓ Help & Info")
+    .add("back-to-main", "⬅️ Back to Main Menu")
+    .build();
+
+  await sendActions(ctx, loadTestMenu);
+}
+
 async function showUxDemoMenu(ctx: MessageContext) {
   const timestamp = Date.now();
   const uxDemoMenu = ActionBuilder.create(
@@ -191,7 +227,8 @@ async function showUxDemoMenu(ctx: MessageContext) {
     .add("ux-text", "📝 Text Message")
     .add("ux-reaction", "👍 Reaction")
     .add("ux-reply", "💬 Reply")
-    .add("ux-attachment", "📎 Attachment")
+    .add("ux-attachment", "📎 Real Attachment")
+    .add("ux-usdc", "💰 USDC Transaction")
     .add("back-to-main", "⬅️ Back to Main Menu")
     .build();
 
@@ -228,6 +265,26 @@ async function showAddressInputMenu(ctx: MessageContext) {
   );
 }
 
+async function showCustomLoadTestMenu(ctx: MessageContext) {
+  const timestamp = Date.now();
+  const customMenu = ActionBuilder.create(
+    `custom-load-test-menu-${timestamp}`,
+    "⚙️ Custom Load Test",
+  )
+    .add("back-to-main", "⬅️ Back to Main Menu")
+    .build();
+
+  await sendActions(ctx, customMenu);
+  await ctx.conversation.send(
+    "Please send your custom parameters as a text message in the format:\n" +
+      "**groups messages**\n\n" +
+      "Examples:\n" +
+      "• `5 20` = 5 groups × 20 messages\n" +
+      "• `100 1` = 100 groups × 1 message\n" +
+      "• `3 50` = 3 groups × 50 messages",
+  );
+}
+
 async function showNavigationOptions(ctx: MessageContext, message: string) {
   const timestamp = Date.now();
   const navigationMenu = ActionBuilder.create(
@@ -236,7 +293,10 @@ async function showNavigationOptions(ctx: MessageContext, message: string) {
   )
     .add("key-packages-menu", "🔑 Key Packages")
     .add("debug-tools-menu", "🛠️ Debug Tools")
+    .add("load-test-menu", "🧪 Load Testing")
     .add("ux-demo-menu", "🎨 UX Demo")
+    .add("ux-attachment", "📎 Real Attachment")
+    .add("ux-usdc", "💰 USDC Transaction")
     .add("back-to-main", "⬅️ Main Menu")
     .build();
 
@@ -251,6 +311,9 @@ const agent = (await Agent.createFromEnv({
   codecs: [
     new ReactionCodec(),
     new ReplyCodec(),
+    new RemoteAttachmentCodec(),
+    new AttachmentCodec(),
+    new WalletSendCallsCodec(),
     new ActionsCodec(),
     new IntentCodec(),
   ],
@@ -258,6 +321,38 @@ const agent = (await Agent.createFromEnv({
 
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
+
+// Initialize load test handlers now that agent is available
+const loadTestHandlers = new LoadTestHandlers(agent);
+
+// Register load testing actions
+registerAction("load-test-menu", async (ctx) => {
+  await showLoadTestMenu(ctx);
+});
+
+registerAction("load-test-10x10", async (ctx) => {
+  await loadTestHandlers.handleLoadTest10Groups10Messages(ctx);
+  await showNavigationOptions(ctx, "Load test 10×10 completed!");
+});
+
+registerAction("load-test-50x10", async (ctx) => {
+  await loadTestHandlers.handleLoadTest50Groups10Messages(ctx);
+  await showNavigationOptions(ctx, "Load test 50×10 completed!");
+});
+
+registerAction("load-test-1x100", async (ctx) => {
+  await loadTestHandlers.handleLoadTest1Group100Messages(ctx);
+  await showNavigationOptions(ctx, "Load test 1×100 completed!");
+});
+
+registerAction("load-test-custom", async (ctx) => {
+  await showCustomLoadTestMenu(ctx);
+});
+
+registerAction("load-test-help", async (ctx) => {
+  await loadTestHandlers.handleLoadTestHelp(ctx);
+  await showNavigationOptions(ctx, "Load testing help displayed!");
+});
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
@@ -295,6 +390,35 @@ agent.on("text", async (ctx) => {
     return;
   }
 
+  // Check if this might be custom load test parameters (groups messages)
+  const customLoadTestPattern = /^(\d+)\s+(\d+)$/;
+  const customMatch = content.trim().match(customLoadTestPattern);
+  if (customMatch) {
+    const groups = parseInt(customMatch[1]);
+    const messages = parseInt(customMatch[2]);
+    console.log(
+      `Detected custom load test parameters: ${groups} groups × ${messages} messages`,
+    );
+
+    // Validate reasonable limits
+    if (groups > 0 && messages > 0 && groups <= 1000 && messages <= 1000) {
+      await loadTestHandlers.handleLoadTestCustom(ctx, groups, messages);
+      await showNavigationOptions(ctx, "Custom load test completed!");
+    } else {
+      await ctx.conversation.send(
+        "❌ Invalid parameters! Please use reasonable values:\n" +
+          "• Groups: 1-1000\n" +
+          "• Messages: 1-1000\n\n" +
+          "Example: `10 20` for 10 groups × 20 messages",
+      );
+      await showNavigationOptions(
+        ctx,
+        "Please try again with valid parameters.",
+      );
+    }
+    return;
+  }
+
   // If it's not a recognized pattern, show the main menu as a fallback
   console.log(`Unrecognized input, showing main menu: ${content}`);
   await showMainMenu(ctx);
@@ -312,6 +436,9 @@ agent.on("start", () => {
   console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
   console.log(`🔗${getTestUrl(agent)}`);
+
+  // Debug: Log all registered actions
+  console.log("🔍 Registered actions:", getRegisteredActions());
 });
 
 await agent.start();
