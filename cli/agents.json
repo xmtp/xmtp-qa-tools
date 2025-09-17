@@ -80,12 +80,34 @@
     "respondOnTagged": false
   },
   {
+    "name": "gang",
+    "baseName": "gang.base.eth",
+    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"],
+    "networks": [],
+    "live": false,
+    "slackChannel": "#gang-alerts",
+    "respondOnTagged": false
+  },
+  {
+    "name": "csx",
+    "baseName": "csx.base.eth",
+    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"],
+    "networks": [],
+    "live": false,
+    "slackChannel": "#csx-alerts",
+    "respondOnTagged": false
+  },
+  {
     "name": "bracky",
     "baseName": "bracky.base.eth",
     "address": "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     "sendMessage": "hi",
     "live": false,
-    "networks": ["production"]
+    "networks": []
   },
   {
     "name": "gm",
