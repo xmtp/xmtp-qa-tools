@@ -3,7 +3,6 @@ import { type Group, type MessageContext } from "@xmtp/agent-sdk";
 export class ForksHandlers {
   async handleForkDetection(ctx: MessageContext): Promise<void> {
     const message = ctx.message;
-    const client = ctx.client;
     const conversation = ctx.conversation;
 
     try {
@@ -14,7 +13,6 @@ export class ForksHandlers {
 
       // Get conversation debug info
       const debugInfo = await conversation.debugInfo();
-      const members = await conversation.members();
       const group = conversation as Group;
 
       let debugReport = "🔍 **Fork Detection Report**\n\n";
@@ -25,57 +23,12 @@ export class ForksHandlers {
       debugReport += `• Sender: ${senderAddress}\n`;
       debugReport += `• Message ID: ${message.id}\n`;
       debugReport += `• Sent: ${message.sentAt.toISOString()}\n\n`;
-
-      // Conversation info
-      debugReport += "**💬 Conversation Info:**\n";
       debugReport += `• Conversation ID: ${conversation.id}\n`;
       debugReport += `• Created: ${conversation.createdAt.toISOString()}\n`;
       debugReport += `• Epoch: ${debugInfo.epoch}\n`;
-      debugReport += `• Maybe Forked: ${debugInfo.maybeForked ? "⚠️ YES" : "✅ NO"}\n\n`;
-
-      // Members info
-      debugReport += "**👥 Members Info:**\n";
-      debugReport += `• Total members: ${members.length}\n`;
-      for (let i = 0; i < members.length; i++) {
-        const member = members[i];
-        const memberAddress = await ctx.getSenderAddress();
-
-        debugReport += `• Member ${i + 1}: ${memberAddress}\n`;
-        debugReport += `  - InboxId: ${member.inboxId}\n`;
-        debugReport += `  - Installations: ${member.installationIds.length}\n`;
-        debugReport += `  - Permission: ${member.permissionLevel}\n`;
-      }
-      debugReport += "\n";
-
-      // Group info (if applicable)
-      if (
-        group.name ||
-        group.description ||
-        group.imageUrl ||
-        group.admins ||
-        group.superAdmins ||
-        group.isActive ||
-        group.addedByInboxId
-      ) {
-        debugReport += "**🏷️ Group Info:**\n";
-        debugReport += `• Name: ${group.name || "undefined"}\n`;
-        debugReport += `• Description: ${group.description || "undefined"}\n`;
-        debugReport += `• Image: ${group.imageUrl || "undefined"}\n`;
-        debugReport += `• Admins: ${group.admins.join(", ") || "undefined"}\n`;
-        debugReport += `• Super Admins: ${group.superAdmins.join(", ") || "undefined"}\n`;
-        debugReport += `• Active: ${group.isActive}\n`;
-        debugReport += `• Added By: ${group.addedByInboxId || "undefined"}\n\n`;
-      }
-
-      // Client info
-      debugReport += "**🔧 Client Info:**\n";
-      debugReport += `• InboxId: ${client.inboxId}\n`;
-      debugReport += `• InstallationId: ${client.installationId}\n\n`;
-
-      await ctx.conversation.send(debugReport);
-
-      // Post-sync state check
-      debugReport = "**🔄 Post-Sync Analysis:**\n";
+      debugReport += `• Maybe Forked: ${debugInfo.maybeForked ? "⚠️ YES" : "✅ NO"}\n`;
+      debugReport += `• Active: ${group.isActive}\n`;
+      debugReport += `• Added By: ${group.addedByInboxId || "undefined"}\n`;
       try {
         await conversation.sync();
         const postSyncDebugInfo = await conversation.debugInfo();

@@ -143,7 +143,6 @@ const appConfig: AppConfig = {
         {
           id: "fork",
           label: "🔀 Detect Forks",
-          style: "danger",
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await forksHandlers.handleForkDetection(ctx);
@@ -212,7 +211,6 @@ const appConfig: AppConfig = {
         {
           id: "load-test-50x10",
           label: "🚀 50 Groups × 10 Msgs",
-          style: "danger",
         },
         { id: "load-test-1x100", label: "⚡ 1 Group × 100 Msgs" },
         { id: "load-test-custom", label: "⚙️ Custom" },
