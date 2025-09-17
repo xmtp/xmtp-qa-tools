@@ -52,6 +52,7 @@ describe(testName, async () => {
         agent.sendMessage,
         1,
         ["text", "reply", "actions", "intent"],
+        16000,
       );
 
       const responseTime = Math.abs(
