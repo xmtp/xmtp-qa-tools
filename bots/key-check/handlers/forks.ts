@@ -1,134 +1,263 @@
 import { type Group, type MessageContext } from "@xmtp/agent-sdk";
 
+interface ForkDebugInfo {
+  epoch: bigint;
+  maybeForked: boolean;
+  timestamp: Date;
+}
+
+interface ForkAnalysisResult {
+  isForkDetected: boolean;
+  epochChanged: boolean;
+  preSyncEpoch: bigint;
+  postSyncEpoch: bigint;
+  memberCount: number;
+  messageCount: number;
+  timeSinceLastMessage: number | null;
+  syncErrors: string[];
+}
+
 export class ForksHandlers {
-  async handleForkDetection(ctx: MessageContext): Promise<void> {
-    const message = ctx.message;
-    const client = ctx.client;
-    const conversation = ctx.conversation;
+  private logSection(header: string): void {
+    console.log("\n" + "=".repeat(60));
+    console.log(`🔍 FORK DEBUG: ${header}`);
+    console.log("=".repeat(60));
+  }
+
+  private logInfo(message: string, data?: any): void {
+    console.log(`ℹ️  ${message}`, data ? JSON.stringify(data, null, 2) : "");
+  }
+
+  private logWarning(message: string, data?: any): void {
+    console.log(`⚠️  ${message}`, data ? JSON.stringify(data, null, 2) : "");
+  }
+
+  private logError(message: string, error?: any): void {
+    console.error(`❌ ${message}`, error);
+  }
+
+  private formatTimestamp(date: Date): string {
+    return date.toISOString().replace("T", " ").replace("Z", " UTC");
+  }
+
+  private calculateTimeSinceLastMessage(messages: any[]): number | null {
+    if (messages.length === 0) return null;
+    const lastMessage = messages[0];
+    return Date.now() - lastMessage.sentAt.getTime();
+  }
+
+  private async analyzeForkState(
+    conversation: Group,
+  ): Promise<ForkAnalysisResult> {
+    const syncErrors: string[] = [];
+    let preSyncInfo: ForkDebugInfo | undefined;
+    let postSyncInfo: ForkDebugInfo | undefined;
+    let memberCount = 0;
+    let messageCount = 0;
+    let timeSinceLastMessage: number | null = null;
 
     try {
-      console.log("=== FORK DETECTION DEBUG START ===");
+      // Get initial state
+      preSyncInfo = {
+        epoch: (await conversation.debugInfo()).epoch,
+        maybeForked: (await conversation.debugInfo()).maybeForked,
+        timestamp: new Date(),
+      };
 
-      // Get sender address
-      const senderAddress = await ctx.getSenderAddress();
+      this.logInfo(`Pre-sync state captured`, preSyncInfo);
 
-      // Get conversation debug info
-      const debugInfo = await conversation.debugInfo();
-      const members = await conversation.members();
-      const group = conversation as Group;
+      // Attempt sync
+      await conversation.sync();
+      this.logInfo("Conversation sync completed successfully");
 
-      let debugReport = "🔍 **Fork Detection Report**\n\n";
+      // Get post-sync state
+      postSyncInfo = {
+        epoch: (await conversation.debugInfo()).epoch,
+        maybeForked: (await conversation.debugInfo()).maybeForked,
+        timestamp: new Date(),
+      };
 
-      // Message info
-      debugReport += "**📩 Message Info:**\n";
-      debugReport += `• Content: ${message.content as string}\n`;
-      debugReport += `• Sender: ${senderAddress}\n`;
-      debugReport += `• Message ID: ${message.id}\n`;
-      debugReport += `• Sent: ${message.sentAt.toISOString()}\n\n`;
+      this.logInfo(`Post-sync state captured`, postSyncInfo);
 
-      // Conversation info
-      debugReport += "**💬 Conversation Info:**\n";
-      debugReport += `• Conversation ID: ${conversation.id}\n`;
-      debugReport += `• Created: ${conversation.createdAt.toISOString()}\n`;
-      debugReport += `• Epoch: ${debugInfo.epoch}\n`;
-      debugReport += `• Maybe Forked: ${debugInfo.maybeForked ? "⚠️ YES" : "✅ NO"}\n\n`;
-
-      // Members info
-      debugReport += "**👥 Members Info:**\n";
-      debugReport += `• Total members: ${members.length}\n`;
-      for (let i = 0; i < members.length; i++) {
-        const member = members[i];
-        const memberAddress = await ctx.getSenderAddress();
-
-        debugReport += `• Member ${i + 1}: ${memberAddress}\n`;
-        debugReport += `  - InboxId: ${member.inboxId}\n`;
-        debugReport += `  - Installations: ${member.installationIds.length}\n`;
-        debugReport += `  - Permission: ${member.permissionLevel}\n`;
-      }
-      debugReport += "\n";
-
-      // Group info (if applicable)
-      if (
-        group.name ||
-        group.description ||
-        group.imageUrl ||
-        group.admins ||
-        group.superAdmins ||
-        group.isActive ||
-        group.addedByInboxId
-      ) {
-        debugReport += "**🏷️ Group Info:**\n";
-        debugReport += `• Name: ${group.name || "undefined"}\n`;
-        debugReport += `• Description: ${group.description || "undefined"}\n`;
-        debugReport += `• Image: ${group.imageUrl || "undefined"}\n`;
-        debugReport += `• Admins: ${group.admins.join(", ") || "undefined"}\n`;
-        debugReport += `• Super Admins: ${group.superAdmins.join(", ") || "undefined"}\n`;
-        debugReport += `• Active: ${group.isActive}\n`;
-        debugReport += `• Added By: ${group.addedByInboxId || "undefined"}\n\n`;
-      }
-
-      // Client info
-      debugReport += "**🔧 Client Info:**\n";
-      debugReport += `• InboxId: ${client.inboxId}\n`;
-      debugReport += `• InstallationId: ${client.installationId}\n\n`;
-
-      await ctx.conversation.send(debugReport);
-
-      // Post-sync state check
-      debugReport = "**🔄 Post-Sync Analysis:**\n";
+      // Analyze members
       try {
-        await conversation.sync();
-        const postSyncDebugInfo = await conversation.debugInfo();
-        debugReport += `• Post-sync Epoch: ${postSyncDebugInfo.epoch}\n`;
-        debugReport += `• Post-sync Maybe Forked: ${postSyncDebugInfo.maybeForked ? "⚠️ YES" : "✅ NO"}\n`;
-
-        if (postSyncDebugInfo.epoch !== debugInfo.epoch) {
-          debugReport += `• ⚠️ **EPOCH CHANGED**: ${debugInfo.epoch} → ${postSyncDebugInfo.epoch}\n`;
-          console.log(
-            `⚠️ EPOCH CHANGED: ${debugInfo.epoch} → ${postSyncDebugInfo.epoch}`,
-          );
-        } else {
-          debugReport += `• ✅ Epoch stable: ${debugInfo.epoch}\n`;
-        }
+        const members = await conversation.members();
+        memberCount = members.length;
+        this.logInfo(`Member analysis completed: ${memberCount} members`);
       } catch (error) {
-        debugReport += `• ❌ Failed to sync conversation: ${error instanceof Error ? error.message : "Unknown error"}\n`;
-        console.log(`Failed to sync conversation:`, error);
+        syncErrors.push(
+          `Member analysis failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        this.logError("Failed to analyze members", error);
       }
-      debugReport += "\n";
 
-      // Message history analysis
-      debugReport += "**📚 Message History:**\n";
+      // Analyze messages
       try {
         const messages = await conversation.messages();
-        debugReport += `• Total messages: ${messages.length}\n`;
-        if (messages.length > 0) {
-          debugReport += `• First message: ${messages[messages.length - 1].sentAt.toISOString()}\n`;
-          debugReport += `• Last message: ${messages[0].sentAt.toISOString()}\n`;
-        }
+        messageCount = messages.length;
+        timeSinceLastMessage = this.calculateTimeSinceLastMessage(messages);
+        this.logInfo(`Message analysis completed: ${messageCount} messages`);
       } catch (error) {
-        debugReport += `• ❌ Failed to get message history: ${error instanceof Error ? error.message : "Unknown error"}\n`;
-        console.log(`Failed to get message history:`, error);
+        syncErrors.push(
+          `Message analysis failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        this.logError("Failed to analyze messages", error);
       }
-
-      // Fork detection summary
-      debugReport += "\n**🚨 Fork Detection Summary:**\n";
-      if (debugInfo.maybeForked) {
-        debugReport += "⚠️ **POTENTIAL FORK DETECTED**\n";
-        debugReport += "This conversation may have experienced a fork.\n";
-        debugReport += "Check epoch changes and member consistency.\n";
-      } else {
-        debugReport += "✅ **NO FORK DETECTED**\n";
-        debugReport += "Conversation appears to be in a consistent state.\n";
-      }
-
-      await ctx.conversation.send(debugReport);
-
-      console.log("=== FORK DETECTION DEBUG END ===");
     } catch (error) {
-      console.error("Error in fork detection:", error);
-      await ctx.conversation.send(
-        `❌ Error during fork detection: ${error instanceof Error ? error.message : "Unknown error"}`,
+      syncErrors.push(
+        `Sync operation failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
+      this.logError("Critical sync failure", error);
+
+      // Fallback to pre-sync info only
+      postSyncInfo = preSyncInfo;
+    }
+
+    // Ensure we have valid info objects
+    if (!preSyncInfo || !postSyncInfo) {
+      throw new Error("Failed to capture conversation state information");
+    }
+
+    const epochChanged = preSyncInfo.epoch !== postSyncInfo.epoch;
+    const isForkDetected = postSyncInfo.maybeForked || epochChanged;
+
+    if (epochChanged) {
+      this.logWarning(
+        `EPOCH CHANGE DETECTED: ${preSyncInfo.epoch} → ${postSyncInfo.epoch}`,
+      );
+    }
+
+    if (isForkDetected) {
+      this.logWarning("FORK DETECTED - Investigation required");
+    } else {
+      this.logInfo("No fork detected - conversation appears stable");
+    }
+
+    return {
+      isForkDetected,
+      epochChanged,
+      preSyncEpoch: preSyncInfo.epoch,
+      postSyncEpoch: postSyncInfo.epoch,
+      memberCount,
+      messageCount,
+      timeSinceLastMessage,
+      syncErrors,
+    };
+  }
+
+  private buildForkReport(
+    ctx: MessageContext,
+    analysis: ForkAnalysisResult,
+    senderAddress: string,
+  ): string {
+    const message = ctx.message;
+    const conversation = ctx.conversation;
+    const group = conversation as Group;
+
+    let report = "🔍 **FORK DETECTION ANALYSIS REPORT**\n";
+    report += `${"=".repeat(50)}\n\n`;
+
+    // Critical Status Section
+    report += "🚨 **CRITICAL STATUS**\n";
+    report += `${"─".repeat(20)}\n`;
+    if (analysis.isForkDetected) {
+      report += "⚠️ **FORK DETECTED** - Immediate attention required\n";
+      if (analysis.epochChanged) {
+        report += `🔄 Epoch changed: ${analysis.preSyncEpoch} → ${analysis.postSyncEpoch}\n`;
+      }
+    } else {
+      report += "✅ **NO FORK DETECTED** - Conversation stable\n";
+    }
+    report += `📊 Epoch: ${analysis.postSyncEpoch}\n\n`;
+
+    // Message Context
+    report += "📩 **MESSAGE CONTEXT**\n";
+    report += `${"─".repeat(20)}\n`;
+    report += `• Content: "${message.content as string}"\n`;
+    report += `• Sender: \`${senderAddress}\`\n`;
+    report += `• Message ID: \`${message.id}\`\n`;
+    report += `• Sent: ${this.formatTimestamp(message.sentAt)}\n\n`;
+
+    // Conversation Metadata
+    report += "💬 **CONVERSATION METADATA**\n";
+    report += `${"─".repeat(20)}\n`;
+    report += `• ID: \`${conversation.id}\`\n`;
+    report += `• Created: ${this.formatTimestamp(conversation.createdAt)}\n`;
+    report += `• Active: ${group.isActive ? "✅" : "❌"}\n`;
+    report += `• Added By: ${group.addedByInboxId || "Unknown"}\n\n`;
+
+    // Fork Analysis Details
+    report += "🔬 **FORK ANALYSIS DETAILS**\n";
+    report += `${"─".repeat(20)}\n`;
+    report += `• Pre-sync Epoch: ${analysis.preSyncEpoch}\n`;
+    report += `• Post-sync Epoch: ${analysis.postSyncEpoch}\n`;
+    report += `• Epoch Stability: ${analysis.epochChanged ? "⚠️ CHANGED" : "✅ STABLE"}\n`;
+    report += `• Member Count: ${analysis.memberCount}\n`;
+    report += `• Message Count: ${analysis.messageCount}\n`;
+
+    if (analysis.timeSinceLastMessage !== null) {
+      const minutesAgo = Math.floor(
+        analysis.timeSinceLastMessage / (1000 * 60),
+      );
+      report += `• Last Message: ${minutesAgo} minutes ago\n`;
+    }
+    report += "\n";
+
+    // Error Summary
+    if (analysis.syncErrors.length > 0) {
+      report += "❌ **SYNC ERRORS**\n";
+      report += `${"─".repeat(20)}\n`;
+      analysis.syncErrors.forEach((error, index) => {
+        report += `${index + 1}. ${error}\n`;
+      });
+      report += "\n";
+    }
+
+    // Recommendations
+    report += "💡 **RECOMMENDATIONS**\n";
+    report += `${"─".repeat(20)}\n`;
+    if (analysis.isForkDetected) {
+      report += "• Investigate epoch changes and member consistency\n";
+      report += "• Check for duplicate messages or missing content\n";
+      report += "• Verify all members can see the same conversation state\n";
+      report += "• Consider conversation recovery procedures\n";
+    } else {
+      report += "• Conversation appears healthy\n";
+      report += "• Continue normal operations\n";
+      report += "• Monitor for future fork indicators\n";
+    }
+
+    return report;
+  }
+
+  async handleForkDetection(ctx: MessageContext): Promise<void> {
+    this.logSection("FORK DETECTION START");
+
+    try {
+      const conversation = ctx.conversation as Group;
+      const senderAddress = await ctx.getSenderAddress();
+
+      this.logInfo(`Processing fork detection request from ${senderAddress}`);
+      this.logInfo(`Conversation ID: ${conversation.id}`);
+
+      // Perform comprehensive fork analysis
+      const analysis = await this.analyzeForkState(conversation);
+
+      // Build and send detailed report
+      const report = this.buildForkReport(ctx, analysis, senderAddress);
+      await ctx.conversation.send(report);
+
+      this.logInfo("Fork detection report sent successfully");
+      this.logSection("FORK DETECTION COMPLETE");
+    } catch (error) {
+      this.logError("Critical error in fork detection", error);
+
+      const errorMessage =
+        `❌ **FORK DETECTION FAILED**\n\n` +
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}\n\n` +
+        `Please check the logs for detailed error information.`;
+
+      await ctx.conversation.send(errorMessage);
     }
   }
 }

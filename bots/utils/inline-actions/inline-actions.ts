@@ -38,14 +38,24 @@ export function clearAllActions(): void {
 }
 
 // Show the last shown menu
-export async function showLastMenu(ctx: MessageContext): Promise<void> {
+export async function showLastMenu(
+  ctx: MessageContext,
+  fallbackConfig?: AppConfig,
+): Promise<void> {
   if (lastShownMenu) {
     console.log(`🔄 Showing last menu: ${lastShownMenu.menuId}`);
     await showMenu(ctx, lastShownMenu.config, lastShownMenu.menuId);
   } else {
     console.warn("⚠️ No last menu to show, falling back to main menu");
     // Fallback to main menu if no last menu is tracked
-    await ctx.conversation.send("Returning to main menu...");
+    if (fallbackConfig) {
+      console.log("🔄 Showing main menu as fallback");
+      await showMenu(ctx, fallbackConfig, "main-menu");
+    } else {
+      await ctx.conversation.send(
+        "❌ No menu context available. Please use 'help' or '/kc' to show the main menu.",
+      );
+    }
   }
 }
 
@@ -364,7 +374,7 @@ export function initializeAppFromConfig(
         const wrappedHandler = async (ctx: MessageContext) => {
           await action.handler?.(ctx);
           if (action.showNavigationOptions) {
-            await showLastMenu(ctx);
+            await showLastMenu(ctx, config);
           }
         };
         registerAction(action.id, wrappedHandler);
