@@ -52,13 +52,15 @@ const appConfig: AppConfig = {
   menus: {
     "main-menu": {
       id: "main-menu",
-      title: "🔧 Key-Check Bot",
+      title:
+        "🔧 Key-Check Bot\n\n* if appears greyed out, please go back to the conversation list and open the conversation again",
+
       actions: [
         { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
         { id: "group-tools-menu", label: "👥 Group Tools" },
         { id: "debug-tools-menu", label: "🛠️ Debug Tools" },
         { id: "load-test-menu", label: "🧪 Load Testing" },
-        { id: "ux-demo-menu", label: "🎨 UX Demo" },
+        { id: "ux-demo-menu", label: "🎨 UX" },
       ],
     },
     "key-packages-menu": {
@@ -161,7 +163,7 @@ const appConfig: AppConfig = {
     },
     "ux-demo-menu": {
       id: "ux-demo-menu",
-      title: "🎨 UX Demo",
+      title: "🎨 UX",
       actions: [
         {
           id: "ux-text-reply-reaction",

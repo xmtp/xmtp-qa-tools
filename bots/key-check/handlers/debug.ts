@@ -9,9 +9,7 @@ import {
 const require = createRequire(import.meta.url);
 const packageJson = require("../../../package.json");
 const xmtpSdkVersion: string =
-  packageJson.dependencies[
-    "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
-  ] ?? "unknown";
+  packageJson.dependencies["@xmtp/agent-sdk"] ?? "unknown";
 
 export class DebugHandlers {
   private startTime: Date;
@@ -26,8 +24,8 @@ export class DebugHandlers {
   }
 
   async handleVersion(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(`XMTP node-sdk Version: ${xmtpSdkVersion}`);
-    console.log(`Sent XMTP node-sdk version: ${xmtpSdkVersion}`);
+    await ctx.conversation.send(`XMTP agent-sdk Version: ${xmtpSdkVersion}`);
+    console.log(`Sent XMTP agent-sdk version: ${xmtpSdkVersion}`);
   }
 
   async handleUptime(ctx: MessageContext): Promise<void> {
@@ -106,7 +104,7 @@ export class DebugHandlers {
     const debugInfo = `🔧 **Key-Check Bot Debug Information**
 
 📦 **Version Info:**
-• XMTP SDK: ${xmtpSdkVersion}
+• XMTP Agent SDK: ${xmtpSdkVersion}
 • Client Version: ${ctx.client.constructor.name}
 • App Version: ${appVersion}
 • Environment: ${env}
@@ -125,7 +123,6 @@ export class DebugHandlers {
 
 💬 **Conversations:**
 • Total: ${conversations.length}
-• IDs: ${conversations.map((c: any) => c.id).join(", ") || "None"}
 
 🛠️ **System Status:**
 • Bot Status: ✅ Running

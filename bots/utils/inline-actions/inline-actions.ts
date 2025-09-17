@@ -49,6 +49,44 @@ export async function showLastMenu(ctx: MessageContext): Promise<void> {
   }
 }
 
+// Track menu navigation history to prevent infinite loops
+const menuHistory: string[] = [];
+const MAX_HISTORY = 10;
+
+// Show menu with proper history tracking
+export async function showMenuWithHistory(
+  ctx: MessageContext,
+  config: AppConfig,
+  menuId: string,
+): Promise<void> {
+  // Add to history if it's not the same as the last menu
+  if (
+    menuHistory.length === 0 ||
+    menuHistory[menuHistory.length - 1] !== menuId
+  ) {
+    menuHistory.push(menuId);
+    // Keep history size manageable
+    if (menuHistory.length > MAX_HISTORY) {
+      menuHistory.shift();
+    }
+  }
+
+  await showMenu(ctx, config, menuId);
+}
+
+// Get the previous menu in history
+export function getPreviousMenu(): string | null {
+  if (menuHistory.length > 1) {
+    return menuHistory[menuHistory.length - 2];
+  }
+  return null;
+}
+
+// Clear menu history
+export function clearMenuHistory(): void {
+  menuHistory.length = 0;
+}
+
 // Middleware
 export const inlineActionsMiddleware: AgentMiddleware = async (ctx, next) => {
   if (ctx.message.contentType?.typeId === "intent") {
@@ -242,6 +280,18 @@ export async function showMenu(
   // Track the last shown menu
   lastShownMenu = { config, menuId };
 
+  // Add to history if it's not the same as the last menu
+  if (
+    menuHistory.length === 0 ||
+    menuHistory[menuHistory.length - 1] !== menuId
+  ) {
+    menuHistory.push(menuId);
+    // Keep history size manageable
+    if (menuHistory.length > MAX_HISTORY) {
+      menuHistory.shift();
+    }
+  }
+
   // Use a stable action ID without timestamp to prevent conflicts
   const builder = ActionBuilder.create(menuId, menu.title);
 
@@ -355,6 +405,12 @@ export function initializeAppFromConfig(
   // Auto-register common navigation actions (only if not already registered)
   if (!registeredMenuActions.has("main-menu")) {
     registerAction("main-menu", async (ctx: MessageContext) => {
+      // Check if we're already at the main menu
+      if (lastShownMenu?.menuId === "main-menu") {
+        // If already at main menu, just send a message instead of showing menu again
+        await ctx.conversation.send("You're already at the main menu! 🏠");
+        return;
+      }
       await showMenu(ctx, config, "main-menu");
     });
   }
@@ -364,6 +420,12 @@ export function initializeAppFromConfig(
   });
 
   registerAction("back-to-main", async (ctx: MessageContext) => {
+    // Check if we're already at the main menu
+    if (lastShownMenu?.menuId === "main-menu") {
+      // If already at main menu, just send a message instead of showing menu again
+      await ctx.conversation.send("You're already at the main menu! 🏠");
+      return;
+    }
     await showMenu(ctx, config, "main-menu");
   });
 }
