@@ -197,6 +197,14 @@ const appConfig: AppConfig = {
             await uxHandlers.handleTransaction(ctx);
           },
         },
+        {
+          id: "ux-deeplink",
+          label: "🔗 Deeplink",
+          showNavigationOptions: true,
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleDeeplink(ctx);
+          },
+        },
         { id: "main-menu", label: "⬅️ Back" },
       ],
     },

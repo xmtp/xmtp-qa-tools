@@ -12,6 +12,7 @@ import {
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
+import { ContentTypeActions } from "../../utils/inline-actions/types/ActionsContent";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
@@ -150,6 +151,44 @@ function greet(name) {
     );
     console.log("Replied with wallet sendcall");
     await ctx.conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
+  }
+
+  async handleDeeplink(ctx: MessageContext): Promise<void> {
+    try {
+      const senderAddress = await ctx.getSenderAddress();
+      const deeplinkUrl = `cbwallet://messaging/${senderAddress}`;
+
+      console.log(`Creating deeplink for address: ${senderAddress}`);
+
+      // Send a message explaining the deeplink
+      await ctx.sendText(
+        `🔗 **Deeplink to Your Address**\n\n` +
+          `This button will open your address in Coinbase Wallet:\n` +
+          `\`${deeplinkUrl}\`\n\n` +
+          `Tap the button below to test the deeplink!`,
+      );
+
+      // Create the deeplink button using ActionsContent
+      const deeplinkActions = {
+        id: `deeplink-${Date.now()}`,
+        description: "Open your address in Coinbase Wallet",
+        actions: [
+          {
+            id: "open-address",
+            label: "🔗 Open My Address",
+            style: "primary" as const,
+          },
+        ],
+      };
+
+      // Send the actions (this will create the button)
+      await ctx.conversation.send(deeplinkActions, ContentTypeActions);
+
+      console.log("Deeplink button sent successfully");
+    } catch (error) {
+      console.error("Error creating deeplink:", error);
+      await ctx.sendText("❌ Failed to create deeplink button");
+    }
   }
 }
 
