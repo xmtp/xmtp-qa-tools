@@ -1,6 +1,5 @@
 import { createRequire } from "node:module";
-import { type MessageContext } from "@xmtp/agent-sdk";
-import { IdentifierKind } from "version-management/client-versions";
+import { type IdentifierKind, type MessageContext } from "@xmtp/agent-sdk";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -141,7 +140,7 @@ export class DebugHandlers {
       try {
         const inboxId = await ctx.client.getInboxIdByIdentifier({
           identifier: targetAddress,
-          identifierKind: IdentifierKind.Ethereum,
+          identifierKind: 0,
         });
         if (!inboxId) {
           await ctx.sendText(`No inbox found for address ${targetAddress}`);

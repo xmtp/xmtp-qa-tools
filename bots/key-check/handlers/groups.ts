@@ -1,6 +1,6 @@
 import {
-  IdentifierKind,
   type Group,
+  type IdentifierKind,
   type MessageContext,
   type PermissionLevel,
 } from "@xmtp/agent-sdk";
@@ -22,7 +22,7 @@ export class GroupHandlers {
         try {
           // Get the address from the member's account identifiers
           const ethIdentifier = member.accountIdentifiers.find(
-            (id: any) => id.identifierKind == IdentifierKind.Ethereum,
+            (id: any) => id.identifierKind == (0 as IdentifierKind),
           );
           const address = ethIdentifier?.identifier || "Unknown";
 
@@ -119,7 +119,7 @@ export class GroupHandlers {
           try {
             // Get the address from the member's account identifiers
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind == IdentifierKind.Ethereum,
+              (id: any) => id.identifierKind == (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
 
@@ -197,7 +197,7 @@ export class GroupHandlers {
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind === IdentifierKind.Ethereum,
+              (id: any) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
             permissionsText += `  • ${address}\n`;
@@ -213,7 +213,7 @@ export class GroupHandlers {
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind === IdentifierKind.Ethereum,
+              (id: any) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
             permissionsText += `  • ${address}\n`;
