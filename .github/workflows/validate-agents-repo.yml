@@ -23,15 +23,7 @@ jobs:
           git clone https://github.com/ephemeraHQ/xmtp-agent-examples.git
           cd xmtp-agent-examples
           yarn install
-
-      - name: Generate keys
-        run: |
-          cd xmtp-agent-examples
           yarn gen:keys
-          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" >> .env
-
-      - name: Create .env file
-        run: echo "XMTP_ENV=local" > .env
 
       - name: Run agent
         run: |
