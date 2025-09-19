@@ -329,16 +329,11 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
-  await ctx.sendReaction("❤️");
   const content = message.content;
 
-  const isDm = (await ctx.conversation.metadata()).conversationType === "dm";
-  // Check if this is a command to show the main menu
   if (
-    (isDm &&
-      (content.trim().toLowerCase() === "help" ||
-        content.trim().startsWith("/kc"))) ||
-    (!isDm && content.trim().startsWith("@kc"))
+    (ctx.isDm() && content.trim().startsWith("/kc")) ||
+    (ctx.isGroup() && content.trim().startsWith("@kc"))
   ) {
     console.log(`Showing main menu for: ${content}`);
     await showMenu(ctx, appConfig, "main-menu");

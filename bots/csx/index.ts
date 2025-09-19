@@ -58,11 +58,7 @@ agent.on("text", async (ctx: MessageContext) => {
   console.debug("Secret code received, processing group addition");
 
   await (group as Group).sync();
-  const conversationMetadata = await ctx.conversation.metadata();
-  if (
-    conversationMetadata.conversationType === "dm" ||
-    conversationMetadata.conversationType === "group"
-  ) {
+  if (ctx.isDm()) {
     const members = await (group as Group).members();
     const isMember = members.some(
       (member) =>

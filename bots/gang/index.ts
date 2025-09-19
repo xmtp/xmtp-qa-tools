@@ -53,55 +53,49 @@ agent.on("text", async (ctx) => {
   console.debug("Secret code received, processing group addition");
 
   await (group as Group).sync();
-  const conversationMetadata = await ctx.conversation.metadata();
-  if (
-    conversationMetadata.conversationType === "dm" ||
-    conversationMetadata.conversationType === "group"
-  ) {
-    const members = await (group as Group).members();
-    const isMember = members.some(
-      (member) =>
-        member.inboxId.toLowerCase() ===
-        ctx.message.senderInboxId.toLowerCase(),
+
+  const members = await (group as Group).members();
+  const isMember = members.some(
+    (member) =>
+      member.inboxId.toLowerCase() === ctx.message.senderInboxId.toLowerCase(),
+  );
+
+  if (!isMember) {
+    console.debug(
+      `Adding member ${ctx.message.senderInboxId} to group ${currentGroupId}`,
     );
+    await (group as Group).addMembers([ctx.message.senderInboxId]);
 
-    if (!isMember) {
+    // Check if user should be admin
+    if (isAdmin.includes(ctx.message.senderInboxId)) {
       console.debug(
-        `Adding member ${ctx.message.senderInboxId} to group ${currentGroupId}`,
+        `Adding admin ${ctx.message.senderInboxId} to group ${currentGroupId}`,
       );
-      await (group as Group).addMembers([ctx.message.senderInboxId]);
-
-      // Check if user should be admin
-      if (isAdmin.includes(ctx.message.senderInboxId)) {
-        console.debug(
-          `Adding admin ${ctx.message.senderInboxId} to group ${currentGroupId}`,
-        );
-        await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
-      }
-
-      // Send success messages
-      for (const successMessage of messages.success) {
-        await ctx.sendText(successMessage);
-      }
-      return true;
-    } else {
-      // User is already in group, check if they need admin privileges
-      const isAdminFromGroup = (group as Group).isSuperAdmin(
-        ctx.message.senderInboxId,
-      );
-      if (!isAdminFromGroup && isAdmin.includes(ctx.message.senderInboxId)) {
-        console.debug(
-          `Adding admin privileges to ${ctx.message.senderInboxId} in group ${currentGroupId}`,
-        );
-        await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
-      }
-
-      console.debug(
-        `Member ${ctx.message.senderInboxId} already in group ${currentGroupId}`,
-      );
-      await ctx.sendText(messages.alreadyInGroup);
-      return false;
+      await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
     }
+
+    // Send success messages
+    for (const successMessage of messages.success) {
+      await ctx.sendText(successMessage);
+    }
+    return true;
+  } else {
+    // User is already in group, check if they need admin privileges
+    const isAdminFromGroup = (group as Group).isSuperAdmin(
+      ctx.message.senderInboxId,
+    );
+    if (!isAdminFromGroup && isAdmin.includes(ctx.message.senderInboxId)) {
+      console.debug(
+        `Adding admin privileges to ${ctx.message.senderInboxId} in group ${currentGroupId}`,
+      );
+      await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
+    }
+
+    console.debug(
+      `Member ${ctx.message.senderInboxId} already in group ${currentGroupId}`,
+    );
+    await ctx.sendText(messages.alreadyInGroup);
+    return false;
   }
 });
 

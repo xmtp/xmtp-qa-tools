@@ -183,12 +183,6 @@ async function getGroupById(groupId: string, env: string): Promise<Group> {
       throw new Error(`Group not found: ${groupId}`);
     }
 
-    // Verify it's a group
-    const metadata = await conversation.metadata();
-    if (metadata?.conversationType !== "group") {
-      throw new Error(`Conversation is not a group: ${groupId}`);
-    }
-
     return conversation as Group;
   } catch (error) {
     throw new Error(
