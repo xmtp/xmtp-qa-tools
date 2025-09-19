@@ -12,7 +12,6 @@ import {
 import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
-import { ContentTypeActions } from "../../utils/inline-actions/types/ActionsContent";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
