@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd xmtp-agent-examples
-          yarn install --immutable
+          yarn install
 
       - name: Generate keys
         run: |
