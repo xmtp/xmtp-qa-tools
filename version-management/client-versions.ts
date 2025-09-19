@@ -38,7 +38,7 @@ import {
 import {
   Client as Client420,
   Conversation as Conversation420,
-  Dm as Dm411,
+  Dm as Dm420,
   Group as Group420,
 } from "@xmtp/node-sdk-4.2.0rc1";
 
