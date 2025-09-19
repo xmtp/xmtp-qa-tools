@@ -3,7 +3,7 @@ description: "browser support"
 
 on:
   schedule:
-    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "15 */2 * * *" # Runs every 2 hours at 15 minutes past the hour
   workflow_dispatch:
 
 jobs:

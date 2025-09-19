@@ -48,9 +48,8 @@ export class IntentCodec implements ContentCodec<IntentContent> {
 
   decode(content: EncodedContent): IntentContent {
     const encoding = content.parameters.encoding;
-    if (encoding && encoding !== "UTF-8") {
+    if (encoding && encoding !== "UTF-8")
       throw new Error(`unrecognized encoding ${encoding}`);
-    }
 
     const decodedContent = new TextDecoder().decode(content.content);
     try {
