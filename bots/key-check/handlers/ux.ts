@@ -155,39 +155,20 @@ function greet(name) {
 
   async handleDeeplink(ctx: MessageContext): Promise<void> {
     try {
-      const senderAddress = await ctx.getSenderAddress();
-      const deeplinkUrl = `cbwallet://messaging/${senderAddress}`;
+      const agentAddress = ctx.client.accountIdentifier?.identifier || "";
+      const deeplink = `cbwallet://messaging/${agentAddress}`;
 
-      console.log(`Creating deeplink for address: ${senderAddress}`);
+      console.log(`Creating deeplink for agent address: ${agentAddress}`);
 
-      // Send a message explaining the deeplink
-      await ctx.sendText(
-        `🔗 **Deeplink to Your Address**\n\n` +
-          `This button will open your address in Coinbase Wallet:\n` +
-          `\`${deeplinkUrl}\`\n\n` +
-          `Tap the button below to test the deeplink!`,
+      // Send deeplink message as specified in the user's function
+      await ctx.conversation.send(
+        `💬 Want to chat privately? Tap here to start a direct conversation:\n\n${deeplink}`,
       );
 
-      // Create the deeplink button using ActionsContent
-      const deeplinkActions = {
-        id: `deeplink-${Date.now()}`,
-        description: "Open your address in Coinbase Wallet",
-        actions: [
-          {
-            id: "open-address",
-            label: "🔗 Open My Address",
-            style: "primary" as const,
-          },
-        ],
-      };
-
-      // Send the actions (this will create the button)
-      await ctx.conversation.send(deeplinkActions, ContentTypeActions);
-
-      console.log("Deeplink button sent successfully");
+      console.log("Deeplink message sent successfully");
     } catch (error) {
       console.error("Error creating deeplink:", error);
-      await ctx.sendText("❌ Failed to create deeplink button");
+      await ctx.sendText("❌ Failed to create deeplink message");
     }
   }
 }
