@@ -391,10 +391,6 @@ agent.on("text", async (ctx) => {
     }
     return;
   }
-
-  // If it's not a recognized pattern, show the main menu as a fallback
-  console.log(`Unrecognized input, showing main menu: ${content}`);
-  await showMenu(ctx, appConfig, "main-menu");
 });
 
 // 4. Log when we're ready
