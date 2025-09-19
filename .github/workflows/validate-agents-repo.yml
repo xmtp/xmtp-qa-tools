@@ -1,6 +1,7 @@
 name: Validate agents repo
 
 on:
+  pull_request:
   schedule:
     - cron: "0 * * * *" # every hour
   workflow_dispatch:
@@ -21,26 +22,8 @@ jobs:
         run: |
           git clone https://github.com/ephemeraHQ/xmtp-agent-examples.git
           cd xmtp-agent-examples
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          # Disable built-in cache since we're working with external repo
-
-      - name: Install dependencies
-        run: |
-          cd xmtp-agent-examples
-          yarn install
-
-      - name: Generate keys
-        run: |
-          cd xmtp-agent-examples
+          yarn install --no-frozen-lockfile
           yarn gen:keys
-          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" >> .env
-
-      - name: Create .env file
-        run: echo "XMTP_ENV=local" > .env
 
       - name: Run agent
         run: |
