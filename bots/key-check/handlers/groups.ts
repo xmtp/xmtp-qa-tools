@@ -1,17 +1,14 @@
 import {
+  IdentifierKind,
   type Group,
   type MessageContext,
   type PermissionLevel,
 } from "@xmtp/agent-sdk";
-import {
-  IdentifierKind,
-  type GroupMember,
-} from "version-management/client-versions";
 
 export class GroupHandlers {
   async handleGroupMembers(ctx: MessageContext): Promise<void> {
     try {
-      const members: GroupMember[] = await ctx.conversation.members();
+      const members = await ctx.conversation.members();
 
       if (!members || members.length === 0) {
         await ctx.sendText("No members found in this group.");
@@ -25,7 +22,7 @@ export class GroupHandlers {
         try {
           // Get the address from the member's account identifiers
           const ethIdentifier = member.accountIdentifiers.find(
-            (id) => id.identifierKind === IdentifierKind.Ethereum,
+            (id: any) => id.identifierKind == IdentifierKind.Ethereum,
           );
           const address = ethIdentifier?.identifier || "Unknown";
 
@@ -101,7 +98,7 @@ export class GroupHandlers {
 
   async handleGroupAdmins(ctx: MessageContext): Promise<void> {
     try {
-      const members: GroupMember[] = await ctx.conversation.members();
+      const members = await ctx.conversation.members();
 
       if (!members || members.length === 0) {
         await ctx.sendText("No members found in this group.");
@@ -115,14 +112,14 @@ export class GroupHandlers {
 
       for (const member of members) {
         if (
-          member.permissionLevel === (1 as PermissionLevel) ||
-          member.permissionLevel === (0 as PermissionLevel) ||
-          member.permissionLevel === (2 as PermissionLevel)
+          member.permissionLevel == (1 as PermissionLevel) ||
+          member.permissionLevel == (0 as PermissionLevel) ||
+          member.permissionLevel == (2 as PermissionLevel)
         ) {
           try {
             // Get the address from the member's account identifiers
             const ethIdentifier = member.accountIdentifiers.find(
-              (id) => id.identifierKind === IdentifierKind.Ethereum,
+              (id: any) => id.identifierKind == IdentifierKind.Ethereum,
             );
             const address = ethIdentifier?.identifier || "Unknown";
 
@@ -136,7 +133,7 @@ export class GroupHandlers {
             if (isBot) marker += "🤖 ";
             if (isSender) marker += "👤 ";
 
-            if (member.permissionLevel === (2 as PermissionLevel)) {
+            if (member.permissionLevel == (2 as PermissionLevel)) {
               adminsList += `${marker}👑 **${address}** *(Super Admin)*\n`;
               superAdminCount++;
             } else {
@@ -150,7 +147,7 @@ export class GroupHandlers {
               `Error getting address for admin ${member.inboxId}:`,
               error,
             );
-            if (member.permissionLevel === (2 as PermissionLevel)) {
+            if (member.permissionLevel == (2 as PermissionLevel)) {
               adminsList += `❓ **Unknown Address** *(Super Admin)*\n`;
               superAdminCount++;
             } else {
@@ -196,7 +193,7 @@ export class GroupHandlers {
       if (superAdmins.length > 0) {
         for (const superAdminInboxId of superAdmins) {
           const member = members.find(
-            (m: GroupMember) => m.inboxId === superAdminInboxId,
+            (m: { inboxId: string }) => m.inboxId == superAdminInboxId,
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
@@ -212,7 +209,7 @@ export class GroupHandlers {
       if (admins.length > 0) {
         for (const adminInboxId of admins) {
           const member = members.find(
-            (m: GroupMember) => m.inboxId === adminInboxId,
+            (m: { inboxId: string }) => m.inboxId == adminInboxId,
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
