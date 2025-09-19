@@ -595,12 +595,15 @@ export async function checkKeyPackageStatusesByInboxId(
     },
   );
 
-  console.warn({
+  const logObject = {
     inboxId,
     installationIds,
     totalInstallations,
     validInstallations,
     invalidInstallations,
     installationDetails,
-  });
+  };
+
+  console.warn(JSON.stringify(logObject), null, 2);
+  return;
 }
