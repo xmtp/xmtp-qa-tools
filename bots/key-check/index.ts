@@ -232,7 +232,7 @@ async function showInboxInputMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, inputMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send the Inbox ID (64 hex characters) you want to check as a regular text message.",
   );
 }
@@ -246,7 +246,7 @@ async function showAddressInputMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, inputMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send the Ethereum address (0x + 40 hex characters) you want to check as a regular text message.",
   );
 }
@@ -260,7 +260,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, customMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send your custom parameters as a text message in the format:\n" +
       "**groups messages**\n\n" +
       "Examples:\n" +
@@ -382,7 +382,7 @@ agent.on("text", async (ctx) => {
         "Custom load test completed!",
       );
     } else {
-      await ctx.conversation.send(
+      await ctx.sendText(
         "❌ Invalid parameters! Please use reasonable values:\n" +
           "• Groups: 1-1000\n" +
           "• Messages: 1-1000\n\n" +

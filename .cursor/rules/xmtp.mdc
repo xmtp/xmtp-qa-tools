@@ -34,7 +34,7 @@ agent.on("text", async (ctx) => {
   const messageContent = ctx.message.content;
   const senderAddress = await ctx.getSenderAddress();
   console.log(`Received message: ${messageContent} by ${senderAddress}`);
-  await ctx.conversation.send("gm");
+  await ctx.sendText("gm");
 });
 
 // 4. Log when we're ready
@@ -91,11 +91,11 @@ agent.on("reply", async (ctx) => {
 
 // Handle new conversations
 agent.on("dm", async (ctx) => {
-  await ctx.conversation.send("Welcome to our DM!");
+  await ctx.sendText("Welcome to our DM!");
 });
 
 agent.on("group", async (ctx) => {
-  await ctx.conversation.send("Hello group!");
+  await ctx.sendText("Hello group!");
 });
 
 // Handle uncaught errors
@@ -116,7 +116,7 @@ import { CommandRouter } from "@xmtp/agent-sdk";
 const router = new CommandRouter();
 
 router.command("/version", async (ctx) => {
-  await ctx.conversation.send(`v${process.env.npm_package_version}`);
+  await ctx.sendText(`v${process.env.npm_package_version}`);
 });
 
 agent.use(router.middleware());
@@ -135,7 +135,7 @@ import { filter, withFilter } from "@xmtp/agent-sdk";
 agent.on(
   "text",
   withFilter(filter.startsWith("@agent"), async (ctx) => {
-    await ctx.conversation.send("How can I help you?");
+    await ctx.sendText("How can I help you?");
   }),
 );
 
@@ -145,7 +145,7 @@ const combined = filter.and(filter.notFromSelf, filter.isText);
 agent.on(
   "text",
   withFilter(combined, async (ctx) => {
-    await ctx.conversation.send("You sent a text message ✅");
+    await ctx.sendText("You sent a text message ✅");
   }),
 );
 ```
@@ -206,10 +206,10 @@ agent.on("text", async (ctx) => {
   try {
     // Parse the message to extract two numbers
     const result = parseAndMultiply(messageContent);
-    await ctx.conversation.send(result);
+    await ctx.sendText(result);
   } catch (error) {
     console.error("Error processing message:", error);
-    await ctx.conversation.send(
+    await ctx.sendText(
       "Please send two numbers separated by space, comma, or 'x'. Examples: '5 3', '5,3', '5 x 3', 'multiply 5 and 3'",
     );
   }
@@ -625,7 +625,7 @@ agent.use(inlineActionsMiddleware);
 
 // 2. Register action handlers
 registerAction("my-action", async (ctx) => {
-  await ctx.conversation.send("Action executed!");
+  await ctx.sendText("Action executed!");
 });
 
 // 3. Send interactive buttons
@@ -656,8 +656,8 @@ await ActionBuilder.create("menu-id", "Description")
 await sendConfirmation(
   ctx,
   "Delete this item?",
-  async (ctx) => await ctx.conversation.send("Deleted!"),
-  async (ctx) => await ctx.conversation.send("Cancelled"),
+  async (ctx) => await ctx.sendText("Deleted!"),
+  async (ctx) => await ctx.sendText("Cancelled"),
 );
 ```
 
@@ -711,7 +711,7 @@ Register handlers for button clicks:
 ```typescript
 registerAction("my-action", async (ctx: MessageContext) => {
   // Handle the action
-  await ctx.conversation.send("Action completed!");
+  await ctx.sendText("Action completed!");
 
   // Optionally show navigation options
   await showNavigationOptions(ctx, config, "What would you like to do next?");
@@ -727,7 +727,7 @@ import { validators } from "./inline-actions";
 
 const result = validators.inboxId("123abc...");
 if (!result.valid) {
-  await ctx.conversation.send(`Error: ${result.error}`);
+  await ctx.sendText(`Error: ${result.error}`);
 }
 ```
 

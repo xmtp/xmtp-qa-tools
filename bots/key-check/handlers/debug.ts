@@ -16,12 +16,12 @@ export class DebugHandlers {
   }
 
   async handleHelp(ctx: MessageContext, helpText: string): Promise<void> {
-    await ctx.conversation.send(helpText);
+    await ctx.sendText(helpText);
     console.log("Sent help information");
   }
 
   async handleVersion(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(`XMTP agent-sdk Version: ${xmtpSdkVersion}`);
+    await ctx.sendText(`XMTP agent-sdk Version: ${xmtpSdkVersion}`);
     console.log(`Sent XMTP agent-sdk version: ${xmtpSdkVersion}`);
   }
 
@@ -41,7 +41,7 @@ export class DebugHandlers {
       `Bot started at: ${this.startTime.toLocaleString()}\n` +
       `Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    await ctx.conversation.send(uptimeText);
+    await ctx.sendText(uptimeText);
     console.log(`Sent uptime information: ${uptimeText}`);
   }
 
@@ -52,7 +52,7 @@ export class DebugHandlers {
       "Conversations:",
       conversations.map((conversation: any) => conversation.id),
     );
-    await ctx.conversation.send(
+    await ctx.sendText(
       `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
   }
@@ -125,7 +125,7 @@ export class DebugHandlers {
 • Bot Status: ✅ Running
 • Last Updated: ${currentTime.toLocaleString()}`;
 
-    await ctx.conversation.send(debugInfo);
+    await ctx.sendText(debugInfo);
     console.log("Sent comprehensive debug information");
   }
 
@@ -144,15 +144,13 @@ export class DebugHandlers {
           identifierKind: IdentifierKind.Ethereum,
         });
         if (!inboxId) {
-          await ctx.conversation.send(
-            `No inbox found for address ${targetAddress}`,
-          );
+          await ctx.sendText(`No inbox found for address ${targetAddress}`);
           return;
         }
         resolvedInboxId = inboxId;
       } catch (error) {
         console.error(`Error resolving address ${targetAddress}:`, error);
-        await ctx.conversation.send(`Error resolving address ${targetAddress}`);
+        await ctx.sendText(`Error resolving address ${targetAddress}`);
         return;
       }
     }
@@ -165,9 +163,7 @@ export class DebugHandlers {
       );
 
       if (!inboxState || inboxState.length === 0) {
-        await ctx.conversation.send(
-          `No inbox state found for ${resolvedInboxId}`,
-        );
+        await ctx.sendText(`No inbox state found for ${resolvedInboxId}`);
         return;
       }
 
@@ -220,14 +216,14 @@ export class DebugHandlers {
         }
       }
 
-      await ctx.conversation.send(summaryText);
+      await ctx.sendText(summaryText);
       console.log(`Sent key status for ${resolvedInboxId}`);
     } catch (error) {
       console.error(
         `Error processing key-check for ${resolvedInboxId}:`,
         error,
       );
-      await ctx.conversation.send(
+      await ctx.sendText(
         `Error processing key-check: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }

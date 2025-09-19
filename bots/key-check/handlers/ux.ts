@@ -25,7 +25,7 @@ export class UxHandlers {
       const senderAddress = await ctx.getSenderAddress();
 
       console.log(`Preparing attachment for ${senderAddress}...`);
-      await ctx.conversation.send(`I'll send you an attachment now...`);
+      await ctx.sendText(`I'll send you an attachment now...`);
 
       await ctx.conversation.send(
         parseSavedAttachment(),
@@ -35,7 +35,7 @@ export class UxHandlers {
       console.log("Remote attachment sent successfully");
     } catch (error) {
       console.error("❌ Error sending real attachment:", error);
-      await ctx.conversation.send("❌ Failed to send real attachment");
+      await ctx.sendText("❌ Failed to send real attachment");
     }
   }
 
@@ -92,13 +92,13 @@ function greet(name) {
 
       await ctx.conversation.send(markdownContent, ContentTypeMarkdown);
 
-      await ctx.conversation.send(
+      await ctx.sendText(
         "✅ Markdown message sent successfully! Check how it renders in your client.",
       );
       console.log("Sent comprehensive markdown demo");
     } catch (error) {
       console.error("Error sending markdown demo:", error);
-      await ctx.conversation.send("❌ Failed to send markdown demo");
+      await ctx.sendText("❌ Failed to send markdown demo");
     }
   }
 
@@ -132,7 +132,7 @@ function greet(name) {
       console.log("Sent reply to text message");
     } catch (error) {
       console.error("Error in basics demo:", error);
-      await ctx.conversation.send("❌ Failed to complete basics demo");
+      await ctx.sendText("❌ Failed to complete basics demo");
     }
   }
 

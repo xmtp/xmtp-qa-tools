@@ -245,7 +245,7 @@ export class ForksHandlers {
 
       // Build and send detailed report
       const report = this.buildForkReport(ctx, analysis, senderAddress);
-      await ctx.conversation.send(report);
+      await ctx.sendText(report);
 
       this.logInfo("Fork detection report sent successfully");
       this.logSection("FORK DETECTION COMPLETE");
@@ -257,7 +257,7 @@ export class ForksHandlers {
         `Error: ${error instanceof Error ? error.message : "Unknown error"}\n\n` +
         `Please check the logs for detailed error information.`;
 
-      await ctx.conversation.send(errorMessage);
+      await ctx.sendText(errorMessage);
     }
   }
 }

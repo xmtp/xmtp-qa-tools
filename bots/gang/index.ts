@@ -40,13 +40,13 @@ agent.on("text", async (ctx) => {
 
   if (!group) {
     console.debug(`Group not found in the db: ${currentGroupId}`);
-    await ctx.conversation.send(messages.groupNotFound);
+    await ctx.sendText(messages.groupNotFound);
     return false;
   }
 
   // Check the message content against the secret code
   if (ctx.message.content !== currentGroupCode) {
-    await ctx.conversation.send(messages.invalid);
+    await ctx.sendText(messages.invalid);
     return false;
   }
 
@@ -81,7 +81,7 @@ agent.on("text", async (ctx) => {
 
       // Send success messages
       for (const successMessage of messages.success) {
-        await ctx.conversation.send(successMessage);
+        await ctx.sendText(successMessage);
       }
       return true;
     } else {
@@ -99,7 +99,7 @@ agent.on("text", async (ctx) => {
       console.debug(
         `Member ${ctx.message.senderInboxId} already in group ${currentGroupId}`,
       );
-      await ctx.conversation.send(messages.alreadyInGroup);
+      await ctx.sendText(messages.alreadyInGroup);
       return false;
     }
   }
