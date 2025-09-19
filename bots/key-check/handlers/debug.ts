@@ -1,9 +1,6 @@
 import { createRequire } from "node:module";
 import { type MessageContext } from "@xmtp/agent-sdk";
-import {
-  getActiveVersion,
-  IdentifierKind,
-} from "version-management/client-versions";
+import { IdentifierKind } from "version-management/client-versions";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);

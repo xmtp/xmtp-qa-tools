@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.3.28",
+  "version": "0.3.29",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
-    "@xmtp/agent-sdk": "^0.0.12",
+    "@xmtp/agent-sdk": "^0.0.14",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",

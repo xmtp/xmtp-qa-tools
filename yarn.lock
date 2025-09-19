@@ -1361,18 +1361,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk@npm:^0.0.12":
-  version: 0.0.12
-  resolution: "@xmtp/agent-sdk@npm:0.0.12"
+"@xmtp/agent-sdk@npm:^0.0.14":
+  version: 0.0.14
+  resolution: "@xmtp/agent-sdk@npm:0.0.14"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.1.0"
+    "@xmtp/node-sdk": "npm:^4.1.1"
     uint8arrays: "npm:^5.1.0"
-    viem: "npm:^2.31.7"
-  checksum: 10/17dae2b2a108f45f9d4bae8335ea5d5aba8ed56b41e12432ecb86c08776766899e01b945750e245a31dc57db4c86130bb51dbef78665b580dc3fcef325ccad3b
+    viem: "npm:^2.37.6"
+  checksum: 10/adf9a2e338bf118e58a61ac58193046dd892c53bf313a84bf431f6ecc3069048de3988ce58b0df798f98d8f765ac81e2e03ddeb152e4621cd630a2d0dbf37ca9
   languageName: node
   linkType: hard
 
@@ -1535,7 +1535,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.1.0@npm:@xmtp/node-sdk@4.1.0, @xmtp/node-sdk@npm:^4.1.0":
+"@xmtp/node-sdk-4.1.0@npm:@xmtp/node-sdk@4.1.0":
   version: 4.1.0
   resolution: "@xmtp/node-sdk@npm:4.1.0"
   dependencies:
@@ -1544,6 +1544,18 @@ __metadata:
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.4.0"
   checksum: 10/bce354f7dfa87a06c47c89ff1464b3aa2b76c509cdc73da9c8ecd6443af33a3c1197cf4201104204fb2c9c9240daacf6c8c5bf22621a2576b9616861da5551b8
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "@xmtp/node-sdk@npm:4.1.1"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.4.0"
+  checksum: 10/115242fa6284a1466c9c32aad33a48f40162300d5d6f7aa0d4b65fb7fa3da20c2db5c0b87bd6a483e5a473d80a2a0969ee700436b2783883ca5e38c2a2efced1
   languageName: node
   linkType: hard
 
@@ -4316,9 +4328,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.31.7":
-  version: 2.37.5
-  resolution: "viem@npm:2.37.5"
+"viem@npm:^2.37.6":
+  version: 2.37.6
+  resolution: "viem@npm:2.37.6"
   dependencies:
     "@noble/curves": "npm:1.9.1"
     "@noble/hashes": "npm:1.8.0"
@@ -4333,7 +4345,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/00990664ea40c54269ed19245306f378a9511c313ec21a79a75e9775128b42bd6e2e4ec7bc449bbaff5e20548308a797268e91c6f68381bac6c5ca1cfb16b2db
+  checksum: 10/b17242414c748fc195fb2899100deb21a269a4a8f72b45e5537a7f7117134857b9c4827ef230a33be69363732e63155092dc5e088d6affb3f739f6b3dac0af5e
   languageName: node
   linkType: hard
 
@@ -4621,7 +4633,7 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@xmtp/agent-sdk": "npm:^0.0.12"
+    "@xmtp/agent-sdk": "npm:^0.0.14"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
