@@ -6,6 +6,7 @@ import {
   ConsentState,
   type Client,
   type Conversation,
+  type Dm,
   type Group,
 } from "version-management/client-versions";
 
@@ -206,7 +207,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
  * Specialized function to message streams
  */
 export async function verifyMessageStream(
-  group: Conversation,
+  group: Dm | Group | Conversation,
   receivers: Worker[],
   count = 1,
   messageTemplate: string = "gm-{i}-{randomSuffix}",

@@ -36,11 +36,11 @@ import {
   Group as Group410,
 } from "@xmtp/node-sdk-4.1.0";
 import {
-  Client as Client411,
-  Conversation as Conversation411,
-  Dm as Dm411,
-  Group as Group411,
-} from "@xmtp/node-sdk-4.1.1";
+  Client as Client420,
+  Conversation as Conversation420,
+  Dm as Dm420,
+  Group as Group420,
+} from "@xmtp/node-sdk-4.2.0rc1";
 
 export {
   Client,
@@ -58,15 +58,15 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.1.1";
+} from "@xmtp/node-sdk-4.2.0rc1";
 
 export const VersionList = [
   {
-    Client: Client411,
-    Conversation: Conversation411,
-    Dm: Dm411,
-    Group: Group411,
-    nodeSDK: "4.1.1",
+    Client: Client420,
+    Conversation: Conversation420,
+    Dm: Dm420,
+    Group: Group420,
+    nodeSDK: "4.2.0rc1",
     nodeBindings: "1.5.0rc1",
     auto: true,
   },
