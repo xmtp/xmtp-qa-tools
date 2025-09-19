@@ -67,7 +67,7 @@ export const VersionList = [
     Dm: Dm411,
     Group: Group411,
     nodeSDK: "4.1.1",
-    nodeBindings: "1.5.0-rc1",
+    nodeBindings: "1.5.0rc1",
     auto: true,
   },
   {

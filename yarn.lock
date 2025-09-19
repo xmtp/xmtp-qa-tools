@@ -1487,7 +1487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-1.5.0-rc1@npm:@xmtp/node-bindings@1.5.0-rc1":
+"@xmtp/node-bindings-1.5.0rc1@npm:@xmtp/node-bindings@1.5.0-rc1":
   version: 1.5.0-rc1
   resolution: "@xmtp/node-bindings@npm:1.5.0-rc1"
   checksum: 10/03efcbee860bb323a16f71a9d2b4e34c78d5baa3b13783934e942b01f84db7d31231923d968b53160ba895961aa813c179a53fa375abe2f3045635d8604da8cd
@@ -4650,7 +4650,7 @@ __metadata:
     "@xmtp/node-bindings-1.3.5": "npm:@xmtp/node-bindings@1.3.5"
     "@xmtp/node-bindings-1.3.6": "npm:@xmtp/node-bindings@1.3.6"
     "@xmtp/node-bindings-1.4.0": "npm:@xmtp/node-bindings@1.4.0"
-    "@xmtp/node-bindings-1.5.0-rc1": "npm:@xmtp/node-bindings@1.5.0-rc1"
+    "@xmtp/node-bindings-1.5.0rc1": "npm:@xmtp/node-bindings@1.5.0-rc1"
     "@xmtp/node-sdk-3.2.2": "npm:@xmtp/node-sdk@3.2.2"
     "@xmtp/node-sdk-4.0.1": "npm:@xmtp/node-sdk@4.0.1"
     "@xmtp/node-sdk-4.0.2": "npm:@xmtp/node-sdk@4.0.2"
