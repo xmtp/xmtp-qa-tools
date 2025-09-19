@@ -14,7 +14,7 @@ export class GroupHandlers {
       const members: GroupMember[] = await ctx.conversation.members();
 
       if (!members || members.length === 0) {
-        await ctx.conversation.send("No members found in this group.");
+        await ctx.sendText("No members found in this group.");
         console.log("No members found in the group");
         return;
       }
@@ -55,11 +55,11 @@ export class GroupHandlers {
       membersList += `\n📊 **Total Members:** ${members.length}\n`;
       membersList += "🤖 = Bot  👤 = You";
 
-      await ctx.conversation.send(membersList);
+      await ctx.sendText(membersList);
       console.log(`Sent group members list (${members.length} members)`);
     } catch (error) {
       console.error("Error getting group members:", error);
-      await ctx.conversation.send("❌ Failed to retrieve group members");
+      await ctx.sendText("❌ Failed to retrieve group members");
     }
   }
 
@@ -91,11 +91,11 @@ export class GroupHandlers {
       infoText += `🆔 **Group ID:** \`${groupId.substring(0, 8)}...${groupId.substring(groupId.length - 8)}\`\n`;
       infoText += `📋 **Full Group ID:** \`${groupId}\`\n\n`;
 
-      await ctx.conversation.send(infoText);
+      await ctx.sendText(infoText);
       console.log("Sent group information");
     } catch (error) {
       console.error("Error getting group info:", error);
-      await ctx.conversation.send("❌ Failed to retrieve group information");
+      await ctx.sendText("❌ Failed to retrieve group information");
     }
   }
 
@@ -104,7 +104,7 @@ export class GroupHandlers {
       const members: GroupMember[] = await ctx.conversation.members();
 
       if (!members || members.length === 0) {
-        await ctx.conversation.send("No members found in this group.");
+        await ctx.sendText("No members found in this group.");
         return;
       }
 
@@ -171,13 +171,13 @@ export class GroupHandlers {
       adminsList += `🔧 Admins: ${adminCount}\n`;
       adminsList += `📈 Total Administrators: ${adminCount + superAdminCount}`;
 
-      await ctx.conversation.send(adminsList);
+      await ctx.sendText(adminsList);
       console.log(
         `Sent group admins list (${superAdminCount} super admins, ${adminCount} admins)`,
       );
     } catch (error) {
       console.error("Error getting group admins:", error);
-      await ctx.conversation.send("❌ Failed to retrieve group administrators");
+      await ctx.sendText("❌ Failed to retrieve group administrators");
     }
   }
 
@@ -235,11 +235,11 @@ export class GroupHandlers {
         "• **Admins** can perform admin-level actions based on group settings\n";
       permissionsText += "• **Members** have basic participation rights\n";
 
-      await ctx.conversation.send(permissionsText);
+      await ctx.sendText(permissionsText);
       console.log("Sent group permissions information");
     } catch (error) {
       console.error("Error getting group permissions:", error);
-      await ctx.conversation.send("❌ Failed to retrieve group permissions");
+      await ctx.sendText("❌ Failed to retrieve group permissions");
     }
   }
 }

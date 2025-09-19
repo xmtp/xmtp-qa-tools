@@ -45,24 +45,20 @@ agent.on("text", async (ctx: MessageContext) => {
 
   if (!group) {
     console.debug(`Group not found in the db: ${currentGroupId}`);
-    await ctx.conversation.send(messages.groupNotFound);
+    await ctx.sendText(messages.groupNotFound);
     return false;
   }
 
   // Check the message content against the secret code
   if (ctx.message.content !== currentGroupCode) {
-    await ctx.conversation.send(messages.invalid);
+    await ctx.sendText(messages.invalid);
     return false;
   }
 
   console.debug("Secret code received, processing group addition");
 
   await (group as Group).sync();
-  const conversationMetadata = await ctx.conversation.metadata();
-  if (
-    conversationMetadata.conversationType === "dm" ||
-    conversationMetadata.conversationType === "group"
-  ) {
+  if (ctx.isDm()) {
     const members = await (group as Group).members();
     const isMember = members.some(
       (member) =>
@@ -86,7 +82,7 @@ agent.on("text", async (ctx: MessageContext) => {
 
       // Send success messages
       for (const successMessage of messages.success) {
-        await ctx.conversation.send(successMessage);
+        await ctx.sendText(successMessage);
       }
       return true;
     } else {
@@ -104,7 +100,7 @@ agent.on("text", async (ctx: MessageContext) => {
       console.debug(
         `Member ${ctx.message.senderInboxId} already in group ${currentGroupId}`,
       );
-      await ctx.conversation.send(messages.alreadyInGroup);
+      await ctx.sendText(messages.alreadyInGroup);
       return false;
     }
   }

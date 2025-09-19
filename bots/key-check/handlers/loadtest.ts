@@ -4,9 +4,7 @@ export class LoadTestHandlers {
   constructor(private agent: any) {}
 
   async handleLoadTest10Groups10Messages(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(
-      "🚀 Starting Load Test: 10 groups × 10 messages",
-    );
+    await ctx.sendText("🚀 Starting Load Test: 10 groups × 10 messages");
     console.log("Starting load test: 10 groups × 10 messages");
 
     try {
@@ -44,15 +42,13 @@ export class LoadTestHandlers {
             await new Promise((resolve) => setTimeout(resolve, 100));
           }
 
-          await ctx.conversation.send(
-            `Completed ${groupName} (10 messages sent)`,
-          );
+          await ctx.sendText(`Completed ${groupName} (10 messages sent)`);
         } catch (groupError) {
           console.error(
             `Failed to create group ${groupIndex + 1}:`,
             groupError,
           );
-          await ctx.conversation.send(
+          await ctx.sendText(
             `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
@@ -75,18 +71,16 @@ export class LoadTestHandlers {
           )
           .join("\n");
 
-      await ctx.conversation.send(summary);
+      await ctx.sendText(summary);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
+      await ctx.sendText(`❌ Load test failed: ${String(error)}`);
     }
   }
 
   async handleLoadTest50Groups10Messages(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(
-      "🚀 Starting Load Test: 50 groups × 10 messages",
-    );
+    await ctx.sendText("🚀 Starting Load Test: 50 groups × 10 messages");
     console.log("Starting load test: 50 groups × 10 messages");
 
     try {
@@ -126,7 +120,7 @@ export class LoadTestHandlers {
 
           // Progress update every 10 groups
           if ((groupIndex + 1) % 10 === 0) {
-            await ctx.conversation.send(
+            await ctx.sendText(
               `📊 Progress: ${groupIndex + 1}/50 groups completed`,
             );
           }
@@ -135,7 +129,7 @@ export class LoadTestHandlers {
             `Failed to create group ${groupIndex + 1}:`,
             groupError,
           );
-          await ctx.conversation.send(
+          await ctx.sendText(
             `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
@@ -159,18 +153,16 @@ export class LoadTestHandlers {
           )
           .join("\n");
 
-      await ctx.conversation.send(summary);
+      await ctx.sendText(summary);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
+      await ctx.sendText(`❌ Load test failed: ${String(error)}`);
     }
   }
 
   async handleLoadTest1Group100Messages(ctx: MessageContext): Promise<void> {
-    await ctx.conversation.send(
-      "🚀 Starting Load Test: 1 group × 100 messages",
-    );
+    await ctx.sendText("🚀 Starting Load Test: 1 group × 100 messages");
     console.log("Starting load test: 1 group × 100 messages");
 
     try {
@@ -205,7 +197,7 @@ export class LoadTestHandlers {
 
           // Progress updates every 25 messages
           if ((messageIndex + 1) % 25 === 0) {
-            await ctx.conversation.send(
+            await ctx.sendText(
               `📊 Progress: ${messageIndex + 1}/100 messages sent`,
             );
           }
@@ -215,9 +207,7 @@ export class LoadTestHandlers {
         }
       } catch (groupError) {
         console.error(`Failed to create group:`, groupError);
-        await ctx.conversation.send(
-          `❌ Failed to create group: ${String(groupError)}`,
-        );
+        await ctx.sendText(`❌ Failed to create group: ${String(groupError)}`);
         return;
       }
 
@@ -238,11 +228,11 @@ export class LoadTestHandlers {
           )
           .join("\n");
 
-      await ctx.conversation.send(summary);
+      await ctx.sendText(summary);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
-      await ctx.conversation.send(`❌ Load test failed: ${String(error)}`);
+      await ctx.sendText(`❌ Load test failed: ${String(error)}`);
     }
   }
 
@@ -251,7 +241,7 @@ export class LoadTestHandlers {
     groups: number,
     messagesPerGroup: number,
   ): Promise<void> {
-    await ctx.conversation.send(
+    await ctx.sendText(
       `🚀 Starting Custom Load Test: ${groups} groups × ${messagesPerGroup} messages`,
     );
     console.log(
@@ -301,7 +291,7 @@ export class LoadTestHandlers {
 
           // Progress update for larger tests
           if (groups > 10 && (groupIndex + 1) % Math.ceil(groups / 10) === 0) {
-            await ctx.conversation.send(
+            await ctx.sendText(
               `📊 Progress: ${groupIndex + 1}/${groups} groups completed`,
             );
           }
@@ -310,7 +300,7 @@ export class LoadTestHandlers {
             `Failed to create group ${groupIndex + 1}:`,
             groupError,
           );
-          await ctx.conversation.send(
+          await ctx.sendText(
             `❌ Failed to create group ${groupIndex + 1}: ${String(groupError)}`,
           );
         }
@@ -334,13 +324,11 @@ export class LoadTestHandlers {
           )
           .join("\n");
 
-      await ctx.conversation.send(summary);
+      await ctx.sendText(summary);
       console.log("Custom load test completed:", summary);
     } catch (error) {
       console.error("Custom load test failed:", error);
-      await ctx.conversation.send(
-        `❌ Custom load test failed: ${String(error)}`,
-      );
+      await ctx.sendText(`❌ Custom load test failed: ${String(error)}`);
     }
   }
 }

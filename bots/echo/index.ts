@@ -14,7 +14,7 @@ agent.on("text", async (ctx) => {
 
   count++;
   console.log(`Count: ${count}`);
-  await ctx.conversation.send(`echo: ${ctx.message.content}`);
+  await ctx.sendText(`echo: ${ctx.message.content}`);
 });
 
 // Handle uncaught errors

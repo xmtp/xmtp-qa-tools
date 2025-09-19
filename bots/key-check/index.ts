@@ -232,7 +232,7 @@ async function showInboxInputMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, inputMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send the Inbox ID (64 hex characters) you want to check as a regular text message.",
   );
 }
@@ -246,7 +246,7 @@ async function showAddressInputMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, inputMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send the Ethereum address (0x + 40 hex characters) you want to check as a regular text message.",
   );
 }
@@ -260,7 +260,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, customMenu);
-  await ctx.conversation.send(
+  await ctx.sendText(
     "Please send your custom parameters as a text message in the format:\n" +
       "**groups messages**\n\n" +
       "Examples:\n" +
@@ -329,16 +329,11 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
-  await ctx.sendReaction("❤️");
   const content = message.content;
 
-  const isDm = (await ctx.conversation.metadata()).conversationType === "dm";
-  // Check if this is a command to show the main menu
   if (
-    (isDm &&
-      (content.trim().toLowerCase() === "help" ||
-        content.trim().startsWith("/kc"))) ||
-    (!isDm && content.trim().startsWith("@kc"))
+    (ctx.isDm() && content.trim().startsWith("/kc")) ||
+    (ctx.isGroup() && content.trim().startsWith("@kc"))
   ) {
     console.log(`Showing main menu for: ${content}`);
     await showMenu(ctx, appConfig, "main-menu");
@@ -382,7 +377,7 @@ agent.on("text", async (ctx) => {
         "Custom load test completed!",
       );
     } else {
-      await ctx.conversation.send(
+      await ctx.sendText(
         "❌ Invalid parameters! Please use reasonable values:\n" +
           "• Groups: 1-1000\n" +
           "• Messages: 1-1000\n\n" +
@@ -396,10 +391,6 @@ agent.on("text", async (ctx) => {
     }
     return;
   }
-
-  // If it's not a recognized pattern, show the main menu as a fallback
-  console.log(`Unrecognized input, showing main menu: ${content}`);
-  await showMenu(ctx, appConfig, "main-menu");
 });
 
 // 4. Log when we're ready

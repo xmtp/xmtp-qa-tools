@@ -52,7 +52,7 @@ export async function showLastMenu(
       console.log("🔄 Showing main menu as fallback");
       await showMenu(ctx, fallbackConfig, "main-menu");
     } else {
-      await ctx.conversation.send(
+      await ctx.sendText(
         "❌ No menu context available. Please use 'help' or '/kc' to show the main menu.",
       );
     }
@@ -110,14 +110,12 @@ export const inlineActionsMiddleware: AgentMiddleware = async (ctx, next) => {
         await handler(ctx);
       } catch (error) {
         console.error(`❌ Error in action handler:`, error);
-        await ctx.conversation.send(
+        await ctx.sendText(
           `❌ Error: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     } else {
-      await ctx.conversation.send(
-        `❌ Unknown action: ${intentContent.actionId}`,
-      );
+      await ctx.sendText(`❌ Unknown action: ${intentContent.actionId}`);
     }
     return;
   }
@@ -190,7 +188,7 @@ export async function sendConfirmation(
     noId,
     onNo ||
       (async (ctx) => {
-        await ctx.conversation.send("❌ Cancelled");
+        await ctx.sendText("❌ Cancelled");
       }),
   );
 
@@ -283,7 +281,7 @@ export async function showMenu(
   const menu = config.menus[menuId];
   if (!menu) {
     console.error(`❌ Menu not found: ${menuId}`);
-    await ctx.conversation.send(`❌ Menu not found: ${menuId}`);
+    await ctx.sendText(`❌ Menu not found: ${menuId}`);
     return;
   }
 
@@ -328,7 +326,7 @@ export async function showNavigationOptions(
 
   if (!autoShowMenu) {
     // If auto-show is disabled, just send the message without showing menu
-    await ctx.conversation.send(message);
+    await ctx.sendText(message);
     return;
   }
 
@@ -418,7 +416,7 @@ export function initializeAppFromConfig(
       // Check if we're already at the main menu
       if (lastShownMenu?.menuId === "main-menu") {
         // If already at main menu, just send a message instead of showing menu again
-        await ctx.conversation.send("You're already at the main menu! 🏠");
+        await ctx.sendText("You're already at the main menu! 🏠");
         return;
       }
       await showMenu(ctx, config, "main-menu");
@@ -433,7 +431,7 @@ export function initializeAppFromConfig(
     // Check if we're already at the main menu
     if (lastShownMenu?.menuId === "main-menu") {
       // If already at main menu, just send a message instead of showing menu again
-      await ctx.conversation.send("You're already at the main menu! 🏠");
+      await ctx.sendText("You're already at the main menu! 🏠");
       return;
     }
     await showMenu(ctx, config, "main-menu");
