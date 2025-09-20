@@ -338,11 +338,11 @@ initializeAppFromConfig(appConfig);
 agent.on("text", async (ctx) => {
   const message = ctx.message;
   const content = message.content;
-
-  if (
-    (ctx.isDm() && content.trim().startsWith("/kc")) ||
-    (ctx.isGroup() && content.trim().startsWith("@kc"))
-  ) {
+  const isTagged =
+    content.trim().startsWith("@kc") ||
+    content.trim().startsWith("/kc") ||
+    content.trim().startsWith("@key-check.eth");
+  if (isTagged) {
     console.log(`Showing main menu for: ${content}`);
     await showMenu(ctx, appConfig, "main-menu");
     return;
@@ -399,6 +399,9 @@ agent.on("text", async (ctx) => {
     }
     return;
   }
+
+  if (ctx.isDm() && !isTagged)
+    await ctx.sendText("Please send /kc to see the main menu");
 });
 
 // 4. Log when we're ready
