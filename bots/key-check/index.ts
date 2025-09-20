@@ -53,7 +53,7 @@ const appConfig: AppConfig = {
     "main-menu": {
       id: "main-menu",
       title:
-        "🔧 Key-Check Bot\n\n* if appears greyed out, please go back to the conversation list and open the conversation again",
+        "🔧 Hey, this is the Key-Check Bot 🔑\n\n* if appears greyed out, please go back to the conversation list and open the conversation again",
 
       actions: [
         { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
