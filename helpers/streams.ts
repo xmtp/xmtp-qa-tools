@@ -303,7 +303,12 @@ export async function verifyMembershipStream(
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       for (const member of membersToAdd) {
-        await group.addMembers([member]);
+        try {
+          await group.addMembers([member]);
+        } catch (error) {
+          console.error("Error adding member to group", error);
+          console.error("member", member);
+        }
         sent.push({ inboxId: member, sentAt });
       }
       return sent;

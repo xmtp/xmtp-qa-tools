@@ -171,10 +171,6 @@ describe(testName, () => {
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
-      console.log(
-        "extraMember",
-        checkKeyPackageStatusesByInboxId(creator!.client, extraMember.inboxId),
-      );
       const verifyResult = await verifyMembershipStream(
         newGroup,
         workers.getAllButCreator(),
