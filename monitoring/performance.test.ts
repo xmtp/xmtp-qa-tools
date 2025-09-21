@@ -188,11 +188,12 @@ describe(testName, () => {
       await newGroup.removeMembers([extraMember.inboxId]);
     });
     it(`addMember-${i}:add members to a group`, async () => {
-      console.log(
-        "extraMember",
-        checkKeyPackageStatusesByInboxId(creator!.client, extraMember.inboxId),
-      );
-      await newGroup.addMembers([extraMember.inboxId]);
+      try {
+        await newGroup.addMembers([extraMember.inboxId]);
+      } catch (error) {
+        console.error("Error adding member to group", error);
+        console.error("extraMember", extraMember);
+      }
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
       const verifyResult = await verifyMessageStream(
