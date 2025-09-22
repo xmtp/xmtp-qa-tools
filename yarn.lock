@@ -1361,18 +1361,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk@npm:^0.0.14":
-  version: 0.0.14
-  resolution: "@xmtp/agent-sdk@npm:0.0.14"
+"@xmtp/agent-sdk@npm:^0.0.15":
+  version: 0.0.15
+  resolution: "@xmtp/agent-sdk@npm:0.0.15"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.1.1"
+    "@xmtp/node-sdk": "npm:^4.1.2"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/adf9a2e338bf118e58a61ac58193046dd892c53bf313a84bf431f6ecc3069048de3988ce58b0df798f98d8f765ac81e2e03ddeb152e4621cd630a2d0dbf37ca9
+  checksum: 10/52b41adca86540f56eb72c741f62b3a8aee15ad86da05043db676d133e621db55bf2b8610d24e15bdc01bf65c4dd00668c4429613c0a4c8a6ea780123c547142
   languageName: node
   linkType: hard
 
@@ -1566,15 +1566,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "@xmtp/node-sdk@npm:4.1.1"
+"@xmtp/node-sdk@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "@xmtp/node-sdk@npm:4.1.2"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.2"
     "@xmtp/content-type-primitives": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.4.0"
-  checksum: 10/115242fa6284a1466c9c32aad33a48f40162300d5d6f7aa0d4b65fb7fa3da20c2db5c0b87bd6a483e5a473d80a2a0969ee700436b2783883ca5e38c2a2efced1
+  checksum: 10/31c17878f1dfaf3999cb46ab419a2d005460cff0e85e70c878a03cfd8a1165cf420e08f5e356cdd6620f02a9d4795bb88da773efcb9bf6926fbd0ffc648ae09c
   languageName: node
   linkType: hard
 
@@ -4652,7 +4652,7 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@xmtp/agent-sdk": "npm:^0.0.14"
+    "@xmtp/agent-sdk": "npm:^0.0.15"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
