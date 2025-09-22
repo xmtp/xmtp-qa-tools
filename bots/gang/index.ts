@@ -1,5 +1,6 @@
 import { getDbPath } from "@helpers/client";
-import { Agent, getTestUrl, type Group } from "@xmtp/agent-sdk";
+import { Agent, type Group } from "@xmtp/agent-sdk";
+import { getTestUrl } from "@xmtp/agent-sdk/debug";
 
 const isAdmin = [
   "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
@@ -102,7 +103,7 @@ agent.on("text", async (ctx) => {
 agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
-  console.log(`🔗${getTestUrl(agent)}`);
+  console.log(`🔗${getTestUrl(agent.client)}`);
 });
 
 await agent.start();
