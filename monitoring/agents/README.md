@@ -2,18 +2,19 @@
 
 ## Automated workflows
 
-| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency | Networks           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)      | Every 30 min  | `dev` `production` |
-| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 4 hours | `dev` `production` |
+| Test suite | Status                                                                                                                                                                   | Resources                                                                                                                                                          | Run frequency | Networks           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ------------------ |
+| Agents     | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)    | Every 30 min  | `dev` `production` |
+| AgentText  | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 4 hours | `dev` `production` |
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
 ### Core tests:
 
-- `agents-dms: direct message responsiveness validation`
-- `agents-tagged: tagged message and slash command response verification`
-- `agents-untagged: negative testing ensuring proper message filtering`
+- `agents-dms: dm first reaction`
+- `agents-text: first meaningful response`
+- `agents-tagged: group chat message and slash command response`
+- `agents-untagged: negative testing ensuring proper filtering`
 
 **Measurements**:
 
@@ -31,13 +32,17 @@ Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents
 2. Send agent's configured `sendMessage`
 3. agent responds within timeout period
 
-### Live agents:
+## 1. First reaction response
 
-- **tbachat**: `/help` command testing
-- **elsa**: "hi" message testing
-- **key-check**: "/kc help" command testing
+Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
 
-## 2. Tagged message testing
+### Test flow:
+
+1. Create DM conversation with agent using Ethereum address
+2. Send agent's configured `sendMessage`
+3. agent responds within timeout period
+
+## 2. Meaningful response testing
 
 Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
 
@@ -54,7 +59,7 @@ Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/age
 - Only tests agents where `respondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
-## 3. Untagged message testing
+## 3. Negative testing
 
 Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/agents/agents-untagged.test.ts)
 
