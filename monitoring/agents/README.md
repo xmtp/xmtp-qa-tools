@@ -48,11 +48,9 @@ Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/age
 
 ### Test flow:
 
-1. Create group conversation with agent and random participant
-2. Send tagged message or slash command:
-   - Slash commands: sent as-is (e.g., `/help`)
-   - Regular messages: prefixed with agent tag (e.g., `@agent.base.eth message`)
-3. agent responds within timeout
+1. Create DM conversation with agent using Ethereum address
+2. Send agent's configured `sendMessage`
+3. agent responds within timeout period
 
 ### Agent filtering:
 
@@ -88,7 +86,7 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 ```json
 {
   "name": "gm",
-  "baseName": "gm.base.eth",
+  "baseName": "gm.xmtp.eth",
   "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
   "sendMessage": "hola",
   "live": false,
