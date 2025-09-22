@@ -149,16 +149,3 @@ Storage utilization comparison between sender and receiver across varying inbox 
 | 5000       | 5000          | 265       |
 | 10000      | 10000         | 282       |
 | 20000      | 20000         | 300       |
-
-## Service level objectives (SLOs)
-
-Weekly SLO performance tracking for critical XMTP SDK metrics.
-
-| SLO Name                       | Target | AUG-11   | AUG-18   | AUG-25   | WTD      |
-| ------------------------------ | ------ | -------- | -------- | -------- | -------- |
-| Network uptime                 | 99%    | 100.000% | 100.000% | 100.000% | 100.000% |
-| Agent response under 3 seconds | 99%    | 81.042%  | 75.384%  | 85.062%  | 80.320%  |
-| Messages ordered               | 99%    | 100.000% | 100.000% | 100.000% | 100.000% |
-| Messages delivered             | 99%    | 100.000% | 100.000% | 99.950%  | 100.000% |
-| New group under 1.5 seconds    | 99%    | 99.851%  | 99.950%  | 99.900%  | 99.771%  |
-| Response times under 1 second  | 99%    | 100.000% | 100.000% | 100.000% | 100.000% |
