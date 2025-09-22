@@ -1,4 +1,4 @@
-name: Agents
+name: Agents groups
 description: "performance of the library in the production network"
 
 on:

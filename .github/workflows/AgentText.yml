@@ -1,5 +1,5 @@
-name: Agent text health
-description: "health of the agents"
+name: Agent text
+description: "First meaningful response of the agents"
 
 on:
   #pull_request:

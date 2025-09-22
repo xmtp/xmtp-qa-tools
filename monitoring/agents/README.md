@@ -1,19 +1,19 @@
 # Agents monitoring
 
-## Automated workflows
-
-| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency | Networks           |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------ |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)      | Every 30 min  | `dev` `production` |
-| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 4 hours | `dev` `production` |
+| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency    | Networks           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------ |
+| AgentGroups | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)      | Every 30 min     | `dev` `production` |
+| AgentText   | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml)     | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)   | Every 4 hours    | `dev` `production` |
+| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 10 minutes | `dev` `production` |
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
 ### Core tests:
 
-- `agents-dms: direct message responsiveness validation`
-- `agents-tagged: tagged message and slash command response verification`
-- `agents-untagged: negative testing ensuring proper message filtering`
+- `agents-dms: dm first reaction`
+- `agents-text: first meaningful response`
+- `agents-tagged: group chat message and slash command response`
+- `agents-untagged: negative testing ensuring proper filtering`
 
 **Measurements**:
 
@@ -21,7 +21,7 @@
 - Success/failure rate per agent
 - Behavioral compliance (respond/don't respond as configured)
 
-## 1. Direct message testing
+## 1. First reaction response
 
 Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
 
@@ -31,30 +31,22 @@ Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents
 2. Send agent's configured `sendMessage`
 3. agent responds within timeout period
 
-### Live agents:
-
-- **tbachat**: `/help` command testing
-- **elsa**: "hi" message testing
-- **key-check**: "/kc help" command testing
-
-## 2. Tagged message testing
+## 2. Meaningful response testing
 
 Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
 
 ### Test flow:
 
-1. Create group conversation with agent and random participant
-2. Send tagged message or slash command:
-   - Slash commands: sent as-is (e.g., `/help`)
-   - Regular messages: prefixed with agent tag (e.g., `@agent.base.eth message`)
-3. agent responds within timeout
+1. Create DM conversation with agent using Ethereum address
+2. Send agent's configured `sendMessage`
+3. agent responds within timeout period
 
 ### Agent filtering:
 
 - Only tests agents where `respondOnTagged: true`
 - Filters by network environment (`dev` or `production`)
 
-## 3. Untagged message testing
+## 3. Negative testing
 
 Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/agents/agents-untagged.test.ts)
 
@@ -66,6 +58,19 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 4. agent does NOT respond
 
 **Expected behavior**: Agents should NOT respond to generic "hi" messages to prevent spam.
+
+## 4. Group chat testing
+
+Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
+
+### Test flow:
+
+1. Create group conversation with agent and random participant
+2. Send agent's configured `sendMessage`
+3. agent responds within timeout period
+4. agent responds within timeout period
+
+**Expected behavior**: Agents should respond to group chat messages.
 
 ## Agent configuration
 
@@ -83,7 +88,7 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 ```json
 {
   "name": "gm",
-  "baseName": "gm.base.eth",
+  "baseName": "gm.xmtp.eth",
   "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
   "sendMessage": "hola",
   "live": false,
