@@ -8,12 +8,12 @@
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
-### Core tests:
+## Core tests:
 
-- `agents-dms: dm first reaction`
-- `agents-text: first meaningful response`
-- `agents-tagged: group chat message and slash command response`
-- `agents-untagged: negative testing ensuring proper filtering`
+- 1. `agents-dms: dm first reaction`
+- 2. `agents-text: first meaningful response`
+- 3. `agents-tagged: group chat message and slash command response`
+- 4. `agents-untagged: negative testing ensuring proper filtering`
 
 **Measurements**:
 
@@ -33,7 +33,7 @@ Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents
 
 ## 2. Meaningful response testing
 
-Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
+Link to test code [../monitoring/agents/agents-text.test.ts](../monitoring/agents/agents-tagged.test.ts)
 
 ### Test flow:
 
