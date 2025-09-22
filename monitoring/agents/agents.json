@@ -80,6 +80,29 @@
     "respondOnTagged": false
   },
   {
+    "name": "freysa",
+    "baseName": "freysa.base.eth",
+    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"],
+    "networks": [],
+    "live": false,
+    "slackChannel": "#freysa-alerts",
+    "respondOnTagged": false
+  },
+  {
+    "name": "neurobro",
+    "baseName": "neurobro.base.eth",
+    "address": "0x9D2B24b027F4732BB87cD6531E16ce4Dc571c30c",
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"],
+    "networks": [],
+    "live": false,
+    "slackChannel": "#neurobro-alerts",
+    "respondOnTagged": false
+  },
+
+  {
     "name": "gang",
     "baseName": "gang.base.eth",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
