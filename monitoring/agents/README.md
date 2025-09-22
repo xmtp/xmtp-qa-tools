@@ -21,16 +21,6 @@
 - Success/failure rate per agent
 - Behavioral compliance (respond/don't respond as configured)
 
-## 1. Direct message testing
-
-Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
-
-### Test flow:
-
-1. Create DM conversation with agent using Ethereum address
-2. Send agent's configured `sendMessage`
-3. agent responds within timeout period
-
 ## 1. First reaction response
 
 Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
