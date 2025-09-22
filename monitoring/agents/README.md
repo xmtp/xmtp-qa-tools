@@ -70,6 +70,19 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 
 **Expected behavior**: Agents should NOT respond to generic "hi" messages to prevent spam.
 
+## 4. Group chat testing
+
+Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
+
+### Test flow:
+
+1. Create group conversation with agent and random participant
+2. Send agent's configured `sendMessage`
+3. agent responds within timeout period
+4. agent responds within timeout period
+
+**Expected behavior**: Agents should respond to group chat messages.
+
 ## Agent configuration
 
 ### Properties:
