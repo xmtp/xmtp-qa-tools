@@ -1,7 +1,5 @@
 # Agents monitoring
 
-## Automated workflows
-
 | Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency    | Networks           |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------ |
 | AgentGroups | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)      | Every 30 min     | `dev` `production` |
