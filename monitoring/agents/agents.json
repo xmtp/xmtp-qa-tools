@@ -101,7 +101,6 @@
     "slackChannel": "#neurobro-alerts",
     "respondOnTagged": false
   },
-
   {
     "name": "gang",
     "baseName": "gang.base.eth",
