@@ -4,10 +4,6 @@
 
 How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
 
-- **[nodeSDK](https://www.npmjs.com/package/@xmtp/node-sdk?activeTab=versions)**: Thin TypeScript wrappers providing developer-friendly API
-- **[Bindings](https://www.npmjs.com/package/@xmtp/node-bindings?activeTab=versions)**: Compiled Rust code and native bindings
-- **[libxmtp](https://github.com/xmtp/libxmtp)**: Core cryptographic and networking logic
-
 ### Version mapping system
 
 Versions are mapped in `workers/versions.ts`:
