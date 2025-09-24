@@ -1,4 +1,3 @@
-import { getDbPath } from "@helpers/client";
 import { Agent, type Group } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
 
@@ -22,7 +21,9 @@ const messages = {
 
 const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  dbPath: getDbPath(`${process.env.XMTP_ENV}-gang`),
+  dbPath: (inboxId) =>
+    (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
+    `/${process.env.XMTP_ENV}-gang-${inboxId.slice(0, 8)}.db3`,
   appVersion: "gang-group/0",
 });
 
@@ -102,7 +103,7 @@ agent.on("text", async (ctx) => {
 
 agent.on("start", () => {
   console.log(`Waiting for messages...`);
-  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
 });
 

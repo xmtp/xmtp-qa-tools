@@ -1361,9 +1361,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk@npm:^0.0.16":
-  version: 0.0.16
-  resolution: "@xmtp/agent-sdk@npm:0.0.16"
+"@xmtp/agent-sdk@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@xmtp/agent-sdk@npm:1.0.0"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
@@ -1372,7 +1372,7 @@ __metadata:
     "@xmtp/node-sdk": "npm:^4.1.2"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/46af0267e0f230a17c69d5b10f744125c405a88faa29dff5a47a1f70db00f2132c977c67d6a2fdd764138b847dbe915726361cdf71d3e8ba5d4ff39897ae1f3b
+  checksum: 10/534d839d1ce4b4a7cefa7a64558bd6bac7b3373c2a30ab43e0b3f00caa52265dc47ece27e23dbcb64fe217702b0709a9a30bda6504f2109fb60d582fd51342a4
   languageName: node
   linkType: hard
 
@@ -4652,7 +4652,7 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@xmtp/agent-sdk": "npm:^0.0.16"
+    "@xmtp/agent-sdk": "npm:^1.0.0"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"

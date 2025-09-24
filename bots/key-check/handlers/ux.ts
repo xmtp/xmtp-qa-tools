@@ -2,15 +2,9 @@ import { USDCHandler } from "@bots/utils/usdc";
 import { type MessageContext } from "@xmtp/agent-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
-  ContentTypeReaction,
-  type Reaction,
-} from "@xmtp/content-type-reaction";
-import {
   ContentTypeRemoteAttachment,
   type RemoteAttachment,
 } from "@xmtp/content-type-remote-attachment";
-import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
-import { ContentTypeText } from "@xmtp/content-type-text";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
 
 export class UxHandlers {
@@ -111,24 +105,10 @@ function greet(name) {
       console.log("Sent text message for basics demo", textMessage);
 
       // Step 1: Add thinking emoji reaction
-      await ctx.conversation.send(
-        {
-          action: "added",
-          content: "❤️",
-          reference: textMessage,
-          schema: "shortcode",
-        } as Reaction,
-        ContentTypeReaction,
-      );
+      await ctx.sendReaction("❤️");
 
-      await ctx.conversation.send(
-        {
-          reference: textMessage,
-          contentType: ContentTypeText,
-          content: "💬 This is a reply to the text message!",
-        } as Reply,
-        ContentTypeReply,
-      );
+      await ctx.sendTextReply("💬 This is a reply to the text message!");
+
       console.log("Sent reply to text message");
     } catch (error) {
       console.error("Error in basics demo:", error);

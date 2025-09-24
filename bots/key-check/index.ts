@@ -1,4 +1,3 @@
-import { getDbPath } from "@helpers/client";
 import { Agent, type LogLevel, type MessageContext } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
@@ -278,7 +277,9 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 const agent = await Agent.createFromEnv({
   appVersion: "key-check/0",
   loggingLevel: "warn" as LogLevel,
-  dbPath: getDbPath(`key-check`),
+  dbPath: (inboxId) =>
+    (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
+    `/${process.env.XMTP_ENV}-key-check-${inboxId.slice(0, 8)}.db3`,
   codecs: [
     new MarkdownCodec(),
     new ReactionCodec(),
@@ -410,7 +411,7 @@ agent.on("start", () => {
     "Usage: Send '/kc', 'help', or 'menu' to see interactive options",
   );
   console.log("Or directly send an Inbox ID or Ethereum address to check");
-  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
 
   // Debug: Log all registered actions

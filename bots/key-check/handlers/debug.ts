@@ -73,7 +73,7 @@ export class DebugHandlers {
     const conversations = await ctx.client.conversations.list();
 
     // Get client details
-    const address = ctx.client.accountIdentifier?.identifier as string;
+    const address = ctx.getClientAddress() as string;
     const inboxId = ctx.client.inboxId;
     const installationId = ctx.client.installationId;
     const appVersion = ctx.client.options?.appVersion;
