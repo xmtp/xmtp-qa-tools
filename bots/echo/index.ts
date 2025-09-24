@@ -10,7 +10,7 @@ let count = 0;
 
 agent.on("text", async (ctx) => {
   console.log(`Waiting for messages...`);
-  console.log(`Address: ${agent.client.accountIdentifier?.identifier}`);
+  console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
 
   count++;

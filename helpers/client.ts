@@ -1,24 +1,19 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
-import { createRequire } from "node:module";
 import path from "node:path";
 import type { Worker, WorkerManager } from "@workers/manager";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import {
-  Client,
-  getActiveVersion,
   IdentifierKind,
   regressionClient,
+  type Client,
   type Conversation,
   type Signer,
   type XmtpEnv,
 } from "version-management/client-versions";
 import { createWalletClient, http, toBytes } from "viem";
-import {
-  privateKeyToAccount,
-  generatePrivateKey as viemGeneratePrivateKey,
-} from "viem/accounts";
+import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
@@ -91,6 +86,22 @@ export const createUser = (key: string): User => {
     }),
   };
 };
+export const generateEncryptionKeyHex = () => {
+  /* Generate a random encryption key */
+  const uint8Array = getRandomValues(new Uint8Array(32));
+  /* Convert the encryption key to a hex string */
+  return toString(uint8Array, "hex");
+};
+
+/**
+ * Get the encryption key from a hex string
+ * @param hex - The hex string
+ * @returns The encryption key
+ */
+export const getEncryptionKeyFromHex = (hex: string) => {
+  /* Convert the hex string to an encryption key */
+  return fromString(hex, "hex");
+};
 
 /**
  * Creates a signer object with a wallet and account
@@ -116,131 +127,6 @@ export const createSigner = (key: string): Signer => {
   };
 };
 
-export const generatePrivateKey = (): `0x${string}` => {
-  return viemGeneratePrivateKey();
-};
-/**
- * Generate a random encryption key
- * @returns The encryption key
- */
-export const generateEncryptionKeyHex = () => {
-  /* Generate a random encryption key */
-  const uint8Array = getRandomValues(new Uint8Array(32));
-  /* Convert the encryption key to a hex string */
-  return toString(uint8Array, "hex");
-};
-
-/**
- * Get the encryption key from a hex string
- * @param hex - The hex string
- * @returns The encryption key
- */
-export const getEncryptionKeyFromHex = (hex: string) => {
-  /* Convert the hex string to an encryption key */
-  return fromString(hex, "hex");
-};
-
-export const logAgentDetails = async (
-  clients: Client | Client[],
-): Promise<void> => {
-  const clientArray = Array.isArray(clients) ? clients : [clients];
-  const clientsByAddress = clientArray.reduce<Record<string, Client[]>>(
-    (acc, client) => {
-      const address = client.accountIdentifier?.identifier as string;
-      acc[address] = acc[address] ?? [];
-      acc[address].push(client);
-      return acc;
-    },
-    {},
-  );
-  // Get XMTP SDK version from package.json
-  const require = createRequire(import.meta.url);
-  const packageJson = require("../package.json") as {
-    dependencies: Record<string, string>;
-  };
-  const xmtpSdkVersion =
-    packageJson.dependencies[
-      "@xmtp/node-sdk-" + getActiveVersion().nodeBindings
-    ];
-  const bindingVersion = (
-    require(
-      "../node_modules/@xmtp/node-bindings-" +
-        getActiveVersion().nodeBindings +
-        "/package.json",
-    ) as {
-      version: string;
-    }
-  ).version;
-
-  for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
-    const firstClient = clientGroup[0];
-    const inboxId = firstClient.inboxId;
-    const installationId = firstClient.installationId;
-    const environments = clientGroup
-      .map((c: Client) => c.options?.env ?? "dev")
-      .join(", ");
-    console.log(`\x1b[38;2;252;76;52m
-        ██╗  ██╗███╗   ███╗████████╗██████╗ 
-        ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
-         ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
-         ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
-        ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
-        ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
-      \x1b[0m`);
-
-    const urls = [`http://xmtp.chat/dm/${address}`];
-
-    const conversations = await firstClient.conversations.list();
-    const inboxState = await firstClient.preferences.inboxState();
-    const keyPackageStatuses =
-      await firstClient.getKeyPackageStatusesForInstallationIds([
-        installationId,
-      ]);
-
-    let createdDate = new Date();
-    let expiryDate = new Date();
-
-    // Extract key package status for the specific installation
-    const keyPackageStatus = keyPackageStatuses[installationId];
-    if (keyPackageStatus.lifetime) {
-      createdDate = new Date(
-        Number(keyPackageStatus.lifetime.notBefore) * 1000,
-      );
-      expiryDate = new Date(Number(keyPackageStatus.lifetime.notAfter) * 1000);
-    }
-    console.log(`
-    ✓ XMTP Client:
-    • InboxId: ${inboxId}
-    • SDK: ${xmtpSdkVersion}
-    • Bindings: ${bindingVersion}
-    • Version: ${Client.version}
-    • Address: ${address}
-    • appVersion: ${firstClient.options?.appVersion}
-    • Conversations: ${conversations.length}
-    • Installations: ${inboxState.installations.length}
-    • InstallationId: ${installationId}
-    • Key Package created: ${createdDate.toLocaleString()}
-    • Key Package valid until: ${expiryDate.toLocaleString()}
-    • Networks: ${environments}
-    ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
-  }
-};
-
-export const getDbPath = (description: string = "xmtp") => {
-  //Checks if the environment is a Railway deployment
-  let volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  // Create database directory if it doesn't exist
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  if (process.env.XMTP_ENV) {
-    volumePath = `${volumePath}/${process.env.XMTP_ENV}-${description}.db3`;
-  } else {
-    volumePath = `${volumePath}/${description}.db3`;
-  }
-
-  return volumePath;
-};
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
@@ -254,7 +140,7 @@ export async function createClient(
   dbPath: string;
   address: `0x${string}`;
 }> {
-  const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
+  const encryptionKey = fromString(encryptionKeyHex, "hex");
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
