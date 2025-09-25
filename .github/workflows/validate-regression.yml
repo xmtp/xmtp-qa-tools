@@ -44,8 +44,8 @@ jobs:
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
 
