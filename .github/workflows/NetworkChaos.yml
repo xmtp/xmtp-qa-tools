@@ -41,8 +41,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".node-version"
-          # Disable built-in cache to use shared cache below
+          node-version: "20"
 
       - name: Enable Corepack
         run: corepack enable
