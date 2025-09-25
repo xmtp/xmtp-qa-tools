@@ -56,21 +56,13 @@ ENVIRONMENTS:
   production  Production XMTP network
 
 TEST SUITES:
-  functional     Complete functional test suite
-  convos         Direct message tests
-  groups         Group conversation tests
   performance    Core performance metrics and large groups  
   delivery       Message delivery reliability
-  bench          Benchmarking suite
   browser        Playwright browser automation
   agents         Live bot monitoring
   networkchaos   Network partition tolerance
-  other          Security, spam detection, rate limiting
-  forks          Git commit-based testing
 
 EXAMPLES:
-  yarn test functional --env dev --log warn --file
-  yarn test convos --no-fail --parallel
   yarn test performance --versions 3
   yarn test --help
 

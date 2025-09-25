@@ -1,5 +1,5 @@
 name: Wildcard
-description: "Manual PR verification workflow - supports functional and performance tests"
+description: "Manual PR verification workflow"
 
 on:
   #pull_request:
@@ -16,7 +16,6 @@ jobs:
       matrix:
         env: [production]
         test: [browser] # performance test with more large groups
-        # test: [functional] # full functional test
         # test: [performance] # performance test with more large groups
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}

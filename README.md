@@ -142,18 +142,13 @@ LOG_LEVEL="info" # JS logs level
 To get started set up the environment in [variables](./.env.example) and run the tests with:
 
 ```bash
-# Simple dms test
-yarn test convos
-# Full functional test
-yarn test functional
-# Performance test example
-yarn test performance
+yarn test performance --env dev
 ```
 
 #### Debug mode
 
 ```bash
-yarn test functional --no-fail --log warn --file
+yarn test performance --no-fail --log warn --file
 ```
 
 > This will save logs to `logs/` directory and will not print to the terminal.

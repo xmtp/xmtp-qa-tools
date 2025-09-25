@@ -73,7 +73,7 @@ yarn versions
 ### Testing specific versions (automated)
 
 ```bash
-yarn test functional --versions 3  # Test latest 3 auto-enabled versions
-yarn test functional --nodeSDK 3.2.2 # custom version
+yarn test performance --versions 3  # Test latest 3 auto-enabled versions
+yarn test performance --nodeSDK 3.2.2 # custom version
 yarn regression  # Vibe check on latest version
 ```
