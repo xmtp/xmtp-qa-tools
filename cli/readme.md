@@ -25,15 +25,11 @@ yarn test <suite> [options]
 
 **Test Suites:**
 
-- `functional` - Complete functional tests
-- `convos` - Direct message tests
-- `groups` - Group conversation tests
 - `performance` - Performance metrics
 - `delivery` - Message delivery reliability
 - `browser` - Playwright automation
 - `agents` - Bot monitoring
 - `networkchaos` - Network partition tests
-- `other` - Security, spam, rate limiting
 
 **Options:**
 
@@ -211,7 +207,7 @@ yarn test convos --env dev
 yarn send --target 0x1234... --env production --users 500 --wait
 
 # Multi-version compatibility testing
-yarn test functional --versions 3 --log warn --file
+yarn test performance --versions 3 --log warn --file
 
 # Generate test data for multiple environments
 yarn gen --count 500 --env local,dev --installations 3

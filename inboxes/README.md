@@ -80,5 +80,5 @@ rm -rf .data/ logs/
 yarn local-update
 
 # Run tests to verify
-yarn test functional --env local
+yarn test performance --env local
 ```
