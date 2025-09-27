@@ -73,3 +73,7 @@ runs:
     - name: Install dependencies
       run: yarn
       shell: bash
+
+    - name: Install dependencies
+      run: yarn lint
+      shell: bash
