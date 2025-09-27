@@ -27,6 +27,9 @@ import { GroupHandlers } from "./handlers/groups";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
+// Load .env file only in local development
+if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
+
 // Initialize handler instances
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
