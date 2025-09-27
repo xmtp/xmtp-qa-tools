@@ -20,8 +20,8 @@
     "baseName": "flaunchy",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "hi",
-    "live": true,
-    "networks": ["production"]
+    "networks": ["production"],
+    "live": true
   },
   {
     "name": "mamo",
@@ -65,20 +65,18 @@
   },
   {
     "name": "freysa",
-    "baseName": "freysa.base.eth",
-    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
-    "networks": [],
+    "baseName": "freysa-ai.base.eth",
+    "address": "0xEb7DB3ED8609165Ec5d99966CfDdeaE587070cD8",
+    "sendMessage": "hi",
+    "networks": ["production"],
     "live": true
   },
   {
     "name": "neurobro",
     "baseName": "neurobro.base.eth",
     "address": "0x9D2B24b027F4732BB87cD6531E16ce4Dc571c30c",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
-    "networks": [],
+    "sendMessage": "hi",
+    "networks": ["production"],
     "live": true
   },
   {
@@ -86,55 +84,46 @@
     "baseName": "bracky.base.eth",
     "address": "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     "sendMessage": "hi",
-    "live": true,
-    "networks": []
+    "networks": [],
+    "live": false
   },
   {
     "name": "gm",
     "baseName": "gm.base.eth",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
-    "sendMessage": "hola",
-    "live": false,
-    "networks": ["dev", "production"]
-  },
-  {
-    "name": "local",
-    "baseName": "local.base.eth",
-    "address": "0xb6469a25ba51c59303eb24c04dad0e0ee1127d5b",
-    "sendMessage": "hola",
-    "live": false,
-    "networks": ["local"]
+    "sendMessage": "hi",
+    "live": false
   },
   {
     "name": "bankr",
     "baseName": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "sendMessage": "hey there how are you?",
-    "live": true,
-    "networks": ["production"]
+    "networks": ["production"],
+    "live": true
   },
   {
     "name": "key-check",
     "baseName": "key-check.base.eth",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "sendMessage": "/kc help",
-    "live": false,
-    "networks": ["dev", "production"]
+    "networks": ["dev", "production"],
+    "live": false
   },
   {
     "name": "bitte",
     "baseName": "bitte.base.eth",
     "address": "0xb177e33734e982828eBb5993627ebcD7C8A9106a",
     "sendMessage": "hi",
-    "live": true,
-    "networks": ["production"]
+    "networks": ["production"],
+    "live": false
   },
   {
     "name": "tokenbot",
     "baseName": "0x9e73…3466",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
-    "live": true,
-    "networks": ["production"]
+    "networks": [],
+    "live": false
   }
 ]

@@ -27,6 +27,7 @@ import { GroupHandlers } from "./handlers/groups";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
+process.loadEnvFile(".env");
 // Initialize handler instances
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
@@ -276,7 +277,6 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 // 2. Spin up the agent with UX demo codecs and inline actions
 const agent = await Agent.createFromEnv({
   appVersion: "key-check/0",
-  loggingLevel: "warn" as LogLevel,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-key-check-${inboxId.slice(0, 8)}.db3`,
@@ -334,6 +334,7 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
+  console.debug(message, await ctx.getSenderAddress());
   const content = message.content;
   const isTagged =
     content.trim().startsWith("@kc") ||
