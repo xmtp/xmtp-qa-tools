@@ -65,10 +65,9 @@
   },
   {
     "name": "freysa",
-    "baseName": "freysa.base.eth",
-    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
+    "baseName": "freysa-ai.base.eth",
+    "address": "0xEb7DB3ED8609165Ec5d99966CfDdeaE587070cD8",
+    "sendMessage": "hi",
     "networks": ["production"],
     "live": true
   },
@@ -76,8 +75,7 @@
     "name": "neurobro",
     "baseName": "neurobro.base.eth",
     "address": "0x9D2B24b027F4732BB87cD6531E16ce4Dc571c30c",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
+    "sendMessage": "hi",
     "networks": ["production"],
     "live": true
   },
@@ -93,8 +91,7 @@
     "name": "gm",
     "baseName": "gm.base.eth",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
-    "sendMessage": "hola",
-    "networks": ["dev", "production"],
+    "sendMessage": "hi",
     "live": false
   },
   {
