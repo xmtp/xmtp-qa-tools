@@ -97,4 +97,4 @@ Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/age
 }
 ```
 
-See agents [configuration](agents.json)
+See agents [configuration](agents.ts)
