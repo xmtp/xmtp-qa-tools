@@ -93,7 +93,6 @@ Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/age
   "sendMessage": "hola",
   "live": false,
   "networks": ["dev", "production"],
-  "slackChannel": "#gm-alerts",
   "respondOnTagged": false
 }
 ```
