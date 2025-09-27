@@ -1,4 +1,4 @@
-import { Agent, type LogLevel, type MessageContext } from "@xmtp/agent-sdk";
+import { Agent, type MessageContext } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
@@ -27,7 +27,6 @@ import { GroupHandlers } from "./handlers/groups";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
-process.loadEnvFile(".env");
 // Initialize handler instances
 const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
