@@ -16,10 +16,6 @@ export interface AgentConfig {
   expectedMessage?: string[];
   /** Networks the agent supports */
   networks: string[];
-  /** Whether the agent is disabled */
-  disabled?: boolean;
-  /** Slack channel for notifications */
-  slackChannel?: string;
   /**  the agent is production */
   live: boolean;
 }

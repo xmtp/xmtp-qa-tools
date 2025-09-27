@@ -10,7 +10,7 @@ import {
   type XmtpEnv,
 } from "version-management/client-versions";
 import { describe, expect, it } from "vitest";
-import productionAgents from "./agents.json";
+import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";
 
 const testName = "agents-tagged";
@@ -76,8 +76,6 @@ describe(testName, async () => {
         metric_type: "agent",
         metric_subtype: "dm",
         live: agent.live ? "true" : "false",
-
-        slackChannel: agent.slackChannel,
         agent: agent.name,
         address: agent.address,
         sdk: workers.getCreator().sdk,
