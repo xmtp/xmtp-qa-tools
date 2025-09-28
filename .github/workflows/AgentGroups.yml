@@ -27,18 +27,18 @@ jobs:
         uses: ./.github/actions/xmtp-test-setup
 
       - name: Run ${{ matrix.test }} ${{ matrix.env }}
-        run: yarn test agents-tagged  --env ${{ matrix.env }} --no-fail --log off
+        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }} --no-fail --log off
 
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
         with:
-          test-name: agents-tagged
+          test-name: ${{ matrix.test }}
           env: ${{ matrix.env }}
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         uses: ./.github/actions/slack-notification
         with:
-          workflow-name: "Agents (tagged, ${{ matrix.env }})"
+          workflow-name: "Agents (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
