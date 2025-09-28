@@ -2,18 +2,20 @@ name: Agents groups
 description: "performance of the library in the production network"
 
 on:
+  pull_request:
   schedule:
     - cron: "0 */4 * * *" # Runs every 4 hours
   workflow_dispatch:
 
 jobs:
-  agents-tagged:
+  agents-groups:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        env: [dev, production]
+        test: [agents-tagged, agents-untagged]
+        env: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
@@ -24,8 +26,8 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
-      - name: Run agents-tagged ${{ matrix.env }}
-        run: yarn test agents-tagged --no-fail --log warn --file --no-datadog --env ${{ matrix.env }}
+      - name: Run ${{ matrix.test }} ${{ matrix.env }}
+        run: yarn test agents-tagged  --env ${{ matrix.env }} --no-fail --log off
 
       - name: Cleanup and upload artifacts
         if: always()
@@ -39,38 +41,4 @@ jobs:
         uses: ./.github/actions/slack-notification
         with:
           workflow-name: "Agents (tagged, ${{ matrix.env }})"
-          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
-
-  agents-untagged:
-    timeout-minutes: 10
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        env: [dev, production]
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      REGION: ${{ vars.REGION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup test env
-        uses: ./.github/actions/xmtp-test-setup
-
-      - name: Run agents-untagged tests
-        run: yarn test agents-untagged --no-fail --log warn --file --env ${{ matrix.env }}
-
-      - name: Cleanup and upload artifacts
-        if: always()
-        uses: ./.github/actions/xmtp-test-cleanup
-        with:
-          test-name: agents-untagged
-          env: ${{ matrix.env }}
-
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        uses: ./.github/actions/slack-notification
-        with:
-          workflow-name: "Agents (untagged, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
