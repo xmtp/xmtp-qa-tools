@@ -66,10 +66,6 @@ describe(testName, async () => {
       const responseTime = Math.abs(
         result?.averageEventTiming ?? streamTimeout,
       );
-      console.log("result.averageEventTiming", result?.averageEventTiming);
-      console.log("streamTimeout", streamTimeout);
-      console.log("responseTime", responseTime);
-
       // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
       sendMetric("response", responseTime, {
         test: testName,

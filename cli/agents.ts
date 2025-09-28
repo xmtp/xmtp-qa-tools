@@ -1,6 +1,5 @@
 import { type AgentConfig } from "../monitoring/agents/helper";
 
-// dont delete this file
 const agents: AgentConfig[] = [
   {
     name: "elsa",
@@ -9,7 +8,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "ponder",
@@ -18,7 +16,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "flaunchy",
@@ -27,7 +24,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "mamo",
@@ -36,7 +32,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "squabble",
@@ -45,7 +40,6 @@ const agents: AgentConfig[] = [
     sendMessage: "@squabble.base.eth",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "arma",
@@ -54,7 +48,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "onit",
@@ -63,7 +56,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hey",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "byte",
@@ -72,7 +64,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "freysa",
@@ -81,7 +72,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "neurobro",
@@ -90,7 +80,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "bracky",
@@ -99,7 +88,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: [],
     live: false,
-    respondOnTagged: false,
   },
   {
     name: "gm",
@@ -108,7 +96,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["dev", "production"],
     live: false,
-    respondOnTagged: false,
   },
   {
     name: "bankr",
@@ -117,7 +104,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hey there how are you?",
     networks: ["production"],
     live: true,
-    respondOnTagged: false,
   },
   {
     name: "key-check",
@@ -126,7 +112,6 @@ const agents: AgentConfig[] = [
     sendMessage: "/kc help",
     networks: ["dev", "production"],
     live: false,
-    respondOnTagged: false,
   },
   {
     name: "bitte",
@@ -135,7 +120,6 @@ const agents: AgentConfig[] = [
     sendMessage: "hi",
     networks: ["production"],
     live: false,
-    respondOnTagged: false,
   },
   {
     name: "tokenbot",
@@ -144,7 +128,6 @@ const agents: AgentConfig[] = [
     sendMessage: "@tokenbot",
     networks: [],
     live: false,
-    respondOnTagged: false,
   },
 ];
 
