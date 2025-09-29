@@ -1,8 +1,6 @@
 # SDK version management
 
-### Overview
-
-## Upgrade procedure
+### Upgrade procedure
 
 When upgrading XMTP node-sdk versions, update these 3 files:
 
@@ -11,7 +9,7 @@ When upgrading XMTP node-sdk versions, update these 3 files:
 3. Run `yarn versions` to link the new versions.
 4. Run `yarn regression` to check regression of latest 3 versions.
 
-## Version mapping system
+### Version mapping system
 
 Versions are mapped in `workers/versions.ts`:
 
