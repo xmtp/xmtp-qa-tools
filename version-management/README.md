@@ -2,7 +2,7 @@
 
 ### Upgrade procedure
 
-When upgrading XMTP node-sdk versions, update these 3 files:
+When upgrading XMTP bindings and/or node-sdk versions:
 
 1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
 2. Add import for new SDK version to `workers/versions.ts`.
