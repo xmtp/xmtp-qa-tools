@@ -2,9 +2,16 @@
 
 ### Overview
 
-How XMTP SDK versions relate to the underlying `libxmtp` Rust library and how to test with custom versions.
+## Upgrade procedure
 
-### Version mapping system
+When upgrading XMTP node-sdk versions, update these 3 files:
+
+1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
+2. Add import for new SDK version to `workers/versions.ts`.
+3. Run `yarn versions` to link the new versions.
+4. Run `yarn regression` to check regression of latest 3 versions.
+
+## Version mapping system
 
 Versions are mapped in `workers/versions.ts`:
 
@@ -47,30 +54,6 @@ node_modules/@xmtp/
 └── node-bindings-1.3.3/
 ```
 
-### Release process
-
-1. Developer creates libxmtp branch
-2. Node bindings CI compiles new libxmtp into `@xmtp/node-bindings`
-3. New bindings package published to npm
-4. QA tools updated with new bindings version
-5. Tests run against new version
-
-### Switch between versions (manual testing)
-
-If your libxmtp version is already compiled:
-
-1. Find the bindings version containing your libxmtp commit
-2. Update mapping in `workers/versions.ts`
-3. Point any SDK to that bindings version
-
-```bash
-{
-  "nodeSDK": "3.2.2",
-  "nodeBindings": "1.3.1", // Use existing bindings
-  "auto": false // Manual testing only
-}
-```
-
 ### Finding libxmtp version
 
 The libxmtp commit hash is in:
@@ -93,12 +76,3 @@ yarn test performance --versions 3  # Test latest 3 auto-enabled versions
 yarn test performance --nodeSDK 3.2.2 # custom version
 yarn regression  # Vibe check on latest version
 ```
-
-## Upgrade procedure
-
-When upgrading XMTP node-sdk versions, update these 3 files:
-
-1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
-2. Add import for new SDK version to `workers/versions.ts`.
-3. Add VersionList entry (`auto: false` for latest) to `workers/versions.ts`.
-4. Run `yarn regression`.
