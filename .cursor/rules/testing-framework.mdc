@@ -428,8 +428,8 @@ Use predefined names from the 61 available:
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
+import { IdentifierKind } from "@version-management/client-versions";
 import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@workers/versions";
 ```
 
 ## Quick Snippets
@@ -495,8 +495,8 @@ const workers = await getWorkers(["alice", "bob"], {});
 
 ```typescript
 import { setupDurationTracking } from "@helpers/vitest";
+import { IdentifierKind } from "@version-management/client-versions";
 import { getWorkerNames, getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@workers/versions";
 
 // Start message streaming
 workers.getReceiver().worker.startStream(typeofStream.Message);
