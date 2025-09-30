@@ -41,6 +41,12 @@ import {
   Dm as Dm420,
   Group as Group420,
 } from "@xmtp/node-sdk-4.2.0";
+import {
+  Client as Client430,
+  Conversation as Conversation430,
+  Dm as Dm430,
+  Group as Group430,
+} from "@xmtp/node-sdk-4.3.0-dev.e66a716";
 
 export {
   Client,
