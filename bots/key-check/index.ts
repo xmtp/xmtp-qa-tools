@@ -180,6 +180,14 @@ const appConfig: AppConfig = {
           },
         },
         {
+          id: "ux-mini-app",
+          label: "📲 Mini App",
+          showNavigationOptions: true,
+          handler: async (ctx: MessageContext) => {
+            await uxHandlers.handleUxMiniApp(ctx);
+          },
+        },
+        {
           id: "ux-attachment",
           label: "🎇 Image",
           showNavigationOptions: true,
