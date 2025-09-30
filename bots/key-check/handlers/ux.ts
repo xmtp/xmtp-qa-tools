@@ -13,7 +13,15 @@ export class UxHandlers {
   constructor() {
     this.usdcHandler = new USDCHandler("base-sepolia");
   }
-
+  async handleUxMiniApp(ctx: MessageContext): Promise<void> {
+    try {
+      const miniAppContent = `https://squabble.lol/`;
+      await ctx.sendText(miniAppContent);
+    } catch (error) {
+      console.error("Error sending mini app:", error);
+      await ctx.sendText("❌ Failed to send mini app");
+    }
+  }
   async handleUxAttachment(ctx: MessageContext): Promise<void> {
     try {
       const senderAddress = await ctx.getSenderAddress();
