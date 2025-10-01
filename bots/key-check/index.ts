@@ -8,6 +8,7 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { APP_VERSION } from "version-management/client-versions";
 import {
   ActionBuilder,
   getRegisteredActions,
@@ -286,7 +287,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 
 // 2. Spin up the agent with UX demo codecs and inline actions
 const agent = await Agent.createFromEnv({
-  appVersion: "key-check/0",
+  appVersion: APP_VERSION,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-key-check-${inboxId.slice(0, 8)}.db3`,
