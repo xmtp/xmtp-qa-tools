@@ -1,12 +1,13 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
+import { APP_VERSION } from "version-management/client-versions";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
-  appVersion: "echo-agent/0",
+  appVersion: APP_VERSION,
 });
 
 let count = 0;

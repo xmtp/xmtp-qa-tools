@@ -1,5 +1,6 @@
 import { Agent, type Group, type MessageContext } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
+import { APP_VERSION } from "version-management/client-versions";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -27,7 +28,7 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-csx-${inboxId.slice(0, 8)}.db3`,
-  appVersion: "csx-group/0",
+  appVersion: APP_VERSION,
 });
 
 // Handle uncaught errors
