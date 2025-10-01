@@ -1376,18 +1376,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@xmtp/agent-sdk@npm:1.1.0"
+"@xmtp/agent-sdk@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@xmtp/agent-sdk@npm:1.1.2"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.2.0"
+    "@xmtp/node-sdk": "npm:^4.2.1"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/6a13b84653d02035c4e3598a2c66b31bdf9d992dafd12c2b26cdc91f10ea7c9e6c8a9e67e12a542588b86da194fe4301e3eb00fa7d1a0221e17419425589e4e4
+  checksum: 10/4954e536bbeab5bb8a6d47438d5064441a3ff922c7ab0e8cada48a2860bc4b43abaf931a998ff1a27359e36e24c59518b620645057d915dd0494ef60beb6ac0c
   languageName: node
   linkType: hard
 
@@ -1509,6 +1509,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/node-bindings@npm:1.5.3":
+  version: 1.5.3
+  resolution: "@xmtp/node-bindings@npm:1.5.3"
+  checksum: 10/88f6550a96161b41773c01ea2fc8c19021740c456b82a745f623ddc995c6365691193be28cf35ca8bc08f45cf08bbd1613eeedc6ae934160ae80223632cf6c7c
+  languageName: node
+  linkType: hard
+
 "@xmtp/node-sdk-3.2.2@npm:@xmtp/node-sdk@3.2.2":
   version: 3.2.2
   resolution: "@xmtp/node-sdk@npm:3.2.2"
@@ -1569,7 +1576,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.2.0@npm:@xmtp/node-sdk@4.2.0, @xmtp/node-sdk@npm:^4.2.0":
+"@xmtp/node-sdk-4.2.0@npm:@xmtp/node-sdk@4.2.0":
   version: 4.2.0
   resolution: "@xmtp/node-sdk@npm:4.2.0"
   dependencies:
@@ -1578,6 +1585,18 @@ __metadata:
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.5.2"
   checksum: 10/7167f1da5e706e51319d79e4dfed06d966ae6e49f2fe9bcf82fd9b1d558fa372ec40125c88a18044fb4162884fb7ab0cdb77d6e574f4f0f1a76a401442833b40
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk@npm:^4.2.1":
+  version: 4.2.2
+  resolution: "@xmtp/node-sdk@npm:4.2.2"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.5.3"
+  checksum: 10/548a5661aeb1e413bd265fc1d93ca40900ca9efb280c6ee06d7c0c28a427e4f27bf93e2417a7f558ea3ed66afe87154b2ee22148189c9f63ecf9ba9529e1560b
   languageName: node
   linkType: hard
 
@@ -4577,7 +4596,7 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@xmtp/agent-sdk": "npm:^1.1.0"
+    "@xmtp/agent-sdk": "npm:^1.1.2"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
