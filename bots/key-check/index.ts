@@ -345,7 +345,6 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   const message = ctx.message;
-  console.debug(message, await ctx.getSenderAddress());
   const content = message.content;
   const isTagged =
     content.trim().startsWith("@kc") ||
