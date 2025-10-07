@@ -1,9 +1,0 @@
-name: Agent stress
-description: "Stress test agents with random groups and tagging"
-
-on:
-  schedule:
-    - cron: "0 * * * *" # Runs every hour at minute 0
-  workflow_dispatch:
-
-jobs:
