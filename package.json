@@ -31,11 +31,11 @@
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "versions": "tsx agents/version-management/cli-node-versions.ts"
+    "versions": "tsx version-management/cli-node-versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
-    "@xmtp/agent-sdk": "^1.1.2",
+    "@xmtp/agent-sdk": "^1.1.5",
     "@xmtp/agent-sdk-1.0.0": "npm:@xmtp/agent-sdk@1.0.0",
     "@xmtp/agent-sdk-1.0.1": "npm:@xmtp/agent-sdk@1.0.1",
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2",

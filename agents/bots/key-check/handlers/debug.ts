@@ -3,7 +3,7 @@ import { type MessageContext } from "@xmtp/agent-sdk";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
-const packageJson = require("../../../package.json");
+const packageJson = require("../../../../package.json");
 const xmtpSdkVersion: string =
   packageJson.dependencies["@xmtp/agent-sdk"] ?? "unknown";
 

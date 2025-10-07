@@ -19,7 +19,7 @@ agents/
 └── version-management/      # Agent SDK version management
     ├── sdk-agent-versions.ts    # Agent SDK version mappings
     ├── cli-agent-versions.ts    # CLI for Agent SDK versions
-    └── README.md               # Version management docs
+    └── README.md               # Agent SDK version management docs
 ```
 
 ## Quick Start
@@ -64,3 +64,5 @@ yarn test agents-stress
 | 1.0.0     | 4.1.0    | 1.4.0         | 🟡 manual |
 
 For detailed information, see the individual README files in each subdirectory.
+
+**Note**: Node SDK version management is handled separately in the root `version-management/` directory.

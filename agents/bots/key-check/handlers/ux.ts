@@ -1,4 +1,3 @@
-import { USDCHandler } from "@bots/utils/usdc";
 import { type MessageContext } from "@xmtp/agent-sdk";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
@@ -6,6 +5,7 @@ import {
   type RemoteAttachment,
 } from "@xmtp/content-type-remote-attachment";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
+import { USDCHandler } from "../../utils/usdc";
 
 export class UxHandlers {
   private usdcHandler: USDCHandler;
