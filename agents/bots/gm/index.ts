@@ -1,10 +1,15 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { getTestUrl, logDetails } from "@xmtp/agent-sdk/debug";
+import { APP_VERSION } from "versions/sdk";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
+  dbPath: (inboxId) =>
+    (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
+    `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+  appVersion: APP_VERSION,
   env: process.env.XMTP_ENV as "local" | "dev" | "production",
 });
 

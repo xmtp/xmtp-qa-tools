@@ -290,7 +290,7 @@ const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
-    `/${process.env.XMTP_ENV}-key-check-${inboxId.slice(0, 8)}.db3`,
+    `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   codecs: [
     new MarkdownCodec(),
     new ReactionCodec(),
