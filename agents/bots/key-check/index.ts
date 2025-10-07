@@ -19,9 +19,9 @@ import {
   showNavigationOptions,
   type AppConfig,
   type MenuAction,
-} from "../utils/inline-actions/inline-actions";
-import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
+} from "../../utils/inline-actions/inline-actions";
+import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
+import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";
