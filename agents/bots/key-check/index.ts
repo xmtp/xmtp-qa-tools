@@ -423,7 +423,7 @@ agent.on("start", () => {
   );
   console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.address}`);
-  logDetails(agent.client);
+  void logDetails(agent.client);
   console.log(`🔗${getTestUrl(agent.client)}`);
 
   // Debug: Log all registered actions
