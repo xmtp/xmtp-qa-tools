@@ -1,10 +1,12 @@
-import { streamTimeout } from "@helpers/client";
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
+import {
+  IdentifierKind,
+  type Conversation,
+  type XmtpEnv,
+} from "@versions/node-sdk";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Conversation, type XmtpEnv } from "versions/sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";
@@ -109,46 +111,6 @@ describe(testName, async () => {
           testMessage,
           3,
         );
-
-        const responseTime = Math.abs(
-          result?.averageEventTiming ?? streamTimeout,
-        );
-
-        // Send metrics to DataDog
-        sendMetric("response", responseTime, {
-          test: testName,
-          metric_type: "agent",
-          metric_subtype: "group_stress",
-          live: agent.live ? "true" : "false",
-          agent: agent.name,
-          address: agent.address,
-          group_size: groupSize.toString(),
-          group_index: (groupIndex + 1).toString(),
-          sdk: workers.getCreator().sdk,
-        } as ResponseMetricTags);
-
-        // Send success/failure metric
-        sendMetric("success", result?.receptionPercentage === 100 ? 1 : 0, {
-          test: testName,
-          metric_type: "agent",
-          metric_subtype: "group_stress",
-          live: agent.live ? "true" : "false",
-          agent: agent.name,
-          address: agent.address,
-          group_size: groupSize.toString(),
-          group_index: (groupIndex + 1).toString(),
-          sdk: workers.getCreator().sdk,
-        } as ResponseMetricTags);
-
-        if (result?.receptionPercentage === 0) {
-          console.error(
-            `Agent ${agent.name} in group ${groupIndex + 1} - no response`,
-          );
-        } else {
-          console.log(
-            `Agent ${agent.name} in group ${groupIndex + 1} - response received (${result?.receptionPercentage}%)`,
-          );
-        }
 
         expect(result?.receptionPercentage).toBeGreaterThanOrEqual(0);
       }

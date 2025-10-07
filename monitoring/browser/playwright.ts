@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
 import { browserTimeout, streamColdStartTimeout } from "@helpers/client";
+import type { XmtpEnv } from "@versions/node-sdk";
 import {
   chromium,
   type Browser,
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
-import type { XmtpEnv } from "versions/sdk";
 
 export type BrowserSession = {
   browser: Browser;

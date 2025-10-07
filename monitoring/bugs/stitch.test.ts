@@ -1,6 +1,6 @@
 import { getInboxes } from "@inboxes/utils";
+import { type Group } from "@versions/node-sdk";
 import { getWorkers } from "@workers/manager";
-import { type Group } from "versions/sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync";

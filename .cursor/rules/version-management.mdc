@@ -5,13 +5,13 @@
 When upgrading XMTP node-sdk versions, update these 3 files:
 
 1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
-2. Add import for new SDK version to `versions/sdk.ts`.
+2. Add import for new SDK version to `versions/node-sdk.ts`.
 3. Run `yarn versions` to link the new versions.
 4. Run `yarn regression` to check regression of latest 3 versions.
 
 ### Version mapping system
 
-Versions are mapped in `versions/sdk.ts`:
+Versions are mapped in `versions/node-sdk.ts`:
 
 ```typescript
 export const VersionList = [

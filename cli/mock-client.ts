@@ -1,12 +1,15 @@
 import "dotenv/config";
-import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import {
   APP_VERSION,
+  createSigner,
+  getEncryptionKeyFromHex,
+} from "@helpers/client";
+import {
   getActiveVersion,
   IdentifierKind,
   type Client,
   type XmtpEnv,
-} from "versions/sdk";
+} from "@versions/node-sdk";
 
 // MOCK AGENT ADDRESS 0x7723d790A5e00b650BF146A0961F8Bb148F0450C
 

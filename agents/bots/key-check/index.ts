@@ -1,3 +1,4 @@
+import { APP_VERSION } from "@helpers/client";
 import { Agent, type MessageContext } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
@@ -8,7 +9,6 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import { APP_VERSION } from "versions/sdk";
 import {
   ActionBuilder,
   getRegisteredActions,

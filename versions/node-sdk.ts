@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createSigner } from "@helpers/client";
+import { APP_VERSION, createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
@@ -116,8 +116,6 @@ export const VersionList = [
     auto: true,
   },
 ];
-
-export const APP_VERSION = "xmtp-qa-tools/1.0.0";
 
 export const getActiveVersion = (index = 0) => {
   checkNoNameContains(VersionList);

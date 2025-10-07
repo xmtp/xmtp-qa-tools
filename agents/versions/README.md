@@ -15,13 +15,13 @@ yarn bot key-check --agentSDK 1.1.2
 When upgrading Agent SDK versions:
 
 1. Add `@xmtp/agent-sdk-X.X.X` to package.json
-2. Add import for new Agent SDK version to `versions/sdk-agent-versions.ts`
+2. Add import for new Agent SDK version to `versions/node-sdk-agent-versions.ts`
 3. Run `yarn agent-versions` to link the new versions
 4. Test your agents with the new version
 
 ### Agent SDK Version Mapping
 
-Versions are mapped in `versions/sdk-agent-versions.ts`:
+Versions are mapped in `versions/node-sdk-agent-versions.ts`:
 
 ```typescript
 export const AgentVersionList = [
