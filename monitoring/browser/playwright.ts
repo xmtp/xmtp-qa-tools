@@ -7,7 +7,7 @@ import {
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
-import type { XmtpEnv } from "version-management/client-versions";
+import type { XmtpEnv } from "version-management/node-versions";
 
 export type BrowserSession = {
   browser: Browser;

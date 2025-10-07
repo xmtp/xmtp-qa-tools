@@ -11,7 +11,7 @@ import {
   type Client,
   type Group,
   type XmtpEnv,
-} from "version-management/client-versions";
+} from "version-management/node-versions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,

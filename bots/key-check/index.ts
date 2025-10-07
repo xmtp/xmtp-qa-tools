@@ -8,7 +8,7 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import { APP_VERSION } from "version-management/client-versions";
+import { APP_VERSION } from "version-management/node-versions";
 import {
   ActionBuilder,
   getRegisteredActions,

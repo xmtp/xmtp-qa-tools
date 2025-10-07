@@ -1,7 +1,7 @@
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Dm } from "version-management/client-versions";
+import { type Dm } from "version-management/node-versions";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability/container";
 
