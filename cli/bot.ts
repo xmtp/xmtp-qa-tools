@@ -91,12 +91,19 @@ async function main() {
     process.exit(1);
   }
 
-  const botPath = join(__dirname, "..", "bots", config.botName, "index.ts");
+  const botPath = join(
+    __dirname,
+    "..",
+    "agents",
+    "bots",
+    config.botName,
+    "index.ts",
+  );
 
   try {
     // Check if the bot directory exists
     const fs = await import("fs");
-    const botDir = join(__dirname, "..", "bots", config.botName);
+    const botDir = join(__dirname, "..", "agents", "bots", config.botName);
 
     if (!fs.existsSync(botDir)) {
       console.error(`Error: Bot '${config.botName}' not found`);

@@ -1,4 +1,4 @@
-import { type AgentConfig } from "../monitoring/agents/helper";
+import { type AgentConfig } from "../agents/monitoring/helper";
 
 const agents: AgentConfig[] = [
   {
