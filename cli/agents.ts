@@ -79,25 +79,11 @@ const agents: AgentConfig[] = [
     live: false,
   },
   {
-    name: "gm",
-    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
-    sendMessage: "hi",
-    networks: ["dev", "production"],
-    live: false,
-  },
-  {
     name: "bankr",
     address: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     sendMessage: "hey there how are you?",
     networks: ["production"],
     live: true,
-  },
-  {
-    name: "key-check",
-    address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    sendMessage: "/kc help",
-    networks: ["dev", "production"],
-    live: false,
   },
   {
     name: "bitte",
@@ -113,6 +99,27 @@ const agents: AgentConfig[] = [
     networks: [],
     live: false,
   },
-];
+  {
+    name: "key-check",
+    address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    sendMessage: "/kc help",
+    networks: ["dev", "production"],
+    live: false,
+  },
+  {
+    name: "gm",
+    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    sendMessage: "hi",
+    networks: ["dev", "production"],
+    live: false,
+  },
 
+  {
+    name: "baseline",
+    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    sendMessage: "hi",
+    networks: ["dev"],
+    live: false,
+  },
+];
 export default agents;
