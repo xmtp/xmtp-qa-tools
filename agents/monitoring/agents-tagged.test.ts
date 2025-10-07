@@ -34,7 +34,7 @@ describe(testName, async () => {
       const isSlashCommand = agent.sendMessage.startsWith("/");
       const testMessage = isSlashCommand
         ? agent.sendMessage
-        : `@${agent.baseName} ${agent.sendMessage}`;
+        : `@${agent.name} ${agent.sendMessage}`;
 
       console.log(`sending ${testMessage} to agent`, agent.name, agent.address);
       const conversation = await workers

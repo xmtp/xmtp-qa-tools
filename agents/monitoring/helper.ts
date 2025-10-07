@@ -4,8 +4,6 @@
 export interface AgentConfig {
   /** Agent name */
   name: string;
-  /** Base name (e.g., ENS name) */
-  baseName: string;
   /** Ethereum address */
   address: string;
   /** Message to send for testing */

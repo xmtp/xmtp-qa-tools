@@ -97,7 +97,7 @@ describe(testName, async () => {
         const isSlashCommand = agent.sendMessage.startsWith("/");
         const testMessage = isSlashCommand
           ? agent.sendMessage
-          : `@${agent.baseName} ${agent.sendMessage}`;
+          : `@${agent.name} ${agent.sendMessage}`;
 
         console.log(
           `Testing ${agent.name} in group ${groupIndex + 1}: ${testMessage}`,

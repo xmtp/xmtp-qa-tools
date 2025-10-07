@@ -88,7 +88,6 @@ Link to test code [agents-tagged.test.ts](./agents-tagged.test.ts)
 ```json
 {
   "name": "gm",
-  "baseName": "gm.xmtp.eth",
   "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
   "sendMessage": "hola",
   "live": false,
