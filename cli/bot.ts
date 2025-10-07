@@ -119,11 +119,6 @@ async function main() {
       process.exit(1);
     }
 
-    console.log(`Starting bot: ${config.botName}`);
-    console.log(`Environment: ${config.env}`);
-    console.log(`Node SDK: ${config.nodeBindings}`);
-    console.log(`Path: ${botPath}`);
-
     // Run the bot using tsx with environment variable
     const child = spawn("npx", ["tsx", "--watch", botPath], {
       stdio: "inherit",
