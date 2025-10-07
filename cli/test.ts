@@ -426,8 +426,6 @@ function logDetails(testName: string, options: TestOptions) {
   );
 }
 async function runTest(testName: string, options: TestOptions): Promise<void> {
-  logDetails(testName, options);
-
   // Determine which retry mode to use
   const useMaxRetry = options.maxRetry > 1;
   const maxAttempts = useMaxRetry ? options.maxRetry : options.attempts;

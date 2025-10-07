@@ -1,5 +1,5 @@
 import { Agent } from "@xmtp/agent-sdk";
-import { getTestUrl, logDetails } from "@xmtp/agent-sdk/debug";
+import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { APP_VERSION } from "versions/sdk";
 
 // Load .env file only in local development
@@ -37,7 +37,6 @@ agent.on("start", () => {
   console.log(`Address: ${agent.address}`);
   console.log(agent.client.options);
   console.log(`🔗${getTestUrl(agent.client)}`);
-  void logDetails(agent.client);
 });
 
 await agent.start();
