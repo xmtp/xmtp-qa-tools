@@ -1,5 +1,5 @@
 import { Agent, type MessageContext } from "@xmtp/agent-sdk";
-import { getTestUrl, logDetails } from "@xmtp/agent-sdk/debug";
+import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import {
@@ -423,7 +423,6 @@ agent.on("start", () => {
   );
   console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.address}`);
-  void logDetails(agent.client);
   console.log(`🔗${getTestUrl(agent.client)}`);
 
   // Debug: Log all registered actions

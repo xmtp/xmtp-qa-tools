@@ -45,9 +45,6 @@ const clientData = await createClient(
   { sdkVersion: "220", name: "alice", testName, folder: "test-run" },
   "dev",
 );
-
-// Log agent details with connection info
-await logAgentDetails(client);
 ```
 
 Functions: Multi-version SDK support, signer creation, database management, environment configuration, key generation.
