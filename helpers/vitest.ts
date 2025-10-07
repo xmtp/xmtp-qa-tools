@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { getActiveVersion } from "versions/sdk";
+import { getActiveVersion } from "@versions/node-sdk";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 import { loadEnv } from "./client";
 import {

@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createSigner } from "@helpers/client";
-import { Client, type XmtpEnv } from "versions/sdk";
+import { Client, type XmtpEnv } from "@versions/node-sdk";
 
 // Check Node.js version
 const nodeBindings = process.versions.node;

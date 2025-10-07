@@ -4,7 +4,7 @@ import {
   type Group,
   type LogLevel,
   type XmtpEnv,
-} from "versions/sdk";
+} from "@versions/node-sdk";
 import "dotenv/config";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";

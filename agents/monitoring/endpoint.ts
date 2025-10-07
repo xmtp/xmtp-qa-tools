@@ -1,14 +1,14 @@
 import "dotenv/config";
 import fs from "node:fs";
-import { fromString } from "uint8arrays";
+import { APP_VERSION } from "@helpers/client";
 import {
-  APP_VERSION,
   Client,
   IdentifierKind,
   type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "versions/sdk";
+} from "@versions/node-sdk";
+import { fromString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";

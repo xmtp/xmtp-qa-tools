@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - "package.json"
-      - "versions/client-versions.ts"
+      - "@versions/node-sdk.ts"
   workflow_dispatch:
 
 jobs:

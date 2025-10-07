@@ -2,8 +2,12 @@ import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
+import {
+  IdentifierKind,
+  type Conversation,
+  type XmtpEnv,
+} from "@versions/node-sdk";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Conversation, type XmtpEnv } from "versions/sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";
@@ -15,7 +19,7 @@ describe(testName, async () => {
   const workers = await getWorkers(["randomguy"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env);
+    return agent.networks.includes(env as string);
   });
 
   // Handle case where no agents are configured for the current environment

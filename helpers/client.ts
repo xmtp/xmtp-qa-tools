@@ -1,9 +1,6 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import type { Worker, WorkerManager } from "@workers/manager";
-import dotenv from "dotenv";
-import { fromString, toString } from "uint8arrays";
 import {
   IdentifierKind,
   regressionClient,
@@ -11,7 +8,10 @@ import {
   type Conversation,
   type Signer,
   type XmtpEnv,
-} from "versions/sdk";
+} from "@versions/node-sdk";
+import type { Worker, WorkerManager } from "@workers/manager";
+import dotenv from "dotenv";
+import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
@@ -162,6 +162,8 @@ export async function createClient(
     address,
   };
 }
+
+export const APP_VERSION = "xmtp-qa-tools/1.0.0";
 
 function loadDataPath(name: string, installationId: string): string {
   // Extract the base name without installation ID for folder structure

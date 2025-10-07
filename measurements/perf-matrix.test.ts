@@ -6,19 +6,19 @@ import {
 } from "@helpers/streams";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import {
-  getRandomNames,
-  getWorkers,
-  type Worker,
-  type WorkerManager,
-} from "@workers/manager";
-import {
   Client,
   ConsentEntityType,
   ConsentState,
   IdentifierKind,
   type Dm,
   type Group,
-} from "versions/sdk";
+} from "@versions/node-sdk";
+import {
+  getRandomNames,
+  getWorkers,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
