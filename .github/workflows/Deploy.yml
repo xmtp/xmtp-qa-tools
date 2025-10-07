@@ -8,38 +8,8 @@ on:
       - "package.json"
 
 jobs:
-  detect-version-bump:
+  deploy:
     runs-on: ubuntu-latest
-    outputs:
-      version_changed: ${{ steps.check-version.outputs.version_changed }}
-      new_version: ${{ steps.extract-version.outputs.version }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - name: Check for package.json changes
-        id: check-version
-        run: |
-          git diff HEAD^ HEAD --name-only | grep -q "package.json" && \
-          echo "version_changed=true" >> $GITHUB_OUTPUT || \
-          echo "version_changed=false" >> $GITHUB_OUTPUT
-
-      - name: Extract new version
-        id: extract-version
-        if: steps.check-version.outputs.version_changed == 'true'
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-  create-and-merge-pr:
-    needs: detect-version-bump
-    if: needs.detect-version-bump.outputs.version_changed == 'true'
-    runs-on: ubuntu-latest
-    env:
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      REGION: ${{ vars.REGION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -51,7 +21,7 @@ jobs:
 
       - name: Create deployment branch
         run: |
-          VERSION="${{ needs.detect-version-bump.outputs.new_version }}"
+          VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME="deploy"
 
           # Create new branch (or reset if it exists)
@@ -62,7 +32,7 @@ jobs:
           git add deploy-metadata.json
 
           # Commit and push
-          git commit -m "Update deploy to version $VERSION"
+          git commit -m "Deploy package.json changes - version $VERSION"
           git push -f origin $BRANCH_NAME
 
       - name: Create PR
@@ -71,7 +41,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const version = "${{ needs.detect-version-bump.outputs.new_version }}";
+            const version = require('./package.json').version;
 
             // Check if PR already exists
             const existingPRs = await github.rest.pulls.list({
@@ -95,8 +65,8 @@ jobs:
             const pr = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Deploy deploy version ${version}`,
-              body: `Automatic PR for deploying deploy version ${version}`,
+              title: `Deploy package.json changes - version ${version}`,
+              body: `Automatic deployment for package.json changes (version ${version})`,
               head: 'deploy',
               base: 'main'
             });
