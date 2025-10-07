@@ -7,7 +7,7 @@ import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "version-management/sdk-node-versions";
+} from "versions/sdk-node-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";

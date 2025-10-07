@@ -9,7 +9,7 @@
     "workers"
   ],
   "scripts": {
-    "agent-versions": "tsx agents/version-management/cli-agent-versions.ts",
+    "agent-versions": "tsx agents/versions/cli-agent-versions.ts",
     "ansi:clean": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "ansi:forks": "tsx -e \"(async () => { const { cleanForksLogs } = await import('./helpers/analyzer.js'); await cleanForksLogs(); })();\"",
     "bot": "tsx cli/bot.ts",
@@ -31,7 +31,7 @@
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "versions": "tsx version-management/cli-node-versions.ts"
+    "versions": "tsx versions/cli-node-versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",

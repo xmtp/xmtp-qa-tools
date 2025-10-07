@@ -7,7 +7,7 @@ on:
       - main
     paths:
       - "package.json"
-      - "version-management/client-versions.ts"
+      - "versions/client-versions.ts"
   workflow_dispatch:
 
 jobs:

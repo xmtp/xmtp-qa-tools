@@ -24,7 +24,7 @@ EXAMPLES:
   yarn agent-versions --clean
   yarn agent-versions --help
 
-For more information, see: agents/version-management/README.md
+For more information, see: agents/versions/README.md
 `);
 }
 

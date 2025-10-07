@@ -1,11 +1,7 @@
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import {
-  APP_VERSION,
-  Client,
-  type XmtpEnv,
-} from "version-management/sdk-node-versions";
+import { APP_VERSION, Client, type XmtpEnv } from "versions/sdk-node-versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {

@@ -4,7 +4,7 @@ import {
   type LogLevel,
   type PermissionUpdateType,
   type XmtpEnv,
-} from "version-management/sdk-node-versions";
+} from "versions/sdk-node-versions";
 import "dotenv/config";
 import { getWorkers } from "@workers/manager";
 
