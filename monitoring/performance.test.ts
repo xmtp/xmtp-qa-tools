@@ -19,7 +19,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "versions/sdk-node-versions";
+} from "versions/sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

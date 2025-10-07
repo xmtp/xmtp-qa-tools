@@ -2,7 +2,7 @@ import "@helpers/datadog";
 import { checkKeyPackageStatusesByInboxId } from "@helpers/client";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Group } from "versions/sdk-node-versions";
+import { IdentifierKind, type Group } from "versions/sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

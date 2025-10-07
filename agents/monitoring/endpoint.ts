@@ -8,7 +8,7 @@ import {
   type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "versions/sdk-node-versions";
+} from "versions/sdk";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
