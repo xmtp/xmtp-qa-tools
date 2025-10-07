@@ -1,6 +1,6 @@
 import { sleep } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
-import { type DecodedMessage } from "version-management/client-versions";
+import { type DecodedMessage } from "version-management/sdk-node-versions";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";

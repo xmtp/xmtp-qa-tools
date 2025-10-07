@@ -1,6 +1,6 @@
 import { Agent } from "@xmtp/agent-sdk";
 import { getTestUrl } from "@xmtp/agent-sdk/debug";
-import { APP_VERSION } from "version-management/client-versions";
+import { APP_VERSION } from "version-management/sdk-node-versions";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");

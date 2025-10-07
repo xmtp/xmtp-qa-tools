@@ -1,5 +1,7 @@
 # SDK version management
 
+## Node SDK Version Management
+
 ### Upgrade procedure
 
 When upgrading XMTP bindings and/or node-sdk versions:

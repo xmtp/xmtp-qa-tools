@@ -13,7 +13,7 @@ export default defineConfig({
       "@workers": resolve(__dirname, "./workers"),
       "@scripts": resolve(__dirname, "./scripts"),
       "@inboxes": resolve(__dirname, "./inboxes"),
-      "@bots": resolve(__dirname, "./bots"),
+      "@bots": resolve(__dirname, "./agents/bots"),
     },
   },
   test: {

@@ -91,12 +91,19 @@ async function main() {
     process.exit(1);
   }
 
-  const botPath = join(__dirname, "..", "bots", config.botName, "index.ts");
+  const botPath = join(
+    __dirname,
+    "..",
+    "agents",
+    "bots",
+    config.botName,
+    "index.ts",
+  );
 
   try {
     // Check if the bot directory exists
     const fs = await import("fs");
-    const botDir = join(__dirname, "..", "bots", config.botName);
+    const botDir = join(__dirname, "..", "agents", "bots", config.botName);
 
     if (!fs.existsSync(botDir)) {
       console.error(`Error: Bot '${config.botName}' not found`);
@@ -111,11 +118,6 @@ async function main() {
       );
       process.exit(1);
     }
-
-    console.log(`Starting bot: ${config.botName}`);
-    console.log(`Environment: ${config.env}`);
-    console.log(`Node SDK: ${config.nodeBindings}`);
-    console.log(`Path: ${botPath}`);
 
     // Run the bot using tsx with environment variable
     const child = spawn("npx", ["tsx", "--watch", botPath], {

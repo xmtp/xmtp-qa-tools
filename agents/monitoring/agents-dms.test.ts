@@ -7,19 +7,19 @@ import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents-text";
+const testName = "agents-dms";
 describe(testName, async () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["randomguy"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env) && agent.live;
+    return agent.networks.includes(env);
   });
 
   // Handle case where no agents are configured for the current environment
@@ -50,9 +50,7 @@ describe(testName, async () => {
         conversation as Conversation,
         [workers.getCreator()],
         agent.sendMessage,
-        1,
-        ["text", "reply", "actions", "intent"],
-        16000,
+        3,
       );
 
       const responseTime = Math.abs(
@@ -63,7 +61,7 @@ describe(testName, async () => {
       sendMetric("response", responseTime, {
         test: testName,
         metric_type: "agent",
-        metric_subtype: "text",
+        metric_subtype: "dm",
         live: agent.live ? "true" : "false",
         agent: agent.name,
         address: agent.address,

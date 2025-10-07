@@ -5,7 +5,7 @@ import { getWorkers, type Worker } from "@workers/manager";
 import {
   getActiveVersion,
   type Group,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { describe, it } from "vitest";
 
 // Count of groups to create

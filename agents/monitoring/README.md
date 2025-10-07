@@ -2,9 +2,9 @@
 
 | Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency    | Networks           |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------ |
-| AgentGroups | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 30 min     | `dev` `production` |
-| AgentText   | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml)     | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents)   | Every 4 hours    | `dev` `production` |
-| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/monitoring/agents) | Every 10 minutes | `dev` `production` |
+| AgentGroups | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 30 min     | `dev` `production` |
+| AgentText   | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml)     | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentText.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring)   | Every 4 hours    | `dev` `production` |
+| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 10 minutes | `dev` `production` |
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
@@ -23,7 +23,7 @@
 
 ## 1. First reaction response
 
-Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents/agents-dms.test.ts)
+Link to test code [agents-dms.test.ts](./agents-dms.test.ts)
 
 ### Test flow:
 
@@ -33,7 +33,7 @@ Link to test code [../monitoring/agents/agents-dms.test.ts](../monitoring/agents
 
 ## 2. Meaningful response testing
 
-Link to test code [../monitoring/agents/agents-text.test.ts](../monitoring/agents/agents-tagged.test.ts)
+Link to test code [agents-text.test.ts](./agents-text.test.ts)
 
 ### Test flow:
 
@@ -48,7 +48,7 @@ Link to test code [../monitoring/agents/agents-text.test.ts](../monitoring/agent
 
 ## 3. Negative testing
 
-Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/agents/agents-untagged.test.ts)
+Link to test code [agents-untagged.test.ts](./agents-untagged.test.ts)
 
 ### Test flow:
 
@@ -61,7 +61,7 @@ Link to test code [../monitoring/agents/agents-untagged.test.ts](../monitoring/a
 
 ## 4. Group chat testing
 
-Link to test code [../monitoring/agents/agents-tagged.test.ts](../monitoring/agents/agents-tagged.test.ts)
+Link to test code [agents-tagged.test.ts](./agents-tagged.test.ts)
 
 ### Test flow:
 

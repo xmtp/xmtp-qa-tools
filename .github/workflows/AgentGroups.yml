@@ -42,3 +42,38 @@ jobs:
         with:
           workflow-name: "Agents (${{ matrix.test }}, ${{ matrix.env }})"
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  agents-stress:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [agents-stress]
+        env: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+
+      - name: ${{ matrix.test }} ${{ matrix.env }}
+        run: yarn test ${{ matrix.test }} --env ${{ matrix.env }} --no-fail --log off
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          test-name: ${{ matrix.test }}
+          env: ${{ matrix.env }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Agent stress (${{ matrix.test }}, ${{ matrix.env }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

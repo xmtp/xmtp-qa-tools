@@ -5,7 +5,7 @@ import {
   APP_VERSION,
   Client,
   type XmtpEnv,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {

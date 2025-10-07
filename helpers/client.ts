@@ -11,7 +11,7 @@ import {
   type Conversation,
   type Signer,
   type XmtpEnv,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";

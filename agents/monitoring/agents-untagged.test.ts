@@ -8,12 +8,12 @@ import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents-tagged";
+const testName = "agents-untagged";
 
 describe(testName, async () => {
   setupDurationTracking({ testName, initDataDog: true });
@@ -27,20 +27,15 @@ describe(testName, async () => {
   // Handle case where no agents are configured for the current environment
   if (filteredAgents.length === 0) {
     it(`${env}: No agents configured for this environment`, () => {
-      console.log(`No agents found for env: ${env}`);
+      console.log(`No agents found for environment: ${env}`);
       expect(true).toBe(true); // Pass the test
     });
     return;
   }
 
   for (const agent of filteredAgents) {
-    it(`${testName}: ${agent.name} should respond to tagged/command message : ${agent.address}`, async () => {
-      const isSlashCommand = agent.sendMessage.startsWith("/");
-      const testMessage = isSlashCommand
-        ? agent.sendMessage
-        : `@${agent.baseName} ${agent.sendMessage}`;
-
-      console.log(`sending ${testMessage} to agent`, agent.name, agent.address);
+    it(`${testName}: ${agent.name} should not respond to untagged hi : ${agent.address}`, async () => {
+      console.log("sending message to agent", agent.name, agent.address);
       const conversation = await workers
         .getCreator()
         .client.conversations.newGroupWithIdentifiers([
@@ -54,18 +49,23 @@ describe(testName, async () => {
           },
         ]);
 
+      //Ignore welcome message
+      await verifyAgentMessageStream(
+        conversation as Conversation,
+        [workers.getCreator()],
+        "hi",
+      );
+      //Ignore welcome message
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
-        testMessage,
-        3,
+        "hi",
       );
-
-      // If the agent didn't respond, log the timeout value instead of 0
 
       const responseTime = Math.abs(
         result?.averageEventTiming ?? streamTimeout,
       );
+
       // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
       sendMetric("response", responseTime, {
         test: testName,
@@ -79,6 +79,7 @@ describe(testName, async () => {
 
       if (result?.receptionPercentage === 0)
         console.error(agent.name, "no response");
+
       expect(result?.receptionPercentage).toBeGreaterThanOrEqual(0);
     });
   }

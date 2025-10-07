@@ -18,7 +18,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "version-management/client-versions";
+} from "version-management/sdk-node-versions";
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 
