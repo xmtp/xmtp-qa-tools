@@ -19,10 +19,10 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Check for version changes
+      - name: Check for package.json changes
         id: check-version
         run: |
-          git diff HEAD^ HEAD -- package.json lerna.json */package.json | grep -q '"version"' && \
+          git diff HEAD^ HEAD --name-only | grep -q "package.json" && \
           echo "version_changed=true" >> $GITHUB_OUTPUT || \
           echo "version_changed=false" >> $GITHUB_OUTPUT
 
