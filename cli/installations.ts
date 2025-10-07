@@ -2,14 +2,14 @@ import {
   APP_VERSION,
   IdentifierKind,
   type XmtpEnv,
-} from "version-management/node-versions";
+} from "version-management/sdk-node-versions";
 import "dotenv/config";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
-import { Client } from "version-management/node-versions";
+import { Client } from "version-management/sdk-node-versions";
 import { generatePrivateKey } from "viem/accounts";
 
 interface Config {

@@ -5,7 +5,7 @@ import {
   APP_VERSION,
   Client,
   type XmtpEnv,
-} from "version-management/node-versions";
+} from "version-management/sdk-node-versions";
 import {
   createSigner,
   generateEncryptionKeyHex,

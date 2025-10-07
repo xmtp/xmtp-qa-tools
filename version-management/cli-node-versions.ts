@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { VersionList } from "version-management/client-versions";
+import { VersionList } from "version-management/sdk-node-versions";
 
 function showHelp() {
   console.log(`

@@ -2,7 +2,10 @@ import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { getActiveVersion, type Group } from "version-management/node-versions";
+import {
+  getActiveVersion,
+  type Group,
+} from "version-management/sdk-node-versions";
 import { describe, it } from "vitest";
 
 // Count of groups to create

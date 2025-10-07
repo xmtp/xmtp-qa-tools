@@ -1,6 +1,6 @@
 import { ProgressBar } from "@helpers/logger";
 import { getWorkers, type Worker } from "@workers/manager";
-import { IdentifierKind } from "version-management/node-versions";
+import { IdentifierKind } from "version-management/sdk-node-versions";
 import { describe, it } from "vitest";
 
 describe("bysize", () => {

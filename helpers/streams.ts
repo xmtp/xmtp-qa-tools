@@ -8,7 +8,7 @@ import {
   type Conversation,
   type Dm,
   type Group,
-} from "version-management/node-versions";
+} from "version-management/sdk-node-versions";
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {

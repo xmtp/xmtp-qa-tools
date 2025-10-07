@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { AgentVersionList } from "./agent-versions";
+import { AgentVersionList } from "./sdk-agent-versions";
 
 function showHelp() {
   console.log(`
@@ -87,7 +87,9 @@ function createAgentSDKSymlinks() {
   console.log("Available versions:");
   for (const config of AgentVersionList) {
     const status = config.auto ? "🟢 auto" : "🟡 manual";
-    console.log(`  ${config.agentSDK} ${status}`);
+    console.log(
+      `  ${config.agentSDK} ${status} (node-sdk: ${config.nodeSDK}, bindings: ${config.nodeBindings})`,
+    );
   }
 }
 
