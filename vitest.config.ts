@@ -14,6 +14,7 @@ export default defineConfig({
       "@scripts": resolve(__dirname, "./scripts"),
       "@inboxes": resolve(__dirname, "./inboxes"),
       "@bots": resolve(__dirname, "./agents/bots"),
+      "@versions": resolve(__dirname, "./versions"),
     },
   },
   test: {
