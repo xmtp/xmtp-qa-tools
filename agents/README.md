@@ -31,7 +31,7 @@ agents/
 yarn bot key-check
 
 # Run with specific Agent SDK version
-AGENT_SDK_VERSION=1.1.2 yarn bot key-check
+yarn bot key-check --agentSDK 1.1.2
 ```
 
 ### Agent SDK Version Management
@@ -41,7 +41,7 @@ AGENT_SDK_VERSION=1.1.2 yarn bot key-check
 yarn agent-versions
 
 # Test with specific version
-AGENT_SDK_VERSION=1.0.1 yarn bot key-check
+AGENT_SDK_VERSION=1.0.1 yarn bot key-check --agentSDK 1.0.1
 ```
 
 ### Monitoring Agents
@@ -53,16 +53,3 @@ yarn test agents
 # Run specific agent test
 yarn test agents-stress
 ```
-
-## Agent SDK Versions
-
-| Agent SDK | Node SDK | Node Bindings | Status    |
-| --------- | -------- | ------------- | --------- |
-| 1.1.5     | 4.2.0    | 1.5.2         | 🟢 auto   |
-| 1.1.2     | 4.2.0    | 1.5.2         | 🟢 auto   |
-| 1.0.1     | 4.1.0    | 1.4.0         | 🟢 auto   |
-| 1.0.0     | 4.1.0    | 1.4.0         | 🟡 manual |
-
-For detailed information, see the individual README files in each subdirectory.
-
-**Note**: Node SDK version management is handled separately in the root `version-management/` directory.
