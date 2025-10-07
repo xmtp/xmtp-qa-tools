@@ -428,7 +428,7 @@ Use predefined names from the 61 available:
 ```typescript
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import { IdentifierKind } from "@versions/client-versions";
+import { IdentifierKind } from "@versions/sdk";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 ```
 
@@ -495,7 +495,7 @@ const workers = await getWorkers(["alice", "bob"], {});
 
 ```typescript
 import { setupDurationTracking } from "@helpers/vitest";
-import { IdentifierKind } from "@versions/client-versions";
+import { IdentifierKind } from "@versions/sdk";
 import { getWorkerNames, getWorkers } from "@workers/manager";
 
 // Start message streaming
