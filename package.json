@@ -31,7 +31,7 @@
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "versions": "tsx versions/cli-node-versions.ts"
+    "versions": "tsx versions/cli.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
