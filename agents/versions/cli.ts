@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { AgentVersionList } from "./sdk-agent-versions";
+import { AgentVersionList } from "./sdk";
 
 function showHelp() {
   console.log(`
@@ -24,7 +24,7 @@ EXAMPLES:
   yarn agent-versions --clean
   yarn agent-versions --help
 
-For more information, see: agents/version-management/README.md
+For more information, see: agents/versions/README.md
 `);
 }
 

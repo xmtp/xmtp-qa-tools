@@ -1,11 +1,7 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import { ProgressBar } from "@helpers/logger";
-import {
-  APP_VERSION,
-  Client,
-  type XmtpEnv,
-} from "version-management/sdk-node-versions";
+import { APP_VERSION, Client, type XmtpEnv } from "versions/sdk";
 import {
   createSigner,
   generateEncryptionKeyHex,

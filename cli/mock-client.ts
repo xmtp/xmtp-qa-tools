@@ -6,7 +6,7 @@ import {
   IdentifierKind,
   type Client,
   type XmtpEnv,
-} from "version-management/sdk-node-versions";
+} from "versions/sdk";
 
 // MOCK AGENT ADDRESS 0x7723d790A5e00b650BF146A0961F8Bb148F0450C
 

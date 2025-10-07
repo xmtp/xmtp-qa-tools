@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { VersionList } from "./sdk-node-versions";
+import { VersionList } from "./sdk";
 
 function showHelp() {
   console.log(`
@@ -85,7 +85,7 @@ function createBindingsSymlinks() {
         bindingsDir,
       );
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`${config.nodeSDK} -> ${config.nodeBindings}`);
+      console.log(`${config.nodeSDK} -> ${config.nodeBindings} ✅`);
     } catch (error) {
       console.error(`Error linking ${config.nodeSDK}: ${String(error)}`);
       hasErrors = true;
@@ -142,6 +142,14 @@ function main() {
   }
 
   createBindingsSymlinks();
+  console.log("✅ Node SDK version setup complete!");
+  console.log("Available versions:");
+  for (const config of VersionList) {
+    const status = config.auto ? "🟢 auto" : "🟡 manual";
+    console.log(
+      `  ${config.nodeSDK} ${status} (bindings: ${config.nodeBindings})`,
+    );
+  }
   console.log("Done");
 }
 

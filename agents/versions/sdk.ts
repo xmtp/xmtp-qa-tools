@@ -7,10 +7,6 @@ import {
   MessageContext as MessageContext101,
 } from "@xmtp/agent-sdk-1.0.1";
 import {
-  Agent as Agent112,
-  MessageContext as MessageContext112,
-} from "@xmtp/agent-sdk-1.1.2";
-import {
   Agent as Agent115,
   MessageContext as MessageContext115,
 } from "@xmtp/agent-sdk-1.1.5";
@@ -23,23 +19,15 @@ export const AgentVersionList = [
     Agent: Agent115,
     MessageContext: MessageContext115,
     agentSDK: "1.1.5",
-    nodeSDK: "4.2.0", // Agent SDK 1.1.5 uses node-sdk ^4.2.2, closest available is 4.2.0
-    nodeBindings: "1.5.2",
-    auto: true,
-  },
-  {
-    Agent: Agent112,
-    MessageContext: MessageContext112,
-    agentSDK: "1.1.2",
-    nodeSDK: "4.2.0", // Agent SDK 1.1.2 uses node-sdk ^4.2.1, closest available is 4.2.0
-    nodeBindings: "1.5.2",
+    nodeSDK: "4.2.3",
+    nodeBindings: "1.5.4",
     auto: true,
   },
   {
     Agent: Agent101,
     MessageContext: MessageContext101,
     agentSDK: "1.0.1",
-    nodeSDK: "4.1.0", // Agent SDK 1.0.1 uses node-sdk ^4.1.2, closest available is 4.1.0
+    nodeSDK: "4.1.0",
     nodeBindings: "1.4.0",
     auto: true,
   },
@@ -47,9 +35,9 @@ export const AgentVersionList = [
     Agent: Agent100,
     MessageContext: MessageContext100,
     agentSDK: "1.0.0",
-    nodeSDK: "4.1.0", // Agent SDK 1.0.0 uses node-sdk ^4.1.2, closest available is 4.1.0
+    nodeSDK: "4.1.0",
     nodeBindings: "1.4.0",
-    auto: false, // Keep for compatibility but not in auto testing
+    auto: true,
   },
 ];
 

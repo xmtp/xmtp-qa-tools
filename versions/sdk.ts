@@ -40,7 +40,7 @@ import {
   Conversation as Conversation420,
   Dm as Dm420,
   Group as Group420,
-} from "@xmtp/node-sdk-4.2.0";
+} from "@xmtp/node-sdk-4.2.3";
 
 export {
   Client,
@@ -58,7 +58,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.2.0";
+} from "@xmtp/node-sdk-4.2.3";
 
 export const VersionList = [
   {
@@ -66,8 +66,8 @@ export const VersionList = [
     Conversation: Conversation420,
     Dm: Dm420,
     Group: Group420,
-    nodeSDK: "4.2.0",
-    nodeBindings: "1.5.2",
+    nodeSDK: "4.2.3",
+    nodeBindings: "1.5.4",
     auto: true,
   },
   {
@@ -127,7 +127,7 @@ export const getActiveVersion = (index = 0) => {
       (v) => v.nodeBindings === process.env.NODE_VERSION,
     ) as (typeof VersionList)[number];
     if (!latestVersion) {
-      throw new Error(`Node version ${process.env.NODE_VERSION} not found`);
+      throw new Error(`Node SDK version ${process.env.NODE_VERSION} not found`);
     }
   }
   return latestVersion;
@@ -138,12 +138,12 @@ export const getVersions = (filterAuto: boolean = true) => {
 };
 
 export const checkNoNameContains = (versionList: typeof VersionList) => {
-  // Versions should no include - because it messes   up with the worker name-installation conversion. FIX
+  // Node SDK versions should not include - because it messes up with the worker name-installation conversion
   for (const version of versionList) {
     if (version.nodeSDK.includes("-")) {
-      throw new Error(`Version ${version.nodeSDK} contains -`);
+      throw new Error(`Node SDK version ${version.nodeSDK} contains -`);
     } else if (version.nodeBindings.includes("-")) {
-      throw new Error(`Bindings package ${version.nodeBindings} contains -`);
+      throw new Error(`Node SDK version ${version.nodeBindings} contains -`);
     }
   }
 };

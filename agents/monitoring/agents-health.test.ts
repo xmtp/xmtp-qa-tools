@@ -1,7 +1,7 @@
 // import { streamTimeout } from "@helpers/client";
 // import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 // import { setupDurationTracking } from "@helpers/vitest";
-// import { getActiveVersion } from "version-management/client-versions";
+// import { getActiveVersion } from "versions/client-versions";
 // import { describe, expect, it } from "vitest";
 // import productionAgents from "./agents.json";
 // import { type AgentConfig } from "./helper";
