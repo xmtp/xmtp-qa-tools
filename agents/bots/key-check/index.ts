@@ -19,9 +19,9 @@ import {
   showNavigationOptions,
   type AppConfig,
   type MenuAction,
-} from "../utils/inline-actions/inline-actions";
-import { ActionsCodec } from "../utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "../utils/inline-actions/types/IntentContent";
+} from "../../utils/inline-actions/inline-actions";
+import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
+import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";
@@ -290,7 +290,7 @@ const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
-    `/${process.env.XMTP_ENV}-key-check-${inboxId.slice(0, 8)}.db3`,
+    `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   codecs: [
     new MarkdownCodec(),
     new ReactionCodec(),
