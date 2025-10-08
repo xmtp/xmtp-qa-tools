@@ -9,16 +9,25 @@ import {
 import {
   Agent as Agent115,
   MessageContext as MessageContext115,
-} from "@xmtp/agent-sdk-1.1.5";
+} from "@xmtp/agent-sdk-1.1.6";
 
 // Export the latest version as default
-export { Agent, MessageContext } from "@xmtp/agent-sdk-1.1.5";
+export {
+  Agent,
+  MessageContext,
+  type AgentMiddleware,
+  type Group,
+  type IdentifierKind,
+  type PermissionLevel,
+} from "@xmtp/agent-sdk-1.1.6";
+
+export { getTestUrl } from "@xmtp/agent-sdk-1.1.6/debug";
 
 export const AgentVersionList = [
   {
     Agent: Agent115,
     MessageContext: MessageContext115,
-    agentSDK: "1.1.5",
+    agentSDK: "1.1.6",
     nodeSDK: "4.2.3",
     nodeBindings: "1.5.4",
     auto: true,

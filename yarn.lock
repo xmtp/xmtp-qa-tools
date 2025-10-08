@@ -1421,18 +1421,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.5@npm:@xmtp/agent-sdk@1.1.5, @xmtp/agent-sdk@npm:^1.1.5":
-  version: 1.1.5
-  resolution: "@xmtp/agent-sdk@npm:1.1.5"
+"@xmtp/agent-sdk-1.1.6@npm:@xmtp/agent-sdk@1.1.6":
+  version: 1.1.6
+  resolution: "@xmtp/agent-sdk@npm:1.1.6"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.2.2"
+    "@xmtp/node-sdk": "npm:^4.2.3"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/209638240ff8d0a4407652e5a4505d1e5044bf22fa717de50df56514c45a93e4b8446be025b6126f87611a296c00e654a9683f73830951de1e63b88f3275a2a6
+  checksum: 10/a3be6f167c478aec546ba0920a0aa58dbc8eba8839ed8a17d8c1d131b9516b937f54d773315c9c11a522516c6c85e843ba122dbedc5cb4b680ecde3e8f09d4ca
   languageName: node
   linkType: hard
 
@@ -1621,7 +1621,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.2.3@npm:@xmtp/node-sdk@4.2.3":
+"@xmtp/node-sdk-4.2.3@npm:@xmtp/node-sdk@4.2.3, @xmtp/node-sdk@npm:^4.2.3":
   version: 4.2.3
   resolution: "@xmtp/node-sdk@npm:4.2.3"
   dependencies:
@@ -1633,7 +1633,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:^4.1.2, @xmtp/node-sdk@npm:^4.2.1, @xmtp/node-sdk@npm:^4.2.2":
+"@xmtp/node-sdk@npm:^4.1.2, @xmtp/node-sdk@npm:^4.2.1":
   version: 4.2.2
   resolution: "@xmtp/node-sdk@npm:4.2.2"
   dependencies:
@@ -4641,11 +4641,10 @@ __metadata:
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@xmtp/agent-sdk": "npm:^1.1.5"
     "@xmtp/agent-sdk-1.0.0": "npm:@xmtp/agent-sdk@1.0.0"
     "@xmtp/agent-sdk-1.0.1": "npm:@xmtp/agent-sdk@1.0.1"
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2"
-    "@xmtp/agent-sdk-1.1.5": "npm:@xmtp/agent-sdk@1.1.5"
+    "@xmtp/agent-sdk-1.1.6": "npm:@xmtp/agent-sdk@1.1.6"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"

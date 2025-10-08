@@ -1,4 +1,4 @@
-import { type MessageContext } from "@xmtp/agent-sdk";
+import { type MessageContext } from "../../../versions/agent-sdk";
 
 export class LoadTestHandlers {
   constructor(private agent: any) {}

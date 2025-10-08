@@ -1,6 +1,4 @@
 import { APP_VERSION } from "@helpers/client";
-import { Agent, type MessageContext } from "@xmtp/agent-sdk";
-import { getTestUrl } from "@xmtp/agent-sdk/debug";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import {
@@ -22,6 +20,11 @@ import {
 } from "../../utils/inline-actions/inline-actions";
 import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
+import {
+  Agent,
+  getTestUrl,
+  type MessageContext,
+} from "../../versions/agent-sdk";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";

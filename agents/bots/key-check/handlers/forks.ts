@@ -1,4 +1,4 @@
-import { type Group, type MessageContext } from "@xmtp/agent-sdk";
+import { type Group, type MessageContext } from "../../../versions/agent-sdk";
 
 interface ForkDebugInfo {
   epoch: bigint;
