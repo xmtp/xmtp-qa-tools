@@ -1,0 +1,17 @@
+{
+  "framework": {
+    "name": "XMTP CLI Framework",
+    "description": "A React-like declarative CLI framework for AI-discoverable commands",
+    "version": "1.0.0"
+  },
+  "usage": {
+    "pattern": "yarn cli <command> [options]",
+    "help": "yarn cli --help",
+    "commandHelp": "yarn cli <command> --help"
+  },
+  "schema": {
+    "version": "1.0.0",
+    "commands": {}
+  },
+  "commands": {}
+}

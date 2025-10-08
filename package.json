@@ -16,6 +16,8 @@
     "build": "tsc",
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
+    "cli": "tsx cli/framework/cli.ts",
+    "cli:gen-ai-context": "tsx cli/ai-context.ts",
     "format": "prettier -w .",
     "gen": "tsx inboxes/gen.ts",
     "groups": "tsx cli/groups.ts",
