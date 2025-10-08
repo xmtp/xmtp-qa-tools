@@ -12,7 +12,16 @@ import {
 } from "@xmtp/agent-sdk-1.1.6";
 
 // Export the latest version as default
-export { Agent, MessageContext } from "@xmtp/agent-sdk-1.1.6";
+export {
+  Agent,
+  MessageContext,
+  AgentMiddleware,
+  type Group,
+  type IdentifierKind,
+  type PermissionLevel,
+} from "@xmtp/agent-sdk-1.1.6";
+
+export { getTestUrl } from "@xmtp/agent-sdk-1.1.6/debug";
 
 export const AgentVersionList = [
   {

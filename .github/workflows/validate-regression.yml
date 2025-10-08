@@ -61,6 +61,7 @@ jobs:
 
       - name: Run script version
         run: yarn versions
+        run: yarn agent-versions
 
       - name: Run regression tests
         run: yarn regression

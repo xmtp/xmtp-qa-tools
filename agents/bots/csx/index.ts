@@ -1,6 +1,10 @@
 import { APP_VERSION } from "@helpers/client";
-import { Agent, type Group, type MessageContext } from "@xmtp/agent-sdk";
-import { getTestUrl } from "@xmtp/agent-sdk/debug";
+import {
+  Agent,
+  getTestUrl,
+  type Group,
+  type MessageContext,
+} from "../../versions/agent-sdk";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
