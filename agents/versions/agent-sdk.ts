@@ -15,7 +15,7 @@ import {
 export {
   Agent,
   MessageContext,
-  AgentMiddleware,
+  type AgentMiddleware,
   type Group,
   type IdentifierKind,
   type PermissionLevel,
