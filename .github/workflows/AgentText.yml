@@ -4,7 +4,7 @@ description: "First meaningful response of the agents"
 on:
   #pull_request:
   schedule:
-    - cron: "*/90 * * * *" # Runs every 90 minutes for agents-text
+    - cron: "30 * * * *" # Runs every hour at 30 minutes past
   workflow_dispatch:
 
 jobs:
