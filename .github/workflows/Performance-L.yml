@@ -4,7 +4,7 @@ description: "performance of medium groups"
 on:
   #pull_request:
   schedule:
-    - cron: "30 */6 * * *" # Runs every 6 hours at 30 minutes past the hour (avoids :00 and provides separation from Performance at :30)
+    - cron: "45 */6 * * *" # Runs every 6 hours at 45 minutes past the hour
   workflow_dispatch:
 
 jobs:
