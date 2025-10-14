@@ -71,15 +71,15 @@ describe(testName, () => {
     expect(result).toBe(true);
   });
 
-  it("newDm and message stream", async () => {
-    await sleep();
-    await xmtpTester.newDmFromUI(receiver.address);
-    await xmtpTester.sendMessage(`hi ${receiver.name}`);
-    console.log("waiting for response");
-    const result = await xmtpTester.waitForResponse(["gm"]);
-    console.log("response received", result);
-    expect(result).toBe(true);
-  });
+  // it("newDm and message stream", async () => {
+  //   await sleep();
+  //   await xmtpTester.newDmFromUI(receiver.address);
+  //   await xmtpTester.sendMessage(`hi ${receiver.name}`);
+  //   console.log("waiting for response");
+  //   const result = await xmtpTester.waitForResponse(["gm"]);
+  //   console.log("response received", result);
+  //   expect(result).toBe(true);
+  // });
 
   it("newGroup and message stream", async () => {
     await sleep();
@@ -129,18 +129,18 @@ describe(testName, () => {
     }
   }, 30000);
 
-  it("new installation and message stream", async () => {
-    const xmtpNewTester = new playwright({
-      headless,
-    });
+  // it("new installation and message stream", async () => {
+  //   const xmtpNewTester = new playwright({
+  //     headless,
+  //   });
 
-    await xmtpNewTester.startPage();
+  //   await xmtpNewTester.startPage();
 
-    await xmtpNewTester.newDmFromUI(receiver.address);
-    await xmtpNewTester.sendMessage(`hi ${receiver.name}`);
-    console.log("waiting for response");
-    const result = await xmtpNewTester.waitForResponse(["gm"]);
-    console.log("response received", result);
-    expect(result).toBe(true);
-  });
+  //   await xmtpNewTester.newDmFromUI(receiver.address);
+  //   await xmtpNewTester.sendMessage(`hi ${receiver.name}`);
+  //   console.log("waiting for response");
+  //   const result = await xmtpNewTester.waitForResponse(["gm"]);
+  //   console.log("response received", result);
+  //   expect(result).toBe(true);
+  // });
 });

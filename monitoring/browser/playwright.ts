@@ -82,9 +82,19 @@ export class playwright {
   ): Promise<void> {
     try {
       if (!this.page) throw new Error("Page is not initialized");
-      await this.page.goto(
-        `https://xmtp.chat/conversations/${groupId}/manage/members`,
-      );
+
+      // Navigate using client-side routing instead of page reload
+      const targetUrl = `https://xmtp.chat/conversations/${groupId}/manage/members`;
+      if (this.page.url() !== targetUrl) {
+        await this.page.evaluate((url) => {
+          // @ts-expect-error Window access in browser context
+          window.history.pushState({}, "", url);
+          // @ts-expect-error Window access in browser context
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }, targetUrl);
+        await this.page.waitForURL(targetUrl);
+      }
+
       await this.page.getByRole("textbox", { name: "Address" }).fill(address);
       await this.page.getByRole("button", { name: "Add" }).click();
       await this.page.getByRole("button", { name: "Save" }).click();
@@ -103,8 +113,18 @@ export class playwright {
     try {
       if (!this.page) throw new Error("Page is not initialized");
 
-      // Target the second button with the menu popup attribute
-      await this.page.goto("https://xmtp.chat/conversations/new-group");
+      // Navigate using client-side routing instead of page reload
+      const targetUrl = "https://xmtp.chat/conversations/new-group";
+      if (this.page.url() !== targetUrl) {
+        await this.page.evaluate((url) => {
+          // @ts-expect-error Window access in browser context
+          window.history.pushState({}, "", url);
+          // @ts-expect-error Window access in browser context
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }, targetUrl);
+        await this.page.waitForURL(targetUrl);
+      }
+
       await this.page.getByRole("button", { name: "Members" }).click();
 
       const addressInput = this.page.getByRole("textbox", { name: "Address" });
@@ -131,11 +151,23 @@ export class playwright {
   /**
    * Fills addresses and creates a new conversation
    */
-  public async newDmFromUI(address: string): Promise<void> {
+  public async newDmFromUI(address: string, wait = true): Promise<string> {
     try {
       if (!this.page) throw new Error("Page is not initialized");
       console.debug("Navigating to new DM");
-      await this.page.goto("https://xmtp.chat/conversations/new-dm");
+
+      // Navigate using client-side routing instead of page reload
+      const targetUrl = "https://xmtp.chat/conversations/new-dm";
+      if (this.page.url() !== targetUrl) {
+        await this.page.evaluate((url) => {
+          // @ts-expect-error Window access in browser context
+          window.history.pushState({}, "", url);
+          // @ts-expect-error Window access in browser context
+          window.dispatchEvent(new PopStateEvent("popstate"));
+        }, targetUrl);
+        await this.page.waitForURL(targetUrl);
+      }
+
       console.debug("Filling address");
       const addressInput = this.page.getByRole("textbox", { name: "Address" });
       await addressInput.waitFor({ state: "visible" });
@@ -143,8 +175,15 @@ export class playwright {
       await addressInput.fill(address);
       console.debug("Clicked create");
       await this.page.getByRole("button", { name: "Create" }).click();
-      await addressInput.waitFor({ state: "hidden" });
-      return;
+      if (wait) {
+        await addressInput.waitFor({ state: "hidden" });
+        await this.page.waitForURL(/\/conversations\/.+/);
+        const url = this.page.url();
+        const conversationId = url.split("/conversations/")[1];
+        console.debug("Created DM with ID:", conversationId);
+        return conversationId;
+      }
+      return "";
     } catch (error) {
       await this.takeSnapshot(`newDmFromUI-error-${address}`);
       throw error;
