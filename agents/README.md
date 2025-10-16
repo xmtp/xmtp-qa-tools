@@ -17,8 +17,8 @@ agents/
 │   ├── agents.ts           # Agent management utilities
 │   └── endpoint.ts         # Agent endpoint testing
 └── versions/      # Agent SDK version management
-    ├── sdk-agent-versions.ts    # Agent SDK version mappings
-    ├── cli-agent-versions.ts    # CLI for Agent SDK versions
+    ├── agent-sdk.ts    # Agent SDK version mappings
+    ├── cli.ts    # CLI for Agent SDK versions
     └── README.md               # Agent SDK version management docs
 ```
 

@@ -125,15 +125,15 @@ function greet(name) {
   }
 
   async handleTransaction(ctx: MessageContext): Promise<void> {
-    const agentAddress = ctx.client.accountIdentifier?.identifier || "";
+    const agentAddress = await ctx.getClientAddress();
     const senderAddress = await ctx.getSenderAddress();
 
     // Convert amount to USDC decimals (6 decimal places)
     const amountInDecimals = Math.floor(0.1 * Math.pow(10, 6));
 
     const walletSendCalls = this.usdcHandler.createUSDCTransferCalls(
-      senderAddress,
-      agentAddress,
+      senderAddress as string,
+      agentAddress as string,
       amountInDecimals,
     );
     console.log("Replied with wallet sendcall");

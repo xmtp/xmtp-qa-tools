@@ -1,3 +1,4 @@
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { type MessageContext } from "../../../versions/agent-sdk";
 
 export class LoadTestHandlers {
@@ -57,21 +58,27 @@ export class LoadTestHandlers {
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
 
-      const summary =
-        `🎯 Load Test Complete!\n` +
-        `📊 Groups created: ${groupsCreated}\n` +
-        `📨 Total messages sent: ${totalMessagesSent}\n` +
-        `⏱️ Duration: ${duration.toFixed(2)} seconds\n` +
-        `📈 Messages per second: ${(totalMessagesSent / duration).toFixed(2)}\n\n` +
-        `📋 Created Groups:\n` +
-        createdGroups
-          .map(
-            (group, index) =>
-              `${index + 1}. ${group.name} (ID: ${group.id.substring(0, 8)}...)`,
-          )
-          .join("\n");
+      const summary = `## 🎯 Load Test Complete!
 
-      await ctx.sendText(summary);
+### 📊 Results
+
+| Metric | Value |
+|--------|-------|
+| Groups created | ${groupsCreated} |
+| Total messages sent | ${totalMessagesSent} |
+| Duration | ${duration.toFixed(2)}s |
+| Messages per second | ${(totalMessagesSent / duration).toFixed(2)} |
+
+### 📋 Created Groups
+
+${createdGroups
+  .map(
+    (group, index) =>
+      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+  )
+  .join("\n\n")}`;
+
+      await ctx.conversation.send(summary, ContentTypeMarkdown);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
@@ -138,22 +145,28 @@ export class LoadTestHandlers {
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
 
-      const summary =
-        `🎯 Load Test Complete!\n` +
-        `📊 Groups created: ${groupsCreated}\n` +
-        `📨 Total messages sent: ${totalMessagesSent}\n` +
-        `⏱️ Duration: ${duration.toFixed(2)} seconds\n` +
-        `📈 Messages per second: ${(totalMessagesSent / duration).toFixed(2)}\n\n` +
-        `📋 Created Groups (showing first 10):\n` +
-        createdGroups
-          .slice(0, 10)
-          .map(
-            (group, index) =>
-              `${index + 1}. ${group.name} (ID: ${group.id.substring(0, 8)}...)`,
-          )
-          .join("\n");
+      const summary = `## 🎯 Load Test Complete!
 
-      await ctx.sendText(summary);
+### 📊 Results
+
+| Metric | Value |
+|--------|-------|
+| Groups created | ${groupsCreated} |
+| Total messages sent | ${totalMessagesSent} |
+| Duration | ${duration.toFixed(2)}s |
+| Messages per second | ${(totalMessagesSent / duration).toFixed(2)} |
+
+### 📋 Created Groups (showing first 10)
+
+${createdGroups
+  .slice(0, 10)
+  .map(
+    (group, index) =>
+      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+  )
+  .join("\n\n")}`;
+
+      await ctx.conversation.send(summary, ContentTypeMarkdown);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
@@ -214,21 +227,27 @@ export class LoadTestHandlers {
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
 
-      const summary =
-        `🎯 Load Test Complete!\n` +
-        `📊 Groups created: ${groupsCreated}\n` +
-        `📨 Total messages sent: ${totalMessagesSent}\n` +
-        `⏱️ Duration: ${duration.toFixed(2)} seconds\n` +
-        `📈 Messages per second: ${(totalMessagesSent / duration).toFixed(2)}\n\n` +
-        `📋 Created Group:\n` +
-        createdGroups
-          .map(
-            (group, index) =>
-              `${index + 1}. ${group.name} (ID: ${group.id.substring(0, 8)}...)`,
-          )
-          .join("\n");
+      const summary = `## 🎯 Load Test Complete!
 
-      await ctx.sendText(summary);
+### 📊 Results
+
+| Metric | Value |
+|--------|-------|
+| Groups created | ${groupsCreated} |
+| Total messages sent | ${totalMessagesSent} |
+| Duration | ${duration.toFixed(2)}s |
+| Messages per second | ${(totalMessagesSent / duration).toFixed(2)} |
+
+### 📋 Created Group
+
+${createdGroups
+  .map(
+    (group, index) =>
+      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+  )
+  .join("\n\n")}`;
+
+      await ctx.conversation.send(summary, ContentTypeMarkdown);
       console.log("Load test completed:", summary);
     } catch (error) {
       console.error("Load test failed:", error);
@@ -309,22 +328,28 @@ export class LoadTestHandlers {
       const endTime = Date.now();
       const duration = (endTime - startTime) / 1000;
 
-      const summary =
-        `🎯 Custom Load Test Complete!\n` +
-        `📊 Groups created: ${groupsCreated}\n` +
-        `📨 Total messages sent: ${totalMessagesSent}\n` +
-        `⏱️ Duration: ${duration.toFixed(2)} seconds\n` +
-        `📈 Messages per second: ${(totalMessagesSent / duration).toFixed(2)}\n\n` +
-        `📋 Created Groups${createdGroups.length > 10 ? " (showing first 10)" : ""}:\n` +
-        createdGroups
-          .slice(0, 10)
-          .map(
-            (group, index) =>
-              `${index + 1}. ${group.name} (ID: ${group.id.substring(0, 8)}...)`,
-          )
-          .join("\n");
+      const summary = `## 🎯 Custom Load Test Complete!
 
-      await ctx.sendText(summary);
+### 📊 Results
+
+| Metric | Value |
+|--------|-------|
+| Groups created | ${groupsCreated} |
+| Total messages sent | ${totalMessagesSent} |
+| Duration | ${duration.toFixed(2)}s |
+| Messages per second | ${(totalMessagesSent / duration).toFixed(2)} |
+
+### 📋 Created Groups${createdGroups.length > 10 ? " (showing first 10)" : ""}
+
+${createdGroups
+  .slice(0, 10)
+  .map(
+    (group, index) =>
+      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+  )
+  .join("\n\n")}`;
+
+      await ctx.conversation.send(summary, ContentTypeMarkdown);
       console.log("Custom load test completed:", summary);
     } catch (error) {
       console.error("Custom load test failed:", error);
