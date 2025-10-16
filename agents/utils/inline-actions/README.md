@@ -37,6 +37,11 @@ await ActionBuilder.create("menu-id", "Description")
   .add("action-id", "Button Label", "primary") // primary|secondary|danger
   .add("action-id-2", "Another Button")
   .send(ctx);
+
+// With markdown support for the title
+await ActionBuilder.create("menu-id", "**Bold Title**\n\n*Italic text*", true)
+  .add("action-id", "Button Label")
+  .send(ctx);
 ```
 
 ### Helper Functions
@@ -49,6 +54,15 @@ await sendConfirmation(
   "Delete this item?",
   async (ctx) => await ctx.sendText("Deleted!"),
   async (ctx) => await ctx.sendText("Cancelled"),
+);
+
+// With markdown support
+await sendConfirmation(
+  ctx,
+  "**Are you sure?**\n\nThis action cannot be undone.",
+  async (ctx) => await ctx.sendText("Deleted!"),
+  async (ctx) => await ctx.sendText("Cancelled"),
+  true, // Enable markdown
 );
 ```
 
@@ -71,6 +85,16 @@ await sendSelection(ctx, "Pick a color:", [
     },
   },
 ]);
+
+// With markdown support
+await sendSelection(
+  ctx,
+  "**Select an option:**\n\n- Choose carefully\n- This is important",
+  [
+    /* options */
+  ],
+  true, // Enable markdown
+);
 ```
 
 ### App Configuration
@@ -83,7 +107,8 @@ const config: AppConfig = {
   menus: {
     "main-menu": {
       id: "main-menu",
-      title: "Main Menu",
+      title: "**Main Menu**\n\nChoose an option below:",
+      markdownTitle: true, // Enable markdown for this menu's title
       actions: [
         { id: "sub-menu", label: "Go to Sub Menu" },
         { id: "action-1", label: "Do Something", handler: myHandler },
