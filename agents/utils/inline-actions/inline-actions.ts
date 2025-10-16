@@ -127,11 +127,17 @@ export class ActionBuilder {
   private actions: Action[] = [];
   private actionId = "";
   private actionDescription = "";
+  private useMarkdown = false;
 
-  static create(id: string, description: string): ActionBuilder {
+  static create(
+    id: string,
+    description: string,
+    markdown = false,
+  ): ActionBuilder {
     const builder = new ActionBuilder();
     builder.actionId = id;
     builder.actionDescription = description;
+    builder.useMarkdown = markdown;
     return builder;
   }
 
@@ -149,6 +155,7 @@ export class ActionBuilder {
       id: this.actionId,
       description: this.actionDescription,
       actions: this.actions,
+      ...(this.useMarkdown && { markdownTitle: true }),
     };
   }
 
@@ -178,6 +185,7 @@ export async function sendConfirmation(
   message: string,
   onYes: ActionHandler,
   onNo?: ActionHandler,
+  markdown = false,
 ): Promise<void> {
   const timestamp = Date.now();
   const yesId = `yes-${timestamp}`;
@@ -192,7 +200,7 @@ export async function sendConfirmation(
       }),
   );
 
-  await ActionBuilder.create(`confirm-${timestamp}`, message)
+  await ActionBuilder.create(`confirm-${timestamp}`, message, markdown)
     .add(yesId, "✅ Yes", "primary")
     .add(noId, "❌ No", "danger")
     .send(ctx);
@@ -207,8 +215,13 @@ export async function sendSelection(
     style?: "primary" | "secondary" | "danger";
     handler: ActionHandler;
   }>,
+  markdown = false,
 ): Promise<void> {
-  const builder = ActionBuilder.create(`selection-${Date.now()}`, message);
+  const builder = ActionBuilder.create(
+    `selection-${Date.now()}`,
+    message,
+    markdown,
+  );
 
   options.forEach((option) => {
     registerAction(option.id, option.handler);
@@ -257,6 +270,7 @@ export type Menu = {
   id: string;
   title: string;
   actions: MenuAction[];
+  markdownTitle?: boolean;
 };
 
 export type AppConfig = {
@@ -301,7 +315,7 @@ export async function showMenu(
   }
 
   // Use a stable action ID without timestamp to prevent conflicts
-  const builder = ActionBuilder.create(menuId, menu.title);
+  const builder = ActionBuilder.create(menuId, menu.title, menu.markdownTitle);
 
   menu.actions.forEach((action) => {
     builder.add(action.id, action.label, action.style);
@@ -320,6 +334,7 @@ export async function showNavigationOptions(
     label: string;
     style?: "primary" | "secondary" | "danger";
   }>,
+  markdown = false,
 ): Promise<void> {
   // Check if auto-show menu is enabled (default: true for backward compatibility)
   const autoShowMenu = config.options?.autoShowMenuAfterAction !== false;
@@ -331,7 +346,11 @@ export async function showNavigationOptions(
   }
 
   // Use a stable action ID to prevent conflicts
-  const navigationMenu = ActionBuilder.create("navigation-options", message);
+  const navigationMenu = ActionBuilder.create(
+    "navigation-options",
+    message,
+    markdown,
+  );
 
   // Add custom actions if provided
   if (customActions) {
