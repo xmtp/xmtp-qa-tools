@@ -1421,9 +1421,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.6@npm:@xmtp/agent-sdk@1.1.6":
-  version: 1.1.6
-  resolution: "@xmtp/agent-sdk@npm:1.1.6"
+"@xmtp/agent-sdk-1.1.7@npm:@xmtp/agent-sdk@1.1.7":
+  version: 1.1.7
+  resolution: "@xmtp/agent-sdk@npm:1.1.7"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
@@ -1432,7 +1432,7 @@ __metadata:
     "@xmtp/node-sdk": "npm:^4.2.3"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/a3be6f167c478aec546ba0920a0aa58dbc8eba8839ed8a17d8c1d131b9516b937f54d773315c9c11a522516c6c85e843ba122dbedc5cb4b680ecde3e8f09d4ca
+  checksum: 10/f8d76265a4cbcb32282ba75404d50779bef0f7bb9bd16298a825348b03a15f0fa290966d4eb15a71bcd3a621be279379b632ea6e448e715bdefe782e9ac99a34
   languageName: node
   linkType: hard
 
@@ -4644,7 +4644,7 @@ __metadata:
     "@xmtp/agent-sdk-1.0.0": "npm:@xmtp/agent-sdk@1.0.0"
     "@xmtp/agent-sdk-1.0.1": "npm:@xmtp/agent-sdk@1.0.1"
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2"
-    "@xmtp/agent-sdk-1.1.6": "npm:@xmtp/agent-sdk@1.1.6"
+    "@xmtp/agent-sdk-1.1.7": "npm:@xmtp/agent-sdk@1.1.7"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
