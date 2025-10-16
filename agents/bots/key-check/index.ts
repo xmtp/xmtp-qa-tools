@@ -419,9 +419,9 @@ agent.on("text", async (ctx) => {
   }
 
   if (ctx.isDm() && !isTagged) {
-    const welcomeMessage = `# 👋 Welcome to Key-Check Bot
+    const welcomeMessage = `### 👋 Welcome to Key-Check Bot
 
-Please send **\`/kc\`** to see the main menu
+Please send \`/kc\` to see the main menu
 
 Or directly send:
 - 📧 An **Ethereum address** to check key packages

@@ -1,3 +1,4 @@
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { type Group, type MessageContext } from "../../../versions/agent-sdk";
 
 interface ForkDebugInfo {
@@ -156,59 +157,55 @@ export class ForksHandlers {
     const conversation = ctx.conversation;
     const group = conversation as Group;
 
-    let report = "🔍 **FORK DETECTION ANALYSIS REPORT**\n";
-    report += `${"=".repeat(50)}\n\n`;
+    let report = "# 🔍 FORK DETECTION ANALYSIS REPORT\n\n";
 
     // Critical Status Section
-    report += "🚨 **CRITICAL STATUS**\n";
-    report += `${"─".repeat(20)}\n`;
+    report += "## 🚨 Critical Status\n\n";
     if (analysis.isForkDetected) {
-      report += "⚠️ **FORK DETECTED** - Immediate attention required\n";
+      report += "⚠️ **FORK DETECTED** - Immediate attention required\n\n";
       if (analysis.epochChanged) {
-        report += `🔄 Epoch changed: ${analysis.preSyncEpoch} → ${analysis.postSyncEpoch}\n`;
+        report += `🔄 Epoch changed: ${analysis.preSyncEpoch} → ${analysis.postSyncEpoch}\n\n`;
       }
     } else {
-      report += "✅ **NO FORK DETECTED** - Conversation stable\n";
+      report += "✅ **NO FORK DETECTED** - Conversation stable\n\n";
     }
-    report += `📊 Epoch: ${analysis.postSyncEpoch}\n\n`;
+    report += `📊 **Epoch:** ${analysis.postSyncEpoch}\n\n`;
 
     // Message Context
-    report += "📩 **MESSAGE CONTEXT**\n";
-    report += `${"─".repeat(20)}\n`;
-    report += `• Content: "${message.content as string}"\n`;
-    report += `• Sender: \`${senderAddress}\`\n`;
-    report += `• Message ID: \`${message.id}\`\n`;
-    report += `• Sent: ${this.formatTimestamp(message.sentAt as Date)}\n\n`;
+    report += "## 📩 Message Context\n\n";
+    report += `- **Content:** "${message.content as string}"\n`;
+    report += `- **Sender:** \`${senderAddress}\`\n`;
+    report += `- **Message ID:** \`${message.id}\`\n`;
+    report += `- **Sent:** ${this.formatTimestamp(message.sentAt as Date)}\n\n`;
 
     // Conversation Metadata
-    report += "💬 **CONVERSATION METADATA**\n";
-    report += `${"─".repeat(20)}\n`;
-    report += `• ID: \`${conversation.id}\`\n`;
-    report += `• Created: ${this.formatTimestamp(conversation.createdAt as Date)}\n`;
-    report += `• Active: ${group.isActive ? "✅" : "❌"}\n`;
-    report += `• Added By: ${group.addedByInboxId || "Unknown"}\n\n`;
+    report += "## 💬 Conversation Metadata\n\n";
+    report += `- **ID:** \`${conversation.id}\`\n`;
+    report += `- **Created:** ${this.formatTimestamp(conversation.createdAt as Date)}\n`;
+    report += `- **Active:** ${group.isActive ? "✅" : "❌"}\n`;
+    report += `- **Added By:** ${group.addedByInboxId || "Unknown"}\n\n`;
 
     // Fork Analysis Details
-    report += "🔬 **FORK ANALYSIS DETAILS**\n";
-    report += `${"─".repeat(20)}\n`;
-    report += `• Pre-sync Epoch: ${analysis.preSyncEpoch}\n`;
-    report += `• Post-sync Epoch: ${analysis.postSyncEpoch}\n`;
-    report += `• Epoch Stability: ${analysis.epochChanged ? "⚠️ CHANGED" : "✅ STABLE"}\n`;
-    report += `• Member Count: ${analysis.memberCount}\n`;
-    report += `• Message Count: ${analysis.messageCount}\n`;
+    report += "## 🔬 Fork Analysis Details\n\n";
+    report += `| Metric | Value |\n`;
+    report += `|--------|-------|\n`;
+    report += `| Pre-sync Epoch | ${analysis.preSyncEpoch} |\n`;
+    report += `| Post-sync Epoch | ${analysis.postSyncEpoch} |\n`;
+    report += `| Epoch Stability | ${analysis.epochChanged ? "⚠️ CHANGED" : "✅ STABLE"} |\n`;
+    report += `| Member Count | ${analysis.memberCount} |\n`;
+    report += `| Message Count | ${analysis.messageCount} |\n`;
 
     if (analysis.timeSinceLastMessage !== null) {
       const minutesAgo = Math.floor(
         analysis.timeSinceLastMessage / (1000 * 60),
       );
-      report += `• Last Message: ${minutesAgo} minutes ago\n`;
+      report += `| Last Message | ${minutesAgo} minutes ago |\n`;
     }
     report += "\n";
 
     // Error Summary
     if (analysis.syncErrors.length > 0) {
-      report += "❌ **SYNC ERRORS**\n";
-      report += `${"─".repeat(20)}\n`;
+      report += "## ❌ Sync Errors\n\n";
       analysis.syncErrors.forEach((error, index) => {
         report += `${index + 1}. ${error}\n`;
       });
@@ -216,17 +213,16 @@ export class ForksHandlers {
     }
 
     // Recommendations
-    report += "💡 **RECOMMENDATIONS**\n";
-    report += `${"─".repeat(20)}\n`;
+    report += "## 💡 Recommendations\n\n";
     if (analysis.isForkDetected) {
-      report += "• Investigate epoch changes and member consistency\n";
-      report += "• Check for duplicate messages or missing content\n";
-      report += "• Verify all members can see the same conversation state\n";
-      report += "• Consider conversation recovery procedures\n";
+      report += "- Investigate epoch changes and member consistency\n";
+      report += "- Check for duplicate messages or missing content\n";
+      report += "- Verify all members can see the same conversation state\n";
+      report += "- Consider conversation recovery procedures\n";
     } else {
-      report += "• Conversation appears healthy\n";
-      report += "• Continue normal operations\n";
-      report += "• Monitor for future fork indicators\n";
+      report += "- Conversation appears healthy\n";
+      report += "- Continue normal operations\n";
+      report += "- Monitor for future fork indicators\n";
     }
 
     return report;
@@ -251,7 +247,7 @@ export class ForksHandlers {
         analysis,
         senderAddress as string,
       );
-      await ctx.sendText(report);
+      await ctx.conversation.send(report, ContentTypeMarkdown);
 
       this.logInfo("Fork detection report sent successfully");
       this.logSection("FORK DETECTION COMPLETE");

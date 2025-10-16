@@ -1,3 +1,4 @@
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   type Group,
   type IdentifierKind,
@@ -16,7 +17,7 @@ export class GroupHandlers {
         return;
       }
 
-      let membersList = "📋 **Group Members by Address:**\n\n";
+      let membersList = "## 📋 Group Members by Address\n\n";
 
       for (const member of members) {
         try {
@@ -37,22 +38,23 @@ export class GroupHandlers {
           if (isBot) marker += "🤖 ";
           if (isSender) marker += "👤 ";
 
-          membersList += `${marker}**${address}**\n`;
-          membersList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
+          membersList += `${marker}**${address}**  \n`;
+          membersList += `└─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
         } catch (error) {
           console.error(
             `Error getting address for member ${member.inboxId}:`,
             error,
           );
-          membersList += `❓ **Unknown Address**\n`;
-          membersList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
+          membersList += `❓ **Unknown Address**  \n`;
+          membersList += `└─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
         }
       }
 
-      membersList += `\n📊 **Total Members:** ${members.length}\n`;
-      membersList += "🤖 = Bot  👤 = You";
+      membersList += `---\n\n`;
+      membersList += `**📊 Total Members:** ${members.length}  \n`;
+      membersList += `🤖 = Bot  👤 = You`;
 
-      await ctx.sendText(membersList);
+      await ctx.conversation.send(membersList, ContentTypeMarkdown);
       console.log(`Sent group members list (${members.length} members)`);
     } catch (error) {
       console.error("Error getting group members:", error);
@@ -68,7 +70,7 @@ export class GroupHandlers {
       const groupDescription = group.description;
       const groupId = ctx.message.conversationId;
 
-      let infoText = "ℹ️ **Group Information:**\n\n";
+      let infoText = "## ℹ️ Group Information\n\n";
 
       // Group Name
       if (groupName && groupName.trim()) {
@@ -85,10 +87,10 @@ export class GroupHandlers {
       }
 
       // Group ID (abbreviated)
-      infoText += `🆔 **Group ID:** \`${groupId.substring(0, 8)}...${groupId.substring(groupId.length - 8)}\`\n`;
-      infoText += `📋 **Full Group ID:** \`${groupId}\`\n\n`;
+      infoText += `🆔 **Group ID:** \`${groupId.substring(0, 8)}...${groupId.substring(groupId.length - 8)}\`\n\n`;
+      infoText += `📋 **Full Group ID:**\n\`\`\`\n${groupId}\n\`\`\`\n`;
 
-      await ctx.sendText(infoText);
+      await ctx.conversation.send(infoText, ContentTypeMarkdown);
       console.log("Sent group information");
     } catch (error) {
       console.error("Error getting group info:", error);
@@ -108,7 +110,7 @@ export class GroupHandlers {
       // Count admins and super admins
       let adminCount = 0;
       let superAdminCount = 0;
-      let adminsList = "👑 **Group Administrators:**\n\n";
+      let adminsList = "## 👑 Group Administrators\n\n";
 
       for (const member of members) {
         if (
@@ -134,27 +136,27 @@ export class GroupHandlers {
             if (isSender) marker += "👤 ";
 
             if (member.permissionLevel == (2 as PermissionLevel)) {
-              adminsList += `${marker}👑 **${address}** *(Super Admin)*\n`;
+              adminsList += `${marker}👑 **${address}** *(Super Admin)*  \n`;
               superAdminCount++;
             } else {
-              adminsList += `${marker}🔧 **${address}** *(Admin)*\n`;
+              adminsList += `${marker}🔧 **${address}** *(Admin)*  \n`;
               adminCount++;
             }
 
-            adminsList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
+            adminsList += `└─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
           } catch (error) {
             console.error(
               `Error getting address for admin ${member.inboxId}:`,
               error,
             );
             if (member.permissionLevel == (2 as PermissionLevel)) {
-              adminsList += `❓ **Unknown Address** *(Super Admin)*\n`;
+              adminsList += `❓ **Unknown Address** *(Super Admin)*  \n`;
               superAdminCount++;
             } else {
-              adminsList += `❓ **Unknown Address** *(Admin)*\n`;
+              adminsList += `❓ **Unknown Address** *(Admin)*  \n`;
               adminCount++;
             }
-            adminsList += `  └─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
+            adminsList += `└─ Inbox: \`${member.inboxId.substring(0, 8)}...${member.inboxId.substring(member.inboxId.length - 8)}\`\n\n`;
           }
         }
       }
@@ -163,12 +165,13 @@ export class GroupHandlers {
         adminsList += "*No administrators found in this group.*\n\n";
       }
 
-      adminsList += `📊 **Summary:**\n`;
-      adminsList += `👑 Super Admins: ${superAdminCount}\n`;
-      adminsList += `🔧 Admins: ${adminCount}\n`;
-      adminsList += `📈 Total Administrators: ${adminCount + superAdminCount}`;
+      adminsList += `---\n\n`;
+      adminsList += `### 📊 Summary\n\n`;
+      adminsList += `- 👑 **Super Admins:** ${superAdminCount}\n`;
+      adminsList += `- 🔧 **Admins:** ${adminCount}\n`;
+      adminsList += `- 📈 **Total Administrators:** ${adminCount + superAdminCount}`;
 
-      await ctx.sendText(adminsList);
+      await ctx.conversation.send(adminsList, ContentTypeMarkdown);
       console.log(
         `Sent group admins list (${superAdminCount} super admins, ${adminCount} admins)`,
       );
@@ -186,10 +189,10 @@ export class GroupHandlers {
       const superAdmins = group.superAdmins || [];
       const members = await ctx.conversation.members();
 
-      let permissionsText = "🔐 **Group Permissions:**\n\n";
+      let permissionsText = "## 🔐 Group Permissions\n\n";
 
       // Display admin information
-      permissionsText += `👑 **Super Admins:** ${superAdmins.length}\n`;
+      permissionsText += `### 👑 Super Admins (${superAdmins.length})\n\n`;
       if (superAdmins.length > 0) {
         for (const superAdminInboxId of superAdmins) {
           const member = members.find(
@@ -200,12 +203,14 @@ export class GroupHandlers {
               (id: any) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
-            permissionsText += `  • ${address}\n`;
+            permissionsText += `- ${address}\n`;
           }
         }
+      } else {
+        permissionsText += "*No super admins*\n";
       }
 
-      permissionsText += `\n🔧 **Admins:** ${admins.length}\n`;
+      permissionsText += `\n### 🔧 Admins (${admins.length})\n\n`;
       if (admins.length > 0) {
         for (const adminInboxId of admins) {
           const member = members.find(
@@ -216,23 +221,30 @@ export class GroupHandlers {
               (id: any) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
-            permissionsText += `  • ${address}\n`;
+            permissionsText += `- ${address}\n`;
           }
         }
+      } else {
+        permissionsText += "*No admins*\n";
       }
 
-      permissionsText += `\n📊 **Total Members:** ${members.length}\n`;
-      permissionsText += `📈 **Regular Members:** ${members.length - admins.length - superAdmins.length}\n\n`;
+      permissionsText += `\n### 📊 Member Summary\n\n`;
+      permissionsText += `| Role | Count |\n`;
+      permissionsText += `|------|-------|\n`;
+      permissionsText += `| Total Members | ${members.length} |\n`;
+      permissionsText += `| Super Admins | ${superAdmins.length} |\n`;
+      permissionsText += `| Admins | ${admins.length} |\n`;
+      permissionsText += `| Regular Members | ${members.length - admins.length - superAdmins.length} |\n\n`;
 
       permissionsText +=
-        "ℹ️ **Note:** XMTP groups use a role-based permission system.\n";
+        "---\n\n**ℹ️ Note:** XMTP groups use a role-based permission system:\n\n";
       permissionsText +=
-        "• **Super Admins** can manage all aspects of the group\n";
+        "- **Super Admins** can manage all aspects of the group\n";
       permissionsText +=
-        "• **Admins** can perform admin-level actions based on group settings\n";
-      permissionsText += "• **Members** have basic participation rights\n";
+        "- **Admins** can perform admin-level actions based on group settings\n";
+      permissionsText += "- **Members** have basic participation rights\n";
 
-      await ctx.sendText(permissionsText);
+      await ctx.conversation.send(permissionsText, ContentTypeMarkdown);
       console.log("Sent group permissions information");
     } catch (error) {
       console.error("Error getting group permissions:", error);

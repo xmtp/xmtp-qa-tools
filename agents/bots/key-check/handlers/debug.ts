@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { type MessageContext } from "../../../versions/agent-sdk";
 
 // Get XMTP SDK version from package.json
@@ -97,34 +98,34 @@ export class DebugHandlers {
     }
 
     // Create comprehensive debug info
-    const debugInfo = `🔧 **Key-Check Bot Debug Information**
+    const debugInfo = `## 🔧 Key-Check Bot Debug Information
 
-📦 **Version Info:**
-• XMTP Agent SDK: ${xmtpSdkVersion}
-• Client Version: ${ctx.client.constructor.name}
-• App Version: ${appVersion}
-• Environment: ${env}
+### 📦 Version Info
+- **XMTP Agent SDK:** ${xmtpSdkVersion}
+- **Client Version:** ${ctx.client.constructor.name}
+- **App Version:** ${appVersion}
+- **Environment:** ${env}
 
-⏰ **Uptime Info:**
-• Started: ${this.startTime.toLocaleString()}
-• Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s
+### ⏰ Uptime Info
+- **Started:** ${this.startTime.toLocaleString()}
+- **Uptime:** ${days}d ${hours}h ${minutes}m ${seconds}s
 
-🔑 **Client Details:**
-• Address: ${address}
-• Inbox ID: ${inboxId}
-• Installation ID: ${installationId}
-• Total Installations: ${inboxState.installations.length}
-• Key Package Created: ${createdDate.toLocaleString()}
-• Key Package Valid Until: ${expiryDate.toLocaleString()}
+### 🔑 Client Details
+- **Address:** \`${address}\`
+- **Inbox ID:** \`${inboxId}\`
+- **Installation ID:** \`${installationId}\`
+- **Total Installations:** ${inboxState.installations.length}
+- **Key Package Created:** ${createdDate.toLocaleString()}
+- **Key Package Valid Until:** ${expiryDate.toLocaleString()}
 
-💬 **Conversations:**
-• Total: ${conversations.length}
+### 💬 Conversations
+- **Total:** ${conversations.length}
 
-🛠️ **System Status:**
-• Bot Status: ✅ Running
-• Last Updated: ${currentTime.toLocaleString()}`;
+### 🛠️ System Status
+- **Bot Status:** ✅ Running
+- **Last Updated:** ${currentTime.toLocaleString()}`;
 
-    await ctx.sendText(debugInfo);
+    await ctx.conversation.send(debugInfo, ContentTypeMarkdown);
     console.log("Sent comprehensive debug information");
   }
 
@@ -186,9 +187,21 @@ export class DebugHandlers {
       ).length;
       const invalidInstallations = totalInstallations - validInstallations;
 
-      // Create and send a human-readable summary with abbreviated IDs
-      let summaryText = `InboxID: \n"${resolvedInboxId}" \nAddress: \n"${addressFromInboxId}" \n You have ${totalInstallations} installations, ${validInstallations} of them are valid and ${invalidInstallations} of them are invalid.\n\n`;
+      // Create table header
+      let summaryText = `## 🔑 Key Package Status
 
+**Inbox ID:** \`${resolvedInboxId}\`  
+**Address:** \`${addressFromInboxId}\`
+
+**Summary:** ${totalInstallations} installations (✅ ${validInstallations} valid, ❌ ${invalidInstallations} invalid)
+
+### Installation Details
+
+| Status | Installation ID | Created | Valid Until | Error |
+|--------|----------------|---------|-------------|-------|
+`;
+
+      // Add table rows
       for (const [installationId, installationStatus] of Object.entries(
         status,
       )) {
@@ -206,16 +219,13 @@ export class DebugHandlers {
             Number(installationStatus.lifetime.notAfter) * 1000,
           );
 
-          summaryText += `✅ '${shortId}':\n`;
-          summaryText += `- created: ${createdDate.toLocaleString()}\n`;
-          summaryText += `- valid until: ${expiryDate.toLocaleString()}\n\n`;
+          summaryText += `| ✅ | \`${shortId}\` | ${createdDate.toLocaleDateString()} | ${expiryDate.toLocaleDateString()} | - |\n`;
         } else if (installationStatus?.validationError) {
-          summaryText += `❌ '${shortId}':\n`;
-          summaryText += `- validationError: '${installationStatus.validationError}'\n\n`;
+          summaryText += `| ❌ | \`${shortId}\` | - | - | ${installationStatus.validationError} |\n`;
         }
       }
 
-      await ctx.sendText(summaryText);
+      await ctx.conversation.send(summaryText, ContentTypeMarkdown);
       console.log(`Sent key status for ${resolvedInboxId}`);
     } catch (error) {
       console.error(
