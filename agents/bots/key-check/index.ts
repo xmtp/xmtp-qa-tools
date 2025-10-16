@@ -1,5 +1,8 @@
 import { APP_VERSION } from "@helpers/client";
-import { MarkdownCodec } from "@xmtp/content-type-markdown";
+import {
+  ContentTypeMarkdown,
+  MarkdownCodec,
+} from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import {
   AttachmentCodec,
@@ -361,7 +364,7 @@ agent.on("text", async (ctx) => {
 
   // Check if this might be an inbox ID (64 hex chars without 0x prefix)
   const inboxIdPattern = /^[a-fA-F0-9]{64}$/;
-  if (inboxIdPattern.test(content.trim())) {
+  if (inboxIdPattern.test(content.trim() as string)) {
     console.log(`Detected inbox ID: ${content.trim()}`);
     await debugHandlers.handleKeyPackageCheck(ctx, content.trim() as string);
     await showNavigationOptions(ctx, appConfig, "Key package check completed!");
@@ -370,19 +373,23 @@ agent.on("text", async (ctx) => {
 
   // Check if this might be an Ethereum address (0x + 40 hex chars)
   const addressPattern = /^0x[a-fA-F0-9]{40}$/;
-  if (addressPattern.test(content.trim())) {
+  if (addressPattern.test(content.trim() as string)) {
     console.log(`Detected Ethereum address: ${content.trim()}`);
-    await debugHandlers.handleKeyPackageCheck(ctx, "", content.trim());
+    await debugHandlers.handleKeyPackageCheck(
+      ctx,
+      "",
+      content.trim() as string,
+    );
     await showNavigationOptions(ctx, appConfig, "Key package check completed!");
     return;
   }
 
   // Check if this might be custom load test parameters (groups messages)
   const customLoadTestPattern = /^(\d+)\s+(\d+)$/;
-  const customMatch = content.trim().match(customLoadTestPattern);
+  const customMatch = content.trim().match(customLoadTestPattern as RegExp);
   if (customMatch) {
-    const groups = parseInt(customMatch[1]);
-    const messages = parseInt(customMatch[2]);
+    const groups = parseInt(customMatch[1] as string);
+    const messages = parseInt(customMatch[2] as string);
     console.log(
       `Detected custom load test parameters: ${groups} groups × ${messages} messages`,
     );
@@ -411,8 +418,17 @@ agent.on("text", async (ctx) => {
     return;
   }
 
-  if (ctx.isDm() && !isTagged)
-    await ctx.sendText("Please send /kc to see the main menu");
+  if (ctx.isDm() && !isTagged) {
+    const welcomeMessage = `# 👋 Welcome to Key-Check Bot
+
+Please send **\`/kc\`** to see the main menu
+
+Or directly send:
+- 📧 An **Ethereum address** to check key packages
+- 🔑 An **Inbox ID** to check key packages`;
+
+    await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
+  }
 });
 
 // 4. Log when we're ready

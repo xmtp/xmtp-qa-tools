@@ -95,7 +95,9 @@ export class ForksHandlers {
       try {
         const messages = await conversation.messages();
         messageCount = messages.length;
-        timeSinceLastMessage = this.calculateTimeSinceLastMessage(messages);
+        timeSinceLastMessage = this.calculateTimeSinceLastMessage(
+          messages as any[],
+        );
         this.logInfo(`Message analysis completed: ${messageCount} messages`);
       } catch (error) {
         syncErrors.push(
@@ -176,13 +178,13 @@ export class ForksHandlers {
     report += `• Content: "${message.content as string}"\n`;
     report += `• Sender: \`${senderAddress}\`\n`;
     report += `• Message ID: \`${message.id}\`\n`;
-    report += `• Sent: ${this.formatTimestamp(message.sentAt)}\n\n`;
+    report += `• Sent: ${this.formatTimestamp(message.sentAt as Date)}\n\n`;
 
     // Conversation Metadata
     report += "💬 **CONVERSATION METADATA**\n";
     report += `${"─".repeat(20)}\n`;
     report += `• ID: \`${conversation.id}\`\n`;
-    report += `• Created: ${this.formatTimestamp(conversation.createdAt)}\n`;
+    report += `• Created: ${this.formatTimestamp(conversation.createdAt as Date)}\n`;
     report += `• Active: ${group.isActive ? "✅" : "❌"}\n`;
     report += `• Added By: ${group.addedByInboxId || "Unknown"}\n\n`;
 
