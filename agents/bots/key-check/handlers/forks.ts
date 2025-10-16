@@ -244,7 +244,11 @@ export class ForksHandlers {
       const analysis = await this.analyzeForkState(conversation);
 
       // Build and send detailed report
-      const report = this.buildForkReport(ctx, analysis, senderAddress);
+      const report = this.buildForkReport(
+        ctx,
+        analysis,
+        senderAddress as string,
+      );
       await ctx.sendText(report);
 
       this.logInfo("Fork detection report sent successfully");

@@ -77,7 +77,7 @@ const appConfig: AppConfig = {
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleKeyPackageCheck(
               ctx,
-              ctx.message.senderInboxId,
+              ctx.message.senderInboxId as string,
             );
           },
         },
@@ -363,7 +363,7 @@ agent.on("text", async (ctx) => {
   const inboxIdPattern = /^[a-fA-F0-9]{64}$/;
   if (inboxIdPattern.test(content.trim())) {
     console.log(`Detected inbox ID: ${content.trim()}`);
-    await debugHandlers.handleKeyPackageCheck(ctx, content.trim());
+    await debugHandlers.handleKeyPackageCheck(ctx, content.trim() as string);
     await showNavigationOptions(ctx, appConfig, "Key package check completed!");
     return;
   }
