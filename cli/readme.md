@@ -10,10 +10,7 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`          |
 | `yarn installations`                        | Manage installations  | `yarn installations --help` |
 | `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
-| `yarn revoke <inbox-id>`                    | Revoke installations  | `yarn revoke --help`        |
-| `yarn groups`                               | Create DMs/groups     | `yarn groups --help`        |
-| `yarn permissions`                          | Manage permissions    | `yarn permissions --help`   |
-| `yarn mock`                                 | Mock client           | `yarn mock --help`          |
+| `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
 
 ## Core Commands
 
