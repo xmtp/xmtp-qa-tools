@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { VersionList } from "./node-sdk";
+import { VersionList } from "../workers/node-sdk";
 
 function showHelp() {
   console.log(`
@@ -136,9 +136,21 @@ function main() {
   if (!process.env.GITHUB_ACTIONS) {
     const nodeModulesDir = path.join(process.cwd(), "node_modules");
     if (fs.existsSync(nodeModulesDir)) {
-      fs.rmSync(nodeModulesDir, { recursive: true, force: true });
+      try {
+        fs.rmSync(nodeModulesDir, { recursive: true, force: true });
+      } catch (error) {
+        console.warn(
+          `Warning: Could not remove node_modules directory: ${error}`,
+        );
+        console.log("Continuing with existing node_modules...");
+      }
     }
-    execSync("yarn install", { stdio: "inherit" });
+    try {
+      execSync("yarn install", { stdio: "inherit" });
+    } catch (error) {
+      console.warn(`Warning: Could not run yarn install: ${error}`);
+      console.log("Continuing with existing installation...");
+    }
   }
 
   createBindingsSymlinks();

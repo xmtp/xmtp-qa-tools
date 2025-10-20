@@ -1,7 +1,7 @@
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
-import type { Group } from "@versions/node-sdk";
 import { getWorkers } from "@workers/manager";
+import type { Group } from "@workers/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability/container";
 
