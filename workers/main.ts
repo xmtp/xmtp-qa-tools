@@ -103,9 +103,6 @@ interface IWorkerClient {
   ): Promise<StreamConversationMessage[]>;
   collectConsentUpdates(count?: number): Promise<StreamConsentMessage[]>;
 
-  // Installation Management
-  checkAndManageInstallations(targetCount: number): Promise<number>;
-  checkInstallationAge(): Promise<void>;
   revokeExcessInstallations(threshold?: number): Promise<void>;
   addNewInstallation(): Promise<{
     client: Client;
@@ -1113,66 +1110,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
     } catch (error) {
       console.error(`[${this.nameId}] Error clearing database:`, error);
       return Promise.resolve(false);
-    }
-  }
-
-  /**
-   * Checks and manages installations for this specific worker
-   * @param targetCount - Target number of installations for this worker
-   * @returns Current installation count after operations
-   */
-  async checkAndManageInstallations(targetCount: number): Promise<number> {
-    const installations = await this.client.preferences.inboxState();
-    const currentCount = installations.installations.length;
-
-    console.debug(
-      `[${this.name}] Current installations: ${currentCount}, Target: ${targetCount}`,
-    );
-
-    if (currentCount === targetCount) {
-      console.debug(`[${this.name}] Installation count matches target`);
-      return currentCount;
-    } else if (currentCount > targetCount) {
-      console.debug(
-        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
-      );
-      await this.addNewInstallation();
-      return currentCount + 1;
-    } else if (currentCount < targetCount) {
-      console.debug(
-        `[${this.name}] Not enough installations (${currentCount}), adding new installation`,
-      );
-      for (let i = 0; i < targetCount - currentCount; i++) {
-        await this.addNewInstallation();
-      }
-      return targetCount;
-    }
-
-    return currentCount;
-  }
-
-  /**
-   * Checks installation age and warns about old installations
-   */
-  async checkInstallationAge(): Promise<void> {
-    const installations = await this.client.preferences.inboxState();
-
-    for (const installation of installations.installations) {
-      // Convert nanoseconds to milliseconds for Date constructor
-      const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
-      const installationDate = new Date(timestampMs);
-      const now = new Date();
-      const diffMs = now.getTime() - installationDate.getTime();
-      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-      const daysText = diffDays === 1 ? "day" : "days";
-      const greenCheck = diffDays < 90 ? " ✅" : "❌";
-
-      if (diffDays > 90) {
-        console.warn(
-          `[${this.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
-        );
-      }
     }
   }
 
