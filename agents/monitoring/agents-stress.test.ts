@@ -1,7 +1,7 @@
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { IdentifierKind, type XmtpEnv } from "@versions/node-sdk";
 import { getWorkers } from "@workers/manager";
+import { IdentifierKind, type XmtpEnv } from "@workers/node-sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";

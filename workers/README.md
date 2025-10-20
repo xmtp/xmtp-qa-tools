@@ -2,17 +2,85 @@
 
 The `getWorkers` function has three input modes with optional configuration:
 
-### Input Modes
+## Node SDK Version Management
+
+### Upgrade procedure
+
+When upgrading XMTP bindings and/or node-sdk versions:
+
+1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
+2. Add import for new SDK version to `versions/node-sdk.ts`.
+3. Run `yarn versions` to link the new versions.
+4. Run `yarn regression` to check regression of latest 3 versions.
+5. Create and Merge PR. (so it's tested in CI)
+
+### Version mapping system
+
+Versions are mapped in `versions/node-sdk.ts`:
 
 ```typescript
-// 1. Number - creates that many workers with random names (default)
-workers = await getWorkers(5);
-
-// 2. Array of specific worker names
-workers = await getWorkers(["alice", "bob", "charlie"]);
+export const VersionList = [
+  {
+    Client: Client322,
+    Conversation: Conversation322,
+    Dm: Dm322,
+    Group: Group322,
+    nodeSDK: "3.2.2", // SDK version
+    nodeBindings: "1.3.3", // Bindings version
+    auto: true, // Include in automated testing
+  },
+];
 ```
 
-### Options Configuration
+### Package aliases
+
+Multiple versions installed via npm aliases:
+
+```json
+{
+  "dependencies": {
+    "@xmtp/node-sdk-3.2.2": "npm:@xmtp/node-sdk@3.2.2",
+    "@xmtp/node-bindings-1.3.3": "npm:@xmtp/node-bindings@1.3.3"
+  }
+}
+```
+
+### Dynamic linking
+
+`yarn versions` creates symlinks:
+
+```bash
+node_modules/@xmtp/
+├── node-sdk-3.2.2/
+│   └── node_modules/@xmtp/
+│       └── node-bindings -> ../../node-bindings-1.3.3/
+└── node-bindings-1.3.3/
+```
+
+### Finding libxmtp version
+
+The libxmtp commit hash is in:
+
+```bash
+node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
+```
+
+### Using versions command to see current mappings
+
+```bash
+yarn versions
+# shows current SDK → bindings mappings.
+```
+
+### Testing specific versions (automated)
+
+```bash
+yarn test performance --versions 3  # Test latest 3 auto-enabled versions
+yarn test performance --nodeSDK 3.2.2 # custom version
+yarn regression  # Vibe check on latest version
+```
+
+## Worker management
 
 ```typescript
 type GetWorkersOptions = {
@@ -51,29 +119,4 @@ workers.getRandomWorkers(2); // Random subset
 
 // Get worker names array (useful for logging/debugging)
 const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
-```
-
-## Common Usage Patterns
-
-### Simple Testing
-
-```tsx
-// Most common patterns
-let workers = await getWorkers(5); // 5 random workers
-workers = await getWorkers(["alice", "bob"]); // Specific workers
-```
-
-### Version Testing
-
-```tsx
-// Versioning is enabled by default
-workers = await getWorkers(3); // Uses random SDK versions
-workers = await getWorkers(3, {}); // All latest version
-```
-
-### Environment-Specific Testing
-
-```tsx
-workers = await getWorkers(5, { env: "production" });
-workers = await getWorkers(["alice"], { env: "local" });
 ```

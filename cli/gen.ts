@@ -2,7 +2,7 @@ import * as crypto from "crypto";
 import * as fs from "fs";
 import { APP_VERSION } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
-import { Client, type XmtpEnv } from "@versions/node-sdk";
+import { Client, type XmtpEnv } from "@workers/node-sdk";
 import {
   createSigner,
   generateEncryptionKeyHex,

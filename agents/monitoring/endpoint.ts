@@ -7,7 +7,7 @@ import {
   type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "@versions/node-sdk";
+} from "@workers/node-sdk";
 import { fromString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

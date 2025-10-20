@@ -2,12 +2,12 @@ import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
+import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "@versions/node-sdk";
-import { getWorkers } from "@workers/manager";
+} from "@workers/node-sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";

@@ -4,14 +4,7 @@ import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
-import {
-  getActiveVersion,
-  getVersions,
-  VersionList,
-  type Client,
-  type Group,
-  type XmtpEnv,
-} from "@versions/node-sdk";
+import { type Client, type Group, type XmtpEnv } from "@workers/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,
@@ -19,6 +12,11 @@ import {
   WorkerClient,
   type typeofStream,
 } from "./main";
+import {
+  getDefaultSdkVersion,
+  isValidSdkVersion,
+  VersionList,
+} from "./node-sdk";
 
 /**
  * Interface documenting all methods available in WorkerManager class
@@ -409,12 +407,12 @@ export class WorkerManager implements IWorkerManager {
     const baseName = parts[0];
 
     let providedInstallId: string | undefined;
-    let defaultSdk = nodeBindings || getActiveVersion().nodeBindings;
+    let defaultSdk = nodeBindings || getDefaultSdkVersion();
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && VersionList.some((v) => v.nodeBindings === lastPart)) {
+      if (lastPart && isValidSdkVersion(lastPart)) {
         defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
@@ -503,11 +501,11 @@ export async function getWorkers(
   const manager = new WorkerManager(
     (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
   );
-  let sdkVersions = [options.nodeBindings || getActiveVersion().nodeBindings];
+  let sdkVersions = [options.nodeBindings || getDefaultSdkVersion()];
   if (process.env.TEST_VERSIONS) {
-    sdkVersions = getVersions()
-      .slice(0, parseInt(process.env.TEST_VERSIONS))
-      .map((v) => v.nodeBindings);
+    sdkVersions = VersionList.slice(0, parseInt(process.env.TEST_VERSIONS)).map(
+      (v) => v.nodeBindings,
+    );
   }
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];

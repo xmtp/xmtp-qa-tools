@@ -1,8 +1,8 @@
 import "@helpers/datadog";
 import { checkKeyPackageStatusesByInboxId } from "@helpers/client";
 import { getInboxes, type InboxData } from "@inboxes/utils";
-import { IdentifierKind, type Group } from "@versions/node-sdk";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import { IdentifierKind, type Group } from "@workers/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

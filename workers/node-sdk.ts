@@ -226,3 +226,28 @@ export const regressionClient = async (
 
   return client;
 };
+
+/**
+ * Check if a version string is valid
+ */
+export function isValidSdkVersion(version: string): boolean {
+  return VersionList.some((v) => v.nodeBindings === version);
+}
+export function getDefaultSdkVersion(): string {
+  return getActiveVersion().nodeBindings;
+}
+
+/**
+ * Get SDK versions for testing (respects TEST_VERSIONS env var)
+ */
+export function getSdkVersionsForTesting(): string[] {
+  let sdkVersions = [getDefaultSdkVersion()];
+
+  if (process.env.TEST_VERSIONS) {
+    sdkVersions = VersionList.slice(0, parseInt(process.env.TEST_VERSIONS)).map(
+      (v) => v.nodeBindings,
+    );
+  }
+
+  return sdkVersions;
+}

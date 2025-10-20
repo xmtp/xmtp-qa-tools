@@ -5,7 +5,7 @@ import {
 } from "@helpers/client";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { Client, type XmtpEnv } from "@versions/node-sdk";
+import { Client, type XmtpEnv } from "@workers/node-sdk";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {
