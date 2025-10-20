@@ -140,7 +140,7 @@ function main() {
         fs.rmSync(nodeModulesDir, { recursive: true, force: true });
       } catch (error) {
         console.warn(
-          `Warning: Could not remove node_modules directory: ${error}`,
+          `Warning: Could not remove node_modules directory: ${String(error)}`,
         );
         console.log("Continuing with existing node_modules...");
       }
@@ -148,7 +148,7 @@ function main() {
     try {
       execSync("yarn install", { stdio: "inherit" });
     } catch (error) {
-      console.warn(`Warning: Could not run yarn install: ${error}`);
+      console.warn(`Warning: Could not run yarn install: ${String(error)}`);
       console.log("Continuing with existing installation...");
     }
   }
