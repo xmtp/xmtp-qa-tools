@@ -16,7 +16,7 @@ describe(testName, () => {
   let extraMember: string;
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
-  let cumulativeGroups: Group[] = [];
+  const cumulativeGroups: Group[] = [];
 
   let workers: WorkerManager;
   let creator: Worker | undefined;

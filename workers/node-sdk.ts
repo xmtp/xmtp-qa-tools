@@ -153,7 +153,7 @@ export const regressionClient = async (
   dbPath: string,
   env: XmtpEnv,
   apiURL?: string,
-): Promise<any> => {
+): Promise<{ client: unknown; dbPath: string }> => {
   const loggingLevel = (process.env.LOGGING_LEVEL || "warn") as LogLevel;
   const apiUrl = apiURL;
   if (apiUrl) {
@@ -224,7 +224,7 @@ export const regressionClient = async (
     throw new Error(`Failed to create client for SDK version ${nodeBindings}`);
   }
 
-  return client;
+  return { client, dbPath };
 };
 
 /**

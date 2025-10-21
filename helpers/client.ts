@@ -176,7 +176,7 @@ function loadDataPath(name: string, installationId: string): string {
     : name;
 
   // Use baseName for the parent folder, not the full name
-  let basePath = `${preBasePath}/.data/${randomSubfolder}/${installationId}`;
+  const basePath = `${preBasePath}/.data/${randomSubfolder}/${installationId}`;
 
   return basePath;
 }
@@ -186,7 +186,7 @@ export const getDbPathOfInstallation = (
   installationId: string,
   env: XmtpEnv,
 ): string => {
-  let identifier = `${accountAddress}-${env}`;
+  const identifier = `${accountAddress}-${env}`;
 
   const basePath = loadDataPath(name, installationId);
 
@@ -201,11 +201,11 @@ export const getDbPathOfInstallation = (
 };
 
 export function getDataPath(): string {
-  let dataPath = path.join(".data");
+  const dataPath = path.join(".data");
   return dataPath;
 }
 export function getEnvPath(): string {
-  let envPath = path.join(".env");
+  const envPath = path.join(".env");
 
   // Only set CURRENT_ENV_PATH if the file exists
   if (fs.existsSync(envPath)) {
@@ -439,34 +439,51 @@ export async function checkKeyPackageStatusesByInboxId(
   // Retrieve a map of installation id to KeyPackageStatus
   const status = (await client.getKeyPackageStatusesForInstallationIds(
     installationIds,
-  )) as Record<string, any>;
+  )) as Record<
+    string,
+    {
+      validationError?: string;
+      lifetime?: { notBefore: string; notAfter: string };
+    }
+  >;
 
   // Count valid and invalid installations
   const totalInstallations = Object.keys(status).length;
   const validInstallations = Object.values(status).filter(
-    (value) => !value?.validationError,
+    (value) => !(value as { validationError?: string })?.validationError,
   ).length;
   const invalidInstallations = totalInstallations - validInstallations;
 
   // Extract key package dates for each installation
   const installationDetails = Object.entries(status).map(
     ([installationId, installationStatus]) => {
-      const details: any = {
+      const details: Record<string, unknown> = {
         installationId,
       };
 
-      if (installationStatus?.validationError) {
-        details.validationError = installationStatus.validationError;
+      if (
+        (installationStatus as { validationError?: string })?.validationError
+      ) {
+        details.validationError = (
+          installationStatus as { validationError: string }
+        ).validationError;
       }
       let createdDate = new Date();
       let expiryDate = new Date();
-      if (installationStatus?.lifetime) {
-        createdDate = new Date(
-          Number(installationStatus.lifetime.notBefore) * 1000,
-        );
-        expiryDate = new Date(
-          Number(installationStatus.lifetime.notAfter) * 1000,
-        );
+      if (
+        (
+          installationStatus as {
+            lifetime?: { notBefore: string; notAfter: string };
+          }
+        )?.lifetime
+      ) {
+        const lifetime = (
+          installationStatus as {
+            lifetime: { notBefore: string; notAfter: string };
+          }
+        ).lifetime;
+        createdDate = new Date(Number(lifetime.notBefore) * 1000);
+        expiryDate = new Date(Number(lifetime.notAfter) * 1000);
 
         details.createdDate = createdDate.toISOString();
         details.expiryDate = expiryDate.toISOString();

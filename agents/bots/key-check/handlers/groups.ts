@@ -23,7 +23,7 @@ export class GroupHandlers {
         try {
           // Get the address from the member's account identifiers
           const ethIdentifier = member.accountIdentifiers.find(
-            (id: any) => id.identifierKind == (0 as IdentifierKind),
+            (id) => id.identifierKind == (0 as IdentifierKind),
           );
           const address = ethIdentifier?.identifier || "Unknown";
 
@@ -121,7 +121,7 @@ export class GroupHandlers {
           try {
             // Get the address from the member's account identifiers
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind == (0 as IdentifierKind),
+              (id) => id.identifierKind == (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
 
@@ -200,7 +200,7 @@ export class GroupHandlers {
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind === (0 as IdentifierKind),
+              (id) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
             permissionsText += `- ${address}\n`;
@@ -218,7 +218,7 @@ export class GroupHandlers {
           );
           if (member) {
             const ethIdentifier = member.accountIdentifiers.find(
-              (id: any) => id.identifierKind === (0 as IdentifierKind),
+              (id) => id.identifierKind === (0 as IdentifierKind),
             );
             const address = ethIdentifier?.identifier || "Unknown";
             permissionsText += `- ${address}\n`;

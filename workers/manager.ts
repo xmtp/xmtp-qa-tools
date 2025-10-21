@@ -221,7 +221,7 @@ export class WorkerManager implements IWorkerManager {
   }
   public async printWorkers() {
     try {
-      let workersToPrint = [];
+      const workersToPrint = [];
       for (const baseName in this.workers) {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
@@ -302,7 +302,7 @@ export class WorkerManager implements IWorkerManager {
     installationId: string = "a",
   ): Worker | undefined {
     if (typeof baseName === "number") {
-      let index = baseName;
+      const index = baseName;
       if (index >= this.getAll().length) {
         throw new Error(`Worker index ${index} out of bounds`);
       }
@@ -527,7 +527,7 @@ export async function getWorkers(
     );
   } else {
     // Record input - apply versioning if requested
-    let entries = Object.entries(workers);
+    const entries = Object.entries(workers);
 
     descriptors = entries.map(([descriptor]) => descriptor);
     workerPromises = entries.map(([descriptor, apiUrl]) =>

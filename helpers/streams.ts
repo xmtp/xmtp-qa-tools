@@ -40,10 +40,10 @@ function getProperty<T>(
   path: string[],
   defaultValue?: T,
 ): T | undefined {
-  let current: any = obj;
+  let current: unknown = obj;
   for (const key of path) {
     if (current && typeof current === "object" && key in current) {
-      current = current[key];
+      current = (current as Record<string, unknown>)[key];
     } else {
       return defaultValue;
     }
@@ -225,7 +225,7 @@ export async function verifyMessageStream(
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        let content = messageTemplate
+        const content = messageTemplate
           .replace("{i}", `${i + 1}`)
           .replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
@@ -267,7 +267,7 @@ export async function verifyMetadataStream(
     triggerEvents: async () => {
       const sent: { name: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        let name = messageTemplate
+        const name = messageTemplate
           .replace("{i}", `${i + 1}`)
           .replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
@@ -487,8 +487,8 @@ export function calculateMessageStats(
     const inOrder = isOrderedSubsequence(messages, expectedMessages);
     return { inOrder, expectedMessages };
   };
-  let totalExpectedMessages = amount * messagesByWorker.length;
-  let totalReceivedMessages = messagesByWorker.reduce(
+  const totalExpectedMessages = amount * messagesByWorker.length;
+  const totalReceivedMessages = messagesByWorker.reduce(
     (sum, msgs) => sum + msgs.length,
     0,
   );

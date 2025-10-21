@@ -232,7 +232,7 @@ function parseTestArgs(args: string[]): {
     reportForkCount: false, // Report fork count after ansi:forks
   };
 
-  let currentArgs = [...args];
+  const currentArgs = [...args];
   if (currentArgs.length > 0 && !currentArgs[0].startsWith("--")) {
     const shiftedArg = currentArgs.shift();
     testName = shiftedArg || "functional";
