@@ -46,14 +46,14 @@ export class DebugHandlers {
   }
 
   async handleDebug(ctx: MessageContext): Promise<void> {
-    const conversations = await ctx.client.conversations.list();
+    let conversations = await ctx.client.conversations.list();
     // Print the list of conversations ids to console:
     console.log(
       "Conversations:",
-      conversations.map((conversation) => conversation.id),
+      conversations.map((conversation: any) => conversation.id),
     );
     await ctx.sendText(
-      `key-check conversations: \n${conversations.map((conversation) => conversation.id).join("\n")}`,
+      `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
   }
 
@@ -177,19 +177,13 @@ export class DebugHandlers {
       // Retrieve a map of installation id to KeyPackageStatus
       const status = (await ctx.client.getKeyPackageStatusesForInstallationIds(
         installationIds,
-      )) as Record<
-        string,
-        {
-          validationError?: string;
-          lifetime?: { notBefore: string; notAfter: string };
-        }
-      >;
+      )) as Record<string, any>;
       console.log(status);
 
       // Count valid and invalid installations
       const totalInstallations = Object.keys(status).length;
       const validInstallations = Object.values(status).filter(
-        (value) => !(value as { validationError?: string })?.validationError,
+        (value) => !value?.validationError,
       ).length;
       const invalidInstallations = totalInstallations - validInstallations;
 
@@ -217,26 +211,17 @@ export class DebugHandlers {
             ? `${installationId.substring(0, 4)}...${installationId.substring(installationId.length - 4)}`
             : installationId;
 
-        if (
-          (
-            installationStatus as {
-              lifetime?: { notBefore: string; notAfter: string };
-            }
-          )?.lifetime
-        ) {
-          const lifetime = (
-            installationStatus as {
-              lifetime: { notBefore: string; notAfter: string };
-            }
-          ).lifetime;
-          const createdDate = new Date(Number(lifetime.notBefore) * 1000);
-          const expiryDate = new Date(Number(lifetime.notAfter) * 1000);
+        if (installationStatus?.lifetime) {
+          const createdDate = new Date(
+            Number(installationStatus.lifetime.notBefore) * 1000,
+          );
+          const expiryDate = new Date(
+            Number(installationStatus.lifetime.notAfter) * 1000,
+          );
 
           summaryText += `| ✅ | \`${shortId}\` | ${createdDate.toLocaleDateString()} | ${expiryDate.toLocaleDateString()} | - |\n`;
-        } else if (
-          (installationStatus as { validationError?: string })?.validationError
-        ) {
-          summaryText += `| ❌ | \`${shortId}\` | - | - | ${(installationStatus as { validationError: string }).validationError} |\n`;
+        } else if (installationStatus?.validationError) {
+          summaryText += `| ❌ | \`${shortId}\` | - | - | ${installationStatus.validationError} |\n`;
         }
       }
 

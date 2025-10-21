@@ -284,7 +284,7 @@ async function smartUpdate({
   );
   const targetFileName = `${installationCount}.json`;
   const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
-  const existingInboxes: InboxData[] =
+  let existingInboxes: InboxData[] =
     (readJson(targetFilePath) as InboxData[]) || [];
   const existingCount = existingInboxes.length;
   const targetCount = count || existingCount;
@@ -383,8 +383,8 @@ async function smartUpdate({
   const newAccountsNeeded = Math.max(0, targetCount - accountsToProcess);
   if (newAccountsNeeded > 0) {
     const generateProgress = new ProgressBar(newAccountsNeeded);
-    let consecutiveFailures = 0;
-    const MAX_FAILS = 3;
+    let consecutiveFailures = 0,
+      MAX_FAILS = 3;
     for (let i = 0; i < newAccountsNeeded; i++) {
       if (consecutiveFailures >= MAX_FAILS) break;
       const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;

@@ -20,8 +20,8 @@ describe(testName, () => {
 
   let primaryClient: Client;
   let secondaryClient: Client;
-  const createdDms: string[] = [];
-  const createdGroups: string[] = [];
+  let createdDms: string[] = [];
+  let createdGroups: string[] = [];
 
   beforeAll(async () => {
     // Validate environment variables

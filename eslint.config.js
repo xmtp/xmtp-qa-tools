@@ -1,7 +1,9 @@
 import path from "node:path";
+import process from "node:process";
 import { fileURLToPath } from "node:url";
 import { includeIgnoreFile } from "@eslint/compat";
 import eslint from "@eslint/js";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
@@ -15,26 +17,49 @@ export default tseslint.config(
     ignores: [".yarn/**/*"],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.strictTypeChecked,
   {
     languageOptions: {
-      globals: {
-        ...globals.node,
+      parserOptions: {
+        projectService: {
+          defaultProject: "tsconfig.json",
+        },
+        tsconfigRootDir: process.cwd(),
       },
     },
+  },
+  {
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": [
+      "prefer-const": "off",
+      "@typescript-eslint/consistent-type-exports": [
         "error",
         {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
+          fixMixedExportsWithInlineTypeSpecifier: false,
+        },
+      ],
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-deprecated": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/await-thenable": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unnecessary-type-assertion": "off",
+      "@typescript-eslint/no-unnecessary-type-conversion": "off",
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          allowNumber: true,
         },
       ],
     },
   },
   {
-    files: ["**/*.cjs", "**/*.js", "dev/**/*.js"],
+    files: ["**/*.cjs", "**/*.js"],
     extends: [tseslint.configs.disableTypeChecked],
     languageOptions: {
       globals: {
@@ -45,4 +70,11 @@ export default tseslint.config(
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+  {
+    files: ["**/*.test.ts"],
+    rules: {
+      "@typescript-eslint/no-non-null-assertion": "off",
+    },
+  },
+  eslintPluginPrettierRecommended,
 );

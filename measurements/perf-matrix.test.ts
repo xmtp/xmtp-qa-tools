@@ -44,7 +44,7 @@ describe(testName, () => {
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
   let extraMember: InboxData;
-  const cumulativeGroups: Group[] = [];
+  let cumulativeGroups: Group[] = [];
 
   setupSummaryTable({
     testName,

@@ -256,7 +256,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
   async getStats() {
     const stats = await this.client.debugInformation?.apiStatistics();
-    const object = {
+    let object = {
       "Query Group Messages": stats?.queryGroupMessages.toString(),
       "Query Welcome Messages": stats?.queryWelcomeMessages.toString(),
       "Send Group Messages": stats?.sendGroupMessages.toString(),
@@ -553,9 +553,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
     this.dbPath = dbPath;
     this.client = client as Client;
-    this.address = ((client as { address?: string }).address ||
-      privateKeyToAccount(this.walletKey as `0x${string}`)
-        .address) as `0x${string}`;
+    this.address =
+      (client as any).address ||
+      privateKeyToAccount(this.walletKey as `0x${string}`).address;
 
     const installationId = this.client.installationId;
 
@@ -581,7 +581,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
           const stream = await this.client.conversations.streamAllMessages();
 
           // Store stream reference with .end() method if available, otherwise create mock
-          const streamRef = stream as { end?: () => void };
+          const streamRef = stream as any;
           this.streamReferences.set(type, {
             end:
               streamRef.end ||
@@ -685,7 +685,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
   logMessage(message: DecodedMessage) {
     const content =
-      (message?.content as { content?: string })?.content ??
+      (message?.content as any)?.content ??
       message?.content ??
       message?.contentType?.typeId;
     const contentType = message?.contentType?.typeId;
@@ -774,7 +774,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
           const stream = this.client.conversations.stream();
 
           // Store stream reference with .end() method if available, otherwise create mock
-          const streamRef = stream as { end?: () => void };
+          const streamRef = stream as any;
           this.streamReferences.set(streamType, {
             end:
               streamRef.end ||
@@ -845,7 +845,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         try {
           const stream = await this.client.preferences.streamConsent();
 
-          const streamRef = stream as { end?: () => void };
+          const streamRef = stream as any;
           this.streamReferences.set(streamType, {
             end:
               streamRef.end ||

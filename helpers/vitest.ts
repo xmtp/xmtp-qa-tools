@@ -32,7 +32,7 @@ export const setupDurationTracking = ({
     loadEnv(testName);
     if (initDataDog) initializeDatadog();
   });
-  const skipNetworkStats = false;
+  let skipNetworkStats = false;
   let start: number;
   beforeEach(() => {
     start = performance.now();
@@ -123,7 +123,7 @@ export function parseTestName(testName: string): ParsedTestName {
   const metricName = metricNameParts.replaceAll(" > ", ".");
   const operationParts = metricName.split(".");
 
-  const testNameExtracted = operationParts[0];
+  let testNameExtracted = operationParts[0];
 
   let operationName = "";
   let members = "";
