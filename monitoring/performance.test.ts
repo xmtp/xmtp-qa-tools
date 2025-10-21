@@ -37,7 +37,7 @@ describe(testName, () => {
   let extraMember: InboxData;
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
-  const cumulativeGroups: Group[] = [];
+  let cumulativeGroups: Group[] = [];
 
   setupDurationTracking({
     testName,
@@ -231,7 +231,7 @@ describe(testName, () => {
     });
 
     it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      const randomName = "random" + Math.random().toString(36).substring(2, 5);
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
@@ -241,7 +241,7 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
-      const randomName = "random" + Math.random().toString(36).substring(2, 5);
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
@@ -252,7 +252,7 @@ describe(testName, () => {
     });
 
     it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
-      const randomName = "random" + Math.random().toString(36).substring(2, 5);
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       for (const group of cumulativeGroups) {
@@ -264,7 +264,7 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
-      const randomName = "random" + Math.random().toString(36).substring(2, 5);
+      let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
       for (const group of cumulativeGroups) {

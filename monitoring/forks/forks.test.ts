@@ -85,7 +85,7 @@ describe(testName, () => {
   };
 
   it("perform concurrent operations with multiple users across 5 groups", async () => {
-    const workers = await getWorkers(workerNames, {
+    let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
       nodeBindings: NODE_VERSION,
     });

@@ -25,15 +25,15 @@ export class ForksHandlers {
     console.log("=".repeat(60));
   }
 
-  private logInfo(message: string, data?: unknown): void {
+  private logInfo(message: string, data?: any): void {
     console.log(`ℹ️  ${message}`, data ? JSON.stringify(data, null, 2) : "");
   }
 
-  private logWarning(message: string, data?: unknown): void {
+  private logWarning(message: string, data?: any): void {
     console.log(`⚠️  ${message}`, data ? JSON.stringify(data, null, 2) : "");
   }
 
-  private logError(message: string, error?: unknown): void {
+  private logError(message: string, error?: any): void {
     console.error(`❌ ${message}`, error);
   }
 
@@ -41,9 +41,9 @@ export class ForksHandlers {
     return date.toISOString().replace("T", " ").replace("Z", " UTC");
   }
 
-  private calculateTimeSinceLastMessage(messages: unknown[]): number | null {
+  private calculateTimeSinceLastMessage(messages: any[]): number | null {
     if (messages.length === 0) return null;
-    const lastMessage = messages[0] as { sentAt: Date };
+    const lastMessage = messages[0];
     return Date.now() - lastMessage.sentAt.getTime();
   }
 
@@ -97,7 +97,7 @@ export class ForksHandlers {
         const messages = await conversation.messages();
         messageCount = messages.length;
         timeSinceLastMessage = this.calculateTimeSinceLastMessage(
-          messages as unknown[],
+          messages as any[],
         );
         this.logInfo(`Message analysis completed: ${messageCount} messages`);
       } catch (error) {

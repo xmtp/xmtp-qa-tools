@@ -72,6 +72,6 @@ export async function loadRemoteAttachment(
   // @eslint-disable-next-line TODO: fix this
   return await RemoteAttachmentCodec.load(
     remoteAttachment,
-    client as unknown as CodecRegistry,
+    client as any as CodecRegistry,
   );
 }
