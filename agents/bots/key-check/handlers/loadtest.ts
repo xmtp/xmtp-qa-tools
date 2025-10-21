@@ -2,7 +2,7 @@ import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { type MessageContext } from "../../../versions/agent-sdk";
 
 export class LoadTestHandlers {
-  constructor(private agent: any) {}
+  constructor(private agent: unknown) {}
 
   async handleLoadTest10Groups10Messages(ctx: MessageContext): Promise<void> {
     await ctx.sendText("🚀 Starting Load Test: 10 groups × 10 messages");
@@ -12,7 +12,7 @@ export class LoadTestHandlers {
       const startTime = Date.now();
       let totalMessagesSent = 0;
       let groupsCreated = 0;
-      const createdGroups: any[] = [];
+      const createdGroups: unknown[] = [];
 
       for (let groupIndex = 0; groupIndex < 10; groupIndex++) {
         // Create a new XMTP group with the sender included
@@ -21,13 +21,25 @@ export class LoadTestHandlers {
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
-            [ctx.message.senderInboxId],
-            {
-              groupName,
-              groupDescription: `Load test group ${groupIndex + 1}/10 created for testing purposes`,
-            },
-          );
+          const group = await (
+            this.agent as {
+              client: {
+                conversations: {
+                  newGroup: (
+                    members: string[],
+                    options?: { groupName?: string; groupDescription?: string },
+                  ) => Promise<{
+                    name: string;
+                    id: string;
+                    send: (message: string) => Promise<void>;
+                  }>;
+                };
+              };
+            }
+          ).client.conversations.newGroup([ctx.message.senderInboxId], {
+            groupName,
+            groupDescription: `Load test group ${groupIndex + 1}/10 created for testing purposes`,
+          });
 
           createdGroups.push(group);
           groupsCreated++;
@@ -74,7 +86,7 @@ export class LoadTestHandlers {
 ${createdGroups
   .map(
     (group, index) =>
-      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+      `${index + 1}. **${(group as { name: string; id: string }).name}**  \n   ID: \`${(group as { name: string; id: string }).id.substring(0, 8)}...\``,
   )
   .join("\n\n")}`;
 
@@ -94,7 +106,7 @@ ${createdGroups
       const startTime = Date.now();
       let totalMessagesSent = 0;
       let groupsCreated = 0;
-      const createdGroups: any[] = [];
+      const createdGroups: unknown[] = [];
 
       for (let groupIndex = 0; groupIndex < 50; groupIndex++) {
         // Create a new XMTP group with the sender included
@@ -103,13 +115,25 @@ ${createdGroups
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
-            [ctx.message.senderInboxId],
-            {
-              groupName,
-              groupDescription: `Load test group ${groupIndex + 1}/50 created for testing purposes`,
-            },
-          );
+          const group = await (
+            this.agent as {
+              client: {
+                conversations: {
+                  newGroup: (
+                    members: string[],
+                    options?: { groupName?: string; groupDescription?: string },
+                  ) => Promise<{
+                    name: string;
+                    id: string;
+                    send: (message: string) => Promise<void>;
+                  }>;
+                };
+              };
+            }
+          ).client.conversations.newGroup([ctx.message.senderInboxId], {
+            groupName,
+            groupDescription: `Load test group ${groupIndex + 1}/50 created for testing purposes`,
+          });
 
           createdGroups.push(group);
           groupsCreated++;
@@ -162,7 +186,7 @@ ${createdGroups
   .slice(0, 10)
   .map(
     (group, index) =>
-      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+      `${index + 1}. **${(group as { name: string; id: string }).name}**  \n   ID: \`${(group as { name: string; id: string }).id.substring(0, 8)}...\``,
   )
   .join("\n\n")}`;
 
@@ -182,7 +206,7 @@ ${createdGroups
       const startTime = Date.now();
       let totalMessagesSent = 0;
       let groupsCreated = 0;
-      const createdGroups: any[] = [];
+      const createdGroups: unknown[] = [];
 
       // Create a single XMTP group with the sender included
       const groupName = `Load Test Group 1/1 - ${new Date().toISOString()}`;
@@ -190,13 +214,25 @@ ${createdGroups
 
       try {
         // Create group with sender as the only member initially
-        const group = await this.agent.client.conversations.newGroup(
-          [ctx.message.senderInboxId],
-          {
-            groupName,
-            groupDescription: `Single load test group created for high-volume message testing`,
-          },
-        );
+        const group = await (
+          this.agent as {
+            client: {
+              conversations: {
+                newGroup: (
+                  members: string[],
+                  options?: { groupName?: string; groupDescription?: string },
+                ) => Promise<{
+                  name: string;
+                  id: string;
+                  send: (message: string) => Promise<void>;
+                }>;
+              };
+            };
+          }
+        ).client.conversations.newGroup([ctx.message.senderInboxId], {
+          groupName,
+          groupDescription: `Single load test group created for high-volume message testing`,
+        });
 
         createdGroups.push(group);
         groupsCreated++;
@@ -243,7 +279,7 @@ ${createdGroups
 ${createdGroups
   .map(
     (group, index) =>
-      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+      `${index + 1}. **${(group as { name: string; id: string }).name}**  \n   ID: \`${(group as { name: string; id: string }).id.substring(0, 8)}...\``,
   )
   .join("\n\n")}`;
 
@@ -271,7 +307,7 @@ ${createdGroups
       const startTime = Date.now();
       let totalMessagesSent = 0;
       let groupsCreated = 0;
-      const createdGroups: any[] = [];
+      const createdGroups: unknown[] = [];
 
       for (let groupIndex = 0; groupIndex < groups; groupIndex++) {
         // Create a new XMTP group with the sender included
@@ -280,7 +316,22 @@ ${createdGroups
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
+          const group = await (
+            this.agent as {
+              client: {
+                conversations: {
+                  newGroup: (
+                    members: string[],
+                    options?: { groupName?: string; groupDescription?: string },
+                  ) => Promise<{
+                    name: string;
+                    id: string;
+                    send: (message: string) => Promise<void>;
+                  }>;
+                };
+              };
+            }
+          ).client.conversations.newGroup(
             [], // Start with empty member list, sender is automatically included
             {
               groupName,
@@ -345,7 +396,7 @@ ${createdGroups
   .slice(0, 10)
   .map(
     (group, index) =>
-      `${index + 1}. **${group.name}**  \n   ID: \`${group.id.substring(0, 8)}...\``,
+      `${index + 1}. **${(group as { name: string; id: string }).name}**  \n   ID: \`${(group as { name: string; id: string }).id.substring(0, 8)}...\``,
   )
   .join("\n\n")}`;
 

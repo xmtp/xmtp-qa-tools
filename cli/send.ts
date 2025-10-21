@@ -252,7 +252,21 @@ interface TestResult {
 
 // Simple worker task that sends a message and optionally waits for response
 async function runWorker(
-  worker: any,
+  worker: {
+    send: (message: string) => Promise<void>;
+    client: {
+      conversations: {
+        newDmWithIdentifier: (options: {
+          identifier: string;
+          identifierKind: IdentifierKind;
+        }) => Promise<unknown>;
+        streamAllMessages: (options: {
+          onValue: (message: DecodedMessage) => void;
+        }) => void;
+      };
+    };
+    inboxId: string;
+  },
   workerId: number,
   attempt: number,
   config: Config,
@@ -293,7 +307,9 @@ async function runWorker(
     const sendStart = Date.now();
     const messageText =
       config.customMessage || `test-${workerId}-${attempt}-${Date.now()}`;
-    await conversation.send(messageText);
+    await (conversation as { send: (message: string) => Promise<void> }).send(
+      messageText,
+    );
     const sendTime = Date.now() - sendStart;
 
     console.log(
@@ -364,7 +380,26 @@ async function runAttempt(
   try {
     // Run all workers in parallel
     const promises = workers.map((worker, i) =>
-      runWorker(worker, i, attempt, config),
+      runWorker(
+        worker as unknown as {
+          send: (message: string) => Promise<void>;
+          client: {
+            conversations: {
+              newDmWithIdentifier: (options: {
+                identifier: string;
+                identifierKind: IdentifierKind;
+              }) => Promise<unknown>;
+              streamAllMessages: (options: {
+                onValue: (message: DecodedMessage) => void;
+              }) => void;
+            };
+          };
+          inboxId: string;
+        },
+        i,
+        attempt,
+        config,
+      ),
     );
     const results = await Promise.allSettled(promises);
 

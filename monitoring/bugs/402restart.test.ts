@@ -11,9 +11,9 @@ describe(testName, () => {
     let messageCount = 0;
 
     // First test
-    let talkerWorkers = await getWorkers(1);
-    let creator = talkerWorkers.getCreator();
-    let convo = await creator.client.conversations.newDm(agent.inboxId);
+    const talkerWorkers = await getWorkers(1);
+    const creator = talkerWorkers.getCreator();
+    const convo = await creator.client.conversations.newDm(agent.inboxId);
 
     let stream = await agent.client.conversations.streamAllMessages({
       onValue: (message: DecodedMessage) => {

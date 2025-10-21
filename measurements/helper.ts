@@ -169,7 +169,9 @@ function updateTableAndFiles(testName: string): void {
 
         allIterations.forEach((iteration) => {
           const result = testResults.find((r) => r.iteration === iteration);
-          let duration = result ? Math.round(result.duration).toString() : "-";
+          const duration = result
+            ? Math.round(result.duration).toString()
+            : "-";
 
           // Don't add emojis to CSV - keep it clean
           row.push(duration);

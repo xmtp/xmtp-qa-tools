@@ -64,7 +64,7 @@ async function populate(count: number, worker: Worker) {
     );
     return;
   }
-  let diff = count - messagesBefore.length;
+  const diff = count - messagesBefore.length;
 
   const prefix = "random";
   const BATCH_SIZE = 100;
@@ -102,7 +102,7 @@ async function populate(count: number, worker: Worker) {
     // Create conversations for this batch
     console.log(`[${worker.name}] Creating ${batchSize} conversations...`);
     let batchCreated = 0;
-    let batchFailed = 0;
+    const batchFailed = 0;
 
     await Promise.all(
       senderWorkers.map(async (sender) => {
