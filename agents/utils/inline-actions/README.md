@@ -107,8 +107,7 @@ const config: AppConfig = {
   menus: {
     "main-menu": {
       id: "main-menu",
-      title: "**Main Menu**\n\nChoose an option below:",
-      markdownTitle: true, // Enable markdown for this menu's title
+      title: "Main Menu\nChoose an option below:",
       actions: [
         { id: "sub-menu", label: "Go to Sub Menu" },
         { id: "action-1", label: "Do Something", handler: myHandler },

@@ -1,4 +1,4 @@
-import { APP_VERSION } from "@helpers/client";
+import { APP_VERSION, createSigner } from "@helpers/client";
 import {
   ContentTypeMarkdown,
   MarkdownCodec,
@@ -58,8 +58,8 @@ const appConfig: AppConfig = {
     "main-menu": {
       id: "main-menu",
       title:
-        "🔧 **Hey, this is the Key-Check Bot** 🔑\n\n- *if appears greyed out, please go back to the conversation list and open the conversation again*",
-      markdownTitle: true,
+        "Hey, this is the Key-Check Bot** 🔑\n*if appears greyed out, please go back to the conversation list and open the conversation again",
+
       actions: [
         { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
         { id: "group-tools-menu", label: "👥 Group Tools" },
@@ -249,7 +249,7 @@ async function showInboxInputMenu(ctx: MessageContext) {
     "inbox-input-menu",
     "🔍 Check by Inbox ID",
   )
-    .add("back-to-main", "⬅️ Back to Main Menu")
+    .add("back-to-main", "⬅️ Go back")
     .build();
 
   await sendActions(ctx, inputMenu);
@@ -263,7 +263,7 @@ async function showAddressInputMenu(ctx: MessageContext) {
     "address-input-menu",
     "📧 Check by Address",
   )
-    .add("back-to-main", "⬅️ Back to Main Menu")
+    .add("back-to-main", "⬅️ Go back")
     .build();
 
   await sendActions(ctx, inputMenu);
@@ -277,7 +277,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
     "custom-load-test-menu",
     "⚙️ Custom Load Test",
   )
-    .add("back-to-main", "⬅️ Back to Main Menu")
+    .add("back-to-main", "⬅️ Go back")
     .build();
 
   await sendActions(ctx, customMenu);
@@ -290,9 +290,15 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
       "• `3 50` = 3 groups × 50 messages",
   );
 }
-
-// 2. Spin up the agent with UX demo codecs and inline actions
-const agent = await Agent.createFromEnv({
+const signer = createSigner(process.env.XMTP_WALLET_KEY as `0x${string}`);
+const encryptionKey = Buffer.from(
+  process.env.XMTP_DB_ENCRYPTION_KEY as string,
+  "hex",
+);
+const env = process.env.XMTP_ENV as "local" | "dev" | "production";
+const agent = await Agent.create(signer, {
+  env,
+  dbEncryptionKey: encryptionKey,
   appVersion: APP_VERSION,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +

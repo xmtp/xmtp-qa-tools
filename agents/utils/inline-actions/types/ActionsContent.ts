@@ -44,8 +44,6 @@ export type ActionsContent = {
   actions: Action[];
   /** Optional ISO-8601 expiration timestamp */
   expiresAt?: string;
-  /** Optional flag to indicate if description should be rendered as markdown */
-  markdownTitle?: boolean;
 };
 
 /**
