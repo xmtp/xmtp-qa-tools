@@ -46,8 +46,8 @@ export async function showLastMenu(
     console.log(`🔄 Showing last menu: ${lastShownMenu.menuId}`);
     await showMenu(ctx, lastShownMenu.config, lastShownMenu.menuId);
   } else {
-    console.warn("⚠️ No last menu to show, falling back to main menu");
-    // Fallback to main menu if no last menu is tracked
+    console.warn("⚠️ No last menu to show, falling Go back");
+    // FallGo back if no last menu is tracked
     if (fallbackConfig) {
       console.log("🔄 Showing main menu as fallback");
       await showMenu(ctx, fallbackConfig, "main-menu");
@@ -155,7 +155,6 @@ export class ActionBuilder {
       id: this.actionId,
       description: this.actionDescription,
       actions: this.actions,
-      ...(this.useMarkdown && { markdownTitle: true }),
     };
   }
 
@@ -270,7 +269,6 @@ export type Menu = {
   id: string;
   title: string;
   actions: MenuAction[];
-  markdownTitle?: boolean;
 };
 
 export type AppConfig = {
@@ -315,7 +313,7 @@ export async function showMenu(
   }
 
   // Use a stable action ID without timestamp to prevent conflicts
-  const builder = ActionBuilder.create(menuId, menu.title, menu.markdownTitle);
+  const builder = ActionBuilder.create(menuId, menu.title);
 
   menu.actions.forEach((action) => {
     builder.add(action.id, action.label, action.style);
