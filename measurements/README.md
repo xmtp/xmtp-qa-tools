@@ -37,7 +37,7 @@ Individual SDK operation performance metrics including client creation, messagin
 | setConsentStates    | Managing consent preferences           | 2   | <100   | On Target   |
 | getConversationById | Getting conversation by ID             | 1   | <100   | On Target   |
 
-![Duration metrics](images/Duration metrics.png)
+![Duration metrics](images/duration-metrics.png)
 
 _Note: Baseline is `us-east` region and `production` network._
 
@@ -58,7 +58,7 @@ Operations performed by the message sender including group creation and manageme
 | removeMembers | Removing members    | 118 | 196  | 200  | 246  | 292  | 344   | On Target   |
 | updateName    | Updating group name | 82  | 137  | 138  | 195  | 230  | 260   | On Target   |
 
-![newGroup performance over time](images/newGroup performance over time.png)
+![newGroup performance over time](images/newgroup-performance-over-time.png)
 
 _Note: Measurements taken from the sender's perspective during group operations._
 
@@ -76,10 +76,10 @@ Operations performed by message receivers including streaming and synchronizatio
 | syncAll           | Syncing all          | 386 | 719 | 1207 | 1429 | 1706 | 2145 | Concern     |
 | syncAllCumulative | Sync all previous    | 384 | 715 | 1077 | 1417 | 1749 | 2168 | Concern     |
 
-![100 member performance over time](images/100 member performance over time.png)
-![syncAll performance over time](images/syncAll performance over time.png)
-![syncAll Cumulative performance over time](images/syncAll Cumulative performance over time.png)
-![Message stream performance](images/Message stream performance.png)
+![100 member performance over time](images/100-member-performance-over-time.png)
+![syncAll performance over time](images/syncall-performance-over-time.png)
+![syncAll Cumulative performance over time](images/syncall-cumulative-performance-over-time.png)
+![Message stream performance](images/message-stream-performance.png)
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
@@ -99,7 +99,7 @@ Core network operation timings from DNS lookup through server response processin
 | Processing         | 32         | 30  | <100   | On Target   |
 | Dns Lookup         | 23         | 16  | <50    | On Target   |
 
-![Network Performance](images/Network Performance.png)
+![Network Performance](images/network-performance.png)
 
 ### By region
 
@@ -114,7 +114,7 @@ Comparative network performance across different global regions relative to us-e
 | asia          | 425        | 521 | +438%      | Concern     |
 | south-america | 734        | 734 | +438%      | Concern     |
 
-![Performance average by region](images/Performance average by region.png)
+![Performance average by region](images/performance-average-by-region.png)
 
 _Note: Baseline is `us-east` region and `production` network._
 
@@ -132,11 +132,11 @@ Message delivery and ordering reliability metrics across different testing scena
 | Poll Order            | 100% in order   | 99.9% in order | On Target   |
 | Recovery Order        | 100% in order   | 99.9% in order | On Target   |
 
-![Response metrics](images/Response metrics.png)
-![Response time by test](images/Response time by test.png)
-![Order metrics](images/Order metrics.png)
-![Emoji response time](images/Emoji response time.png)
-![Non-emoji response](images/Non-emoji response.png)
+![Response metrics](images/response-metrics.png)
+![Response time by test](images/response-time-by-test.png)
+![Order metrics](images/order-metrics.png)
+![Emoji response time](images/emoji-response-time.png)
+![Non-emoji response](images/non-emoji-response.png)
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
