@@ -223,7 +223,9 @@ export async function cleanForksLogs(
         if (removeNonMatching) {
           // Skip creating cleaned version for non-fork logs
           // Raw log is always preserved
-          console.debug(`Skipping ${file} - does not contain fork content (raw log preserved)`);
+          console.debug(
+            `Skipping ${file} - does not contain fork content (raw log preserved)`,
+          );
           removedCount++;
         } else {
           // Create cleaned version even if no fork content
@@ -241,7 +243,9 @@ export async function cleanForksLogs(
       const outputFileName = file.replace("raw-", "cleaned-");
       const outputPath = path.join(outputDir, outputFileName);
       await processLogFile(rawFilePath, outputPath);
-      console.debug(`Cleaned forks log: ${file} -> ${outputFileName} (raw log preserved)`);
+      console.debug(
+        `Cleaned forks log: ${file} -> ${outputFileName} (raw log preserved)`,
+      );
       processedCount++;
     } catch (error) {
       console.error(`Failed to process ${file}:`, error);
@@ -253,7 +257,9 @@ export async function cleanForksLogs(
       `Skipped creating cleaned versions for ${removedCount} files that did not contain fork content (raw logs preserved)`,
     );
   }
-  console.debug(`Processed ${processedCount} forks log files (all raw logs preserved)`);
+  console.debug(
+    `Processed ${processedCount} forks log files (all raw logs preserved)`,
+  );
 }
 
 /**
