@@ -5,28 +5,36 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const chaosLatencyMs = process.env.CHAOS_LATENCY_MS ? parseInt(process.env.CHAOS_LATENCY_MS) : 0;
-const chaosJitterMs = process.env.CHAOS_JITTER_MS ? parseInt(process.env.CHAOS_JITTER_MS) : 0;
-const chaosLossPct = process.env.CHAOS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_PACKET_LOSS_PCT) : 0;
+const chaosLatencyMs = process.env.CHAOS_LATENCY_MS
+  ? parseInt(process.env.CHAOS_LATENCY_MS)
+  : 0;
+const chaosJitterMs = process.env.CHAOS_JITTER_MS
+  ? parseInt(process.env.CHAOS_JITTER_MS)
+  : 0;
+const chaosLossPct = process.env.CHAOS_PACKET_LOSS_PCT
+  ? parseFloat(process.env.CHAOS_PACKET_LOSS_PCT)
+  : 0;
 
-const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS ? parseInt(process.env.CHAOS_EGRESS_LATENCY_MS) : 0;
-const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS) : 0;
-const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT) : 0;
+const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS
+  ? parseInt(process.env.CHAOS_EGRESS_LATENCY_MS)
+  : 0;
+const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS
+  ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS)
+  : 0;
+const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT
+  ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT)
+  : 0;
 
-const workerCount = process.env.GROUP_SIZE ? parseInt(process.env.GROUP_SIZE) : 20;
+const workerCount = process.env.GROUP_SIZE
+  ? parseInt(process.env.GROUP_SIZE)
+  : 20;
 const opFreq = process.env.OP_FREQ ? parseInt(process.env.OP_FREQ) : 10000;
 
 const durationMs = 300000;
 
 const enabledOps = process.env.ENABLED_OPS
   ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
-  : [
-    "verify",
-    "updateName",
-    "modifyMembership",
-    "promoteAdmin",
-    "demoteAdmin"
-  ];
+  : ["verify", "updateName", "modifyMembership", "promoteAdmin", "demoteAdmin"];
 
 console.log("=== Fork Matrix Test Configuration ===");
 console.table({
@@ -39,7 +47,7 @@ console.table({
   CHAOS_EGRESS_PACKET_LOSS_PCT: chaosEgressLossPct,
   ENABLED_OPS: enabledOps.join(", "),
   GROUP_SIZE: workerCount,
-  OP_FREQ: opFreq
+  OP_FREQ: opFreq,
 });
 console.log("=======================================");
 
@@ -51,7 +59,7 @@ describe(testName, async () => {
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),
     new DockerContainer("multinode-node3-1"),
-    new DockerContainer("multinode-node4-1")
+    new DockerContainer("multinode-node4-1"),
   ];
 
   const userDescriptors = {};
@@ -80,7 +88,10 @@ describe(testName, async () => {
           try {
             console.log("[verify] Checking forks and delivery");
             await workers.checkForks();
-            const res = await verifyMessageStream(group, workers.getAllButCreator());
+            const res = await verifyMessageStream(
+              group,
+              workers.getAllButCreator(),
+            );
             expect(res.allReceived).toBe(true);
           } catch (err) {
             console.warn("[verify] Skipping check due to error", err);
@@ -98,39 +109,48 @@ describe(testName, async () => {
 
           const groupId = group.id;
           const target = workers.getRandomWorker();
-          const convo = await target.client.conversations.getConversationById(groupId);
+          const convo =
+            await target.client.conversations.getConversationById(groupId);
           if (!convo) return;
 
           const inboxId = target.client.inboxId;
 
           if (enabledOps.includes("updateName")) {
-            console.log(`[op #${opCounter}] executing updateName - setting new name for group`);
+            console.log(
+              `[op #${opCounter}] executing updateName - setting new name for group`,
+            );
             await group.updateName("Update Group Name Test " + Date.now());
           }
 
           if (enabledOps.includes("modifyMembership")) {
-            console.log(`[op #${opCounter}] executing modifyMembership - removing and re-adding user ${inboxId}`);
+            console.log(
+              `[op #${opCounter}] executing modifyMembership - removing and re-adding user ${inboxId}`,
+            );
             await group.removeMembers([inboxId]);
             await group.addMembers([inboxId]);
           }
 
           if (enabledOps.includes("promoteAdmin")) {
-            console.log(`[op #${opCounter}] executing promoteAdmin - promoting user ${inboxId}`);
+            console.log(
+              `[op #${opCounter}] executing promoteAdmin - promoting user ${inboxId}`,
+            );
             await group.addSuperAdmin(inboxId);
           }
 
           if (enabledOps.includes("demoteAdmin")) {
-            console.log(`[op #${opCounter}] executing demoteAdmin - demoting user ${inboxId}`);
+            console.log(
+              `[op #${opCounter}] executing demoteAdmin - demoting user ${inboxId}`,
+            );
             await group.removeSuperAdmin(inboxId);
           }
         })();
       }, opFreq);
     };
 
-
     const startChaos = () => {
       const ingressEnabled = chaosLatencyMs || chaosJitterMs || chaosLossPct;
-      const egressEnabled = chaosEgressLatencyMs || chaosEgressJitterMs || chaosEgressLossPct;
+      const egressEnabled =
+        chaosEgressLatencyMs || chaosEgressJitterMs || chaosEgressLossPct;
 
       if (!ingressEnabled && !egressEnabled) {
         console.log("[chaos] Skipping chaos injection - all knobs set to 0");

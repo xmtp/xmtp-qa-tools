@@ -633,10 +633,10 @@ export function getDataSubFolderCount() {
 export function getLatestVersion(): string {
   if (VersionList.length === 0) {
     // Fallback to a known good version if VersionList is somehow empty
-    return "4.2.4";
+    return "4.3.0";
   }
   // Return the latest version (last in array)
-  return "4.2.4";
+  return "4.3.0";
 }
 
 export function getNodeSdkVersion(sdkVersion: string): string {

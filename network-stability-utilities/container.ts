@@ -179,13 +179,19 @@ export class DockerContainer {
 
   measureRttFromHost(): number | null {
     try {
-      const output = execSync(`ping -c 3 ${this.ip}`, { stdio: "pipe" }).toString();
-      const match = output.match(/rtt.*? = ([0-9.]+)\/[0-9.]+\/[0-9.]+\/[0-9.]+ ms/);
+      const output = execSync(`ping -c 3 ${this.ip}`, {
+        stdio: "pipe",
+      }).toString();
+      const match = output.match(
+        /rtt.*? = ([0-9.]+)\/[0-9.]+\/[0-9.]+\/[0-9.]+ ms/,
+      );
       if (match) {
         return parseFloat(match[1]);
       }
     } catch (e) {
-      console.warn(`[sh] RTT check from host failed: ${e instanceof Error ? e.message : String(e)}`);
+      console.warn(
+        `[sh] RTT check from host failed: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
     return null;
   }
@@ -194,7 +200,7 @@ export class DockerContainer {
     console.log(`[sh] Pinging ${this.name} (${this.ip}) from host...`);
     try {
       const output = execSync(`ping -c ${count} ${this.ip}`, {
-        stdio: "pipe"
+        stdio: "pipe",
       }).toString();
       const summary = output
         .split("\n")
@@ -205,7 +211,9 @@ export class DockerContainer {
         console.log(`[sh] ${output}`);
       }
     } catch (e) {
-      console.error(`[sh] Ping from host failed: ${e instanceof Error ? e.message : String(e)}`);
+      console.error(
+        `[sh] Ping from host failed: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 
@@ -223,26 +231,30 @@ export class DockerContainer {
   static getNodes(): DockerContainer[] {
     try {
       const output = execSync(
-        `docker ps --filter ancestor=xmtp/node-go --format '{{.Names}}'`
+        `docker ps --filter ancestor=ghcr.io/xmtp/node-go --format '{{.Names}}'`,
       )
         .toString()
         .trim();
 
       if (!output) {
-        console.warn("[DockerContainer.getXmtpNodes] No XMTP node containers found");
+        console.warn(
+          "[DockerContainer.getXmtpNodes] No XMTP node containers found",
+        );
         return [];
       }
 
       const names = output.split("\n").filter(Boolean);
-      console.log(`[DockerContainer.getXmtpNodes] Found ${names.length} XMTP node(s):`, names);
+      console.log(
+        `[DockerContainer.getXmtpNodes] Found ${names.length} XMTP node(s):`,
+        names,
+      );
       return names.map((name) => new DockerContainer(name));
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[DockerContainer.getXmtpNodes] Failed to detect XMTP nodes: ${msg}`);
+      console.error(
+        `[DockerContainer.getXmtpNodes] Failed to detect XMTP nodes: ${msg}`,
+      );
       return [];
     }
   }
-
 }
-
-

@@ -1,6 +1,6 @@
 services:
   node:
-    image: xmtp/node-go:latest
+    image: ghcr.io/xmtp/node-go:main
     platform: linux/amd64
     environment:
       - GOWAKU-NODEKEY=8a30dcb604b0b53627a5adc054dbf434b446628d4bd1eccc681d223f0550ce67
@@ -12,7 +12,8 @@ services:
       - --mls-validation.grpc-address=validation:50051
       - --api.enable-mls
       - --wait-for-db=30s
-      - --api.authn.enable
+      # Disable authn until we have reliable support for generating auth tokens
+      # - --api.authn.enable
     ports:
       - 5555:5555
       - 5556:5556
@@ -20,22 +21,32 @@ services:
       - db
       - mlsdb
       - validation
-
   validation:
     image: ghcr.io/xmtp/mls-validation-service:main
     platform: linux/amd64
-
-  db:
-    image: postgres:13
     environment:
-      POSTGRES_PASSWORD: xmtp
-
-  mlsdb:
-    image: postgres:13
-    environment:
-      POSTGRES_PASSWORD: xmtp
-
-  upload-service:
-    build: ./uploadService
+      ANVIL_URL: "http://anvil:8545"
+  anvil:
+    image: ghcr.io/foundry-rs/foundry:latest
+    platform: linux/amd64
     ports:
-      - 3000:3000
+      - 8545:8545
+    entrypoint:
+      - anvil
+      - --host
+      - 0.0.0.0
+      - --base-fee
+      - "100"
+  history-server:
+    image: ghcr.io/xmtp/message-history-server:main
+    platform: linux/amd64
+    ports:
+      - 5558:5558
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: xmtp
+  mlsdb:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: xmtp

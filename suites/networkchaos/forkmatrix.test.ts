@@ -5,26 +5,40 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const chaosLatencyMs = process.env.CHAOS_LATENCY_MS ? parseInt(process.env.CHAOS_LATENCY_MS) : 0;
-const chaosJitterMs = process.env.CHAOS_JITTER_MS ? parseInt(process.env.CHAOS_JITTER_MS) : 0;
-const chaosLossPct = process.env.CHAOS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_PACKET_LOSS_PCT) : 0;
+const chaosLatencyMs = process.env.CHAOS_LATENCY_MS
+  ? parseInt(process.env.CHAOS_LATENCY_MS)
+  : 0;
+const chaosJitterMs = process.env.CHAOS_JITTER_MS
+  ? parseInt(process.env.CHAOS_JITTER_MS)
+  : 0;
+const chaosLossPct = process.env.CHAOS_PACKET_LOSS_PCT
+  ? parseFloat(process.env.CHAOS_PACKET_LOSS_PCT)
+  : 0;
 
-const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS ? parseInt(process.env.CHAOS_EGRESS_LATENCY_MS) : 0;
-const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS) : 0;
-const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT) : 0;
+const chaosEgressLatencyMs = process.env.CHAOS_EGRESS_LATENCY_MS
+  ? parseInt(process.env.CHAOS_EGRESS_LATENCY_MS)
+  : 0;
+const chaosEgressJitterMs = process.env.CHAOS_EGRESS_JITTER_MS
+  ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS)
+  : 0;
+const chaosEgressLossPct = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT
+  ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT)
+  : 0;
 
-const durationMs = process.env.DURATION_MS ? parseInt(process.env.DURATION_MS) : 300000;
+const durationMs = process.env.DURATION_MS
+  ? parseInt(process.env.DURATION_MS)
+  : 300000;
 
 const enabledOps = process.env.ENABLED_OPS
   ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
   : [
-    "sendMessage",
-    "verify",
-    "updateName",
-    "modifyMembership",
-    "promoteAdmin",
-    "demoteAdmin"
-  ];
+      "sendMessage",
+      "verify",
+      "updateName",
+      "modifyMembership",
+      "promoteAdmin",
+      "demoteAdmin",
+    ];
 
 console.log("=== Fork Matrix Test Configuration ===");
 console.table({
@@ -35,7 +49,7 @@ console.table({
   CHAOS_EGRESS_LATENCY_MS: chaosEgressLatencyMs,
   CHAOS_EGRESS_JITTER_MS: chaosEgressJitterMs,
   CHAOS_EGRESS_PACKET_LOSS_PCT: chaosEgressLossPct,
-  ENABLED_OPS: enabledOps.join(", ")
+  ENABLED_OPS: enabledOps.join(", "),
 });
 console.log("=======================================");
 
@@ -47,7 +61,7 @@ describe(testName, async () => {
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),
     new DockerContainer("multinode-node3-1"),
-    new DockerContainer("multinode-node4-1")
+    new DockerContainer("multinode-node4-1"),
   ];
 
   const userDescriptors: Record<string, string> = {};
@@ -77,7 +91,9 @@ describe(testName, async () => {
         }
 
         for (const sender of workers.getAll()) {
-          const convo = await sender.client.conversations.getConversationById(group.id);
+          const convo = await sender.client.conversations.getConversationById(
+            group.id,
+          );
           if (!convo) continue;
 
           try {
@@ -98,7 +114,10 @@ describe(testName, async () => {
           try {
             console.log("[verify] Checking forks and delivery");
             await workers.checkForks();
-            const res = await verifyMessageStream(group, workers.getAllButCreator());
+            const res = await verifyMessageStream(
+              group,
+              workers.getAllButCreator(),
+            );
             expect(res.allReceived).toBe(true);
           } catch (err) {
             console.warn("[verify] Skipping check due to error", err);
@@ -112,7 +131,8 @@ describe(testName, async () => {
         void (async () => {
           const groupId = group.id;
           const target = workers.getRandomWorker();
-          const convo = await target.client.conversations.getConversationById(groupId);
+          const convo =
+            await target.client.conversations.getConversationById(groupId);
           if (!convo) return;
 
           const inboxId = target.client.inboxId;
@@ -139,7 +159,8 @@ describe(testName, async () => {
 
     const startChaos = () => {
       const ingressEnabled = chaosLatencyMs || chaosJitterMs || chaosLossPct;
-      const egressEnabled = chaosEgressLatencyMs || chaosEgressJitterMs || chaosEgressLossPct;
+      const egressEnabled =
+        chaosEgressLatencyMs || chaosEgressJitterMs || chaosEgressLossPct;
 
       if (!ingressEnabled && !egressEnabled) {
         console.log("[chaos] Skipping chaos injection - all knobs set to 0");

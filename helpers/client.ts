@@ -65,6 +65,12 @@ import {
   Dm as Dm424,
   Group as Group424,
 } from "@xmtp/node-sdk-4.2.4";
+import {
+  Client as Client430,
+  Conversation as Conversation430,
+  Dm as Dm430,
+  Group as Group430,
+} from "@xmtp/node-sdk-4.3.0";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -162,6 +168,15 @@ export const VersionList = [
     nodeVersion: "4.2.4",
     bindingsPackage: "1.3.2",
     libXmtpVersion: "dc3e8c8",
+  },
+  {
+    Client: Client430,
+    Conversation: Conversation430,
+    Dm: Dm430,
+    Group: Group430,
+    nodeVersion: "4.3.0",
+    bindingsPackage: "1.6.0",
+    libXmtpVersion: "35d2ff1",
   },
 ];
 
@@ -276,12 +291,12 @@ export const logAgentDetails = async (
       .map((c: Client) => c.options?.env ?? "dev")
       .join(", ");
     console.log(`\x1b[38;2;252;76;52m
-        ██╗  ██╗███╗   ███╗████████╗██████╗ 
+        ██╗  ██╗███╗   ███╗████████╗██████╗
         ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
          ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
-         ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
-        ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
-        ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
+         ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝
+        ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║
+        ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝
       \x1b[0m`);
 
     const urls = [`http://xmtp.chat/dm/${address}`];

@@ -59,6 +59,7 @@
     "@xmtp/node-sdk-3.0.1": "npm:@xmtp/node-sdk@3.0.1",
     "@xmtp/node-sdk-3.2.1": "npm:@xmtp/node-sdk@3.2.1",
     "@xmtp/node-sdk-4.2.4": "npm:@xmtp/node-sdk@4.2.4",
+    "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.3.0",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",
@@ -138,8 +139,7 @@
       "dependencies": {
         "@xmtp/node-bindings": "1.3.2"
       }
-    }
-    ,
+    },
     "@xmtp/node-sdk@4.2.4": {
       "dependencies": {
         "@xmtp/node-bindings": "1.3.2"
