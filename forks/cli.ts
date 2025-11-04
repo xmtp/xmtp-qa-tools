@@ -3,6 +3,19 @@ import fs from "fs";
 import path from "path";
 import { cleanAllRawLogs, cleanForksLogs } from "@helpers/analyzer";
 import "dotenv/config";
+import {
+  epochRotationOperations,
+  groupCount,
+  installationCount,
+  network,
+  NODE_VERSION,
+  otherOperations,
+  parallelOperations,
+  randomInboxIdsCount,
+  targetEpoch,
+  testName,
+  workerNames,
+} from "./config";
 
 interface ForkOptions {
   count: number; // Number of times to run the process (default: 100)
@@ -66,12 +79,38 @@ function runForkTest(env?: string): void {
 }
 
 /**
+ * Log fork matrix parameters from shared config
+ */
+function logForkMatrixParameters(): void {
+  console.info("\nFORK MATRIX PARAMETERS");
+  console.info("-".repeat(60));
+  console.info(`groupCount: ${groupCount}`);
+  console.info(`parallelOperations: ${parallelOperations}`);
+  console.info(`NODE_VERSION: ${NODE_VERSION}`);
+  console.info(`workerNames: [${workerNames.join(", ")}]`);
+  console.info(
+    `epochRotationOperations: ${JSON.stringify(epochRotationOperations)}`,
+  );
+  console.info(`otherOperations: ${JSON.stringify(otherOperations)}`);
+  console.info(`targetEpoch: ${targetEpoch}`);
+  console.info(`network: ${network || "undefined"}`);
+  console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
+  console.info(`installationCount: ${installationCount}`);
+  console.info(`testName: ${testName}`);
+  console.info("-".repeat(60) + "\n");
+}
+
+/**
  * Run fork detection process and collect stats
  */
 async function runForkDetection(options: ForkOptions): Promise<void> {
   console.info("=".repeat(60));
   console.info("XMTP Fork Detection CLI");
   console.info("=".repeat(60));
+
+  // Log fork matrix parameters once
+  logForkMatrixParameters();
+
   console.info(`Running fork detection process ${options.count} time(s)...\n`);
 
   const stats = {
