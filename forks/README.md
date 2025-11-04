@@ -23,7 +23,7 @@ The main approach creates intentional conflicts by running parallel operations o
 ## Parameters
 
 - **groupCount**: `5` - Number of groups to create in parallel
-- **nodeBindings**: `3.1.1` - Node SDK version to use
+- **nodeBindings**: `3.x.x` - Node SDK version to use
 - **parallelOperations**: `1` - How many operations to perform in parallel
 - **enabledOperations**: - Operations configuration - enable/disable specific operations
   - `updateName`: true, // updates the name of the group
