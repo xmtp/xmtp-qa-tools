@@ -4,6 +4,7 @@
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 num_runs=10
+mkdir -p test
 
 #rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
 
