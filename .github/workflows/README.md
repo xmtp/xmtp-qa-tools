@@ -12,7 +12,6 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **Agents.yml**                         | Production agent testing        | Every 4 hours, manual        | Test tagged and untagged agents                |
 | **Browser.yml**                        | Browser compatibility testing   | Every 30 minutes, manual     | browser support and functionality              |
 | **Delivery.yml**                       | Message delivery reliability    | Every 30 minutes, manual     | Test message loss with 200 streams             |
-| **Forks.yml**                          | Fork testing on local network   | Every 12 hours, manual       | Daily forks testing with local XMTP network    |
 | **NetworkChaos.yml**                   | Network chaos testing           | Daily, manual                | Test network partitions and failures           |
 | **Wildcard.yml**                       | Manual PR verification          | Yearly, manual               | Flexible testing for PRs and manual runs       |
 | **Deploy.yml**                         | Railway deployment automation   | Version bump in package.json | Auto PR creation and merging for deployments   |
@@ -76,7 +75,6 @@ Handles notifications and artifact uploads for XMTP tests.
 
 - **NetworkChaos.yml**: Runs daily chaos tests against 4-node XMTP-go cluster
 - Tests include: smoketests, DM duplicate prevention, group partitions, node blackholes, key rotation
-- **Forks.yml**: Tests fork scenarios on local network every 12 hours
 
 ### Validation Workflows
 

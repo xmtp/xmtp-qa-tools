@@ -1,14 +1,14 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { cleanForksLogs, cleanAllRawLogs } from "@helpers/analyzer";
+import { cleanAllRawLogs, cleanForksLogs } from "@helpers/analyzer";
 import "dotenv/config";
 
 interface ForkOptions {
   count: number; // Number of times to run the process (default: 100)
-  clean: boolean; // Clean logs before processing
-  cleanAll: boolean; // Clean all raw logs
+  cleanAll: boolean; // Clean all raw logs before starting
   removeNonMatching: boolean; // Remove non-matching logs
+  env?: string; // XMTP environment (local, dev, production)
 }
 
 function showHelp() {
@@ -20,18 +20,17 @@ USAGE:
 
 OPTIONS:
   --count <number>           Number of times to run the fork detection process [default: 100]
-  --clean                    Clean fork logs before processing
-  --clean-all                Clean all raw logs (equivalent to ansi:clean)
+  --clean-all                Clean all raw logs before starting (equivalent to ansi:clean)
   --remove-non-matching      Remove logs that don't contain fork content [default: true]
   --no-remove-non-matching   Keep logs that don't contain fork content
+  --env <environment>        XMTP environment (local, dev, production) [default: dev]
   -h, --help                 Show this help message
 
 EXAMPLES:
   yarn fork                    # Run 100 times and get stats
   yarn fork --count 50          # Run 50 times
-  yarn fork --clean             # Clean fork logs and get stats
-  yarn fork --clean-all         # Clean all raw logs
-  yarn fork --count 200 --clean # Run 200 times with cleaning
+  yarn fork --clean-all         # Clean all raw logs before starting
+  yarn fork --count 200 --env local # Run 200 times on local environment
 
 For more information, see: forks/README.md
 `);
@@ -46,6 +45,24 @@ function getForkCount(): number {
     return 0;
   }
   return fs.readdirSync(logsDir).length;
+}
+
+/**
+ * Run the fork test (suppress output)
+ */
+function runForkTest(env?: string): void {
+  const envFlag = env ? `--env ${env}` : "";
+  const command = `yarn test forks ${envFlag} --log warn --file`.trim();
+
+  try {
+    execSync(command, {
+      stdio: "ignore",
+      env: { ...process.env },
+    });
+  } catch {
+    // Test may fail if forks are detected, that's expected
+    // We'll analyze the logs afterward
+  }
 }
 
 /**
@@ -64,33 +81,38 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     runsWithoutForks: 0,
   };
 
-  // Clean logs if requested
+  // Clean logs if requested before starting
   if (options.cleanAll) {
-    console.info("Cleaning all raw logs...");
+    console.info("Cleaning all raw logs before starting...");
     await cleanAllRawLogs();
     console.info("Finished cleaning all raw logs\n");
   }
 
-  // Run the process N times
+  // Run the test N times
   for (let i = 1; i <= options.count; i++) {
-    console.info(`Run ${i}/${options.count}...`);
+    // Run the fork test (silently)
+    runForkTest(options.env);
 
-    // Clean fork logs if requested
-    if (options.clean) {
-      await cleanForksLogs(options.removeNonMatching);
-    }
+    // Clean and analyze fork logs after the test (suppress output)
+    const originalConsoleDebug = console.debug;
+    console.debug = () => {}; // Suppress debug output
+    await cleanForksLogs(options.removeNonMatching);
+    console.debug = originalConsoleDebug;
 
     // Count forks detected
     const forkCount = getForkCount();
     stats.totalRuns++;
     stats.forksDetected += forkCount;
 
+    // Show only run number and result
     if (forkCount > 0) {
       stats.runsWithForks++;
-      console.info(`  Found ${forkCount} fork(s) in this run`);
+      console.info(
+        `Run ${i}/${options.count}: ✅ ${forkCount} fork(s) detected`,
+      );
     } else {
       stats.runsWithoutForks++;
-      console.info(`  No forks detected`);
+      console.info(`Run ${i}/${options.count}: ⚪ No forks`);
     }
 
     // Clean up empty cleaned directory if it exists
@@ -147,9 +169,9 @@ async function main() {
   // Default options
   const options: ForkOptions = {
     count: 100,
-    clean: false,
     cleanAll: false,
     removeNonMatching: true,
+    env: process.env.XMTP_ENV || "dev",
   };
 
   // Parse arguments
@@ -176,9 +198,6 @@ async function main() {
           process.exit(1);
         }
         break;
-      case "--clean":
-        options.clean = true;
-        break;
       case "--clean-all":
         options.cleanAll = true;
         break;
@@ -187,6 +206,20 @@ async function main() {
         break;
       case "--no-remove-non-matching":
         options.removeNonMatching = false;
+        break;
+      case "--env":
+        if (i + 1 < args.length) {
+          const env = args[i + 1];
+          if (!["local", "dev", "production"].includes(env)) {
+            console.error("--env must be one of: local, dev, production");
+            process.exit(1);
+          }
+          options.env = env;
+          i++; // Skip next argument
+        } else {
+          console.error("--env flag requires a value (e.g., --env dev)");
+          process.exit(1);
+        }
         break;
       default:
         console.error(`Unknown option: ${arg}`);
@@ -198,8 +231,7 @@ async function main() {
   await runForkDetection(options);
 }
 
-main().catch((error) => {
+main().catch((error: unknown) => {
   console.error("Fatal error:", error);
   process.exit(1);
 });
-

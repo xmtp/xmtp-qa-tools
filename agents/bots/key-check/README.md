@@ -6,7 +6,6 @@ A configurable XMTP bot for testing key packages, group functionality, and UX de
 
 - **Configurable Menu Display**: Control whether the menu is shown after each action
 - Interactive key package validation
-- Fork detection
 - Group management tools
 - UX message type demos
 - Load testing capabilities
