@@ -2,39 +2,22 @@ import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { getActiveVersion, type Group } from "@workers/node-sdk";
+import { type Group } from "@workers/node-sdk";
 import { describe, it } from "vitest";
+import {
+  epochRotationOperations,
+  groupCount,
+  installationCount,
+  network,
+  NODE_VERSION,
+  otherOperations,
+  parallelOperations,
+  randomInboxIdsCount,
+  targetEpoch,
+  testName,
+  workerNames,
+} from "./config";
 
-// Count of groups to create
-const groupCount = 5;
-const parallelOperations = 5; // How many operations to perform in parallel
-const NODE_VERSION = getActiveVersion().nodeBindings; // default to latest version, can be overridden with --nodeBindings=3.1.1
-// By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
-// We want to create a key each run to ensure the forks are "pure"
-const workerNames = [
-  "random1",
-  "random2",
-  "random3",
-  "random4",
-  "random5",
-] as string[];
-
-// Operations configuration - enable/disable specific operations
-const epochRotationOperations = {
-  updateName: true, // updates the name of the group
-  addMember: true, // adds a random member to the group
-  removeMember: true, // removes a random member from the group
-};
-const otherOperations = {
-  createInstallation: true, // creates a new installation for a random worker
-  sendMessage: true, // sends a message to the group
-};
-const targetEpoch = 20n; // The target epoch to stop the test (epochs are when performing forks to the group)
-const network = process.env.XMTP_ENV; // Network environment setting
-const randomInboxIdsCount = 10; // How many inboxIds to use randomly in the add/remove operations
-const installationCount = 2; // How many installations to use randomly in the createInstallation operations
-
-const testName = "forks";
 describe(testName, () => {
   setupDurationTracking({ testName });
 

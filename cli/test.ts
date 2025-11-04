@@ -23,7 +23,6 @@ interface TestOptions {
   verboseLogging: boolean; // Show terminal output
   parallel: boolean; // Run tests in parallel
   sendToDatadog: boolean; // Disable sending error logs to Datadog
-  reportForkCount: boolean; // Report fork count after ansi:forks
 }
 
 function showHelp() {
@@ -68,35 +67,6 @@ EXAMPLES:
 
 For more information, see: cli/readme.md
 `);
-}
-
-/**
- * Runs ansi:forks and optionally reports fork count
- */
-function runAnsiForksAndReport(): void {
-  console.info("Running ansi:forks...");
-  try {
-    execSync("yarn ansi:forks", { stdio: "inherit" });
-    console.info("Finished cleaning up");
-
-    const logsDir = path.join(process.cwd(), "logs", "cleaned");
-    if (fs.existsSync(logsDir)) {
-      const forkCount = fs.readdirSync(logsDir).length;
-      console.info(`Found ${forkCount} forks in logs/cleaned`);
-      if (forkCount > 0) {
-        process.exit(1);
-      }
-      // Remove the cleaned folder if it's empty
-      if (forkCount === 0) {
-        fs.rmdirSync(logsDir);
-        console.info("Removed empty logs/cleaned directory");
-      }
-    } else {
-      console.info("No logs/cleaned directory found");
-    }
-  } catch (error) {
-    console.error("Failed to run ansi:forks:", error);
-  }
 }
 
 async function cleanSpecificLogFile(
@@ -229,7 +199,6 @@ function parseTestArgs(args: string[]): {
     verboseLogging: true, // Show terminal output by default
     parallel: false,
     sendToDatadog: true,
-    reportForkCount: false, // Report fork count after ansi:forks
   };
 
   let currentArgs = [...args];
@@ -352,9 +321,6 @@ function parseTestArgs(args: string[]): {
             "--populate flag requires a value (e.g., --populate 1000)",
           );
         }
-        break;
-      case "--forks":
-        options.reportForkCount = true;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -501,11 +467,6 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
         } else {
           console.info(`Found ${fail_lines.length} failed lines:`);
           console.error(fail_lines);
-        }
-
-        if (options.reportForkCount) {
-          console.info(`\nRunning fork analysis...`);
-          runAnsiForksAndReport();
         }
 
         if (options.sendToDatadog) {
