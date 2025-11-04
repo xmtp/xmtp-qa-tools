@@ -10,9 +10,8 @@ When upgrading XMTP bindings and/or node-sdk versions:
 
 1. Add `@xmtp/node-sdk-X.X.X` and `@xmtp/node-bindings-X.X.X` to package.json.
 2. Add import for new SDK version to `versions/node-sdk.ts`.
-3. Run `yarn versions` to link the new versions.
-4. Run `yarn regression` to check regression of latest 3 versions.
-5. Create and Merge PR. (so it's tested in CI)
+3. Run `yarn regression` to check regression of latest 3 versions.
+4. Create and Merge PR. (so it's tested in CI)
 
 ### Version mapping system
 
