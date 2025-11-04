@@ -29,4 +29,3 @@ export const network = process.env.XMTP_ENV; // Network environment setting
 export const randomInboxIdsCount = 10; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
 export const testName = "forks";
-
