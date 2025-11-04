@@ -14,11 +14,11 @@ for ((x=1; x<=num_runs; x++)); do
   rm -rf .data
   sleep 10
   tid=$(date +%s)
-  echo "Running test iteration $x of 10..." 
+  echo "Running test iteration $x of 10..."
 
   #LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout $DURATION_MS npx vitest run suites/networkchaos/forkmatrix.test.ts >& logs/raw-forkmatrix-${tid}.log
   #LOG_LEVEL=info timeout $DURATION_MS time yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
-  LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts --debug
+  LOGGING_LEVEL="error" LOG_LEVEL="silly" timeout 300 yarn test suites/networkchaos/forkmatrix-streamonly.test.ts
   #LOG_LEVEL=info timeout 300 time npx vitest run suites/networkchaos/forkmatrix-streamonly.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | tee test-${x}.log
   exit_code=$?
 
