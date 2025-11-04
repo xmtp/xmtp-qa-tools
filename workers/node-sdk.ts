@@ -64,7 +64,7 @@ export {
   type KeyPackageStatus,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.2.3";
+} from "@xmtp/node-sdk-4.3.0";
 
 export const VersionList = [
   {

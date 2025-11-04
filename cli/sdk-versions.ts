@@ -155,13 +155,7 @@ function main() {
 
   createBindingsSymlinks();
   console.log("✅ Node SDK version setup complete!");
-  console.log("Available versions:");
-  for (const config of VersionList) {
-    const status = config.auto ? "🟢 auto" : "🟡 manual";
-    console.log(
-      `  ${config.nodeSDK} ${status} (bindings: ${config.nodeBindings})`,
-    );
-  }
+
   console.log("Done");
 }
 
