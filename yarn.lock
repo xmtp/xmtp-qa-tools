@@ -1424,18 +1424,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.7@npm:@xmtp/agent-sdk@1.1.7":
-  version: 1.1.7
-  resolution: "@xmtp/agent-sdk@npm:1.1.7"
+"@xmtp/agent-sdk-1.1.9@npm:@xmtp/agent-sdk@1.1.9":
+  version: 1.1.9
+  resolution: "@xmtp/agent-sdk@npm:1.1.9"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.2.3"
-    uint8arrays: "npm:^5.1.0"
+    "@xmtp/node-sdk": "npm:^4.2.4"
     viem: "npm:^2.37.6"
-  checksum: 10/f8d76265a4cbcb32282ba75404d50779bef0f7bb9bd16298a825348b03a15f0fa290966d4eb15a71bcd3a621be279379b632ea6e448e715bdefe782e9ac99a34
+  checksum: 10/457b6bb94f387a0f6d2b61f16a172f13bae35ce2b0ad78dbf162a1777b19cf4504b872d5c8070ad9ccba995cd11ac5168ca8697aee1d58b4807dd4e16797f715
   languageName: node
   linkType: hard
 
@@ -1624,7 +1623,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.2.3@npm:@xmtp/node-sdk@4.2.3, @xmtp/node-sdk@npm:^4.1.2, @xmtp/node-sdk@npm:^4.2.1, @xmtp/node-sdk@npm:^4.2.3":
+"@xmtp/node-sdk-4.2.3@npm:@xmtp/node-sdk@4.2.3, @xmtp/node-sdk@npm:^4.1.2, @xmtp/node-sdk@npm:^4.2.1":
   version: 4.2.3
   resolution: "@xmtp/node-sdk@npm:4.2.3"
   dependencies:
@@ -1636,7 +1635,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.3.0@npm:@xmtp/node-sdk@4.3.0":
+"@xmtp/node-sdk-4.3.0@npm:@xmtp/node-sdk@4.3.0, @xmtp/node-sdk@npm:^4.2.4":
   version: 4.3.0
   resolution: "@xmtp/node-sdk@npm:4.3.0"
   dependencies:
@@ -4643,7 +4642,7 @@ __metadata:
     "@xmtp/agent-sdk-1.0.0": "npm:@xmtp/agent-sdk@1.0.0"
     "@xmtp/agent-sdk-1.0.1": "npm:@xmtp/agent-sdk@1.0.1"
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2"
-    "@xmtp/agent-sdk-1.1.7": "npm:@xmtp/agent-sdk@1.1.7"
+    "@xmtp/agent-sdk-1.1.9": "npm:@xmtp/agent-sdk@1.1.9"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"

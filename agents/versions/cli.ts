@@ -84,13 +84,6 @@ function createAgentSDKSymlinks() {
   }
 
   console.log("✅ Agent SDK version setup complete!");
-  console.log("Available versions:");
-  for (const config of AgentVersionList) {
-    const status = config.auto ? "🟢 auto" : "🟡 manual";
-    console.log(
-      `  ${config.agentSDK} ${status} (node-sdk: ${config.nodeSDK}, bindings: ${config.nodeBindings})`,
-    );
-  }
 }
 
 function cleanPackageJson() {

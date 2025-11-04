@@ -290,15 +290,8 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
       "• `3 50` = 3 groups × 50 messages",
   );
 }
-const signer = createSigner(process.env.XMTP_WALLET_KEY as `0x${string}`);
-const encryptionKey = Buffer.from(
-  process.env.XMTP_DB_ENCRYPTION_KEY as string,
-  "hex",
-);
-const env = process.env.XMTP_ENV as "local" | "dev" | "production";
-const agent = await Agent.create(signer, {
-  env,
-  dbEncryptionKey: encryptionKey,
+
+const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +

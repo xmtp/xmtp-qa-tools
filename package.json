@@ -22,7 +22,7 @@
     "lint": "eslint .",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "regression": "yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
+    "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
     "versions": "tsx cli/sdk-versions.ts"
@@ -32,7 +32,7 @@
     "@xmtp/agent-sdk-1.0.0": "npm:@xmtp/agent-sdk@1.0.0",
     "@xmtp/agent-sdk-1.0.1": "npm:@xmtp/agent-sdk@1.0.1",
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2",
-    "@xmtp/agent-sdk-1.1.7": "npm:@xmtp/agent-sdk@1.1.7",
+    "@xmtp/agent-sdk-1.1.9": "npm:@xmtp/agent-sdk@1.1.9",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
