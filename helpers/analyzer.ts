@@ -217,22 +217,31 @@ export async function cleanForksLogs(
         "may be fork",
       );
 
+      // Always preserve raw logs for debugging/analysis
+      // Only manage cleaned versions based on fork content
       if (!containsForkContent) {
         if (removeNonMatching) {
-          await fs.promises.unlink(rawFilePath);
-          console.debug(`Removed ${file} - does not contain fork content`);
+          // Skip creating cleaned version for non-fork logs
+          // Raw log is always preserved
+          console.debug(`Skipping ${file} - does not contain fork content (raw log preserved)`);
           removedCount++;
         } else {
-          console.debug(`Skipping ${file} - does not contain fork content`);
+          // Create cleaned version even if no fork content
+          const outputFileName = file.replace("raw-", "cleaned-");
+          const outputPath = path.join(outputDir, outputFileName);
+          await processLogFile(rawFilePath, outputPath);
+          console.debug(`Cleaned ${file} (raw log preserved)`);
+          processedCount++;
         }
         continue;
       }
 
+      // Process file with fork content and create cleaned version
+      // Raw log is always preserved
       const outputFileName = file.replace("raw-", "cleaned-");
       const outputPath = path.join(outputDir, outputFileName);
-
       await processLogFile(rawFilePath, outputPath);
-      console.debug(`Cleaned forks log: ${file} -> ${outputFileName}`);
+      console.debug(`Cleaned forks log: ${file} -> ${outputFileName} (raw log preserved)`);
       processedCount++;
     } catch (error) {
       console.error(`Failed to process ${file}:`, error);
@@ -241,10 +250,10 @@ export async function cleanForksLogs(
 
   if (removeNonMatching && removedCount > 0) {
     console.debug(
-      `Removed ${removedCount} files that did not contain fork content`,
+      `Skipped creating cleaned versions for ${removedCount} files that did not contain fork content (raw logs preserved)`,
     );
   }
-  console.debug(`Processed ${processedCount} forks log files`);
+  console.debug(`Processed ${processedCount} forks log files (all raw logs preserved)`);
 }
 
 /**
