@@ -4,7 +4,6 @@
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 num_runs=10
-mkdir -p test
 
 original_cwd=$(pwd)
 #rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
@@ -12,7 +11,8 @@ original_cwd=$(pwd)
 for ((x=1; x<=num_runs; x++)); do
   echo "Starting test cycle at $(date)"
 
-  cd ${original_cwd}/multinode && docker compose down && ./ci.sh && cd ${original_cwd}
+  cd ${original_cwd}/multinode && docker compose down && ./ci.sh
+  cd ${original_cwd}
   rm -rf .data
   sleep 10
   tid=$(date +%s)
