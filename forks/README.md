@@ -59,6 +59,33 @@ yarn local-update
 yarn test forks --attempts 100 --env local --log warn --file --forks
 ```
 
+## CLI Usage
+
+The fork detection CLI runs the test multiple times and collects statistics:
+
+```bash
+# Run 100 times (default)
+yarn fork
+
+# Run a specific number of times
+yarn fork --count 50
+
+# Clean all raw logs before starting
+yarn fork --clean-all
+
+# Run on a specific environment
+yarn fork --count 200 --env local
+
+# Show help
+yarn fork --help
+```
+
+The CLI provides statistics including:
+
+- Total runs and forks detected
+- Fork detection rate
+- Average forks per run
+
 ### Log processing features
 
 - **Clean slate**: Removes old logs and data before starting
