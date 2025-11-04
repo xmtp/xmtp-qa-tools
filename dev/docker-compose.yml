@@ -26,12 +26,12 @@ services:
     platform: linux/amd64
 
   db:
-    image: postgres:13
+    image: postgres:16
     environment:
       POSTGRES_PASSWORD: xmtp
 
   mlsdb:
-    image: postgres:13
+    image: postgres:16
     environment:
       POSTGRES_PASSWORD: xmtp
 
