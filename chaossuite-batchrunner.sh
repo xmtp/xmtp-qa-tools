@@ -13,6 +13,7 @@ for ((x=1; x<=num_runs; x++)); do
 
   cd ${original_cwd}/multinode && docker compose down && ./ci.sh
   cd ${original_cwd}
+  echo "CWD is $original_cwd"
   rm -rf .data
   sleep 10
   tid=$(date +%s)
