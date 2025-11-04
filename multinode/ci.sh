@@ -12,7 +12,7 @@ for x in {1..3}; {
   sleep 10
 
   NODE_COUNT=$(docker ps --filter "ancestor=ghcr.io/xmtp/node-go:main" --format "{{.ID}}" | wc -l)
-  [ "$NODE_COUNT" -eq "4" ] && echo "Found $NODE_COUNT XMTP node(s) running" && exit 0
+  [ "$NODE_COUNT" -eq 4 ] && echo "Found $NODE_COUNT XMTP node(s) running" && exit 0
   echo "Error: Expected 4 XMTP nodes to be running."
   docker ps
 }
