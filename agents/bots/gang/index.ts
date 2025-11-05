@@ -106,8 +106,9 @@ agent.on("text", async (ctx) => {
 agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
-  // @ts-expect-error - getTestUrl is not typed correctly
   console.log(`🔗${getTestUrl(agent.client)}`);
+  // @ts-expect-error - getTestUrl is not typed correctly
+  logDetails(agent.client).catch(console.error);
 });
 
 await agent.start();

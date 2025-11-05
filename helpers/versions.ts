@@ -595,10 +595,33 @@ export function getSDKVersionInfo(
     ? getBindingsVersion(nodeBindings)
     : null;
 
-  return {
+  const versionInfo: {
+    agentSDK: string | null;
+    nodeSDK: string | null;
+    nodeBindings: string | null;
+    bindingsVersion: { branch: string; version: string; date: string } | null;
+  } = {
     agentSDK,
     nodeSDK,
     nodeBindings,
     bindingsVersion,
   };
+  console.log(`\n📦 SDK Versions:`);
+  if (versionInfo.agentSDK) {
+    console.log(`  • Agent SDK: ${versionInfo.agentSDK}`);
+  }
+  if (versionInfo.nodeSDK) {
+    console.log(`  • Node SDK: ${versionInfo.nodeSDK}`);
+  }
+  if (versionInfo.nodeBindings) {
+    console.log(`  • Node Bindings: ${versionInfo.nodeBindings}`);
+    if (versionInfo.bindingsVersion) {
+      console.log(
+        `    └─ libxmtp: ${versionInfo.bindingsVersion.branch}@${versionInfo.bindingsVersion.version} (${versionInfo.bindingsVersion.date})`,
+      );
+    }
+  }
+  console.log();
+
+  return versionInfo;
 }

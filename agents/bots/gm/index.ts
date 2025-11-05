@@ -38,30 +38,9 @@ agent.on("text", async (ctx) => {
 agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
-
-  // Log SDK version information
-  const versionInfo = getSDKVersionInfo(agent, agent.client);
-  console.log(`\n📦 SDK Versions:`);
-  if (versionInfo.agentSDK) {
-    console.log(`  • Agent SDK: ${versionInfo.agentSDK}`);
-  }
-  if (versionInfo.nodeSDK) {
-    console.log(`  • Node SDK: ${versionInfo.nodeSDK}`);
-  }
-  if (versionInfo.nodeBindings) {
-    console.log(`  • Node Bindings: ${versionInfo.nodeBindings}`);
-    if (versionInfo.bindingsVersion) {
-      console.log(
-        `    └─ libxmtp: ${versionInfo.bindingsVersion.branch}@${versionInfo.bindingsVersion.version} (${versionInfo.bindingsVersion.date})`,
-      );
-    }
-  }
-  console.log();
-
-  // @ts-expect-error - getTestUrl is not typed correctly
-  logDetails(agent.client).catch(console.error);
-  // @ts-expect-error - getTestUrl is not typed correctly
   console.log(`🔗${getTestUrl(agent.client)}`);
+  logDetails(agent.client).catch(console.error);
+  getSDKVersionInfo(Agent, agent.client);
 });
 
 await agent.start();

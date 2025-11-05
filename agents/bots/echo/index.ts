@@ -25,9 +25,8 @@ agent.on("unhandledError", (error) => {
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  // @ts-expect-error - getTestUrl is not typed correctly
-  logDetails(agent.client).catch(console.error);
-  // @ts-expect-error - getTestUrl is not typed correctly
+  console.log(`Waiting for messages...`);
+  console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
 });
 

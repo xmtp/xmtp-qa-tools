@@ -1,6 +1,7 @@
 import { APP_VERSION } from "@helpers/client";
 import {
   Agent,
+  getSDKVersionInfo,
   getTestUrl,
   logDetails,
   type MessageContext,
@@ -416,22 +417,11 @@ Or directly send:
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log("🔧 Key-Check Bot with Inline Actions started!");
-  console.log(
-    "Features: Interactive key package validation, fork detection, and UX message type demos",
-  );
-  console.log(
-    "Usage: Send '/kc', 'help', or 'menu' to see interactive options",
-  );
-  console.log("Or directly send an Inbox ID or Ethereum address to check");
+  console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
-  // @ts-expect-error - getTestUrl is not typed correctly
   console.log(`🔗${getTestUrl(agent.client)}`);
-  // @ts-expect-error - getTestUrl is not typed correctly
   logDetails(agent.client).catch(console.error);
-
-  // Debug: Log all registered actions
-  console.log("🔍 Registered actions:", getRegisteredActions());
+  getSDKVersionInfo(Agent, agent.client);
 });
 
 await agent.start();
