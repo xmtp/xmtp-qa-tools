@@ -351,3 +351,248 @@ export function getSdkVersionsForTesting(): string[] {
 
   return sdkVersions;
 }
+
+/**
+ * Detect which agent-sdk version is being used by checking the Agent constructor
+ */
+export function detectAgentSDKVersion(AgentClass: any): string | null {
+  try {
+    // Check if Agent is from a specific version by comparing constructors
+    for (const version of AgentVersionList) {
+      if (version.Agent === AgentClass) {
+        return version.agentSDK;
+      }
+    }
+
+    // Since Agent is hardcoded to 1.1.10 in exports, check if it matches
+    if (AgentClass === Agent110) {
+      return "1.1.10";
+    }
+    if (AgentClass === Agent17) {
+      return "1.1.7";
+    }
+    if (AgentClass === Agent12) {
+      return "1.1.2";
+    }
+
+    // Try to detect from the module path if available
+    // Check which agent-sdk package is actually loaded
+    try {
+      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.10");
+      if (modulePath && fs.existsSync(modulePath)) {
+        // Check if the Agent class comes from this package
+        const agentSDKPath = path.dirname(modulePath);
+        if (agentSDKPath.includes("agent-sdk-1.1.10")) {
+          return "1.1.10";
+        }
+      }
+    } catch {
+      // Ignore module resolution errors
+    }
+
+    try {
+      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.7");
+      if (modulePath && fs.existsSync(modulePath)) {
+        const agentSDKPath = path.dirname(modulePath);
+        if (agentSDKPath.includes("agent-sdk-1.1.7")) {
+          return "1.1.7";
+        }
+      }
+    } catch {
+      // Ignore module resolution errors
+    }
+
+    try {
+      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.2");
+      if (modulePath && fs.existsSync(modulePath)) {
+        const agentSDKPath = path.dirname(modulePath);
+        if (agentSDKPath.includes("agent-sdk-1.1.2")) {
+          return "1.1.2";
+        }
+      }
+    } catch {
+      // Ignore module resolution errors
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  // Default: Agent is hardcoded to 1.1.10 in exports
+  return "1.1.10";
+}
+
+/**
+ * Detect which node-sdk version is being used by checking the client instance or linked bindings
+ */
+export function detectNodeSDKVersion(client: any): {
+  nodeSDK: string | null;
+  nodeBindings: string | null;
+  bindingsVersion: { branch: string; version: string; date: string } | null;
+} {
+  try {
+    // First, try to find the client in VersionList
+    for (const version of VersionList) {
+      if (
+        client instanceof version.Client ||
+        client?.constructor === version.Client
+      ) {
+        // Try to get the bindings version from the linked node-bindings
+        const bindingsVersion = getBindingsVersion(version.nodeBindings);
+        return {
+          nodeSDK: version.nodeSDK,
+          nodeBindings: version.nodeBindings,
+          bindingsVersion,
+        };
+      }
+    }
+
+    // If not found, try to detect from the bindings path
+    // Check the symlink path to find which bindings are linked
+    const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
+
+    // Try to find the bindings by checking the symlink
+    for (const version of VersionList) {
+      const bindingsDir = path.join(
+        xmtpDir,
+        `node-bindings-${version.nodeBindings}`,
+      );
+      if (fs.existsSync(bindingsDir)) {
+        const versionJsonPath = path.join(bindingsDir, "dist", "version.json");
+        if (fs.existsSync(versionJsonPath)) {
+          try {
+            const versionInfo = JSON.parse(
+              fs.readFileSync(versionJsonPath, "utf8"),
+            );
+            // Check if this bindings version matches what the client might be using
+            // by checking the client's internal structure or by checking which node-sdk
+            // is linked to this bindings
+            const nodeSDKDir = path.join(
+              xmtpDir,
+              `node-sdk-${version.nodeSDK}`,
+            );
+            const sdkNodeModulesXmtpDir = path.join(
+              nodeSDKDir,
+              "node_modules",
+              "@xmtp",
+            );
+            const symlinkTarget = path.join(
+              sdkNodeModulesXmtpDir,
+              "node-bindings",
+            );
+
+            if (fs.existsSync(symlinkTarget)) {
+              try {
+                const stats = fs.lstatSync(symlinkTarget);
+                if (stats.isSymbolicLink()) {
+                  const target = fs.readlinkSync(symlinkTarget);
+                  if (
+                    path.resolve(sdkNodeModulesXmtpDir, target) === bindingsDir
+                  ) {
+                    return {
+                      nodeSDK: version.nodeSDK,
+                      nodeBindings: version.nodeBindings,
+                      bindingsVersion: versionInfo,
+                    };
+                  }
+                }
+              } catch {
+                // Ignore symlink read errors
+              }
+            }
+          } catch {
+            // Ignore version.json read errors
+          }
+        }
+      }
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  return {
+    nodeSDK: null,
+    nodeBindings: null,
+    bindingsVersion: null,
+  };
+}
+
+/**
+ * Get the bindings version information from version.json
+ */
+export function getBindingsVersion(bindingsVersion: string): {
+  branch: string;
+  version: string;
+  date: string;
+} | null {
+  try {
+    const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
+    const bindingsDir = path.join(xmtpDir, `node-bindings-${bindingsVersion}`);
+    const versionJsonPath = path.join(bindingsDir, "dist", "version.json");
+
+    if (fs.existsSync(versionJsonPath)) {
+      const versionInfo = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
+      return versionInfo;
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  return null;
+}
+
+/**
+ * Get SDK version information for logging
+ */
+export function getSDKVersionInfo(
+  agent: any,
+  client: any,
+): {
+  agentSDK: string | null;
+  nodeSDK: string | null;
+  nodeBindings: string | null;
+  bindingsVersion: { branch: string; version: string; date: string } | null;
+} {
+  // Detect agent-sdk version
+  const AgentClass = agent?.constructor || Agent110;
+  const agentSDK = detectAgentSDKVersion(AgentClass);
+
+  // Find the corresponding node-sdk version from AgentVersionList
+  let nodeSDK: string | null = null;
+  let nodeBindings: string | null = null;
+
+  if (agentSDK) {
+    const agentVersion = AgentVersionList.find((v) => v.agentSDK === agentSDK);
+    if (agentVersion) {
+      nodeSDK = agentVersion.nodeSDK;
+
+      // Find the corresponding bindings from VersionList
+      const nodeVersion = VersionList.find((v) => v.nodeSDK === nodeSDK);
+      if (nodeVersion) {
+        nodeBindings = nodeVersion.nodeBindings;
+      }
+    }
+  }
+
+  // Try to detect from client if not found
+  if (!nodeSDK || !nodeBindings) {
+    const nodeInfo = detectNodeSDKVersion(client);
+    if (nodeInfo.nodeSDK) {
+      nodeSDK = nodeInfo.nodeSDK;
+    }
+    if (nodeInfo.nodeBindings) {
+      nodeBindings = nodeInfo.nodeBindings;
+    }
+  }
+
+  // Get bindings version info
+  const bindingsVersion = nodeBindings
+    ? getBindingsVersion(nodeBindings)
+    : null;
+
+  return {
+    agentSDK,
+    nodeSDK,
+    nodeBindings,
+    bindingsVersion,
+  };
+}
