@@ -4,7 +4,7 @@ import {
   type RemoteAttachment,
 } from "@xmtp/content-type-remote-attachment";
 import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
-import { type MessageContext } from "../../../agent-sdk";
+import { type MessageContext } from "@helpers/versions";
 import { USDCHandler } from "../../../utils/usdc";
 
 export class UxHandlers {

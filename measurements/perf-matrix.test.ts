@@ -18,7 +18,7 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
 import { describe, expect, it } from "vitest";
 import { setupSummaryTable } from "./helper";
 

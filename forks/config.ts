@@ -1,4 +1,4 @@
-import { getActiveVersion } from "@workers/node-sdk";
+import { getActiveVersion } from "@helpers/versions";
 
 // Fork matrix parameters - shared between test and CLI
 export const groupCount = 5;

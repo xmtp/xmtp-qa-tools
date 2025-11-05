@@ -9,7 +9,7 @@ import {
   type Conversation,
   type Signer,
   type XmtpEnv,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";

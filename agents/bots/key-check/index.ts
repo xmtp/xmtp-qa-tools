@@ -10,7 +10,7 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import { Agent, getTestUrl, type MessageContext } from "../../agent-sdk";
+import { Agent, getTestUrl, type MessageContext } from "@helpers/versions";
 import {
   ActionBuilder,
   getRegisteredActions,

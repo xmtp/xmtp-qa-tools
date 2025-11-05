@@ -1,4 +1,4 @@
-import type { AgentMiddleware, MessageContext } from "../../agent-sdk";
+import type { AgentMiddleware, MessageContext } from "@helpers/versions";
 import {
   ContentTypeActions,
   type Action,

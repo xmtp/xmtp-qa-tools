@@ -2,7 +2,7 @@ import "dotenv/config";
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import { getActiveVersion } from "../workers/node-sdk";
+import { getActiveVersion } from "@helpers/versions";
 
 // Consolidated interfaces
 interface MetricData {
