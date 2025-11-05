@@ -28,18 +28,21 @@ export const AgentVersionList = [
     Agent: Agent110,
     MessageContext: MessageContext110,
     agentSDK: "1.1.10",
+    nodeSDK: "4.3.0",
     auto: true,
   },
   {
     Agent: Agent17,
     MessageContext: MessageContext17,
     agentSDK: "1.1.7",
+    nodeSDK: "4.2.3",
     auto: true,
   },
   {
     Agent: Agent12,
     MessageContext: MessageContext12,
     agentSDK: "1.1.2",
+    nodeSDK: "4.1.0",
     auto: true,
   },
 ];

@@ -29,8 +29,6 @@ export const AgentVersionList = [
     Agent: Agent115,
     MessageContext: MessageContext115,
     agentSDK: "1.1.5",
-    nodeSDK: "4.2.0", // Agent SDK 1.1.5 uses node-sdk ^4.2.2
-    nodeBindings: "1.5.2",
     auto: true, // Include in automated testing
   },
   // ... more versions
