@@ -1,8 +1,8 @@
 import { getTime } from "@helpers/logger";
+import { type Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
-import { type Group } from "@helpers/versions";
 import { describe, it } from "vitest";
 import {
   epochRotationOperations,

@@ -1,7 +1,7 @@
 import { verifyMessageStream } from "@helpers/streams";
+import type { Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import type { Group } from "@helpers/versions";
 import { describe, expect, it } from "vitest";
 import * as iptables from "../../network-stability/iptables";
 

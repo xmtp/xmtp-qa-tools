@@ -1,6 +1,4 @@
 import { sleep, streamColdStartTimeout } from "@helpers/client";
-import { typeofStream } from "@workers/main";
-import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
@@ -9,6 +7,8 @@ import {
   type Dm,
   type Group,
 } from "@helpers/versions";
+import { typeofStream } from "@workers/main";
+import type { Worker } from "@workers/manager";
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {

@@ -1,16 +1,6 @@
-import { APP_VERSION, createSigner } from "@helpers/client";
-import {
-  ContentTypeMarkdown,
-  MarkdownCodec,
-} from "@xmtp/content-type-markdown";
-import { ReactionCodec } from "@xmtp/content-type-reaction";
-import {
-  AttachmentCodec,
-  RemoteAttachmentCodec,
-} from "@xmtp/content-type-remote-attachment";
-import { ReplyCodec } from "@xmtp/content-type-reply";
-import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { APP_VERSION } from "@helpers/client";
 import { Agent, getTestUrl, type MessageContext } from "@helpers/versions";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ActionBuilder,
   getRegisteredActions,

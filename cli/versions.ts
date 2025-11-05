@@ -91,7 +91,7 @@ function createBindingsSymlinks() {
             needsUpdate = false;
           }
         }
-      } catch (error) {
+      } catch {
         // If we can't read the symlink, we'll recreate it
       }
     }
@@ -117,7 +117,7 @@ function createBindingsSymlinks() {
               // Directory not empty, that's fine
             }
           }
-        } catch (error) {
+        } catch {
           // If removal fails, try removing the entire node_modules
           if (fs.existsSync(path.join(sdkDir, "node_modules"))) {
             fs.rmSync(path.join(sdkDir, "node_modules"), {
@@ -170,7 +170,9 @@ function createAgentSDKSymlinks() {
   }
 
   console.log("Creating Agent SDK symlinks...");
-  console.log("  (Linking agent-sdk versions to their required node-sdk versions)");
+  console.log(
+    "  (Linking agent-sdk versions to their required node-sdk versions)",
+  );
 
   let hasErrors = false;
 
@@ -222,7 +224,7 @@ function createAgentSDKSymlinks() {
             needsUpdate = false;
           }
         }
-      } catch (error) {
+      } catch {
         // If we can't read the symlink, we'll recreate it
       }
     }
@@ -248,7 +250,7 @@ function createAgentSDKSymlinks() {
               // Directory not empty, that's fine
             }
           }
-        } catch (error) {
+        } catch {
           // If removal fails, try removing the entire node_modules
           if (fs.existsSync(path.join(agentSDKDir, "node_modules"))) {
             fs.rmSync(path.join(agentSDKDir, "node_modules"), {

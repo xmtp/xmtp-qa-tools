@@ -1,5 +1,5 @@
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { type Group, type MessageContext } from "@helpers/versions";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 
 interface ForkDebugInfo {
   epoch: bigint;

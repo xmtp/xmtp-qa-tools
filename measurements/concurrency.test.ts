@@ -3,9 +3,9 @@ import {
   createSigner,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
+import { Client, type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { Client, type XmtpEnv } from "@helpers/versions";
 import { beforeAll, describe, it } from "vitest";
 
 const testConfig = {
