@@ -70,7 +70,7 @@ export {
   type PermissionLevel as AgentPermissionLevel,
 } from "@xmtp/agent-sdk-1.1.5";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.5/debug";
 
 // Node SDK exports
 export {
