@@ -1,6 +1,10 @@
 import { APP_VERSION } from "@helpers/client";
-import { Agent, getTestUrl, type MessageContext } from "@helpers/versions";
-import { logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
+import {
+  Agent,
+  getTestUrl,
+  logDetails,
+  type MessageContext,
+} from "@helpers/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ActionBuilder,
