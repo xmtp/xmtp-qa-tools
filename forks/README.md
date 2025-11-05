@@ -2,7 +2,27 @@
 
 XMTP forks occur when different clients create conflicting states in group conversations.
 
-## Fork generation through send testing
+### Getting started
+
+```bash
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+
+# Install dependencies
+yarn install
+```
+
+### Environment setup
+
+```bash
+# MAIN
+LOGGING_LEVEL=off
+LOG_LEVEL=debug
+XMTP_ENV=production
+```
+
+### Fork generation through send testing
 
 The main approach creates intentional conflicts by running parallel operations on shared groups:
 
@@ -20,7 +40,7 @@ The main approach creates intentional conflicts by running parallel operations o
   - Log epoch progress
 - Export forks into a folder
 
-## Parameters
+### Parameters
 
 - **groupCount**: `5` - Number of groups to create in parallel
 - **nodeBindings**: `3.x.x` - Node SDK version to use
@@ -39,16 +59,9 @@ The main approach creates intentional conflicts by running parallel operations o
 - **typeofStreamForTest**: `typeofStream.None` - No streams started by default (configured on-demand)
 - **typeOfSyncForTest**: `typeOfSync.None` - No automatic syncing (configured on-demand)
 
-## Test setup
+### Test setup in local network
 
 ```bash
-# Installation For a faster download with just the latest code
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-
-# Install dependencies
-yarn install
-
 # Start local network
 ./dev/up
 
