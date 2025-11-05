@@ -4,7 +4,7 @@ import {
   type IdentifierKind,
   type MessageContext,
   type PermissionLevel,
-} from "../../../versions/agent-sdk";
+} from "../../../agent-sdk";
 
 export class GroupHandlers {
   async handleGroupMembers(ctx: MessageContext): Promise<void> {

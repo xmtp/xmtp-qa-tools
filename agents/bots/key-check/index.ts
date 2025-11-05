@@ -10,6 +10,7 @@ import {
 } from "@xmtp/content-type-remote-attachment";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { Agent, getTestUrl, type MessageContext } from "../../agent-sdk";
 import {
   ActionBuilder,
   getRegisteredActions,
@@ -23,11 +24,6 @@ import {
 } from "../../utils/inline-actions/inline-actions";
 import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
-import {
-  Agent,
-  getTestUrl,
-  type MessageContext,
-} from "../../versions/agent-sdk";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";

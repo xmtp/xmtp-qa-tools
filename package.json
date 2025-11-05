@@ -9,7 +9,7 @@
     "workers"
   ],
   "scripts": {
-    "agent-versions": "tsx agents/versions/cli.ts",
+    "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
     "c": "yarn build && yarn lint && yarn format",
@@ -25,7 +25,7 @@
     "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "versions": "tsx cli/sdk-versions.ts"
+    "versions": "tsx cli/versions.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
