@@ -1,4 +1,4 @@
-# XMTP QA Tools CLI
+# XMTP QA Tools CLIs
 
 A comprehensive CLI for testing XMTP protocol implementations across environments and SDK versions.
 
