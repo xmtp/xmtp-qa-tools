@@ -60,14 +60,15 @@ import {
   Group as Group430,
 } from "@xmtp/node-sdk-4.3.0";
 
-// Agent SDK exports
+// Agent SDK exports - use first auto-enabled version
+// Since 1.1.10 has auto: false, we export from 1.1.7 (first auto: true)
 export {
   Agent,
   MessageContext,
   type AgentMiddleware,
-} from "@xmtp/agent-sdk-1.1.10";
+} from "@xmtp/agent-sdk-1.1.7";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.7/debug";
 
 // Node SDK exports
 export {
@@ -417,8 +418,9 @@ export function detectAgentSDKVersion(AgentClass: any): string | null {
     // Ignore errors
   }
 
-  // Default: Agent is hardcoded to 1.1.10 in exports
-  return "1.1.10";
+  // Default: Use first auto-enabled version (respects auto flag)
+  const activeVersion = getActiveAgentVersion(0);
+  return activeVersion.agentSDK;
 }
 
 /**
@@ -553,7 +555,9 @@ export function getSDKVersionInfo(
   bindingsVersion: { branch: string; version: string; date: string } | null;
 } {
   // Detect agent-sdk version
-  const AgentClass = agent?.constructor || Agent110;
+  // Use Agent from the first auto-enabled version (respects auto flag)
+  const activeVersion = getActiveAgentVersion(0);
+  const AgentClass = agent?.constructor || activeVersion.Agent;
   const agentSDK = detectAgentSDKVersion(AgentClass);
 
   // Find the corresponding node-sdk version from AgentVersionList
