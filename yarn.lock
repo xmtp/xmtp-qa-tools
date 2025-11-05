@@ -1412,18 +1412,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.7@npm:@xmtp/agent-sdk@1.1.7":
-  version: 1.1.7
-  resolution: "@xmtp/agent-sdk@npm:1.1.7"
+"@xmtp/agent-sdk-1.1.5@npm:@xmtp/agent-sdk@1.1.5":
+  version: 1.1.5
+  resolution: "@xmtp/agent-sdk@npm:1.1.5"
   dependencies:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-sdk": "npm:^4.2.3"
+    "@xmtp/node-sdk": "npm:^4.2.2"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2.37.6"
-  checksum: 10/f8d76265a4cbcb32282ba75404d50779bef0f7bb9bd16298a825348b03a15f0fa290966d4eb15a71bcd3a621be279379b632ea6e448e715bdefe782e9ac99a34
+  checksum: 10/209638240ff8d0a4407652e5a4505d1e5044bf22fa717de50df56514c45a93e4b8446be025b6126f87611a296c00e654a9683f73830951de1e63b88f3275a2a6
   languageName: node
   linkType: hard
 
@@ -1649,7 +1649,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.3.0@npm:@xmtp/node-sdk@4.3.0, @xmtp/node-sdk@npm:^4.2.3, @xmtp/node-sdk@npm:^4.2.4":
+"@xmtp/node-sdk-4.3.0@npm:@xmtp/node-sdk@4.3.0, @xmtp/node-sdk@npm:^4.2.2, @xmtp/node-sdk@npm:^4.2.4":
   version: 4.3.0
   resolution: "@xmtp/node-sdk@npm:4.3.0"
   dependencies:
@@ -4655,7 +4655,7 @@ __metadata:
     "@types/node": "npm:^20.0.0"
     "@xmtp/agent-sdk-1.1.10": "npm:@xmtp/agent-sdk@1.1.10"
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2"
-    "@xmtp/agent-sdk-1.1.7": "npm:@xmtp/agent-sdk@1.1.7"
+    "@xmtp/agent-sdk-1.1.5": "npm:@xmtp/agent-sdk@1.1.5"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
