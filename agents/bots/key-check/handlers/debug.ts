@@ -1,6 +1,6 @@
 import { createRequire } from "node:module";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import { type MessageContext } from "../../../versions/agent-sdk";
+import { type MessageContext } from "../../../agent-sdk";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);

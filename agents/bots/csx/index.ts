@@ -4,7 +4,7 @@ import {
   getTestUrl,
   type Group,
   type MessageContext,
-} from "../../versions/agent-sdk";
+} from "../../agent-sdk";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
