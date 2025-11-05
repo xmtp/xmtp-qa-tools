@@ -9,7 +9,6 @@ import {
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ActionBuilder,
-  getRegisteredActions,
   initializeAppFromConfig,
   inlineActionsMiddleware,
   sendActions,
