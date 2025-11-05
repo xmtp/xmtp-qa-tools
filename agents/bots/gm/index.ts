@@ -1,5 +1,6 @@
 import { APP_VERSION } from "@helpers/client";
 import { Agent, getTestUrl } from "@helpers/versions";
+import { logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -35,6 +36,7 @@ agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
+  logDetails(agent.client).catch(console.error);
 });
 
 await agent.start();

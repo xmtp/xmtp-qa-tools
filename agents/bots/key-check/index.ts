@@ -1,5 +1,6 @@
 import { APP_VERSION } from "@helpers/client";
 import { Agent, getTestUrl, type MessageContext } from "@helpers/versions";
+import { logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ActionBuilder,
@@ -421,6 +422,7 @@ agent.on("start", () => {
   console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
+  logDetails(agent.client).catch(console.error);
 
   // Debug: Log all registered actions
   console.log("🔍 Registered actions:", getRegisteredActions());
