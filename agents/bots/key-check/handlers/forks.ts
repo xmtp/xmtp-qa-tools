@@ -1,4 +1,4 @@
-import { type Group, type MessageContext } from "@helpers/versions";
+import { type AgentGroupType, type MessageContext } from "@helpers/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 
 interface ForkDebugInfo {
@@ -48,7 +48,7 @@ export class ForksHandlers {
   }
 
   private async analyzeForkState(
-    conversation: Group,
+    conversation: AgentGroupType,
   ): Promise<ForkAnalysisResult> {
     const syncErrors: string[] = [];
     let preSyncInfo: ForkDebugInfo | undefined;
@@ -155,7 +155,7 @@ export class ForksHandlers {
   ): string {
     const message = ctx.message;
     const conversation = ctx.conversation;
-    const group = conversation as Group;
+    const group = conversation as AgentGroupType;
 
     let report = "# 🔍 FORK DETECTION ANALYSIS REPORT\n\n";
 
@@ -232,7 +232,7 @@ export class ForksHandlers {
     this.logSection("FORK DETECTION START");
 
     try {
-      const conversation = ctx.conversation as Group;
+      const conversation = ctx.conversation as AgentGroupType;
       const senderAddress = await ctx.getSenderAddress();
 
       this.logInfo(`Processing fork detection request from ${senderAddress}`);

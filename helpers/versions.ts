@@ -66,6 +66,8 @@ export {
   Agent,
   MessageContext,
   type AgentMiddleware,
+  type Group as AgentGroupType,
+  type PermissionLevel as AgentPermissionLevel,
 } from "@xmtp/agent-sdk-1.1.7";
 
 export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.7/debug";

@@ -1,9 +1,9 @@
 import { APP_VERSION } from "@helpers/client";
 import {
   Agent,
+  getSDKVersionInfo,
   getTestUrl,
   logDetails,
-  getSDKVersionInfo,
 } from "@helpers/versions";
 
 // Load .env file only in local development
@@ -39,7 +39,7 @@ agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
-  
+
   // Log SDK version information
   const versionInfo = getSDKVersionInfo(agent, agent.client);
   console.log(`\n📦 SDK Versions:`);
@@ -58,7 +58,7 @@ agent.on("start", () => {
     }
   }
   console.log();
-  
+
   logDetails(agent.client).catch(console.error);
 });
 
