@@ -1,8 +1,8 @@
 import {
-  type Group,
+  type AgentGroupType,
+  type AgentPermissionLevel,
   type IdentifierKind,
   type MessageContext,
-  type PermissionLevel,
 } from "@helpers/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 
@@ -64,7 +64,7 @@ export class GroupHandlers {
 
   async handleGroupInfo(ctx: MessageContext): Promise<void> {
     try {
-      const group = ctx.conversation as Group;
+      const group = ctx.conversation as AgentGroupType;
       // Get basic group information using properties, not async methods
       const groupName = group.name;
       const groupDescription = group.description;
@@ -114,9 +114,9 @@ export class GroupHandlers {
 
       for (const member of members) {
         if (
-          member.permissionLevel == (1 as PermissionLevel) ||
-          member.permissionLevel == (0 as PermissionLevel) ||
-          member.permissionLevel == (2 as PermissionLevel)
+          member.permissionLevel == (1 as AgentPermissionLevel) ||
+          member.permissionLevel == (0 as AgentPermissionLevel) ||
+          member.permissionLevel == (2 as AgentPermissionLevel)
         ) {
           try {
             // Get the address from the member's account identifiers
@@ -135,7 +135,7 @@ export class GroupHandlers {
             if (isBot) marker += "🤖 ";
             if (isSender) marker += "👤 ";
 
-            if (member.permissionLevel == (2 as PermissionLevel)) {
+            if (member.permissionLevel == (2 as AgentPermissionLevel)) {
               adminsList += `${marker}👑 **${address}** *(Super Admin)*  \n`;
               superAdminCount++;
             } else {
@@ -149,7 +149,7 @@ export class GroupHandlers {
               `Error getting address for admin ${member.inboxId}:`,
               error,
             );
-            if (member.permissionLevel == (2 as PermissionLevel)) {
+            if (member.permissionLevel == (2 as AgentPermissionLevel)) {
               adminsList += `❓ **Unknown Address** *(Super Admin)*  \n`;
               superAdminCount++;
             } else {
@@ -184,7 +184,7 @@ export class GroupHandlers {
   async handleGroupPermissions(ctx: MessageContext): Promise<void> {
     try {
       // Get group admin information using Group class methods
-      const group = ctx.conversation as Group;
+      const group = ctx.conversation as AgentGroupType;
       const admins = group.admins || [];
       const superAdmins = group.superAdmins || [];
       const members = await ctx.conversation.members();

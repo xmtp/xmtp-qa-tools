@@ -5,7 +5,6 @@ import { Agent, getTestUrl } from "@helpers/versions";
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
-  env: process.env.XMTP_ENV as "local" | "dev" | "production",
   appVersion: APP_VERSION,
 });
 

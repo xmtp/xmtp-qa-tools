@@ -1,5 +1,5 @@
 import { APP_VERSION } from "@helpers/client";
-import { Agent, getTestUrl, type Group } from "@helpers/versions";
+import { Agent, getTestUrl, type AgentGroupType } from "@helpers/versions";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -23,7 +23,6 @@ const messages = {
 };
 
 const agent = await Agent.createFromEnv({
-  env: process.env.XMTP_ENV as "local" | "dev" | "production",
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-gang-${inboxId.slice(0, 8)}.db3`,
@@ -57,9 +56,9 @@ agent.on("text", async (ctx) => {
 
   console.debug("Secret code received, processing group addition");
 
-  await (group as Group).sync();
+  await (group as AgentGroupType).sync();
 
-  const members = await (group as Group).members();
+  const members = await (group as AgentGroupType).members();
   const isMember = members.some(
     (member) =>
       member.inboxId.toLowerCase() === ctx.message.senderInboxId.toLowerCase(),
@@ -69,14 +68,14 @@ agent.on("text", async (ctx) => {
     console.debug(
       `Adding member ${ctx.message.senderInboxId} to group ${currentGroupId}`,
     );
-    await (group as Group).addMembers([ctx.message.senderInboxId]);
+    await (group as AgentGroupType).addMembers([ctx.message.senderInboxId]);
 
     // Check if user should be admin
     if (isAdmin.includes(ctx.message.senderInboxId)) {
       console.debug(
         `Adding admin ${ctx.message.senderInboxId} to group ${currentGroupId}`,
       );
-      await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
+      await (group as AgentGroupType).addSuperAdmin(ctx.message.senderInboxId);
     }
 
     // Send success messages
@@ -86,14 +85,14 @@ agent.on("text", async (ctx) => {
     return true;
   } else {
     // User is already in group, check if they need admin privileges
-    const isAdminFromGroup = (group as Group).isSuperAdmin(
+    const isAdminFromGroup = (group as AgentGroupType).isSuperAdmin(
       ctx.message.senderInboxId,
     );
     if (!isAdminFromGroup && isAdmin.includes(ctx.message.senderInboxId)) {
       console.debug(
         `Adding admin privileges to ${ctx.message.senderInboxId} in group ${currentGroupId}`,
       );
-      await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
+      await (group as AgentGroupType).addSuperAdmin(ctx.message.senderInboxId);
     }
 
     console.debug(
