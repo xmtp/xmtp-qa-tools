@@ -56,6 +56,9 @@ jobs:
         run: corepack prepare yarn@4.6.0 --activate
         shell: bash
 
+      - name: Install dependencies
+        run: yarn install
+
       - name: Run regression tests
         run: yarn regression
 
