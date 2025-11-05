@@ -67,7 +67,7 @@ export {
   type AgentMiddleware,
 } from "@xmtp/agent-sdk-1.1.10";
 
-export { getTestUrl } from "@xmtp/agent-sdk-1.1.10/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
 
 // Node SDK exports
 export {
