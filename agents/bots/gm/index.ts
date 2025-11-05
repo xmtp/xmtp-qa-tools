@@ -38,7 +38,6 @@ agent.on("text", async (ctx) => {
 agent.on("start", () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
-  console.log(`🔗${getTestUrl(agent.client)}`);
 
   // Log SDK version information
   const versionInfo = getSDKVersionInfo(agent, agent.client);
@@ -59,7 +58,10 @@ agent.on("start", () => {
   }
   console.log();
 
+  // @ts-expect-error - getTestUrl is not typed correctly
   logDetails(agent.client).catch(console.error);
+  // @ts-expect-error - getTestUrl is not typed correctly
+  console.log(`🔗${getTestUrl(agent.client)}`);
 });
 
 await agent.start();

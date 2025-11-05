@@ -425,7 +425,9 @@ agent.on("start", () => {
   );
   console.log("Or directly send an Inbox ID or Ethereum address to check");
   console.log(`Address: ${agent.address}`);
+  // @ts-expect-error - getTestUrl is not typed correctly
   console.log(`🔗${getTestUrl(agent.client)}`);
+  // @ts-expect-error - getTestUrl is not typed correctly
   logDetails(agent.client).catch(console.error);
 
   // Debug: Log all registered actions
