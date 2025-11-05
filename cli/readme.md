@@ -10,6 +10,8 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`          |
 | `yarn installations`                        | Manage installations  | `yarn installations --help` |
 | `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
+| `yarn fork`                                 | Run forks testing     | `yarn fork --help`          |
+| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`      |
 | `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
 
 ## Core Commands
