@@ -28,7 +28,6 @@ const messages = {
 };
 
 const agent = await Agent.createFromEnv({
-  env: process.env.XMTP_ENV as "dev" | "production",
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-csx-${inboxId.slice(0, 8)}.db3`,

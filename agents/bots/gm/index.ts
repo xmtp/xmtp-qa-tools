@@ -9,7 +9,6 @@ const agent = await Agent.createFromEnv({
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   appVersion: APP_VERSION,
-  env: process.env.XMTP_ENV as "local" | "dev" | "production",
 });
 
 agent.on("text", async (ctx) => {
