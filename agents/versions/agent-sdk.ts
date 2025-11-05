@@ -29,7 +29,7 @@ export const AgentVersionList = [
     MessageContext: MessageContext110,
     agentSDK: "1.1.10",
     nodeSDK: "4.3.0",
-    nodeBindings: "1.6.0-rc2",
+    nodeBindings: "1.6.1",
     auto: true,
   },
   {
