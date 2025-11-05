@@ -296,16 +296,7 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
-  codecs: [
-    new MarkdownCodec(),
-    new ReactionCodec(),
-    new ReplyCodec(),
-    new RemoteAttachmentCodec(),
-    new AttachmentCodec(),
-    new WalletSendCallsCodec(),
-    new ActionsCodec(),
-    new IntentCodec(),
-  ],
+  codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
 // Add inline actions middleware
@@ -356,7 +347,9 @@ agent.on("text", async (ctx) => {
     content.trim().startsWith("/kc") ||
     content.trim().startsWith("@key-check.eth");
   if (isTagged) {
-    console.log(`Showing main menu for: ${content}`);
+    console.log(
+      `Showing main menu for: ${content} to ${await ctx.getSenderAddress()}`,
+    );
     await showMenu(ctx, appConfig, "main-menu");
     return;
   }
