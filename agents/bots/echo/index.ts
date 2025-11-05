@@ -12,8 +12,6 @@ let count = 0;
 
 agent.on("text", async (ctx) => {
   console.log(`Waiting for messages...`);
-  console.log(`Address: ${agent.address}`);
-  console.log(`🔗${getTestUrl(agent.client)}`);
 
   count++;
   console.log(`Count: ${count}`);
@@ -27,7 +25,9 @@ agent.on("unhandledError", (error) => {
 
 // 4. Log when we're ready
 agent.on("start", () => {
-  console.log(`We are online: ${getTestUrl(agent.client)}`);
+  console.log(`Waiting for messages...`);
+  console.log(`Address: ${agent.address}`);
+  console.log(`🔗${getTestUrl(agent.client)}`);
 });
 
 await agent.start();

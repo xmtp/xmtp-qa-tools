@@ -8,7 +8,7 @@ import {
 import {
   Agent as Agent17, // 1.1.7
   MessageContext as MessageContext17,
-} from "@xmtp/agent-sdk-1.1.7";
+} from "@xmtp/agent-sdk-1.1.5";
 import {
   Agent as Agent110, // 1.1.10 (latest)
   MessageContext as MessageContext110,
@@ -68,9 +68,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.7";
+} from "@xmtp/agent-sdk-1.1.5";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.7/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.5/debug";
 
 // Node SDK exports
 export {
@@ -104,7 +104,7 @@ export const AgentVersionList = [
   {
     Agent: Agent17,
     MessageContext: MessageContext17,
-    agentSDK: "1.1.7",
+    agentSDK: "1.1.5",
     nodeSDK: "4.2.3",
     auto: true,
   },
@@ -595,10 +595,33 @@ export function getSDKVersionInfo(
     ? getBindingsVersion(nodeBindings)
     : null;
 
-  return {
+  const versionInfo: {
+    agentSDK: string | null;
+    nodeSDK: string | null;
+    nodeBindings: string | null;
+    bindingsVersion: { branch: string; version: string; date: string } | null;
+  } = {
     agentSDK,
     nodeSDK,
     nodeBindings,
     bindingsVersion,
   };
+  console.log(`\n📦 SDK Versions:`);
+  if (versionInfo.agentSDK) {
+    console.log(`  • Agent SDK: ${versionInfo.agentSDK}`);
+  }
+  if (versionInfo.nodeSDK) {
+    console.log(`  • Node SDK: ${versionInfo.nodeSDK}`);
+  }
+  if (versionInfo.nodeBindings) {
+    console.log(`  • Node Bindings: ${versionInfo.nodeBindings}`);
+    if (versionInfo.bindingsVersion) {
+      console.log(
+        `    └─ libxmtp: ${versionInfo.bindingsVersion.branch}@${versionInfo.bindingsVersion.version} (${versionInfo.bindingsVersion.date})`,
+      );
+    }
+  }
+  console.log();
+
+  return versionInfo;
 }
