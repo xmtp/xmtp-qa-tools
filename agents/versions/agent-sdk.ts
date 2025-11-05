@@ -1,15 +1,15 @@
 import {
-  Agent as Agent100,
-  MessageContext as MessageContext100,
-} from "@xmtp/agent-sdk-1.0.0";
+  Agent as Agent12,
+  MessageContext as MessageContext12,
+} from "@xmtp/agent-sdk-1.1.2";
 import {
-  Agent as Agent101,
-  MessageContext as MessageContext101,
-} from "@xmtp/agent-sdk-1.0.1";
+  Agent as Agent17, // 1.1.7
+  MessageContext as MessageContext17,
+} from "@xmtp/agent-sdk-1.1.7";
 import {
-  Agent as Agent115,
-  MessageContext as MessageContext115,
-} from "@xmtp/agent-sdk-1.1.9";
+  Agent as Agent110, // 1.1.10 (latest)
+  MessageContext as MessageContext110,
+} from "@xmtp/agent-sdk-1.1.10";
 
 // Export the latest version as default
 export {
@@ -19,31 +19,31 @@ export {
   type Group,
   type IdentifierKind,
   type PermissionLevel,
-} from "@xmtp/agent-sdk-1.1.9";
+} from "@xmtp/agent-sdk-1.1.10";
 
-export { getTestUrl } from "@xmtp/agent-sdk-1.1.9/debug";
+export { getTestUrl } from "@xmtp/agent-sdk-1.1.10/debug";
 
 export const AgentVersionList = [
   {
-    Agent: Agent115,
-    MessageContext: MessageContext115,
-    agentSDK: "1.1.9",
-    nodeSDK: "4.2.3",
-    nodeBindings: "1.5.4",
+    Agent: Agent110,
+    MessageContext: MessageContext110,
+    agentSDK: "1.1.10",
+    nodeSDK: "4.3.0",
+    nodeBindings: "1.6.0-rc2",
     auto: true,
   },
   {
-    Agent: Agent101,
-    MessageContext: MessageContext101,
-    agentSDK: "1.0.1",
+    Agent: Agent17,
+    MessageContext: MessageContext17,
+    agentSDK: "1.1.7",
     nodeSDK: "4.1.0",
     nodeBindings: "1.4.0",
     auto: true,
   },
   {
-    Agent: Agent100,
-    MessageContext: MessageContext100,
-    agentSDK: "1.0.0",
+    Agent: Agent12,
+    MessageContext: MessageContext12,
+    agentSDK: "1.1.2",
     nodeSDK: "4.1.0",
     nodeBindings: "1.4.0",
     auto: true,
