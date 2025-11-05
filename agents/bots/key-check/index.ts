@@ -6,7 +6,12 @@ import {
   logDetails,
   type MessageContext,
 } from "@helpers/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
+import {
+  ContentTypeMarkdown,
+  MarkdownCodec,
+} from "@xmtp/content-type-markdown";
+import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
+import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -287,7 +292,13 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
-  codecs: [new ActionsCodec(), new IntentCodec()],
+  codecs: [
+    new ActionsCodec(),
+    new IntentCodec(),
+    new TransactionReferenceCodec(),
+    new MarkdownCodec(),
+    new WalletSendCallsCodec(),
+  ],
 });
 
 // Add inline actions middleware
