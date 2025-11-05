@@ -12,7 +12,7 @@ import {
   type Client,
   type DecodedMessage,
   type XmtpEnv,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
 import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";

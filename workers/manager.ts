@@ -4,7 +4,14 @@ import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
-import { type Client, type Group, type XmtpEnv } from "@workers/node-sdk";
+import {
+  getDefaultSdkVersion,
+  isValidSdkVersion,
+  VersionList,
+  type Client,
+  type Group,
+  type XmtpEnv,
+} from "@helpers/versions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,
@@ -12,11 +19,6 @@ import {
   WorkerClient,
   type typeofStream,
 } from "./main";
-import {
-  getDefaultSdkVersion,
-  isValidSdkVersion,
-  VersionList,
-} from "./node-sdk";
 
 /**
  * Interface documenting all methods available in WorkerManager class

@@ -1,14 +1,14 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
-import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxes } from "@inboxes/utils";
-import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
+import { setupDurationTracking } from "@helpers/vitest";
+import { getInboxes } from "@inboxes/utils";
+import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
 import { type AgentConfig } from "./helper";

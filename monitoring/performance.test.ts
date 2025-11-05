@@ -9,9 +9,6 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import { setupDurationTracking } from "@helpers/vitest";
-import { getInboxes, type InboxData } from "@inboxes/utils";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import {
   Client,
   ConsentEntityType,
@@ -19,7 +16,10 @@ import {
   IdentifierKind,
   type Dm,
   type Group,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
+import { setupDurationTracking } from "@helpers/vitest";
+import { getInboxes, type InboxData } from "@inboxes/utils";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "performance";

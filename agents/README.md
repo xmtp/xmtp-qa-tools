@@ -37,9 +37,6 @@ yarn bot key-check --agentSDK 1.1.2
 ### Agent SDK Version Management
 
 ```bash
-# Setup Agent SDK versions
-yarn agent-versions
-
 # Test with specific version
 AGENT_SDK_VERSION=1.0.1 yarn bot key-check --agentSDK 1.0.1
 ```

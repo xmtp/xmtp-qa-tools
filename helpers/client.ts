@@ -1,7 +1,6 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import type { Worker, WorkerManager } from "@workers/manager";
 import {
   IdentifierKind,
   regressionClient,
@@ -9,7 +8,8 @@ import {
   type Conversation,
   type Signer,
   type XmtpEnv,
-} from "@workers/node-sdk";
+} from "@helpers/versions";
+import type { Worker, WorkerManager } from "@workers/manager";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
