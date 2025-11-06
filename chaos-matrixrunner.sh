@@ -2,16 +2,19 @@
 
 XMTP_ENV="local"
 
-# Matrix params
+# Resume from this test number (1-based index)
+RESUME_FROM=18
+
+# Matrix parameters
 DURATION_MS_LIST=(300000)
 CHAOS_LATENCY_MS_LIST=(0 100)
-CHAOS_JITTER_MS_LIST=(0 50)
+CHAOS_JITTER_MS_LIST=(0 100)
 CHAOS_PACKET_LOSS_PCT_LIST=(0 10)
-CHAOS_EGRESS_LATENCY_MS_LIST=(50)
-CHAOS_EGRESS_JITTER_MS_LIST=(0)
-CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0)
-WORKER_COUNTS=(10 100)
-OP_FREQS=(10000 2000)
+CHAOS_EGRESS_LATENCY_MS_LIST=(0 100)
+CHAOS_EGRESS_JITTER_MS_LIST=(0 100)
+CHAOS_EGRESS_PACKET_LOSS_PCT_LIST=(0 10)
+WORKER_COUNTS=(10 100 200)
+OP_FREQS=(30000 10000 2000)
 
 # Enabled ops permutations (modify/add/remove as needed)
 ENABLED_OPS_LIST=(
@@ -32,6 +35,21 @@ for CHAOS_EGRESS_PACKET_LOSS_PCT in "${CHAOS_EGRESS_PACKET_LOSS_PCT_LIST[@]}"; d
 for WORKER_COUNT in "${WORKER_COUNTS[@]}"; do
 for ENABLED_OPS in "${ENABLED_OPS_LIST[@]}"; do
 for OP_FREQ in "${OP_FREQS[@]}"; do
+
+  # Skip previously completed runs
+  if (( i < RESUME_FROM )); then
+    ((i++))
+    continue
+  fi
+
+  # Check disk usage on root filesystem
+  ROOT_USE=$(df / | awk 'NR==2 {gsub("%",""); print $5}')
+  if (( ROOT_USE >= 95 )); then
+    echo ""
+    echo "=> Disk usage on / is ${ROOT_USE}% — aborting test run."
+    echo "=> Resume next time from: RESUME_FROM=$i"
+    exit 1
+  fi
 
   echo ""
   echo "========================================================="
