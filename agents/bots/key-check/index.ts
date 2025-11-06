@@ -342,6 +342,9 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
+  console.log(
+    `Received text message: ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
+  );
   const message = ctx.message;
   const content = message.content;
   const isTagged =
@@ -349,9 +352,6 @@ agent.on("text", async (ctx) => {
     content.trim().startsWith("/kc") ||
     content.trim().startsWith("@key-check.eth");
   if (isTagged) {
-    console.log(
-      `Showing main menu for: ${content} to ${await ctx.getSenderAddress()}`,
-    );
     await showMenu(ctx, appConfig, "main-menu");
     return;
   }
