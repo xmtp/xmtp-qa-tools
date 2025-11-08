@@ -69,8 +69,10 @@ describe(testName, async () => {
       } as ResponseMetricTags);
 
       if (result?.receptionPercentage === 0)
-        console.error(agent.name, "no response");
-      expect(result?.receptionPercentage).toBeGreaterThanOrEqual(0);
+        console.error(agent.name, "FAILED TO RESPOND");
+      else console.log(agent.name, "SUCCESS");
+
+      expect(result?.receptionPercentage).toBeGreaterThan(0);
     });
   }
 });

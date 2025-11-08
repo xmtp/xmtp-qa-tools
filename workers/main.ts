@@ -980,9 +980,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
     types: string[] = ["text"],
     customTimeout?: number,
   ): Promise<StreamTextMessage[]> {
-    console.debug(
-      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
-    );
+    // console.debug(
+    //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+    // );
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
