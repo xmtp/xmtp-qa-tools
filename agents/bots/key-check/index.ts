@@ -343,7 +343,7 @@ initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
   console.log(
-    `Received text message: ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
+    `Received text message in group (${ctx.conversation.id}): ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
   );
   const message = ctx.message;
   const content = message.content;
