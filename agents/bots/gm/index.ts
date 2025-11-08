@@ -29,9 +29,8 @@ agent.on("text", async (ctx) => {
   console.log(
     `Received message in group: ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
   );
-  if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
+  if (ctx.isGroup() && ctx.message.content.includes("@gm"))
     await ctx.sendText("gm");
-  }
 });
 
 agent.on("start", () => {
