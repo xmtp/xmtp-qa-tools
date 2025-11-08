@@ -556,6 +556,13 @@ export async function verifyAgentMessageStream(
 
     attempts++;
   }
+
+  if (!result || result.averageEventTiming === undefined) {
+    const attemptLabel = maxRetries === 1 ? "attempt" : "attempts";
+    console.error(
+      `❌ Agent failed to respond after ${maxRetries} ${attemptLabel} for conversation ${group.id}`,
+    );
+  }
   receivers.forEach((worker) => {
     worker.worker.stopStreams();
   });

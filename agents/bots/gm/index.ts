@@ -5,6 +5,7 @@ import {
   getTestUrl,
   logDetails,
 } from "@helpers/versions";
+import { filter } from "@xmtp/agent-sdk";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -17,21 +18,52 @@ const agent = await Agent.createFromEnv({
 });
 
 agent.on("text", async (ctx) => {
+  console.log(`[GM Bot] Text event received: ${ctx.message.content}`);
+  console.log(`[GM Bot] Is DM: ${ctx.isDm()}, Is Group: ${ctx.isGroup()}`);
+  
+  // Filter out messages from self
+  if (filter.fromSelf(ctx.message, ctx.client)) {
+    console.log(`[GM Bot] Skipping message from self`);
+    return;
+  }
+
   if (ctx.isDm()) {
-    const messageContent = ctx.message.content;
-    const senderAddress = await ctx.getSenderAddress();
-    console.log(`Received message: ${messageContent} by ${senderAddress}`);
-    await ctx.sendText("gm");
+    try {
+      const messageContent = ctx.message.content;
+      const senderAddress = await ctx.getSenderAddress();
+      console.log(`[GM Bot] Received DM message: ${messageContent} from ${senderAddress}`);
+      await ctx.sendText("gm");
+      console.log(`[GM Bot] Sent response: gm`);
+    } catch (error) {
+      console.error("[GM Bot] Error handling DM message:", error);
+    }
   }
 });
 
 agent.on("text", async (ctx) => {
-  console.log(
-    `Received message in group: ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
-  );
-  if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
-    await ctx.sendText("gm");
+  // Filter out messages from self
+  if (filter.fromSelf(ctx.message, ctx.client)) {
+    return;
   }
+
+  try {
+    console.log(
+      `Received message in group: ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
+    );
+    if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
+      await ctx.sendText("gm");
+    }
+  } catch (error) {
+    console.error("Error handling group message:", error);
+  }
+});
+
+agent.on("message", async (ctx) => {
+  console.log(`[GM Bot] Message event received, type: ${ctx.message.contentType?.typeId}`);
+});
+
+agent.on("unhandledError", (error) => {
+  console.error("[GM Bot] Unhandled error:", error);
 });
 
 agent.on("start", () => {
