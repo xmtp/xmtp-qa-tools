@@ -12,7 +12,7 @@ import {
 import {
   Agent as Agent110, // 1.1.10 (latest)
   MessageContext as MessageContext110,
-} from "@xmtp/agent-sdk-1.1.12";
+} from "@xmtp/agent-sdk-1.1.10";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
@@ -52,7 +52,7 @@ import {
   Conversation as Conversation420,
   Dm as Dm420,
   Group as Group420,
-} from "@xmtp/node-sdk-4.2.6";
+} from "@xmtp/node-sdk-4.2.3";
 import {
   Client as Client430,
   Conversation as Conversation430,
@@ -68,9 +68,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.12";
+} from "@xmtp/agent-sdk-1.1.10";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.12/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
 
 // Node SDK exports
 export {
@@ -97,7 +97,7 @@ export const AgentVersionList = [
   {
     Agent: Agent110,
     MessageContext: MessageContext110,
-    agentSDK: "1.1.12",
+    agentSDK: "1.1.10",
     nodeSDK: "4.3.0",
     auto: true,
   },
@@ -105,7 +105,7 @@ export const AgentVersionList = [
     Agent: Agent17,
     MessageContext: MessageContext17,
     agentSDK: "1.1.5",
-    nodeSDK: "4.2.6",
+    nodeSDK: "4.2.3",
     auto: true,
   },
   {
@@ -133,7 +133,7 @@ export const VersionList = [
     Conversation: Conversation420,
     Dm: Dm420,
     Group: Group420,
-    nodeSDK: "4.2.6",
+    nodeSDK: "4.2.3",
     nodeBindings: "1.5.4",
     auto: true,
   },
