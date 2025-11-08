@@ -99,6 +99,53 @@ The CLI provides statistics including:
 - Fork detection rate
 - Average forks per run
 
+### Network Chaos Testing
+
+The fork test can inject network chaos (latency, jitter, packet loss) to simulate adverse network conditions. This helps identify forks that occur under realistic network stress.
+
+**Requirements:**
+- Network chaos requires `--env local`
+- Multinode Docker containers must be running (`./dev/up`)
+- Requires `sudo` access for `tc` and `iptables` commands
+
+**Chaos Levels:**
+
+| Level  | Delay Range | Jitter Range | Packet Loss | Interval |
+|--------|-------------|--------------|-------------|----------|
+| low    | 50-150ms    | 0-50ms       | 0-2%        | 15s      |
+| medium | 100-300ms   | 0-75ms       | 0-3.5%      | 10s      |
+| high   | 100-500ms   | 0-100ms      | 0-5%        | 10s      |
+
+**Usage:**
+
+```bash
+# Run with default (medium) chaos
+yarn fork --env local --chaos-enabled
+
+# Run with high chaos level
+yarn fork --env local --chaos-enabled --chaos-level high
+
+# Run 50 iterations with low chaos
+yarn fork --count 50 --env local --chaos-enabled --chaos-level low
+```
+
+**How it works:**
+1. Initializes Docker container handles for all multinode nodes
+2. Applies random network conditions (within preset ranges) at regular intervals
+3. Runs the fork test as normal while chaos is active
+4. Cleans up network rules when test completes (even if test fails)
+
+**Example output:**
+```
+NETWORK CHAOS PARAMETERS
+chaosEnabled: true
+chaosLevel: high
+  delay: 100-500ms
+  jitter: 0-100ms
+  packetLoss: 0-5%
+  interval: 10000ms
+```
+
 ### Log processing features
 
 - **Clean slate**: Removes old logs and data before starting
