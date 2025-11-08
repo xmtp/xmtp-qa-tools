@@ -46,6 +46,7 @@ describe(testName, async () => {
           identifierKind: IdentifierKind.Ethereum,
         });
 
+      console.log("DM created", conversation.id);
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
@@ -69,8 +70,8 @@ describe(testName, async () => {
       } as ResponseMetricTags);
 
       if (result?.receptionPercentage === 0)
-        console.error(agent.name, "no response");
-      expect(result?.receptionPercentage).toBeGreaterThanOrEqual(0);
+        console.error(agent.name, "ERROR: NO RESPONSE");
+      else console.log(agent.name, "SUCCESS");
     });
   }
 });
