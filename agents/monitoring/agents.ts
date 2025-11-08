@@ -102,14 +102,14 @@ const agents: AgentConfig[] = [
   {
     name: "key-check",
     address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    sendMessage: "/kc",
-    networks: ["production"],
+    sendMessage: "hi from QA",
+    networks: ["dev", "production"],
     live: false,
   },
   {
     name: "gm",
     address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
-    sendMessage: "hi",
+    sendMessage: "hi from QA",
     networks: ["dev", "production"],
     live: false,
   },
