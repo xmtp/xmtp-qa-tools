@@ -46,6 +46,7 @@ describe(testName, async () => {
           identifierKind: IdentifierKind.Ethereum,
         });
 
+      console.log("DM created", conversation.id);
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
