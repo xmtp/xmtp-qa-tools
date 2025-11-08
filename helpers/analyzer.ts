@@ -214,7 +214,7 @@ export async function cleanForksLogs(
       // Check if the file contains fork-related content
       const containsForkContent = await fileContainsString(
         rawFilePath,
-        "may be fork",
+        "may have forked",
       );
 
       // Always preserve raw logs for debugging/analysis
