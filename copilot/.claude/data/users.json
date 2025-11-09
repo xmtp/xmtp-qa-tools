@@ -1,0 +1,39 @@
+[
+  {
+    "app": "fabri-convos-desktop",
+    "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
+    "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
+    "network": "production",
+    "name": "prod-testing"
+  },
+  {
+    "app": "fabri-tba",
+    "inboxId": "7e5d2a57b752d7b0a29807929c09b416f64ec0878204b87ab6a32c0b47729f27",
+    "network": "production",
+    "name": "prod-testing"
+  },
+  {
+    "app": "fabri-xmtpchat",
+    "inboxId": "2ac60b0589a33b1ba027aebc1f3c193a61cc3f3893d31e1b3ed5c56d561c1771",
+    "network": "local",
+    "name": "local-testing"
+  },
+  {
+    "app": "fabri-convos",
+    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
+    "network": "production",
+    "name": "prod-"
+  },
+  {
+    "app": "fabri-convos-oneoff",
+    "inboxId": "c2982d604ab4a3b21949893060e430388c1219f33124aa214eb44d727b4b70d6",
+    "network": "production",
+    "name": "prod-testing"
+  },
+  {
+    "app": "fabri-convos-dev",
+    "inboxId": "0fb3a0a9eaa2d8ef25a4b05c2154c1dbdb3324fe873c8ee25d89b7126d57e880",
+    "network": "dev",
+    "name": "dev-oneoff"
+  }
+]

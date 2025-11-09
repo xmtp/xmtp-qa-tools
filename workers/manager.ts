@@ -351,8 +351,8 @@ export class WorkerManager implements IWorkerManager {
       return this.keysCache[baseName];
     }
 
-    const walletKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}`;
-    const encryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
+    const walletKeyEnv = `XMTP_WALLET_KEY_${baseName.toUpperCase()}`;
+    const encryptionKeyEnv = `XMTP_DB_ENCRYPTION_KEY_${baseName.toUpperCase()}`;
 
     // Check if keys exist in environment variables
     if (

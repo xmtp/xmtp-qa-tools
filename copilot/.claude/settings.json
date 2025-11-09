@@ -1,0 +1,30 @@
+{
+  "env": {
+    "XMTP_ENV": "production",
+    "NODE_ENV": "development"
+  },
+  "permissions": {
+    "allow": [
+      "*",
+      "Bash(yarn groups:*)",
+      "Bash(yarn send:*)",
+      "Bash(yarn permissions:*)",
+      "Bash(yarn installations:*)",
+      "Bash(yarn generate:*)",
+      "Bash(yarn revoke:*)",
+      "Bash(yarn debug:*)",
+      "Bash(yarn conversations list:*)",
+      "Bash(yarn conversations messages:*)",
+      "Bash(yarn content attachment:*)",
+      "Bash(yarn list:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(tsx src/commands/list.ts:*)",
+      "Bash(yarn run list:*)",
+      "Bash(yarn run debug:*)",
+      "Bash(npx tsx:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
