@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { validHex, type XmtpEnv } from "@xmtp/agent-sdk";
-import { createSigner, createUser } from "@xmtp/agent-sdk/user";
+import { createSigner } from "@helpers/client";
+import { type XmtpEnv } from "@helpers/versions";
 import { Client } from "@xmtp/node-sdk";
 
 // Check Node.js version
@@ -117,12 +117,12 @@ async function main() {
 
   try {
     // Create signer and encryption key
-    const signer = createSigner(createUser(validHex(envVars.XMTP_WALLET_KEY)));
+    const signer = createSigner(envVars.XMTP_WALLET_KEY);
 
     // Get current inbox state
     const inboxState = await Client.inboxStateFromInboxIds(
       [inboxId],
-      envVars.XMTP_ENV as XmtpEnv,
+      envVars.XMTP_ENV as unknown as XmtpEnv,
     );
 
     const currentInstallations = inboxState[0].installations;

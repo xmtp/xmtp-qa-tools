@@ -5,9 +5,9 @@ Create an XMTP agent that can use the signing capabilities provided by a signer.
 ## Create an EOA signer
 
 ```tsx [Node]
+import { getRandomValues } from "node:crypto";
 import { Agent } from "@xmtp/agent-sdk";
 import { createSigner, createUser } from "@xmtp/agent-sdk/user";
-import { getRandomValues } from "node:crypto";
 import { fromString } from "uint8arrays/from-string";
 
 // Replace with your own wallet key and encryption key
@@ -41,8 +41,8 @@ Using the environment variables, you can setup your agent in just a few lines of
 ## Generate random keys
 
 ```tsx [Node]
-import { generatePrivateKey } from "viem";
 import { getRandomValues } from "node:crypto";
+import { generatePrivateKey } from "viem";
 
 const walletKey = generatePrivateKey();
 const encryptionKeyHex = getRandomValues(new Uint8Array(32));

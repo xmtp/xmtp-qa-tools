@@ -28,6 +28,7 @@ After importing the package, you can register the codec.
 
 ```js [Node]
 import { ReplyCodec } from "@xmtp/content-type-reply";
+
 // Create the XMTP agent
 const agent = await Agent.create(signer, {
   env: "dev",
@@ -44,9 +45,8 @@ Once you've created a reply, you can send it. Replies are represented as objects
 - `content`: String representation of the reply
 
 ```ts [Node]
+import { ContentTypeReply, type Reply } from "@xmtp/content-type-reply";
 import { ContentTypeText } from "@xmtp/content-type-text";
-import { ContentTypeReply } from "@xmtp/content-type-reply";
-import type { Reply } from "@xmtp/content-type-reply";
 
 const reply: Reply = {
   reference: someMessageID,
