@@ -10,6 +10,7 @@ interface Config {
   botName: string;
   env: string;
   nodeBindings: string;
+  agentSDK: string;
   logLevel: string;
 }
 
@@ -26,6 +27,7 @@ ARGUMENTS:
 OPTIONS:
   --env <environment>   XMTP environment (local, dev, production) [default: production]
   --nodeBindings <version>   XMTP Node SDK version to use [default: latest]
+  --agentSDK <version>  XMTP Agent SDK version to use [default: latest]
   --log <level>         Logging level (info, warn, error) [default: info]
   -h, --help           Show this help message
 
@@ -41,6 +43,8 @@ AVAILABLE BOTS:
 EXAMPLES:
   yarn bot echo --env dev
   yarn bot key-check --env local
+  yarn bot key-check --agentSDK 1.1.10
+  yarn bot key-check --agentSDK 1.1.5 --nodeBindings 1.5.4
   yarn bot key-check --help
 
 For more information, see: cli/readme.md
@@ -64,6 +68,9 @@ function parseArgs(): Config {
     } else if (arg === "--nodeBindings" && nextArg) {
       process.env.NODE_VERSION = nextArg;
       i++;
+    } else if (arg === "--agentSDK" && nextArg) {
+      process.env.AGENT_SDK_VERSION = nextArg;
+      i++;
     } else if (arg === "--log" && nextArg) {
       process.env.LOGGING_LEVEL = nextArg;
       i++;
@@ -77,6 +84,7 @@ function parseArgs(): Config {
     botName,
     env: process.env.XMTP_ENV as string,
     nodeBindings: process.env.NODE_VERSION as string,
+    agentSDK: process.env.AGENT_SDK_VERSION as string,
     logLevel: process.env.LOGGING_LEVEL as string,
   };
 }
@@ -127,6 +135,7 @@ async function main() {
         ...process.env,
         XMTP_ENV: config.env,
         XMTP_NODE_SDK: config.nodeBindings,
+        AGENT_SDK_VERSION: config.agentSDK,
         LOGGING_LEVEL: config.logLevel,
       },
     });
