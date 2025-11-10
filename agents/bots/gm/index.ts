@@ -5,34 +5,14 @@ import {
   getTestUrl,
   logDetails,
 } from "@helpers/versions";
+import {
+  logSyncResults,
+  shouldSkipOldMessage,
+  startUpSync,
+} from "../../utils/general";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
-
-function shouldSkipOldMessage(
-  messageTimestamp: number,
-  startupTimestamp: number,
-  skippedCount: { count: number },
-  totalConversations: number,
-): boolean {
-  if (messageTimestamp >= startupTimestamp) {
-    return false;
-  }
-
-  const ageMs = startupTimestamp - messageTimestamp;
-  const ageHours = ageMs / (1000 * 60 * 60);
-  const ageDays = ageHours / 24;
-  const ageDisplay =
-    ageDays >= 1
-      ? `${ageDays.toFixed(1)} days`
-      : `${ageHours.toFixed(1)} hours`;
-
-  skippedCount.count++;
-  console.log(
-    `Skipping message because it was sent before startup (${ageDisplay} old, skipped: ${skippedCount.count}) for total conversations: ${totalConversations}`,
-  );
-  return true;
-}
 
 const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
@@ -41,15 +21,15 @@ const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
 });
 
-const startupTimeStamp = new Date().getTime();
-const totalConversations = await agent.client.conversations.list();
-const skippedMessagesCount = { count: 0 };
+const syncResults = await startUpSync(agent);
+const { startupTimeStamp, skippedMessagesCount, totalConversations } =
+  syncResults;
 
+console.log("Listening for messages...");
 agent.on("text", async (ctx) => {
-  const messageTimeStamp = ctx.message.sentAt.getTime();
   if (
     shouldSkipOldMessage(
-      messageTimeStamp,
+      ctx.message.sentAt.getTime(),
       startupTimeStamp,
       skippedMessagesCount,
       totalConversations.length,
@@ -72,6 +52,7 @@ agent.on("start", () => {
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
   getSDKVersionInfo(Agent, agent.client);
+  logSyncResults(syncResults);
 });
 
 await agent.start();

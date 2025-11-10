@@ -2,6 +2,7 @@
 import { spawn } from "child_process";
 import { join } from "path";
 import { fileURLToPath } from "url";
+import { createTestLogger } from "@helpers/logger";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, "..");
@@ -12,6 +13,7 @@ interface Config {
   nodeBindings: string;
   agentSDK: string;
   logLevel: string;
+  fileLogging: boolean;
 }
 
 function showHelp() {
@@ -29,6 +31,7 @@ OPTIONS:
   --nodeBindings <version>   XMTP Node SDK version to use [default: latest]
   --agentSDK <version>  XMTP Agent SDK version to use [default: latest]
   --log <level>         Logging level (info, warn, error) [default: info]
+  --file                Enable file logging (saves raw logs to logs/ directory)
   -h, --help           Show this help message
 
 ENVIRONMENTS:
@@ -45,6 +48,7 @@ EXAMPLES:
   yarn bot key-check --env local
   yarn bot key-check --agentSDK 1.1.10
   yarn bot key-check --agentSDK 1.1.5 --nodeBindings 1.5.4
+  yarn bot key-check --file
   yarn bot key-check --help
 
 For more information, see: cli/readme.md
@@ -54,6 +58,7 @@ For more information, see: cli/readme.md
 function parseArgs(): Config {
   const args = process.argv.slice(2);
   let botName = "";
+  let fileLogging = false;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -74,6 +79,8 @@ function parseArgs(): Config {
     } else if (arg === "--log" && nextArg) {
       process.env.LOGGING_LEVEL = nextArg;
       i++;
+    } else if (arg === "--file") {
+      fileLogging = true;
     } else if (!botName) {
       // First non-flag argument is the bot name
       botName = arg;
@@ -86,6 +93,7 @@ function parseArgs(): Config {
     nodeBindings: process.env.NODE_VERSION as string,
     agentSDK: process.env.AGENT_SDK_VERSION as string,
     logLevel: process.env.LOGGING_LEVEL as string,
+    fileLogging,
   };
 }
 
@@ -127,9 +135,23 @@ async function main() {
       process.exit(1);
     }
 
+    // Create logger if file logging is enabled
+    const logger = config.fileLogging
+      ? createTestLogger({
+          fileLogging: true,
+          testName: config.botName,
+          verboseLogging: true,
+          logLevel: config.logLevel || "info",
+        })
+      : undefined;
+
+    if (config.fileLogging && logger) {
+      console.info(`File logging enabled: ${logger.logFileName}`);
+    }
+
     // Run the bot using tsx with environment variable
     const child = spawn("npx", ["tsx", "--watch", botPath], {
-      stdio: "inherit",
+      stdio: config.fileLogging ? ["pipe", "pipe", "pipe"] : "inherit",
       cwd: process.cwd(),
       env: {
         ...process.env,
@@ -140,12 +162,47 @@ async function main() {
       },
     });
 
+    // Capture output for file logging
+    if (config.fileLogging && logger) {
+      child.stdout?.on("data", (data: Buffer) => {
+        logger.processOutput(data);
+      });
+
+      child.stderr?.on("data", (data: Buffer) => {
+        logger.processOutput(data);
+      });
+    }
+
     child.on("error", (error) => {
       console.error(`Failed to start bot: ${error.message}`);
+      logger?.close();
       process.exit(1);
     });
 
     child.on("exit", () => {
+      logger?.close();
+      if (config.fileLogging && logger?.logFileName) {
+        console.info(`Log file saved: ${logger.logFileName}`);
+      }
+      process.exit(0);
+    });
+
+    // Handle process termination signals
+    process.on("SIGINT", () => {
+      logger?.close();
+      if (config.fileLogging && logger?.logFileName) {
+        console.info(`\nLog file saved: ${logger.logFileName}`);
+      }
+      child.kill();
+      process.exit(0);
+    });
+
+    process.on("SIGTERM", () => {
+      logger?.close();
+      if (config.fileLogging && logger?.logFileName) {
+        console.info(`\nLog file saved: ${logger.logFileName}`);
+      }
+      child.kill();
       process.exit(0);
     });
   } catch (error) {
