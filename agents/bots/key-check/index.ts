@@ -413,7 +413,7 @@ agent.on("text", async (ctx) => {
   }
 
   if (ctx.isDm() && !isTagged) {
-    const welcomeMessage = `### 👋 Welcome to Key-Check Bot
+    const welcomeMessage = `### 👋 Welcome to Key-Check Bot isDm: ${ctx.isDm()} isTagged: ${isTagged}
 
 Please send \`/kc\` to see the main menu
 
