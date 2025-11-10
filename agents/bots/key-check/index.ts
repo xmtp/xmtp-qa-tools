@@ -12,6 +12,7 @@ import {
 } from "@xmtp/content-type-markdown";
 import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
 import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
+import { startUpSync } from "../../utils/general";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -292,14 +293,9 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
-  codecs: [
-    new ActionsCodec(),
-    new IntentCodec(),
-    new TransactionReferenceCodec(),
-    new MarkdownCodec(),
-    new WalletSendCallsCodec(),
-  ],
 });
+
+const syncResults = await startUpSync(agent);
 
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
@@ -432,6 +428,7 @@ agent.on("start", () => {
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
   getSDKVersionInfo(Agent, agent.client);
+  logSyncResults(syncResults);
 });
 
 await agent.start();
