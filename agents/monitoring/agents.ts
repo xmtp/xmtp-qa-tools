@@ -44,6 +44,13 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
+    name: "jesse",
+    address: "0x83384b8bed996b3f62a643d681419a4d06049525",
+    sendMessage: "hi",
+    networks: ["production"],
+    live: true,
+  },
+  {
     name: "onit",
     address: "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
     sendMessage: "hey",
@@ -54,7 +61,7 @@ const agents: AgentConfig[] = [
     name: "byte",
     address: "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     sendMessage: "hi",
-    networks: ["production"],
+    networks: [],
     live: true,
   },
   {
