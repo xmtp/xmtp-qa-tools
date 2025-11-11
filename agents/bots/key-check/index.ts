@@ -6,13 +6,12 @@ import {
   logDetails,
   type MessageContext,
 } from "@helpers/versions";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
-  ContentTypeMarkdown,
-  MarkdownCodec,
-} from "@xmtp/content-type-markdown";
-import { TransactionReferenceCodec } from "@xmtp/content-type-transaction-reference";
-import { WalletSendCallsCodec } from "@xmtp/content-type-wallet-send-calls";
-import { startUpSync } from "../../utils/general";
+  logSyncResults,
+  shouldSkipOldMessage,
+  startUpSync,
+} from "../../utils/general";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -293,9 +292,12 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+  codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
 const syncResults = await startUpSync(agent);
+const { startupTimeStamp, skippedMessagesCount, totalConversations } =
+  syncResults;
 
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
@@ -341,6 +343,16 @@ agent.on("text", async (ctx) => {
   console.log(
     `Received text message in group (${ctx.conversation.id}): ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
   );
+  if (
+    shouldSkipOldMessage(
+      ctx.message.sentAt.getTime(),
+      startupTimeStamp,
+      skippedMessagesCount,
+      totalConversations.length,
+    )
+  ) {
+    return;
+  }
   const message = ctx.message;
   const content = message.content;
   const isTagged =
