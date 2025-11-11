@@ -5,6 +5,11 @@ import {
   getTestUrl,
   logDetails,
 } from "@helpers/versions";
+import {
+  logSyncResults,
+  shouldSkipOldMessage,
+  startUpSync,
+} from "../../utils/general";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -16,20 +21,28 @@ const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
 });
 
+const syncResults = await startUpSync(agent);
+const { startupTimeStamp, skippedMessagesCount, totalConversations } =
+  syncResults;
+
+console.log("Listening for messages...");
 agent.on("text", async (ctx) => {
+  if (
+    shouldSkipOldMessage(
+      ctx.message.sentAt.getTime(),
+      startupTimeStamp,
+      skippedMessagesCount,
+      totalConversations.length,
+    )
+  ) {
+    return;
+  }
   if (ctx.isDm()) {
     const messageContent = ctx.message.content;
     const senderAddress = await ctx.getSenderAddress();
     console.log(`Received message: ${messageContent} by ${senderAddress}`);
     await ctx.sendText("gm");
-  }
-});
-
-agent.on("text", async (ctx) => {
-  console.log(
-    `Received message in group (${ctx.conversation.id}): ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
-  );
-  if (ctx.isGroup() && ctx.message.content.includes("@gm"))
+  } else if (ctx.isGroup() && ctx.message.content.includes("@gm"))
     await ctx.sendText("gm");
 });
 
@@ -39,6 +52,7 @@ agent.on("start", () => {
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
   getSDKVersionInfo(Agent, agent.client);
+  logSyncResults(syncResults);
 });
 
 await agent.start();
