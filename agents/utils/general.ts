@@ -123,23 +123,12 @@ export function logSyncResults(results: SyncResult): void {
     1000
   ).toFixed(2);
 
-  console.log("\n" + "=".repeat(60));
-  console.log("📊 Sync Results");
-  console.log("=".repeat(60));
   console.log(
     `✅ syncAll completed in ${syncDurationSec}s (${results.syncDurationMs.toFixed(0)}ms)`,
   );
-  console.log(`📊 Total conversations: ${results.totalConversations.length}`);
+  console.log(
+    `   └─ Total conversations: ${results.totalConversations.length}`,
+  );
   console.log(`   └─ DMs: ${results.dmsCount}, Groups: ${results.groupsCount}`);
-  console.log(`📊 Total messages: ${results.totalMessages}`);
-
-  if (isDebugMode) {
-    console.log("\n🔍 [DEBUG] Detailed Metrics:");
-    console.log(
-      `   └─ Message counting took ${messageCountDurationSec}s (${results.messageCountDurationMs.toFixed(0)}ms)`,
-    );
-    console.log(`   └─ Total syncAll + message counting: ${totalDurationSec}s`);
-  }
-
-  console.log("=".repeat(60) + "\n");
+  console.log(`   └─ Total messages: ${results.totalMessages}`);
 }
