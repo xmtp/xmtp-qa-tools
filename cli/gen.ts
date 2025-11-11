@@ -62,9 +62,9 @@ EXAMPLES:
   yarn gen --help
 
 PRESET COMMANDS:
-  yarn update:local      Update 500 inboxes for local testing
-  yarn update:prod       Update inboxes for production testing
-  yarn restart:prod      Restart production installations (force recreate)
+  yarn gen update:local      Update 500 inboxes for local testing
+  yarn gen update:prod       Update inboxes for production testing
+  yarn gen restart:prod      Restart production installations (force recreate)
 
 For more information, see: cli/readme.md
 `);

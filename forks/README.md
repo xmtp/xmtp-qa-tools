@@ -22,6 +22,9 @@ LOG_LEVEL=debug
 XMTP_ENV=production
 ```
 
+### Running locally
+Before running this suite locally you _must_ run `yarn gen update:local` to pre-populate the database with inboxes to add and remove from the group. Otherwise add/remove member operations will fail, which will not increase the epoch or trigger forks.
+
 ### Fork generation through send testing
 
 The main approach creates intentional conflicts by running parallel operations on shared groups:
@@ -105,8 +108,9 @@ The fork test can inject network chaos (latency, jitter, packet loss) to simulat
 
 **Requirements:**
 - Network chaos requires `--env local`
-- Multinode Docker containers must be running (`./dev/up`)
-- Requires `sudo` access for `tc` and `iptables` commands
+- Multinode Docker containers must be running (`./multinode/up`)
+- Must be run on linux with `tc` and `iptables` commands available. Will not work on MacOS.
+- Requires `sudo` access
 
 **Chaos Levels:**
 
@@ -145,11 +149,3 @@ chaosLevel: high
   packetLoss: 0-5%
   interval: 10000ms
 ```
-
-### Log processing features
-
-- **Clean slate**: Removes old logs and data before starting
-- **Continuous capture**: Each iteration captures debug logs
-- **ANSI cleaning**: Strips escape codes for analysis
-- **Fork counting**: Automatically counts detected conflicts
-- **Graceful interruption**: Ctrl+C exits cleanly
