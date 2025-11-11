@@ -351,7 +351,7 @@ agent.on("text", async (ctx) => {
       totalConversations.length,
     )
   ) {
-    return;
+    //return;
   }
   const message = ctx.message;
   const content = message.content;
