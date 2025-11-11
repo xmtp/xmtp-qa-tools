@@ -54,7 +54,7 @@ const agents: AgentConfig[] = [
     name: "onit",
     address: "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
     sendMessage: "hey",
-    networks: ["production"],
+    networks: [],
     live: true,
   },
   {
