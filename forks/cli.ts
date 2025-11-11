@@ -8,7 +8,6 @@ import {
   epochRotationOperations,
   groupCount,
   installationCount,
-  network,
   NODE_VERSION,
   otherOperations,
   parallelOperations,
@@ -89,8 +88,8 @@ function runForkTest(options: ForkOptions): void {
         CHAOS_LEVEL: options.chaosLevel,
       },
     });
-  } catch {
-    console.log("Error running fork test");
+  } catch (e) {
+    console.error("Error running fork test", e);
     // Test may fail if forks are detected, that's expected
     // We'll analyze the logs afterward
   }
@@ -111,7 +110,7 @@ function logForkMatrixParameters(options: ForkOptions): void {
   );
   console.info(`otherOperations: ${JSON.stringify(otherOperations)}`);
   console.info(`targetEpoch: ${targetEpoch}`);
-  console.info(`network: ${network || "undefined"}`);
+  console.info(`network: ${options.env || "undefined"}`);
   console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
   console.info(`installationCount: ${installationCount}`);
   console.info(`testName: ${testName}`);
@@ -191,15 +190,6 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     } else {
       stats.runsWithoutForks++;
       console.info(`Run ${i}/${options.count}: ⚪ No forks`);
-    }
-
-    // Clean up empty cleaned directory if it exists
-    const logsDir = path.join(process.cwd(), "logs", "cleaned");
-    if (fs.existsSync(logsDir)) {
-      const files = fs.readdirSync(logsDir);
-      if (files.length === 0) {
-        fs.rmdirSync(logsDir);
-      }
     }
   }
 

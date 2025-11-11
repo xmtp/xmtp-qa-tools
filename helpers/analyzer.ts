@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { forkDetectedString } from "forks/constants";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
@@ -180,11 +181,6 @@ export async function cleanForksLogs(
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
-  if (!fs.existsSync(logsDir)) {
-    console.debug("No logs directory found");
-    return;
-  }
-
   if (!fs.existsSync(outputDir)) {
     await fs.promises.mkdir(outputDir, { recursive: true });
   }
@@ -214,7 +210,7 @@ export async function cleanForksLogs(
       // Check if the file contains fork-related content
       const containsForkContent = await fileContainsString(
         rawFilePath,
-        "may have forked",
+        forkDetectedString,
       );
 
       // Always preserve raw logs for debugging/analysis

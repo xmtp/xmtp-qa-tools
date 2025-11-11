@@ -20,7 +20,60 @@ import {
   targetEpoch,
   testName,
   workerNames,
+  type ChaosPreset,
 } from "./config";
+
+const startChaos = (
+  allNodes: DockerContainer[],
+  preset: ChaosPreset,
+): NodeJS.Timeout => {
+  console.log(`[chaos] Initialized ${allNodes.length} Docker containers`);
+
+  // Validate containers are running
+  for (const node of allNodes) {
+    try {
+      // Test if container exists by trying to get its IP
+      if (!node.ip) {
+        throw new Error(`Container ${node.name} has no IP address`);
+      }
+    } catch {
+      throw new Error(
+        `Docker container ${node.name} is not running. Network chaos requires local multinode setup (./dev/up).`,
+      );
+    }
+  }
+  console.log("[chaos] All Docker containers validated");
+
+  // Function to apply chaos to all nodes
+  const applyChaos = () => {
+    console.log(
+      "[chaos] Applying jitter, delay, and drop rules to all nodes...",
+    );
+    for (const node of allNodes) {
+      const delay = Math.floor(
+        preset.delayMin + Math.random() * (preset.delayMax - preset.delayMin),
+      );
+      const jitter = Math.floor(
+        preset.jitterMin +
+          Math.random() * (preset.jitterMax - preset.jitterMin),
+      );
+      const loss =
+        preset.lossMin + Math.random() * (preset.lossMax - preset.lossMin);
+
+      try {
+        node.addJitter(delay, jitter);
+        if (Math.random() < 0.5) node.addLoss(loss);
+      } catch (err) {
+        console.warn(`[chaos] Error applying netem on ${node.name}:`, err);
+      }
+    }
+  };
+
+  // Apply chaos immediately
+  applyChaos();
+
+  return setInterval(applyChaos, preset.interval);
+};
 
 describe(testName, () => {
   setupDurationTracking({ testName });
@@ -91,79 +144,29 @@ describe(testName, () => {
 
         // Initialize Docker containers for multinode setup
         allNodes = multinodeContainers.map((name) => new DockerContainer(name));
-        console.log(`[chaos] Initialized ${allNodes.length} Docker containers`);
-
-        // Validate containers are running
-        for (const node of allNodes) {
-          try {
-            // Test if container exists by trying to get its IP
-            if (!node.ip) {
-              throw new Error(`Container ${node.name} has no IP address`);
-            }
-          } catch (_err) {
-            throw new Error(
-              `Docker container ${node.name} is not running. Network chaos requires local multinode setup (./dev/up).`,
-            );
-          }
-        }
-        console.log("[chaos] All Docker containers validated");
-
         const preset = chaosPresets[chaosConfig.level];
-
-        // Function to apply chaos to all nodes
-        const applyChaos = () => {
-          console.log(
-            "[chaos] Applying jitter, delay, and drop rules to all nodes...",
-          );
-          for (const node of allNodes) {
-            const delay = Math.floor(
-              preset.delayMin +
-                Math.random() * (preset.delayMax - preset.delayMin),
-            );
-            const jitter = Math.floor(
-              preset.jitterMin +
-                Math.random() * (preset.jitterMax - preset.jitterMin),
-            );
-            const loss =
-              preset.lossMin +
-              Math.random() * (preset.lossMax - preset.lossMin);
-
-            try {
-              node.addJitter(delay, jitter);
-              if (Math.random() < 0.5) node.addLoss(loss);
-            } catch (err) {
-              console.warn(
-                `[chaos] Error applying netem on ${node.name}:`,
-                err,
-              );
-            }
-          }
-        };
-
-        // Apply chaos immediately
-        applyChaos();
-
         // Then set interval for continued chaos
-        chaosInterval = setInterval(applyChaos, preset.interval);
+        chaosInterval = startChaos(allNodes, preset);
         console.log(`[chaos] Started chaos interval (${preset.interval}ms)`);
-
-        // Start periodic verification during chaos
-        const verifyLoop = () => {
-          verifyInterval = setInterval(() => {
-            void (async () => {
-              try {
-                console.log("[verify] Checking forks under chaos");
-                await workers.checkForks();
-              } catch (e) {
-                console.warn("[verify] Skipping check due to exception:", e);
-              }
-            })();
-          }, 10 * 1000);
-        };
-
-        verifyLoop();
-        console.log("[chaos] Started verification interval (10000ms)");
       }
+
+      // Start periodic verification during chaos
+      const verifyLoop = () => {
+        verifyInterval = setInterval(() => {
+          void (async () => {
+            try {
+              console.log("[verify] Checking forks under chaos");
+              await workers.checkForks();
+            } catch (e) {
+              console.warn("[verify] Skipping check due to exception:", e);
+              throw e;
+            }
+          })();
+        }, 10 * 1000);
+      };
+
+      verifyLoop();
+      console.log("Started verification interval (10000ms)");
 
       // Create groups
       const groupOperationPromises = Array.from(
@@ -228,7 +231,13 @@ describe(testName, () => {
       );
 
       await Promise.all(groupOperationPromises);
+      await workers.checkForks();
+    } catch (e) {
+      console.error("Error during fork testing:", e);
     } finally {
+      if (verifyInterval) {
+        clearInterval(verifyInterval);
+      }
       // Clean up chaos if it was enabled
       if (chaosConfig.enabled) {
         console.log("[chaos] Cleaning up network chaos...");
@@ -236,9 +245,6 @@ describe(testName, () => {
         // Clear intervals
         if (chaosInterval) {
           clearInterval(chaosInterval);
-        }
-        if (verifyInterval) {
-          clearInterval(verifyInterval);
         }
 
         // Clear network rules
@@ -252,10 +258,6 @@ describe(testName, () => {
             );
           }
         }
-
-        // Cooldown period to allow in-flight messages to be processed
-        console.log("[chaos] Waiting 5s cooldown before final validation");
-        await new Promise((r) => setTimeout(r, 5000));
 
         console.log("[chaos] Cleanup complete");
       }

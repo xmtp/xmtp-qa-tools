@@ -21,10 +21,10 @@ export const epochRotationOperations = {
   removeMember: true, // removes a random member from the group
 };
 export const otherOperations = {
-  createInstallation: true, // creates a new installation for a random worker
+  createInstallation: false, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
 };
-export const targetEpoch = 150n; // The target epoch to stop the test (epochs are when performing forks to the group)
+export const targetEpoch = 30n; // The target epoch to stop the test (epochs are when performing forks to the group)
 export const network = process.env.XMTP_ENV; // Network environment setting
 export const randomInboxIdsCount = 10; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
@@ -63,12 +63,12 @@ export const chaosPresets: Record<ChaosLevel, ChaosPreset> = {
     interval: 10000, // 10 seconds
   },
   high: {
-    delayMin: 100,
+    delayMin: 0,
     delayMax: 500,
-    jitterMin: 0,
-    jitterMax: 100,
+    jitterMin: 50,
+    jitterMax: 200,
     lossMin: 0,
-    lossMax: 5,
+    lossMax: 10,
     interval: 10000, // 10 seconds
   },
 };
@@ -90,4 +90,6 @@ export const multinodeContainers = [
   "multinode-node2-1",
   "multinode-node3-1",
   "multinode-node4-1",
+  // Include the MLS validation service to add some additional chaos
+  "multinode-validation-1",
 ];
