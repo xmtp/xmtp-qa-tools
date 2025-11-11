@@ -12,7 +12,7 @@ const agents: AgentConfig[] = [
     name: "ponder",
     address: "0x2674f0B09B648551d2623177e2761242D708FBb2",
     sendMessage: "hi",
-    networks: ["production"],
+    networks: [],
     live: true,
   },
   {
@@ -47,7 +47,7 @@ const agents: AgentConfig[] = [
     name: "onit",
     address: "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
     sendMessage: "hey",
-    networks: ["production"],
+    networks: [],
     live: true,
   },
   {
