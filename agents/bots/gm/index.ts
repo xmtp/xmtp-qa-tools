@@ -25,7 +25,6 @@ const syncResults = await startUpSync(agent);
 const { startupTimeStamp, skippedMessagesCount, totalConversations } =
   syncResults;
 
-console.log("Listening for messages...");
 agent.on("text", async (ctx) => {
   if (
     shouldSkipOldMessage(
@@ -35,7 +34,7 @@ agent.on("text", async (ctx) => {
       totalConversations.length,
     )
   ) {
-    return;
+    //return;
   }
   if (ctx.isDm()) {
     const messageContent = ctx.message.content;
