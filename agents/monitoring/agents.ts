@@ -11,7 +11,7 @@ const agents: AgentConfig[] = [
   {
     name: "ponder",
     address: "0x2674f0B09B648551d2623177e2761242D708FBb2",
-    sendMessage: "hi",
+    sendMessage: "hi", //s
     networks: [],
     live: true,
   },
