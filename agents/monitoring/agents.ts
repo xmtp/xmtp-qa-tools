@@ -61,7 +61,7 @@ const agents: AgentConfig[] = [
     name: "byte",
     address: "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     sendMessage: "hi",
-    networks: ["production"],
+    networks: [],
     live: true,
   },
   {
