@@ -112,16 +112,7 @@ export async function startUpSync(agent: {
 }
 
 export function logSyncResults(results: SyncResult): void {
-  const isDebugMode = true; // process.env.XMTP_FORCE_DEBUG === "true";
-
   const syncDurationSec = (results.syncDurationMs / 1000).toFixed(2);
-  const messageCountDurationSec = (
-    results.messageCountDurationMs / 1000
-  ).toFixed(2);
-  const totalDurationSec = (
-    (results.syncDurationMs + results.messageCountDurationMs) /
-    1000
-  ).toFixed(2);
 
   console.log(
     `✅ syncAll completed in ${syncDurationSec}s (${results.syncDurationMs.toFixed(0)}ms)`,
