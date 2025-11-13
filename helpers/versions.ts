@@ -58,7 +58,7 @@ import {
   Conversation as Conversation430,
   Dm as Dm430,
   Group as Group430,
-} from "@xmtp/node-sdk-4.3.0";
+} from "@xmtp/node-sdk-4.3.1";
 
 // Agent SDK exports - use first auto-enabled version
 // Since 1.1.10 has auto: false, we export from 1.1.7 (first auto: true)
@@ -90,7 +90,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.3.0";
+} from "@xmtp/node-sdk-4.3.1";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -98,7 +98,7 @@ export const AgentVersionList = [
     Agent: Agent110,
     MessageContext: MessageContext110,
     agentSDK: "1.1.10",
-    nodeSDK: "4.3.0",
+    nodeSDK: "4.3.1",
     auto: true,
   },
   {
@@ -124,7 +124,7 @@ export const VersionList = [
     Conversation: Conversation430,
     Dm: Dm430,
     Group: Group430,
-    nodeSDK: "4.3.0",
+    nodeSDK: "4.3.1",
     nodeBindings: "1.6.1",
     auto: true,
   },
