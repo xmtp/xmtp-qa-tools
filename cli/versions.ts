@@ -1,10 +1,7 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import {
-  AgentVersionConfigList,
-  NodeVersionConfigList,
-} from "@helpers/version-config";
+import { AgentVersionList, VersionList } from "@helpers/versions";
 
 function showHelp() {
   console.log(`
@@ -46,8 +43,7 @@ function createBindingsSymlinks() {
   console.log("  (Linking node-sdk versions to their required bindings)");
 
   let hasErrors = false;
-
-  for (const config of NodeVersionConfigList) {
+  for (const config of VersionList) {
     if (!config.nodeSDK) continue;
 
     const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
@@ -187,7 +183,7 @@ function createAgentSDKSymlinks() {
 
   let hasErrors = false;
 
-  for (const config of AgentVersionConfigList) {
+  for (const config of AgentVersionList) {
     if (!config.agentSDK || !config.nodeSDK) continue;
 
     const agentSDKDir = path.join(xmtpDir, `agent-sdk-${config.agentSDK}`);

@@ -83,9 +83,9 @@ export {
   type Group,
   LogLevel,
   type XmtpEnv,
-  type PermissionLevel,
   type GroupMember,
   type KeyPackageStatus,
+  type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.3.1";
@@ -96,7 +96,7 @@ export const AgentVersionList = [
     Agent: Agent110,
     MessageContext: MessageContext110,
     agentSDK: "1.1.10",
-    nodeSDK: "4.3.1",
+    nodeSDK: "4.3.0",
     auto: true,
   },
   {
@@ -122,7 +122,7 @@ export const VersionList = [
     Conversation: Conversation430,
     Dm: Dm430,
     Group: Group430,
-    nodeSDK: "4.3.1",
+    nodeSDK: "4.3.0",
     nodeBindings: "1.6.1",
     auto: true,
   },
