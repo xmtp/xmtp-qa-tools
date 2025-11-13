@@ -51,7 +51,7 @@
     "@xmtp/node-sdk-4.0.3": "npm:@xmtp/node-sdk@4.0.3",
     "@xmtp/node-sdk-4.1.0": "npm:@xmtp/node-sdk@4.1.0",
     "@xmtp/node-sdk-4.2.3": "npm:@xmtp/node-sdk@4.2.3",
-    "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.3.0",
+    "@xmtp/node-sdk-4.3.1": "npm:@xmtp/node-sdk@4.3.1",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",

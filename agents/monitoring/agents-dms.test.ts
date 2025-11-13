@@ -72,7 +72,7 @@ describe(testName, async () => {
       if (result?.receptionPercentage === 0)
         console.error(agent.name, "ERROR: NO RESPONSE");
       else console.log(agent.name, "SUCCESS");
-
+      console.log("process.env.NODE_ENV", process.env.NODE_ENV);
       if (process.env.NODE_ENV === "development") {
         expect(result?.receptionPercentage).toBeGreaterThan(0);
       }
