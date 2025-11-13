@@ -1,7 +1,7 @@
 import { getActiveVersion } from "@helpers/versions";
 
 // Fork matrix parameters - shared between test and CLI
-export const groupCount = 5;
+export const groupCount = 1;
 export const parallelOperations = 5; // How many operations to perform in parallel
 export const NODE_VERSION = getActiveVersion().nodeBindings; // default to latest version, can be overridden with --nodeBindings=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
@@ -23,10 +23,11 @@ export const epochRotationOperations = {
 export const otherOperations = {
   createInstallation: false, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
+  sync: true, // syncs the group
 };
 export const targetEpoch = 30n; // The target epoch to stop the test (epochs are when performing forks to the group)
 export const network = process.env.XMTP_ENV; // Network environment setting
-export const randomInboxIdsCount = 10; // How many inboxIds to use randomly in the add/remove operations
+export const randomInboxIdsCount = 50; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
 export const testName = "forks";
 
@@ -68,7 +69,7 @@ export const chaosPresets: Record<ChaosLevel, ChaosPreset> = {
     jitterMin: 50,
     jitterMax: 200,
     lossMin: 0,
-    lossMax: 10,
+    lossMax: 25,
     interval: 10000, // 10 seconds
   },
 };
@@ -83,6 +84,9 @@ export const chaosConfig: ChaosConfig = {
   enabled: process.env.CHAOS_ENABLED === "true",
   level: (process.env.CHAOS_LEVEL as ChaosLevel) || "medium",
 };
+
+// Parse streams config from environment
+export const streamsEnabled = process.env.STREAMS_ENABLED === "true";
 
 // Multinode container names for local environment chaos testing
 export const multinodeContainers = [

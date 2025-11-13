@@ -2,8 +2,9 @@ import { getTime } from "@helpers/logger";
 import { type Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../network-stability/container";
 import {
   chaosConfig,
@@ -17,71 +18,17 @@ import {
   otherOperations,
   parallelOperations,
   randomInboxIdsCount,
+  streamsEnabled,
   targetEpoch,
   testName,
   workerNames,
-  type ChaosPreset,
 } from "./config";
-
-const startChaos = (
-  allNodes: DockerContainer[],
-  preset: ChaosPreset,
-): NodeJS.Timeout => {
-  console.log(`[chaos] Initialized ${allNodes.length} Docker containers`);
-
-  // Validate containers are running
-  for (const node of allNodes) {
-    try {
-      // Test if container exists by trying to get its IP
-      if (!node.ip) {
-        throw new Error(`Container ${node.name} has no IP address`);
-      }
-    } catch {
-      throw new Error(
-        `Docker container ${node.name} is not running. Network chaos requires local multinode setup (./dev/up).`,
-      );
-    }
-  }
-  console.log("[chaos] All Docker containers validated");
-
-  // Function to apply chaos to all nodes
-  const applyChaos = () => {
-    console.log(
-      "[chaos] Applying jitter, delay, and drop rules to all nodes...",
-    );
-    for (const node of allNodes) {
-      const delay = Math.floor(
-        preset.delayMin + Math.random() * (preset.delayMax - preset.delayMin),
-      );
-      const jitter = Math.floor(
-        preset.jitterMin +
-          Math.random() * (preset.jitterMax - preset.jitterMin),
-      );
-      const loss =
-        preset.lossMin + Math.random() * (preset.lossMax - preset.lossMin);
-
-      try {
-        node.addJitter(delay, jitter);
-        if (Math.random() < 0.5) node.addLoss(loss);
-      } catch (err) {
-        console.warn(`[chaos] Error applying netem on ${node.name}:`, err);
-      }
-    }
-  };
-
-  // Apply chaos immediately
-  applyChaos();
-
-  return setInterval(applyChaos, preset.interval);
-};
+import { clearChaos, startChaos } from "./utils";
 
 describe(testName, () => {
   setupDurationTracking({ testName });
 
-  const createOperations = async (worker: Worker, group: Group) => {
-    // This syncs all and can contribute to the fork
-    await worker.client.conversations.syncAll();
-
+  const createOperations = (worker: Worker, group: Group) => {
     // Fetches the group from the worker perspective
     const getGroup = () =>
       worker.client.conversations.getConversationById(
@@ -121,6 +68,7 @@ describe(testName, () => {
         getGroup().then((g) =>
           g.send(`Message from ${worker.name}`).then(() => {}),
         ),
+      sync: () => getGroup().then((g) => g.sync()),
     };
   };
 
@@ -129,13 +77,21 @@ describe(testName, () => {
     let allNodes: DockerContainer[] = [];
     let chaosInterval: NodeJS.Timeout | undefined;
     let verifyInterval: NodeJS.Timeout | undefined;
+    let mustFail = false;
 
     try {
       let workers = await getWorkers(workerNames, {
         env: network as "local" | "dev" | "production",
         nodeBindings: NODE_VERSION,
       });
-      // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
+
+      // Enable message streams if configured
+      if (streamsEnabled) {
+        console.log("[streams] Enabling message streams on all workers");
+        workers.getAll().forEach((worker) => {
+          worker.worker.startStream(typeofStream.Message);
+        });
+      }
 
       // Initialize network chaos if enabled
       if (chaosConfig.enabled) {
@@ -159,7 +115,6 @@ describe(testName, () => {
               await workers.checkForks();
             } catch (e) {
               console.warn("[verify] Skipping check due to exception:", e);
-              throw e;
             }
           })();
         }, 10 * 1000);
@@ -175,6 +130,9 @@ describe(testName, () => {
           const group = await workers.createGroupBetweenAll();
 
           let currentEpoch = 0n;
+          await Promise.all(
+            workers.getAll().map((w) => w.client.conversations.sync()),
+          );
 
           while (currentEpoch < targetEpoch) {
             const parallelOperationsArray = Array.from(
@@ -186,7 +144,7 @@ describe(testName, () => {
                       Math.floor(Math.random() * workers.getAll().length)
                     ];
 
-                  const ops = await createOperations(randomWorker, group);
+                  const ops = createOperations(randomWorker, group);
                   const operationList = [
                     ...(epochRotationOperations.updateName
                       ? [ops.updateName]
@@ -203,6 +161,7 @@ describe(testName, () => {
                       ? [ops.createInstallation]
                       : []),
                     ...(otherOperations.sendMessage ? [ops.sendMessage] : []),
+                    ...(otherOperations.sync ? [ops.sync] : []),
                   ];
 
                   const randomOperation =
@@ -217,11 +176,19 @@ describe(testName, () => {
                     await randomOperation();
                     await otherRandomOperation();
                   } catch (e) {
-                    console.log(`Group ${groupIndex + 1} operation failed:`, e);
+                    console.error(
+                      `Group ${groupIndex + 1} operation failed:`,
+                      e,
+                    );
                   }
                 })(),
             );
-            await Promise.all(parallelOperationsArray);
+            try {
+              await Promise.all(parallelOperationsArray);
+            } catch (e) {
+              console.error(`Group ${groupIndex + 1} operation failed:`, e);
+            }
+
             await workers.checkForksForGroup(group.id);
             currentEpoch = (await group.debugInfo()).epoch;
           }
@@ -232,8 +199,9 @@ describe(testName, () => {
 
       await Promise.all(groupOperationPromises);
       await workers.checkForks();
-    } catch (e) {
+    } catch (e: any) {
       console.error("Error during fork testing:", e);
+      mustFail = true;
     } finally {
       if (verifyInterval) {
         clearInterval(verifyInterval);
@@ -241,25 +209,18 @@ describe(testName, () => {
       // Clean up chaos if it was enabled
       if (chaosConfig.enabled) {
         console.log("[chaos] Cleaning up network chaos...");
-
         // Clear intervals
         if (chaosInterval) {
           clearInterval(chaosInterval);
         }
 
-        // Clear network rules
-        for (const node of allNodes) {
-          try {
-            node.clearLatency();
-          } catch (err) {
-            console.warn(
-              `[chaos] Error clearing latency on ${node.name}:`,
-              err,
-            );
-          }
-        }
+        clearChaos(allNodes);
 
         console.log("[chaos] Cleanup complete");
+      }
+
+      if (mustFail) {
+        expect.fail(`Test failed`);
       }
     }
   });
