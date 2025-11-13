@@ -1,7 +1,10 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { AgentVersionList, VersionList } from "@helpers/versions";
+import {
+  AgentVersionConfigList,
+  NodeVersionConfigList,
+} from "@helpers/version-config";
 
 function showHelp() {
   console.log(`
@@ -44,7 +47,7 @@ function createBindingsSymlinks() {
 
   let hasErrors = false;
 
-  for (const config of VersionList) {
+  for (const config of NodeVersionConfigList) {
     if (!config.nodeSDK) continue;
 
     const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
@@ -79,20 +82,28 @@ function createBindingsSymlinks() {
         const stats = fs.lstatSync(symlinkTarget);
         if (stats.isSymbolicLink()) {
           const currentTarget = fs.readlinkSync(symlinkTarget);
+          const resolvedTarget = path.resolve(
+            sdkNodeModulesXmtpDir,
+            currentTarget,
+          );
           const expectedRelativePath = path.relative(
             sdkNodeModulesXmtpDir,
             bindingsDir,
           );
-          // Normalize paths for comparison
+          const expectedResolvedTarget = path.resolve(
+            sdkNodeModulesXmtpDir,
+            expectedRelativePath,
+          );
+          // Normalize paths for comparison and verify target exists
           if (
-            path.resolve(sdkNodeModulesXmtpDir, currentTarget) ===
-            path.resolve(sdkNodeModulesXmtpDir, expectedRelativePath)
+            resolvedTarget === expectedResolvedTarget &&
+            fs.existsSync(resolvedTarget)
           ) {
             needsUpdate = false;
           }
         }
       } catch {
-        // If we can't read the symlink, we'll recreate it
+        // If we can't read the symlink or target doesn't exist, we'll recreate it
       }
     }
 
@@ -176,7 +187,7 @@ function createAgentSDKSymlinks() {
 
   let hasErrors = false;
 
-  for (const config of AgentVersionList) {
+  for (const config of AgentVersionConfigList) {
     if (!config.agentSDK || !config.nodeSDK) continue;
 
     const agentSDKDir = path.join(xmtpDir, `agent-sdk-${config.agentSDK}`);
@@ -212,20 +223,28 @@ function createAgentSDKSymlinks() {
         const stats = fs.lstatSync(symlinkTarget);
         if (stats.isSymbolicLink()) {
           const currentTarget = fs.readlinkSync(symlinkTarget);
+          const resolvedTarget = path.resolve(
+            agentSDKNodeModulesXmtpDir,
+            currentTarget,
+          );
           const expectedRelativePath = path.relative(
             agentSDKNodeModulesXmtpDir,
             nodeSDKDir,
           );
-          // Normalize paths for comparison
+          const expectedResolvedTarget = path.resolve(
+            agentSDKNodeModulesXmtpDir,
+            expectedRelativePath,
+          );
+          // Normalize paths for comparison and verify target exists
           if (
-            path.resolve(agentSDKNodeModulesXmtpDir, currentTarget) ===
-            path.resolve(agentSDKNodeModulesXmtpDir, expectedRelativePath)
+            resolvedTarget === expectedResolvedTarget &&
+            fs.existsSync(resolvedTarget)
           ) {
             needsUpdate = false;
           }
         }
       } catch {
-        // If we can't read the symlink, we'll recreate it
+        // If we can't read the symlink or target doesn't exist, we'll recreate it
       }
     }
 

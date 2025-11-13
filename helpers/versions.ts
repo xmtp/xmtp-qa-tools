@@ -66,8 +66,6 @@ export {
   Agent,
   MessageContext,
   type AgentMiddleware,
-  type Group as AgentGroupType,
-  type PermissionLevel as AgentPermissionLevel,
 } from "@xmtp/agent-sdk-1.1.10";
 
 export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
@@ -85,9 +83,9 @@ export {
   type Group,
   LogLevel,
   type XmtpEnv,
+  type PermissionLevel,
   type GroupMember,
   type KeyPackageStatus,
-  type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.3.1";

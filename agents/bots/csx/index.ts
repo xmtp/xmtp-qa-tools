@@ -2,7 +2,7 @@ import { APP_VERSION } from "@helpers/client";
 import {
   Agent,
   getTestUrl,
-  type AgentGroupType,
+  type Group,
   type MessageContext,
 } from "@helpers/versions";
 
@@ -61,9 +61,9 @@ agent.on("text", async (ctx: MessageContext) => {
 
   console.debug("Secret code received, processing group addition");
 
-  await (group as AgentGroupType).sync();
+  await (group as Group).sync();
   if (ctx.isDm()) {
-    const members = await (group as AgentGroupType).members();
+    const members = await (group as Group).members();
     const isMember = members.some(
       (member) =>
         member.inboxId.toLowerCase() ===
@@ -74,16 +74,14 @@ agent.on("text", async (ctx: MessageContext) => {
       console.debug(
         `Adding member ${ctx.message.senderInboxId} to group ${currentGroupId}`,
       );
-      await (group as AgentGroupType).addMembers([ctx.message.senderInboxId]);
+      await (group as Group).addMembers([ctx.message.senderInboxId]);
 
       // Check if user should be admin
       if (isAdmin.includes(ctx.message.senderInboxId)) {
         console.debug(
           `Adding admin ${ctx.message.senderInboxId} to group ${currentGroupId}`,
         );
-        await (group as AgentGroupType).addSuperAdmin(
-          ctx.message.senderInboxId,
-        );
+        await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
       }
 
       // Send success messages
@@ -93,16 +91,14 @@ agent.on("text", async (ctx: MessageContext) => {
       return true;
     } else {
       // User is already in group, check if they need admin privileges
-      const isAdminFromGroup = (group as AgentGroupType).isSuperAdmin(
+      const isAdminFromGroup = (group as Group).isSuperAdmin(
         ctx.message.senderInboxId,
       );
       if (!isAdminFromGroup && isAdmin.includes(ctx.message.senderInboxId)) {
         console.debug(
           `Adding admin privileges to ${ctx.message.senderInboxId} in group ${currentGroupId}`,
         );
-        await (group as AgentGroupType).addSuperAdmin(
-          ctx.message.senderInboxId,
-        );
+        await (group as Group).addSuperAdmin(ctx.message.senderInboxId);
       }
 
       console.debug(
