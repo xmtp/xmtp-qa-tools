@@ -26,6 +26,10 @@ interface ForkOptions {
   chaosEnabled: boolean; // Enable network chaos
   chaosLevel: ChaosLevel; // Chaos level (low, medium, high)
   streams: boolean; // Enable message streams on all workers
+  dbChaosEnabled: boolean; // Enable database chaos
+  dbLockTimeMin: number; // Minimum DB lock duration in ms
+  dbLockTimeMax: number; // Maximum DB lock duration in ms
+  dbLockInterval: number; // How often to apply DB locks in ms
 }
 
 function showHelp() {
@@ -44,6 +48,10 @@ OPTIONS:
   --chaos-enabled            Enable network chaos testing (requires --env local)
   --chaos-level <level>      Chaos level: low, medium, high [default: medium]
   --streams                  Enable message streams on all workers [default: false]
+  --db-chaos-enabled         Enable database locking chaos [default: false]
+  --db-lock-time-min <ms>    Minimum DB lock duration in ms [default: 100]
+  --db-lock-time-max <ms>    Maximum DB lock duration in ms [default: 2000]
+  --db-lock-interval <ms>    How often to apply DB locks in ms [default: 15000]
   -h, --help                 Show this help message
 
 CHAOS LEVELS:
@@ -59,6 +67,8 @@ EXAMPLES:
   yarn fork --env local --chaos-enabled  # Run with medium network chaos
   yarn fork --env local --chaos-enabled --chaos-level high  # Run with high chaos
   yarn fork --streams                    # Run with message streams enabled
+  yarn fork --db-chaos-enabled           # Run with database locking chaos
+  yarn fork --db-chaos-enabled --db-lock-time-min 500 --db-lock-time-max 3000  # Custom DB chaos timing
 
 For more information, see: forks/README.md
 `);
@@ -90,6 +100,10 @@ function runForkTest(options: ForkOptions): boolean {
         CHAOS_ENABLED: options.chaosEnabled ? "true" : "false",
         CHAOS_LEVEL: options.chaosLevel,
         STREAMS_ENABLED: options.streams ? "true" : "false",
+        DB_CHAOS_ENABLED: options.dbChaosEnabled ? "true" : "false",
+        DB_LOCK_TIME_MIN: options.dbLockTimeMin.toString(),
+        DB_LOCK_TIME_MAX: options.dbLockTimeMax.toString(),
+        DB_LOCK_INTERVAL: options.dbLockInterval.toString(),
       },
     });
 
@@ -132,6 +146,15 @@ function logForkMatrixParameters(options: ForkOptions): void {
     console.info(`  jitter: ${preset.jitterMin}-${preset.jitterMax}ms`);
     console.info(`  packetLoss: ${preset.lossMin}-${preset.lossMax}%`);
     console.info(`  interval: ${preset.interval}ms`);
+  }
+
+  if (options.dbChaosEnabled) {
+    console.info("\nDATABASE CHAOS PARAMETERS");
+    console.info(`dbChaosEnabled: true`);
+    console.info(
+      `  lockDuration: ${options.dbLockTimeMin}-${options.dbLockTimeMax}ms`,
+    );
+    console.info(`  interval: ${options.dbLockInterval}ms`);
   }
 
   console.info("-".repeat(60) + "\n");
@@ -257,6 +280,10 @@ async function main() {
     chaosEnabled: false,
     chaosLevel: "medium",
     streams: false,
+    dbChaosEnabled: false,
+    dbLockTimeMin: 100,
+    dbLockTimeMax: 6000,
+    dbLockInterval: 5000,
   };
 
   // Parse arguments
@@ -327,6 +354,57 @@ async function main() {
         break;
       case "--streams":
         options.streams = true;
+        break;
+      case "--db-chaos-enabled":
+        options.dbChaosEnabled = true;
+        break;
+      case "--db-lock-time-min":
+        if (i + 1 < args.length) {
+          const value = parseInt(args[i + 1], 10);
+          if (isNaN(value) || value < 0) {
+            console.error("--db-lock-time-min must be a positive number");
+            process.exit(1);
+          }
+          options.dbLockTimeMin = value;
+          i++; // Skip next argument
+        } else {
+          console.error(
+            "--db-lock-time-min flag requires a value (e.g., --db-lock-time-min 100)",
+          );
+          process.exit(1);
+        }
+        break;
+      case "--db-lock-time-max":
+        if (i + 1 < args.length) {
+          const value = parseInt(args[i + 1], 10);
+          if (isNaN(value) || value < 0) {
+            console.error("--db-lock-time-max must be a positive number");
+            process.exit(1);
+          }
+          options.dbLockTimeMax = value;
+          i++; // Skip next argument
+        } else {
+          console.error(
+            "--db-lock-time-max flag requires a value (e.g., --db-lock-time-max 2000)",
+          );
+          process.exit(1);
+        }
+        break;
+      case "--db-lock-interval":
+        if (i + 1 < args.length) {
+          const value = parseInt(args[i + 1], 10);
+          if (isNaN(value) || value < 0) {
+            console.error("--db-lock-interval must be a positive number");
+            process.exit(1);
+          }
+          options.dbLockInterval = value;
+          i++; // Skip next argument
+        } else {
+          console.error(
+            "--db-lock-interval flag requires a value (e.g., --db-lock-interval 15000)",
+          );
+          process.exit(1);
+        }
         break;
       default:
         console.error(`Unknown option: ${arg}`);

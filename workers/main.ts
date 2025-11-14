@@ -146,17 +146,17 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
   import { parentPort, workerData } from "node:worker_threads";
-  
+
   // Execute the worker code
   const workerCode = ${JSON.stringify(workerThreadCode)};
   const workerModule = new Function('require', 'parentPort', 'workerData', 'process', workerCode);
-  
+
   // Get the require function
   import { createRequire } from "node:module";
   import { fileURLToPath } from "node:url";
   const __filename = fileURLToPath("${import.meta.url}");
   const require = createRequire(__filename);
-  
+
   // Execute the worker code
   workerModule(require, parentPort, workerData, process);
 `;
@@ -1111,6 +1111,38 @@ export class WorkerClient extends Worker implements IWorkerClient {
       console.error(`[${this.nameId}] Error clearing database:`, error);
       return Promise.resolve(false);
     }
+  }
+
+  /**
+   * Locks the database file for a specified duration to simulate chaos
+   * @param lockMs - Duration to hold the lock in milliseconds
+   * @returns Promise that resolves when the lock is released
+   */
+  public async lockDB(lockMs: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.client.disconnectDatabase();
+
+        // Release the lock after the specified duration
+        setTimeout(async () => {
+          try {
+            await this.client.reconnectDatabase();
+            console.log(`[${this.nameId}] Reconnected to the database`);
+            resolve();
+          } catch (error: any) {
+            reject(
+              new Error(
+                `[${this.nameId}] Error releasing database lock: ${error}`,
+              ),
+            );
+          }
+        }, lockMs);
+      } catch (error: any) {
+        reject(
+          new Error(`[${this.nameId}] Error disconnecting database: ${error}`),
+        );
+      }
+    });
   }
 
   /**
