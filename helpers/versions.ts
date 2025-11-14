@@ -31,6 +31,8 @@ import {
   Group as Group431,
 } from "@xmtp/node-sdk-4.3.1";
 
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.12/debug";
+
 // Agent SDK exports - use first auto-enabled version
 export {
   Agent,
@@ -38,9 +40,7 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.12";
-
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.12/debug";
+} from "@xmtp/agent-sdk-1.1.14";
 
 // Node SDK exports
 export {
@@ -69,6 +69,7 @@ export const AgentVersionList = [
     MessageContext: MessageContext114,
     agentSDK: "1.1.14",
     nodeSDK: "4.3.1",
+    nodeBindings: "1.6.1",
     auto: true,
   },
   {

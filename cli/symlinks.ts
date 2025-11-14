@@ -12,6 +12,9 @@ USAGE:
 
 OPTIONS:
   --clean               Clean package.json imports and node_modules before setup
+  --agentSDK <version>  Link a custom agent-sdk version to a node-sdk
+  --nodeSDK <version>   Specify the node-sdk version for custom linking
+  --nodeBindings <ver>  Specify the node-bindings version for custom linking
   -h, --help            Show this help message
 
 DESCRIPTION:
@@ -31,6 +34,269 @@ For more information, see: cli/README.md
 `);
 }
 
+type CliOptions = {
+  clean: boolean;
+  agentSDK?: string;
+  nodeSDK?: string;
+  nodeBindings?: string;
+};
+
+function parseArgs(args: string[]): CliOptions {
+  const options: CliOptions = {
+    clean: false,
+  };
+
+  const getValue = (
+    arg: string,
+    nextValue: string | undefined,
+    flag: string,
+  ): { value: string; consumedNext: boolean } => {
+    if (arg.includes("=")) {
+      const [, rawValue] = arg.split("=", 2);
+      if (!rawValue) {
+        console.error(`Missing value for ${flag}`);
+        process.exit(1);
+      }
+      return { value: rawValue, consumedNext: false };
+    }
+
+    if (nextValue && !nextValue.startsWith("--")) {
+      return { value: nextValue, consumedNext: true };
+    }
+
+    console.error(`Missing value for ${flag}`);
+    process.exit(1);
+  };
+
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    const next = args[i + 1];
+
+    switch (true) {
+      case arg === "--clean":
+        options.clean = true;
+        break;
+      case arg.startsWith("--agentSDK"): {
+        const { value, consumedNext } = getValue(arg, next, "--agentSDK");
+        options.agentSDK = value;
+        if (consumedNext) i += 1;
+        break;
+      }
+      case arg.startsWith("--nodeSDK"): {
+        const { value, consumedNext } = getValue(arg, next, "--nodeSDK");
+        options.nodeSDK = value;
+        if (consumedNext) i += 1;
+        break;
+      }
+      case arg.startsWith("--nodeBindings"): {
+        const { value, consumedNext } = getValue(arg, next, "--nodeBindings");
+        options.nodeBindings = value;
+        if (consumedNext) i += 1;
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  return options;
+}
+
+function linkNodeSDKToBindings(nodeSDK: string, nodeBindings: string): boolean {
+  const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
+
+  const sdkDir = path.join(xmtpDir, `node-sdk-${nodeSDK}`);
+  const bindingsDir = path.join(xmtpDir, `node-bindings-${nodeBindings}`);
+
+  if (!fs.existsSync(sdkDir)) {
+    console.error(`❌ SDK directory not found: ${nodeSDK} (${sdkDir})`);
+    return false;
+  }
+
+  if (!fs.existsSync(bindingsDir)) {
+    console.error(
+      `❌ Bindings directory not found: ${nodeBindings} (${bindingsDir})`,
+    );
+    return false;
+  }
+
+  const sdkNodeModulesXmtpDir = path.join(sdkDir, "node_modules", "@xmtp");
+  const symlinkTarget = path.join(sdkNodeModulesXmtpDir, "node-bindings");
+
+  let needsUpdate = true;
+  if (fs.existsSync(symlinkTarget)) {
+    try {
+      const stats = fs.lstatSync(symlinkTarget);
+      if (stats.isSymbolicLink()) {
+        const currentTarget = fs.readlinkSync(symlinkTarget);
+        const expectedRelativePath = path.relative(
+          sdkNodeModulesXmtpDir,
+          bindingsDir,
+        );
+        if (
+          path.resolve(sdkNodeModulesXmtpDir, currentTarget) ===
+          path.resolve(sdkNodeModulesXmtpDir, expectedRelativePath)
+        ) {
+          needsUpdate = false;
+        }
+      }
+    } catch {
+      // If we can't read the symlink, we'll recreate it
+    }
+  }
+
+  if (!needsUpdate) {
+    console.log(
+      `⏭️  node-sdk-${nodeSDK} → node-bindings-${nodeBindings} (already linked)`,
+    );
+    return true;
+  }
+
+  if (fs.existsSync(sdkNodeModulesXmtpDir)) {
+    try {
+      if (fs.existsSync(symlinkTarget)) {
+        const stats = fs.lstatSync(symlinkTarget);
+        if (stats.isSymbolicLink()) {
+          fs.unlinkSync(symlinkTarget);
+        } else {
+          fs.rmSync(symlinkTarget, { recursive: true, force: true });
+        }
+      }
+      if (fs.existsSync(sdkNodeModulesXmtpDir)) {
+        try {
+          fs.rmdirSync(sdkNodeModulesXmtpDir);
+        } catch {
+          // Directory not empty, that's fine
+        }
+      }
+    } catch {
+      if (fs.existsSync(path.join(sdkDir, "node_modules"))) {
+        fs.rmSync(path.join(sdkDir, "node_modules"), {
+          recursive: true,
+          force: true,
+        });
+      }
+    }
+  }
+
+  fs.mkdirSync(sdkNodeModulesXmtpDir, { recursive: true });
+
+  try {
+    const relativeBindingsPath = path.relative(
+      sdkNodeModulesXmtpDir,
+      bindingsDir,
+    );
+    fs.symlinkSync(relativeBindingsPath, symlinkTarget);
+    console.log(`✅ node-sdk-${nodeSDK} → node-bindings-${nodeBindings}`);
+    return true;
+  } catch (error) {
+    console.error(
+      `❌ Error linking node-sdk-${nodeSDK} to node-bindings-${nodeBindings}: ${String(error)}`,
+    );
+    return false;
+  }
+}
+
+function linkAgentSDKToNodeSDK(agentSDK: string, nodeSDK: string): boolean {
+  const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
+  const agentSDKDir = path.join(xmtpDir, `agent-sdk-${agentSDK}`);
+  const nodeSDKDir = path.join(xmtpDir, `node-sdk-${nodeSDK}`);
+
+  if (!fs.existsSync(agentSDKDir)) {
+    console.error(
+      `❌ Agent SDK directory not found: ${agentSDK} (${agentSDKDir})`,
+    );
+    return false;
+  }
+
+  if (!fs.existsSync(nodeSDKDir)) {
+    console.error(
+      `❌ Node SDK directory not found: ${nodeSDK} (${nodeSDKDir})`,
+    );
+    return false;
+  }
+
+  const agentSDKNodeModulesXmtpDir = path.join(
+    agentSDKDir,
+    "node_modules",
+    "@xmtp",
+  );
+  const symlinkTarget = path.join(agentSDKNodeModulesXmtpDir, "node-sdk");
+
+  let needsUpdate = true;
+  if (fs.existsSync(symlinkTarget)) {
+    try {
+      const stats = fs.lstatSync(symlinkTarget);
+      if (stats.isSymbolicLink()) {
+        const currentTarget = fs.readlinkSync(symlinkTarget);
+        const expectedRelativePath = path.relative(
+          agentSDKNodeModulesXmtpDir,
+          nodeSDKDir,
+        );
+        if (
+          path.resolve(agentSDKNodeModulesXmtpDir, currentTarget) ===
+          path.resolve(agentSDKNodeModulesXmtpDir, expectedRelativePath)
+        ) {
+          needsUpdate = false;
+        }
+      }
+    } catch {
+      // If we can't read the symlink, we'll recreate it
+    }
+  }
+
+  if (!needsUpdate) {
+    console.log(
+      `⏭️  agent-sdk-${agentSDK} → node-sdk-${nodeSDK} (already linked)`,
+    );
+    return true;
+  }
+
+  if (fs.existsSync(agentSDKNodeModulesXmtpDir)) {
+    try {
+      if (fs.existsSync(symlinkTarget)) {
+        const stats = fs.lstatSync(symlinkTarget);
+        if (stats.isSymbolicLink()) {
+          fs.unlinkSync(symlinkTarget);
+        } else {
+          fs.rmSync(symlinkTarget, { recursive: true, force: true });
+        }
+      }
+      if (fs.existsSync(agentSDKNodeModulesXmtpDir)) {
+        try {
+          fs.rmdirSync(agentSDKNodeModulesXmtpDir);
+        } catch {
+          // Directory not empty, that's fine
+        }
+      }
+    } catch {
+      if (fs.existsSync(path.join(agentSDKDir, "node_modules"))) {
+        fs.rmSync(path.join(agentSDKDir, "node_modules"), {
+          recursive: true,
+          force: true,
+        });
+      }
+    }
+  }
+
+  fs.mkdirSync(agentSDKNodeModulesXmtpDir, { recursive: true });
+
+  try {
+    const relativeNodeSDKPath = path.relative(
+      agentSDKNodeModulesXmtpDir,
+      nodeSDKDir,
+    );
+    fs.symlinkSync(relativeNodeSDKPath, symlinkTarget);
+    console.log(`✅ agent-sdk-${agentSDK} → node-sdk-${nodeSDK}`);
+    return true;
+  } catch (error) {
+    console.error(
+      `❌ Error linking agent-sdk-${agentSDK} to node-sdk-${nodeSDK}: ${String(error)}`,
+    );
+    return false;
+  }
+}
+
 function createBindingsSymlinks() {
   const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
 
@@ -46,110 +312,8 @@ function createBindingsSymlinks() {
 
   for (const config of VersionList) {
     if (!config.nodeSDK) continue;
-
-    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
-    const bindingsDir = path.join(
-      xmtpDir,
-      `node-bindings-${config.nodeBindings}`,
-    );
-
-    if (!fs.existsSync(sdkDir)) {
-      console.error(
-        `❌ SDK directory not found: ${config.nodeSDK} (${sdkDir})`,
-      );
+    if (!linkNodeSDKToBindings(config.nodeSDK, config.nodeBindings)) {
       hasErrors = true;
-      continue;
-    }
-
-    if (!fs.existsSync(bindingsDir)) {
-      console.error(
-        `❌ Bindings directory not found: ${config.nodeBindings} (${bindingsDir})`,
-      );
-      hasErrors = true;
-      continue;
-    }
-
-    const sdkNodeModulesXmtpDir = path.join(sdkDir, "node_modules", "@xmtp");
-    const symlinkTarget = path.join(sdkNodeModulesXmtpDir, "node-bindings");
-
-    // Check if symlink already exists and points to correct target
-    let needsUpdate = true;
-    if (fs.existsSync(symlinkTarget)) {
-      try {
-        const stats = fs.lstatSync(symlinkTarget);
-        if (stats.isSymbolicLink()) {
-          const currentTarget = fs.readlinkSync(symlinkTarget);
-          const expectedRelativePath = path.relative(
-            sdkNodeModulesXmtpDir,
-            bindingsDir,
-          );
-          // Normalize paths for comparison
-          if (
-            path.resolve(sdkNodeModulesXmtpDir, currentTarget) ===
-            path.resolve(sdkNodeModulesXmtpDir, expectedRelativePath)
-          ) {
-            needsUpdate = false;
-          }
-        }
-      } catch {
-        // If we can't read the symlink, we'll recreate it
-      }
-    }
-
-    if (needsUpdate) {
-      // Remove existing node_modules/@xmtp directory if it exists
-      if (fs.existsSync(sdkNodeModulesXmtpDir)) {
-        try {
-          // Only remove the symlink, not the entire directory
-          if (fs.existsSync(symlinkTarget)) {
-            const stats = fs.lstatSync(symlinkTarget);
-            if (stats.isSymbolicLink()) {
-              fs.unlinkSync(symlinkTarget);
-            } else {
-              fs.rmSync(symlinkTarget, { recursive: true, force: true });
-            }
-          }
-          // Remove parent directories if empty
-          if (fs.existsSync(sdkNodeModulesXmtpDir)) {
-            try {
-              fs.rmdirSync(sdkNodeModulesXmtpDir);
-            } catch {
-              // Directory not empty, that's fine
-            }
-          }
-        } catch {
-          // If removal fails, try removing the entire node_modules
-          if (fs.existsSync(path.join(sdkDir, "node_modules"))) {
-            fs.rmSync(path.join(sdkDir, "node_modules"), {
-              recursive: true,
-              force: true,
-            });
-          }
-        }
-      }
-
-      // Create directories and symlink
-      fs.mkdirSync(sdkNodeModulesXmtpDir, { recursive: true });
-
-      try {
-        const relativeBindingsPath = path.relative(
-          sdkNodeModulesXmtpDir,
-          bindingsDir,
-        );
-        fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-        console.log(
-          `✅ node-sdk-${config.nodeSDK} → node-bindings-${config.nodeBindings}`,
-        );
-      } catch (error) {
-        console.error(
-          `❌ Error linking node-sdk-${config.nodeSDK} to node-bindings-${config.nodeBindings}: ${String(error)}`,
-        );
-        hasErrors = true;
-      }
-    } else {
-      console.log(
-        `⏭️  node-sdk-${config.nodeSDK} → node-bindings-${config.nodeBindings} (already linked)`,
-      );
     }
   }
 
@@ -178,111 +342,8 @@ function createAgentSDKSymlinks() {
 
   for (const config of AgentVersionList) {
     if (!config.agentSDK || !config.nodeSDK) continue;
-
-    const agentSDKDir = path.join(xmtpDir, `agent-sdk-${config.agentSDK}`);
-    const nodeSDKDir = path.join(xmtpDir, `node-sdk-${config.nodeSDK}`);
-
-    if (!fs.existsSync(agentSDKDir)) {
-      console.error(
-        `❌ Agent SDK directory not found: ${config.agentSDK} (${agentSDKDir})`,
-      );
+    if (!linkAgentSDKToNodeSDK(config.agentSDK, config.nodeSDK)) {
       hasErrors = true;
-      continue;
-    }
-
-    if (!fs.existsSync(nodeSDKDir)) {
-      console.error(
-        `❌ Node SDK directory not found: ${config.nodeSDK} (${nodeSDKDir})`,
-      );
-      hasErrors = true;
-      continue;
-    }
-
-    const agentSDKNodeModulesXmtpDir = path.join(
-      agentSDKDir,
-      "node_modules",
-      "@xmtp",
-    );
-    const symlinkTarget = path.join(agentSDKNodeModulesXmtpDir, "node-sdk");
-
-    // Check if symlink already exists and points to correct target
-    let needsUpdate = true;
-    if (fs.existsSync(symlinkTarget)) {
-      try {
-        const stats = fs.lstatSync(symlinkTarget);
-        if (stats.isSymbolicLink()) {
-          const currentTarget = fs.readlinkSync(symlinkTarget);
-          const expectedRelativePath = path.relative(
-            agentSDKNodeModulesXmtpDir,
-            nodeSDKDir,
-          );
-          // Normalize paths for comparison
-          if (
-            path.resolve(agentSDKNodeModulesXmtpDir, currentTarget) ===
-            path.resolve(agentSDKNodeModulesXmtpDir, expectedRelativePath)
-          ) {
-            needsUpdate = false;
-          }
-        }
-      } catch {
-        // If we can't read the symlink, we'll recreate it
-      }
-    }
-
-    if (needsUpdate) {
-      // Remove existing node_modules/@xmtp directory if it exists
-      if (fs.existsSync(agentSDKNodeModulesXmtpDir)) {
-        try {
-          // Only remove the symlink, not the entire directory
-          if (fs.existsSync(symlinkTarget)) {
-            const stats = fs.lstatSync(symlinkTarget);
-            if (stats.isSymbolicLink()) {
-              fs.unlinkSync(symlinkTarget);
-            } else {
-              fs.rmSync(symlinkTarget, { recursive: true, force: true });
-            }
-          }
-          // Remove parent directories if empty
-          if (fs.existsSync(agentSDKNodeModulesXmtpDir)) {
-            try {
-              fs.rmdirSync(agentSDKNodeModulesXmtpDir);
-            } catch {
-              // Directory not empty, that's fine
-            }
-          }
-        } catch {
-          // If removal fails, try removing the entire node_modules
-          if (fs.existsSync(path.join(agentSDKDir, "node_modules"))) {
-            fs.rmSync(path.join(agentSDKDir, "node_modules"), {
-              recursive: true,
-              force: true,
-            });
-          }
-        }
-      }
-
-      // Create directories and symlink
-      fs.mkdirSync(agentSDKNodeModulesXmtpDir, { recursive: true });
-
-      try {
-        const relativeNodeSDKPath = path.relative(
-          agentSDKNodeModulesXmtpDir,
-          nodeSDKDir,
-        );
-        fs.symlinkSync(relativeNodeSDKPath, symlinkTarget);
-        console.log(
-          `✅ agent-sdk-${config.agentSDK} → node-sdk-${config.nodeSDK}`,
-        );
-      } catch (error) {
-        console.error(
-          `❌ Error linking agent-sdk-${config.agentSDK} to node-sdk-${config.nodeSDK}: ${String(error)}`,
-        );
-        hasErrors = true;
-      }
-    } else {
-      console.log(
-        `⏭️  agent-sdk-${config.agentSDK} → node-sdk-${config.nodeSDK} (already linked)`,
-      );
     }
   }
 
@@ -323,7 +384,8 @@ function main() {
     return;
   }
 
-  const shouldClean = args.includes("--clean");
+  const options = parseArgs(args);
+  const shouldClean = options.clean;
 
   if (shouldClean) {
     cleanPackageJson();
@@ -351,6 +413,51 @@ function main() {
   // Always run both operations
   createBindingsSymlinks();
   createAgentSDKSymlinks();
+
+  if (options.agentSDK || options.nodeSDK || options.nodeBindings) {
+    let resolvedNodeSDK = options.nodeSDK;
+
+    if (!resolvedNodeSDK && options.nodeBindings) {
+      const matchingVersion = VersionList.find(
+        (version) => version.nodeBindings === options.nodeBindings,
+      );
+      resolvedNodeSDK = matchingVersion?.nodeSDK;
+    }
+
+    if (!resolvedNodeSDK && options.agentSDK) {
+      const matchingAgent = AgentVersionList.find(
+        (version) => version.agentSDK === options.agentSDK,
+      );
+      resolvedNodeSDK = matchingAgent?.nodeSDK;
+    }
+
+    if (options.nodeBindings && !resolvedNodeSDK) {
+      console.error(
+        `❌ Unable to resolve node-sdk version for node-bindings-${options.nodeBindings}. Provide --nodeSDK to continue.`,
+      );
+      process.exit(1);
+    }
+
+    if (options.nodeBindings && resolvedNodeSDK) {
+      if (!linkNodeSDKToBindings(resolvedNodeSDK, options.nodeBindings)) {
+        process.exit(1);
+      }
+    }
+
+    if (options.agentSDK) {
+      if (!resolvedNodeSDK) {
+        console.error(
+          `❌ Unable to resolve node-sdk version for agent-sdk-${options.agentSDK}. Provide --nodeSDK or --nodeBindings.`,
+        );
+        process.exit(1);
+      }
+
+      if (!linkAgentSDKToNodeSDK(options.agentSDK, resolvedNodeSDK)) {
+        process.exit(1);
+      }
+    }
+  }
+
   console.log("✅ All version setup complete!");
   console.log("Done");
 }
