@@ -72,6 +72,9 @@ describe(testName, async () => {
       if (result?.receptionPercentage === 0)
         console.error(agent.name, "ERROR: NO RESPONSE");
       else console.log(agent.name, "SUCCESS");
+
+      if (process.env.XMTP_ENV !== "development")
+        expect(result?.receptionPercentage).toBeGreaterThan(0);
     });
   }
 });
