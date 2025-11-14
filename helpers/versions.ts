@@ -2,17 +2,9 @@ import fs from "fs";
 import path from "path";
 import { APP_VERSION, createSigner } from "@helpers/client";
 import {
-  Agent as Agent12,
-  MessageContext as MessageContext12,
-} from "@xmtp/agent-sdk-1.1.2";
-import {
-  Agent as Agent17, // 1.1.7
+  Agent as Agent177,
   MessageContext as MessageContext17,
-} from "@xmtp/agent-sdk-1.1.5";
-import {
-  Agent as Agent110, // 1.1.10 (latest)
-  MessageContext as MessageContext110,
-} from "@xmtp/agent-sdk-1.1.10";
+} from "@xmtp/agent-sdk-1.1.14";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
@@ -95,24 +87,10 @@ export {
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent110,
-    MessageContext: MessageContext110,
-    agentSDK: "1.1.10",
-    nodeSDK: "4.3.0",
-    auto: true,
-  },
-  {
-    Agent: Agent17,
+    Agent: Agent177,
     MessageContext: MessageContext17,
-    agentSDK: "1.1.5",
-    nodeSDK: "4.2.3",
-    auto: true,
-  },
-  {
-    Agent: Agent12,
-    MessageContext: MessageContext12,
-    agentSDK: "1.1.2",
-    nodeSDK: "4.1.0",
+    agentSDK: "1.1.14",
+    nodeSDK: "4.3.0",
     auto: true,
   },
 ];
@@ -144,42 +122,6 @@ export const VersionList = [
     Group: Group410,
     nodeSDK: "4.1.0",
     nodeBindings: "1.4.0",
-    auto: true,
-  },
-  {
-    Client: Client403,
-    Conversation: Conversation403,
-    Dm: Dm403,
-    Group: Group403,
-    nodeSDK: "4.0.3",
-    nodeBindings: "1.3.6",
-    auto: true,
-  },
-  {
-    Client: Client402,
-    Conversation: Conversation402,
-    Dm: Dm402,
-    Group: Group402,
-    nodeSDK: "4.0.2",
-    nodeBindings: "1.3.5",
-    auto: true,
-  },
-  {
-    Client: Client401,
-    Conversation: Conversation401,
-    Dm: Dm401,
-    Group: Group401,
-    nodeSDK: "4.0.1",
-    nodeBindings: "1.3.4",
-    auto: true,
-  },
-  {
-    Client: Client322,
-    Conversation: Conversation322,
-    Dm: Dm322,
-    Group: Group322,
-    nodeSDK: "3.2.2",
-    nodeBindings: "1.3.3",
     auto: true,
   },
 ];
@@ -367,54 +309,23 @@ export function detectAgentSDKVersion(AgentClass: any): string | null {
       }
     }
 
-    // Since Agent is hardcoded to 1.1.10 in exports, check if it matches
-    if (AgentClass === Agent110) {
-      return "1.1.10";
-    }
-    if (AgentClass === Agent17) {
-      return "1.1.7";
-    }
-    if (AgentClass === Agent12) {
-      return "1.1.2";
-    }
-
     // Try to detect from the module path if available
-    // Check which agent-sdk package is actually loaded
-    try {
-      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.10");
-      if (modulePath && fs.existsSync(modulePath)) {
-        // Check if the Agent class comes from this package
-        const agentSDKPath = path.dirname(modulePath);
-        if (agentSDKPath.includes("agent-sdk-1.1.10")) {
-          return "1.1.10";
+    // Check which agent-sdk package is actually loaded by iterating through all versions
+    for (const version of AgentVersionList) {
+      try {
+        const modulePath = require.resolve(
+          `@xmtp/agent-sdk-${version.agentSDK}`,
+        );
+        if (modulePath && fs.existsSync(modulePath)) {
+          // Check if the Agent class comes from this package
+          const agentSDKPath = path.dirname(modulePath);
+          if (agentSDKPath.includes(`agent-sdk-${version.agentSDK}`)) {
+            return version.agentSDK;
+          }
         }
+      } catch {
+        // Ignore module resolution errors for this version
       }
-    } catch {
-      // Ignore module resolution errors
-    }
-
-    try {
-      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.7");
-      if (modulePath && fs.existsSync(modulePath)) {
-        const agentSDKPath = path.dirname(modulePath);
-        if (agentSDKPath.includes("agent-sdk-1.1.7")) {
-          return "1.1.7";
-        }
-      }
-    } catch {
-      // Ignore module resolution errors
-    }
-
-    try {
-      const modulePath = require.resolve("@xmtp/agent-sdk-1.1.2");
-      if (modulePath && fs.existsSync(modulePath)) {
-        const agentSDKPath = path.dirname(modulePath);
-        if (agentSDKPath.includes("agent-sdk-1.1.2")) {
-          return "1.1.2";
-        }
-      }
-    } catch {
-      // Ignore module resolution errors
     }
   } catch {
     // Ignore errors
