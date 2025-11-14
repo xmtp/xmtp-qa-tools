@@ -96,7 +96,7 @@ const agents: AgentConfig[] = [
     name: "bitte",
     address: "0xb177e33734e982828eBb5993627ebcD7C8A9106a",
     sendMessage: "hi",
-    networks: ["production"],
+    networks: [],
     live: false,
   },
   {
