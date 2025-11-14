@@ -21,11 +21,29 @@ import {
   Group as Group410,
 } from "@xmtp/node-sdk-4.1.0";
 import {
+  Client as Client420,
+  Conversation as Conversation420,
+  Dm as Dm420,
+  Group as Group420,
+} from "@xmtp/node-sdk-4.2.3";
+import {
   Client as Client426,
   Conversation as Conversation426,
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
+import {
+  Client as Client430,
+  Conversation as Conversation430,
+  Dm as Dm430,
+  Group as Group430,
+} from "@xmtp/node-sdk-4.3.0";
+import {
+  Client as Client430Dev,
+  Conversation as Conversation430Dev,
+  Dm as Dm430Dev,
+  Group as Group430Dev,
+} from "@xmtp/node-sdk-4.3.0-dev";
 
 export {
   Agent,
@@ -55,7 +73,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.2.6";
+} from "@xmtp/node-sdk-4.3.0-dev";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -71,11 +89,38 @@ export const AgentVersionList = [
 // Node SDK version list
 export const VersionList = [
   {
+    Client: Client430Dev,
+    Conversation: Conversation430Dev,
+    Dm: Dm430Dev,
+    Group: Group430Dev,
+    nodeSDK: "4.3.0",
+    nodeBindings: "1.7.0",
+    auto: true,
+  },
+  {
+    Client: Client430,
+    Conversation: Conversation430,
+    Dm: Dm430,
+    Group: Group430,
+    nodeSDK: "4.3.0",
+    nodeBindings: "1.6.1",
+    auto: true,
+  },
+  {
     Client: Client426,
     Conversation: Conversation426,
     Dm: Dm426,
     Group: Group426,
     nodeSDK: "4.2.6",
+    nodeBindings: "1.5.4",
+    auto: true,
+  },
+  {
+    Client: Client420,
+    Conversation: Conversation420,
+    Dm: Dm420,
+    Group: Group420,
+    nodeSDK: "4.2.3",
     nodeBindings: "1.5.4",
     auto: true,
   },
