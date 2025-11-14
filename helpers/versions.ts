@@ -35,9 +35,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.10";
+} from "@xmtp/agent-sdk-1.1.14";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.10/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.14/debug";
 
 // Node SDK exports
 export {
