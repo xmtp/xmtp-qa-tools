@@ -60,7 +60,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.2.6";
+} from "@xmtp/node-sdk-4.3.1";
 
 // Agent SDK version list
 export const AgentVersionList = [
