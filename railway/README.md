@@ -28,13 +28,17 @@ cd xmtp-qa-tools
    railway init
    ```
 
-3. Deploy the download server:
+3. In the Railway dashboard, open your service settings and set the **Start
+   Command** to `yarn web`. This ensures Railway runs the web server entrypoint
+   after each deploy.
+
+4. Deploy the download server:
 
    ```bash
    railway up
    ```
 
-## 4. Access the download page
+## 3. Access the download page
 
 Once the deployment finishes, open the Railway service URL in your browser:
 

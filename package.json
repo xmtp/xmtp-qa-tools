@@ -27,7 +27,8 @@
     "revoke": "tsx scripts/revokeInstallations.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
-    "versions": "tsx cli/versions.ts"
+    "versions": "tsx cli/versions.ts",
+    "web": "tsx railway/download-server.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
