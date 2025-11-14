@@ -22,6 +22,9 @@ LOG_LEVEL=debug
 XMTP_ENV=production
 ```
 
+### Running locally
+Before running this suite locally you _must_ run `yarn gen update:local` to pre-populate the database with inboxes to add and remove from the group. Otherwise add/remove member operations will fail, which will not increase the epoch or trigger forks.
+
 ### Fork generation through send testing
 
 The main approach creates intentional conflicts by running parallel operations on shared groups:
@@ -99,10 +102,50 @@ The CLI provides statistics including:
 - Fork detection rate
 - Average forks per run
 
-### Log processing features
+### Network Chaos Testing
 
-- **Clean slate**: Removes old logs and data before starting
-- **Continuous capture**: Each iteration captures debug logs
-- **ANSI cleaning**: Strips escape codes for analysis
-- **Fork counting**: Automatically counts detected conflicts
-- **Graceful interruption**: Ctrl+C exits cleanly
+The fork test can inject network chaos (latency, jitter, packet loss) to simulate adverse network conditions. This helps identify forks that occur under realistic network stress.
+
+**Requirements:**
+- Network chaos requires `--env local`
+- Multinode Docker containers must be running (`./multinode/up`)
+- Must be run on linux with `tc` and `iptables` commands available. Will not work on MacOS.
+- Requires `sudo` access
+
+**Chaos Levels:**
+
+| Level  | Delay Range | Jitter Range | Packet Loss | Interval |
+|--------|-------------|--------------|-------------|----------|
+| low    | 50-150ms    | 0-50ms       | 0-2%        | 15s      |
+| medium | 100-300ms   | 0-75ms       | 0-3.5%      | 10s      |
+| high   | 100-500ms   | 0-100ms      | 0-5%        | 10s      |
+
+**Usage:**
+
+```bash
+# Run with default (medium) chaos
+yarn fork --env local --chaos-enabled
+
+# Run with high chaos level
+yarn fork --env local --chaos-enabled --chaos-level high
+
+# Run 50 iterations with low chaos
+yarn fork --count 50 --env local --chaos-enabled --chaos-level low
+```
+
+**How it works:**
+1. Initializes Docker container handles for all multinode nodes
+2. Applies random network conditions (within preset ranges) at regular intervals
+3. Runs the fork test as normal while chaos is active
+4. Cleans up network rules when test completes (even if test fails)
+
+**Example output:**
+```
+NETWORK CHAOS PARAMETERS
+chaosEnabled: true
+chaosLevel: high
+  delay: 100-500ms
+  jitter: 0-100ms
+  packetLoss: 0-5%
+  interval: 10000ms
+```

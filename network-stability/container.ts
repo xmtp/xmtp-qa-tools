@@ -52,7 +52,7 @@ export class DockerContainer {
   }
 
   sh(cmd: string, expectFailure = false): string {
-    console.log(`[sh] Executing: ${cmd}`);
+    console.debug(`[sh] Executing: ${cmd}`);
     try {
       const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] })
         .toString()
@@ -60,7 +60,7 @@ export class DockerContainer {
       return output;
     } catch (e) {
       if (expectFailure) {
-        console.log(`[sh] Shell command failed as expected: ${cmd}`);
+        console.debug(`[sh] Shell command failed as expected: ${cmd}`);
         return "";
       }
 
@@ -76,7 +76,7 @@ export class DockerContainer {
   }
 
   ping(target: DockerContainer, count = 3, expectFailure = false): void {
-    console.log(
+    console.debug(
       `[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`,
     );
     try {
@@ -96,7 +96,7 @@ export class DockerContainer {
       }
     } catch (e) {
       if (expectFailure) {
-        console.log("[iptables] Ping failed as expected");
+        console.debug("[iptables] Ping failed as expected");
       } else {
         console.error(
           `[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`,

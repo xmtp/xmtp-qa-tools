@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 import "dotenv/config";
+import { forkDetectedString } from "forks/constants";
 
 // Consolidated ANSI escape code regex
 // eslint-disable-next-line no-control-regex
@@ -44,7 +45,7 @@ export async function processLogFile(
 
     let buffer = "";
     let foundForkLine = false;
-    const targetString = "may be fork";
+    const targetString = forkDetectedString;
 
     readStream.on("data", (chunk: string | Buffer) => {
       if (foundForkLine) {

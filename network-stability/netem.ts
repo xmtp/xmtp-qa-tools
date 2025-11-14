@@ -4,7 +4,6 @@ export function applyLatency(
   container: DockerContainer,
   latencyMs: number,
 ): void {
-  console.log(`[netem] Clearing existing qdisc on ${container.veth}`);
   container.sh(`sudo tc qdisc del dev ${container.veth} root`, true);
   container.sh(
     `sudo tc qdisc add dev ${container.veth} root netem delay ${latencyMs}ms`,
@@ -30,7 +29,6 @@ export function applyLoss(container: DockerContainer, percent: number): void {
 }
 
 export function clear(container: DockerContainer): void {
-  console.log(`[netem] Clearing latency from ${container.veth}`);
   container.sh(`sudo tc qdisc del dev ${container.veth} root`, true);
 }
 
