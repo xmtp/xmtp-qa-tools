@@ -31,8 +31,8 @@ const {
 
 agent.on("text", async (ctx) => {
   if (
-      shouldSkipOldMessage(
-      ctx.message.sentAt.getTime(),
+    shouldSkipOldMessage(
+      ctx.message.sentAt.getTime() as number,
       startupTimeStamp,
       skippedMessagesCount,
       totalConversations.length,
