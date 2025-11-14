@@ -5,6 +5,10 @@ import {
   Agent as Agent177,
   MessageContext as MessageContext17,
 } from "@xmtp/agent-sdk-1.1.12";
+import {
+  Agent as Agent114,
+  MessageContext as MessageContext114,
+} from "@xmtp/agent-sdk-1.1.14";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
@@ -20,6 +24,12 @@ import {
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
+import {
+  Client as Client431,
+  Conversation as Conversation431,
+  Dm as Dm431,
+  Group as Group431,
+} from "@xmtp/node-sdk-4.3.1";
 
 // Agent SDK exports - use first auto-enabled version
 export {
@@ -55,6 +65,13 @@ export {
 // Agent SDK version list
 export const AgentVersionList = [
   {
+    Agent: Agent114,
+    MessageContext: MessageContext114,
+    agentSDK: "1.1.14",
+    nodeSDK: "4.3.1",
+    auto: true,
+  },
+  {
     Agent: Agent177,
     MessageContext: MessageContext17,
     agentSDK: "1.1.12",
@@ -65,6 +82,15 @@ export const AgentVersionList = [
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client431,
+    Conversation: Conversation431,
+    Dm: Dm431,
+    Group: Group431,
+    nodeSDK: "4.3.1",
+    nodeBindings: "1.6.1",
+    auto: true,
+  },
   {
     Client: Client426,
     Conversation: Conversation426,
