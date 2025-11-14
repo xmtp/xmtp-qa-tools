@@ -27,7 +27,8 @@
     "revoke": "tsx scripts/revokeInstallations.ts",
     "send": "tsx cli/send.ts",
     "symlinks": "tsx cli/symlinks.ts --clean",
-    "test": "tsx cli/test.ts"
+    "test": "tsx cli/test.ts",
+    "web": "tsx web/download-server.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
@@ -46,6 +47,7 @@
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",
+    "express": "^4.21.1",
     "node-fetch": "^3.3.0",
     "rimraf": "^6.0.1",
     "uint8arrays": "^5.1.0",
