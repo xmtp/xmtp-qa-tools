@@ -9,6 +9,10 @@ import { DockerContainer } from "../network-stability/container";
 import {
   chaosConfig,
   chaosPresets,
+  dbChaosEnabled,
+  dbLockInterval,
+  dbLockTimeMax,
+  dbLockTimeMin,
   epochRotationOperations,
   groupCount,
   installationCount,
@@ -23,6 +27,7 @@ import {
   testName,
   workerNames,
 } from "./config";
+import { clearDbChaos, startDbChaos } from "./db-chaos-utils";
 import { clearChaos, startChaos } from "./utils";
 
 describe(testName, () => {
@@ -76,6 +81,7 @@ describe(testName, () => {
     // Initialize chaos variables in outer scope for cleanup
     let allNodes: DockerContainer[] = [];
     let chaosInterval: NodeJS.Timeout | undefined;
+    let dbChaosInterval: NodeJS.Timeout | undefined;
     let verifyInterval: NodeJS.Timeout | undefined;
     let mustFail = false;
 
@@ -104,6 +110,22 @@ describe(testName, () => {
         // Then set interval for continued chaos
         chaosInterval = startChaos(allNodes, preset);
         console.log(`[chaos] Started chaos interval (${preset.interval}ms)`);
+      }
+
+      // Initialize database chaos if enabled
+      if (dbChaosEnabled) {
+        console.log("[db-chaos] Database chaos enabled");
+        console.log(
+          `[db-chaos] Lock duration: ${dbLockTimeMin}-${dbLockTimeMax}ms, interval: ${dbLockInterval}ms`,
+        );
+
+        dbChaosInterval = startDbChaos(
+          workers.getAll(),
+          dbLockTimeMin,
+          dbLockTimeMax,
+          dbLockInterval,
+        );
+        console.log(`[db-chaos] Started chaos interval (${dbLockInterval}ms)`);
       }
 
       // Start periodic verification during chaos
@@ -217,6 +239,19 @@ describe(testName, () => {
         clearChaos(allNodes);
 
         console.log("[chaos] Cleanup complete");
+      }
+
+      // Clean up database chaos if it was enabled
+      if (dbChaosEnabled) {
+        console.log("[db-chaos] Cleaning up database chaos...");
+        // Clear interval
+        if (dbChaosInterval) {
+          clearInterval(dbChaosInterval);
+        }
+
+        await clearDbChaos();
+
+        console.log("[db-chaos] Cleanup complete");
       }
 
       if (mustFail) {
