@@ -1,5 +1,4 @@
 import { existsSync } from "fs";
-import type { Conversation } from "@helpers/versions";
 
 export function loadEnvFile() {
   // Only do this in the gm example because it's called from the root
@@ -38,7 +37,7 @@ export function shouldSkipOldMessage(
 export interface SyncResult {
   startupTimeStamp: number;
   skippedMessagesCount: { count: number };
-  totalConversations: Conversation[];
+  totalConversations: any[];
   syncDurationMs: number;
   totalMessages: number;
   dmsCount: number;
@@ -50,7 +49,7 @@ export async function startUpSync(agent: {
   client: {
     conversations: {
       syncAll: () => Promise<unknown>;
-      list: () => Promise<Conversation[]>;
+      list: () => Promise<any[]>;
     };
   };
 }): Promise<SyncResult> {
@@ -84,7 +83,7 @@ export async function startUpSync(agent: {
 
         // Get messages for this conversation
         const messages = await conversation.messages();
-        totalMessages += messages.length;
+        totalMessages += (messages?.length ?? 0) as number;
       } catch {
         // Silently continue if a conversation fails
       }

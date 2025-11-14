@@ -41,7 +41,6 @@
     "@xmtp/node-bindings-1.6.1": "npm:@xmtp/node-bindings@1.6.1-rc3",
     "@xmtp/node-sdk-4.1.0": "npm:@xmtp/node-sdk@4.1.0",
     "@xmtp/node-sdk-4.2.6": "npm:@xmtp/node-sdk@4.2.6",
-    "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.3.0",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",

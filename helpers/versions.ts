@@ -71,16 +71,7 @@ export const VersionList = [
     Dm: Dm426,
     Group: Group426,
     nodeSDK: "4.2.6",
-    nodeBindings: "1.6.1",
-    auto: true,
-  },
-  {
-    Client: Client426,
-    Conversation: Conversation426,
-    Dm: Dm426,
-    Group: Group426,
-    nodeSDK: "4.2.6",
-    nodeBindings: "1.6.1",
+    nodeBindings: "1.5.4",
     auto: true,
   },
   {
