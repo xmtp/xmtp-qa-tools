@@ -73,7 +73,7 @@ describe(testName, async () => {
         console.error(agent.name, "ERROR: NO RESPONSE");
       else console.log(agent.name, "SUCCESS");
 
-      if (process.env.XMTP_ENV !== "development")
+      if (process.env.XMTP_ENV !== "production")
         expect(result?.receptionPercentage).toBeGreaterThan(0);
     });
   }
