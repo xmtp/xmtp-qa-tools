@@ -46,7 +46,7 @@ Multiple versions installed via npm aliases:
 
 ### Dynamic linking
 
-`yarn versions` creates symlinks:
+`yarn symlinks` creates symlinks:
 
 ```bash
 node_modules/@xmtp/
@@ -67,7 +67,7 @@ node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
 ### Using versions command to see current mappings
 
 ```bash
-yarn versions
+yarn symlinks
 # shows current SDK → bindings mappings.
 ```
 

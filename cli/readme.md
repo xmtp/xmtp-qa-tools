@@ -11,7 +11,7 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn installations`                        | Manage installations  | `yarn installations --help` |
 | `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
 | `yarn fork`                                 | Run forks testing     | `yarn fork --help`          |
-| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`      |
+| `yarn symlinks`                             | Manage SDK versions   | `yarn symlinks --help`      |
 | `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
 
 ## Core Commands
@@ -237,7 +237,7 @@ yarn test --help       # Test command help
 yarn send --help       # Send command help
 yarn bot --help        # Bot command help
 yarn gen --help        # Generator help
-yarn versions --help   # Versions help
+yarn symlinks --help   # Versions help
 yarn revoke --help     # Revoke help
 yarn groups --help     # Groups help
 yarn permissions --help # Permissions help

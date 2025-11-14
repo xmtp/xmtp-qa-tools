@@ -8,7 +8,7 @@ function showHelp() {
 XMTP Versions CLI - SDK and Agent SDK version management and setup
 
 USAGE:
-  yarn versions [options]
+  yarn symlinks [options]
 
 OPTIONS:
   --clean               Clean package.json imports and node_modules before setup
@@ -23,9 +23,9 @@ DESCRIPTION:
   - Creates node-sdk symlinks for agent-sdk versions
 
 EXAMPLES:
-  yarn versions
-  yarn versions --clean
-  yarn versions --help
+  yarn symlinks
+  yarn symlinks --clean
+  yarn symlinks --help
 
 For more information, see: cli/README.md
 `);

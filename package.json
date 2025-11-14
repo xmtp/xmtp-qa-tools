@@ -9,11 +9,11 @@
     "workers"
   ],
   "scripts": {
-    "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
+    "clean:modules": "rimraf node_modules",
     "fork": "tsx forks/cli.ts",
     "format": "prettier -w .",
     "gen": "tsx cli/gen.ts",
@@ -23,15 +23,16 @@
     "lint": "eslint .",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
+    "regression": "yarn symlinks && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
     "revoke": "tsx scripts/revokeInstallations.ts",
     "send": "tsx cli/send.ts",
-    "test": "tsx cli/test.ts",
-    "versions": "tsx cli/versions.ts"
+    "symlinks": "tsx cli/symlinks.ts --clean",
+    "test": "tsx cli/test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
     "@xmtp/agent-sdk-1.1.10": "npm:@xmtp/agent-sdk@1.1.10",
+    "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14",
     "@xmtp/agent-sdk-1.1.2": "npm:@xmtp/agent-sdk@1.1.2",
     "@xmtp/agent-sdk-1.1.5": "npm:@xmtp/agent-sdk@1.1.5",
     "@xmtp/content-type-markdown": "^1.0.0",

@@ -72,6 +72,9 @@ describe(testName, async () => {
       if (result?.receptionPercentage === 0)
         console.error(agent.name, "ERROR: NO RESPONSE");
       else console.log(agent.name, "SUCCESS");
+
+      if (result?.receptionPercentage === 0)
+        expect(result?.receptionPercentage).toBeGreaterThan(0);
     });
   }
 });
