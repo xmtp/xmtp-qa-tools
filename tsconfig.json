@@ -17,7 +17,7 @@
     "strict": true,
     "esModuleInterop": true,
     "target": "ESNext",
-    "types": ["node", "vitest"],
+    "types": ["node", "vitest", "express"],
     "paths": {
       "@helpers/*": ["./helpers/*"],
       "@workers/*": ["./workers/*"],
