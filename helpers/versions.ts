@@ -76,11 +76,8 @@ export {
   ConsentState,
   type Signer,
   type ClientOptions,
-  type Conversation,
   IdentifierKind,
   type DecodedMessage,
-  type Dm,
-  type Group,
   LogLevel,
   type XmtpEnv,
   type GroupMember,
@@ -89,6 +86,10 @@ export {
   type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.2.6";
+
+// Export conversation types separately to match Agent SDK's node-sdk version
+// This ensures type compatibility when conversation comes from agent context
+export type { Conversation, Dm, Group } from "@xmtp/node-sdk-4.2.6";
 
 // Agent SDK version list
 export const AgentVersionList = [
