@@ -1,29 +1,40 @@
-import express from "express";
 import fs from "fs/promises";
 import path from "path";
+import express, {
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import winston from "winston";
 
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.printf(({ level, message, timestamp, ...meta }) => {
-      const metaString = Object.keys(meta).length
-        ? ` ${JSON.stringify(meta)}`
+    winston.format.printf((info) => {
+      const { level, message, timestamp, ...meta } =
+        info as winston.Logform.TransformableInfo & { timestamp?: string };
+      const safeTimestamp =
+        typeof timestamp === "string" ? timestamp : new Date().toISOString();
+      const safeMessage =
+        typeof message === "string" ? message : JSON.stringify(message);
+      const metaRecord = meta as Record<string, unknown>;
+      const metaString = Object.keys(metaRecord).length
+        ? ` ${JSON.stringify(metaRecord)}`
         : "";
-      return `${timestamp} [${level}] ${message}${metaString}`;
+      return `${safeTimestamp} [${level}] ${safeMessage}${metaString}`;
     }),
   ),
   transports: [new winston.transports.Console()],
 });
 
 const app = express();
-const port = Number.parseInt(process.env.PORT ?? "3000", 10);
+const port = Number.parseInt(process.env.PORT ?? "8080", 10);
 const relativeFilePath = "data/db-backup.tar.gz";
 const dataDir = "/app/data";
 const absoluteFilePath = path.join("/app", relativeFilePath);
 
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   logger.info("Incoming request", {
     method: req.method,
     url: req.originalUrl,
@@ -39,7 +50,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   logger.info("Serving landing page");
   res.type("html").send(`
     <!DOCTYPE html>
@@ -112,7 +123,7 @@ app.get("/", (req, res) => {
   `);
 });
 
-app.get("/download", async (req, res) => {
+app.get("/download", async (req: Request, res: Response) => {
   try {
     const stat = await fs.stat(absoluteFilePath);
     logger.info("Initiating download", {
@@ -120,7 +131,7 @@ app.get("/download", async (req, res) => {
       sizeBytes: stat.size,
       updatedAt: stat.mtime.toISOString(),
     });
-    res.download(absoluteFilePath, "db-backup.tar.gz", (err) => {
+    res.download(absoluteFilePath, "db-backup.tar.gz", (err?: Error | null) => {
       if (err) {
         logger.error("Download failed", { error: err.message });
       } else {
@@ -128,17 +139,21 @@ app.get("/download", async (req, res) => {
       }
     });
   } catch (error) {
+    const message =
+      error instanceof Error ? error.message : JSON.stringify(error);
     logger.error("File missing or unreadable", {
-      error: error instanceof Error ? error.message : String(error),
+      error: message,
       attemptedPath: absoluteFilePath,
       dataDirExists: await fs
         .access(dataDir)
         .then(() => true)
         .catch(() => false),
     });
-    res
-      .status(404)
-      .json({ error: "Backup file not found", path: absoluteFilePath });
+    res.status(404).json({
+      error: "Backup file not found",
+      path: absoluteFilePath,
+      detail: message,
+    });
   }
 });
 
@@ -148,4 +163,3 @@ app.listen(port, () => {
     filePath: absoluteFilePath,
   });
 });
-
