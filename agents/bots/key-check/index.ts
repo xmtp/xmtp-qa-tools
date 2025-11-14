@@ -11,6 +11,7 @@ import {
   logSyncResults,
   shouldSkipOldMessage,
   startUpSync,
+  type SyncResult,
 } from "../../utils/general";
 import {
   ActionBuilder,
@@ -295,9 +296,12 @@ const agent = await Agent.createFromEnv({
   codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
-const syncResults = await startUpSync(agent);
-const { startupTimeStamp, skippedMessagesCount, totalConversations } =
-  syncResults;
+const syncResults: SyncResult = await startUpSync(agent);
+const {
+  startupTimeStamp,
+  skippedMessagesCount,
+  totalConversations,
+}: SyncResult = syncResults;
 
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
@@ -345,7 +349,7 @@ agent.on("text", async (ctx) => {
   );
   if (
     shouldSkipOldMessage(
-      ctx.message.sentAt.getTime(),
+      ctx.message.sentAt.getTime() as number,
       startupTimeStamp,
       skippedMessagesCount,
       totalConversations.length,

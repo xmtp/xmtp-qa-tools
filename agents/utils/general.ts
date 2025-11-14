@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import type { Conversation, Dm, Group } from "@helpers/versions";
+import type { Dm, Group } from "@helpers/versions";
 
 export function loadEnvFile() {
   // Only do this in the gm example because it's called from the root
@@ -46,14 +46,7 @@ export interface SyncResult {
   messageCountDurationMs: number;
 }
 
-export async function startUpSync(agent: {
-  client: {
-    conversations: {
-      syncAll: () => Promise<unknown>;
-      list: () => Promise<(Dm | Group)[]>;
-    };
-  };
-}): Promise<SyncResult> {
+export async function startUpSync(agent: any): Promise<SyncResult> {
   try {
     const startupTimeStamp = new Date().getTime();
 
@@ -64,7 +57,8 @@ export async function startUpSync(agent: {
     const syncDurationMs = syncEndTime - syncStartTime;
 
     // Get conversations
-    const totalConversations = await agent.client.conversations.list();
+    const totalConversations =
+      (await agent.client.conversations.list()) as Array<Dm | Group>;
 
     // Count messages across all conversations
     const messageCountStartTime = performance.now();
