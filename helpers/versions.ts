@@ -7,32 +7,7 @@ import {
 } from "@xmtp/agent-sdk-1.1.14";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
-import {
-  Client as Client322,
-  Conversation as Conversation322,
-  Dm as Dm322,
-  Group as Group322,
-} from "@xmtp/node-sdk-3.2.2";
-import {
-  Client as Client401,
-  Conversation as Conversation401,
-  Dm as Dm401,
-  Group as Group401,
-} from "@xmtp/node-sdk-4.0.1";
-import {
-  Client as Client402,
-  Conversation as Conversation402,
-  Dm as Dm402,
-  Group as Group402,
-  type LogLevel,
-  type XmtpEnv,
-} from "@xmtp/node-sdk-4.0.2";
-import {
-  Client as Client403,
-  Conversation as Conversation403,
-  Dm as Dm403,
-  Group as Group403,
-} from "@xmtp/node-sdk-4.0.3";
+import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import {
   Client as Client410,
   Conversation as Conversation410,
