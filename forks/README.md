@@ -61,6 +61,7 @@ The main approach creates intentional conflicts by running parallel operations o
 - **installationCount**: `5` - How many installations to use randomly in the createInstallation operations
 - **typeofStreamForTest**: `typeofStream.None` - No streams started by default (configured on-demand)
 - **typeOfSyncForTest**: `typeOfSync.None` - No automatic syncing (configured on-demand)
+- **streams**: `false` - Enable message streams on all workers (configured via `--streams` CLI flag)
 
 ### Test setup in local network
 
@@ -91,6 +92,9 @@ yarn fork --clean-all
 
 # Run on a specific environment
 yarn fork --count 200 --env local
+
+# Enable message streams on all workers
+yarn fork --streams
 
 # Show help
 yarn fork --help

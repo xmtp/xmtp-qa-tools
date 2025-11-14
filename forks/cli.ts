@@ -25,6 +25,7 @@ interface ForkOptions {
   env?: string; // XMTP environment (local, dev, production)
   chaosEnabled: boolean; // Enable network chaos
   chaosLevel: ChaosLevel; // Chaos level (low, medium, high)
+  streams: boolean; // Enable message streams on all workers
 }
 
 function showHelp() {
@@ -42,6 +43,7 @@ OPTIONS:
   --env <environment>        XMTP environment (local, dev, production) [default: dev]
   --chaos-enabled            Enable network chaos testing (requires --env local)
   --chaos-level <level>      Chaos level: low, medium, high [default: medium]
+  --streams                  Enable message streams on all workers [default: false]
   -h, --help                 Show this help message
 
 CHAOS LEVELS:
@@ -56,6 +58,7 @@ EXAMPLES:
   yarn fork --count 200 --env local      # Run 200 times on local environment
   yarn fork --env local --chaos-enabled  # Run with medium network chaos
   yarn fork --env local --chaos-enabled --chaos-level high  # Run with high chaos
+  yarn fork --streams                    # Run with message streams enabled
 
 For more information, see: forks/README.md
 `);
@@ -73,9 +76,9 @@ function getForkCount(): number {
 }
 
 /**
- * Run the fork test (suppress output)
+ * Run the fork test (suppress output) and return whether it completed successfully
  */
-function runForkTest(options: ForkOptions): void {
+function runForkTest(options: ForkOptions): boolean {
   const envFlag = options.env ? `--env ${options.env}` : "";
   const command = `yarn test forks ${envFlag} --log warn --file`.trim();
 
@@ -86,10 +89,14 @@ function runForkTest(options: ForkOptions): void {
         ...process.env,
         CHAOS_ENABLED: options.chaosEnabled ? "true" : "false",
         CHAOS_LEVEL: options.chaosLevel,
+        STREAMS_ENABLED: options.streams ? "true" : "false",
       },
     });
+
+    return true;
   } catch (e) {
     console.error("Error running fork test", e);
+    return false;
     // Test may fail if forks are detected, that's expected
     // We'll analyze the logs afterward
   }
@@ -114,6 +121,7 @@ function logForkMatrixParameters(options: ForkOptions): void {
   console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
   console.info(`installationCount: ${installationCount}`);
   console.info(`testName: ${testName}`);
+  console.info(`streams: ${options.streams}`);
 
   if (options.chaosEnabled) {
     const preset = chaosPresets[options.chaosLevel];
@@ -156,6 +164,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     forksDetected: 0,
     runsWithForks: 0,
     runsWithoutForks: 0,
+    runsWithErrors: 0,
   };
 
   // Clean logs if requested before starting
@@ -168,7 +177,11 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   // Run the test N times
   for (let i = 1; i <= options.count; i++) {
     // Run the fork test (silently)
-    runForkTest(options);
+    const success = runForkTest(options);
+    if (!success) {
+      stats.runsWithErrors++;
+      console.log(`❌ Error in run ${i}/${options.count}`);
+    }
 
     // Clean and analyze fork logs after the test (suppress output)
     const originalConsoleDebug = console.debug;
@@ -201,6 +214,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   console.info(`Total forks detected: ${stats.forksDetected}`);
   console.info(`Runs with forks: ${stats.runsWithForks}`);
   console.info(`Runs without forks: ${stats.runsWithoutForks}`);
+  console.info(`Runs with errors: ${stats.runsWithErrors}`);
   console.info(
     `Fork detection rate: ${(
       (stats.runsWithForks / stats.totalRuns) *
@@ -242,6 +256,7 @@ async function main() {
     env: process.env.XMTP_ENV || "dev",
     chaosEnabled: false,
     chaosLevel: "medium",
+    streams: false,
   };
 
   // Parse arguments
@@ -309,6 +324,9 @@ async function main() {
           );
           process.exit(1);
         }
+        break;
+      case "--streams":
+        options.streams = true;
         break;
       default:
         console.error(`Unknown option: ${arg}`);
