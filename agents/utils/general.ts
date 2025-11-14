@@ -1,5 +1,5 @@
 import { existsSync } from "fs";
-import type { Conversation } from "@helpers/versions";
+import type { Dm, Group } from "@helpers/versions";
 
 export function loadEnvFile() {
   // Only do this in the gm example because it's called from the root
@@ -38,7 +38,7 @@ export function shouldSkipOldMessage(
 export interface SyncResult {
   startupTimeStamp: number;
   skippedMessagesCount: { count: number };
-  totalConversations: Conversation[];
+  totalConversations: (Dm | Group)[];
   syncDurationMs: number;
   totalMessages: number;
   dmsCount: number;
@@ -46,14 +46,7 @@ export interface SyncResult {
   messageCountDurationMs: number;
 }
 
-export async function startUpSync(agent: {
-  client: {
-    conversations: {
-      syncAll: () => Promise<unknown>;
-      list: () => Promise<Conversation[]>;
-    };
-  };
-}): Promise<SyncResult> {
+export async function startUpSync(agent: any): Promise<SyncResult> {
   try {
     const startupTimeStamp = new Date().getTime();
 
@@ -64,7 +57,8 @@ export async function startUpSync(agent: {
     const syncDurationMs = syncEndTime - syncStartTime;
 
     // Get conversations
-    const totalConversations = await agent.client.conversations.list();
+    const totalConversations =
+      (await agent.client.conversations.list()) as Array<Dm | Group>;
 
     // Count messages across all conversations
     const messageCountStartTime = performance.now();
@@ -112,16 +106,7 @@ export async function startUpSync(agent: {
 }
 
 export function logSyncResults(results: SyncResult): void {
-  const isDebugMode = true; // process.env.XMTP_FORCE_DEBUG === "true";
-
   const syncDurationSec = (results.syncDurationMs / 1000).toFixed(2);
-  const messageCountDurationSec = (
-    results.messageCountDurationMs / 1000
-  ).toFixed(2);
-  const totalDurationSec = (
-    (results.syncDurationMs + results.messageCountDurationMs) /
-    1000
-  ).toFixed(2);
 
   console.log(
     `✅ syncAll completed in ${syncDurationSec}s (${results.syncDurationMs.toFixed(0)}ms)`,

@@ -45,7 +45,7 @@ const agents: AgentConfig[] = [
   },
   {
     name: "jesse",
-    address: "0x83384b8bed996b3f62a643d681419a4d06049525",
+    address: "0x2f9e2F8FdDEae391720D58D656a8Af0578006eD2",
     sendMessage: "hi",
     networks: ["production"],
     live: true,
@@ -96,7 +96,7 @@ const agents: AgentConfig[] = [
     name: "bitte",
     address: "0xb177e33734e982828eBb5993627ebcD7C8A9106a",
     sendMessage: "hi",
-    networks: ["production"],
+    networks: [],
     live: false,
   },
   {
@@ -109,7 +109,7 @@ const agents: AgentConfig[] = [
   {
     name: "key-check",
     address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    sendMessage: "hi from QA",
+    sendMessage: "/kc",
     networks: ["dev", "production"],
     live: false,
   },

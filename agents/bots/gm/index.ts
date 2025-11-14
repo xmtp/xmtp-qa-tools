@@ -9,6 +9,7 @@ import {
   logSyncResults,
   shouldSkipOldMessage,
   startUpSync,
+  type SyncResult,
 } from "../../utils/general";
 
 // Load .env file only in local development
@@ -21,13 +22,16 @@ const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
 });
 
-const syncResults = await startUpSync(agent);
-const { startupTimeStamp, skippedMessagesCount, totalConversations } =
-  syncResults;
+const syncResults: SyncResult = await startUpSync(agent);
+const {
+  startupTimeStamp,
+  skippedMessagesCount,
+  totalConversations,
+}: SyncResult = syncResults;
 
 agent.on("text", async (ctx) => {
   if (
-    shouldSkipOldMessage(
+      shouldSkipOldMessage(
       ctx.message.sentAt.getTime(),
       startupTimeStamp,
       skippedMessagesCount,
