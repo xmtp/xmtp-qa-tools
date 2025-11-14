@@ -152,34 +152,40 @@ function linkNodeSDKToBindings(nodeSDK: string, nodeBindings: string): boolean {
     return true;
   }
 
-  if (fs.existsSync(sdkNodeModulesXmtpDir)) {
+  // Ensure the target directory exists
+  fs.mkdirSync(sdkNodeModulesXmtpDir, { recursive: true });
+
+  // Remove existing symlink/file/directory if it exists
+  if (fs.existsSync(symlinkTarget)) {
     try {
-      if (fs.existsSync(symlinkTarget)) {
-        const stats = fs.lstatSync(symlinkTarget);
-        if (stats.isSymbolicLink()) {
-          fs.unlinkSync(symlinkTarget);
-        } else {
-          fs.rmSync(symlinkTarget, { recursive: true, force: true });
-        }
-      }
-      if (fs.existsSync(sdkNodeModulesXmtpDir)) {
-        try {
-          fs.rmdirSync(sdkNodeModulesXmtpDir);
-        } catch {
-          // Directory not empty, that's fine
-        }
+      const stats = fs.lstatSync(symlinkTarget);
+      if (stats.isSymbolicLink()) {
+        fs.unlinkSync(symlinkTarget);
+      } else if (stats.isDirectory()) {
+        fs.rmSync(symlinkTarget, { recursive: true, force: true });
+      } else {
+        fs.unlinkSync(symlinkTarget);
       }
     } catch {
-      if (fs.existsSync(path.join(sdkDir, "node_modules"))) {
-        fs.rmSync(path.join(sdkDir, "node_modules"), {
-          recursive: true,
-          force: true,
-        });
+      // If removal fails, try force removal
+      try {
+        fs.rmSync(symlinkTarget, { recursive: true, force: true });
+      } catch (forceError) {
+        console.error(
+          `⚠️  Warning: Could not remove existing target ${symlinkTarget}: ${String(forceError)}`,
+        );
+        // Continue anyway - might still work if it's already the right symlink
       }
     }
   }
 
-  fs.mkdirSync(sdkNodeModulesXmtpDir, { recursive: true });
+  // Verify the target is actually gone before creating symlink
+  if (fs.existsSync(symlinkTarget)) {
+    console.error(
+      `❌ Cannot create symlink: ${symlinkTarget} still exists after removal attempt`,
+    );
+    return false;
+  }
 
   try {
     const relativeBindingsPath = path.relative(
@@ -266,7 +272,7 @@ function linkAgentSDKToNodeSDK(agentSDK: string, nodeSDK: string): boolean {
       } else {
         fs.unlinkSync(symlinkTarget);
       }
-    } catch (error) {
+    } catch {
       // If removal fails, try force removal
       try {
         fs.rmSync(symlinkTarget, { recursive: true, force: true });
