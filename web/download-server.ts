@@ -131,6 +131,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     url: req.originalUrl,
     ip: req.ip,
   });
+
   res.on("finish", () => {
     logger.info("Request completed", {
       method: req.method,
@@ -138,13 +139,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
       statusCode: res.statusCode,
     });
   });
-  next();
+
   req.on("aborted", () => {
     logger.warn("Request aborted by client", {
       method: req.method,
       url: req.originalUrl,
     });
   });
+
   next();
 });
 
