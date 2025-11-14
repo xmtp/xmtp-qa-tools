@@ -4,7 +4,7 @@ import { APP_VERSION, createSigner } from "@helpers/client";
 import {
   Agent as Agent177,
   MessageContext as MessageContext17,
-} from "@xmtp/agent-sdk-1.1.14";
+} from "@xmtp/agent-sdk-1.1.12";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import { type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
@@ -15,29 +15,22 @@ import {
   Group as Group410,
 } from "@xmtp/node-sdk-4.1.0";
 import {
-  Client as Client420,
-  Conversation as Conversation420,
-  Dm as Dm420,
-  Group as Group420,
-} from "@xmtp/node-sdk-4.2.3";
-import {
-  Client as Client430,
-  Conversation as Conversation430,
-  Dm as Dm430,
-  Group as Group430,
-} from "@xmtp/node-sdk-4.3.0";
+  Client as Client426,
+  Conversation as Conversation426,
+  Dm as Dm426,
+  Group as Group426,
+} from "@xmtp/node-sdk-4.2.6";
 
 // Agent SDK exports - use first auto-enabled version
-// Since 1.1.10 has auto: false, we export from 1.1.7 (first auto: true)
 export {
   Agent,
   MessageContext,
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.14";
+} from "@xmtp/agent-sdk-1.1.12";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.14/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.12/debug";
 
 // Node SDK exports
 export {
@@ -57,15 +50,15 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.3.0";
+} from "@xmtp/node-sdk-4.2.6";
 
 // Agent SDK version list
 export const AgentVersionList = [
   {
     Agent: Agent177,
     MessageContext: MessageContext17,
-    agentSDK: "1.1.14",
-    nodeSDK: "4.3.0",
+    agentSDK: "1.1.12",
+    nodeSDK: "4.2.6",
     auto: true,
   },
 ];
@@ -73,21 +66,21 @@ export const AgentVersionList = [
 // Node SDK version list
 export const VersionList = [
   {
-    Client: Client430,
-    Conversation: Conversation430,
-    Dm: Dm430,
-    Group: Group430,
-    nodeSDK: "4.3.0",
+    Client: Client426,
+    Conversation: Conversation426,
+    Dm: Dm426,
+    Group: Group426,
+    nodeSDK: "4.2.6",
     nodeBindings: "1.6.1",
     auto: true,
   },
   {
-    Client: Client420,
-    Conversation: Conversation420,
-    Dm: Dm420,
-    Group: Group420,
-    nodeSDK: "4.2.3",
-    nodeBindings: "1.5.4",
+    Client: Client426,
+    Conversation: Conversation426,
+    Dm: Dm426,
+    Group: Group426,
+    nodeSDK: "4.2.6",
+    nodeBindings: "1.6.1",
     auto: true,
   },
   {
