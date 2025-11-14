@@ -2,8 +2,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createSigner } from "@helpers/client";
-import { type Signer, type XmtpEnv } from "@helpers/versions";
-import { Client } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@helpers/versions";
 
 // Check Node.js version
 const nodeVersion = process.versions.node;
@@ -229,7 +228,7 @@ async function main() {
     console.log(`Revoking ${installationsToRevoke.length} installations...`);
 
     await Client.revokeInstallations(
-      signer as unknown as Signer,
+      signer,
       inboxId,
       installationsToRevokeBytes,
       envVars.XMTP_ENV as XmtpEnv,
