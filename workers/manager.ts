@@ -354,7 +354,7 @@ export class WorkerManager implements IWorkerManager {
 
     if (baseName in this.keysCache) {
       //They persist in memory in the same test run
-      console.log(`Using cached keys for ${baseName}`);
+      console.debug(`Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
 
@@ -435,7 +435,7 @@ export class WorkerManager implements IWorkerManager {
 
     // Check if the worker already exists in our production storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
-      console.log(`Reusing existing worker for ${descriptor}`);
+      console.debug(`Reusing existing worker for ${descriptor}`);
       return this.workers[baseName][providedInstallId];
     }
 

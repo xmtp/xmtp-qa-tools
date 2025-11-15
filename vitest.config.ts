@@ -10,7 +10,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@helpers": resolve(__dirname, "./helpers"),
+      "@chaos": resolve(__dirname, "./chaos"),
+      "@forks": resolve(__dirname, "./forks"),
       "@workers": resolve(__dirname, "./workers"),
+      "@network-stability": resolve(__dirname, "./network-stability"),
       "@scripts": resolve(__dirname, "./scripts"),
       "@inboxes": resolve(__dirname, "./inboxes"),
       "@bots": resolve(__dirname, "./agents/bots"),

@@ -3,19 +3,15 @@ import fs from "fs";
 import path from "path";
 import { cleanAllRawLogs, cleanForksLogs } from "@helpers/analyzer";
 import "dotenv/config";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import {
-  chaosPresets,
-  epochRotationOperations,
-  groupCount,
-  installationCount,
-  NODE_VERSION,
-  otherOperations,
-  parallelOperations,
-  randomInboxIdsCount,
-  targetEpoch,
-  testName,
-  workerNames,
-  type ChaosLevel,
+  printConfig,
+  resolveDbChaosConfig,
+  resolveNetworkChaosConfig,
+  type DbChaosLevel,
+  type NetworkChaosLevel,
+  type RuntimeConfig,
 } from "./config";
 
 interface ForkOptions {
@@ -23,55 +19,13 @@ interface ForkOptions {
   cleanAll: boolean; // Clean all raw logs before starting
   removeNonMatching: boolean; // Remove non-matching logs
   env?: string; // XMTP environment (local, dev, production)
-  chaosEnabled: boolean; // Enable network chaos
-  chaosLevel: ChaosLevel; // Chaos level (low, medium, high)
-  streams: boolean; // Enable message streams on all workers
-  dbChaosEnabled: boolean; // Enable database chaos
-  dbLockTimeMin: number; // Minimum DB lock duration in ms
-  dbLockTimeMax: number; // Maximum DB lock duration in ms
-  dbLockInterval: number; // How often to apply DB locks in ms
-}
-
-function showHelp() {
-  console.log(`
-XMTP Fork Detection CLI - Fork detection and analysis
-
-USAGE:
-  yarn fork [options]
-
-OPTIONS:
-  --count <number>           Number of times to run the fork detection process [default: 100]
-  --clean-all                Clean all raw logs before starting (equivalent to ansi:clean)
-  --remove-non-matching      Remove logs that don't contain fork content [default: true]
-  --no-remove-non-matching   Keep logs that don't contain fork content
-  --env <environment>        XMTP environment (local, dev, production) [default: dev]
-  --chaos-enabled            Enable network chaos testing (requires --env local)
-  --chaos-level <level>      Chaos level: low, medium, high [default: medium]
-  --streams                  Enable message streams on all workers [default: false]
-  --db-chaos-enabled         Enable database locking chaos [default: false]
-  --db-lock-time-min <ms>    Minimum DB lock duration in ms [default: 100]
-  --db-lock-time-max <ms>    Maximum DB lock duration in ms [default: 2000]
-  --db-lock-interval <ms>    How often to apply DB locks in ms [default: 15000]
-  -h, --help                 Show this help message
-
-CHAOS LEVELS:
-  low      - Delay: 50-150ms, Jitter: 0-50ms, Loss: 0-2%, Interval: 15s
-  medium   - Delay: 100-300ms, Jitter: 0-75ms, Loss: 0-3.5%, Interval: 10s
-  high     - Delay: 100-500ms, Jitter: 0-100ms, Loss: 0-5%, Interval: 10s
-
-EXAMPLES:
-  yarn fork                              # Run 100 times and get stats
-  yarn fork --count 50                   # Run 50 times
-  yarn fork --clean-all                  # Clean all raw logs before starting
-  yarn fork --count 200 --env local      # Run 200 times on local environment
-  yarn fork --env local --chaos-enabled  # Run with medium network chaos
-  yarn fork --env local --chaos-enabled --chaos-level high  # Run with high chaos
-  yarn fork --streams                    # Run with message streams enabled
-  yarn fork --db-chaos-enabled           # Run with database locking chaos
-  yarn fork --db-chaos-enabled --db-lock-time-min 500 --db-lock-time-max 3000  # Custom DB chaos timing
-
-For more information, see: forks/README.md
-`);
+  networkChaosLevel: NetworkChaosLevel; // Network chaos level
+  dbChaosLevel: DbChaosLevel; // DB chaos level
+  withBackgroundStreams: boolean; // Enable message streams on all workers
+  logLevel: string; // Log level for test runner
+  groupCount: number; // Number of groups to run the test against
+  parallelOperations: number; // Number of parallel operations run on each group
+  targetEpoch: number; // Target epoch to stop the test at
 }
 
 /**
@@ -86,24 +40,37 @@ function getForkCount(): number {
 }
 
 /**
+ * Build RuntimeConfig from ForkOptions
+ */
+function buildRuntimeConfig(options: ForkOptions): RuntimeConfig {
+  return {
+    groupCount: options.groupCount,
+    parallelOperations: options.parallelOperations,
+    targetEpoch: options.targetEpoch,
+    network: (options.env || "dev") as "local" | "dev" | "production",
+    networkChaos: resolveNetworkChaosConfig(options.networkChaosLevel),
+    dbChaos: resolveDbChaosConfig(options.dbChaosLevel),
+    backgroundStreams: options.withBackgroundStreams,
+  };
+}
+
+/**
  * Run the fork test (suppress output) and return whether it completed successfully
  */
-function runForkTest(options: ForkOptions): boolean {
+function runForkTest(
+  options: ForkOptions,
+  runtimeConfig: RuntimeConfig,
+): boolean {
   const envFlag = options.env ? `--env ${options.env}` : "";
-  const command = `yarn test forks ${envFlag} --log warn --file`.trim();
+  const command =
+    `yarn test forks ${envFlag} --log ${options.logLevel} --file`.trim();
 
   try {
     execSync(command, {
       stdio: "ignore",
       env: {
         ...process.env,
-        CHAOS_ENABLED: options.chaosEnabled ? "true" : "false",
-        CHAOS_LEVEL: options.chaosLevel,
-        STREAMS_ENABLED: options.streams ? "true" : "false",
-        DB_CHAOS_ENABLED: options.dbChaosEnabled ? "true" : "false",
-        DB_LOCK_TIME_MIN: options.dbLockTimeMin.toString(),
-        DB_LOCK_TIME_MAX: options.dbLockTimeMax.toString(),
-        DB_LOCK_INTERVAL: options.dbLockInterval.toString(),
+        FORK_TEST_CONFIG: JSON.stringify(runtimeConfig),
       },
     });
 
@@ -117,50 +84,6 @@ function runForkTest(options: ForkOptions): boolean {
 }
 
 /**
- * Log fork matrix parameters from shared config
- */
-function logForkMatrixParameters(options: ForkOptions): void {
-  console.info("\nFORK MATRIX PARAMETERS");
-  console.info("-".repeat(60));
-  console.info(`groupCount: ${groupCount}`);
-  console.info(`parallelOperations: ${parallelOperations}`);
-  console.info(`NODE_VERSION: ${NODE_VERSION}`);
-  console.info(`workerNames: [${workerNames.join(", ")}]`);
-  console.info(
-    `epochRotationOperations: ${JSON.stringify(epochRotationOperations)}`,
-  );
-  console.info(`otherOperations: ${JSON.stringify(otherOperations)}`);
-  console.info(`targetEpoch: ${targetEpoch}`);
-  console.info(`network: ${options.env || "undefined"}`);
-  console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
-  console.info(`installationCount: ${installationCount}`);
-  console.info(`testName: ${testName}`);
-  console.info(`streams: ${options.streams}`);
-
-  if (options.chaosEnabled) {
-    const preset = chaosPresets[options.chaosLevel];
-    console.info("\nNETWORK CHAOS PARAMETERS");
-    console.info(`chaosEnabled: true`);
-    console.info(`chaosLevel: ${options.chaosLevel}`);
-    console.info(`  delay: ${preset.delayMin}-${preset.delayMax}ms`);
-    console.info(`  jitter: ${preset.jitterMin}-${preset.jitterMax}ms`);
-    console.info(`  packetLoss: ${preset.lossMin}-${preset.lossMax}%`);
-    console.info(`  interval: ${preset.interval}ms`);
-  }
-
-  if (options.dbChaosEnabled) {
-    console.info("\nDATABASE CHAOS PARAMETERS");
-    console.info(`dbChaosEnabled: true`);
-    console.info(
-      `  lockDuration: ${options.dbLockTimeMin}-${options.dbLockTimeMax}ms`,
-    );
-    console.info(`  interval: ${options.dbLockInterval}ms`);
-  }
-
-  console.info("-".repeat(60) + "\n");
-}
-
-/**
  * Run fork detection process and collect stats
  */
 async function runForkDetection(options: ForkOptions): Promise<void> {
@@ -169,7 +92,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   console.info("=".repeat(60));
 
   // Validate chaos requirements
-  if (options.chaosEnabled && options.env !== "local") {
+  if (options.networkChaosLevel !== "none" && options.env !== "local") {
     console.error("\n❌ Error: Network chaos testing requires --env local");
     console.error(
       "Network chaos manipulates Docker containers which are only available in local environment.\n",
@@ -177,8 +100,11 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     process.exit(1);
   }
 
+  // Build RuntimeConfig for logging and running tests
+  const runtimeConfig = buildRuntimeConfig(options);
+
   // Log fork matrix parameters once
-  logForkMatrixParameters(options);
+  printConfig(runtimeConfig);
 
   console.info(`Running fork detection process ${options.count} time(s)...\n`);
 
@@ -200,7 +126,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   // Run the test N times
   for (let i = 1; i <= options.count; i++) {
     // Run the fork test (silently)
-    const success = runForkTest(options);
+    const success = runForkTest(options, runtimeConfig);
     if (!success) {
       stats.runsWithErrors++;
       console.log(`❌ Error in run ${i}/${options.count}`);
@@ -269,149 +195,116 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-
-  // Default options
-  const options: ForkOptions = {
-    count: 100,
-    cleanAll: false,
-    removeNonMatching: true,
-    env: process.env.XMTP_ENV || "dev",
-    chaosEnabled: false,
-    chaosLevel: "medium",
-    streams: false,
-    dbChaosEnabled: false,
-    dbLockTimeMin: 100,
-    dbLockTimeMax: 6000,
-    dbLockInterval: 5000,
-  };
-
-  // Parse arguments
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    switch (arg) {
-      case "-h":
-      case "--help":
-        showHelp();
-        process.exit(0);
-        break;
-      case "--count":
-        if (i + 1 < args.length) {
-          const count = parseInt(args[i + 1], 10);
-          if (isNaN(count) || count < 1) {
-            console.error("--count must be a positive number");
-            process.exit(1);
-          }
-          options.count = count;
-          i++; // Skip next argument
-        } else {
-          console.error("--count flag requires a value (e.g., --count 100)");
-          process.exit(1);
-        }
-        break;
-      case "--clean-all":
-        options.cleanAll = true;
-        break;
-      case "--remove-non-matching":
-        options.removeNonMatching = true;
-        break;
-      case "--no-remove-non-matching":
-        options.removeNonMatching = false;
-        break;
-      case "--env":
-        if (i + 1 < args.length) {
-          const env = args[i + 1];
-          if (!["local", "dev", "production"].includes(env)) {
-            console.error("--env must be one of: local, dev, production");
-            process.exit(1);
-          }
-          options.env = env;
-          i++; // Skip next argument
-        } else {
-          console.error("--env flag requires a value (e.g., --env dev)");
-          process.exit(1);
-        }
-        break;
-      case "--chaos-enabled":
-        options.chaosEnabled = true;
-        break;
-      case "--chaos-level":
-        if (i + 1 < args.length) {
-          const level = args[i + 1] as ChaosLevel;
-          if (!["low", "medium", "high"].includes(level)) {
-            console.error("--chaos-level must be one of: low, medium, high");
-            process.exit(1);
-          }
-          options.chaosLevel = level;
-          i++; // Skip next argument
-        } else {
-          console.error(
-            "--chaos-level flag requires a value (e.g., --chaos-level medium)",
-          );
-          process.exit(1);
-        }
-        break;
-      case "--streams":
-        options.streams = true;
-        break;
-      case "--db-chaos-enabled":
-        options.dbChaosEnabled = true;
-        break;
-      case "--db-lock-time-min":
-        if (i + 1 < args.length) {
-          const value = parseInt(args[i + 1], 10);
-          if (isNaN(value) || value < 0) {
-            console.error("--db-lock-time-min must be a positive number");
-            process.exit(1);
-          }
-          options.dbLockTimeMin = value;
-          i++; // Skip next argument
-        } else {
-          console.error(
-            "--db-lock-time-min flag requires a value (e.g., --db-lock-time-min 100)",
-          );
-          process.exit(1);
-        }
-        break;
-      case "--db-lock-time-max":
-        if (i + 1 < args.length) {
-          const value = parseInt(args[i + 1], 10);
-          if (isNaN(value) || value < 0) {
-            console.error("--db-lock-time-max must be a positive number");
-            process.exit(1);
-          }
-          options.dbLockTimeMax = value;
-          i++; // Skip next argument
-        } else {
-          console.error(
-            "--db-lock-time-max flag requires a value (e.g., --db-lock-time-max 2000)",
-          );
-          process.exit(1);
-        }
-        break;
-      case "--db-lock-interval":
-        if (i + 1 < args.length) {
-          const value = parseInt(args[i + 1], 10);
-          if (isNaN(value) || value < 0) {
-            console.error("--db-lock-interval must be a positive number");
-            process.exit(1);
-          }
-          options.dbLockInterval = value;
-          i++; // Skip next argument
-        } else {
-          console.error(
-            "--db-lock-interval flag requires a value (e.g., --db-lock-interval 15000)",
-          );
-          process.exit(1);
-        }
-        break;
+  const argv = await yargs(hideBin(process.argv))
+    .usage("Usage: yarn fork [options]")
+    .option("count", {
+      type: "number",
+      default: 100,
+      describe: "Number of times to run the fork detection process",
+    })
+    .option("clean-all", {
+      type: "boolean",
+      default: false,
+      describe: "Clean all raw logs before starting",
+    })
+    .parserConfiguration({
+      "boolean-negation": true,
+    })
+    .option("remove-non-matching", {
+      type: "boolean",
+      default: true,
+      describe: "Remove logs that don't contain fork content",
+    })
+    .option("env", {
+      type: "string",
+      choices: ["local", "dev", "production"] as const,
       default:
-        console.error(`Unknown option: ${arg}`);
-        console.error("Use --help for usage information");
-        process.exit(1);
-    }
-  }
+        (process.env.XMTP_ENV as "local" | "dev" | "production") || "dev",
+      describe: "XMTP environment",
+    })
+    .option("network-chaos-level", {
+      type: "string",
+      choices: ["none", "low", "medium", "high"] as const,
+      default: "none" as const,
+      describe: "Network chaos level (requires --env local)",
+    })
+    .option("db-chaos-level", {
+      type: "string",
+      choices: ["none", "low", "medium", "high"] as const,
+      default: "none" as const,
+      describe: "Database chaos level with presets",
+    })
+    .option("with-background-streams", {
+      type: "boolean",
+      default: false,
+      describe: "Enable message streams on all workers",
+    })
+    .option("log-level", {
+      type: "string",
+      default: "warn",
+      describe: "Log level for test runner (e.g., debug, info, warn, error)",
+    })
+    .option("group-count", {
+      type: "number",
+      default: 5,
+      describe: "Number of groups to run the test against",
+    })
+    .option("parallel-operations", {
+      type: "number",
+      default: 5,
+      describe: "Number of parallel operations run on each group",
+    })
+    .option("target-epoch", {
+      type: "number",
+      default: 20,
+      describe: "Target epoch to stop the test at",
+    })
+    .example("yarn fork", "Run 100 times and get stats")
+    .example("yarn fork --count 50", "Run 50 times")
+    .example("yarn fork --clean-all", "Clean all raw logs before starting")
+    .example(
+      "yarn fork --count 200 --env local",
+      "Run 200 times on local environment",
+    )
+    .example(
+      "yarn fork --env local --network-chaos-level medium",
+      "Run with medium network chaos",
+    )
+    .example(
+      "yarn fork --env local --network-chaos-level high",
+      "Run with high network chaos",
+    )
+    .example(
+      "yarn fork --with-background-streams",
+      "Run with message streams enabled",
+    )
+    .example(
+      "yarn fork --db-chaos-level medium",
+      "Run with medium database locking chaos",
+    )
+    .example(
+      "yarn fork --no-remove-non-matching",
+      "Keep logs that don't contain fork content",
+    )
+    .epilogue("For more information, see: forks/README.md")
+    .help()
+    .alias("h", "help")
+    .strict()
+    .parseAsync();
+
+  const options: ForkOptions = {
+    count: argv.count,
+    cleanAll: argv["clean-all"],
+    removeNonMatching: argv["remove-non-matching"],
+    env: argv.env,
+    networkChaosLevel: argv["network-chaos-level"] as NetworkChaosLevel,
+    dbChaosLevel: argv["db-chaos-level"] as DbChaosLevel,
+    withBackgroundStreams: argv["with-background-streams"],
+    logLevel: argv["log-level"],
+    groupCount: argv["group-count"],
+    parallelOperations: argv["parallel-operations"],
+    targetEpoch: argv["target-epoch"],
+  };
 
   await runForkDetection(options);
 }
