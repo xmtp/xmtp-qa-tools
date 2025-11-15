@@ -1,8 +1,7 @@
-import { getActiveVersion } from "@helpers/versions";
+import { type DbChaosConfig } from "@chaos/db";
+import type { NetworkChaosConfig } from "@chaos/network";
+import { getActiveVersion, type XmtpEnv } from "@helpers/versions";
 
-// Fork matrix parameters - shared between test and CLI
-export const groupCount = 10;
-export const parallelOperations = 5; // How many operations to perform in parallel
 export const NODE_VERSION = getActiveVersion().nodeBindings; // default to latest version, can be overridden with --nodeBindings=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
 // We want to create a key each run to ensure the forks are "pure"
@@ -25,26 +24,17 @@ export const otherOperations = {
   sendMessage: true, // sends a message to the group
   sync: true, // syncs the group
 };
-export const targetEpoch = 30n; // The target epoch to stop the test (epochs are when performing forks to the group)
-export const network = process.env.XMTP_ENV; // Network environment setting
 export const randomInboxIdsCount = 50; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
 export const testName = "forks";
 
 // Network chaos configuration
-export type ChaosLevel = "low" | "medium" | "high";
+export type NetworkChaosLevel = "none" | "low" | "medium" | "high";
 
-export interface ChaosPreset {
-  delayMin: number; // Minimum delay in ms
-  delayMax: number; // Maximum delay in ms
-  jitterMin: number; // Minimum jitter in ms
-  jitterMax: number; // Maximum jitter in ms
-  lossMin: number; // Minimum packet loss percentage (0-100)
-  lossMax: number; // Maximum packet loss percentage (0-100)
-  interval: number; // How often to apply chaos in ms
-}
-
-export const chaosPresets: Record<ChaosLevel, ChaosPreset> = {
+export const networkChaosPresets: Record<
+  Exclude<NetworkChaosLevel, "none">,
+  NetworkChaosConfig
+> = {
   low: {
     delayMin: 50,
     delayMax: 150,
@@ -74,34 +64,51 @@ export const chaosPresets: Record<ChaosLevel, ChaosPreset> = {
   },
 };
 
-export interface ChaosConfig {
-  enabled: boolean;
-  level: ChaosLevel;
-}
+// Database chaos configuration
+export type DbChaosLevel = "none" | "low" | "medium" | "high";
 
-// Parse chaos config from environment
-export const chaosConfig: ChaosConfig = {
-  enabled: process.env.CHAOS_ENABLED === "true",
-  level: (process.env.CHAOS_LEVEL as ChaosLevel) || "medium",
+export const dbChaosPresets: Record<
+  Exclude<DbChaosLevel, "none">,
+  DbChaosConfig
+> = {
+  low: {
+    minLockTime: 50,
+    maxLockTime: 250,
+    lockInterval: 10000, // 20 seconds
+  },
+  medium: {
+    minLockTime: 100,
+    maxLockTime: 2000,
+    lockInterval: 15000, // 15 seconds
+  },
+  high: {
+    minLockTime: 500,
+    maxLockTime: 2000,
+    lockInterval: 5000, // 5 seconds
+  },
 };
 
-// Parse streams config from environment
-export const streamsEnabled = process.env.STREAMS_ENABLED === "true";
+// Helper functions to get chaos configs
+export function resolveNetworkChaosConfig(
+  networkChaosLevel: NetworkChaosLevel,
+): NetworkChaosConfig | null {
+  if (networkChaosLevel === "none") return null;
+  if (!networkChaosPresets[networkChaosLevel]) {
+    throw new Error(`Invalid network chaos level: ${networkChaosLevel}`);
+  }
+  return networkChaosPresets[networkChaosLevel];
+}
 
-// Database chaos configuration
-export const dbLockTimeMin = parseInt(
-  process.env.DB_LOCK_TIME_MIN || "100",
-  10,
-); // Minimum lock duration in ms
-export const dbLockTimeMax = parseInt(
-  process.env.DB_LOCK_TIME_MAX || "6000",
-  10,
-); // Maximum lock duration in ms
-export const dbLockInterval = parseInt(
-  process.env.DB_LOCK_INTERVAL || "10000",
-  10,
-); // How often to apply DB locks in ms
-export const dbChaosEnabled = process.env.DB_CHAOS_ENABLED === "true";
+export function resolveDbChaosConfig(
+  dbChaosLevel: DbChaosLevel,
+): DbChaosConfig | null {
+  if (dbChaosLevel === "none") return null;
+  if (!dbChaosPresets[dbChaosLevel]) {
+    throw new Error(`Invalid DB chaos level: ${dbChaosLevel}`);
+  }
+
+  return dbChaosPresets[dbChaosLevel];
+}
 
 // Multinode container names for local environment chaos testing
 export const multinodeContainers = [
@@ -112,3 +119,71 @@ export const multinodeContainers = [
   // Include the MLS validation service to add some additional chaos
   "multinode-validation-1",
 ];
+
+/**
+ * The config flags that are passed in as JSON from the environment
+ */
+export type RuntimeConfig = {
+  groupCount: number; // Number of groups to run the test against
+  parallelOperations: number; // Number of parallel operations run on each group
+  targetEpoch: number; // Target epoch to stop the test at
+  network: XmtpEnv; // XMTP network
+  networkChaos: NetworkChaosConfig | null; // Network chaos configuration
+  dbChaos: DbChaosConfig | null; // Database chaos configuration
+  backgroundStreams: boolean; //
+};
+
+export function getConfigFromEnv(): RuntimeConfig {
+  const jsonString = process.env.FORK_TEST_CONFIG;
+  if (!jsonString) {
+    throw new Error("FORK_TEST_CONFIG environment variable is not set");
+  }
+
+  return JSON.parse(jsonString) as RuntimeConfig;
+}
+
+/**
+ * Pretty-print the complete runtime configuration
+ */
+export function printConfig(config: RuntimeConfig): void {
+  console.info("\nFORK MATRIX PARAMETERS");
+  console.info("-".repeat(60));
+  console.info(`groupCount: ${config.groupCount}`);
+  console.info(`parallelOperations: ${config.parallelOperations}`);
+  console.info(`NODE_VERSION: ${NODE_VERSION}`);
+  console.info(`workerNames: [${workerNames.join(", ")}]`);
+  console.info(
+    `epochRotationOperations: ${JSON.stringify(epochRotationOperations)}`,
+  );
+  console.info(`otherOperations: ${JSON.stringify(otherOperations)}`);
+  console.info(`targetEpoch: ${config.targetEpoch}`);
+  console.info(`network: ${config.network}`);
+  console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
+  console.info(`installationCount: ${installationCount}`);
+  console.info(`testName: ${testName}`);
+  console.info(`backgroundStreams: ${config.backgroundStreams}`);
+
+  if (config.networkChaos) {
+    console.info("\nNETWORK CHAOS PARAMETERS");
+    console.info(
+      `  delay: ${config.networkChaos.delayMin}-${config.networkChaos.delayMax}ms`,
+    );
+    console.info(
+      `  jitter: ${config.networkChaos.jitterMin}-${config.networkChaos.jitterMax}ms`,
+    );
+    console.info(
+      `  packetLoss: ${config.networkChaos.lossMin}-${config.networkChaos.lossMax}%`,
+    );
+    console.info(`  interval: ${config.networkChaos.interval}ms`);
+  }
+
+  if (config.dbChaos) {
+    console.info("\nDATABASE CHAOS PARAMETERS");
+    console.info(
+      `  lockDuration: ${config.dbChaos.minLockTime}-${config.dbChaos.maxLockTime}ms`,
+    );
+    console.info(`  interval: ${config.dbChaos.lockInterval}ms`);
+  }
+
+  console.info("-".repeat(60) + "\n");
+}

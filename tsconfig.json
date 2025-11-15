@@ -19,7 +19,10 @@
     "target": "ESNext",
     "types": ["node", "vitest"],
     "paths": {
+      "@chaos/*": ["./chaos/*"],
+      "@forks/*": ["./forks/*"],
       "@helpers/*": ["./helpers/*"],
+      "@network-stability/*": ["./network-stability/*"],
       "@workers/*": ["./workers/*"],
       "@inboxes/*": ["./inboxes/*"],
       "@versions/*": ["./versions/*"],
