@@ -77,9 +77,9 @@ export const AgentVersionList = [
     auto: true,
   },
   {
-    Agent: Agent114,
-    MessageContext: MessageContext114,
-    agentSDK: "1.1.14",
+    Agent: Agent117,
+    MessageContext: MessageContext117,
+    agentSDK: "1.1.7",
     nodeSDK: "4.2.6",
     auto: true,
   },
