@@ -1,7 +1,7 @@
 import { getActiveVersion } from "@helpers/versions";
 
 // Fork matrix parameters - shared between test and CLI
-export const groupCount = 1;
+export const groupCount = 10;
 export const parallelOperations = 5; // How many operations to perform in parallel
 export const NODE_VERSION = getActiveVersion().nodeBindings; // default to latest version, can be overridden with --nodeBindings=3.1.1
 // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
@@ -87,6 +87,21 @@ export const chaosConfig: ChaosConfig = {
 
 // Parse streams config from environment
 export const streamsEnabled = process.env.STREAMS_ENABLED === "true";
+
+// Database chaos configuration
+export const dbLockTimeMin = parseInt(
+  process.env.DB_LOCK_TIME_MIN || "100",
+  10,
+); // Minimum lock duration in ms
+export const dbLockTimeMax = parseInt(
+  process.env.DB_LOCK_TIME_MAX || "6000",
+  10,
+); // Maximum lock duration in ms
+export const dbLockInterval = parseInt(
+  process.env.DB_LOCK_INTERVAL || "10000",
+  10,
+); // How often to apply DB locks in ms
+export const dbChaosEnabled = process.env.DB_CHAOS_ENABLED === "true";
 
 // Multinode container names for local environment chaos testing
 export const multinodeContainers = [
