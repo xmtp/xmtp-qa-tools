@@ -64,6 +64,7 @@ const initClient = async (network: XmtpEnv = "dev") => {
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     dbPath: getDbPath(`ping-api-${network}`),
     appVersion: APP_VERSION,
+    apiUrl: process.env.XMTP_API_URL,
   });
 
   clients.set(network, client);

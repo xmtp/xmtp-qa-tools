@@ -447,12 +447,15 @@ export class WorkerManager implements IWorkerManager {
       encryptionKey,
     };
 
+    // Use provided apiUrl, or fallback to XMTP_API_URL environment variable
+    const effectiveApiUrl = apiUrl || process.env.XMTP_API_URL;
+
     // Create and initialize the worker
     const workerClient = new WorkerClient(
       workerData,
       this.env,
       {},
-      apiUrl,
+      effectiveApiUrl,
       undefined,
     );
 
