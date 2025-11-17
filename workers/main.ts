@@ -113,6 +113,9 @@ interface IWorkerClient {
 
   // Properties
   readonly currentFolder: string;
+
+  // Clone Management
+  clone(): Promise<WorkerClient>;
 }
 
 // Worker thread code as a string
@@ -1253,5 +1256,43 @@ export class WorkerClient extends Worker implements IWorkerClient {
       address: address,
       installationId: newInstallationId,
     };
+  }
+
+  /**
+   * Creates a clone of this worker client with a separate underlying client instance
+   * The clone will have the same configuration but a new name: ${original_worker_name}_clone
+   * @returns A new WorkerClient instance with separate client
+   */
+  async clone(): Promise<WorkerClient> {
+    console.debug(`[${this.nameId}] Creating clone of worker`);
+
+    // Create the clone name
+    const cloneName = `${this.name}_clone`;
+
+    // Create a WorkerBase object with the same properties but new name
+    const cloneWorkerBase: WorkerBase = {
+      name: cloneName,
+      sdk: this.sdk,
+      folder: this.folder,
+      walletKey: this.walletKey,
+      encryptionKey: this.encryptionKeyHex,
+    };
+
+    // Create a new WorkerClient instance with the same configuration
+    const clonedWorker = new WorkerClient(
+      cloneWorkerBase,
+      this.env,
+      {}, // Use default worker options
+      this.apiUrl,
+    );
+
+    // Initialize the cloned worker to create its client instance
+    await clonedWorker.initialize();
+
+    console.debug(
+      `[${this.nameId}] Successfully created clone: ${clonedWorker.nameId}`,
+    );
+
+    return clonedWorker;
   }
 }

@@ -1,14 +1,29 @@
 import type { ChaosProvider } from "@chaos/provider";
-import { typeofStream } from "@workers/main";
+import { typeofStream, type WorkerClient } from "@workers/main";
 import type { WorkerManager } from "@workers/manager";
 
+export type StreamsConfig = {
+  cloned: boolean;
+};
+
 export class StreamsChaos implements ChaosProvider {
-  workers?: WorkerManager;
-  start(workers: WorkerManager) {
+  workers?: WorkerClient[];
+  config: StreamsConfig;
+
+  constructor(config: StreamsConfig) {
+    this.config = config;
+  }
+
+  async start(workers: WorkerManager) {
     console.log("Starting StreamsChaos");
-    this.workers = workers;
-    for (const worker of workers.getAll()) {
-      worker.worker.startStream(typeofStream.Message);
+    let allWorkers = workers.getAll().map((w) => w.worker);
+    if (this.config.cloned) {
+      allWorkers = await Promise.all(allWorkers.map((w) => w.clone()));
+    }
+
+    this.workers = allWorkers;
+    for (const worker of allWorkers) {
+      worker.startStream(typeofStream.Message);
     }
 
     return Promise.resolve();
@@ -16,8 +31,8 @@ export class StreamsChaos implements ChaosProvider {
 
   stop() {
     if (this.workers) {
-      for (const worker of this.workers.getAll()) {
-        worker.worker.stopStreams();
+      for (const worker of this.workers) {
+        worker.stopStreams();
       }
     }
 

@@ -5,6 +5,7 @@ export type DbChaosConfig = {
   minLockTime: number;
   maxLockTime: number;
   lockInterval: number;
+  impactedWorkerPercentage: number; // number between 0 and 100 for what % of workers to lock on each run
 };
 
 export class DbChaos implements ChaosProvider {
@@ -17,7 +18,8 @@ export class DbChaos implements ChaosProvider {
   }
 
   start(workers: WorkerManager): Promise<void> {
-    const { minLockTime, maxLockTime, lockInterval } = this.config;
+    const { minLockTime, maxLockTime, lockInterval, impactedWorkerPercentage } =
+      this.config;
     console.log(
       `Starting DB Chaos:
       Locking for ${minLockTime}ms - ${maxLockTime}ms
@@ -25,6 +27,9 @@ export class DbChaos implements ChaosProvider {
     );
     this.interval = setInterval(() => {
       for (const worker of workers.getAll()) {
+        if (Math.random() * 100 > impactedWorkerPercentage) {
+          continue;
+        }
         const duration = Math.floor(
           minLockTime + Math.random() * (maxLockTime - minLockTime),
         );
