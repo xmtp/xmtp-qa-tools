@@ -2,8 +2,12 @@ import fs from "fs";
 import path from "path";
 import { APP_VERSION, createSigner } from "@helpers/client";
 import {
-  Agent as Agent17,
-  MessageContext as MessageContext17,
+  Agent as Agent117,
+  MessageContext as MessageContext117,
+} from "@xmtp/agent-sdk-1.1.7";
+import {
+  Agent as Agent114,
+  MessageContext as MessageContext114,
 } from "@xmtp/agent-sdk-1.1.14";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
@@ -26,6 +30,12 @@ import {
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
+import {
+  Client as Client440,
+  Conversation as Conversation440,
+  Dm as Dm440,
+  Group as Group440,
+} from "@xmtp/node-sdk-4.4.0";
 
 export {
   Agent,
@@ -60,8 +70,15 @@ export {
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent17,
-    MessageContext: MessageContext17,
+    Agent: Agent114,
+    MessageContext: MessageContext114,
+    agentSDK: "1.1.7",
+    nodeSDK: "4.4.0",
+    auto: true,
+  },
+  {
+    Agent: Agent114,
+    MessageContext: MessageContext114,
     agentSDK: "1.1.14",
     nodeSDK: "4.2.6",
     auto: true,
@@ -70,6 +87,15 @@ export const AgentVersionList = [
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client440,
+    Conversation: Conversation440,
+    Dm: Dm440,
+    Group: Group440,
+    nodeSDK: "4.4.0",
+    nodeBindings: "1.6.1",
+    auto: true,
+  },
   {
     Client: Client426,
     Conversation: Conversation426,
