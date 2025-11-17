@@ -25,7 +25,7 @@ XMTP_ENV=production
 ### Running locally
 Before running this suite locally you _must_ run `yarn gen update:local` to pre-populate the database with inboxes to add and remove from the group. Otherwise add/remove member operations will fail, which will not increase the epoch or trigger forks.
 
-### Fork generation through send testing
+### Fork generation through parallel operations
 
 The main approach creates intentional conflicts by running parallel operations on shared groups:
 
@@ -33,7 +33,7 @@ The main approach creates intentional conflicts by running parallel operations o
 - Add X workers as super admins to each group
 - Loop each group until epoch Y:
   - Choose random worker and syncAll conversations
-  - Run between 2 random operations:
+  - Run parallel operations:
     - Update group name
     - Send message (random message)
     - Add member (random inboxId)
@@ -45,23 +45,25 @@ The main approach creates intentional conflicts by running parallel operations o
 
 ### Parameters
 
-- **groupCount**: `5` - Number of groups to create in parallel
-- **nodeBindings**: `3.x.x` - Node SDK version to use
-- **parallelOperations**: `1` - How many operations to perform in parallel
-- **enabledOperations**: - Operations configuration - enable/disable specific operations
-  - `updateName`: true, // updates the name of the group
-  - `sendMessage`: false, // sends a message to the group
-  - `addMember`: true, // adds a random member to the group
-  - `removeMember`: true, // removes a random member from the group
-  - `createInstallation`: true, // creates a new installation for a random worker
-- **workerNames**: Random workers (`random1`, `random2`, ..., `random10`)
-- **targetEpoch**: `100n` - The target epoch to stop the test (epochs are when performing forks to the group)
-- **network**: `process.env.XMTP_ENV` - Network environment setting
-- **randomInboxIdsCount**: `30` - How many inboxIds to use randomly in the add/remove operations
-- **installationCount**: `5` - How many installations to use randomly in the createInstallation operations
-- **typeofStreamForTest**: `typeofStream.None` - No streams started by default (configured on-demand)
-- **typeOfSyncForTest**: `typeOfSync.None` - No automatic syncing (configured on-demand)
-- **streams**: `false` - Enable message streams on all workers (configured via `--streams` CLI flag)
+Default configuration values (can be overridden via CLI flags):
+
+- **groupCount**: `5` - Number of groups to create in parallel (override with `--group-count`)
+- **nodeBindings**: Latest version - Node SDK version to use
+- **parallelOperations**: `5` - How many operations to perform in parallel (override with `--parallel-operations`)
+- **epochRotationOperations**: Operations that rotate epochs:
+  - `updateName`: true - Updates the name of the group
+  - `addMember`: true - Adds a random member to the group
+  - `removeMember`: true - Removes a random member from the group
+- **otherOperations**: Additional operations:
+  - `sendMessage`: true - Sends a message to the group
+  - `createInstallation`: false - Creates a new installation for a random worker
+  - `sync`: false - Syncs the group
+- **workerNames**: Random workers (`random1`, `random2`, `random3`, `random4`, `random5`)
+- **targetEpoch**: `20` - The target epoch to stop the test (override with `--target-epoch`)
+- **network**: `dev` - Network environment setting (override with `--env`)
+- **randomInboxIdsCount**: `50` - How many inboxIds to use randomly in the add/remove operations
+- **installationCount**: `2` - How many installations to use randomly in the createInstallation operations
+- **backgroundStreams**: `false` - Enable message streams on all workers (enable with `--with-background-streams`)
 
 ### Test setup in local network
 
@@ -73,7 +75,7 @@ The main approach creates intentional conflicts by running parallel operations o
 yarn local-update
 
 # Process that runs the test 100 times and exports forks logs
-yarn test forks --attempts 100 --env local --log warn --file --forks
+yarn fork --count 100 --env local
 ```
 
 ## CLI Usage
@@ -90,21 +92,50 @@ yarn fork --count 50
 # Clean all raw logs before starting
 yarn fork --clean-all
 
+# Keep logs that don't contain fork content
+yarn fork --no-remove-non-matching
+
 # Run on a specific environment
 yarn fork --count 200 --env local
 
 # Enable message streams on all workers
-yarn fork --streams
+yarn fork --with-background-streams
+
+# Configure test parameters
+yarn fork --group-count 10 --parallel-operations 3 --target-epoch 50
+
+# Set log level for test runner
+yarn fork --log-level debug
 
 # Show help
 yarn fork --help
 ```
 
+### CLI Options
+
+- `--count`: Number of times to run the fork detection process (default: 100)
+- `--clean-all`: Clean all raw logs before starting (default: false)
+- `--remove-non-matching`: Remove logs that don't contain fork content (default: true)
+- `--no-remove-non-matching`: Keep logs that don't contain fork content
+- `--env`: XMTP environment - `local`, `dev`, or `production` (default: `dev` or `XMTP_ENV`)
+- `--network-chaos-level`: Network chaos level - `none`, `low`, `medium`, or `high` (default: `none`)
+- `--db-chaos-level`: Database chaos level - `none`, `low`, `medium`, or `high` (default: `none`)
+- `--with-background-streams`: Enable message streams on all workers (default: false)
+- `--log-level`: Log level for test runner - `debug`, `info`, `warn`, `error` (default: `warn`)
+- `--group-count`: Number of groups to run the test against (default: 5)
+- `--parallel-operations`: Number of parallel operations run on each group (default: 5)
+- `--target-epoch`: Target epoch to stop the test at (default: 20)
+
+### Statistics Output
+
 The CLI provides statistics including:
 
 - Total runs and forks detected
+- Runs with forks vs. runs without forks
+- Runs with errors
 - Fork detection rate
 - Average forks per run
+- Average forks per run (with forks only)
 
 ### Network Chaos Testing
 
@@ -113,7 +144,7 @@ The fork test can inject network chaos (latency, jitter, packet loss) to simulat
 **Requirements:**
 - Network chaos requires `--env local`
 - Multinode Docker containers must be running (`./multinode/up`)
-- Must be run on linux with `tc` and `iptables` commands available. Will not work on MacOS.
+- Must be run on Linux with `tc` and `iptables` commands available. Will not work on MacOS.
 - Requires `sudo` access
 
 **Chaos Levels:**
@@ -122,19 +153,19 @@ The fork test can inject network chaos (latency, jitter, packet loss) to simulat
 |--------|-------------|--------------|-------------|----------|
 | low    | 50-150ms    | 0-50ms       | 0-2%        | 15s      |
 | medium | 100-300ms   | 0-75ms       | 0-3.5%      | 10s      |
-| high   | 100-500ms   | 0-100ms      | 0-5%        | 10s      |
+| high   | 0-500ms     | 50-200ms     | 0-25%       | 10s      |
 
 **Usage:**
 
 ```bash
-# Run with default (medium) chaos
-yarn fork --env local --chaos-enabled
+# Run with low network chaos
+yarn fork --env local --network-chaos-level low
 
-# Run with high chaos level
-yarn fork --env local --chaos-enabled --chaos-level high
+# Run with high network chaos level
+yarn fork --env local --network-chaos-level high
 
-# Run 50 iterations with low chaos
-yarn fork --count 50 --env local --chaos-enabled --chaos-level low
+# Run 50 iterations with medium network chaos
+yarn fork --count 50 --env local --network-chaos-level medium
 ```
 
 **How it works:**
@@ -146,10 +177,49 @@ yarn fork --count 50 --env local --chaos-enabled --chaos-level low
 **Example output:**
 ```
 NETWORK CHAOS PARAMETERS
-chaosEnabled: true
-chaosLevel: high
-  delay: 100-500ms
-  jitter: 0-100ms
-  packetLoss: 0-5%
+  delay: 0-500ms
+  jitter: 50-200ms
+  packetLoss: 0-25%
   interval: 10000ms
+```
+
+### Database Chaos Testing
+
+The fork test can inject database chaos by temporarily locking database files to simulate database contention and I/O issues.
+
+**Chaos Levels:**
+
+| Level  | Lock Duration | Interval |
+|--------|---------------|----------|
+| low    | 50-250ms      | 10s      |
+| medium | 100-2000ms    | 15s      |
+| high   | 500-2000ms    | 5s       |
+
+**Usage:**
+
+```bash
+# Run with low database chaos
+yarn fork --db-chaos-level low
+
+# Run with high database chaos level
+yarn fork --db-chaos-level high
+
+# Run 50 iterations with medium database chaos
+yarn fork --count 50 --db-chaos-level medium
+
+# Combine network and database chaos
+yarn fork --env local --network-chaos-level medium --db-chaos-level medium
+```
+
+**How it works:**
+1. Periodically locks database files for each worker
+2. Lock duration is randomized within the preset range
+3. Workers experience database busy/locked errors during operations
+4. Cleans up and waits for all locks to complete when test finishes
+
+**Example output:**
+```
+DATABASE CHAOS PARAMETERS
+  lockDuration: 500-2000ms
+  interval: 5000ms
 ```

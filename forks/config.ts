@@ -1,5 +1,6 @@
 import { type DbChaosConfig } from "@chaos/db";
 import type { NetworkChaosConfig } from "@chaos/network";
+import type { StreamsConfig } from "@chaos/streams";
 import { getActiveVersion, type XmtpEnv } from "@helpers/versions";
 
 export const NODE_VERSION = getActiveVersion().nodeBindings; // default to latest version, can be overridden with --nodeBindings=3.1.1
@@ -22,7 +23,7 @@ export const epochRotationOperations = {
 export const otherOperations = {
   createInstallation: false, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
-  sync: true, // syncs the group
+  sync: false, // syncs the group
 };
 export const randomInboxIdsCount = 50; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
@@ -74,17 +75,20 @@ export const dbChaosPresets: Record<
   low: {
     minLockTime: 50,
     maxLockTime: 250,
-    lockInterval: 10000, // 20 seconds
+    lockInterval: 10000, // 10 seconds
+    impactedWorkerPercentage: 20,
   },
   medium: {
     minLockTime: 100,
     maxLockTime: 2000,
     lockInterval: 15000, // 15 seconds
+    impactedWorkerPercentage: 40,
   },
   high: {
     minLockTime: 500,
     maxLockTime: 2000,
     lockInterval: 5000, // 5 seconds
+    impactedWorkerPercentage: 60,
   },
 };
 
@@ -130,7 +134,7 @@ export type RuntimeConfig = {
   network: XmtpEnv; // XMTP network
   networkChaos: NetworkChaosConfig | null; // Network chaos configuration
   dbChaos: DbChaosConfig | null; // Database chaos configuration
-  backgroundStreams: boolean; //
+  backgroundStreams: StreamsConfig | null; //
 };
 
 export function getConfigFromEnv(): RuntimeConfig {
@@ -161,7 +165,9 @@ export function printConfig(config: RuntimeConfig): void {
   console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
   console.info(`installationCount: ${installationCount}`);
   console.info(`testName: ${testName}`);
-  console.info(`backgroundStreams: ${config.backgroundStreams}`);
+  console.info(
+    `backgroundStreams: ${config.backgroundStreams ? "enabled" : "disabled"}. From separate client instances: ${config.backgroundStreams?.cloned}`,
+  );
 
   if (config.networkChaos) {
     console.info("\nNETWORK CHAOS PARAMETERS");
