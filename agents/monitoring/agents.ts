@@ -120,5 +120,12 @@ const agents: AgentConfig[] = [
     networks: ["dev", "production"],
     live: false,
   },
+  {
+    name: "basemate",
+    address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
+    sendMessage: "hi",
+    networks: ["dev", "production"],
+    live: true,
+  },
 ];
 export default agents;
