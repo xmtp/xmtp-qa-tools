@@ -50,7 +50,11 @@ function buildRuntimeConfig(options: ForkOptions): RuntimeConfig {
     network: (options.env || "dev") as "local" | "dev" | "production",
     networkChaos: resolveNetworkChaosConfig(options.networkChaosLevel),
     dbChaos: resolveDbChaosConfig(options.dbChaosLevel),
-    backgroundStreams: options.withBackgroundStreams,
+    backgroundStreams: options.withBackgroundStreams
+      ? {
+          cloned: true,
+        }
+      : null,
   };
 }
 
@@ -129,7 +133,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     const success = runForkTest(options, runtimeConfig);
     if (!success) {
       stats.runsWithErrors++;
-      console.log(`❌ Error in run ${i}/${options.count}`);
+      console.info(`❌ Error in run ${i}/${options.count}`);
     }
 
     // Clean and analyze fork logs after the test (suppress output)

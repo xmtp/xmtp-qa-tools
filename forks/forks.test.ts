@@ -32,8 +32,14 @@ const {
 } = getConfigFromEnv();
 
 const createOperations = (worker: Worker, groupID: string) => {
-  const getGroup = () =>
-    worker.client.conversations.getConversationById(groupID) as Promise<Group>;
+  const getGroup = async () => {
+    const group =
+      await worker.client.conversations.getConversationById(groupID);
+    if (!group) {
+      throw new Error(`Group ${groupID} not found`);
+    }
+    return group as Group;
+  };
 
   return {
     updateName: () =>
@@ -89,7 +95,7 @@ const startChaos = async (workers: WorkerManager): Promise<ChaosProvider[]> => {
   }
 
   if (backgroundStreams) {
-    chaosProviders.push(new StreamsChaos());
+    chaosProviders.push(new StreamsChaos(backgroundStreams));
   }
 
   // Start all chaos providers
@@ -141,8 +147,9 @@ describe(testName, () => {
       const groupOperationPromises = groupIDs.map(
         async (groupID, groupIndex) => {
           let currentEpoch = 0n;
+          let numConsecutiveFailures = 0;
 
-          while (currentEpoch < targetEpoch) {
+          while (currentEpoch < targetEpoch && numConsecutiveFailures < 5) {
             const parallelOperationsArray = Array.from(
               { length: parallelOperations },
               () =>
@@ -191,20 +198,30 @@ describe(testName, () => {
                   }
                 })(),
             );
-            try {
-              await Promise.all(parallelOperationsArray);
-            } catch (e) {
-              console.error(`Group ${groupIndex + 1} operation failed:`, e);
+            const results = await Promise.allSettled(parallelOperationsArray);
+            for (const result of results) {
+              if (result.status === "rejected") {
+                console.error(
+                  `Group ${groupIndex + 1} operation failed:`,
+                  result.reason,
+                );
+              }
             }
 
-            await workers.checkForksForGroup(groupID);
-            const group = await workers
-              .getCreator()
-              .client.conversations.getConversationById(groupID);
-            if (!group) {
-              throw new Error("Could not find group");
+            try {
+              await workers.checkForksForGroup(groupID);
+              const group = await workers
+                .getCreator()
+                .client.conversations.getConversationById(groupID);
+              if (!group) {
+                throw new Error("Could not find group");
+              }
+              currentEpoch = (await group.debugInfo()).epoch;
+              numConsecutiveFailures = 0;
+            } catch (e) {
+              console.error(`Group ${groupIndex + 1} operation failed:`, e);
+              numConsecutiveFailures++;
             }
-            currentEpoch = (await group.debugInfo()).epoch;
           }
 
           return { groupIndex, finalEpoch: currentEpoch };
@@ -212,7 +229,6 @@ describe(testName, () => {
       );
 
       await Promise.all(groupOperationPromises);
-      await workers.checkForks();
     } catch (e: any) {
       const msg = `Error during fork testing: ${e}`;
       console.error(msg);
@@ -223,6 +239,8 @@ describe(testName, () => {
       for (const chaosProvider of chaosProviders) {
         await chaosProvider.stop();
       }
+      // Check for forks one last time, with all chaos turned off to ensure the check can succeed.
+      await workers.checkForks();
     }
   });
 });
