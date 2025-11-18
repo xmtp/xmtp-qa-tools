@@ -23,6 +23,7 @@ XMTP_ENV=production
 ```
 
 ### Running locally
+
 Before running this suite locally you _must_ run `yarn gen update:local` to pre-populate the database with inboxes to add and remove from the group. Otherwise add/remove member operations will fail, which will not increase the epoch or trigger forks.
 
 ### Fork generation through parallel operations
@@ -142,6 +143,7 @@ The CLI provides statistics including:
 The fork test can inject network chaos (latency, jitter, packet loss) to simulate adverse network conditions. This helps identify forks that occur under realistic network stress.
 
 **Requirements:**
+
 - Network chaos requires `--env local`
 - Multinode Docker containers must be running (`./multinode/up`)
 - Must be run on Linux with `tc` and `iptables` commands available. Will not work on MacOS.
@@ -150,7 +152,7 @@ The fork test can inject network chaos (latency, jitter, packet loss) to simulat
 **Chaos Levels:**
 
 | Level  | Delay Range | Jitter Range | Packet Loss | Interval |
-|--------|-------------|--------------|-------------|----------|
+| ------ | ----------- | ------------ | ----------- | -------- |
 | low    | 50-150ms    | 0-50ms       | 0-2%        | 15s      |
 | medium | 100-300ms   | 0-75ms       | 0-3.5%      | 10s      |
 | high   | 0-500ms     | 50-200ms     | 0-25%       | 10s      |
@@ -169,12 +171,14 @@ yarn fork --count 50 --env local --network-chaos-level medium
 ```
 
 **How it works:**
+
 1. Initializes Docker container handles for all multinode nodes
 2. Applies random network conditions (within preset ranges) at regular intervals
 3. Runs the fork test as normal while chaos is active
 4. Cleans up network rules when test completes (even if test fails)
 
 **Example output:**
+
 ```
 NETWORK CHAOS PARAMETERS
   delay: 0-500ms
@@ -190,7 +194,7 @@ The fork test can inject database chaos by temporarily locking database files to
 **Chaos Levels:**
 
 | Level  | Lock Duration | Interval |
-|--------|---------------|----------|
+| ------ | ------------- | -------- |
 | low    | 50-250ms      | 10s      |
 | medium | 100-2000ms    | 15s      |
 | high   | 500-2000ms    | 5s       |
@@ -212,12 +216,14 @@ yarn fork --env local --network-chaos-level medium --db-chaos-level medium
 ```
 
 **How it works:**
+
 1. Periodically locks database files for each worker
 2. Lock duration is randomized within the preset range
 3. Workers experience database busy/locked errors during operations
 4. Cleans up and waits for all locks to complete when test finishes
 
 **Example output:**
+
 ```
 DATABASE CHAOS PARAMETERS
   lockDuration: 500-2000ms
