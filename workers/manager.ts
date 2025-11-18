@@ -175,7 +175,7 @@ export class WorkerManager implements IWorkerManager {
         continue;
       }
 
-      await group.sync();
+      // await group.sync();
       const debugInfo = await group.debugInfo();
       const members = await group.members();
       let totalGroupInstallations = 0;
