@@ -14,6 +14,7 @@
     "build": "tsc",
     "c": "yarn build && yarn lint && yarn format",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
+    "download-server": "tsx railway/download-server.ts",
     "fork": "tsx forks/cli.ts",
     "format": "prettier -w .",
     "gen": "tsx cli/gen.ts",
