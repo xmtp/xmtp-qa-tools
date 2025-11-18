@@ -1,4 +1,5 @@
 import { DbChaos } from "@chaos/db";
+import { ExpandGroup } from "@chaos/expand";
 import { NetworkChaos } from "@chaos/network";
 import type { ChaosProvider } from "@chaos/provider";
 import { StreamsChaos } from "@chaos/streams";
@@ -29,6 +30,7 @@ const {
   targetEpoch,
   networkChaos,
   dbChaos,
+  groupExpansion,
   backgroundStreams,
 } = getConfigFromEnv();
 
@@ -97,6 +99,10 @@ const startChaos = async (workers: WorkerManager): Promise<ChaosProvider[]> => {
 
   if (backgroundStreams) {
     chaosProviders.push(new StreamsChaos(backgroundStreams));
+  }
+
+  if (groupExpansion) {
+    chaosProviders.push(new ExpandGroup({ interval: groupExpansion.interval }));
   }
 
   // Start all chaos providers

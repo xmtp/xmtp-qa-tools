@@ -153,7 +153,7 @@ export class WorkerManager implements IWorkerManager {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
       await Promise.all(
-        groups.flat().map(async (g) => {
+        groups.map(async (g) => {
           const debugInfo = await g.debugInfo();
           if (debugInfo.maybeForked || debugInfo.isCommitLogForked) {
             throw new Error(

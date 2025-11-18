@@ -27,6 +27,7 @@ interface ForkOptions {
   groupCount: number; // Number of groups to run the test against
   parallelOperations: number; // Number of parallel operations run on each group
   targetEpoch: number; // Target epoch to stop the test at
+  expandGroupEvery?: number;
 }
 
 /**
@@ -51,9 +52,16 @@ function buildRuntimeConfig(options: ForkOptions): RuntimeConfig {
     network: (options.env || "dev") as "local" | "dev" | "production",
     networkChaos: resolveNetworkChaosConfig(options.networkChaosLevel),
     dbChaos: resolveDbChaosConfig(options.dbChaosLevel),
+    groupExpansion: options.expandGroupEvery
+      ? {
+          interval: options.expandGroupEvery * 1000,
+        }
+      : null,
     backgroundStreams: options.withBackgroundStreams
       ? {
-          cloned: true,
+          cloned: false,
+          streamGroups: true,
+          streamMessages: true,
         }
       : null,
   };
@@ -264,6 +272,10 @@ async function main() {
       default: 20,
       describe: "Target epoch to stop the test at",
     })
+    .option("expand-group-every", {
+      type: "number",
+      describe: "Add a member to the group every n seconds",
+    })
     .example("yarn fork", "Run 100 times and get stats")
     .example("yarn fork --count 50", "Run 50 times")
     .example("yarn fork --clean-all", "Clean all raw logs before starting")
@@ -309,6 +321,7 @@ async function main() {
     groupCount: argv["group-count"],
     parallelOperations: argv["parallel-operations"],
     targetEpoch: argv["target-epoch"],
+    expandGroupEvery: argv["expand-group-every"],
   };
 
   await runForkDetection(options);
