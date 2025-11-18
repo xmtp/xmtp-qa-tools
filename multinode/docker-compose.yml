@@ -113,6 +113,12 @@ services:
       - mlsdb
       - validation
 
+  history-server:
+    image: ghcr.io/xmtp/message-history-server:main
+    platform: linux/amd64
+    ports:
+      - 5558:5558
+
   validation:
     image: ghcr.io/xmtp/mls-validation-service:main
     platform: linux/amd64

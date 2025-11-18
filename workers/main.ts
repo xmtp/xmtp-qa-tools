@@ -113,6 +113,9 @@ interface IWorkerClient {
 
   // Properties
   readonly currentFolder: string;
+
+  // Clone Management
+  clone(): Promise<WorkerClient>;
 }
 
 // Worker thread code as a string
@@ -146,17 +149,17 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
   import { parentPort, workerData } from "node:worker_threads";
-  
+
   // Execute the worker code
   const workerCode = ${JSON.stringify(workerThreadCode)};
   const workerModule = new Function('require', 'parentPort', 'workerData', 'process', workerCode);
-  
+
   // Get the require function
   import { createRequire } from "node:module";
   import { fileURLToPath } from "node:url";
   const __filename = fileURLToPath("${import.meta.url}");
   const require = createRequire(__filename);
-  
+
   // Execute the worker code
   workerModule(require, parentPort, workerData, process);
 `;
@@ -1114,6 +1117,38 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
 
   /**
+   * Locks the database file for a specified duration to simulate chaos
+   * @param lockMs - Duration to hold the lock in milliseconds
+   * @returns Promise that resolves when the lock is released
+   */
+  public async lockDB(lockMs: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.client.disconnectDatabase();
+
+        // Release the lock after the specified duration
+        setTimeout(async () => {
+          try {
+            await this.client.reconnectDatabase();
+            console.log(`[${this.nameId}] Reconnected to the database`);
+            resolve();
+          } catch (error: any) {
+            reject(
+              new Error(
+                `[${this.nameId}] Error releasing database lock: ${error}`,
+              ),
+            );
+          }
+        }, lockMs);
+      } catch (error: any) {
+        reject(
+          new Error(`[${this.nameId}] Error disconnecting database: ${error}`),
+        );
+      }
+    });
+  }
+
+  /**
    * Revokes installations above a threshold count
    * @param threshold - Maximum number of installations allowed
    */
@@ -1221,5 +1256,43 @@ export class WorkerClient extends Worker implements IWorkerClient {
       address: address,
       installationId: newInstallationId,
     };
+  }
+
+  /**
+   * Creates a clone of this worker client with a separate underlying client instance
+   * The clone will have the same configuration but a new name: ${original_worker_name}_clone
+   * @returns A new WorkerClient instance with separate client
+   */
+  async clone(): Promise<WorkerClient> {
+    console.debug(`[${this.nameId}] Creating clone of worker`);
+
+    // Create the clone name
+    const cloneName = `${this.name}_clone`;
+
+    // Create a WorkerBase object with the same properties but new name
+    const cloneWorkerBase: WorkerBase = {
+      name: cloneName,
+      sdk: this.sdk,
+      folder: this.folder,
+      walletKey: this.walletKey,
+      encryptionKey: this.encryptionKeyHex,
+    };
+
+    // Create a new WorkerClient instance with the same configuration
+    const clonedWorker = new WorkerClient(
+      cloneWorkerBase,
+      this.env,
+      {}, // Use default worker options
+      this.apiUrl,
+    );
+
+    // Initialize the cloned worker to create its client instance
+    await clonedWorker.initialize();
+
+    console.debug(
+      `[${this.nameId}] Successfully created clone: ${clonedWorker.nameId}`,
+    );
+
+    return clonedWorker;
   }
 }

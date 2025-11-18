@@ -12,6 +12,7 @@ import {
   type Group,
   type XmtpEnv,
 } from "@helpers/versions";
+import { forkDetectedString } from "forks/constants";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,
@@ -154,8 +155,10 @@ export class WorkerManager implements IWorkerManager {
       await Promise.all(
         groups.flat().map(async (g) => {
           const debugInfo = await g.debugInfo();
-          if (debugInfo.maybeForked) {
-            throw new Error(`Stopping test, group id ${g.id} may have forked`);
+          if (debugInfo.maybeForked || debugInfo.isCommitLogForked) {
+            throw new Error(
+              `${forkDetectedString} Stopping test, group id ${g.id} may have forked`,
+            );
           }
         }),
       );
@@ -179,8 +182,8 @@ export class WorkerManager implements IWorkerManager {
       for (const member of members)
         totalGroupInstallations += member.installationIds.length;
 
-      if (debugInfo.maybeForked) {
-        const logMessage = `Fork detected, group id ${groupId} may have forked, epoch ${debugInfo.epoch} for worker ${worker.name}`;
+      if (debugInfo.maybeForked || debugInfo.isCommitLogForked) {
+        const logMessage = `${forkDetectedString}. Group id ${groupId} may have forked, epoch ${debugInfo.epoch} for worker ${worker.name}`;
         console.error(logMessage);
         throw new Error(logMessage);
       }

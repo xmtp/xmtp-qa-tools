@@ -3,50 +3,30 @@ import fs from "fs";
 import path from "path";
 import { cleanAllRawLogs, cleanForksLogs } from "@helpers/analyzer";
 import "dotenv/config";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import {
-  epochRotationOperations,
-  groupCount,
-  installationCount,
-  network,
-  NODE_VERSION,
-  otherOperations,
-  parallelOperations,
-  randomInboxIdsCount,
-  targetEpoch,
-  testName,
-  workerNames,
+  printConfig,
+  resolveDbChaosConfig,
+  resolveNetworkChaosConfig,
+  type DbChaosLevel,
+  type NetworkChaosLevel,
+  type RuntimeConfig,
 } from "./config";
 
+// CLI options for fork testing
 interface ForkOptions {
   count: number; // Number of times to run the process (default: 100)
   cleanAll: boolean; // Clean all raw logs before starting
   removeNonMatching: boolean; // Remove non-matching logs
   env?: string; // XMTP environment (local, dev, production)
-}
-
-function showHelp() {
-  console.log(`
-XMTP Fork Detection CLI - Fork detection and analysis
-
-USAGE:
-  yarn fork [options]
-
-OPTIONS:
-  --count <number>           Number of times to run the fork detection process [default: 100]
-  --clean-all                Clean all raw logs before starting (equivalent to ansi:clean)
-  --remove-non-matching      Remove logs that don't contain fork content [default: true]
-  --no-remove-non-matching   Keep logs that don't contain fork content
-  --env <environment>        XMTP environment (local, dev, production) [default: dev]
-  -h, --help                 Show this help message
-
-EXAMPLES:
-  yarn fork                    # Run 100 times and get stats
-  yarn fork --count 50          # Run 50 times
-  yarn fork --clean-all         # Clean all raw logs before starting
-  yarn fork --count 200 --env local # Run 200 times on local environment
-
-For more information, see: forks/README.md
-`);
+  networkChaosLevel: NetworkChaosLevel; // Network chaos level
+  dbChaosLevel: DbChaosLevel; // DB chaos level
+  withBackgroundStreams: boolean; // Enable message streams on all workers
+  logLevel: string; // Log level for test runner
+  groupCount: number; // Number of groups to run the test against
+  parallelOperations: number; // Number of parallel operations run on each group
+  targetEpoch: number; // Target epoch to stop the test at
 }
 
 /**
@@ -61,43 +41,51 @@ function getForkCount(): number {
 }
 
 /**
- * Run the fork test (suppress output)
+ * Build RuntimeConfig from ForkOptions
  */
-function runForkTest(env?: string): void {
-  const envFlag = env ? `--env ${env}` : "";
-  const command = `yarn test forks ${envFlag} --log warn --file`.trim();
+function buildRuntimeConfig(options: ForkOptions): RuntimeConfig {
+  return {
+    groupCount: options.groupCount,
+    parallelOperations: options.parallelOperations,
+    targetEpoch: options.targetEpoch,
+    network: (options.env || "dev") as "local" | "dev" | "production",
+    networkChaos: resolveNetworkChaosConfig(options.networkChaosLevel),
+    dbChaos: resolveDbChaosConfig(options.dbChaosLevel),
+    backgroundStreams: options.withBackgroundStreams
+      ? {
+          cloned: true,
+        }
+      : null,
+  };
+}
+
+/**
+ * Run the fork test (suppress output) and return whether it completed successfully
+ */
+function runForkTest(
+  options: ForkOptions,
+  runtimeConfig: RuntimeConfig,
+): boolean {
+  const envFlag = options.env ? `--env ${options.env}` : "";
+  const command =
+    `yarn test forks ${envFlag} --log ${options.logLevel} --file`.trim();
 
   try {
     execSync(command, {
       stdio: "ignore",
-      env: { ...process.env },
+      env: {
+        ...process.env,
+        FORK_TEST_CONFIG: JSON.stringify(runtimeConfig),
+      },
     });
-  } catch {
+
+    return true;
+  } catch (e) {
+    console.error("Error running fork test", e);
+    return false;
     // Test may fail if forks are detected, that's expected
     // We'll analyze the logs afterward
   }
-}
-
-/**
- * Log fork matrix parameters from shared config
- */
-function logForkMatrixParameters(): void {
-  console.info("\nFORK MATRIX PARAMETERS");
-  console.info("-".repeat(60));
-  console.info(`groupCount: ${groupCount}`);
-  console.info(`parallelOperations: ${parallelOperations}`);
-  console.info(`NODE_VERSION: ${NODE_VERSION}`);
-  console.info(`workerNames: [${workerNames.join(", ")}]`);
-  console.info(
-    `epochRotationOperations: ${JSON.stringify(epochRotationOperations)}`,
-  );
-  console.info(`otherOperations: ${JSON.stringify(otherOperations)}`);
-  console.info(`targetEpoch: ${targetEpoch}`);
-  console.info(`network: ${network || "undefined"}`);
-  console.info(`randomInboxIdsCount: ${randomInboxIdsCount}`);
-  console.info(`installationCount: ${installationCount}`);
-  console.info(`testName: ${testName}`);
-  console.info("-".repeat(60) + "\n");
 }
 
 /**
@@ -108,8 +96,20 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   console.info("XMTP Fork Detection CLI");
   console.info("=".repeat(60));
 
+  // Validate chaos requirements
+  if (options.networkChaosLevel !== "none" && options.env !== "local") {
+    console.error("\n❌ Error: Network chaos testing requires --env local");
+    console.error(
+      "Network chaos manipulates Docker containers which are only available in local environment.\n",
+    );
+    process.exit(1);
+  }
+
+  // Build RuntimeConfig for logging and running tests
+  const runtimeConfig = buildRuntimeConfig(options);
+
   // Log fork matrix parameters once
-  logForkMatrixParameters();
+  printConfig(runtimeConfig);
 
   console.info(`Running fork detection process ${options.count} time(s)...\n`);
 
@@ -118,6 +118,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
     forksDetected: 0,
     runsWithForks: 0,
     runsWithoutForks: 0,
+    runsWithErrors: 0,
   };
 
   // Clean logs if requested before starting
@@ -130,7 +131,11 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   // Run the test N times
   for (let i = 1; i <= options.count; i++) {
     // Run the fork test (silently)
-    runForkTest(options.env);
+    const success = runForkTest(options, runtimeConfig);
+    if (!success) {
+      stats.runsWithErrors++;
+      console.info(`❌ Error in run ${i}/${options.count}`);
+    }
 
     // Clean and analyze fork logs after the test (suppress output)
     const originalConsoleDebug = console.debug;
@@ -153,15 +158,6 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
       stats.runsWithoutForks++;
       console.info(`Run ${i}/${options.count}: ⚪ No forks`);
     }
-
-    // Clean up empty cleaned directory if it exists
-    const logsDir = path.join(process.cwd(), "logs", "cleaned");
-    if (fs.existsSync(logsDir)) {
-      const files = fs.readdirSync(logsDir);
-      if (files.length === 0) {
-        fs.rmdirSync(logsDir);
-      }
-    }
   }
 
   // Display final statistics
@@ -172,6 +168,7 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
   console.info(`Total forks detected: ${stats.forksDetected}`);
   console.info(`Runs with forks: ${stats.runsWithForks}`);
   console.info(`Runs without forks: ${stats.runsWithoutForks}`);
+  console.info(`Runs with errors: ${stats.runsWithErrors}`);
   console.info(
     `Fork detection rate: ${(
       (stats.runsWithForks / stats.totalRuns) *
@@ -203,69 +200,116 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-
-  // Default options
-  const options: ForkOptions = {
-    count: 100,
-    cleanAll: false,
-    removeNonMatching: true,
-    env: process.env.XMTP_ENV || "dev",
-  };
-
-  // Parse arguments
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-
-    switch (arg) {
-      case "-h":
-      case "--help":
-        showHelp();
-        process.exit(0);
-        break;
-      case "--count":
-        if (i + 1 < args.length) {
-          const count = parseInt(args[i + 1], 10);
-          if (isNaN(count) || count < 1) {
-            console.error("--count must be a positive number");
-            process.exit(1);
-          }
-          options.count = count;
-          i++; // Skip next argument
-        } else {
-          console.error("--count flag requires a value (e.g., --count 100)");
-          process.exit(1);
-        }
-        break;
-      case "--clean-all":
-        options.cleanAll = true;
-        break;
-      case "--remove-non-matching":
-        options.removeNonMatching = true;
-        break;
-      case "--no-remove-non-matching":
-        options.removeNonMatching = false;
-        break;
-      case "--env":
-        if (i + 1 < args.length) {
-          const env = args[i + 1];
-          if (!["local", "dev", "production"].includes(env)) {
-            console.error("--env must be one of: local, dev, production");
-            process.exit(1);
-          }
-          options.env = env;
-          i++; // Skip next argument
-        } else {
-          console.error("--env flag requires a value (e.g., --env dev)");
-          process.exit(1);
-        }
-        break;
+  const argv = await yargs(hideBin(process.argv))
+    .usage("Usage: yarn fork [options]")
+    .option("count", {
+      type: "number",
+      default: 100,
+      describe: "Number of times to run the fork detection process",
+    })
+    .option("clean-all", {
+      type: "boolean",
+      default: false,
+      describe: "Clean all raw logs before starting",
+    })
+    .parserConfiguration({
+      "boolean-negation": true,
+    })
+    .option("remove-non-matching", {
+      type: "boolean",
+      default: true,
+      describe: "Remove logs that don't contain fork content",
+    })
+    .option("env", {
+      type: "string",
+      choices: ["local", "dev", "production"] as const,
       default:
-        console.error(`Unknown option: ${arg}`);
-        console.error("Use --help for usage information");
-        process.exit(1);
-    }
-  }
+        (process.env.XMTP_ENV as "local" | "dev" | "production") || "local",
+      describe: "XMTP environment",
+    })
+    .option("network-chaos-level", {
+      type: "string",
+      choices: ["none", "low", "medium", "high"] as const,
+      default: "none" as const,
+      describe: "Network chaos level (requires --env local)",
+    })
+    .option("db-chaos-level", {
+      type: "string",
+      choices: ["none", "low", "medium", "high"] as const,
+      default: "none" as const,
+      describe: "Database chaos level with presets",
+    })
+    .option("with-background-streams", {
+      type: "boolean",
+      default: false,
+      describe: "Enable message streams on all workers",
+    })
+    .option("log-level", {
+      type: "string",
+      default: "warn",
+      describe: "Log level for test runner (e.g., debug, info, warn, error)",
+    })
+    .option("group-count", {
+      type: "number",
+      default: 5,
+      describe: "Number of groups to run the test against",
+    })
+    .option("parallel-operations", {
+      type: "number",
+      default: 5,
+      describe: "Number of parallel operations run on each group",
+    })
+    .option("target-epoch", {
+      type: "number",
+      default: 20,
+      describe: "Target epoch to stop the test at",
+    })
+    .example("yarn fork", "Run 100 times and get stats")
+    .example("yarn fork --count 50", "Run 50 times")
+    .example("yarn fork --clean-all", "Clean all raw logs before starting")
+    .example(
+      "yarn fork --count 200 --env local",
+      "Run 200 times on local environment",
+    )
+    .example(
+      "yarn fork --env local --network-chaos-level medium",
+      "Run with medium network chaos",
+    )
+    .example(
+      "yarn fork --env local --network-chaos-level high",
+      "Run with high network chaos",
+    )
+    .example(
+      "yarn fork --with-background-streams",
+      "Run with message streams enabled",
+    )
+    .example(
+      "yarn fork --db-chaos-level medium",
+      "Run with medium database locking chaos",
+    )
+    .example(
+      "yarn fork --no-remove-non-matching",
+      "Keep logs that don't contain fork content",
+    )
+    .epilogue("For more information, see: forks/README.md")
+    .help()
+    .alias("h", "help")
+    .strict()
+    .parseAsync();
+
+  const options: ForkOptions = {
+    count: argv.count,
+    cleanAll: argv["clean-all"],
+    removeNonMatching: argv["remove-non-matching"],
+    env: argv.env,
+    networkChaosLevel: argv["network-chaos-level"] as NetworkChaosLevel,
+    dbChaosLevel: argv["db-chaos-level"] as DbChaosLevel,
+    withBackgroundStreams: argv["with-background-streams"],
+    logLevel: argv["log-level"],
+    groupCount: argv["group-count"],
+    parallelOperations: argv["parallel-operations"],
+    targetEpoch: argv["target-epoch"],
+  };
 
   await runForkDetection(options);
 }
