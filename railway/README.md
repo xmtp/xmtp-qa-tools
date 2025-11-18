@@ -6,6 +6,14 @@ server to Railway, and accessing the backups listing on port `8080`.
 > [!NOTE]  
 > THis guides assumes you are deploying to Railway in the /app/data folder using this [tutorial](https://docs.xmtp.org/agents/deploy/deploy-agent)
 
+> [!TIP]  
+> If you already have an agent deployed on Railway, you can simply SSH into it and run the download server:
+>
+> ```bash
+> railway ssh
+> yarn download-server
+> ```
+
 ## 1. Clone the project
 
 ```bash
