@@ -13,6 +13,7 @@ import {
   epochRotationOperations,
   getConfigFromEnv,
   installationCount,
+  maxConsecutiveFailures,
   multinodeContainers,
   NODE_VERSION,
   otherOperations,
@@ -149,7 +150,8 @@ describe(testName, () => {
           let currentEpoch = 0n;
           let numConsecutiveFailures = 0;
 
-          while (currentEpoch < targetEpoch && numConsecutiveFailures < 5) {
+          // Run until we reach the target epoch or we hit 5 consecutive failures.
+          while (currentEpoch < targetEpoch) {
             const parallelOperationsArray = Array.from(
               { length: parallelOperations },
               () =>
@@ -198,6 +200,8 @@ describe(testName, () => {
                   }
                 })(),
             );
+
+            // We want to wait for all operations to complete, but ignore any errors which may be caused by the chaos
             const results = await Promise.allSettled(parallelOperationsArray);
             for (const result of results) {
               if (result.status === "rejected") {
@@ -221,6 +225,9 @@ describe(testName, () => {
             } catch (e) {
               console.error(`Group ${groupIndex + 1} operation failed:`, e);
               numConsecutiveFailures++;
+              if (numConsecutiveFailures >= maxConsecutiveFailures) {
+                throw e;
+              }
             }
           }
 
@@ -232,6 +239,7 @@ describe(testName, () => {
     } catch (e: any) {
       const msg = `Error during fork testing: ${e}`;
       console.error(msg);
+      // This will fail the test if there were too many failures
       expect.fail(msg);
     } finally {
       clearInterval(verifyInterval);

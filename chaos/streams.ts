@@ -3,7 +3,7 @@ import { typeofStream, type WorkerClient } from "@workers/main";
 import type { WorkerManager } from "@workers/manager";
 
 export type StreamsConfig = {
-  cloned: boolean;
+  cloned: boolean; // Should the stream be run against the workers used in the tests, or a cloned client instance?
 };
 
 export class StreamsChaos implements ChaosProvider {

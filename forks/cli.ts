@@ -14,6 +14,7 @@ import {
   type RuntimeConfig,
 } from "./config";
 
+// CLI options for fork testing
 interface ForkOptions {
   count: number; // Number of times to run the process (default: 100)
   cleanAll: boolean; // Clean all raw logs before starting
@@ -223,7 +224,7 @@ async function main() {
       type: "string",
       choices: ["local", "dev", "production"] as const,
       default:
-        (process.env.XMTP_ENV as "local" | "dev" | "production") || "dev",
+        (process.env.XMTP_ENV as "local" | "dev" | "production") || "local",
       describe: "XMTP environment",
     })
     .option("network-chaos-level", {

@@ -2,9 +2,9 @@ import type { ChaosProvider } from "@chaos/provider";
 import type { WorkerManager } from "@workers/manager";
 
 export type DbChaosConfig = {
-  minLockTime: number;
-  maxLockTime: number;
-  lockInterval: number;
+  minLockTime: number; // Minimum duration in milliseconds to lock the database
+  maxLockTime: number; // Maximum duration in milliseconds to lock the database
+  lockInterval: number; // Interval in milliseconds between lock attempts
   impactedWorkerPercentage: number; // number between 0 and 100 for what % of workers to lock on each run
 };
 
@@ -14,6 +14,7 @@ export class DbChaos implements ChaosProvider {
   interval?: NodeJS.Timeout;
 
   constructor(config: DbChaosConfig) {
+    validateConfig(config);
     this.config = config;
   }
 
@@ -68,5 +69,28 @@ export class DbChaos implements ChaosProvider {
 
     // Wait for all the existing locks to complete
     await Promise.allSettled(Array.from(this.activeLocks.values()));
+  }
+}
+
+function validateConfig(config: DbChaosConfig): void {
+  if (config.minLockTime > config.maxLockTime) {
+    throw new Error(
+      "Minimum lock time cannot be greater than maximum lock time",
+    );
+  }
+
+  if (
+    config.impactedWorkerPercentage < 0 ||
+    config.impactedWorkerPercentage > 100
+  ) {
+    throw new Error("Impacted worker percentage must be between 0 and 100");
+  }
+
+  if (!config.lockInterval) {
+    throw new Error("Lock interval must be defined");
+  }
+
+  if (config.impactedWorkerPercentage === undefined) {
+    throw new Error("Impacted worker percentage must be defined");
   }
 }

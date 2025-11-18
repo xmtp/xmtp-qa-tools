@@ -12,11 +12,6 @@ export const workerNames = [
   "random3",
   "random4",
   "random5",
-  "random1",
-  "random2",
-  "random3",
-  "random4",
-  "random5",
 ] as string[];
 
 // Operations configuration - enable/disable specific operations
@@ -28,10 +23,11 @@ export const epochRotationOperations = {
 export const otherOperations = {
   createInstallation: true, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
-  sync: false, // syncs the group
+  sync: true, // syncs the group
 };
 export const randomInboxIdsCount = 50; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
+export const maxConsecutiveFailures = 5; // Maximum number of times we throw an error verifying the results of a batch of operations
 export const testName = "forks";
 
 // Network chaos configuration

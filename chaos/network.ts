@@ -11,8 +11,6 @@ export type NetworkChaosConfig = {
   interval: number; // How often to apply chaos in ms
 };
 
-// import type { Worker } from "@workers/manager";
-
 export class NetworkChaos implements ChaosProvider {
   config: NetworkChaosConfig;
   interval?: NodeJS.Timeout;

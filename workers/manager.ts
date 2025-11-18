@@ -271,10 +271,6 @@ export class WorkerManager implements IWorkerManager {
       await group.addMembers(extraMembers);
     }
 
-    for (const member of memberList) {
-      await group.addAdmin(member);
-    }
-
     return group as Group;
   }
 
@@ -516,7 +512,7 @@ export async function getWorkers(
       (v) => v.nodeBindings,
     );
   }
-  let successfulResults: Worker[] = [];
+  let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];
 
   // Handle different input types
@@ -528,75 +524,68 @@ export async function getWorkers(
           : getFixedNames(workers)
         : workers;
     descriptors = names;
-    for (const descriptor of descriptors) {
-      successfulResults.push(
-        await manager.createWorker(
-          descriptor,
-          sdkVersions[Math.floor(Math.random() * sdkVersions.length)],
-        ),
-      );
-    }
+    workerPromises = descriptors.map((descriptor) =>
+      manager.createWorker(
+        descriptor,
+        sdkVersions[Math.floor(Math.random() * sdkVersions.length)],
+      ),
+    );
   } else {
     // Record input - apply versioning if requested
     let entries = Object.entries(workers);
 
     descriptors = entries.map(([descriptor]) => descriptor);
-    for (const descriptor of descriptors) {
-      successfulResults.push(
-        await manager.createWorker(
-          descriptor,
-          sdkVersions[Math.floor(Math.random() * sdkVersions.length)],
-        ),
-      );
-    }
+    workerPromises = entries.map(([descriptor, apiUrl]) =>
+      manager.createWorker(descriptor, sdkVersions[0], apiUrl),
+    );
   }
 
-  // // Only use progress bar if there are more than 50 workers
-  // const useProgressBar = workerPromises.length > 50;
-  // let progressBar: ProgressBar | undefined;
+  // Only use progress bar if there are more than 50 workers
+  const useProgressBar = workerPromises.length > 50;
+  let progressBar: ProgressBar | undefined;
 
-  // if (useProgressBar) {
-  //   progressBar = new ProgressBar(
-  //     workerPromises.length,
-  //     `Initializing ${workerPromises.length} workers...`,
-  //   );
-  //   // Show initial progress immediately
-  //   progressBar.update(0);
-  // }
+  if (useProgressBar) {
+    progressBar = new ProgressBar(
+      workerPromises.length,
+      `Initializing ${workerPromises.length} workers...`,
+    );
+    // Show initial progress immediately
+    progressBar.update(0);
+  }
 
-  // // Track all workers in parallel and update progress as each completes
-  // let completedCount = 0;
-  // const results = await Promise.allSettled(
-  //   workerPromises.map(async (workerPromise) => {
-  //     try {
-  //       const worker = await workerPromise;
-  //       completedCount++;
-  //       if (useProgressBar && progressBar) {
-  //         progressBar.update(completedCount);
-  //       }
-  //       return worker;
-  //     } catch (error) {
-  //       completedCount++;
-  //       if (useProgressBar && progressBar) {
-  //         progressBar.update(completedCount);
-  //       }
-  //       throw error;
-  //     }
-  //   }),
-  // );
+  // Track all workers in parallel and update progress as each completes
+  let completedCount = 0;
+  const results = await Promise.allSettled(
+    workerPromises.map(async (workerPromise) => {
+      try {
+        const worker = await workerPromise;
+        completedCount++;
+        if (useProgressBar && progressBar) {
+          progressBar.update(completedCount);
+        }
+        return worker;
+      } catch (error) {
+        completedCount++;
+        if (useProgressBar && progressBar) {
+          progressBar.update(completedCount);
+        }
+        throw error;
+      }
+    }),
+  );
 
-  // // Check for any failures
-  // const failedResults = results.filter(
-  //   (result) => result.status === "rejected",
-  // );
-  // if (failedResults.length > 0) {
-  //   throw failedResults[0].reason;
-  // }
+  // Check for any failures
+  const failedResults = results.filter(
+    (result) => result.status === "rejected",
+  );
+  if (failedResults.length > 0) {
+    throw failedResults[0].reason;
+  }
 
-  // // Extract successful results
-  // const successfulResults = results.map(
-  //   (result) => (result as PromiseFulfilledResult<Worker>).value,
-  // );
+  // Extract successful results
+  const successfulResults = results.map(
+    (result) => (result as PromiseFulfilledResult<Worker>).value,
+  );
 
   // Add all successful workers to the manager
   for (const worker of successfulResults) {
@@ -625,11 +614,12 @@ function getNextFolderName(): string {
   const dataPath = path.resolve(process.cwd(), ".data");
   let folder = "a";
   if (fs.existsSync(dataPath)) {
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    folder = Array.from(
-      { length: 32 },
-      () => chars[Math.floor(Math.random() * chars.length)],
-    ).join("");
+    const existingFolders = fs
+      .readdirSync(dataPath)
+      .filter((f) => /^[a-z]$/.test(f));
+    folder = String.fromCharCode(
+      "a".charCodeAt(0) + (existingFolders.length % 26),
+    );
   }
   return folder;
 }

@@ -106,21 +106,21 @@ export const AgentVersionList = [
 // Node SDK version list
 export const VersionList = [
   {
-    Client: Client440,
-    Conversation: Conversation440,
-    Dm: Dm440,
-    Group: Group440,
-    nodeSDK: "4.4.0",
-    nodeBindings: "1.6.1",
-    auto: true,
-  },
-  {
     Client: Client430Dev,
     Conversation: Conversation430Dev,
     Dm: Dm430Dev,
     Group: Group430Dev,
     nodeSDK: "4.3.0",
     nodeBindings: "1.7.0",
+    auto: true,
+  },
+  {
+    Client: Client440,
+    Conversation: Conversation440,
+    Dm: Dm440,
+    Group: Group440,
+    nodeSDK: "4.4.0",
+    nodeBindings: "1.6.1",
     auto: true,
   },
   {
@@ -275,8 +275,6 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
       appVersion: APP_VERSION,
-      historySyncUrl: "http://localhost:5558",
-      disableDeviceSync: false,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } catch (error) {
