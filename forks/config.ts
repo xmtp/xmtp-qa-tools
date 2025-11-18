@@ -26,7 +26,7 @@ export const epochRotationOperations = {
   removeMember: true, // removes a random member from the group
 };
 export const otherOperations = {
-  createInstallation: false, // creates a new installation for a random worker
+  createInstallation: true, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
   sync: false, // syncs the group
 };

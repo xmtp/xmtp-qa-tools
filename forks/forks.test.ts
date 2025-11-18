@@ -32,12 +32,13 @@ const {
 } = getConfigFromEnv();
 
 const createOperations = (worker: Worker, groupID: string) => {
-  const getGroup = () => {
-    const group = worker.client.conversations.getConversationById(groupID);
+  const getGroup = async () => {
+    const group =
+      await worker.client.conversations.getConversationById(groupID);
     if (!group) {
       throw new Error(`Group ${groupID} not found`);
     }
-    return group as Promise<Group>;
+    return group as Group;
   };
 
   return {
