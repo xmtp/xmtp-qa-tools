@@ -4,6 +4,8 @@ import type { WorkerManager } from "@workers/manager";
 
 export type StreamsConfig = {
   cloned: boolean; // Should the stream be run against the workers used in the tests, or a cloned client instance?
+  streamGroups: boolean;
+  streamMessages: boolean;
 };
 
 export class StreamsChaos implements ChaosProvider {
@@ -23,7 +25,12 @@ export class StreamsChaos implements ChaosProvider {
 
     this.workers = allWorkers;
     for (const worker of allWorkers) {
-      worker.startStream(typeofStream.Message);
+      if (this.config.streamGroups) {
+        worker.startStream(typeofStream.Conversation);
+      }
+      if (this.config.streamMessages) {
+        worker.startStream(typeofStream.Message);
+      }
     }
 
     return Promise.resolve();

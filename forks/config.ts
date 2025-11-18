@@ -1,4 +1,5 @@
 import { type DbChaosConfig } from "@chaos/db";
+import { type ExpandGroupConfig } from "@chaos/expand";
 import type { NetworkChaosConfig } from "@chaos/network";
 import type { StreamsConfig } from "@chaos/streams";
 import { getActiveVersion, type XmtpEnv } from "@helpers/versions";
@@ -21,7 +22,7 @@ export const epochRotationOperations = {
   removeMember: true, // removes a random member from the group
 };
 export const otherOperations = {
-  createInstallation: true, // creates a new installation for a random worker
+  createInstallation: false, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
   sync: true, // syncs the group
 };
@@ -135,7 +136,8 @@ export type RuntimeConfig = {
   network: XmtpEnv; // XMTP network
   networkChaos: NetworkChaosConfig | null; // Network chaos configuration
   dbChaos: DbChaosConfig | null; // Database chaos configuration
-  backgroundStreams: StreamsConfig | null; //
+  backgroundStreams: StreamsConfig | null; // Background streams configuration
+  groupExpansion: ExpandGroupConfig | null;
 };
 
 export function getConfigFromEnv(): RuntimeConfig {
