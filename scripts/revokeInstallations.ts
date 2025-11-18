@@ -79,6 +79,19 @@ async function main() {
     process.exit(1);
   }
 
+  // Sanitize environment variable value by removing surrounding quotes
+  const sanitizeEnvValue = (value: string): string => {
+    const trimmed = value.trim();
+    // Remove surrounding quotes (single or double) if present
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      return trimmed.slice(1, -1);
+    }
+    return trimmed;
+  };
+
   // Read and parse .env file
   const envContent = await readFile(envPath, "utf-8");
   const envVars: Record<string, string> = {};
@@ -86,7 +99,7 @@ async function main() {
   envContent.split("\n").forEach((line) => {
     const [key, value] = line.split("=");
     if (key && value && !key.startsWith("#")) {
-      envVars[key.trim()] = value.trim();
+      envVars[key.trim()] = sanitizeEnvValue(value);
     }
   });
 
