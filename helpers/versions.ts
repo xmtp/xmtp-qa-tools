@@ -26,6 +26,12 @@ import {
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
+import {
+  Client as Client440,
+  Conversation as Conversation440,
+  Dm as Dm440,
+  Group as Group440,
+} from "@xmtp/node-sdk-4.4.0";
 
 export {
   Agent,
@@ -37,7 +43,7 @@ export {
 
 export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.14/debug";
 
-// Node SDK exports
+// Node SDK exports (using latest D14N-compatible version)
 export {
   Client,
   ConsentState,
@@ -55,7 +61,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.2.6";
+} from "@xmtp/node-sdk-4.4.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -70,6 +76,15 @@ export const AgentVersionList = [
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client440,
+    Conversation: Conversation440,
+    Dm: Dm440,
+    Group: Group440,
+    nodeSDK: "4.4.0",
+    nodeBindings: "1.6.1",
+    auto: true,
+  },
   {
     Client: Client426,
     Conversation: Conversation426,
@@ -195,17 +210,28 @@ export const regressionClient = async (
 
   const signer = createSigner(walletKey);
 
+  // D14N support: For bindings 1.6.1+, use d14nHost parameter instead of apiUrl
+  const supportsD14N = parseFloat(nodeBindings) >= 1.6;
+  const clientOptions: any = {
+    dbEncryptionKey,
+    dbPath,
+    env: env as unknown as XmtpEnv,
+    loggingLevel,
+    appVersion: APP_VERSION,
+    codecs: [new ReactionCodec(), new ReplyCodec()],
+  };
+
+  // Add D14N or legacy API URL parameter based on SDK version
+  if (supportsD14N && apiUrl) {
+    clientOptions.d14nHost = apiUrl; // For 1.6.1+: Use d14nHost for D14N gateway
+    console.debug(`Using D14N mode with gateway: ${apiUrl}`);
+  } else if (apiUrl) {
+    clientOptions.apiUrl = apiUrl; // For older versions: Use apiUrl
+  }
+
   try {
     // @ts-expect-error - TODO: fix this
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env: env as unknown as XmtpEnv,
-      loggingLevel,
-      apiUrl,
-      appVersion: APP_VERSION,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
+    client = await ClientClass.create(signer, clientOptions);
   } catch (error) {
     // If database file is corrupted, try using a different path
     if (
@@ -223,16 +249,24 @@ export const regressionClient = async (
       console.debug(`Using alternative database path: ${alternativeDbPath}`);
 
       // Try to create the client with the alternative path
-      // @ts-expect-error - TODO: fix this
-      client = await ClientClass.create(signer, {
+      const retryOptions: any = {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
         env,
         loggingLevel,
-        apiUrl,
         appVersion: APP_VERSION,
         codecs: [new ReactionCodec(), new ReplyCodec()],
-      });
+      };
+
+      // Add D14N or legacy API URL parameter based on SDK version
+      if (supportsD14N && apiUrl) {
+        retryOptions.d14nHost = apiUrl;
+      } else if (apiUrl) {
+        retryOptions.apiUrl = apiUrl;
+      }
+
+      // @ts-expect-error - TODO: fix this
+      client = await ClientClass.create(signer, retryOptions);
     } else {
       throw error;
     }

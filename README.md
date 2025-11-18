@@ -180,3 +180,42 @@ yarn test performance --no-fail --log warn --file
 - `local`: `http://localhost:5556`
 - `dev`: `https://grpc.dev.xmtp.network:443`
 - `production`: `https://grpc.production.xmtp.network:443`
+
+##### Connecting to D14N (Decentralized) Environment
+
+**🎉 D14N Support Now Built-In!**
+
+The framework now includes **native D14N support** via SDK version 4.4.0 (node-bindings 1.6.1), which uses the `d14nHost` parameter.
+
+**Setup:**
+
+```bash
+# In your .env file
+XMTP_ENV="dev"  # Must be "dev", "production", or "local"
+XMTP_API_URL="https://grpc.testnet-staging.xmtp.network:443"
+```
+
+**How it works:**
+- SDK 1.6.1+ automatically uses `d14nHost` parameter for D14N gateway
+- SDK 1.5.4 and older use `apiUrl` parameter for legacy centralized override
+- The framework **auto-detects** which parameter to use based on SDK version
+
+**Run tests:**
+
+```bash
+yarn test 402restart
+# Will automatically use D14N mode with the gateway URL
+```
+
+**D14N Environment URLs:**
+
+```bash
+# D14N Development
+XMTP_API_URL="https://grpc.testnet-dev.xmtp.network:443"
+
+# D14N Staging  
+XMTP_API_URL="https://grpc.testnet-staging.xmtp.network:443"
+
+# D14N Production
+XMTP_API_URL="https://grpc.testnet-production.xmtp.network:443"
+```
