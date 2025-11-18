@@ -12,6 +12,11 @@ export const workerNames = [
   "random3",
   "random4",
   "random5",
+  "random1",
+  "random2",
+  "random3",
+  "random4",
+  "random5",
 ] as string[];
 
 // Operations configuration - enable/disable specific operations

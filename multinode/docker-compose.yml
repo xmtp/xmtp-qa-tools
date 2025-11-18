@@ -117,6 +117,12 @@ services:
     image: ghcr.io/xmtp/mls-validation-service:main
     platform: linux/amd64
 
+  history-server:
+    image: ghcr.io/xmtp/message-history-server:main
+    platform: linux/amd64
+    ports:
+      - 5558:5558
+
   db:
     image: postgres:13
     environment:

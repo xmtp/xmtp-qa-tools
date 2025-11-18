@@ -275,6 +275,8 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
       appVersion: APP_VERSION,
+      historySyncUrl: "http://localhost:5558",
+      disableDeviceSync: false,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } catch (error) {
