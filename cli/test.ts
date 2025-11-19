@@ -374,6 +374,9 @@ async function runCommand(
 function logDetails(testName: string, options: TestOptions) {
   console.info(`Test Suite: ${testName}`);
   console.info(`Env: ${process.env.XMTP_ENV || "local"}`);
+  console.info(
+    `API URL: ${process.env.XMTP_API_URL || "(using default for environment)"}`,
+  );
   console.info(`Attempts: ${options.attempts} (always run N times)`);
   console.info(`Max Retry: ${options.maxRetry} (retry only on failure)`);
   console.info(`Sync Strategy: ${process.env.SYNC_STRATEGY}`);
@@ -544,6 +547,9 @@ async function main(): Promise<void> {
           // Run test directly without logger for native terminal output
           console.info(`\nTest Suite: ${testName}`);
           console.info(`Environment: ${process.env.XMTP_ENV || "local"}`);
+          console.info(
+            `API URL: ${process.env.XMTP_API_URL || "(using default for environment)"}`,
+          );
           console.info(`Configuration: Simple run (direct execution)`);
 
           const defaultThreadingOptions = options.parallel
