@@ -65,6 +65,12 @@ import {
   Dm as Dm424,
   Group as Group424,
 } from "@xmtp/node-sdk-4.2.4";
+import {
+  Client as Client440rc2,
+  Conversation as Conversation440rc2,
+  Dm as Dm440rc2,
+  Group as Group440rc2,
+} from "@xmtp/node-sdk-4.4.0-rc2";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -162,6 +168,15 @@ export const VersionList = [
     nodeVersion: "4.2.4",
     bindingsPackage: "1.3.2",
     libXmtpVersion: "dc3e8c8",
+  },
+  {
+    Client: Client440rc2,
+    Conversation: Conversation440rc2,
+    Dm: Dm440rc2,
+    Group: Group440rc2,
+    nodeVersion: "4.4.0-rc2",
+    bindingsPackage: "1.6.1-rc3",
+    libXmtpVersion: "unknown",
   },
 ];
 
