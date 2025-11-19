@@ -223,7 +223,7 @@ export class DockerContainer {
   static getNodes(): DockerContainer[] {
     try {
       const output = execSync(
-        `docker ps --filter ancestor=xmtp/node-go --format '{{.Names}}'`
+        `docker ps --filter ancestor=ghcr.io/xmtp/node-go:main --format '{{.Names}}'`
       )
         .toString()
         .trim();
