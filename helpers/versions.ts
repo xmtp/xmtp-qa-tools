@@ -53,7 +53,7 @@ import {
   Conversation as Conversation440,
   Dm as Dm440,
   Group as Group440,
-} from "@xmtp/node-sdk-4.4.0";
+} from "@xmtp/node-sdk-4.5.0";
 
 export {
   Agent,
@@ -91,7 +91,7 @@ export const AgentVersionList = [
     Agent: Agent114,
     MessageContext: MessageContext114,
     agentSDK: "1.1.14",
-    nodeSDK: "4.4.0",
+    nodeSDK: "4.5.0",
     auto: true,
   },
   {
@@ -119,7 +119,7 @@ export const VersionList = [
     Conversation: Conversation440,
     Dm: Dm440,
     Group: Group440,
-    nodeSDK: "4.4.0",
+    nodeSDK: "4.5.0",
     nodeBindings: "1.6.1",
     auto: true,
   },

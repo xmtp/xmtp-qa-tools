@@ -8,12 +8,6 @@ import {
 } from "@helpers/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
-  logSyncResults,
-  shouldSkipOldMessage,
-  startUpSync,
-  type SyncResult,
-} from "../../utils/general";
-import {
   ActionBuilder,
   initializeAppFromConfig,
   inlineActionsMiddleware,
@@ -296,13 +290,6 @@ const agent = await Agent.createFromEnv({
   codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
-const syncResults: SyncResult = await startUpSync(agent);
-const {
-  startupTimeStamp,
-  skippedMessagesCount,
-  totalConversations,
-}: SyncResult = syncResults;
-
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
 
@@ -347,16 +334,7 @@ agent.on("text", async (ctx) => {
   console.log(
     `Received text message in group (${ctx.conversation.id}): ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
   );
-  if (
-    shouldSkipOldMessage(
-      ctx.message.sentAt.getTime() as number,
-      startupTimeStamp,
-      skippedMessagesCount,
-      totalConversations.length,
-    )
-  ) {
-    //return;
-  }
+
   const message = ctx.message;
   const content = message.content;
   const isTagged =
@@ -444,7 +422,6 @@ agent.on("start", () => {
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
   getSDKVersionInfo(Agent, agent.client);
-  logSyncResults(syncResults);
 });
 
 await agent.start();

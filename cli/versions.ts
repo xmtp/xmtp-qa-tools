@@ -195,7 +195,34 @@ function linkNodeSDKToBindings(nodeSDK: string, nodeBindings: string): boolean {
     fs.symlinkSync(relativeBindingsPath, symlinkTarget);
     console.log(`✅ node-sdk-${nodeSDK} → node-bindings-${nodeBindings}`);
     return true;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle EEXIST error specifically - the target might still exist
+    if (error?.code === "EEXIST") {
+      // Try one more time to remove it
+      try {
+        if (fs.existsSync(symlinkTarget)) {
+          const stats = fs.lstatSync(symlinkTarget);
+          if (stats.isSymbolicLink()) {
+            fs.unlinkSync(symlinkTarget);
+          } else {
+            fs.rmSync(symlinkTarget, { recursive: true, force: true });
+          }
+        }
+        // Retry creating the symlink
+        const relativeBindingsPath = path.relative(
+          sdkNodeModulesXmtpDir,
+          bindingsDir,
+        );
+        fs.symlinkSync(relativeBindingsPath, symlinkTarget);
+        console.log(`✅ node-sdk-${nodeSDK} → node-bindings-${nodeBindings}`);
+        return true;
+      } catch (retryError) {
+        console.error(
+          `❌ Error linking node-sdk-${nodeSDK} to node-bindings-${nodeBindings} after retry: ${String(retryError)}`,
+        );
+        return false;
+      }
+    }
     console.error(
       `❌ Error linking node-sdk-${nodeSDK} to node-bindings-${nodeBindings}: ${String(error)}`,
     );
@@ -301,7 +328,34 @@ function linkAgentSDKToNodeSDK(agentSDK: string, nodeSDK: string): boolean {
     fs.symlinkSync(relativeNodeSDKPath, symlinkTarget);
     console.log(`✅ agent-sdk-${agentSDK} → node-sdk-${nodeSDK}`);
     return true;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle EEXIST error specifically - the target might still exist
+    if (error?.code === "EEXIST") {
+      // Try one more time to remove it
+      try {
+        if (fs.existsSync(symlinkTarget)) {
+          const stats = fs.lstatSync(symlinkTarget);
+          if (stats.isSymbolicLink()) {
+            fs.unlinkSync(symlinkTarget);
+          } else {
+            fs.rmSync(symlinkTarget, { recursive: true, force: true });
+          }
+        }
+        // Retry creating the symlink
+        const relativeNodeSDKPath = path.relative(
+          agentSDKNodeModulesXmtpDir,
+          nodeSDKDir,
+        );
+        fs.symlinkSync(relativeNodeSDKPath, symlinkTarget);
+        console.log(`✅ agent-sdk-${agentSDK} → node-sdk-${nodeSDK}`);
+        return true;
+      } catch (retryError) {
+        console.error(
+          `❌ Error linking agent-sdk-${agentSDK} to node-sdk-${nodeSDK} after retry: ${String(retryError)}`,
+        );
+        return false;
+      }
+    }
     console.error(
       `❌ Error linking agent-sdk-${agentSDK} to node-sdk-${nodeSDK}: ${String(error)}`,
     );
