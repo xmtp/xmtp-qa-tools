@@ -44,15 +44,44 @@ describe(testName, async () => {
       // This ensures we use the same conversation that the agent will respond in
       await workers.getCreator().client.conversations.sync();
       
-      // newDmWithIdentifier should return the existing DM if one exists after syncing
-      const conversation = await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
-
-      console.log("DM created/found", conversation.id);
+      // Try to find existing DM first by listing all conversations and finding one with the agent
+      let conversation: Conversation | undefined;
+      const existingConversations = await workers.getCreator().client.conversations.list();
+      
+      // Look for a DM with the agent's address
+      for (const conv of existingConversations) {
+        if ((conv as any).peerInboxId) {
+          // It's a DM, check if it's with the agent
+          try {
+            const members = await conv.members();
+            const hasAgent = members.some((member) => {
+              const ethIdentifier = member.accountIdentifiers.find(
+                (id) => id.identifierKind === IdentifierKind.Ethereum,
+              );
+              return ethIdentifier?.identifier.toLowerCase() === agent.address.toLowerCase();
+            });
+            if (hasAgent) {
+              conversation = conv;
+              console.log("Found existing DM with agent:", conversation.id);
+              break;
+            }
+          } catch (error) {
+            // Skip if we can't get members
+            continue;
+          }
+        }
+      }
+      
+      // If no existing DM found, create a new one
+      if (!conversation) {
+        conversation = await workers
+          .getCreator()
+          .client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+        console.log("Created new DM:", conversation.id);
+      }
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],

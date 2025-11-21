@@ -521,6 +521,44 @@ export async function verifyAgentMessageStream(
     worker.worker.startStream(typeofStream.Message);
   });
 
+  // Get the agent's inbox ID from the conversation
+  // This allows us to accept messages from the agent even if they're in a different conversation
+  let agentInboxId: string | undefined;
+  try {
+    // For DMs, we can use peerInboxId directly
+    if ((group as any).peerInboxId) {
+      agentInboxId = (group as any).peerInboxId;
+      console.log(
+        `[verifyAgentMessageStream] Using peerInboxId for DM: ${agentInboxId}`,
+      );
+    } else {
+      // For groups, get from members
+      const members = await group.members();
+      const receiverInboxIds = new Set(
+        receivers.map((r) => r.client.inboxId.toLowerCase()),
+      );
+      // Find the member that is NOT one of our receivers (i.e., the agent)
+      const agentMember = members.find(
+        (member) => !receiverInboxIds.has(member.inboxId.toLowerCase()),
+      );
+      agentInboxId = agentMember?.inboxId;
+    }
+    
+    if (agentInboxId) {
+      console.log(
+        `[verifyAgentMessageStream] Found agent inbox ID: ${agentInboxId} for conversation ${group.id}`,
+      );
+    } else {
+      console.log(
+        `[verifyAgentMessageStream] Could not determine agent inbox ID for conversation ${group.id}`,
+      );
+    }
+  } catch (error) {
+    console.log(
+      `[verifyAgentMessageStream] Error getting agent inbox ID: ${error}`,
+    );
+  }
+
   let attempts = 0;
   let result: VerifyStreamResult | undefined;
 
@@ -533,7 +571,7 @@ export async function verifyAgentMessageStream(
           1,
           types,
           customTimeout ?? undefined,
-          r.client.inboxId, // Exclude messages from the test client itself
+          agentInboxId, // Accept messages from the agent even if conversationId doesn't match
         ),
       triggerEvents: async () => {
         const sentAt = Date.now();

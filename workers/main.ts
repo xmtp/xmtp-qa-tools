@@ -85,6 +85,7 @@ interface IWorkerClient {
     count: number,
     types?: string[],
     customTimeout?: number,
+    expectedSenderInboxId?: string,
   ): Promise<StreamTextMessage[]>;
   collectGroupUpdates(
     groupId: string,
@@ -986,11 +987,13 @@ export class WorkerClient extends Worker implements IWorkerClient {
     count: number,
     types: string[] = ["text"],
     customTimeout?: number,
+    expectedSenderInboxId?: string,
   ): Promise<StreamTextMessage[]> {
     console.debug(
-      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages${expectedSenderInboxId ? `, from sender: ${expectedSenderInboxId}` : ""}`,
     );
     const myInboxId = this.client?.inboxId?.toLowerCase();
+    const expectedSender = expectedSenderInboxId?.toLowerCase();
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
@@ -1010,10 +1013,14 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const isFromSelf = myInboxId && senderInboxId === myInboxId;
         const idsMatch = groupId === conversationId;
         const typeIsMatch = types.includes(contentType?.typeId as string);
-        const shouldAccept = idsMatch && typeIsMatch && !isFromSelf;
+        
+        // If we have an expected sender, accept messages from that sender even if conversationId doesn't match
+        // This handles the case where the agent responds in a different conversation
+        const isFromExpectedSender = expectedSender && senderInboxId === expectedSender;
+        const shouldAccept = (idsMatch || isFromExpectedSender) && typeIsMatch && !isFromSelf;
         
         console.debug(
-          `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, shouldAccept=${shouldAccept}`,
+          `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}${expectedSender ? `, expected: ${expectedSender}` : ""}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, isFromExpectedSender=${isFromExpectedSender}, shouldAccept=${shouldAccept}`,
         );
         
         return shouldAccept;
