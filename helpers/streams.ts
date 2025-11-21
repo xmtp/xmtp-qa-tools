@@ -7,7 +7,7 @@ import {
   type Dm,
   type Group,
 } from "@helpers/versions";
-import { typeofStream } from "@workers/main";
+import { typeofStream, StreamCollectorType } from "@workers/main";
 import type { Worker } from "@workers/manager";
 
 // Define the expected return type of verifyMessageStream
@@ -516,6 +516,7 @@ export async function verifyAgentMessageStream(
   maxRetries: number = 1,
   types: string[] = ["text", "reply", "reaction", "actions"],
   customTimeout?: number,
+  agentInboxId?: string, // Optional: if provided, accept messages from this inbox ID in any DM
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
@@ -525,16 +526,46 @@ export async function verifyAgentMessageStream(
   let result: VerifyStreamResult | undefined;
 
   while (attempts < maxRetries) {
+    // If agentInboxId is provided, use a custom collector that accepts messages from the agent in any DM
+    const startCollectors = agentInboxId
+      ? (r: Worker) => {
+          // Use collectStreamEvents with custom filter to accept messages from agent in any DM
+          return r.worker.collectStreamEvents<{
+            type: StreamCollectorType.Message;
+            message: {
+              conversationId: string;
+              senderInboxId: string;
+              content: string;
+              contentType?: { typeId: string };
+            };
+          }>({
+            type: typeofStream.Message,
+            filterFn: (msg) => {
+              if (msg.type !== StreamCollectorType.Message) return false;
+              const streamMsg = msg as any;
+              const senderInboxId = streamMsg.message.senderInboxId?.toLowerCase();
+              const contentType = streamMsg.message.contentType;
+              const isFromAgent = senderInboxId === agentInboxId.toLowerCase();
+              const typeIsMatch = types.includes(contentType?.typeId as string);
+              const isFromSelf = r.client.inboxId.toLowerCase() === senderInboxId;
+              return isFromAgent && typeIsMatch && !isFromSelf;
+            },
+            count: 1,
+            customTimeout,
+            testName: "streamMessage",
+          });
+        }
+      : (r: Worker) =>
+          r.worker.collectMessages(
+            group.id,
+            1,
+            types,
+            customTimeout ?? undefined,
+          );
+
     result = await collectAndTimeEventsWithStats({
       receivers,
-      startCollectors: (r) =>
-        r.worker.collectMessages(
-          group.id,
-          1,
-          types,
-          customTimeout ?? undefined,
-          r.client.inboxId, // Exclude messages from the test client itself
-        ),
+      startCollectors,
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage).catch(console.error);
