@@ -1,6 +1,8 @@
+import { type IdentifierKind } from "@helpers/versions";
 import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.12";
 import yargs, { type Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
+import "dotenv/config";
 
 // yarn send --target 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --wait
 // Default message is "hello world"
@@ -184,9 +186,49 @@ async function sendDirectMessage(
   const agent = await Agent.createFromEnv({});
   console.log(`📋 Using agent: ${agent.client.inboxId}`);
 
+  let exitCode = 0;
   try {
     const conversation = await agent.createDmWithAddress(
       target as `0x${string}`,
+    );
+
+    // Get DM information
+    const dmId = conversation.id;
+    const originInboxId = agent.client.inboxId;
+    const env = process.env.XMTP_ENV || "dev";
+
+    // Get members to extract addresses
+    const members = await conversation.members();
+
+    // Find origin (agent) member
+    const originMember = members.find(
+      (member) => member.inboxId.toLowerCase() === originInboxId.toLowerCase(),
+    );
+    const originEthIdentifier = originMember?.accountIdentifiers.find(
+      (id: any) => id.identifierKind == (0 as IdentifierKind),
+    );
+    const originAddress = originEthIdentifier?.identifier || "Unknown";
+
+    // Find destination (peer) member
+    const destinationInboxId = conversation.peerInboxId;
+    const destinationMember = members.find(
+      (member) =>
+        member.inboxId.toLowerCase() === destinationInboxId.toLowerCase(),
+    );
+    const destinationEthIdentifier = destinationMember?.accountIdentifiers.find(
+      (id: any) => id.identifierKind == (0 as IdentifierKind),
+    );
+    const destinationAddress =
+      destinationEthIdentifier?.identifier || "Unknown";
+
+    // Log DM information
+    console.log(`📋 DM ID: ${dmId}`);
+    console.log(`🌍 Environment: ${env}`);
+    console.log(
+      `📤 Origin - Inbox ID: ${originInboxId}, Address: ${originAddress}`,
+    );
+    console.log(
+      `📥 Destination - Inbox ID: ${destinationInboxId}, Address: ${destinationAddress}`,
     );
 
     if (wait) {
@@ -230,7 +272,10 @@ async function sendDirectMessage(
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Failed to send message: ${errorMessage}`);
-    process.exit(1);
+    exitCode = 1;
+  } finally {
+    await agent.stop();
+    process.exit(exitCode);
   }
 }
 
