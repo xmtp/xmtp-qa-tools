@@ -39,14 +39,50 @@ describe(testName, async () => {
         agent.name,
         agent.address,
       );
-      const conversation = await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
+      
+      // Sync conversations first to ensure we have the latest state
+      await workers.getCreator().client.conversations.sync();
+      
+      // Check all existing conversations to find a DM with this agent
+      const allConversations = await workers.getCreator().client.conversations.list();
+      let conversation = null;
+      
+      // Look for existing DM with the agent
+      for (const conv of allConversations) {
+        // Only check DMs (they have peerInboxId)
+        if (!conv.peerInboxId) continue;
+        
+        try {
+          const members = await conv.members();
+          const hasAgent = members.some((member) => {
+            const ethIdentifier = member.accountIdentifiers?.find(
+              (id: any) => id.identifierKind === IdentifierKind.Ethereum
+            );
+            return ethIdentifier?.identifier?.toLowerCase() === agent.address.toLowerCase();
+          });
+          if (hasAgent) {
+            conversation = conv;
+            break;
+          }
+        } catch (error) {
+          // Skip if we can't check members
+          continue;
+        }
+      }
+      
+      // If no existing DM found, create a new one
+      if (!conversation) {
+        conversation = await workers
+          .getCreator()
+          .client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+        // Sync again after creating
+        await workers.getCreator().client.conversations.sync();
+      }
 
-      console.log("DM created", conversation.id);
+      console.log("DM created/found", conversation.id);
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
