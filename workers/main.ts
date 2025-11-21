@@ -646,18 +646,22 @@ export class WorkerClient extends Worker implements IWorkerClient {
               type === typeofStream.MessageandResponse
             ) {
               // Log message details for debugging
-              // console.debug(
-              //   `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
-              // );
+              console.debug(
+                `[${this.nameId}] Stream received message: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}, contentType=${message.contentType?.typeId}, content="${message.content as string}"`,
+              );
 
               // Handle auto-responses if enabled
               await this.handleResponse(message, type);
 
               // Emit standard message
-              if (this.listenerCount("worker_message") > 0) {
-                // console.debug(
-                //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
-                // );
+              const listenerCount = this.listenerCount("worker_message");
+              console.debug(
+                `[${this.nameId}] Listener count for worker_message: ${listenerCount}`,
+              );
+              if (listenerCount > 0) {
+                console.debug(
+                  `[${this.nameId}] Emitting message to ${listenerCount} listeners: "${message.content as string}"`,
+                );
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
                   message: {
@@ -668,9 +672,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
                   },
                 });
               } else {
-                // console.debug(
-                //   `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
-                // );
+                console.debug(
+                  `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
+                );
               }
             } else {
               // // Log non-text messages for debugging
@@ -986,23 +990,32 @@ export class WorkerClient extends Worker implements IWorkerClient {
     console.debug(
       `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
     );
+    const myInboxId = this.client?.inboxId?.toLowerCase();
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
-        console.debug(
-          `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
-        );
-
         if (msg.type !== StreamCollectorType.Message) {
+          console.debug(
+            `[${this.nameId}] Filtering: type mismatch, got=${msg.type}, expected=${StreamCollectorType.Message}`,
+          );
           return false;
         }
 
         const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
+        const senderInboxId = streamMsg.message.senderInboxId?.toLowerCase();
+        
+        // Exclude messages sent by ourselves
+        const isFromSelf = myInboxId && senderInboxId === myInboxId;
         const idsMatch = groupId === conversationId;
         const typeIsMatch = types.includes(contentType?.typeId as string);
-        const shouldAccept = idsMatch && typeIsMatch;
+        const shouldAccept = idsMatch && typeIsMatch && !isFromSelf;
+        
+        console.debug(
+          `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, shouldAccept=${shouldAccept}`,
+        );
+        
         return shouldAccept;
       },
       count,

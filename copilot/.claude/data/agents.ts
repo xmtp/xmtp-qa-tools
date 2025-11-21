@@ -115,7 +115,7 @@ const agents: AgentConfig[] = [
     name: "key-check",
     address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     sendMessage: "/kc",
-    networks: ["dev", "production"],
+    networks: ["production"],
     live: false,
   },
   {

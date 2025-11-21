@@ -533,15 +533,19 @@ export async function verifyAgentMessageStream(
           1,
           types,
           customTimeout ?? undefined,
+          r.client.inboxId, // Exclude messages from the test client itself
         ),
-      // @ts-expect-error - TODO: fix this
-      triggerEvents: () => {
+      triggerEvents: async () => {
         const sentAt = Date.now();
-        group.send(triggerMessage).catch(console.error);
+        await group.send(triggerMessage).catch(console.error);
 
         return [{ conversationId: group.id, sentAt }];
       },
-      getKey: () => group.id, // Use conversation ID as consistent key for both sent and received
+      getKey: (ev) => {
+        // Extract conversation ID from received messages, or use group.id for sent events
+        const conversationId = getProperty<string>(ev, ["message", "conversationId"]);
+        return conversationId || getProperty<string>(ev, ["conversationId"]) || group.id;
+      },
       getMessage: extractContent,
       statsLabel: "bot-response:",
       count: 1,

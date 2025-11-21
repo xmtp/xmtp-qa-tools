@@ -16,7 +16,7 @@ const testName = "agents-dms";
 describe(testName, async () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const workers = await getWorkers(["randomguy"]);
+  const workers = await getWorkers(["bob"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env as string);
