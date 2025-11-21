@@ -241,7 +241,7 @@ async function listAllConversations(client: Client): Promise<void> {
 
   // Print formatted table
   console.log(
-    `${"Type".padEnd(8)} ${"Messages".padEnd(10)} ${"Last Message".padEnd(50)}  Conversation ID`,
+    `${"Type".padEnd(8)} ${"Messages".padEnd(10)} ${"Last Message".padEnd(50)} Conversation ID`,
   );
   console.log("─".repeat(120));
 
