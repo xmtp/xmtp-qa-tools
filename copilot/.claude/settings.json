@@ -7,7 +7,7 @@
     "allow": [
       "*",
       "Bash(yarn groups:*)",
-      "Bash(yarn send:*)",
+      "Bash(yarn blast:*)",
       "Bash(yarn permissions:*)",
       "Bash(yarn installations:*)",
       "Bash(yarn generate:*)",

@@ -11,13 +11,12 @@ import path from "node:path";
 import { getWorkers } from "@workers/manager";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { waitForResponse } from "./response";
 
 // Examples:
-// yarn send --target 0xf1be9a945de5e4e270321cf47672f82380fd3463 --env dev --users 100
-// yarn send --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
-// yarn send --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local --users 500 --attempts 10
-// yarn send --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
+// yarn blast --target 0xf1be9a945de5e4e270321cf47672f82380fd3463 --env dev --users 100
+// yarn blast --target 0x7723d790a5e00b650bf146a0961f8bb148f0450c --env local --users 500 --wait
+// yarn blast --target 0xadc58094c42e2a8149d90f626a1d6cfb4a79f002 --env local --users 500 --attempts 10
+// yarn blast --group-id fa5d8fc796bb25283dccbc1823823f75 --env production --message "Hello group!"
 
 interface Config {
   userCount: number;
@@ -36,7 +35,7 @@ interface Config {
 
 function parseArgs(): Config {
   const argv = yargs(hideBin(process.argv))
-    .scriptName("yarn send")
+    .scriptName("yarn blast")
     .usage("$0 [options]")
     .command("$0", "XMTP Send CLI - Message sending and testing", (yargs) => {
       return yargs;
@@ -289,34 +288,56 @@ async function runWorker(
       identifierKind: IdentifierKind.Ethereum,
     });
 
-    let sendTime = 0;
     let responseTime = 0;
+    let responsePromise: Promise<void> | null = null;
 
+    // Set up response listener if awaiting
     if (config.awaitResponse) {
-      // Use response.ts function to wait for response
-      const messageText =
-        config.customMessage || `test-${workerId}-${attempt}-${Date.now()}`;
-      const result = await waitForResponse({
-        conversation,
-        senderInboxId: worker.inboxId,
-        timeout: config.timeout,
-        messageText,
-        workerId,
-        attempt,
-      });
-      sendTime = result.sendTime;
-      responseTime = result.responseTime;
-    } else {
-      // Send message without waiting for response
-      const sendStart = Date.now();
-      const messageText =
-        config.customMessage || `test-${workerId}-${attempt}-${Date.now()}`;
-      await conversation.send(messageText);
-      sendTime = Date.now() - sendStart;
+      responsePromise = new Promise<void>((resolve) => {
+        const responseStart = Date.now();
 
+        void worker.client.conversations.streamAllMessages({
+          onValue: (message: DecodedMessage) => {
+            if (
+              message.senderInboxId.toLowerCase() !==
+              worker.inboxId.toLowerCase()
+            ) {
+              responseTime = Date.now() - responseStart;
+              resolve();
+            }
+          },
+        });
+      });
+
+      // Small delay to ensure stream is set up
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    // Send message
+    const sendStart = Date.now();
+    const messageText =
+      config.customMessage || `test-${workerId}-${attempt}-${Date.now()}`;
+    await conversation.send(messageText);
+    const sendTime = Date.now() - sendStart;
+
+    console.log(
+      `📩 ${workerId}: Attempt ${attempt}, Message sent in ${sendTime}ms`,
+    );
+
+    // Wait for response if required
+    if (config.awaitResponse && responsePromise) {
+      await Promise.race([
+        responsePromise,
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error("Response timeout"));
+          }, config.timeout);
+        }),
+      ]);
       console.log(
-        `📩 ${workerId}: Attempt ${attempt}, Message sent in ${sendTime}ms`,
+        `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime}ms, Response=${responseTime}ms`,
       );
+    } else {
       console.log(
         `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime}ms (no await)`,
       );
