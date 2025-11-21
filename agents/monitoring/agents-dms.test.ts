@@ -39,6 +39,12 @@ describe(testName, async () => {
         agent.name,
         agent.address,
       );
+      
+      // Sync conversations first to ensure we get the existing DM if it exists
+      // This ensures we use the same conversation that the agent will respond in
+      await workers.getCreator().client.conversations.sync();
+      
+      // newDmWithIdentifier should return the existing DM if one exists after syncing
       const conversation = await workers
         .getCreator()
         .client.conversations.newDmWithIdentifier({
@@ -46,7 +52,7 @@ describe(testName, async () => {
           identifierKind: IdentifierKind.Ethereum,
         });
 
-      console.log("DM created", conversation.id);
+      console.log("DM created/found", conversation.id);
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
