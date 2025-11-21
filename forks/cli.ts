@@ -200,16 +200,31 @@ async function runForkDetection(options: ForkOptions): Promise<void> {
 }
 
 async function main() {
+  // Helper function to parse boolean from env var
+  const getBoolEnv = (key: string, defaultValue: boolean): boolean => {
+    const value = process.env[key];
+    if (value === undefined) return defaultValue;
+    return value.toLowerCase() === "true" || value === "1";
+  };
+
+  // Helper function to parse number from env var
+  const getNumberEnv = (key: string, defaultValue: number): number => {
+    const value = process.env[key];
+    if (value === undefined) return defaultValue;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+  };
+
   const argv = await yargs(hideBin(process.argv))
     .usage("Usage: yarn fork [options]")
     .option("count", {
       type: "number",
-      default: 100,
+      default: getNumberEnv("FORK_COUNT", 100),
       describe: "Number of times to run the fork detection process",
     })
     .option("clean-all", {
       type: "boolean",
-      default: false,
+      default: getBoolEnv("FORK_CLEAN_ALL", false),
       describe: "Clean all raw logs before starting",
     })
     .parserConfiguration({
@@ -217,7 +232,7 @@ async function main() {
     })
     .option("remove-non-matching", {
       type: "boolean",
-      default: true,
+      default: getBoolEnv("FORK_REMOVE_NON_MATCHING", true),
       describe: "Remove logs that don't contain fork content",
     })
     .option("env", {
@@ -230,38 +245,39 @@ async function main() {
     .option("network-chaos-level", {
       type: "string",
       choices: ["none", "low", "medium", "high"] as const,
-      default: "none" as const,
+      default:
+        (process.env.FORK_NETWORK_CHAOS_LEVEL as NetworkChaosLevel) || "none",
       describe: "Network chaos level (requires --env local)",
     })
     .option("db-chaos-level", {
       type: "string",
       choices: ["none", "low", "medium", "high"] as const,
-      default: "none" as const,
+      default: (process.env.FORK_DB_CHAOS_LEVEL as DbChaosLevel) || "none",
       describe: "Database chaos level with presets",
     })
     .option("with-background-streams", {
       type: "boolean",
-      default: false,
+      default: getBoolEnv("FORK_WITH_BACKGROUND_STREAMS", false),
       describe: "Enable message streams on all workers",
     })
     .option("log-level", {
       type: "string",
-      default: "warn",
+      default: process.env.LOG_LEVEL || process.env.FORK_LOG_LEVEL || "warn",
       describe: "Log level for test runner (e.g., debug, info, warn, error)",
     })
     .option("group-count", {
       type: "number",
-      default: 5,
+      default: getNumberEnv("FORK_GROUP_COUNT", 5),
       describe: "Number of groups to run the test against",
     })
     .option("parallel-operations", {
       type: "number",
-      default: 5,
+      default: getNumberEnv("FORK_PARALLEL_OPERATIONS", 5),
       describe: "Number of parallel operations run on each group",
     })
     .option("target-epoch", {
       type: "number",
-      default: 20,
+      default: getNumberEnv("FORK_TARGET_EPOCH", 20),
       describe: "Target epoch to stop the test at",
     })
     .example("yarn fork", "Run 100 times and get stats")
