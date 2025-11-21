@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { APP_VERSION, createSigner } from "@helpers/client";
 import {
-  Agent as Agent117,
-  MessageContext as MessageContext117,
-} from "@xmtp/agent-sdk-1.1.7";
+  Agent as Agent1112,
+  MessageContext as MessageContext112,
+} from "@xmtp/agent-sdk-1.1.12";
 import {
   Agent as Agent114,
   MessageContext as MessageContext114,
@@ -95,9 +95,9 @@ export const AgentVersionList = [
     auto: true,
   },
   {
-    Agent: Agent117,
-    MessageContext: MessageContext117,
-    agentSDK: "1.1.7",
+    Agent: Agent1112,
+    MessageContext: MessageContext112,
+    agentSDK: "1.1.12",
     nodeSDK: "4.2.6",
     auto: true,
   },

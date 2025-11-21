@@ -1,5 +1,6 @@
-import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.7";
-import type { Argv } from "yargs";
+import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.12";
+import yargs, { type Argv } from "yargs";
+import { hideBin } from "yargs/helpers";
 
 // yarn send --target 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --wait
 // Default message is "hello world"
@@ -348,3 +349,52 @@ export async function waitForResponse(
     throw error;
   }
 }
+
+// Main entry point when run directly
+async function main() {
+  try {
+    const argv = await yargs(hideBin(process.argv))
+      .scriptName("yarn send")
+      .option("target", {
+        type: "string",
+        description: "Target wallet address",
+        alias: "t",
+      })
+      .option("group-id", {
+        type: "string",
+        description: "Group ID",
+      })
+      .option("message", {
+        type: "string",
+        description: "Message text to send (default: 'hello world')",
+        alias: "m",
+        default: "hello world",
+      })
+      .option("wait", {
+        type: "boolean",
+        description: "Wait for a response after sending the message",
+        default: false,
+      })
+      .option("timeout", {
+        type: "number",
+        description:
+          "Timeout in milliseconds when waiting for response (default: 30000)",
+        default: 30000,
+      })
+      .help()
+      .parseAsync();
+
+    await runSendCommand({
+      target: argv.target,
+      groupId: argv["group-id"],
+      message: argv.message,
+      wait: argv.wait,
+      timeout: argv.timeout,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    process.exit(1);
+  }
+}
+
+void main();
