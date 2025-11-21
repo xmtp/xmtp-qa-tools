@@ -2,6 +2,7 @@ import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.14";
 import { IdentifierKind } from "@xmtp/node-sdk";
 import yargs, { type Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
+import "dotenv/config";
 
 // yarn send --target 0x194c31cae1418d5256e8c58e0d08aee1046c6ed0 --wait
 // Default message is "hello world"

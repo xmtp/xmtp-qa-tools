@@ -3,6 +3,7 @@ import {
   type Agent as AgentType,
   type KeyPackageStatus,
 } from "@xmtp/agent-sdk-1.1.14";
+import "dotenv/config";
 import { MarkdownCodec } from "@xmtp/content-type-markdown";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import {

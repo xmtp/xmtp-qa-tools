@@ -5,6 +5,7 @@ import { createSigner, createUser } from "@xmtp/agent-sdk-1.1.14/user";
 import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
 import yargs, { type Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
+import "dotenv/config";
 
 export interface RevokeOptions {
   keep?: string;

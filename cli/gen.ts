@@ -9,6 +9,7 @@ import {
   getEncryptionKeyFromHex,
   loadEnv,
 } from "../helpers/client";
+import "dotenv/config";
 
 const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes/byinstallation";
