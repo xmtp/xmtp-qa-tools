@@ -7,8 +7,21 @@ import {
   type Dm,
   type Group,
 } from "@helpers/versions";
-import { typeofStream } from "@workers/main";
+import { typeofStream, StreamCollectorType } from "@workers/main";
 import type { Worker } from "@workers/manager";
+
+// Define stream message types (matching workers/main.ts)
+interface StreamTextMessage {
+  type: StreamCollectorType.Message;
+  message: {
+    conversationId: string;
+    senderInboxId: string;
+    content: string;
+    contentType?: {
+      typeId: string;
+    };
+  };
+}
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
@@ -516,10 +529,35 @@ export async function verifyAgentMessageStream(
   maxRetries: number = 1,
   types: string[] = ["text", "reply", "reaction", "actions"],
   customTimeout?: number,
+  agentAddress?: string, // Optional: agent's Ethereum address for DM matching
 ): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
+
+  // For DMs, get the peer's inboxId and all possible inboxIds for the agent
+  // This handles the case where the agent responds on an existing DM with a different conversation ID
+  // or from a different installation
+  let peerInboxIds: string[] = [];
+  if ('peerInboxId' in group) {
+    const dm = group as Dm;
+    peerInboxIds.push(dm.peerInboxId);
+    
+    // Get all members to find all possible inboxIds for the agent
+    try {
+      const members = await dm.members();
+      const peerMembers = members.filter(
+        (m) => m.inboxId.toLowerCase() !== receivers[0]?.client.inboxId.toLowerCase()
+      );
+      // Collect all inboxIds from peer members (in case of multiple installations)
+      peerInboxIds = peerMembers.map(m => m.inboxId.toLowerCase());
+      console.debug(`[verifyAgentMessageStream] DM detected, peerInboxIds: ${peerInboxIds.join(', ')}`);
+    } catch (error) {
+      console.debug(`[verifyAgentMessageStream] Error getting members: ${error}`);
+    }
+  } else {
+    console.debug(`[verifyAgentMessageStream] Not a DM, using conversation ID matching`);
+  }
 
   let attempts = 0;
   let result: VerifyStreamResult | undefined;
@@ -527,14 +565,63 @@ export async function verifyAgentMessageStream(
   while (attempts < maxRetries) {
     result = await collectAndTimeEventsWithStats({
       receivers,
-      startCollectors: (r) =>
-        r.worker.collectMessages(
-          group.id,
-          1,
-          types,
-          customTimeout ?? undefined,
-          r.client.inboxId, // Exclude messages from the test client itself
-        ),
+      startCollectors: async (r) => {
+        const myInboxId = r.client?.inboxId?.toLowerCase();
+        console.debug(
+          `[verifyAgentMessageStream] Starting collector for ${r.name}, myInboxId: ${myInboxId}, peerInboxIds: [${peerInboxIds.join(', ')}], groupId: ${group.id}`,
+        );
+        
+        // Use collectStreamEvents directly with a custom filter that accepts messages
+        // from the peer agent, regardless of conversation ID (for DMs)
+        return r.worker.collectStreamEvents<StreamTextMessage>({
+          type: typeofStream.Message,
+          filterFn: (msg) => {
+            // Log all messages received for debugging
+            console.log(`[${r.name}-${r.sdk}] Received message event: type=${msg.type}, fullMsg=`, JSON.stringify(msg, null, 2));
+            
+            if (msg.type !== StreamCollectorType.Message) {
+              console.log(`[${r.name}-${r.sdk}] Rejecting: wrong type (${msg.type} !== ${StreamCollectorType.Message})`);
+              return false;
+            }
+
+            const streamMsg = msg;
+            const conversationId = streamMsg.message.conversationId;
+            const contentType = streamMsg.message.contentType;
+            const senderInboxId = streamMsg.message.senderInboxId?.toLowerCase();
+            
+            console.log(`[${r.name}-${r.sdk}] Processing message: conversationId=${conversationId}, sender=${senderInboxId}, contentType=${contentType?.typeId}`);
+            
+            // Exclude messages sent by ourselves
+            const isFromSelf = myInboxId && senderInboxId === myInboxId;
+            const typeIsMatch = types.includes(contentType?.typeId as string);
+            
+            // For DMs, accept messages from any of the peer's inboxIds regardless of conversation ID
+            // This handles cases where the agent responds on an existing DM or from a different installation
+            let shouldAccept = false;
+            if (peerInboxIds.length > 0 && senderInboxId && peerInboxIds.includes(senderInboxId)) {
+              // Accept message from any peer inboxId, regardless of conversation ID
+              shouldAccept = typeIsMatch && !isFromSelf;
+              console.debug(
+                `[${r.name}-${r.sdk}] DM mode: Accepting message from peer (conversationId=${conversationId}, sender=${senderInboxId}, peerInboxIds=[${peerInboxIds.join(', ')}])`,
+              );
+            } else {
+              // For groups or if no peerInboxIds, match by conversation ID
+              const idsMatch = group.id === conversationId;
+              shouldAccept = idsMatch && typeIsMatch && !isFromSelf;
+              if (senderInboxId) {
+                console.debug(
+                  `[${r.name}-${r.sdk}] Group/ID mode: conversationId=${conversationId} (expecting ${group.id}), sender=${senderInboxId}, idsMatch=${idsMatch}, shouldAccept=${shouldAccept}`,
+                );
+              }
+            }
+            
+            return shouldAccept;
+          },
+          count: 1,
+          customTimeout: customTimeout ?? undefined,
+          testName: "streamMessage",
+        });
+      },
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage).catch(console.error);
