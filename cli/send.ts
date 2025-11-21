@@ -1,5 +1,5 @@
-import { type IdentifierKind } from "@helpers/versions";
-import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.12";
+import { Agent, type DecodedMessage, type Group } from "@xmtp/agent-sdk-1.1.14";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import yargs, { type Argv } from "yargs";
 import { hideBin } from "yargs/helpers";
 import "dotenv/config";
@@ -205,7 +205,7 @@ async function sendDirectMessage(
       (member) => member.inboxId.toLowerCase() === originInboxId.toLowerCase(),
     );
     const originEthIdentifier = originMember?.accountIdentifiers.find(
-      (id: any) => id.identifierKind == (0 as IdentifierKind),
+      (id: any) => id.identifierKind === IdentifierKind.Ethereum,
     );
     const originAddress = originEthIdentifier?.identifier || "Unknown";
 
@@ -216,7 +216,7 @@ async function sendDirectMessage(
         member.inboxId.toLowerCase() === destinationInboxId.toLowerCase(),
     );
     const destinationEthIdentifier = destinationMember?.accountIdentifiers.find(
-      (id: any) => id.identifierKind == (0 as IdentifierKind),
+      (id: any) => id.identifierKind === IdentifierKind.Ethereum,
     );
     const destinationAddress =
       destinationEthIdentifier?.identifier || "Unknown";
@@ -334,25 +334,27 @@ export async function waitForResponse(
   let responseMessage: DecodedMessage | null = null;
 
   try {
-    await Promise.race([
-      // Wait for response from stream
-      (async () => {
-        for await (const message of stream as AsyncIterable<DecodedMessage>) {
-          // Skip if the message is from the sender itself
-          if (
-            message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
-          ) {
-            continue;
-          }
-
-          // Got a response from the destination
-          responseTime = Date.now() - responseStartTime;
-          responseMessage = message;
-          break;
+    const responsePromise = (async () => {
+      for await (const message of stream) {
+        // Skip if the message is from the sender itself
+        if (
+          message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
+        ) {
+          continue;
         }
-      })(),
+
+        // Got a response from the destination
+        responseTime = Date.now() - responseStartTime;
+        responseMessage = message;
+        return message;
+      }
+      return null;
+    })();
+
+    const receivedMessage = await Promise.race([
+      responsePromise,
       // Timeout
-      new Promise<void>((_, reject) => {
+      new Promise<null>((_, reject) => {
         setTimeout(() => {
           reject(new Error("Response timeout"));
         }, timeout);
@@ -366,12 +368,11 @@ export async function waitForResponse(
         `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime}ms (${(sendTime / 1000).toFixed(2)}s), Response=${responseTime}ms (${(responseTime / 1000).toFixed(2)}s), Total=${totalTime}ms (${(totalTime / 1000).toFixed(2)}s)`,
       );
 
-      if (responseMessage) {
-        const msg = responseMessage as DecodedMessage;
+      if (receivedMessage) {
         const messageContent =
-          typeof msg.content === "string"
-            ? msg.content
-            : JSON.stringify(msg.content);
+          typeof receivedMessage.content === "string"
+            ? receivedMessage.content
+            : JSON.stringify(receivedMessage.content);
         const preview = messageContent.substring(0, 100);
         console.log(
           `   📬 Response: "${preview}${messageContent.length > 100 ? "..." : ""}"`,
@@ -395,51 +396,53 @@ export async function waitForResponse(
   }
 }
 
-// Main entry point when run directly
 async function main() {
-  try {
-    const argv = await yargs(hideBin(process.argv))
-      .scriptName("yarn send")
-      .option("target", {
-        type: "string",
-        description: "Target wallet address",
-        alias: "t",
-      })
-      .option("group-id", {
-        type: "string",
-        description: "Group ID",
-      })
-      .option("message", {
-        type: "string",
-        description: "Message text to send (default: 'hello world')",
-        alias: "m",
-        default: "hello world",
-      })
-      .option("wait", {
-        type: "boolean",
-        description: "Wait for a response after sending the message",
-        default: false,
-      })
-      .option("timeout", {
-        type: "number",
-        description:
-          "Timeout in milliseconds when waiting for response (default: 30000)",
-        default: 30000,
-      })
-      .help()
-      .parseAsync();
+  const argv = await yargs(hideBin(process.argv))
+    .scriptName("yarn send")
+    .usage("$0 [options]")
+    .command("$0", "Send a message to a conversation", (yargs) => {
+      return yargs
+        .option("target", {
+          type: "string",
+          description: "Target wallet address",
+          alias: "t",
+        })
+        .option("group-id", {
+          type: "string",
+          description: "Group ID",
+        })
+        .option("message", {
+          type: "string",
+          description: "Message text to send (default: 'hello world')",
+          alias: "m",
+          default: "hello world",
+        })
+        .option("wait", {
+          type: "boolean",
+          description: "Wait for a response after sending the message",
+          default: false,
+        })
+        .option("timeout", {
+          type: "number",
+          description:
+            "Timeout in milliseconds when waiting for response (default: 30000)",
+          default: 30000,
+        });
+    })
+    .help()
+    .parse();
 
-    await runSendCommand({
-      target: argv.target,
-      groupId: argv["group-id"],
-      message: argv.message,
-      wait: argv.wait,
-      timeout: argv.timeout,
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    process.exit(1);
-  }
+  await runSendCommand({
+    target: argv.target as string | undefined,
+    groupId: argv["group-id"] as string | undefined,
+    message: argv.message as string | undefined,
+    wait: argv.wait as boolean | undefined,
+    timeout: argv.timeout as number | undefined,
+  });
 }
 
-void main();
+main().catch((error: unknown) => {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  console.error("Unexpected error:", errorMessage);
+  process.exit(1);
+});
