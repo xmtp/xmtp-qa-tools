@@ -26,6 +26,7 @@
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
+    "response": "tsx cli/response.ts",
     "revoke": "tsx cli/revoke.ts",
     "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
@@ -33,8 +34,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
+    "@xmtp/agent-sdk-1.1.12": "npm:@xmtp/agent-sdk@1.1.12",
     "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14",
-    "@xmtp/agent-sdk-1.1.7": "npm:@xmtp/agent-sdk@1.1.12",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",

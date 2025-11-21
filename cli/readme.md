@@ -4,19 +4,19 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 
 ## Quick Reference
 
-| Command                                     | Purpose               | Help                        |
-| ------------------------------------------- | --------------------- | --------------------------- |
-| `yarn test <suite>`                         | Run test suites       | `yarn test --help`          |
-| `yarn send --target <addr> --users <count>` | Test message delivery | `yarn send --help`          |
-| `yarn installations`                        | Manage installations  | `yarn installations --help` |
-| `yarn bot <name>`                           | Run interactive bots  | `yarn bot --help`           |
-| `yarn fork`                                 | Run forks testing     | `yarn fork --help`          |
-| `yarn versions`                             | Manage SDK versions   | `yarn versions --help`      |
-| `yarn gen`                                  | Generate test data    | `yarn gen --help`           |
-| `yarn gen:keys [--env <env>]`               | Generate wallet keys  | `yarn gen:keys --help`      |
-| `yarn revoke <inbox-id> [--keep <ids>]`     | Revoke installations  | `yarn revoke --help`        |
-| `yarn debug --address <addr>`               | Get DM by address     | `yarn debug --help`         |
-| `yarn debug --inbox-id <id>`                | Get DM by inbox ID    | `yarn debug --help`         |
+| Command                                      | Purpose               | Help                        |
+| -------------------------------------------- | --------------------- | --------------------------- |
+| `yarn test <suite>`                          | Run test suites       | `yarn test --help`          |
+| `yarn blast --target <addr> --users <count>` | Test message delivery | `yarn blast --help`         |
+| `yarn installations`                         | Manage installations  | `yarn installations --help` |
+| `yarn bot <name>`                            | Run interactive bots  | `yarn bot --help`           |
+| `yarn fork`                                  | Run forks testing     | `yarn fork --help`          |
+| `yarn versions`                              | Manage SDK versions   | `yarn versions --help`      |
+| `yarn gen`                                   | Generate test data    | `yarn gen --help`           |
+| `yarn gen:keys [--env <env>]`                | Generate wallet keys  | `yarn gen:keys --help`      |
+| `yarn revoke <inbox-id> [--keep <ids>]`      | Revoke installations  | `yarn revoke --help`        |
+| `yarn debug --address <addr>`                | Get DM by address     | `yarn debug --help`         |
+| `yarn debug --inbox-id <id>`                 | Get DM by inbox ID    | `yarn debug --help`         |
 
 ## Core Commands
 
@@ -45,7 +45,7 @@ yarn test <suite> [options]
 ### Send Command
 
 ```bash
-yarn send [options]
+yarn blast [options]
 ```
 
 **Options:**
@@ -316,7 +316,7 @@ All commands support:
 yarn test convos --env dev
 
 # Load testing with response waiting
-yarn send --target 0x1234... --env production --users 500 --wait
+yarn blast --target 0x1234... --env production --users 500 --wait
 
 # Multi-version compatibility testing
 yarn test performance --versions 3 --log warn --file
@@ -356,7 +356,7 @@ yarn debug --list-conversations
 
 ```bash
 yarn test --help        # Test command help
-yarn send --help        # Send command help
+yarn blast --help        # Send command help
 yarn bot --help         # Bot command help
 yarn gen --help         # Generator help
 yarn versions --help    # Versions help
