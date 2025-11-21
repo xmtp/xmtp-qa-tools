@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const testName = "agents-upgrade";
 const CONVERSATION_COUNT = 1000;
 
-describe(testName, async () => {
+describe(testName, () => {
   const env = (process.env.XMTP_ENV || "dev") as XmtpEnv;
   const versions = getVersions(true).slice(0, 3); // Get first 3 SDK versions
 
@@ -146,7 +146,7 @@ async function populateConversations(
           });
           totalCreated++;
         } catch (error) {
-          console.warn(`Failed to create conversation: ${error}`);
+          console.warn(`Failed to create conversation: ${error as string}`);
         }
       }),
     );
