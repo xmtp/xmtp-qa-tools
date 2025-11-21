@@ -177,7 +177,8 @@ async function main() {
   if (!envVars.XMTP_WALLET_KEY || !envVars.XMTP_DB_ENCRYPTION_KEY) {
     const missingVars: string[] = [];
     if (!envVars.XMTP_WALLET_KEY) missingVars.push("XMTP_WALLET_KEY");
-    if (!envVars.XMTP_DB_ENCRYPTION_KEY) missingVars.push("XMTP_DB_ENCRYPTION_KEY");
+    if (!envVars.XMTP_DB_ENCRYPTION_KEY)
+      missingVars.push("XMTP_DB_ENCRYPTION_KEY");
     console.error(
       `Error: Missing required environment variables: ${missingVars.join(", ")}`,
     );
@@ -336,4 +337,3 @@ main().catch((error: unknown) => {
   console.error("Unexpected error:", error);
   process.exit(1);
 });
-

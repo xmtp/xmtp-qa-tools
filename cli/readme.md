@@ -200,6 +200,7 @@ If no `.env` file exists, it will create one with new keys (but won't save them)
 Run `yarn gen:keys` first to generate keys and save them to `.env`.
 
 When using `--list-conversations`, the command will show:
+
 - Total conversation count (DMs and Groups)
 - Message count per conversation
 - Last message preview with timestamp for each conversation

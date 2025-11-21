@@ -3,16 +3,12 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import {
-  IdentifierKind,
-  type XmtpEnv,
-} from "@helpers/versions";
-import {
   APP_VERSION,
   createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
-import { Client } from "@helpers/versions";
+import { Client, IdentifierKind, type XmtpEnv } from "@helpers/versions";
 
 function showHelp() {
   console.log(`
@@ -157,13 +153,13 @@ interface ConversationStats {
 
 async function listAllConversations(client: Client): Promise<void> {
   console.log(`Syncing conversations...`);
-  
+
   // Sync conversations first
   await client.conversations.sync();
-  
+
   // Get all conversations
   const conversations = await client.conversations.list();
-  
+
   // Total conversation count
   const totalCount = conversations.length;
   const dms = conversations.filter((conv) => {
@@ -174,28 +170,28 @@ async function listAllConversations(client: Client): Promise<void> {
     // Check if it's a Group (has name property)
     return "name" in conv;
   });
-  
+
   console.log(`\n📊 Conversation Statistics:`);
   console.log(`   Total Conversations: ${totalCount}`);
   console.log(`   DMs: ${dms.length}`);
   console.log(`   Groups: ${groups.length}`);
-  
+
   if (totalCount === 0) {
     console.log(`\n✓ No conversations found.`);
     return;
   }
-  
+
   console.log(`\n📋 Conversations Details:\n`);
-  
+
   const conversationStats: ConversationStats[] = [];
-  
+
   // Process each conversation
   for (const conv of conversations) {
     try {
       // Get messages for this conversation
       const messages = await conv.messages();
       const messageCount = messages.length;
-      
+
       // Get last message if exists
       let lastMessage: ConversationStats["lastMessage"] | undefined;
       if (messages.length > 0) {
@@ -209,10 +205,10 @@ async function listAllConversations(client: Client): Promise<void> {
           senderInboxId: last.senderInboxId,
         };
       }
-      
+
       // Determine type
       const type = "peerInboxId" in conv ? "DM" : "Group";
-      
+
       conversationStats.push({
         id: conv.id,
         type,
@@ -227,10 +223,12 @@ async function listAllConversations(client: Client): Promise<void> {
         type,
         messageCount: 0,
       });
-      console.warn(`⚠️  Warning: Could not get messages for conversation ${conv.id}: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(
+        `⚠️  Warning: Could not get messages for conversation ${conv.id}: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
-  
+
   // Sort by last message time (most recent first), then by message count
   conversationStats.sort((a, b) => {
     if (a.lastMessage && b.lastMessage) {
@@ -240,17 +238,17 @@ async function listAllConversations(client: Client): Promise<void> {
     if (b.lastMessage) return 1;
     return b.messageCount - a.messageCount;
   });
-  
+
   // Print formatted table
   console.log(
-    `${"Type".padEnd(8)} ${"Messages".padEnd(10)} ${"Last Message".padEnd(50)} ${"Conversation ID"}`,
+    `${"Type".padEnd(8)} ${"Messages".padEnd(10)} ${"Last Message".padEnd(50)}  Conversation ID`,
   );
   console.log("─".repeat(120));
-  
+
   for (const stat of conversationStats) {
     const type = stat.type.padEnd(8);
     const messageCount = stat.messageCount.toString().padEnd(10);
-    
+
     let lastMessageInfo = "No messages";
     if (stat.lastMessage) {
       const timeAgo = Math.floor(
@@ -262,16 +260,18 @@ async function listAllConversations(client: Client): Promise<void> {
           : timeAgo < 1440
             ? `${Math.floor(timeAgo / 60)}h ago`
             : `${Math.floor(timeAgo / 1440)}d ago`;
-      const contentPreview = stat.lastMessage.content.replace(/\n/g, " ").substring(0, 40);
+      const contentPreview = stat.lastMessage.content
+        .replace(/\n/g, " ")
+        .substring(0, 40);
       lastMessageInfo = `${timeStr}: ${contentPreview}${stat.lastMessage.content.length > 40 ? "..." : ""}`;
     }
     lastMessageInfo = lastMessageInfo.padEnd(50);
-    
+
     const conversationId = stat.id.substring(0, 16) + "...";
-    
+
     console.log(`${type} ${messageCount} ${lastMessageInfo} ${conversationId}`);
   }
-  
+
   console.log("─".repeat(120));
   console.log(`\n🔗 View conversations at: https://xmtp.chat/conversations`);
 }
@@ -300,8 +300,12 @@ async function main() {
   } else {
     // Validate that either address or inbox-id is provided
     if (!config.address && !config.inboxId) {
-      console.error("Error: Either --address, --inbox-id, or --list-conversations is required");
-      console.error("Usage: yarn debug --address <address> OR yarn debug --inbox-id <inbox-id> OR yarn debug --list-conversations");
+      console.error(
+        "Error: Either --address, --inbox-id, or --list-conversations is required",
+      );
+      console.error(
+        "Usage: yarn debug --address <address> OR yarn debug --inbox-id <inbox-id> OR yarn debug --list-conversations",
+      );
       console.error("Run 'yarn debug --help' for more information");
       process.exit(1);
     }
@@ -309,14 +313,20 @@ async function main() {
 
   // Validate that both address and inbox-id are not provided
   if (config.address && config.inboxId) {
-    console.error("Error: Cannot use both --address and --inbox-id. Choose one.");
-    console.error("Usage: yarn debug --address <address> OR yarn debug --inbox-id <inbox-id>");
+    console.error(
+      "Error: Cannot use both --address and --inbox-id. Choose one.",
+    );
+    console.error(
+      "Usage: yarn debug --address <address> OR yarn debug --inbox-id <inbox-id>",
+    );
     process.exit(1);
   }
 
   // Validate that list-conversations is not used with address/inbox-id
   if (config.listConversations && (config.address || config.inboxId)) {
-    console.error("Error: Cannot use --list-conversations with --address or --inbox-id.");
+    console.error(
+      "Error: Cannot use --list-conversations with --address or --inbox-id.",
+    );
     console.error("Usage: yarn debug --list-conversations (standalone)");
     process.exit(1);
   }
@@ -375,7 +385,9 @@ async function main() {
     const { generatePrivateKey } = await import("viem/accounts");
     walletKey = generatePrivateKey();
     encryptionKeyHex = generateEncryptionKeyHex();
-    console.log("Generated new keys. Consider running 'yarn gen:keys' to save them to .env");
+    console.log(
+      "Generated new keys. Consider running 'yarn gen:keys' to save them to .env",
+    );
   }
 
   try {
@@ -427,4 +439,3 @@ main().catch((error: unknown) => {
   console.error("Unexpected error:", error);
   process.exit(1);
 });
-
