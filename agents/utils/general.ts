@@ -1,5 +1,4 @@
 import { existsSync } from "fs";
-import type { Dm, Group } from "@helpers/versions";
 
 export function loadEnvFile() {
   // Only do this in the gm example because it's called from the root
@@ -33,87 +32,4 @@ export function shouldSkipOldMessage(
     `Skipping message because it was sent before startup (${ageDisplay} old, skipped: ${skippedCount.count}) for total conversations: ${totalConversations}`,
   );
   return true;
-}
-
-export interface SyncResult {
-  startupTimeStamp: number;
-  skippedMessagesCount: { count: number };
-  totalConversations: (Dm | Group)[];
-  syncDurationMs: number;
-  totalMessages: number;
-  dmsCount: number;
-  groupsCount: number;
-  messageCountDurationMs: number;
-}
-
-export async function startUpSync(agent: any): Promise<SyncResult> {
-  try {
-    const startupTimeStamp = new Date().getTime();
-
-    // Time the syncAll operation
-    const syncStartTime = performance.now();
-    await agent.client.conversations.syncAll();
-    const syncEndTime = performance.now();
-    const syncDurationMs = syncEndTime - syncStartTime;
-
-    // Get conversations
-    const totalConversations =
-      (await agent.client.conversations.list()) as Array<Dm | Group>;
-
-    // Count messages across all conversations
-    const messageCountStartTime = performance.now();
-    let totalMessages = 0;
-    let dmsCount = 0;
-    let groupsCount = 0;
-
-    for (const conversation of totalConversations) {
-      try {
-        // Check if it's a DM or Group by checking for peerInboxId property
-        const isDm = "peerInboxId" in conversation;
-        if (isDm) {
-          dmsCount++;
-        } else {
-          groupsCount++;
-        }
-
-        // Get messages for this conversation
-        const messages = await conversation.messages();
-        totalMessages += messages.length;
-      } catch {
-        // Silently continue if a conversation fails
-      }
-    }
-
-    const messageCountEndTime = performance.now();
-    const messageCountDurationMs = messageCountEndTime - messageCountStartTime;
-
-    const skippedMessagesCount = { count: 0 };
-
-    return {
-      startupTimeStamp,
-      skippedMessagesCount,
-      totalConversations,
-      syncDurationMs,
-      totalMessages,
-      dmsCount,
-      groupsCount,
-      messageCountDurationMs,
-    };
-  } catch (error) {
-    console.error("❌ Error syncing conversations:", error);
-    throw error;
-  }
-}
-
-export function logSyncResults(results: SyncResult): void {
-  const syncDurationSec = (results.syncDurationMs / 1000).toFixed(2);
-
-  console.log(
-    `✅ syncAll completed in ${syncDurationSec}s (${results.syncDurationMs.toFixed(0)}ms)`,
-  );
-  console.log(
-    `   └─ Total conversations: ${results.totalConversations.length}`,
-  );
-  console.log(`   └─ DMs: ${results.dmsCount}, Groups: ${results.groupsCount}`);
-  console.log(`   └─ Total messages: ${results.totalMessages}`);
 }
