@@ -525,17 +525,27 @@ export async function verifyAgentMessageStream(
   // For DMs, this is the peer inbox ID; for groups, we need to find the agent member
   let agentInboxId: string | undefined;
   try {
-    const members = await group.members();
-    const receiverInboxId = receivers[0]?.client.inboxId?.toLowerCase();
-    // Find the member that is NOT the receiver (i.e., the agent)
-    const agentMember = members.find(
-      (member) => member.inboxId.toLowerCase() !== receiverInboxId,
-    );
-    agentInboxId = agentMember?.inboxId;
-    
-    // For DMs, we can also try to get peerInboxId directly if available
-    if (!agentInboxId && "peerInboxId" in group) {
+    // For DMs, try to get peerInboxId directly first (most reliable)
+    if ("peerInboxId" in group && (group as any).peerInboxId) {
       agentInboxId = (group as any).peerInboxId;
+      console.log(`[verifyAgentMessageStream] Using peerInboxId: ${agentInboxId}`);
+    } else {
+      // Fallback: get from members
+      const members = await group.members();
+      const receiverInboxId = receivers[0]?.client.inboxId?.toLowerCase();
+      console.log(`[verifyAgentMessageStream] Receiver inbox ID: ${receiverInboxId}`);
+      console.log(`[verifyAgentMessageStream] Conversation members: ${members.map(m => m.inboxId).join(", ")}`);
+      
+      // Find the member that is NOT the receiver (i.e., the agent)
+      const agentMember = members.find(
+        (member) => member.inboxId.toLowerCase() !== receiverInboxId,
+      );
+      agentInboxId = agentMember?.inboxId;
+      console.log(`[verifyAgentMessageStream] Agent inbox ID from members: ${agentInboxId}`);
+    }
+    
+    if (!agentInboxId) {
+      console.warn("[verifyAgentMessageStream] Could not determine agent inbox ID - will filter by conversation ID only");
     }
   } catch (error) {
     console.warn("Failed to get agent inbox ID from conversation members:", error);

@@ -648,7 +648,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
               type === typeofStream.MessageandResponse
             ) {
               // Log message details for debugging
-              console.debug(
+              console.log(
                 `[${this.nameId}] Stream received message: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}, contentType=${message.contentType?.typeId}, content="${message.content as string}"`,
               );
 
@@ -991,7 +991,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     excludeSender?: string,
     acceptFromSender?: string,
   ): Promise<StreamTextMessage[]> {
-    console.debug(
+    console.log(
       `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages${acceptFromSender ? `, types: ${types.join(", ")}, acceptFromSender: ${acceptFromSender}` : ""}${excludeSender ? `, excludeSender: ${excludeSender}` : ""}`,
     );
     const myInboxId = this.client?.inboxId?.toLowerCase();
@@ -1032,8 +1032,8 @@ export class WorkerClient extends Worker implements IWorkerClient {
           shouldAccept = idsMatch && typeIsMatch && !isFromSelf && !isExcludedSender;
         }
         
-        console.debug(
-          `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, shouldAccept=${shouldAccept}`,
+        console.log(
+          `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, shouldAccept=${shouldAccept}${acceptFromSenderLower ? `, acceptFromSender=${acceptFromSenderLower}` : ""}`,
         );
         
         return shouldAccept;
