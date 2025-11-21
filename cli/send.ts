@@ -9,6 +9,8 @@ import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { getWorkers } from "@workers/manager";
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 
 // Examples:
 // yarn send --target 0xf1be9a945de5e4e270321cf47672f82380fd3463 --env dev --users 100
@@ -31,122 +33,144 @@ interface Config {
   attempts: number;
 }
 
-function showHelp() {
-  console.log(`
-XMTP Send CLI - Message sending and testing
+function parseArgs(): Config {
+  const argv = yargs(hideBin(process.argv))
+    .scriptName("yarn send")
+    .usage("$0 [options]")
+    .command("$0", "XMTP Send CLI - Message sending and testing", (yargs) => {
+      return yargs;
+    })
+    .option("target", {
+      alias: "t",
+      type: "string",
+      description: "Target wallet address to send messages to",
+      default: process.env.TARGET ?? "",
+    })
+    .option("group-id", {
+      alias: "g",
+      type: "string",
+      description: "Target group ID to send message to",
+    })
+    .option("message", {
+      alias: "m",
+      type: "string",
+      description: "Custom message to send (required for group messages)",
+    })
+    .option("custom-message", {
+      type: "string",
+      description:
+        "Custom message for individual DM messages (default: auto-generated)",
+    })
+    .option("sender", {
+      alias: "s",
+      type: "string",
+      description: "Wallet address to use as sender (must be group member)",
+    })
+    .option("env", {
+      alias: "e",
+      type: "string",
+      choices: ["local", "dev", "production"],
+      description: "XMTP environment",
+      default: process.env.XMTP_ENV ?? "production",
+    })
+    .option("users", {
+      alias: "u",
+      type: "number",
+      description: "Number of users to simulate",
+      default: 5,
+    })
+    .option("attempts", {
+      alias: "a",
+      type: "number",
+      description: "Number of attempts to send messages",
+      default: 1,
+    })
+    .option("threshold", {
+      type: "number",
+      description: "Success threshold percentage",
+      default: 95,
+    })
+    .option("wait", {
+      type: "boolean",
+      description: "Wait for responses from target",
+      default: false,
+    })
+    .check((argv) => {
+      // Validation - yargs converts kebab-case option names to camelCase
+      const groupId = (argv as any).groupId;
+      const target = argv.target;
 
-USAGE:
-  yarn send [options]
+      if (groupId && !argv.message) {
+        throw new Error("--message is required when using --group-id");
+      }
 
-OPTIONS:
-  --target <address>     Target wallet address to send messages to
-  --group-id <id>         Target group ID to send message to
-  --message <text>        Custom message to send (required for group messages)
-  --custom-message <text> Custom message for individual DM messages (default: auto-generated)
-  --sender <address>      Wallet address to use as sender (must be group member)
-  --env <environment>     XMTP environment (local, dev, production) [default: production]
-  --users <count>         Number of users to simulate [default: 5]
-  --attempts <count>      Number of attempts to send messages [default: 1]
-  --threshold <percent>   Success threshold percentage [default: 95]
-  --wait                 Wait for responses from target
-  -h, --help             Show this help message
+      if (groupId && target) {
+        throw new Error("Cannot use both --group-id and --target. Choose one.");
+      }
 
-ENVIRONMENTS:
+      if (!groupId && !target) {
+        throw new Error("Either --group-id or --target is required");
+      }
+
+      if (argv.attempts && argv.attempts < 1) {
+        throw new Error("--attempts must be at least 1");
+      }
+
+      return true;
+    })
+    .help("help")
+    .alias("help", "h")
+    .example(
+      "$0 --target 0x1234... --env dev --users 10",
+      "Send messages to a target address with 10 users",
+    )
+    .example(
+      "$0 --target 0x1234... --env production --users 500 --wait",
+      "Send messages and wait for responses",
+    )
+    .example(
+      "$0 --target 0x1234... --env production --users 10 --attempts 5",
+      "Send messages with 5 attempts",
+    )
+    .example(
+      "$0 --target 0x1234... --custom-message 'Hello from CLI!' --env dev",
+      "Send a custom message",
+    )
+    .example(
+      "$0 --group-id abc123... --message 'Hello group!' --sender 0x1234... --env production",
+      "Send a message to a group",
+    )
+    .epilogue(
+      `ENVIRONMENTS:
   local       Local XMTP network for development
-  dev         Development XMTP network (default)
+  dev         Development XMTP network
   production  Production XMTP network
-
-EXAMPLES:
-  yarn send --target 0x1234... --env dev --users 10 
-  yarn send --target 0x1234... --env production --users 500 --wait
-  yarn send --target 0x1234... --env production --users 10 --attempts 5
-  yarn send --target 0x1234... --custom-message "Hello from CLI!" --env dev
-  yarn send --group-id abc123... --message "Hello group!" --sender 0x1234... --env production
-  yarn send --help
 
 ENVIRONMENT VARIABLES:
   TARGET               Default target address
   XMTP_ENV             Default environment
   LOGGING_LEVEL        Logging level
 
-For more information, see: cli/readme.md
-`);
-}
+For more information, see: cli/readme.md`,
+    )
+    .strict()
+    .parseSync();
 
-function parseArgs(): Config {
-  const args = process.argv.slice(2);
+  // yargs converts kebab-case option names to camelCase in the parsed object
   const config: Config = {
-    userCount: 5,
+    userCount: argv.users ?? 5,
     timeout: 120 * 1000, // 120 seconds - used only when --wait is specified
-    env: process.env.XMTP_ENV ?? "production",
-    target: process.env.TARGET ?? "",
-    threshold: 95,
+    env: argv.env ?? process.env.XMTP_ENV ?? "production",
+    target: argv.target ?? process.env.TARGET ?? "",
+    groupId: (argv as any).groupId,
+    message: argv.message,
+    customMessage: argv["custom-message"],
+    senderAddress: argv.sender,
+    threshold: argv.threshold ?? 95,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
-    awaitResponse: false,
-    attempts: 1,
+    awaitResponse: argv.wait ?? false,
+    attempts: argv.attempts ?? 1,
   };
-
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    const nextArg = args[i + 1];
-
-    if (arg === "--help" || arg === "-h") {
-      showHelp();
-      process.exit(0);
-    } else if (arg === "--target" && nextArg) {
-      config.target = nextArg;
-      i++;
-    } else if (arg === "--group-id" && nextArg) {
-      config.groupId = nextArg;
-      i++;
-    } else if (arg === "--message" && nextArg) {
-      config.message = nextArg;
-      i++;
-    } else if (arg === "--custom-message" && nextArg) {
-      config.customMessage = nextArg;
-      i++;
-    } else if (arg === "--sender" && nextArg) {
-      config.senderAddress = nextArg;
-      i++;
-    } else if (arg === "--env" && nextArg) {
-      config.env = nextArg;
-      i++;
-    } else if (arg === "--users" && nextArg) {
-      config.userCount = parseInt(nextArg, 10);
-      i++;
-    } else if (arg === "--attempts" && nextArg) {
-      config.attempts = parseInt(nextArg, 10);
-      i++;
-    } else if (arg === "--threshold" && nextArg) {
-      config.threshold = parseInt(nextArg, 10);
-      i++;
-    } else if (arg === "--wait") {
-      config.awaitResponse = true;
-    }
-  }
-
-  // Validation
-  if (config.groupId && !config.message) {
-    console.error("❌ Error: --message is required when using --group-id");
-    process.exit(1);
-  }
-
-  if (config.groupId && config.target) {
-    console.error(
-      "❌ Error: Cannot use both --group-id and --target. Choose one.",
-    );
-    process.exit(1);
-  }
-
-  if (!config.groupId && !config.target) {
-    console.error("❌ Error: Either --group-id or --target is required");
-    process.exit(1);
-  }
-
-  if (config.attempts < 1) {
-    console.error("❌ Error: --attempts must be at least 1");
-    process.exit(1);
-  }
 
   return config;
 }

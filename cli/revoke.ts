@@ -1,27 +1,97 @@
+#!/usr/bin/env node
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createSigner } from "@helpers/client";
 import { Client, type XmtpEnv } from "@helpers/versions";
 
-// Check Node.js version
-const nodeVersion = process.versions.node;
-const [major] = nodeVersion.split(".").map(Number);
-if (major < 20) {
-  console.error("Error: Node.js version 20 or higher is required");
-  process.exit(1);
+function showHelp() {
+  console.log(`
+XMTP Revoke CLI - Revoke XMTP installations for an inbox
+
+USAGE:
+  yarn revoke <inbox-id> [options]
+
+ARGUMENTS:
+  inbox-id               64-character hex inbox ID (required)
+
+OPTIONS:
+  --keep <ids>           Comma-separated installation IDs to keep (optional)
+  --env <environment>    Override XMTP environment from .env file
+  -h, --help             Show this help message
+
+ENVIRONMENTS:
+  local       Local XMTP network for development
+  dev         Development XMTP network
+  production  Production XMTP network
+
+DESCRIPTION:
+  Revokes XMTP installations for a given inbox ID. You can specify which
+  installations to keep, or omit this to keep only the current installation.
+
+  This command reads wallet keys and environment from a .env file in the
+  current directory. Run 'yarn gen:keys' first to generate keys.
+
+EXAMPLES:
+  # Revoke all installations except current
+  yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64
+
+  # Keep specific installations
+  yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --keep "installation-id1,installation-id2"
+
+  # Override environment
+  yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --env production
+  yarn revoke --help
+
+For more information, see: cli/readme.md
+`);
 }
 
 async function main() {
-  // Get inbox ID and installations to save from command line arguments
-  const inboxId = process.argv[2];
-  const installationsToSave = process.argv[3];
+  const args = process.argv.slice(2);
+
+  if (args.includes("--help") || args.includes("-h")) {
+    showHelp();
+    return;
+  }
+
+  // Check Node.js version
+  const nodeVersion = process.versions.node;
+  const [major] = nodeVersion.split(".").map(Number);
+  if (major < 20) {
+    console.error("Error: Node.js version 20 or higher is required");
+    process.exit(1);
+  }
+
+  // Parse arguments
+  let inboxId = "";
+  let installationsToKeep: string[] = [];
+  let envOverride: string | undefined;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    const nextArg = args[i + 1];
+
+    if (arg === "--keep" && nextArg) {
+      installationsToKeep = nextArg
+        .split(",")
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0);
+      i++;
+    } else if (arg === "--env" && nextArg) {
+      envOverride = nextArg;
+      i++;
+    } else if (!arg.startsWith("--") && !inboxId) {
+      // First non-flag argument is the inbox ID
+      inboxId = arg;
+    }
+  }
 
   if (!inboxId) {
     console.error("Error: Inbox ID is required as a command line argument");
-    console.error("Usage: yarn revoke <inbox-id> [installations-to-save]");
+    console.error("Usage: yarn revoke <inbox-id> [--keep <ids>]");
     console.error(
-      'Example: yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 "current-installation-id,another-installation-id"',
+      'Example: yarn revoke 743f3805fa9daaf879103bc26a2e79bb53db688088259c23cf18dcf1ea2aee64 --keep "installation-id1,installation-id2"',
     );
     process.exit(1);
   }
@@ -34,14 +104,6 @@ async function main() {
     console.error(`Provided: ${inboxId}`);
     process.exit(1);
   }
-
-  // Parse installations to save, default to current installation if not provided
-  const installationsToKeep = installationsToSave
-    ? installationsToSave
-        .split(",")
-        .map((id) => id.trim())
-        .filter((id) => id.length > 0)
-    : [];
 
   // Validate installation IDs if provided
   if (installationsToKeep.length > 0) {
@@ -57,7 +119,7 @@ async function main() {
         "Usage: Provide installation IDs separated by commas, or omit to keep only current installation.",
       );
       console.error(
-        'Example: yarn revoke <inbox-id> "installation-id1,installation-id2"',
+        'Example: yarn revoke <inbox-id> --keep "installation-id1,installation-id2"',
       );
       process.exit(1);
     }
@@ -102,15 +164,21 @@ async function main() {
     }
   });
 
-  // Validate required environment variables
-  const requiredVars = [
-    "XMTP_WALLET_KEY",
-    "XMTP_DB_ENCRYPTION_KEY",
-    "XMTP_ENV",
-  ];
-  const missingVars = requiredVars.filter((varName) => !envVars[varName]);
+  // Use env override if provided, otherwise use .env file value
+  const env = envOverride || envVars.XMTP_ENV;
+  if (!env) {
+    console.error(
+      "Error: XMTP_ENV not found in .env file and --env not provided.",
+    );
+    console.error("Please run 'yarn gen:keys' first or provide --env flag.");
+    process.exit(1);
+  }
 
-  if (missingVars.length > 0) {
+  if (!envVars.XMTP_WALLET_KEY || !envVars.XMTP_DB_ENCRYPTION_KEY) {
+    const missingVars: string[] = [];
+    if (!envVars.XMTP_WALLET_KEY) missingVars.push("XMTP_WALLET_KEY");
+    if (!envVars.XMTP_DB_ENCRYPTION_KEY)
+      missingVars.push("XMTP_DB_ENCRYPTION_KEY");
     console.error(
       `Error: Missing required environment variables: ${missingVars.join(", ")}`,
     );
@@ -120,7 +188,7 @@ async function main() {
 
   console.log(`Revoking installations for ${exampleName}...`);
   console.log(`Inbox ID: ${inboxId}`);
-  console.log(`Environment: ${envVars.XMTP_ENV}`);
+  console.log(`Environment: ${env}`);
   if (installationsToKeep.length > 0) {
     console.log(`Installations to keep: ${installationsToKeep.join(", ")}`);
   } else {
@@ -134,7 +202,7 @@ async function main() {
     // Get current inbox state
     const inboxState = await Client.inboxStateFromInboxIds(
       [inboxId],
-      envVars.XMTP_ENV as unknown as XmtpEnv,
+      env as unknown as XmtpEnv,
     );
 
     const currentInstallations = inboxState[0].installations;
@@ -244,7 +312,7 @@ async function main() {
       signer,
       inboxId,
       installationsToRevokeBytes,
-      envVars.XMTP_ENV as XmtpEnv,
+      env as unknown as XmtpEnv,
     );
 
     console.log(`✓ Revoked ${installationsToRevoke.length} installations`);
@@ -252,7 +320,7 @@ async function main() {
     // Get final state to confirm
     const finalInboxState = await Client.inboxStateFromInboxIds(
       [inboxId],
-      envVars.XMTP_ENV as XmtpEnv,
+      env as unknown as XmtpEnv,
     );
     console.log(
       `✓ Final installations: ${finalInboxState[0].installations.length}`,
