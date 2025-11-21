@@ -4,6 +4,7 @@ import { verifyAgentMessageStream } from "@helpers/streams";
 import {
   IdentifierKind,
   type Conversation,
+  type Dm,
   type XmtpEnv,
 } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
@@ -39,14 +40,54 @@ describe(testName, async () => {
         agent.name,
         agent.address,
       );
-      const conversation = await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
-
-      console.log("DM created", conversation.id);
+      
+      // Sync conversations first to ensure we have the latest state
+      // This is important because the agent might respond on an existing DM
+      await workers.getCreator().client.conversations.sync();
+      
+      // Try to find an existing DM with this peer first
+      const allConversations = await workers.getCreator().client.conversations.list();
+      let conversation: Conversation | undefined;
+      
+      // Look for an existing DM with matching peer address
+      for (const conv of allConversations) {
+        // Type guard to check if it's a DM
+        if ('peerInboxId' in conv) {
+          const dm = conv as Dm;
+          // It's a DM, check if the peer matches by getting members and checking Ethereum address
+          try {
+            const members = await dm.members();
+            const peerMember = members.find(
+              (m) => m.inboxId.toLowerCase() !== workers.getCreator().client.inboxId.toLowerCase()
+            );
+            if (peerMember) {
+              const peerEthId = peerMember.accountIdentifiers.find(
+                (id) => id.identifierKind === IdentifierKind.Ethereum
+              );
+              if (peerEthId && peerEthId.identifier.toLowerCase() === agent.address.toLowerCase()) {
+                console.log(`Found existing DM: ${dm.id} (peer: ${agent.address})`);
+                conversation = dm as Conversation;
+                break;
+              }
+            }
+          } catch (error) {
+            // Skip this conversation if we can't get members
+            console.debug(`Skipping conversation ${dm.id}, error getting members:`, error);
+          }
+        }
+      }
+      
+      // If no existing DM found, create a new one
+      if (!conversation) {
+        conversation = await workers
+          .getCreator()
+          .client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+        console.log("DM created", conversation.id);
+      }
+      
       const result = await verifyAgentMessageStream(
         conversation as Conversation,
         [workers.getCreator()],
