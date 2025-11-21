@@ -85,6 +85,8 @@ interface IWorkerClient {
     count: number,
     types?: string[],
     customTimeout?: number,
+    excludeSender?: string,
+    acceptFromSender?: string,
   ): Promise<StreamTextMessage[]>;
   collectGroupUpdates(
     groupId: string,
@@ -986,11 +988,15 @@ export class WorkerClient extends Worker implements IWorkerClient {
     count: number,
     types: string[] = ["text"],
     customTimeout?: number,
+    excludeSender?: string,
+    acceptFromSender?: string,
   ): Promise<StreamTextMessage[]> {
     console.debug(
-      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages${acceptFromSender ? `, types: ${types.join(", ")}, acceptFromSender: ${acceptFromSender}` : ""}${excludeSender ? `, excludeSender: ${excludeSender}` : ""}`,
     );
     const myInboxId = this.client?.inboxId?.toLowerCase();
+    const excludeSenderLower = excludeSender?.toLowerCase();
+    const acceptFromSenderLower = acceptFromSender?.toLowerCase();
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
@@ -1006,11 +1012,25 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const contentType = streamMsg.message.contentType;
         const senderInboxId = streamMsg.message.senderInboxId?.toLowerCase();
         
-        // Exclude messages sent by ourselves
+        // Exclude messages sent by ourselves or the excluded sender
         const isFromSelf = myInboxId && senderInboxId === myInboxId;
-        const idsMatch = groupId === conversationId;
+        const isExcludedSender = excludeSenderLower && senderInboxId === excludeSenderLower;
         const typeIsMatch = types.includes(contentType?.typeId as string);
-        const shouldAccept = idsMatch && typeIsMatch && !isFromSelf;
+        
+        // If acceptFromSender is specified, accept messages from that sender regardless of conversation ID
+        // Otherwise, require conversation ID to match
+        let idsMatch: boolean;
+        let shouldAccept: boolean;
+        
+        if (acceptFromSenderLower) {
+          // For agent testing: accept messages from the target agent in any conversation
+          idsMatch = senderInboxId === acceptFromSenderLower;
+          shouldAccept = idsMatch && typeIsMatch && !isFromSelf && !isExcludedSender;
+        } else {
+          // Standard behavior: require conversation ID to match
+          idsMatch = groupId === conversationId;
+          shouldAccept = idsMatch && typeIsMatch && !isFromSelf && !isExcludedSender;
+        }
         
         console.debug(
           `[${this.nameId}] Filtering message: conversationId=${conversationId} (expecting ${groupId}), sender=${senderInboxId} (my: ${myInboxId}), contentType=${contentType?.typeId}, idsMatch=${idsMatch}, typeIsMatch=${typeIsMatch}, isFromSelf=${isFromSelf}, shouldAccept=${shouldAccept}`,
