@@ -112,10 +112,10 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Bots: Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
   - [`key-check.eth`](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/key-check): key packages
   - [`hi.xmtp.eth`](https://github.com/xmtp/gm-bot): A bot that replies "gm" to all messages
-- Gen Keys: Generate wallet keys and encryption keys for XMTP testing - [see section](./cli/keys.ts)
+- Generate keys: Generate wallet keys and encryption keys for XMTP testing - [see section](./cli/keys.ts)
   - Creates `.env` file with `XMTP_WALLET_KEY`, `XMTP_DB_ENCRYPTION_KEY`, and `XMTP_ENV`
   - Usage: `yarn gen:keys [--env <environment>]`
-- Revoke Installations: Revoke XMTP installations for a given inbox ID - [see section](./cli/revoke.ts)
+- Revoke installations: Revoke XMTP installations for a given inbox ID - [see section](./cli/revoke.ts)
   - Can keep specific installations or revoke all except one
   - Usage: `yarn revoke <inbox-id> [--keep <ids>] [--env <environment>]`
 - Copilot: XMTP agent assistant for XMTP tasks via Slack or XMTP - [see section](./copilot/CLAUDE.md)
