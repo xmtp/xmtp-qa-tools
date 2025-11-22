@@ -83,7 +83,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.3.0-dev";
+} from "@xmtp/node-sdk-4.5.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -105,15 +105,15 @@ export const AgentVersionList = [
 
 // Node SDK version list
 export const VersionList = [
-  {
-    Client: Client430Dev,
-    Conversation: Conversation430Dev,
-    Dm: Dm430Dev,
-    Group: Group430Dev,
-    nodeSDK: "4.3.0",
-    nodeBindings: "1.7.0",
-    auto: true,
-  },
+  // {
+  //   Client: Client40Dev,
+  //   Conversation: Conversation430Dev,
+  //   Dm: Dm430Dev,
+  //   Group: Group430Dev,
+  //   nodeSDK: "4.3.0",
+  //   nodeBindings: "1.7.0",
+  //   auto: true,
+  // },
   {
     Client: Client440,
     Conversation: Conversation440,
