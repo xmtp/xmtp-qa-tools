@@ -1,22 +1,19 @@
-import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { verifyAgentMessageStream } from "@helpers/streams";
-import {
-  IdentifierKind,
-  type Conversation,
-  type XmtpEnv,
-} from "@helpers/versions";
+import { type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
+import { Agent } from "@xmtp/agent-sdk-1.1.14";
+import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
+import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
-import { type AgentConfig } from "./helper";
+import { waitForResponse, type AgentConfig } from "./helper";
 
 const testName = "agents-dms";
-describe(testName, async () => {
+const TIMEOUT = 30000; // 30 seconds
+
+describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const workers = await getWorkers(["randomguy"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env as string);
@@ -32,49 +29,81 @@ describe(testName, async () => {
   }
 
   // Test each agent in DMs
-  for (const agent of filteredAgents) {
-    it(`${testName}: ${agent.name} DM : ${agent.address}`, async () => {
+  for (const agentConfig of filteredAgents) {
+    it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
+      const agent = await Agent.createFromEnv({
+        codecs: [new ActionsCodec(), new IntentCodec()],
+      });
+      console.log(`📋 Using agent: ${agent.client.inboxId}`);
       console.log(
-        `sending ${agent.sendMessage} to agent`,
-        agent.name,
-        agent.address,
+        `📤 Sending "${agentConfig.sendMessage}" to ${agentConfig.name} (${agentConfig.address})`,
       );
-      const conversation = await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
+
+      try {
+        const conversation = await agent.createDmWithAddress(
+          agentConfig.address as `0x${string}`,
+        );
+        console.log(`📋 DM created: ${conversation.id}`);
+
+        const result = await waitForResponse({
+          conversation: {
+            stream: async () => {
+              return await conversation.stream();
+            },
+            send: async (content: string) => {
+              return await conversation.send(content);
+            },
+          },
+          senderInboxId: agent.client.inboxId,
+          timeout: TIMEOUT,
+          messageText: agentConfig.sendMessage,
         });
 
-      console.log("DM created", conversation.id);
-      const result = await verifyAgentMessageStream(
-        conversation as Conversation,
-        [workers.getCreator()],
-        agent.sendMessage,
-        3,
-      );
+        const responseTime = result.responseTime || 0;
 
-      const responseTime = Math.abs(
-        result?.averageEventTiming ?? streamTimeout,
-      );
+        // Ensure we have a valid response time (use minimum of 0.01ms if somehow 0)
+        const metricValue: number = responseTime > 0 ? responseTime : 0.01;
 
-      // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
-      sendMetric("response", responseTime, {
-        test: testName,
-        metric_type: "agent",
-        metric_subtype: "dm",
-        live: agent.live ? "true" : "false",
-        agent: agent.name,
-        address: agent.address,
-        sdk: workers.getCreator().sdk,
-      } as ResponseMetricTags);
+        // Send metric to DataDog
+        sendMetric(
+          "response",
+          metricValue as number,
+          {
+            test: testName,
+            metric_type: "agent",
+            metric_subtype: "dm",
+            live: agentConfig.live ? "true" : "false",
+            agent: agentConfig.name,
+            address: agentConfig.address,
+          } as ResponseMetricTags,
+        );
 
-      if (result?.receptionPercentage === 0)
-        console.error(agent.name, "ERROR: NO RESPONSE");
-      else console.log(agent.name, "SUCCESS");
+        if (result.success && result.responseMessage) {
+          const responseContent =
+            typeof result.responseMessage.content === "string"
+              ? result.responseMessage.content
+              : JSON.stringify(result.responseMessage.content);
+          console.log(
+            `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
+          );
+          console.log(`💬 Response: "${responseContent}"`);
+        } else {
+          console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
+        }
 
-      if (process.env.XMTP_ENV !== "production")
-        expect(result?.receptionPercentage).toBeGreaterThan(0);
+        // Only assert in non-production environments
+        if (process.env.XMTP_ENV !== "production") {
+          expect(result.success).toBe(true);
+          expect(result.responseMessage).toBeTruthy();
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        console.error(`❌ Failed to test ${agentConfig.name}: ${errorMessage}`);
+        throw error;
+      } finally {
+        await agent.stop();
+      }
     });
   }
 });

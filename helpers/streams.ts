@@ -171,9 +171,17 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
         const duration =
           msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
-        eventTimings[r.name][sentIdx] = duration;
-        timingSum += duration;
-        timingCount++;
+        // Filter out negative or suspiciously low durations (0-1ms)
+        // These typically indicate timing issues, messages already in stream, or clock skew
+        if (duration > 1) {
+          eventTimings[r.name][sentIdx] = duration;
+          timingSum += duration;
+          timingCount++;
+        } else {
+          console.debug(
+            `Filtered out suspiciously low duration: ${duration}ms (likely timing issue)`,
+          );
+        }
       }
     });
   });
@@ -534,10 +542,9 @@ export async function verifyAgentMessageStream(
           types,
           customTimeout ?? undefined,
         ),
-      // @ts-expect-error - TODO: fix this
-      triggerEvents: () => {
+      triggerEvents: async () => {
         const sentAt = Date.now();
-        group.send(triggerMessage).catch(console.error);
+        await group.send(triggerMessage);
 
         return [{ conversationId: group.id, sentAt }];
       },
