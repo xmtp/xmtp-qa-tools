@@ -87,7 +87,6 @@ export async function runSendCommand(options: SendOptions): Promise<void> {
         message || "hello world",
         options.wait,
         options.timeout,
-        `https://xmtp.chat/conversations/${options.groupId}`,
       );
     } else if (target) {
       const dm = await agent.createDmWithAddress(target as `0x${string}`);
@@ -110,15 +109,20 @@ async function sendMessage(
   message: string,
   wait?: boolean,
   timeout?: number,
-  url?: string,
 ) {
   if (wait) {
     const result = await waitForResponse({
+      client: {
+        conversations: {
+          streamAllMessages: () =>
+            agent.client.conversations.streamAllMessages(),
+        },
+        inboxId: agent.client.inboxId,
+      },
       conversation: {
-        stream: () =>
-          conversation.stream() as Promise<AsyncIterable<DecodedMessage>>,
         send: (content: string) => conversation.send(content),
       },
+      conversationId: conversation.id,
       senderInboxId: agent.client.inboxId,
       timeout: timeout || 10000,
       messageText: message,
@@ -131,21 +135,25 @@ async function sendMessage(
           : JSON.stringify(result.responseMessage.content);
       console.log(`📬 Response (${result.responseTime}ms): "${content}"`);
     } else {
-      console.log(`⏱️  No response within timeout`);
+      console.log(`❌ No response within timeout`);
     }
-    if (url) console.log(`🔗 ${url}`);
   } else {
     await conversation.send(message);
     console.log(`✅ Message sent: "${message}"`);
-    if (url) console.log(`🔗 ${url}`);
   }
 }
 
 export async function waitForResponse(options: {
+  client: {
+    conversations: {
+      streamAllMessages: () => Promise<AsyncIterable<DecodedMessage>>;
+    };
+    inboxId: string;
+  };
   conversation: {
-    stream: () => Promise<AsyncIterable<DecodedMessage>>;
     send: (content: string) => Promise<string>;
   };
+  conversationId: string;
   senderInboxId: string;
   timeout: number;
   messageText?: string;
@@ -153,14 +161,45 @@ export async function waitForResponse(options: {
   attempt?: number;
 }): Promise<WaitForResponseResult> {
   const {
+    client,
     conversation,
+    conversationId,
     senderInboxId,
     timeout,
     messageText,
     workerId,
     attempt,
   } = options;
-  const stream = await conversation.stream();
+
+  // Set up stream and start consuming BEFORE sending message to avoid race condition
+  const stream = await client.conversations.streamAllMessages();
+
+  const responseStart = performance.now();
+  let timeoutId: NodeJS.Timeout | null = null;
+
+  // Start consuming the stream BEFORE sending the message
+  const responsePromise = (async () => {
+    try {
+      for await (const message of stream) {
+        // Filter by conversation ID and exclude messages from sender
+        if (
+          message.conversationId !== conversationId ||
+          message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
+        ) {
+          continue;
+        }
+        return message;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // Small delay to ensure stream is actively listening before sending
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  // Now send the message - the stream is already being consumed
   const sendStart = performance.now();
   await conversation.send(messageText || `test-${Date.now()}`);
   const sendTime = performance.now() - sendStart;
@@ -171,27 +210,7 @@ export async function waitForResponse(options: {
     );
   }
 
-  const responseStart = performance.now();
-  const iterator = stream[Symbol.asyncIterator]();
-  let timeoutId: NodeJS.Timeout | null = null;
-
   try {
-    const responsePromise = (async () => {
-      try {
-        while (true) {
-          const { value, done } = await iterator.next();
-          if (done) return null;
-          if (
-            value?.senderInboxId.toLowerCase() !== senderInboxId.toLowerCase()
-          ) {
-            return value;
-          }
-        }
-      } catch {
-        return null;
-      }
-    })();
-
     const timeoutPromise = new Promise<null>((_, reject) => {
       timeoutId = setTimeout(() => {
         reject(new Error("Timeout"));
@@ -221,7 +240,6 @@ export async function waitForResponse(options: {
     };
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
-    await iterator.return?.().catch(() => {});
   }
 }
 

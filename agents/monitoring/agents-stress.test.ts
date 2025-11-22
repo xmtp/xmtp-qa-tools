@@ -11,7 +11,7 @@ import {
   type AgentConfig,
 } from "./helper";
 
-const testName = "agents-text";
+const testName = "agents-stress";
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
@@ -23,7 +23,7 @@ describe(testName, () => {
   const createMetricTags = (agentConfig: AgentConfig): ResponseMetricTags => ({
     test: testName,
     metric_type: "agent",
-    metric_subtype: "text",
+    metric_subtype: "stress",
     live: agentConfig.live ? "true" : "false",
     agent: agentConfig.name,
     address: agentConfig.address,
@@ -31,7 +31,7 @@ describe(testName, () => {
   });
 
   for (const agentConfig of filteredAgents) {
-    it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
+    it(`${testName}: ${agentConfig.name} Stress : ${agentConfig.address}`, async () => {
       const agent = await Agent.createFromEnv({
         codecs: [new ActionsCodec(), new IntentCodec()],
       });
@@ -54,21 +54,17 @@ describe(testName, () => {
           senderInboxId: agent.client.inboxId,
           timeout: AGENT_RESPONSE_TIMEOUT,
           messageText: agentConfig.sendMessage,
-          messageFilter: (message) => {
-            return message.contentType?.typeId === "text";
-          },
         });
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
         sendMetric("response", responseTime, createMetricTags(agentConfig));
 
-        if (result.success && result.responseMessage) {
+        if (result.success && result.responseMessage)
           console.log(
             `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
           );
-        } else {
+        else
           console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
-        }
       } finally {
         await agent.stop();
       }

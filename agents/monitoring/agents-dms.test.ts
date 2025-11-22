@@ -5,10 +5,13 @@ import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, it } from "vitest";
 import productionAgents from "./agents";
-import { waitForResponse, type AgentConfig } from "./helper";
+import {
+  AGENT_RESPONSE_TIMEOUT,
+  waitForResponse,
+  type AgentConfig,
+} from "./helper";
 
 const testName = "agents-dms";
-const TIMEOUT = 10000; // 10 seconds
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
@@ -49,21 +52,19 @@ describe(testName, () => {
           },
           conversationId: conversation.id,
           senderInboxId: agent.client.inboxId,
-          timeout: TIMEOUT,
+          timeout: AGENT_RESPONSE_TIMEOUT,
           messageText: agentConfig.sendMessage,
         });
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
         sendMetric("response", responseTime, createMetricTags(agentConfig));
 
-        if (result.success && result.responseMessage) {
-          const responseContent = result.responseMessage.content as string;
+        if (result.success && result.responseMessage)
           console.log(
-            `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms - "${responseContent}"`,
+            `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
           );
-        } else {
+        else
           console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
-        }
       } finally {
         await agent.stop();
       }

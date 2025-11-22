@@ -26,6 +26,9 @@ jobs:
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
+      - name: Generate keys
+        run: yarn gen:keys
+
       - name: Run ${{ matrix.test }} ${{ matrix.env }}
         run: yarn test ${{ matrix.test }} --env ${{ matrix.env }} --no-fail --log off
 
@@ -60,6 +63,9 @@ jobs:
 
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
+
+      - name: Generate keys
+        run: yarn gen:keys
 
       - name: ${{ matrix.test }} ${{ matrix.env }}
         run: yarn test ${{ matrix.test }} --env ${{ matrix.env }} --no-fail --log off
