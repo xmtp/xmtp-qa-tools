@@ -1,16 +1,16 @@
+import productionAgents from "@agents/agents";
+import {
+  AGENT_RESPONSE_TIMEOUT,
+  waitForResponse,
+  type AgentConfig,
+} from "@agents/helper";
+import { Agent, type XmtpEnv } from "@agents/versions";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { Agent, type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, it } from "vitest";
-import productionAgents from "./agents";
-import {
-  AGENT_RESPONSE_TIMEOUT,
-  waitForResponse,
-  type AgentConfig,
-} from "./helper";
 
 const testName = "agents-tagged";
 

@@ -1,12 +1,3 @@
-import { APP_VERSION } from "@helpers/client";
-import {
-  Agent,
-  getSDKVersionInfo,
-  getTestUrl,
-  logDetails,
-  type MessageContext,
-} from "@helpers/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -16,7 +7,16 @@ import {
   showNavigationOptions,
   type AppConfig,
   type MenuAction,
-} from "../../utils/inline-actions/inline-actions";
+} from "@agents/utils/inline-actions/inline-actions";
+import {
+  Agent,
+  getTestUrl,
+  logDetails,
+  type MessageContext,
+} from "@agents/versions";
+import { APP_VERSION } from "@helpers/client";
+import { getSDKVersionInfo } from "@helpers/versions";
+import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
@@ -284,7 +284,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
 
 const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
-  dbPath: (inboxId) =>
+  dbPath: (inboxId: string) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   codecs: [new ActionsCodec(), new IntentCodec()],
@@ -421,7 +421,7 @@ agent.on("start", () => {
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
-  getSDKVersionInfo(Agent, agent.client);
+  getSDKVersionInfo(agent, agent.client);
 });
 
 await agent.start({

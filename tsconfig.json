@@ -26,6 +26,7 @@
       "@workers/*": ["./workers/*"],
       "@inboxes/*": ["./inboxes/*"],
       "@versions/*": ["./versions/*"],
+      "@agents/*": ["./agents/*"],
       "@bots/*": ["./bots/*"]
     }
   },

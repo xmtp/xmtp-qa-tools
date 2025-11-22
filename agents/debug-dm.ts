@@ -1,9 +1,9 @@
-import { Agent, type DecodedMessage, type Group } from "@helpers/versions";
+import { fileURLToPath } from "node:url";
+import agents from "@agents/agents";
+import { Agent } from "@agents/versions";
+import { type DecodedMessage } from "@xmtp/node-sdk";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import "dotenv/config";
-import { fileURLToPath } from "url";
-import agents from "./agents";
 
 export interface SendOptions {
   target?: string;
@@ -77,7 +77,7 @@ export async function runSendCommand(options: SendOptions): Promise<void> {
       await agent.client.conversations.sync();
       const group = (await agent.client.conversations.list()).find(
         (c) => c.id === options.groupId,
-      ) as Group | undefined;
+      );
       if (!group) {
         throw new Error(`Group ${options.groupId} not found`);
       }
@@ -115,6 +115,7 @@ async function sendMessage(
       client: {
         conversations: {
           streamAllMessages: () =>
+            //@ts-expect-error - TODO: fix this
             agent.client.conversations.streamAllMessages(),
         },
         inboxId: agent.client.inboxId,
