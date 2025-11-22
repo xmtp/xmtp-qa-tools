@@ -34,4 +34,6 @@ agent.on("start", () => {
   getSDKVersionInfo(Agent, agent.client);
 });
 
-await agent.start();
+await agent.start({
+  disableSync: true,
+});
