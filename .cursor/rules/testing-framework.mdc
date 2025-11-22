@@ -3,6 +3,8 @@ alwaysApply: false
 
 # Testing Worker Framework Rules
 
+-- When possible default to streamAllMessages
+
 ## Core Testing Pattern
 
 ```typescript
