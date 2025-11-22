@@ -51,10 +51,11 @@ describe(testName, () => {
         );
 
         const result = await waitForResponse({
+          client: agent.client,
           conversation: {
-            stream: () => conversation.stream(),
             send: (content: string) => conversation.send(content),
           },
+          conversationId: conversation.id,
           senderInboxId: agent.client.inboxId,
           timeout: TIMEOUT,
           messageText: agentConfig.sendMessage,
@@ -75,21 +76,6 @@ describe(testName, () => {
         if (!isProduction) {
           expect(result.success).toBe(true);
           expect(result.responseMessage).toBeTruthy();
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        const isTimeout = errorMessage.includes("timeout");
-
-        console.error(`❌ Failed to test ${agentConfig.name}: ${errorMessage}`);
-
-        if (isProduction && isTimeout) {
-          console.warn(
-            `⚠️  Production timeout for ${agentConfig.name} - skipping assertion`,
-          );
-          sendMetric("response", TIMEOUT, createMetricTags(agentConfig));
-        } else {
-          throw error;
         }
       } finally {
         await agent.stop();

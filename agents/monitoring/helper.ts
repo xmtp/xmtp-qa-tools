@@ -1,7 +1,6 @@
 import { streamTimeout } from "@helpers/client";
 import { type XmtpEnv } from "@helpers/versions";
-import { type DecodedMessage } from "@xmtp/agent-sdk-1.1.14";
-import { expect, it } from "vitest";
+import { type DecodedMessage } from "@xmtp/agent-sdk-1.1.12";
 
 /**
  * Agent configuration interface
@@ -25,14 +24,19 @@ export interface AgentConfig {
  * Options for waitForResponse function
  */
 export interface WaitForResponseOptions {
+  client: {
+    conversations: {
+      streamAllMessages: () => Promise<AsyncIterable<DecodedMessage>>;
+    };
+    inboxId: string;
+  };
   conversation: {
-    stream: () => Promise<AsyncIterable<DecodedMessage>>;
     send: (content: string) => Promise<string>;
   };
+  conversationId: string;
   senderInboxId: string;
   timeout: number;
   messageText?: string;
-  workerId?: number;
   attempt?: number;
 }
 
@@ -53,34 +57,35 @@ export async function waitForResponse(
   options: WaitForResponseOptions,
 ): Promise<WaitForResponseResult> {
   const {
+    client,
     conversation,
+    conversationId,
     senderInboxId,
     timeout,
     messageText,
-    workerId,
     attempt,
   } = options;
-  const hasWorkerLogging = workerId !== undefined && attempt !== undefined;
-  const log = (message: string) => {
-    if (hasWorkerLogging) console.log(message);
-  };
-
-  const stream = await conversation.stream();
   const sendStart = performance.now();
   const textToSend = messageText || `test-${Date.now()}`;
   await conversation.send(textToSend);
   const sendTime = performance.now() - sendStart;
 
-  log(`📩 ${workerId}: Attempt ${attempt}, Message sent in ${sendTime.toFixed(2)}ms`);
+  console.log(
+    `✅  Message sent in ${sendTime.toFixed(2)}ms from ${senderInboxId} to ${conversationId}`,
+  );
 
   const responseStartTime = performance.now();
   let responseTime = 0;
   let responseMessage: DecodedMessage | null = null;
 
   try {
+    const stream = await client.conversations.streamAllMessages();
     const responsePromise = (async () => {
       for await (const message of stream) {
+        console.log(message.conversationId, conversationId);
+        // Filter by conversation ID and exclude messages from sender
         if (
+          message.conversationId !== conversationId ||
           message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
         ) {
           continue;
@@ -95,14 +100,16 @@ export async function waitForResponse(
     const receivedMessage = await Promise.race([
       responsePromise,
       new Promise<null>((_, reject) => {
-        setTimeout(() => reject(new Error("Response timeout")), timeout);
+        setTimeout(() => {
+          reject(new Error("Response timeout"));
+        }, timeout);
       }),
     ]);
 
-    if (hasWorkerLogging) {
+    if (attempt !== undefined) {
       const totalTime = sendTime + responseTime;
       console.log(
-        `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime}ms (${(sendTime / 1000).toFixed(2)}s), Response=${responseTime}ms (${(responseTime / 1000).toFixed(2)}s), Total=${totalTime}ms (${(totalTime / 1000).toFixed(2)}s)`,
+        `✅ Attempt ${attempt}, Send=${sendTime}ms (${(sendTime / 1000).toFixed(2)}s), Response=${responseTime}ms (${(responseTime / 1000).toFixed(2)}s), Total=${totalTime}ms (${(totalTime / 1000).toFixed(2)}s)`,
       );
 
       if (receivedMessage) {
@@ -124,8 +131,8 @@ export async function waitForResponse(
       responseMessage,
     };
   } catch (error) {
-    log(
-      `⏱️  ${workerId}: Attempt ${attempt}, Send=${sendTime}ms, Response timeout after ${timeout}ms`,
+    console.log(
+      `⏱️  Attempt ${attempt}, Send=${sendTime}ms, Response timeout after ${timeout}ms`,
     );
     throw error;
   }
@@ -140,8 +147,7 @@ export function filterAgentsByEnv(
   liveOnly?: boolean,
 ): AgentConfig[] {
   return agents.filter(
-    (agent) =>
-      agent.networks.includes(env) && (!liveOnly || agent.live),
+    (agent) => agent.networks.includes(env) && (!liveOnly || agent.live),
   );
 }
 
