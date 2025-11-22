@@ -1,3 +1,8 @@
+import { streamTimeout } from "@helpers/client";
+import { type XmtpEnv } from "@helpers/versions";
+import { type DecodedMessage } from "@xmtp/agent-sdk-1.1.14";
+import { expect, it } from "vitest";
+
 /**
  * Agent configuration interface
  */
@@ -14,6 +19,31 @@ export interface AgentConfig {
   networks: string[];
   /**  the agent is production */
   live: boolean;
+}
+
+/**
+ * Options for waitForResponse function
+ */
+export interface WaitForResponseOptions {
+  conversation: {
+    stream: () => Promise<AsyncIterable<DecodedMessage>>;
+    send: (content: string) => Promise<string>;
+  };
+  senderInboxId: string;
+  timeout: number;
+  messageText?: string;
+  workerId?: number;
+  attempt?: number;
+}
+
+/**
+ * Result from waitForResponse function
+ */
+export interface WaitForResponseResult {
+  success: boolean;
+  sendTime: number;
+  responseTime: number;
+  responseMessage: DecodedMessage | null;
 }
 
 /**
@@ -112,4 +142,60 @@ export async function waitForResponse(
     }
     throw error;
   }
+}
+
+/**
+ * Filter agents by environment and optionally by live status
+ */
+export function filterAgentsByEnv(
+  agents: AgentConfig[],
+  env: XmtpEnv,
+  liveOnly?: boolean,
+): AgentConfig[] {
+  return agents.filter((agent) => {
+    const matchesEnv = agent.networks.includes(env);
+    const matchesLive = liveOnly ? agent.live : true;
+    return matchesEnv && matchesLive;
+  });
+}
+
+/**
+ * Handle empty agents case by creating a skipped test
+ */
+export function handleEmptyAgents(testName: string, env: XmtpEnv): void {
+  it(`${testName}: No agents configured for this environment`, () => {
+    console.log(`No agents found for env: ${env}`);
+    expect(true).toBe(true); // Pass the test
+  });
+}
+
+/**
+ * Format response message content to string
+ */
+export function formatResponseContent(message: DecodedMessage | null): string {
+  if (!message) return "";
+  return typeof message.content === "string"
+    ? message.content
+    : JSON.stringify(message.content);
+}
+
+/**
+ * Create test message for tagged/command scenarios
+ */
+export function createTaggedTestMessage(
+  agent: AgentConfig,
+  sendMessage?: string,
+): string {
+  const message = sendMessage || agent.sendMessage;
+  const isSlashCommand = message.startsWith("/");
+  return isSlashCommand ? message : `@${agent.name} ${message}`;
+}
+
+/**
+ * Calculate response time with fallback to streamTimeout
+ */
+export function calculateResponseTime(
+  averageEventTiming?: number | null,
+): number {
+  return Math.abs(averageEventTiming ?? streamTimeout);
 }

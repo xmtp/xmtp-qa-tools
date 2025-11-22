@@ -6,7 +6,13 @@ import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
-import { waitForResponse, type AgentConfig } from "./helper";
+import {
+  filterAgentsByEnv,
+  formatResponseContent,
+  handleEmptyAgents,
+  waitForResponse,
+  type AgentConfig,
+} from "./helper";
 
 const testName = "agents-dms";
 const TIMEOUT = 30000; // 30 seconds
@@ -15,16 +21,14 @@ describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
 
-  const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env as string);
-  });
+  const filteredAgents = filterAgentsByEnv(
+    productionAgents as AgentConfig[],
+    env,
+  );
 
   // Handle case where no agents are configured for the current environment
   if (filteredAgents.length === 0) {
-    it(`${testName}: No agents configured for this environment`, () => {
-      console.log(`No agents found for env: ${env}`);
-      expect(true).toBe(true); // Pass the test
-    });
+    handleEmptyAgents(testName, env);
     return;
   }
 
@@ -65,24 +69,17 @@ describe(testName, () => {
         const metricValue: number = responseTime > 0 ? responseTime : 0.01;
 
         // Send metric to DataDog
-        sendMetric(
-          "response",
-          metricValue as number,
-          {
-            test: testName,
-            metric_type: "agent",
-            metric_subtype: "dm",
-            live: agentConfig.live ? "true" : "false",
-            agent: agentConfig.name,
-            address: agentConfig.address,
-          } as ResponseMetricTags,
-        );
+        sendMetric("response", metricValue, {
+          test: testName,
+          metric_type: "agent",
+          metric_subtype: "dm",
+          live: agentConfig.live ? "true" : "false",
+          agent: agentConfig.name,
+          address: agentConfig.address,
+        } as ResponseMetricTags);
 
         if (result.success && result.responseMessage) {
-          const responseContent =
-            typeof result.responseMessage.content === "string"
-              ? result.responseMessage.content
-              : JSON.stringify(result.responseMessage.content);
+          const responseContent = formatResponseContent(result.responseMessage);
           console.log(
             `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
           );

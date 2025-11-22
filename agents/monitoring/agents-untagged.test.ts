@@ -1,4 +1,3 @@
-import { streamTimeout } from "@helpers/client";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { verifyAgentMessageStream } from "@helpers/streams";
 import {
@@ -11,7 +10,12 @@ import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents";
-import { type AgentConfig } from "./helper";
+import {
+  calculateResponseTime,
+  filterAgentsByEnv,
+  handleEmptyAgents,
+  type AgentConfig,
+} from "./helper";
 
 const testName = "agents-untagged";
 
@@ -20,16 +24,14 @@ describe(testName, async () => {
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["randomguy"]);
 
-  const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env);
-  });
+  const filteredAgents = filterAgentsByEnv(
+    productionAgents as AgentConfig[],
+    env,
+  );
 
   // Handle case where no agents are configured for the current environment
   if (filteredAgents.length === 0) {
-    it(`${env}: No agents configured for this environment`, () => {
-      console.log(`No agents found for environment: ${env}`);
-      expect(true).toBe(true); // Pass the test
-    });
+    handleEmptyAgents(testName, env);
     return;
   }
 
@@ -62,9 +64,7 @@ describe(testName, async () => {
         "hi",
       );
 
-      const responseTime = Math.abs(
-        result?.averageEventTiming ?? streamTimeout,
-      );
+      const responseTime = calculateResponseTime(result?.averageEventTiming);
 
       // dont do ?? streamTimeout because it will be 0 and it will be ignored by datadog
       sendMetric("response", responseTime, {
