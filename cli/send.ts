@@ -172,36 +172,16 @@ export async function waitForResponse(options: {
   }
 
   const responseStart = performance.now();
-  let iterator: AsyncIterator<DecodedMessage> | null = null;
   let timeoutId: NodeJS.Timeout | null = null;
-  
-  const cleanup = async () => {
-    if (iterator && typeof iterator.return === "function") {
-      try {
-        await iterator.return();
-      } catch {
-        // Ignore errors during cleanup
-      }
-    }
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  };
 
   try {
-    iterator = stream[Symbol.asyncIterator]();
     const responsePromise = (async () => {
-      try {
-        for await (const msg of stream) {
-          if (msg.senderInboxId.toLowerCase() !== senderInboxId.toLowerCase()) {
-            return msg;
-          }
+      for await (const msg of stream) {
+        if (msg.senderInboxId.toLowerCase() !== senderInboxId.toLowerCase()) {
+          return msg;
         }
-        return null;
-      } catch (error) {
-        // Stream error - return null
-        return null;
       }
+      return null;
     })();
 
     const timeoutPromise = new Promise<null>((_, reject) => {
@@ -210,10 +190,7 @@ export async function waitForResponse(options: {
       }, timeout);
     });
 
-    const received = await Promise.race([
-      responsePromise,
-      timeoutPromise,
-    ]);
+    const received = await Promise.race([responsePromise, timeoutPromise]);
 
     const responseTime = performance.now() - responseStart;
     if (workerId !== undefined && attempt !== undefined) {
@@ -235,7 +212,7 @@ export async function waitForResponse(options: {
       responseMessage: null,
     };
   } finally {
-    await cleanup();
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
