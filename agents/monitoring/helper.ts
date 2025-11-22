@@ -38,6 +38,7 @@ export interface WaitForResponseOptions {
   attempt?: number;
   messageFilter?: (message: DecodedMessage) => boolean;
 }
+export const AGENT_RESPONSE_TIMEOUT = 8000; // 10 seconds
 
 /**
  * Result from waitForResponse function

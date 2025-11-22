@@ -6,10 +6,13 @@ import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, it } from "vitest";
 import productionAgents from "./agents";
-import { waitForResponse, type AgentConfig } from "./helper";
+import {
+  AGENT_RESPONSE_TIMEOUT,
+  waitForResponse,
+  type AgentConfig,
+} from "./helper";
 
 const testName = "agents-tagged";
-const TIMEOUT = 30000; // 30 seconds
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
@@ -53,7 +56,7 @@ describe(testName, () => {
           },
           conversationId: conversation.id,
           senderInboxId: agent.client.inboxId,
-          timeout: TIMEOUT,
+          timeout: AGENT_RESPONSE_TIMEOUT,
           messageText: testMessage,
         });
 
