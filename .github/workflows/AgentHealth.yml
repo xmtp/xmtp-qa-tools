@@ -20,11 +20,16 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_WALLET_KEY: ${{ secrets.XMTP_WALLET_KEY }}
+      XMTP_DB_ENCRYPTION_KEY: ${{ secrets.XMTP_DB_ENCRYPTION_KEY }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
+
+      - name: Generate keys
+        run: yarn gen:keys
 
       - name: ${{ matrix.test }} ${{ matrix.env }}
         run: yarn test ${{ matrix.test }}  --env ${{ matrix.env }} --no-fail --log off

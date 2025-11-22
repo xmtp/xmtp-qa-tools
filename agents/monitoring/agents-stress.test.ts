@@ -7,7 +7,7 @@ import { describe, it } from "vitest";
 import productionAgents from "./agents";
 import { waitForResponse, type AgentConfig } from "./helper";
 
-const testName = "agents-dms";
+const testName = "agents-stress";
 const TIMEOUT = 10000; // 10 seconds
 
 describe(testName, () => {
@@ -20,7 +20,7 @@ describe(testName, () => {
   const createMetricTags = (agentConfig: AgentConfig): ResponseMetricTags => ({
     test: testName,
     metric_type: "agent",
-    metric_subtype: "dm",
+    metric_subtype: "stress",
     live: agentConfig.live ? "true" : "false",
     agent: agentConfig.name,
     address: agentConfig.address,
@@ -28,7 +28,7 @@ describe(testName, () => {
   });
 
   for (const agentConfig of filteredAgents) {
-    it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
+    it(`${testName}: ${agentConfig.name} Stress : ${agentConfig.address}`, async () => {
       const agent = await Agent.createFromEnv({
         codecs: [new ActionsCodec(), new IntentCodec()],
       });

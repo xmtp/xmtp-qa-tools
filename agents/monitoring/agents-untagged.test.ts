@@ -90,9 +90,8 @@ describe(testName, () => {
         sendMetric("response", responseTime, createMetricTags(agentConfig));
 
         if (result.success && result.responseMessage) {
-          const responseContent = result.responseMessage.content as string;
           console.log(
-            `⚠️ ${agentConfig.name} responded to untagged message in ${responseTime.toFixed(2)}ms - "${responseContent}"`,
+            `⚠️ ${agentConfig.name} responded to untagged message in ${responseTime.toFixed(2)}ms`,
           );
         } else {
           console.log(
