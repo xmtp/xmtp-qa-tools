@@ -87,7 +87,6 @@ export async function runSendCommand(options: SendOptions): Promise<void> {
         message || "hello world",
         options.wait,
         options.timeout,
-        `https://xmtp.chat/conversations/${options.groupId}`,
       );
     } else if (target) {
       const dm = await agent.createDmWithAddress(target as `0x${string}`);
@@ -110,7 +109,6 @@ async function sendMessage(
   message: string,
   wait?: boolean,
   timeout?: number,
-  url?: string,
 ) {
   if (wait) {
     const result = await waitForResponse({

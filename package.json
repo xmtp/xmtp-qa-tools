@@ -12,7 +12,7 @@
     "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
     "build": "tsc",
-    "c": "yarn build && yarn lint && yarn format",
+    "c": "yarn format && yarn build && yarn lint ",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "debug": "tsx cli/debug.ts",
     "download-server": "tsx railway/download-server.ts",

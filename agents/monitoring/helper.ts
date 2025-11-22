@@ -68,7 +68,7 @@ export async function waitForResponse(
 
   // Set up stream and start consuming BEFORE sending message to avoid race condition
   const stream = await client.conversations.streamAllMessages();
-  
+
   const responseStartTime = performance.now();
   let responseTime = 0;
   let responseMessage: DecodedMessage | null = null;
@@ -97,17 +97,10 @@ export async function waitForResponse(
         );
         continue;
       }
-      console.log(
-        "incoming message",
-        JSON.stringify(message.content, null, 2),
-      );
+      console.log("incoming message", JSON.stringify(message.content, null, 2));
       // Apply custom message filter if provided
       if (messageFilter && !messageFilter(message)) {
-        console.log(
-          "message filtered",
-          message.conversationId,
-          conversationId,
-        );
+        console.log("message filtered", message.conversationId, conversationId);
         continue;
       }
       responseTime = performance.now() - responseStartTime;
@@ -131,7 +124,6 @@ export async function waitForResponse(
   );
 
   try {
-
     const receivedMessage = await Promise.race([
       responsePromise,
       new Promise<null>((_, reject) => {
