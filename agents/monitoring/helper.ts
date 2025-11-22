@@ -81,18 +81,11 @@ export async function waitForResponse(
         message.conversationId !== conversationId ||
         message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
       ) {
-        console.log(
-          "message filtered by conversation id or sender inbox id",
-          message.conversationId,
-          conversationId,
-          message.senderInboxId,
-          senderInboxId,
-        );
+        console.log("skipping message", message.content);
         continue;
       }
       // Apply custom message filter if provided
       if (messageFilter && !messageFilter(message)) {
-        console.log("message filtered", message.conversationId, conversationId);
         continue;
       }
       responseTime = performance.now() - responseStartTime;
