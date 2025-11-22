@@ -105,7 +105,7 @@ export async function waitForResponse(
         }
         console.log(
           "incoming message",
-          (message.content as string).substring(0, 100),
+          JSON.stringify(message.content, null, 2),
         );
         // Apply custom message filter if provided
         if (messageFilter && !messageFilter(message)) {
