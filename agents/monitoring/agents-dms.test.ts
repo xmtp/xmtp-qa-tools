@@ -51,7 +51,7 @@ describe(testName, () => {
         );
 
         const result = await waitForResponse({
-          client: agent.client,
+          client: agent.client as any,
           conversation: {
             send: (content: string) => conversation.send(content),
           },
