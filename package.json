@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.4.27",
+  "version": "0.4.28",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -52,8 +52,8 @@
     "@xmtp/node-sdk-4.1.0": "npm:@xmtp/node-sdk@4.1.0",
     "@xmtp/node-sdk-4.2.3": "npm:@xmtp/node-sdk@4.2.3",
     "@xmtp/node-sdk-4.2.6": "npm:@xmtp/node-sdk@4.2.6",
-    "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.4.0",
     "@xmtp/node-sdk-4.3.0-dev": "npm:@xmtp/node-sdk@4.3.0-dev.395f798c",
+    "@xmtp/node-sdk-4.4.0": "npm:@xmtp/node-sdk@4.4.0",
     "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0-rc1",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
