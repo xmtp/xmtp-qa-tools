@@ -137,13 +137,11 @@ async function sendMessage(
           : JSON.stringify(result.responseMessage.content);
       console.log(`📬 Response (${result.responseTime}ms): "${content}"`);
     } else {
-      console.log(`⏱️  No response within timeout`);
+      console.log(`❌ No response within timeout`);
     }
-    if (url) console.log(`🔗 ${url}`);
   } else {
     await conversation.send(message);
     console.log(`✅ Message sent: "${message}"`);
-    if (url) console.log(`🔗 ${url}`);
   }
 }
 
@@ -177,7 +175,7 @@ export async function waitForResponse(options: {
 
   // Set up stream and start consuming BEFORE sending message to avoid race condition
   const stream = await client.conversations.streamAllMessages();
-  
+
   const responseStart = performance.now();
   let timeoutId: NodeJS.Timeout | null = null;
 
@@ -215,7 +213,6 @@ export async function waitForResponse(options: {
   }
 
   try {
-
     const timeoutPromise = new Promise<null>((_, reject) => {
       timeoutId = setTimeout(() => {
         reject(new Error("Timeout"));
