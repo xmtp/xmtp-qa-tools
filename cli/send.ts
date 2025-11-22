@@ -200,6 +200,9 @@ export async function waitForResponse(options: {
     }
   })();
 
+  // Small delay to ensure stream is actively listening before sending
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
   // Now send the message - the stream is already being consumed
   const sendStart = performance.now();
   await conversation.send(messageText || `test-${Date.now()}`);
