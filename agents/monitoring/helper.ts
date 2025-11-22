@@ -60,23 +60,19 @@ export async function waitForResponse(
     workerId,
     attempt,
   } = options;
+  const hasWorkerLogging = workerId !== undefined && attempt !== undefined;
+  const log = (message: string) => {
+    if (hasWorkerLogging) console.log(message);
+  };
 
-  // Set up message stream before sending
   const stream = await conversation.stream();
-
-  // Send message - use performance.now() for high precision timing
   const sendStart = performance.now();
   const textToSend = messageText || `test-${Date.now()}`;
   await conversation.send(textToSend);
   const sendTime = performance.now() - sendStart;
 
-  if (workerId !== undefined && attempt !== undefined) {
-    console.log(
-      `📩 ${workerId}: Attempt ${attempt}, Message sent in ${sendTime.toFixed(2)}ms`,
-    );
-  }
+  log(`📩 ${workerId}: Attempt ${attempt}, Message sent in ${sendTime.toFixed(2)}ms`);
 
-  // Start timing response after message is sent - use performance.now() for high precision
   const responseStartTime = performance.now();
   let responseTime = 0;
   let responseMessage: DecodedMessage | null = null;
@@ -84,14 +80,11 @@ export async function waitForResponse(
   try {
     const responsePromise = (async () => {
       for await (const message of stream) {
-        // Skip if the message is from the sender itself
         if (
           message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
         ) {
           continue;
         }
-
-        // Got a response from the destination - use performance.now() for high precision
         responseTime = performance.now() - responseStartTime;
         responseMessage = message;
         return message;
@@ -101,17 +94,13 @@ export async function waitForResponse(
 
     const receivedMessage = await Promise.race([
       responsePromise,
-      // Timeout
       new Promise<null>((_, reject) => {
-        setTimeout(() => {
-          reject(new Error("Response timeout"));
-        }, timeout);
+        setTimeout(() => reject(new Error("Response timeout")), timeout);
       }),
     ]);
 
-    // Log detailed response information
-    const totalTime = sendTime + responseTime;
-    if (workerId !== undefined && attempt !== undefined) {
+    if (hasWorkerLogging) {
+      const totalTime = sendTime + responseTime;
       console.log(
         `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime}ms (${(sendTime / 1000).toFixed(2)}s), Response=${responseTime}ms (${(responseTime / 1000).toFixed(2)}s), Total=${totalTime}ms (${(totalTime / 1000).toFixed(2)}s)`,
       );
@@ -135,11 +124,9 @@ export async function waitForResponse(
       responseMessage,
     };
   } catch (error) {
-    if (workerId !== undefined && attempt !== undefined) {
-      console.log(
-        `⏱️  ${workerId}: Attempt ${attempt}, Send=${sendTime}ms, Response timeout after ${timeout}ms`,
-      );
-    }
+    log(
+      `⏱️  ${workerId}: Attempt ${attempt}, Send=${sendTime}ms, Response timeout after ${timeout}ms`,
+    );
     throw error;
   }
 }
@@ -152,21 +139,10 @@ export function filterAgentsByEnv(
   env: XmtpEnv,
   liveOnly?: boolean,
 ): AgentConfig[] {
-  return agents.filter((agent) => {
-    const matchesEnv = agent.networks.includes(env);
-    const matchesLive = liveOnly ? agent.live : true;
-    return matchesEnv && matchesLive;
-  });
-}
-
-/**
- * Handle empty agents case by creating a skipped test
- */
-export function handleEmptyAgents(testName: string, env: XmtpEnv): void {
-  it(`${testName}: No agents configured for this environment`, () => {
-    console.log(`No agents found for env: ${env}`);
-    expect(true).toBe(true); // Pass the test
-  });
+  return agents.filter(
+    (agent) =>
+      agent.networks.includes(env) && (!liveOnly || agent.live),
+  );
 }
 
 /**
