@@ -6,10 +6,6 @@ import {
   MessageContext as MessageContext112,
 } from "@xmtp/agent-sdk-1.1.12";
 import {
-  Agent as Agent114,
-  MessageContext as MessageContext114,
-} from "@xmtp/agent-sdk-1.1.14";
-import {
   Agent as Agent1115,
   MessageContext as MessageContext1115,
 } from "@xmtp/agent-sdk-1.1.15";
