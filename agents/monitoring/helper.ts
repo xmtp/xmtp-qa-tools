@@ -1,6 +1,4 @@
-import { streamTimeout } from "@helpers/client";
-import { type XmtpEnv } from "@helpers/versions";
-import { type DecodedMessage } from "@xmtp/agent-sdk-1.1.12";
+import { type DecodedMessage } from "@helpers/versions";
 
 /**
  * Agent configuration interface
@@ -84,11 +82,25 @@ export async function waitForResponse(
     const stream = await client.conversations.streamAllMessages();
     const responsePromise = (async () => {
       for await (const message of stream) {
+        console.log(
+          "incoming message",
+          message.conversationId,
+          conversationId,
+          message.senderInboxId,
+          senderInboxId,
+        );
         // Filter by conversation ID and exclude messages from sender
         if (
           message.conversationId !== conversationId ||
           message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
         ) {
+          console.log(
+            "message filtered by conversation id or sender inbox id",
+            message.conversationId,
+            conversationId,
+            message.senderInboxId,
+            senderInboxId,
+          );
           continue;
         }
         console.log(
@@ -97,6 +109,11 @@ export async function waitForResponse(
         );
         // Apply custom message filter if provided
         if (messageFilter && !messageFilter(message)) {
+          console.log(
+            "message filtered",
+            message.conversationId,
+            conversationId,
+          );
           continue;
         }
         responseTime = performance.now() - responseStartTime;
@@ -145,48 +162,4 @@ export async function waitForResponse(
     );
     throw error;
   }
-}
-
-/**
- * Filter agents by environment and optionally by live status
- */
-export function filterAgentsByEnv(
-  agents: AgentConfig[],
-  env: XmtpEnv,
-  liveOnly?: boolean,
-): AgentConfig[] {
-  return agents.filter(
-    (agent) => agent.networks.includes(env) && (!liveOnly || agent.live),
-  );
-}
-
-/**
- * Format response message content to string
- */
-export function formatResponseContent(message: DecodedMessage | null): string {
-  if (!message) return "";
-  return typeof message.content === "string"
-    ? message.content
-    : JSON.stringify(message.content);
-}
-
-/**
- * Create test message for tagged/command scenarios
- */
-export function createTaggedTestMessage(
-  agent: AgentConfig,
-  sendMessage?: string,
-): string {
-  const message = sendMessage || agent.sendMessage;
-  const isSlashCommand = message.startsWith("/");
-  return isSlashCommand ? message : `@${agent.name} ${message}`;
-}
-
-/**
- * Calculate response time with fallback to streamTimeout
- */
-export function calculateResponseTime(
-  averageEventTiming?: number | null,
-): number {
-  return Math.abs(averageEventTiming ?? streamTimeout);
 }
