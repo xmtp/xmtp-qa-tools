@@ -38,6 +38,7 @@ export interface WaitForResponseOptions {
   timeout: number;
   messageText?: string;
   attempt?: number;
+  messageFilter?: (message: DecodedMessage) => boolean;
 }
 
 /**
@@ -64,6 +65,7 @@ export async function waitForResponse(
     timeout,
     messageText,
     attempt,
+    messageFilter,
   } = options;
   const sendStart = performance.now();
   const textToSend = messageText || `test-${Date.now()}`;
@@ -82,12 +84,19 @@ export async function waitForResponse(
     const stream = await client.conversations.streamAllMessages();
     const responsePromise = (async () => {
       for await (const message of stream) {
-        console.log(message.conversationId, conversationId);
         // Filter by conversation ID and exclude messages from sender
         if (
           message.conversationId !== conversationId ||
           message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
         ) {
+          continue;
+        }
+        console.log(
+          "incoming message",
+          (message.content as string).substring(0, 100),
+        );
+        // Apply custom message filter if provided
+        if (messageFilter && !messageFilter(message)) {
           continue;
         }
         responseTime = performance.now() - responseStartTime;

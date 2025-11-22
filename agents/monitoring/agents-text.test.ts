@@ -1,7 +1,6 @@
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { type XmtpEnv } from "@helpers/versions";
+import { Agent, type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
-import { Agent } from "@xmtp/agent-sdk-1.1.15";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
@@ -28,7 +27,7 @@ describe(testName, () => {
   const createMetricTags = (agentConfig: AgentConfig): ResponseMetricTags => ({
     test: testName,
     metric_type: "agent",
-    metric_subtype: "dm",
+    metric_subtype: "text",
     live: agentConfig.live ? "true" : "false",
     agent: agentConfig.name,
     address: agentConfig.address,
@@ -61,20 +60,17 @@ describe(testName, () => {
           messageText: agentConfig.sendMessage,
           messageFilter: (message) => {
             // Only accept text messages, exclude reactions and other message types
-            // Check if content is a string (text messages) and not a reaction
-            const contentType = message.contentType;
+            const contentType = message.contentType?.typeId;
             const isTextContentType =
-              contentType?.typeId === "xmtp.org/text:1.0" ||
-              contentType?.typeId === "text";
+              contentType === "xmtp.org/text:1.0" || contentType === "text";
             const isStringContent = typeof message.content === "string";
-            // Exclude reactions - reactions have a different structure
-            const isReaction =
-              contentType?.typeId === "xmtp.org/reaction:1.0" ||
-              (typeof message.content === "object" &&
-                message.content !== null &&
-                "content" in message.content &&
-                "reference" in message.content);
-            return isTextContentType && isStringContent && !isReaction;
+            // Exclude reactions - reactions have contentType "xmtp.org/reaction:1.0"
+            const isReaction = contentType === "xmtp.org/reaction:1.0";
+            // Exclude replies - replies have contentType "xmtp.org/reply:1.0"
+            const isReply = contentType === "xmtp.org/reply:1.0";
+            return (
+              isTextContentType && isStringContent && !isReaction && !isReply
+            );
           },
         });
 

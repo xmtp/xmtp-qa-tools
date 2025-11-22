@@ -1,7 +1,6 @@
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { type XmtpEnv } from "@helpers/versions";
+import { Agent, type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
-import { Agent } from "@xmtp/agent-sdk-1.1.14";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
@@ -14,7 +13,7 @@ import {
 } from "./helper";
 
 const testName = "agents-dms";
-const TIMEOUT = 30000; // 30 seconds
+const TIMEOUT = 10000; // 10 seconds
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
