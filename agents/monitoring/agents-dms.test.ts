@@ -56,13 +56,12 @@ describe(testName, () => {
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
         sendMetric("response", responseTime, createMetricTags(agentConfig));
 
-        if (result.success && result.responseMessage) {
+        if (result.success && result.responseMessage)
           console.log(
             `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
           );
-        } else {
+        else
           console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
-        }
       } finally {
         await agent.stop();
       }
