@@ -171,9 +171,17 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
         const duration =
           msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
-        eventTimings[r.name][sentIdx] = duration;
-        timingSum += duration;
-        timingCount++;
+        // Filter out negative or suspiciously low durations (0-1ms)
+        // These typically indicate timing issues, messages already in stream, or clock skew
+        if (duration > 1) {
+          eventTimings[r.name][sentIdx] = duration;
+          timingSum += duration;
+          timingCount++;
+        } else {
+          console.debug(
+            `Filtered out suspiciously low duration: ${duration}ms (likely timing issue)`,
+          );
+        }
       }
     });
   });
@@ -502,62 +510,4 @@ export function calculateMessageStats(
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
   return { receptionPercentage, orderPercentage };
-}
-
-/**
- * Specialized function to bot response streams
- * Measures the time it takes for a bot to respond to a trigger message
- * Includes retry logic and fallback message count validation
- */
-export async function verifyAgentMessageStream(
-  group: Conversation,
-  receivers: Worker[],
-  triggerMessage: string,
-  maxRetries: number = 1,
-  types: string[] = ["text", "reply", "reaction", "actions"],
-  customTimeout?: number,
-): Promise<VerifyStreamResult | undefined> {
-  receivers.forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
-
-  let attempts = 0;
-  let result: VerifyStreamResult | undefined;
-
-  while (attempts < maxRetries) {
-    result = await collectAndTimeEventsWithStats({
-      receivers,
-      startCollectors: (r) =>
-        r.worker.collectMessages(
-          group.id,
-          1,
-          types,
-          customTimeout ?? undefined,
-        ),
-      // @ts-expect-error - TODO: fix this
-      triggerEvents: () => {
-        const sentAt = Date.now();
-        group.send(triggerMessage).catch(console.error);
-
-        return [{ conversationId: group.id, sentAt }];
-      },
-      getKey: () => group.id, // Use conversation ID as consistent key for both sent and received
-      getMessage: extractContent,
-      statsLabel: "bot-response:",
-      count: 1,
-      messageTemplate: "",
-      membersForStats: receivers,
-    });
-
-    if (result && result.averageEventTiming !== undefined) {
-      // Check if averageEventTiming is defined
-      return result;
-    }
-
-    attempts++;
-  }
-  receivers.forEach((worker) => {
-    worker.worker.stopStreams();
-  });
-  return result;
 }

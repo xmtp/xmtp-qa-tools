@@ -36,23 +36,23 @@ import {
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
+// import {
+//   Client as Client430Dev,
+//   Conversation as Conversation430Dev,
+//   Dm as Dm430Dev,
+//   Group as Group430Dev,
+// } from "@xmtp/node-sdk-4.3.0-dev";
+// import {
+//   Client as Client440,
+//   Conversation as Conversation440,
+//   Dm as Dm440,
+//   Group as Group440,
+// } from "@xmtp/node-sdk-4.4.0";
 import {
-  Client as Client430,
-  Conversation as Conversation430,
-  Dm as Dm430,
-  Group as Group430,
-} from "@xmtp/node-sdk-4.3.0";
-import {
-  Client as Client430Dev,
-  Conversation as Conversation430Dev,
-  Dm as Dm430Dev,
-  Group as Group430Dev,
-} from "@xmtp/node-sdk-4.3.0-dev";
-import {
-  Client as Client440,
-  Conversation as Conversation440,
-  Dm as Dm440,
-  Group as Group440,
+  Client as Client450,
+  Conversation as Conversation450,
+  Dm as Dm450,
+  Group as Group450,
 } from "@xmtp/node-sdk-4.5.0";
 
 export {
@@ -83,7 +83,7 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.3.0-dev";
+} from "@xmtp/node-sdk-4.5.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -105,30 +105,21 @@ export const AgentVersionList = [
 
 // Node SDK version list
 export const VersionList = [
+  // {
+  //   Client: Client40Dev,
+  //   Conversation: Conversation430Dev,
+  //   Dm: Dm430Dev,
+  //   Group: Group430Dev,
+  //   nodeSDK: "4.3.0",
+  //   nodeBindings: "1.7.0",
+  //   auto: true,
+  // },
   {
-    Client: Client430Dev,
-    Conversation: Conversation430Dev,
-    Dm: Dm430Dev,
-    Group: Group430Dev,
-    nodeSDK: "4.3.0",
-    nodeBindings: "1.7.0",
-    auto: true,
-  },
-  {
-    Client: Client440,
-    Conversation: Conversation440,
-    Dm: Dm440,
-    Group: Group440,
+    Client: Client450,
+    Conversation: Conversation450,
+    Dm: Dm450,
+    Group: Group450,
     nodeSDK: "4.5.0",
-    nodeBindings: "1.6.1",
-    auto: true,
-  },
-  {
-    Client: Client430,
-    Conversation: Conversation430,
-    Dm: Dm430,
-    Group: Group430,
-    nodeSDK: "4.3.0",
     nodeBindings: "1.6.1",
     auto: true,
   },

@@ -1,11 +1,46 @@
 import { existsSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 
-export function loadEnvFile() {
-  // Only do this in the gm example because it's called from the root
-  if (existsSync(".env")) {
-    process.loadEnvFile(".env");
-  } else if (existsSync(`../../.env`)) {
-    process.loadEnvFile(`../../.env`);
+export function loadEnvFile(scriptUrl?: string | URL) {
+  // Check multiple locations in order of priority:
+  // 1. Script's directory (if scriptUrl provided) - HIGHEST PRIORITY
+  // 2. Current working directory
+  // 3. Project root (../../.env from agents/utils/)
+
+  if (scriptUrl) {
+    const __filename = fileURLToPath(scriptUrl);
+    const __dirname = dirname(__filename);
+    const scriptEnvPath = join(__dirname, ".env");
+    if (existsSync(scriptEnvPath)) {
+      console.log(
+        `[loadEnvFile] Loading .env from script directory: ${scriptEnvPath}`,
+      );
+      // Use dotenv.config() directly to ensure we load from the exact path
+      dotenv.config({ path: scriptEnvPath, override: true });
+      return; // Stop here - don't check other locations
+    } else {
+      console.log(
+        `[loadEnvFile] No .env found in script directory: ${scriptEnvPath}`,
+      );
+    }
+  }
+
+  // Only check other locations if script directory doesn't have .env
+  const cwdEnvPath = join(process.cwd(), ".env");
+  if (existsSync(cwdEnvPath)) {
+    console.log(
+      `[loadEnvFile] Loading .env from current working directory: ${cwdEnvPath}`,
+    );
+    dotenv.config({ path: cwdEnvPath, override: true });
+    return;
+  }
+
+  const rootEnvPath = join(process.cwd(), "../../.env");
+  if (existsSync(rootEnvPath)) {
+    console.log(`[loadEnvFile] Loading .env from project root: ${rootEnvPath}`);
+    dotenv.config({ path: rootEnvPath, override: true });
   }
 }
 

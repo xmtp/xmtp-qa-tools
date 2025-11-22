@@ -72,6 +72,13 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
+    name: "key-check",
+    address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    sendMessage: "/kc",
+    networks: ["dev", "production"],
+    live: false,
+  },
+  {
     name: "neurobro",
     address: "0x9D2B24b027F4732BB87cD6531E16ce4Dc571c30c",
     sendMessage: "hi",
@@ -104,13 +111,6 @@ const agents: AgentConfig[] = [
     address: "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     sendMessage: "@tokenbot",
     networks: [],
-    live: false,
-  },
-  {
-    name: "key-check",
-    address: "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    sendMessage: "/kc",
-    networks: ["dev", "production"],
     live: false,
   },
   {

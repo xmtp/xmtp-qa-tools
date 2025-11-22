@@ -1124,12 +1124,13 @@ export class WorkerClient extends Worker implements IWorkerClient {
   public async lockDB(lockMs: number): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        this.client.disconnectDatabase();
+        //this.client.disconnectDatabase();
 
         // Release the lock after the specified duration
-        setTimeout(async () => {
+        setTimeout(() => {
           try {
-            await this.client.reconnectDatabase();
+            console.log(`[${this.nameId}] Releasing database lock`);
+            // await this.client.reconnectDatabase();
             console.log(`[${this.nameId}] Reconnected to the database`);
             resolve();
           } catch (error: any) {

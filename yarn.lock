@@ -1525,7 +1525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.15@npm:@xmtp/agent-sdk@1.1.15":
+"@xmtp/agent-sdk-1.1.15@npm:@xmtp/agent-sdk@1.1.15, @xmtp/agent-sdk@npm:1.1.15":
   version: 1.1.15
   resolution: "@xmtp/agent-sdk@npm:1.1.15"
   dependencies:
@@ -1540,6 +1540,26 @@ __metadata:
     "@xmtp/node-sdk": "npm:4.3.1"
     viem: "npm:^2.37.6"
   checksum: 10/c9886a572a3790a9a6d889434074f696d99515f62195fd79a7270ce13277db5a310ddbec5335bc5246af68461bd76840485d13d568e83c75f0fefefc071978dd
+  languageName: node
+  linkType: hard
+
+"@xmtp/cli@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@xmtp/cli@npm:0.0.3"
+  dependencies:
+    "@xmtp/agent-sdk": "npm:1.1.15"
+    "@xmtp/content-type-markdown": "npm:^1.0.0"
+    "@xmtp/content-type-reaction": "npm:^2.0.2"
+    "@xmtp/content-type-read-receipt": "npm:^2.0.2"
+    "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
+    "@xmtp/content-type-reply": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/content-type-transaction-reference": "npm:^2.0.2"
+    "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
+    yargs: "npm:^17.7.2"
+  bin:
+    xmtp: dist/index.js
+  checksum: 10/ab27b128db15d9af0fcb3f0d7032d4b160a47b10d91ce11bfc152987ae0178f5689732ffb34b9734713d9cde82d2ea7b7882d037c7174e45207fc56ba03ee5a4
   languageName: node
   linkType: hard
 
@@ -1693,13 +1713,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:1.6.0-dev.35d2ff1":
-  version: 1.6.0-dev.35d2ff1
-  resolution: "@xmtp/node-bindings@npm:1.6.0-dev.35d2ff1"
-  checksum: 10/8cfd99033695f422fc8973a65bb9554b4ecb05fe2b2558809e2d17f64bfcb159c831a93ce051e459a36478f0eaa52f0a92ae65805265a9b106f3e65f1d71d654
-  languageName: node
-  linkType: hard
-
 "@xmtp/node-sdk-3.2.2@npm:@xmtp/node-sdk@3.2.2":
   version: 3.2.2
   resolution: "@xmtp/node-sdk@npm:3.2.2"
@@ -1796,15 +1809,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.3.0@npm:@xmtp/node-sdk@4.3.0":
-  version: 4.3.0
-  resolution: "@xmtp/node-sdk@npm:4.3.0"
+"@xmtp/node-sdk-4.4.0@npm:@xmtp/node-sdk@4.4.0":
+  version: 4.4.0
+  resolution: "@xmtp/node-sdk@npm:4.4.0"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.2"
     "@xmtp/content-type-primitives": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.6.0-dev.35d2ff1"
-  checksum: 10/c8cc0b6b0cd3efbb72d3d7799fea0bef409b8a48a63ffbb3518c22ab27c96eb5b4c0cedd63c2e8c8a3805e8f705a5b9d2bf35d1be1a54c43313d7af9aef6da02
+    "@xmtp/node-bindings": "npm:1.5.4"
+  checksum: 10/547e1ae6400d8f5ff0d9c38dd730721a8308c91c69fc5fbb7f779885ebbfa0da7983e0db2738f5d4d12c762f20ea22bfdc0751ba0def29700e21dddf8cbb376d
   languageName: node
   linkType: hard
 
@@ -2164,6 +2177,17 @@ __metadata:
   version: 3.0.0
   resolution: "chownr@npm:3.0.0"
   checksum: 10/b63cb1f73d171d140a2ed8154ee6566c8ab775d3196b0e03a2a94b5f6a0ce7777ee5685ca56849403c8d17bd457a6540672f9a60696a6137c7a409097495b82c
+  languageName: node
+  linkType: hard
+
+"cliui@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "cliui@npm:8.0.1"
+  dependencies:
+    string-width: "npm:^4.2.0"
+    strip-ansi: "npm:^6.0.1"
+    wrap-ansi: "npm:^7.0.0"
+  checksum: 10/eaa5561aeb3135c2cddf7a3b3f562fc4238ff3b3fc666869ef2adf264be0f372136702f16add9299087fb1907c2e4ec5dbfe83bd24bce815c70a80c6c1a2e950
   languageName: node
   linkType: hard
 
@@ -4240,6 +4264,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"require-directory@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "require-directory@npm:2.1.1"
+  checksum: 10/a72468e2589270d91f06c7d36ec97a88db53ae5d6fe3787fadc943f0b0276b10347f89b363b2a82285f650bdcc135ad4a257c61bdd4d00d6df1fa24875b0ddaf
+  languageName: node
+  linkType: hard
+
 "resolve-from@npm:^4.0.0":
   version: 4.0.0
   resolution: "resolve-from@npm:4.0.0"
@@ -4650,7 +4681,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^4.1.0":
+"string-width-cjs@npm:string-width@^4.2.0, string-width@npm:^4.1.0, string-width@npm:^4.2.0, string-width@npm:^4.2.3":
   version: 4.2.3
   resolution: "string-width@npm:4.2.3"
   dependencies:
@@ -5248,7 +5279,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0, wrap-ansi@npm:^7.0.0":
   version: 7.0.0
   resolution: "wrap-ansi@npm:7.0.0"
   dependencies:
@@ -5319,6 +5350,7 @@ __metadata:
     "@xmtp/agent-sdk-1.1.12": "npm:@xmtp/agent-sdk@1.1.12"
     "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14"
     "@xmtp/agent-sdk-1.1.15": "npm:@xmtp/agent-sdk@1.1.15"
+    "@xmtp/cli": "npm:^0.0.3"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
@@ -5335,8 +5367,8 @@ __metadata:
     "@xmtp/node-sdk-4.1.0": "npm:@xmtp/node-sdk@4.1.0"
     "@xmtp/node-sdk-4.2.3": "npm:@xmtp/node-sdk@4.2.3"
     "@xmtp/node-sdk-4.2.6": "npm:@xmtp/node-sdk@4.2.6"
-    "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.3.0"
     "@xmtp/node-sdk-4.3.0-dev": "npm:@xmtp/node-sdk@4.3.0-dev.395f798c"
+    "@xmtp/node-sdk-4.4.0": "npm:@xmtp/node-sdk@4.4.0"
     "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0-rc1"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
@@ -5383,10 +5415,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+"yargs-parser@npm:^21.1.1":
+  version: 21.1.1
+  resolution: "yargs-parser@npm:21.1.1"
+  checksum: 10/9dc2c217ea3bf8d858041252d43e074f7166b53f3d010a8c711275e09cd3d62a002969a39858b92bbda2a6a63a585c7127014534a560b9c69ed2d923d113406e
+  languageName: node
+  linkType: hard
+
 "yargs-parser@npm:^22.0.0":
   version: 22.0.0
   resolution: "yargs-parser@npm:22.0.0"
   checksum: 10/f13c42bad6ebed1a587a72f2db5694f5fa772bcaf409a701691d13cf74eb5adfcf61a2611de08807e319b829d3e5e6e1578b16ebe174cae8e8be3bf7b8e7a19e
+  languageName: node
+  linkType: hard
+
+"yargs@npm:^17.7.2":
+  version: 17.7.2
+  resolution: "yargs@npm:17.7.2"
+  dependencies:
+    cliui: "npm:^8.0.1"
+    escalade: "npm:^3.1.1"
+    get-caller-file: "npm:^2.0.5"
+    require-directory: "npm:^2.1.1"
+    string-width: "npm:^4.2.3"
+    y18n: "npm:^5.0.5"
+    yargs-parser: "npm:^21.1.1"
+  checksum: 10/abb3e37678d6e38ea85485ed86ebe0d1e3464c640d7d9069805ea0da12f69d5a32df8e5625e370f9c96dd1c2dc088ab2d0a4dd32af18222ef3c4224a19471576
   languageName: node
   linkType: hard
 
