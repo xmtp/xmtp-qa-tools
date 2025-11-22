@@ -13,7 +13,6 @@ import productionAgents from "./agents";
 import {
   calculateResponseTime,
   filterAgentsByEnv,
-  handleEmptyAgents,
   type AgentConfig,
 } from "./helper";
 
@@ -28,12 +27,6 @@ describe(testName, async () => {
     productionAgents as AgentConfig[],
     env,
   );
-
-  // Handle case where no agents are configured for the current environment
-  if (filteredAgents.length === 0) {
-    handleEmptyAgents(testName, env);
-    return;
-  }
 
   for (const agent of filteredAgents) {
     it(`${testName}: ${agent.name} should not respond to untagged hi : ${agent.address}`, async () => {

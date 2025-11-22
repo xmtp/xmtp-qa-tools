@@ -61,7 +61,7 @@ describe(testName, () => {
           messageText: agentConfig.sendMessage,
         });
 
-        const responseTime = Math.max(result.responseTime || 0, 0.01);
+        const responseTime = Math.max(result.responseTime || 0, 0.0001);
         sendMetric("response", responseTime, createMetricTags(agentConfig));
 
         if (result.success && result.responseMessage) {
