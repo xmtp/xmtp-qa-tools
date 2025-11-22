@@ -172,16 +172,24 @@ export async function waitForResponse(options: {
   }
 
   const responseStart = performance.now();
+  const iterator = stream[Symbol.asyncIterator]();
   let timeoutId: NodeJS.Timeout | null = null;
 
   try {
     const responsePromise = (async () => {
-      for await (const msg of stream) {
-        if (msg.senderInboxId.toLowerCase() !== senderInboxId.toLowerCase()) {
-          return msg;
+      try {
+        while (true) {
+          const { value, done } = await iterator.next();
+          if (done) return null;
+          if (
+            value?.senderInboxId.toLowerCase() !== senderInboxId.toLowerCase()
+          ) {
+            return value;
+          }
         }
+      } catch {
+        return null;
       }
-      return null;
     })();
 
     const timeoutPromise = new Promise<null>((_, reject) => {
@@ -191,8 +199,8 @@ export async function waitForResponse(options: {
     });
 
     const received = await Promise.race([responsePromise, timeoutPromise]);
-
     const responseTime = performance.now() - responseStart;
+
     if (workerId !== undefined && attempt !== undefined) {
       console.log(
         `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime.toFixed(2)}ms, Response=${responseTime.toFixed(2)}ms`,
@@ -213,6 +221,7 @@ export async function waitForResponse(options: {
     };
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
+    await iterator.return?.().catch(() => {});
   }
 }
 
