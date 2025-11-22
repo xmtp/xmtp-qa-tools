@@ -2,7 +2,7 @@ name: Agents groups
 description: "performance of the library in the production network"
 
 on:
-  #pull_request:
+  pull_request:
   schedule:
     - cron: "0 */3 * * *" # Runs every 3 hours
   workflow_dispatch:

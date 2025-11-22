@@ -2,7 +2,7 @@ name: Agent text
 description: "First meaningful response of the agents"
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "30 * * * *" # Runs every hour at 30 minutes past
   workflow_dispatch:
