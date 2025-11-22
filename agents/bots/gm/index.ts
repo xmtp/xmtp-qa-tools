@@ -5,9 +5,10 @@ import {
   getTestUrl,
   logDetails,
 } from "@helpers/versions";
+import { loadEnvFile } from "../../utils/general";
 
 // Load .env file only in local development
-if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
+if (process.env.NODE_ENV !== "production") loadEnvFile(import.meta.url);
 
 const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
@@ -21,9 +22,9 @@ agent.on("text", async (ctx) => {
     const messageContent = ctx.message.content;
     const senderAddress = await ctx.getSenderAddress();
     console.log(`Received message: ${messageContent} by ${senderAddress}`);
-    await ctx.sendText("gm");
+    await ctx.sendText("gm local " + ctx.conversation.id);
   } else if (ctx.isGroup() && ctx.message.content.includes("@gm"))
-    await ctx.sendText("gm");
+    await ctx.sendText("gm local " + ctx.conversation.id);
 });
 
 agent.on("start", () => {
