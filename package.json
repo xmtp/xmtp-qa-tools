@@ -35,6 +35,7 @@
     "@anthropic-ai/sdk": "^0.54.0",
     "@xmtp/agent-sdk-1.1.12": "npm:@xmtp/agent-sdk@1.1.12",
     "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14",
+    "@xmtp/agent-sdk-1.1.15": "npm:@xmtp/agent-sdk@1.1.15",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",

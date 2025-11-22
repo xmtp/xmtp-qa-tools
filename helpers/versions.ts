@@ -9,6 +9,10 @@ import {
   Agent as Agent114,
   MessageContext as MessageContext114,
 } from "@xmtp/agent-sdk-1.1.14";
+import {
+  Agent as Agent1115,
+  MessageContext as MessageContext1115,
+} from "@xmtp/agent-sdk-1.1.15";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import type { LogLevel, XmtpEnv } from "@xmtp/node-sdk";
@@ -61,9 +65,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.14";
+} from "@xmtp/agent-sdk-1.1.15";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.14/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.15/debug";
 
 // Node SDK exports
 export {
@@ -88,9 +92,9 @@ export {
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent114,
-    MessageContext: MessageContext114,
-    agentSDK: "1.1.14",
+    Agent: Agent1115,
+    MessageContext: MessageContext1115,
+    agentSDK: "1.1.15",
     nodeSDK: "4.5.0",
     auto: true,
   },
