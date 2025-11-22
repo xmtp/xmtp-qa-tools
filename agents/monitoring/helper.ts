@@ -85,9 +85,8 @@ export async function waitForResponse(
         continue;
       }
       // Apply custom message filter if provided
-      if (messageFilter && !messageFilter(message)) {
-        continue;
-      }
+      if (messageFilter && !messageFilter(message)) continue;
+
       responseTime = performance.now() - responseStartTime;
       responseMessage = message;
       return message;
