@@ -76,13 +76,6 @@ export async function waitForResponse(
   // Start consuming the stream BEFORE sending the message
   const responsePromise = (async () => {
     for await (const message of stream) {
-      console.log(
-        "incoming message",
-        message.conversationId,
-        conversationId,
-        message.senderInboxId,
-        senderInboxId,
-      );
       // Filter by conversation ID and exclude messages from sender
       if (
         message.conversationId !== conversationId ||
@@ -97,7 +90,6 @@ export async function waitForResponse(
         );
         continue;
       }
-      console.log("incoming message", JSON.stringify(message.content, null, 2));
       // Apply custom message filter if provided
       if (messageFilter && !messageFilter(message)) {
         console.log("message filtered", message.conversationId, conversationId);
