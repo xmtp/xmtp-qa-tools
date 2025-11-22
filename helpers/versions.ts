@@ -1,14 +1,11 @@
 import fs from "fs";
 import path from "path";
+import {
+  AgentVersionList,
+  detectAgentSDKVersion,
+  getActiveAgentVersion,
+} from "@agents/versions";
 import { APP_VERSION, createSigner } from "@helpers/client";
-import {
-  Agent as Agent1112,
-  MessageContext as MessageContext112,
-} from "@xmtp/agent-sdk-1.1.12";
-import {
-  Agent as Agent1115,
-  MessageContext as MessageContext1115,
-} from "@xmtp/agent-sdk-1.1.15";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import type { LogLevel, XmtpEnv } from "@xmtp/node-sdk";
@@ -55,16 +52,6 @@ import {
   Group as Group450,
 } from "@xmtp/node-sdk-4.5.0";
 
-export {
-  Agent,
-  MessageContext,
-  type AgentMiddleware,
-  type Group as AgentGroupType,
-  type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.15";
-
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.15/debug";
-
 // Node SDK exports
 export {
   Client,
@@ -84,24 +71,6 @@ export {
   type PermissionUpdateType,
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.5.0";
-
-// Agent SDK version list
-export const AgentVersionList = [
-  {
-    Agent: Agent1115,
-    MessageContext: MessageContext1115,
-    agentSDK: "1.1.15",
-    nodeSDK: "4.5.0",
-    auto: true,
-  },
-  {
-    Agent: Agent1112,
-    MessageContext: MessageContext112,
-    agentSDK: "1.1.12",
-    nodeSDK: "4.2.6",
-    auto: true,
-  },
-];
 
 // Node SDK version list
 export const VersionList = [
@@ -160,39 +129,6 @@ export const VersionList = [
     auto: true,
   },
 ];
-
-// Agent SDK functions
-export const getActiveAgentVersion = (index = 0) => {
-  const versions = getAgentVersions();
-  let latestVersion = versions[index];
-
-  if (process.env.AGENT_SDK_VERSION) {
-    latestVersion = versions.find(
-      (v) => v.agentSDK === process.env.AGENT_SDK_VERSION,
-    ) as (typeof AgentVersionList)[number];
-    if (!latestVersion) {
-      throw new Error(
-        `Agent SDK version ${process.env.AGENT_SDK_VERSION} not found`,
-      );
-    }
-  }
-  return latestVersion;
-};
-
-export const getAgentVersions = (filterAuto: boolean = true) => {
-  return filterAuto ? AgentVersionList.filter((v) => v.auto) : AgentVersionList;
-};
-
-export const checkAgentVersionFormat = (
-  versionList: typeof AgentVersionList,
-) => {
-  // Agent SDK versions should not include - because it messes up with the worker name-installation conversion
-  for (const version of versionList) {
-    if (version.agentSDK.includes("-")) {
-      throw new Error(`Agent SDK version ${version.agentSDK} contains -`);
-    }
-  }
-};
 
 // Node SDK functions
 export const getActiveVersion = (index = 0) => {
@@ -331,44 +267,6 @@ export function getSdkVersionsForTesting(): string[] {
   }
 
   return sdkVersions;
-}
-
-/**
- * Detect which agent-sdk version is being used by checking the Agent constructor
- */
-export function detectAgentSDKVersion(AgentClass: any): string | null {
-  try {
-    // Check if Agent is from a specific version by comparing constructors
-    for (const version of AgentVersionList) {
-      if (version.Agent === AgentClass) {
-        return version.agentSDK;
-      }
-    }
-
-    // Try to detect from the module path if available
-    // Check which agent-sdk package is actually loaded by iterating through AgentVersionList
-    for (const version of AgentVersionList) {
-      try {
-        const packageName = `@xmtp/agent-sdk-${version.agentSDK}`;
-        const modulePath = require.resolve(packageName);
-        if (modulePath && fs.existsSync(modulePath)) {
-          // Check if the Agent class comes from this package
-          const agentSDKPath = path.dirname(modulePath);
-          if (agentSDKPath.includes(`agent-sdk-${version.agentSDK}`)) {
-            return version.agentSDK;
-          }
-        }
-      } catch {
-        // Ignore module resolution errors
-      }
-    }
-  } catch {
-    // Ignore errors
-  }
-
-  // Default: Use first auto-enabled version (respects auto flag)
-  const activeVersion = getActiveAgentVersion(0);
-  return activeVersion.agentSDK;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { type MessageContext } from "@helpers/versions";
+import { type MessageContext } from "@agents/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 import {
   ContentTypeRemoteAttachment,

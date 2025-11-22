@@ -1,22 +1,22 @@
-import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
-import { Agent, type XmtpEnv } from "@helpers/versions";
-import { setupDurationTracking } from "@helpers/vitest";
-import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
-import { describe, it } from "vitest";
-import productionAgents from "./agents";
+import productionAgents from "@agents/agents";
 import {
   AGENT_RESPONSE_TIMEOUT,
   waitForResponse,
   type AgentConfig,
-} from "./helper";
+} from "@agents/helper";
+import { Agent, type XmtpEnv } from "@agents/versions";
+import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
+import { setupDurationTracking } from "@helpers/vitest";
+import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
+import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
+import { describe, it } from "vitest";
 
 const testName = "agents-dms";
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const filteredAgents = productionAgents.filter((agent) =>
+  const filteredAgents = productionAgents.filter((agent: AgentConfig) =>
     agent.networks.includes(env),
   );
 

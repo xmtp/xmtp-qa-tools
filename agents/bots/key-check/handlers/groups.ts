@@ -1,10 +1,10 @@
 import {
   type AgentGroupType,
   type AgentPermissionLevel,
-  type IdentifierKind,
   type MessageContext,
-} from "@helpers/versions";
+} from "@agents/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
+import type { IdentifierKind } from "@xmtp/node-sdk";
 
 export class GroupHandlers {
   async handleGroupMembers(ctx: MessageContext): Promise<void> {

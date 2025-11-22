@@ -1,7 +1,8 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { AgentVersionList, VersionList } from "@helpers/versions";
+import { AgentVersionList } from "@agents/versions";
+import { VersionList } from "@helpers/versions";
 
 function showHelp() {
   console.log(`

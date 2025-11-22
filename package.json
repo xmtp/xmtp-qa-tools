@@ -15,6 +15,7 @@
     "c": "yarn format && yarn build && yarn lint ",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "debug": "tsx cli/debug.ts",
+    "debug-dm": "tsx agents/debug-dm.ts",
     "download-server": "tsx railway/download-server.ts",
     "fork": "tsx forks/cli.ts",
     "format": "prettier -w .",
@@ -27,7 +28,6 @@
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
     "revoke": "npx @xmtp/cli revoke",
-    "send": "tsx cli/send.ts",
     "test": "tsx cli/test.ts",
     "versions": "tsx cli/versions.ts"
   },

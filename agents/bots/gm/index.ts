@@ -1,10 +1,6 @@
+import { Agent, getTestUrl, logDetails } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
-import {
-  Agent,
-  getSDKVersionInfo,
-  getTestUrl,
-  logDetails,
-} from "@helpers/versions";
+import { getSDKVersionInfo } from "@helpers/versions";
 import { loadEnvFile } from "../../utils/general";
 
 // Load .env file only in local development
@@ -32,7 +28,7 @@ agent.on("start", () => {
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
-  getSDKVersionInfo(Agent, agent.client);
+  getSDKVersionInfo(agent, agent.client);
 });
 
 await agent.start({

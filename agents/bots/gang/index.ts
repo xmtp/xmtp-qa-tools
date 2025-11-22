@@ -1,5 +1,5 @@
+import { Agent, getTestUrl, type AgentGroupType } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
-import { Agent, getTestUrl, type AgentGroupType } from "@helpers/versions";
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
