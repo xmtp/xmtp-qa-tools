@@ -3,7 +3,7 @@ import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import "dotenv/config";
 import { fileURLToPath } from "url";
-import agents from "../agents/monitoring/agents";
+import agents from "./agents";
 
 export interface SendOptions {
   target?: string;
