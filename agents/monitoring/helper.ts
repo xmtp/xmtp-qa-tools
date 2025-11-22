@@ -81,7 +81,7 @@ export async function waitForResponse(
         message.conversationId !== conversationId ||
         message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
       ) {
-        console.log("skipping message", message.content);
+        console.debug("skipping message", message.content);
         continue;
       }
       // Apply custom message filter if provided
@@ -103,7 +103,7 @@ export async function waitForResponse(
   await conversation.send(textToSend);
   const sendTime = performance.now() - sendStart;
 
-  console.log(
+  console.debug(
     `✅  Message sent in ${sendTime.toFixed(2)}ms from ${senderInboxId} to ${conversationId}`,
   );
 
@@ -119,7 +119,7 @@ export async function waitForResponse(
 
     if (attempt !== undefined) {
       const totalTime = sendTime + responseTime;
-      console.log(
+      console.debug(
         `✅ Attempt ${attempt}, Send=${sendTime}ms (${(sendTime / 1000).toFixed(2)}s), Response=${responseTime}ms (${(responseTime / 1000).toFixed(2)}s), Total=${totalTime}ms (${(totalTime / 1000).toFixed(2)}s)`,
       );
 
@@ -129,7 +129,7 @@ export async function waitForResponse(
             ? receivedMessage.content
             : JSON.stringify(receivedMessage.content);
         const preview = messageContent.substring(0, 100);
-        console.log(
+        console.debug(
           `   📬 Response: "${preview}${messageContent.length > 100 ? "..." : ""}"`,
         );
       }
@@ -142,7 +142,7 @@ export async function waitForResponse(
       responseMessage,
     };
   } catch (error) {
-    console.log(
+    console.debug(
       `⏱️  Attempt ${attempt}, Send=${sendTime}ms, Response timeout after ${timeout}ms`,
     );
     throw error;
