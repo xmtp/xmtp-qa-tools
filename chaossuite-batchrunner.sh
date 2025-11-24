@@ -14,7 +14,7 @@ for ((x=1; x<=num_runs; x++)); do
   docker_exit_code=$?
   
   if [ $docker_exit_code -ne 0 ]; then
-    echo "❌ Docker startup failed with exit code $docker_exit_code, skipping test iteration $x"
+    echo "Docker startup failed with exit code $docker_exit_code, skipping test iteration $x"
     continue
   fi
   

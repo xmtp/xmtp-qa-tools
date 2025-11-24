@@ -3,7 +3,7 @@ script_dir="$(cd $(dirname $0) && pwd)"
 pushd $script_dir >/dev/null
 echo "Tearing down and starting Docker environment..."
 
-for x in {1..5}; {
+for x in {1..100}; {
   echo "Attempt $x..."
   docker compose down
   docker compose pull

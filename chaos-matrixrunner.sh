@@ -3,7 +3,7 @@
 XMTP_ENV="local"
 
 # Resume from this test number (1-based index)
-RESUME_FROM=18
+RESUME_FROM=1
 
 # Matrix parameters
 DURATION_MS_LIST=(300000)
@@ -46,7 +46,7 @@ for OP_FREQ in "${OP_FREQS[@]}"; do
   ROOT_USE=$(df / | awk 'NR==2 {gsub("%",""); print $5}')
   if (( ROOT_USE >= 95 )); then
     echo ""
-    echo "=> Disk usage on / is ${ROOT_USE}% — aborting test run."
+    echo "=> Disk usage on / is ${ROOT_USE}% ï¿½ aborting test run."
     echo "=> Resume next time from: RESUME_FROM=$i"
     exit 1
   fi
