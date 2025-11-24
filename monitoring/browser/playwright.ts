@@ -352,12 +352,34 @@ export class playwright {
         maxRetries--;
       }
       console.debug("Logged in");
+      
+      // Add red background to xmtp.chat
+      await this.addRedBackground(page);
+      
       this.page = page;
       this.browser = browser;
       return { browser, page };
     } catch (error) {
       await this.takeSnapshot("startPage-error");
       throw error;
+    }
+  }
+
+  /**
+   * Injects custom CSS to add a red background to xmtp.chat
+   */
+  private async addRedBackground(page: Page): Promise<void> {
+    try {
+      await page.addStyleTag({
+        content: `
+          body {
+            background-color: red !important;
+          }
+        `,
+      });
+      console.debug("Added red background to xmtp.chat");
+    } catch (error) {
+      console.error("Failed to add red background:", error);
     }
   }
 
