@@ -288,6 +288,7 @@ const agent = await Agent.createFromEnv({
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   codecs: [new ActionsCodec(), new IntentCodec()],
+  disableDeviceSync: true,
 });
 
 // Add inline actions middleware
