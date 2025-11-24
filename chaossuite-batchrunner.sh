@@ -10,7 +10,14 @@ num_runs=10
 for ((x=1; x<=num_runs; x++)); do
   echo "Starting test cycle at $(date)"
 
-  cd multinode && docker compose down && ./ci.sh && cd ..
+  (cd multinode && docker compose down && ./ci.sh)
+  docker_exit_code=$?
+  
+  if [ $docker_exit_code -ne 0 ]; then
+    echo "❌ Docker startup failed with exit code $docker_exit_code, skipping test iteration $x"
+    continue
+  fi
+  
   rm -rf .data
   sleep 10
   tid=$(date +%s)
