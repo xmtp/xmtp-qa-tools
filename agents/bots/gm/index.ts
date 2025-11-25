@@ -16,7 +16,7 @@ const agent = await Agent.createFromEnv({
 });
 
 agent.on("text", async (ctx) => {
-  const messageBody1 = await getMessageBody(ctx);
+  const messageBody1 = await getMessageBody(ctx, "America/Argentina/Buenos_Aires");
   if (ctx.isDm()) {
     await ctx.sendText(messageBody1);
   } else if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
