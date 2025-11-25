@@ -39,12 +39,12 @@ import {
 //   Dm as Dm430Dev,
 //   Group as Group430Dev,
 // } from "@xmtp/node-sdk-4.3.0-dev";
-// import {
-//   Client as Client440,
-//   Conversation as Conversation440,
-//   Dm as Dm440,
-//   Group as Group440,
-// } from "@xmtp/node-sdk-4.4.0";
+import {
+  Client as Client441,
+  Conversation as Conversation441,
+  Dm as Dm441,
+  Group as Group441,
+} from "@xmtp/node-sdk-4.4.1-dev";
 import {
   Client as Client450,
   Conversation as Conversation450,
@@ -70,19 +70,19 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.5.0";
+} from "@xmtp/node-sdk-4.4.1-dev";
 
 // Node SDK version list
 export const VersionList = [
-  // {
-  //   Client: Client40Dev,
-  //   Conversation: Conversation430Dev,
-  //   Dm: Dm430Dev,
-  //   Group: Group430Dev,
-  //   nodeSDK: "4.3.0",
-  //   nodeBindings: "1.7.0",
-  //   auto: true,
-  // },
+  {
+    Client: Client441,
+    Conversation: Conversation441,
+    Dm: Dm441,
+    Group: Group441,
+    nodeSDK: "4.4.1",
+    nodeBindings: "1.7.0",
+    auto: true,
+  },
   {
     Client: Client450,
     Conversation: Conversation450,
