@@ -1,15 +1,20 @@
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
+import "dotenv/config";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  getVersionConfig,
-  nodeVersionOptions,
   sleep,
-  VersionList,
 } from "@helpers/client";
-import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
+import {
+  getDefaultSdkVersion,
+  isValidSdkVersion,
+  VersionList,
+  type Client,
+  type Group,
+  type XmtpEnv,
+} from "@helpers/versions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { installationThreshold, WorkerClient, type typeofStream } from "./main";
 
@@ -23,41 +28,12 @@ export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
 
-// Deprecated: Use getWorkers with useVersions option instead
-export function getWorkersWithVersions(workerNames: string[]): string[] {
-  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-
-  if (!testVersions) {
-    // No versions specified, return names as-is (will use latest version)
-    return workerNames;
-  }
-
-  const availableVersions = nodeVersionOptions().slice(0, testVersions);
-
-  const descriptors: string[] = [];
-  for (const workerName of workerNames) {
-    // Pick a random version from the specified list
-    const randomVersion =
-      availableVersions[Math.floor(Math.random() * availableVersions.length)];
-
-    // If workerName already contains installation ID (has dash), don't add another "-a"
-    if (workerName.includes("-")) {
-      descriptors.push(`${workerName}-${randomVersion}`);
-    } else {
-      descriptors.push(`${workerName}-a-${randomVersion}`);
-    }
-  }
-
-  return descriptors;
-}
 export interface WorkerBase {
   name: string;
   sdk: string;
   folder: string;
   walletKey: string;
   encryptionKey: string;
-  sdkVersion: string;
-  libXmtpVersion: string;
 }
 
 export interface Worker extends WorkerBase {
@@ -140,24 +116,6 @@ export class WorkerManager {
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
   }
 
-  /**
-   * Gets the version of the first worker (as a representative version)
-   */
-  public getVersion(): string {
-    const firstBaseName = Object.keys(this.workers)[0];
-    if (!firstBaseName) return "unknown";
-
-    const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
-    if (!firstInstallId) return "unknown";
-
-    return this.workers[firstBaseName][firstInstallId].sdkVersion;
-  }
-
-  public checkStatistics(): void {
-    // for (const worker of this.getAll()) {
-    //   console.debug(JSON.stringify(worker.client.apiStatistics(), null, 2));
-    // }
-  }
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
@@ -222,7 +180,7 @@ export class WorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk} ${installationCount.installations.length} - ${formatBytes(
               (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
             )}`,
           );
@@ -390,20 +348,21 @@ export class WorkerManager {
    */
   public async createWorker(
     descriptor: string,
+    nodeBindings?: string,
     apiUrl?: string,
   ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
 
-    // Handle version parsing - version is always the last part if it's a number
-    let sdkVersion = getLatestVersion();
+    // Handle version parsing - version is always the last part if valid
     let providedInstallId: string | undefined;
+    let defaultSdk = nodeBindings || getDefaultSdkVersion();
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (lastPart && nodeVersionOptions().includes(lastPart)) {
-        sdkVersion = lastPart;
+      if (lastPart && isValidSdkVersion(lastPart)) {
+        defaultSdk = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
           providedInstallId = parts.slice(1, -1).join("-");
@@ -420,26 +379,31 @@ export class WorkerManager {
       return this.workers[baseName][providedInstallId];
     }
 
-    // Determine folder/installation ID
-    const folder = providedInstallId || getNextFolderName();
-    const libXmtpVersion = getLibxmtpVersion(sdkVersion);
-
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
+
+    // Determine folder/installation ID
+    const folder = providedInstallId || getNextFolderName();
 
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: sdkVersion + "-" + libXmtpVersion,
+      sdk: defaultSdk,
       folder,
       walletKey,
       encryptionKey,
-      sdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
     };
 
+    // Use provided apiUrl, or fallback to XMTP_API_URL environment variable
+    const effectiveApiUrl = apiUrl || process.env.XMTP_API_URL;
+
     // Create and initialize the worker
-    const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
+    const workerClient = new WorkerClient(
+      workerData,
+      this.env,
+      {},
+      effectiveApiUrl,
+    );
 
     const initializedWorker = await workerClient.initialize();
 
@@ -449,8 +413,6 @@ export class WorkerManager {
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
-      sdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
       installationId: initializedWorker.client.installationId,
       env: this.env,
@@ -472,62 +434,51 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrMap: string[] | Record<string, string> | number,
+  workers: string[] | Record<string, string> | number,
   options: {
     env?: XmtpEnv;
-    useVersions?: boolean;
+    nodeBindings?: string;
     randomNames?: boolean;
-  } = {},
+  } = {
+    env: undefined,
+    randomNames: true,
+    nodeBindings: undefined,
+  },
 ): Promise<WorkerManager> {
-  const { useVersions = true, randomNames = true } = options;
-  const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
-  const manager = new WorkerManager(env);
-
+  const manager = new WorkerManager(
+    (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
+  );
+  let sdkVersions = [options.nodeBindings || getDefaultSdkVersion()];
+  if (process.env.TEST_VERSIONS) {
+    sdkVersions = VersionList.slice(0, parseInt(process.env.TEST_VERSIONS)).map(
+      (v) => v.nodeBindings,
+    );
+  }
   let workerPromises: Promise<Worker>[] = [];
+  let descriptors: string[] = [];
 
   // Handle different input types
-  if (typeof descriptorsOrMap === "number") {
-    // Number input - generate worker names based on mode
-    const count = descriptorsOrMap;
-    let names: string[];
-
-    if (randomNames) {
-      names = getRandomNames(count);
-    } else {
-      names = getFixedNames(count);
-    }
-
-    // Apply versioning if requested
-    const descriptors = useVersions ? getWorkersWithVersions(names) : names;
-
+  if (typeof workers === "number" || Array.isArray(workers)) {
+    const names =
+      typeof workers === "number"
+        ? options.randomNames
+          ? getRandomNames(workers)
+          : getFixedNames(workers)
+        : workers;
+    descriptors = names;
     workerPromises = descriptors.map((descriptor) =>
-      manager.createWorker(descriptor),
-    );
-  } else if (Array.isArray(descriptorsOrMap)) {
-    // Array input - apply versioning if requested
-    const descriptors = useVersions
-      ? getWorkersWithVersions(descriptorsOrMap)
-      : descriptorsOrMap;
-
-    workerPromises = descriptors.map((descriptor) =>
-      manager.createWorker(descriptor),
+      manager.createWorker(
+        descriptor,
+        sdkVersions[Math.floor(Math.random() * sdkVersions.length)],
+      ),
     );
   } else {
     // Record input - apply versioning if requested
-    let entries = Object.entries(descriptorsOrMap);
+    let entries = Object.entries(workers);
 
-    if (useVersions) {
-      const versionedKeys = getWorkersWithVersions(
-        Object.keys(descriptorsOrMap),
-      );
-      entries = versionedKeys.map((key, index) => [
-        key,
-        Object.values(descriptorsOrMap)[index],
-      ]);
-    }
-
+    descriptors = entries.map(([descriptor]) => descriptor);
     workerPromises = entries.map(([descriptor, apiUrl]) =>
-      manager.createWorker(descriptor, apiUrl),
+      manager.createWorker(descriptor, sdkVersions[0], apiUrl),
     );
   }
 
@@ -629,30 +580,4 @@ function getNextFolderName(): string {
 export function getDataSubFolderCount() {
   const preBasePath = process.cwd();
   return fs.readdirSync(`${preBasePath}/.data`).length;
-}
-export function getLatestVersion(): string {
-  if (VersionList.length === 0) {
-    // Fallback to a known good version if VersionList is somehow empty
-    return "4.2.4";
-  }
-  // Return the latest version (last in array)
-  return "4.2.4";
-}
-
-export function getNodeSdkVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.nodeVersion;
-  } catch {
-    return "unknown";
-  }
-}
-
-export function getLibxmtpVersion(sdkVersion: string): string {
-  try {
-    const versionConfig = getVersionConfig(sdkVersion);
-    return versionConfig.libXmtpVersion;
-  } catch {
-    return "unknown";
-  }
 }

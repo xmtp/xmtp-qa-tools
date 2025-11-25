@@ -1,13 +1,19 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
-  ConsentState,
-  Dm,
+  createClient,
+  getDataPath,
+  getEncryptionKeyFromHex,
+  streamTimeout,
+} from "@helpers/client";
+import {
+  regressionClient,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
+  ConsentState,
+} from "@helpers/versions";
+import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";
 import type { WorkerBase } from "./manager";
@@ -140,13 +146,10 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private folder: string;
-  private sdkVersion: string;
-  private libXmtpVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
   private apiUrl?: string;
-  private activeStreams: boolean = false;
   private activeStreamTypes: Set<typeofStream> = new Set();
   private streamControllers: Map<typeofStream, AbortController> = new Map();
   private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
@@ -157,6 +160,7 @@ export class WorkerClient extends Worker {
     env: XmtpEnv,
     options: WorkerOptions = {},
     apiUrl?: string,
+    customDbPath?: string,
   ) {
     options.workerData = {
       worker,
@@ -164,15 +168,14 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
     this.name = worker.name;
-    this.sdkVersion = worker.sdkVersion;
-    this.libXmtpVersion = worker.libXmtpVersion;
-    this.sdk = worker.sdkVersion + "-" + worker.libXmtpVersion;
+    this.sdk = worker.sdk;
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
-    this.nameId = worker.name + "-" + worker.sdkVersion;
+    this.nameId = worker.name + "-" + worker.sdk;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
+    this.dbPath = customDbPath || "";
     this.setupEventHandlers();
   }
 
@@ -423,39 +426,58 @@ export class WorkerClient extends Worker {
     installationId: string;
     address: `0x${string}`;
   }> {
-    // Tell the Worker to do any internal initialization
+    // Tell the Worker to do any production initialization
     this.postMessage({
       type: "initialize",
       data: {
         name: this.name,
         folder: this.folder,
-        sdkVersion: this.sdkVersion,
-        libXmtpVersion: this.libXmtpVersion,
+        sdk: this.sdk,
       },
     });
-    const { client, dbPath, address } = await createClient(
-      this.walletKey as `0x${string}`,
-      this.encryptionKeyHex,
-      this.sdkVersion,
-      this.name,
-      this.folder,
-      this.env,
-      this.apiUrl,
-    );
+
+    let dbPath: string;
+    let client: unknown;
+    if (this.dbPath) {
+      // Use the custom dbPath if provided
+      console.debug(`[${this.nameId}] Using custom dbPath: ${this.dbPath}`);
+      // Create client with custom dbPath
+      client = await regressionClient(
+        this.sdk,
+        this.walletKey as `0x${string}`,
+        getEncryptionKeyFromHex(this.encryptionKeyHex),
+        this.dbPath,
+        this.env,
+        this.apiUrl,
+      );
+      dbPath = this.dbPath;
+    } else {
+      // Use the default path generation
+      const result = await createClient(
+        this.walletKey as `0x${string}`,
+        this.encryptionKeyHex,
+        this.sdk,
+        this.name,
+        this.folder,
+        this.env,
+        this.apiUrl,
+      );
+      client = result.client;
+      dbPath = result.dbPath;
+    }
 
     this.dbPath = dbPath;
     this.client = client as Client;
-    this.address = address;
-
-    this.startInitialStream();
-    this.startSyncs();
+    this.address =
+      (client as any).address ||
+      privateKeyToAccount(this.walletKey as `0x${string}`).address;
 
     const installationId = this.client.installationId;
 
     return {
       client: this.client,
       dbPath,
-      address: address,
+      address: this.address,
       installationId,
     };
   }

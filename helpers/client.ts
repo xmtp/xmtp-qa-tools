@@ -3,74 +3,15 @@ import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { ReactionCodec } from "@xmtp/content-type-reaction";
-import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
   IdentifierKind,
+  regressionClient,
   type Client,
   type Conversation,
-  type LogLevel,
   type Signer,
   type XmtpEnv,
-} from "@xmtp/node-sdk";
-import {
-  Client as Client13,
-  Conversation as Conversation13,
-} from "@xmtp/node-sdk-0.0.13";
-import {
-  Client as Client47,
-  Conversation as Conversation47,
-  Dm as Dm47,
-  Group as Group47,
-} from "@xmtp/node-sdk-0.0.47";
-import {
-  Client as Client105,
-  Conversation as Conversation105,
-  Dm as Dm105,
-  Group as Group105,
-} from "@xmtp/node-sdk-1.0.5";
-import {
-  Client as Client209,
-  Conversation as Conversation209,
-  Dm as Dm209,
-  Group as Group209,
-} from "@xmtp/node-sdk-2.0.9";
-import {
-  Client as Client210,
-  Conversation as Conversation210,
-  Dm as Dm210,
-  Group as Group210,
-} from "@xmtp/node-sdk-2.1.0";
-import {
-  Client as Client220,
-  Conversation as Conversation220,
-  Dm as Dm220,
-  Group as Group220,
-} from "@xmtp/node-sdk-2.2.1";
-import {
-  Client as Client300,
-  Conversation as Conversation300,
-  Dm as Dm300,
-  Group as Group300,
-} from "@xmtp/node-sdk-3.0.1";
-import {
-  Client as Client321,
-  Conversation as Conversation321,
-  Dm as Dm321,
-  Group as Group321,
-} from "@xmtp/node-sdk-3.2.1";
-import {
-  Client as Client424,
-  Conversation as Conversation424,
-  Dm as Dm424,
-  Group as Group424,
-} from "@xmtp/node-sdk-4.2.4";
-import {
-  Client as Client440rc2,
-  Conversation as Conversation440rc2,
-  Dm as Dm440rc2,
-  Group as Group440rc2,
-} from "@xmtp/node-sdk-4.4.0-rc2";
+  getDefaultSdkVersion,
+} from "@helpers/versions";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -82,113 +23,7 @@ import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
-export function nodeVersionOptions() {
-  return VersionList.map((v) => v.nodeVersion).reverse();
-}
-
-// SDK version mappings
-export const VersionList = [
-  {
-    Client: Client13,
-    Conversation: Conversation13,
-    Dm: Conversation13,
-    Group: Conversation13,
-    nodeVersion: "0.0.13",
-    bindingsPackage: "0.0.9",
-    libXmtpVersion: "0.0.9",
-  },
-  {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-    nodeVersion: "0.0.47",
-    bindingsPackage: "0.4.1",
-    libXmtpVersion: "6bd613d",
-  },
-  {
-    Client: Client105,
-    Conversation: Conversation105,
-    Dm: Dm105,
-    Group: Group105,
-    nodeVersion: "1.0.5",
-    bindingsPackage: "1.1.3",
-    libXmtpVersion: "6eb1ce4",
-  },
-  {
-    Client: Client209,
-    Conversation: Conversation209,
-    Dm: Dm209,
-    Group: Group209,
-    nodeVersion: "2.0.9",
-    bindingsPackage: "1.1.8",
-    libXmtpVersion: "bfadb76",
-  },
-  {
-    Client: Client210,
-    Conversation: Conversation210,
-    Dm: Dm210,
-    Group: Group210,
-    nodeVersion: "2.1.0",
-    bindingsPackage: "1.2.0",
-    libXmtpVersion: "7b9b4d0",
-  },
-  {
-    Client: Client220,
-    Conversation: Conversation220,
-    Dm: Dm220,
-    Group: Group220,
-    nodeVersion: "2.2.1",
-    bindingsPackage: "1.2.2",
-    libXmtpVersion: "d0f0b67",
-  },
-  {
-    Client: Client300,
-    Conversation: Conversation300,
-    Dm: Dm300,
-    Group: Group300,
-    nodeVersion: "3.0.1",
-    bindingsPackage: "1.2.5",
-    libXmtpVersion: "dc3e8c8",
-  },
-  {
-    Client: Client321,
-    Conversation: Conversation321,
-    Dm: Dm321,
-    Group: Group321,
-    nodeVersion: "3.2.1",
-    bindingsPackage: "1.3.2",
-    libXmtpVersion: "dc3e8c8",
-  },
-  {
-    Client: Client424,
-    Conversation: Conversation424,
-    Dm: Dm424,
-    Group: Group424,
-    nodeVersion: "4.2.4",
-    bindingsPackage: "1.3.2",
-    libXmtpVersion: "dc3e8c8",
-  },
-  {
-    Client: Client440rc2,
-    Conversation: Conversation440rc2,
-    Dm: Dm440rc2,
-    Group: Group440rc2,
-    nodeVersion: "4.4.0-rc2",
-    bindingsPackage: "1.6.1-rc3",
-    libXmtpVersion: "unknown",
-  },
-];
-
-// Helper function to get version config from VersionList
-export function getVersionConfig(sdkVersion: string) {
-  // Find the version config by nodeVersion
-  const config = VersionList.find((v) => v.nodeVersion === sdkVersion);
-  if (!config) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
-  return config;
-}
+export const APP_VERSION = "xmtp-qa-tools/1.0.0";
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -328,7 +163,7 @@ export const getDbPath = (description: string = "xmtp") => {
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
-  sdkVersion: string,
+  sdk: string,
   name: string,
   folder: string,
   env: XmtpEnv,
@@ -336,15 +171,9 @@ export async function createClient(
 ): Promise<{
   client: unknown;
   dbPath: string;
-  sdkVersion: string;
-  libXmtpVersion: string;
   address: `0x${string}`;
 }> {
-  const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
-
-  // Map SDK version to VersionList entry
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
+  const encryptionKey = fromString(encryptionKeyHex, "hex");
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
@@ -352,8 +181,7 @@ export async function createClient(
 
   // Use type assertion to handle the client creation
   const client = await regressionClient(
-    sdkVersion,
-    libXmtpVersion,
+    sdk,
     walletKey,
     encryptionKey,
     dbPath,
@@ -365,98 +193,8 @@ export async function createClient(
     client,
     dbPath,
     address,
-    sdkVersion: String(sdkVersion),
-    libXmtpVersion,
   };
 }
-export const regressionClient = async (
-  sdkVersion: string,
-  libXmtpVersion: string,
-  walletKey: `0x${string}`,
-  dbEncryptionKey: Uint8Array,
-  dbPath: string,
-  env: XmtpEnv,
-  apiURL?: string,
-): Promise<unknown> => {
-  const loggingLevel = (process.env.LOGGING_LEVEL || "error") as LogLevel;
-  const apiUrl = apiURL;
-  if (apiUrl) {
-    console.log(
-      `Creating API client with: SDK version: ${sdkVersion} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
-    );
-  }
-
-  const versionConfig = getVersionConfig(sdkVersion);
-  const ClientClass = versionConfig.Client;
-  let client = null;
-
-  if (sdkVersion === "0.0.13") {
-    throw new Error("Invalid version");
-  } else if (sdkVersion === "0.0.47") {
-    const signer = createSigner47(walletKey);
-
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, dbEncryptionKey, {
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-    });
-  } else if (sdkVersion === "1.0.5") {
-    const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, dbEncryptionKey, {
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-    });
-  } else {
-    const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env,
-      loggingLevel,
-      apiUrl,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
-  }
-
-  if (!client) {
-    throw new Error(`Failed to create client for SDK version ${sdkVersion}`);
-  }
-
-  return client;
-};
-
-export const getLibXmtpVersion = (client: any) => {
-  try {
-    const version = client.version;
-    if (!version || typeof version !== "string") return "unknown";
-
-    const parts = version.split("-");
-    if (parts.length <= 1) return "unknown";
-
-    const spaceParts = parts[1].split(" ");
-    return spaceParts[0] || "unknown";
-  } catch {
-    return "unknown";
-  }
-};
-export const createSigner47 = (privateKey: `0x${string}`) => {
-  const account = privateKeyToAccount(privateKey);
-  return {
-    getAddress: () => account.address,
-    signMessage: async (message: string) => {
-      const signature = await account.signMessage({
-        message,
-      });
-      return toBytes(signature);
-    },
-  };
-};
 
 function loadDataPath(name: string, installationId: string): string {
   // Extract the base name without installation ID for folder structure
@@ -501,10 +239,7 @@ export function getEnvPath(): string {
   return envPath;
 }
 export function getLatestSdkVersion(): string {
-  const sdkVersion = nodeVersionOptions()[0];
-  const versionConfig = getVersionConfig(sdkVersion);
-  const libXmtpVersion = versionConfig.libXmtpVersion;
-  return sdkVersion + "-" + libXmtpVersion;
+  return getDefaultSdkVersion();
 }
 /**
  * Loads environment variables from the specified test's .env file if it exists
