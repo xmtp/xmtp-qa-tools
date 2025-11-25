@@ -333,7 +333,10 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
-  const messageBody1 = await getMessageBody(ctx);
+  const messageBody1 = await getMessageBody(
+    ctx,
+    "America/Argentina/Buenos_Aires",
+  );
   const message = ctx.message;
   const content = message.content;
   const isTagged =

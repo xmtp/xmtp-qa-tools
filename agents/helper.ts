@@ -18,12 +18,23 @@ export interface AgentConfig {
   live: boolean;
 }
 
-export async function getMessageBody(ctx: MessageContext) {
+export async function getMessageBody(ctx: MessageContext, timezone?: string) {
   try {
     const messageContent = ctx.message.content as string;
     const senderAddress = (await ctx.getSenderAddress()) as string;
 
-    const messageBody1 = `replying content: ${messageContent} sent by ${senderAddress} on ${ctx.message.sentAt.toISOString()} on converstion ${ctx.conversation.id}`;
+    let dateString: string;
+    if (timezone) {
+      dateString = ctx.message.sentAt.toLocaleString("en-US", {
+        timeZone: timezone,
+        dateStyle: "medium",
+        timeStyle: "long",
+      });
+    } else {
+      dateString = ctx.message.sentAt.toISOString();
+    }
+
+    const messageBody1 = `replying content: ${messageContent} sent by ${senderAddress} on ${dateString} on converstion ${ctx.conversation.id}`;
 
     console.log(messageBody1);
     return messageBody1;
