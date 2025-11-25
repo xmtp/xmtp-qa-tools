@@ -116,7 +116,7 @@ const agents: AgentConfig[] = [
   {
     name: "echo",
     address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
-    sendMessage: "hi from QA",
+    sendMessage: "hi from QAs",
     networks: ["dev"],
     live: false,
   },
