@@ -7,7 +7,6 @@ inputs:
   status:
     description: "Status of the workflow (success, failure, cancelled)"
     required: false
-    default: ${{ job.status }}
   slack-bot-token:
     description: "Slack bot token"
     required: true
