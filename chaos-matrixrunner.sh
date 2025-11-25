@@ -1,6 +1,7 @@
 #!/bin/bash
 
-XMTP_ENV="local"
+export XMTP_ENV="dev"
+export XMTP_API_URL="https://grpc.testnet-staging.xmtp.network:443"
 
 # Resume from this test number (1-based index)
 RESUME_FROM=1
