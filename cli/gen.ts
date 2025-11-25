@@ -25,6 +25,9 @@ const MAX_RETRIES = 3;
 interface InboxData {
   accountAddress: string;
   walletKey: string;
+  appVersion: string;
+  disableDeviceSync: boolean;
+  env: XmtpEnv;
   dbEncryptionKey: string;
   inboxId: string;
   installations: number;

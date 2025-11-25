@@ -20,6 +20,8 @@ const dbEncryptionKey = fromString(encryptionKey, "hex");
 
 const agent = await Agent.create(signer, {
   env: "dev", // or 'production'
+  disableDeviceSync: true,
+  appVersion: "agent-name/1.0.0",
   dbEncryptionKey: dbEncryptionKey, // save it for later
 });
 ```

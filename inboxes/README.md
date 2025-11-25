@@ -31,6 +31,8 @@ const signer = createSigner(testInbox.walletKey);
 const client = await Client.create(signer, {
   dbEncryptionKey: getEncryptionKeyFromHex(testInbox.dbEncryptionKey),
   env: "dev",
+  disableDeviceSync: true,
+  appVersion: "agent-name/1.0.0",
 });
 ```
 

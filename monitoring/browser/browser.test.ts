@@ -1,4 +1,4 @@
-import { sleep } from "@helpers/client";
+import { APP_VERSION, sleep } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
@@ -36,6 +36,7 @@ describe(testName, () => {
         dbEncryptionKey: xmtpChat.encryptionKey,
         walletKey: xmtpChat.walletKey,
         accountAddress: xmtpChat.address,
+        appVersion: APP_VERSION,
       },
     });
     await xmtpTester.startPage();
