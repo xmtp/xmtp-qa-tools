@@ -27,7 +27,7 @@ interface InboxData {
   walletKey: string;
   appVersion: string;
   disableDeviceSync: boolean;
-  env: XmtpEnv;
+
   dbEncryptionKey: string;
   inboxId: string;
   installations: number;
@@ -427,6 +427,8 @@ async function smartUpdate({
             dbEncryptionKey,
             inboxId,
             installations: installationCount,
+            appVersion: APP_VERSION,
+            disableDeviceSync: true,
           });
           consecutiveFailures = 0;
           writeJson(targetFilePath, existingInboxes);
