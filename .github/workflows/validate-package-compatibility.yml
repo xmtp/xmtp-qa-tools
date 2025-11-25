@@ -19,6 +19,9 @@ jobs:
         package-manager: [npm, yarn, yarn1, bun]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Clone XMTP agent examples
         run: |
           git clone https://github.com/xmtp/gm-bot.git
