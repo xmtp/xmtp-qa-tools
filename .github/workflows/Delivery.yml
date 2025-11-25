@@ -41,4 +41,5 @@ jobs:
         uses: ./.github/actions/slack-notification
         with:
           workflow-name: "Delivery (${{ matrix.test }}, ${{ matrix.env }})"
+          status: ${{ job.status }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

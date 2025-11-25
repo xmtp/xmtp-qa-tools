@@ -17,8 +17,9 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Print workflow region
         run: |

@@ -15,19 +15,8 @@ jobs:
       REGION: ${{ vars.REGION }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/cache
-          key: deps-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            deps-
-      - name: Install dependencies
-        run: yarn
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Run versions
         run: yarn versions
@@ -46,4 +35,5 @@ jobs:
         uses: ./.github/actions/slack-notification
         with:
           workflow-name: "Validate code quality"
+          status: ${{ job.status }}
           slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

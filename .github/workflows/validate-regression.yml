@@ -17,10 +17,9 @@ jobs:
       version_changed: ${{ steps.check-version.outputs.version_changed }}
       new_version: ${{ steps.extract-version.outputs.version }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Check for version changes
         id: check-version

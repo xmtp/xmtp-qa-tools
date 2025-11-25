@@ -15,8 +15,9 @@ jobs:
       REGION: ${{ vars.REGION }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Clone XMTP agent examples
         run: |
