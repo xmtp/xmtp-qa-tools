@@ -17,10 +17,9 @@ jobs:
       version_changed: ${{ steps.check-version.outputs.version_changed }}
       new_version: ${{ steps.extract-version.outputs.version }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
+      - uses: actions/checkout@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Check for version changes
         id: check-version
@@ -46,13 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Prepare Yarn
-        run: corepack prepare yarn@4.6.0 --activate
-        shell: bash
 
       - name: Install dependencies
         run: yarn install

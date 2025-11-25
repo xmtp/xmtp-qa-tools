@@ -1,7 +1,7 @@
 name: Validate package compatibility
 
 on:
-  pull_request:
+  #pull_request:
   schedule:
     - cron: "25 */5 * * *" # every 5 hours at 25 minutes pasts
 
@@ -19,17 +19,12 @@ jobs:
         package-manager: [npm, yarn, yarn1, bun]
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Clone XMTP agent examples
         run: |
           git clone https://github.com/xmtp/gm-bot.git
-
-      - name: Enable Corepack
-        run: corepack enable
-        shell: bash
-
-      - name: Prepare Yarn
-        run: corepack prepare yarn@4.6.0 --activate
-        shell: bash
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -38,7 +33,7 @@ jobs:
 
       - name: Install pnpm
         if: matrix.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 10.7.0
 
