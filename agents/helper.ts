@@ -19,7 +19,7 @@ export interface AgentConfig {
   live: boolean;
 }
 
-export async function getMessageBody(ctx: MessageContext) {
+export async function getMessageBody<T = unknown>(ctx: MessageContext<T>) {
   try {
     const messageContent = ctx.message.content as string;
     const senderAddress = (await ctx.getSenderAddress()) as string;
