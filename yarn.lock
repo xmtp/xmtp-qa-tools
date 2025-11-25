@@ -1525,7 +1525,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.15@npm:@xmtp/agent-sdk@1.1.15, @xmtp/agent-sdk@npm:1.1.15":
+"@xmtp/agent-sdk-1.1.15@npm:@xmtp/agent-sdk@1.1.15":
   version: 1.1.15
   resolution: "@xmtp/agent-sdk@npm:1.1.15"
   dependencies:
@@ -1543,11 +1543,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/cli@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@xmtp/cli@npm:0.0.3"
+"@xmtp/agent-sdk@npm:1.1.16":
+  version: 1.1.16
+  resolution: "@xmtp/agent-sdk@npm:1.1.16"
   dependencies:
-    "@xmtp/agent-sdk": "npm:1.1.15"
+    "@xmtp/content-type-markdown": "npm:^1.0.0"
+    "@xmtp/content-type-reaction": "npm:^2.0.2"
+    "@xmtp/content-type-read-receipt": "npm:^2.0.2"
+    "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
+    "@xmtp/content-type-reply": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/content-type-transaction-reference": "npm:^2.0.2"
+    "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
+    "@xmtp/node-sdk": "npm:4.3.1"
+    viem: "npm:^2.37.6"
+  checksum: 10/d7265bc5c0393f067faae055a84de702e1b54061ab79e185fc81d80fe1ed122399bb19adfb0b972a8e2ed4bb3cf9bab35f5e87a1402d0ba7b1e5eb0c9040feb3
+  languageName: node
+  linkType: hard
+
+"@xmtp/cli@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@xmtp/cli@npm:0.0.4"
+  dependencies:
+    "@xmtp/agent-sdk": "npm:1.1.16"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-read-receipt": "npm:^2.0.2"
@@ -1559,7 +1577,7 @@ __metadata:
     yargs: "npm:^17.7.2"
   bin:
     xmtp: dist/index.js
-  checksum: 10/ab27b128db15d9af0fcb3f0d7032d4b160a47b10d91ce11bfc152987ae0178f5689732ffb34b9734713d9cde82d2ea7b7882d037c7174e45207fc56ba03ee5a4
+  checksum: 10/dd8afa396b266bbf96447002c0b5c4fc42e73225582b439dfb7b90d3dc067e3cd589f71bd2b9dce194a67d64a46e363ed82f0f35c94052e965b7fcf907e8e2ae
   languageName: node
   linkType: hard
 
@@ -5350,7 +5368,7 @@ __metadata:
     "@xmtp/agent-sdk-1.1.12": "npm:@xmtp/agent-sdk@1.1.12"
     "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14"
     "@xmtp/agent-sdk-1.1.15": "npm:@xmtp/agent-sdk@1.1.15"
-    "@xmtp/cli": "npm:^0.0.3"
+    "@xmtp/cli": "npm:^0.0.4"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
