@@ -24,6 +24,7 @@ jobs:
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
+      - uses: actions/checkout@v4
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
         with:
