@@ -19,7 +19,6 @@ describe(testName, () => {
       });
 
       try {
-        const testAgentAddress = agent.address as `0x${string}`;
         const targetAgentAddress = agentConfig.address as `0x${string}`;
         const numGroups = 50;
         const messagesPerGroup = 10;
@@ -29,10 +28,12 @@ describe(testName, () => {
         );
 
         // Create 50 groups
+        // The test agent (agent) is automatically added when creating the group
+        // We just need to add the target agent
         const groups = [];
         for (let i = 0; i < numGroups; i++) {
           const group = await agent.createGroupWithAddresses(
-            [testAgentAddress, targetAgentAddress],
+            [targetAgentAddress],
             {
               groupName: `Stress Test Group ${i + 1}`,
             },
