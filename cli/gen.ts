@@ -318,6 +318,7 @@ async function smartUpdate({
             dbEncryptionKey,
             dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
             appVersion: APP_VERSION,
+            disableDeviceSync: true,
             env,
           });
           const { currentInstallations } = await checkInstallations(
@@ -336,6 +337,7 @@ async function smartUpdate({
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
                   env,
                   appVersion: APP_VERSION,
+                  disableDeviceSync: true,
                 });
                 if (debugMode) {
                   process.stdout.write(
@@ -358,6 +360,7 @@ async function smartUpdate({
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
                   env,
                   appVersion: APP_VERSION,
+                  disableDeviceSync: true,
                 });
                 if (debugMode) {
                   process.stdout.write(
@@ -404,6 +407,7 @@ async function smartUpdate({
                 dbPath: `${LOGPATH}/${env}-${accountAddress}-install-${j}`,
                 env,
                 appVersion: APP_VERSION,
+                disableDeviceSync: true,
               });
               if (j === 0 && env === envs[0]) inboxId = client.inboxId;
               totalCreated++;
