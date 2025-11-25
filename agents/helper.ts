@@ -1,4 +1,5 @@
 import { type DecodedMessage } from "@helpers/versions";
+import type { MessageContext } from "@xmtp/agent-sdk";
 
 /**
  * Agent configuration interface
@@ -16,6 +17,21 @@ export interface AgentConfig {
   networks: string[];
   /**  the agent is production */
   live: boolean;
+}
+
+export async function getMessageBody(ctx: MessageContext) {
+  try {
+    const messageContent = ctx.message.content as string;
+    const senderAddress = (await ctx.getSenderAddress()) as string;
+
+    const messageBody1 = `replying content: ${messageContent} sent by ${senderAddress} on ${ctx.message.sentAt.toISOString()} on converstion ${ctx.conversation.id}`;
+
+    console.log(messageBody1);
+    return messageBody1;
+  } catch (error) {
+    console.error("Error getting message body", error);
+    return "Error getting message body";
+  }
 }
 
 /**

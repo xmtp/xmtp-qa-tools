@@ -1,3 +1,4 @@
+import { getMessageBody } from "@agents/helper";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -332,10 +333,7 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
-  console.log(
-    `Received text message in group (${ctx.conversation.id}): ${ctx.message.content} by ${await ctx.getSenderAddress()}`,
-  );
-
+  const messageBody1 = await getMessageBody(ctx);
   const message = ctx.message;
   const content = message.content;
   const isTagged =
@@ -343,10 +341,6 @@ agent.on("text", async (ctx) => {
     content.trim().startsWith("/kc") ||
     content.trim().startsWith("@key-check.eth");
   if (isTagged) {
-    const messageContent = ctx.message.content;
-    const senderAddress = await ctx.getSenderAddress();
-    const messageBody1 = `replying content: ${messageContent} sent by ${senderAddress} on ${ctx.message.sentAt.toISOString()} on converstion ${ctx.conversation.id}`;
-    console.log(messageBody1);
     await ctx.sendText(messageBody1);
     await showMenu(ctx, appConfig, "main-menu");
     return;
