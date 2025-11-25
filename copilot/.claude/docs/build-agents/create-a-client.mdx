@@ -20,6 +20,8 @@ const dbEncryptionKey = fromString(encryptionKey, "hex");
 
 const agent = await Agent.create(signer, {
   env: "dev", // or 'production'
+  disableDeviceSync: true,
+  appVersion: "agent-name/1.0.0",
   dbEncryptionKey: dbEncryptionKey, // save it for later
 });
 ```
@@ -96,6 +98,10 @@ env?: 'local' | 'dev' | 'production';
  * deprecations and required upgrades.
  */
 appVersion?: string;
+/**
+ * Disable device sync.
+ */
+disableDeviceSync?: boolean;
 /**
  * apiUrl can be used to override the `env` flag and connect to a
  * specific endpoint

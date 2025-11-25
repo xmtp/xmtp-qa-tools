@@ -11,6 +11,8 @@ export interface InboxData {
   accountAddress: string;
   walletKey: string;
   dbEncryptionKey: string;
+  disableDeviceSync: boolean;
+  appVersion: string;
   inboxId: string;
   installations: number;
 }
