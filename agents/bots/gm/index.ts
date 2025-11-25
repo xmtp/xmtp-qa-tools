@@ -1,3 +1,4 @@
+import { getMessageBody } from "@agents/helper";
 import { Agent, getTestUrl, logDetails } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
 import { getSDKVersionInfo } from "@helpers/versions";
@@ -15,13 +16,12 @@ const agent = await Agent.createFromEnv({
 });
 
 agent.on("text", async (ctx) => {
+  const messageBody1 = await getMessageBody(ctx);
   if (ctx.isDm()) {
-    const messageContent = ctx.message.content;
-    const senderAddress = await ctx.getSenderAddress();
-    console.log(`Received message: ${messageContent} by ${senderAddress}`);
-    await ctx.sendText("gm local " + ctx.conversation.id);
-  } else if (ctx.isGroup() && ctx.message.content.includes("@gm"))
-    await ctx.sendText("gm local " + ctx.conversation.id);
+    await ctx.sendText(messageBody1);
+  } else if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
+    await ctx.sendText(messageBody1);
+  }
 });
 
 agent.on("start", () => {
