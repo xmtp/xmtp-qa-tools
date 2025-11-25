@@ -32,6 +32,7 @@ export {
   Agent,
   type XmtpEnv,
   MessageContext,
+  type DecodedMessage,
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,

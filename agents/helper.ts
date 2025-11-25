@@ -1,5 +1,4 @@
-import { type DecodedMessage } from "@helpers/versions";
-import type { MessageContext } from "@xmtp/agent-sdk";
+import { type DecodedMessage, type MessageContext } from "@agents/versions";
 
 /**
  * Agent configuration interface
