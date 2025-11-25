@@ -1,4 +1,4 @@
-name: "Slack Notification"
+name: "Slack Notifications"
 description: "Send Slack notification for workflow status"
 inputs:
   workflow-name:
@@ -7,7 +7,6 @@ inputs:
   status:
     description: "Status of the workflow (success, failure, cancelled)"
     required: false
-    default: ${{ job.status }}
   slack-bot-token:
     description: "Slack bot token"
     required: true

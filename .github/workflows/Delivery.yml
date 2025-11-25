@@ -22,7 +22,6 @@ jobs:
       ERROR_TRESHOLD: 90
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
       - name: Setup test env
         uses: ./.github/actions/xmtp-test-setup
 
