@@ -1,5 +1,4 @@
-import { type DecodedMessage } from "@helpers/versions";
-import type { MessageContext } from "@xmtp/agent-sdk";
+import { type DecodedMessage, type MessageContext } from "@agents/versions";
 
 /**
  * Agent configuration interface
@@ -19,7 +18,7 @@ export interface AgentConfig {
   live: boolean;
 }
 
-export async function getMessageBody<T = unknown>(ctx: MessageContext<T>) {
+export async function getMessageBody(ctx: MessageContext) {
   try {
     const messageContent = ctx.message.content as string;
     const senderAddress = (await ctx.getSenderAddress()) as string;
