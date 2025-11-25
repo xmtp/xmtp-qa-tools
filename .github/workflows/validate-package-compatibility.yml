@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 21, 22, 23, 24]
+        node-version: [22, 23, 24]
         package-manager: [npm, yarn, yarn1, bun]
 
     steps:
