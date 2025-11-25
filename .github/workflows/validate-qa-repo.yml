@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Print workflow region
         run: |
@@ -35,14 +35,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-
-      - name: Enable Corepack
-        run: corepack enable
-        shell: bash
-
-      - name: Prepare Yarn
-        run: corepack prepare yarn@4.6.0 --activate
-        shell: bash
 
       - name: Install dependencies
         run: |

@@ -26,14 +26,6 @@ jobs:
         run: |
           git clone https://github.com/xmtp/gm-bot.git
 
-      - name: Enable Corepack
-        run: corepack enable
-        shell: bash
-
-      - name: Prepare Yarn
-        run: corepack prepare yarn@4.6.0 --activate
-        shell: bash
-
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -41,7 +33,7 @@ jobs:
 
       - name: Install pnpm
         if: matrix.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 10.7.0
 

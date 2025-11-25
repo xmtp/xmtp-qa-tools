@@ -18,7 +18,7 @@ jobs:
       new_version: ${{ steps.extract-version.outputs.version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
@@ -46,13 +46,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Prepare Yarn
-        run: corepack prepare yarn@4.6.0 --activate
-        shell: bash
 
       - name: Install dependencies
         run: yarn install
