@@ -202,6 +202,7 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
       appVersion: APP_VERSION,
+      disableDeviceSync: true,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
   } catch (error) {
@@ -229,6 +230,7 @@ export const regressionClient = async (
         loggingLevel,
         apiUrl,
         appVersion: APP_VERSION,
+        disableDeviceSync: true,
         codecs: [new ReactionCodec(), new ReplyCodec()],
       });
     } else {

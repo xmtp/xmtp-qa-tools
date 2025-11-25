@@ -32,4 +32,4 @@ agent.on("start", () => {
   getSDKVersionInfo(agent, agent.client);
 });
 
-await agent.start();
+await agent.start({});

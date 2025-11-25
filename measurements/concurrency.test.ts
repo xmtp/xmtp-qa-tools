@@ -41,6 +41,7 @@ describe(testName, () => {
     primaryClient = await Client.create(primarySigner, {
       dbEncryptionKey: primaryEncryptionKey,
       env: env.XMTP_ENV as XmtpEnv,
+      disableDeviceSync: true,
       appVersion: APP_VERSION,
     });
 
@@ -51,6 +52,7 @@ describe(testName, () => {
     secondaryClient = await Client.create(secondarySigner, {
       dbEncryptionKey: secondaryEncryptionKey,
       env: env.XMTP_ENV as XmtpEnv,
+      disableDeviceSync: true,
       appVersion: APP_VERSION,
     });
 

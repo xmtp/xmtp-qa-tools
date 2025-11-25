@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.4.30",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -36,7 +36,7 @@
     "@xmtp/agent-sdk-1.1.12": "npm:@xmtp/agent-sdk@1.1.12",
     "@xmtp/agent-sdk-1.1.14": "npm:@xmtp/agent-sdk@1.1.14",
     "@xmtp/agent-sdk-1.1.15": "npm:@xmtp/agent-sdk@1.1.15",
-    "@xmtp/cli": "^0.0.3",
+    "@xmtp/cli": "^0.0.4",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
