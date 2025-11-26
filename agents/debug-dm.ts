@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import agents from "@agents/agents";
+import { PING_MESSAGE } from "@agents/helper";
 import { Agent } from "@agents/versions";
 import { type DecodedMessage } from "@xmtp/node-sdk";
 import yargs from "yargs";
@@ -63,7 +64,7 @@ export async function runSendCommand(options: SendOptions): Promise<void> {
       );
     }
     target = agent.address;
-    message = message || agent.sendMessage;
+    message = message || PING_MESSAGE;
     console.log(`🤖 Using agent: ${agent.name} (${agent.address})`);
   }
 

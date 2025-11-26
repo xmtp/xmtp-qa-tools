@@ -1,6 +1,7 @@
 import productionAgents from "@agents/agents";
 import {
   AGENT_RESPONSE_TIMEOUT,
+  PING_MESSAGE,
   waitForResponse,
   type AgentConfig,
 } from "@agents/helper";
@@ -38,7 +39,7 @@ describe(testName, () => {
       });
 
       try {
-        const testMessage = `@${agentConfig.name} ${agentConfig.sendMessage}`;
+        const testMessage = `@${agentConfig.name} ${PING_MESSAGE}`;
         const testUserAddress = getInboxes(1)[0].accountAddress;
         const conversation = await agent.createGroupWithAddresses([
           agentConfig.address,

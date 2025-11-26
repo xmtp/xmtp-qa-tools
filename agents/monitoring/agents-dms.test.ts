@@ -1,6 +1,7 @@
 import productionAgents from "@agents/agents";
 import {
   AGENT_RESPONSE_TIMEOUT,
+  PING_MESSAGE,
   waitForResponse,
   type AgentConfig,
 } from "@agents/helper";
@@ -42,7 +43,7 @@ describe(testName, () => {
         );
 
         console.log(
-          `📤 Sending "${agentConfig.sendMessage}" to ${agentConfig.name} (${agentConfig.address})`,
+          `📤 Sending "${PING_MESSAGE}" to ${agentConfig.name} (${agentConfig.address})`,
         );
 
         const result = await waitForResponse({
@@ -53,7 +54,7 @@ describe(testName, () => {
           conversationId: conversation.id,
           senderInboxId: agent.client.inboxId,
           timeout: AGENT_RESPONSE_TIMEOUT,
-          messageText: agentConfig.sendMessage,
+          messageText: PING_MESSAGE,
         });
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);

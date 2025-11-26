@@ -1,6 +1,7 @@
 import productionAgents from "@agents/agents";
 import {
   AGENT_RESPONSE_TIMEOUT,
+  PING_MESSAGE,
   waitForResponse,
   type AgentConfig,
 } from "@agents/helper";
@@ -59,7 +60,7 @@ describe(testName, () => {
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,
             timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: "hi",
+            messageText: PING_MESSAGE,
           });
         } catch {
           // Welcome message timeout is acceptable
@@ -77,7 +78,7 @@ describe(testName, () => {
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,
             timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: "hi",
+            messageText: PING_MESSAGE,
           });
         } catch {
           // No response is expected for untagged messages

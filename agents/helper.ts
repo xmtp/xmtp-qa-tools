@@ -60,6 +60,7 @@ export interface WaitForResponseOptions {
   attempt?: number;
   messageFilter?: (message: DecodedMessage) => boolean;
 }
+export const PING_MESSAGE = "ping from QA";
 export const AGENT_RESPONSE_TIMEOUT = 8000; // 10 seconds
 
 /**
