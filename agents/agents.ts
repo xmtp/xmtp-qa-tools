@@ -46,7 +46,7 @@ const agents: AgentConfig[] = [
   {
     name: "jesse",
     address: "0x2f9e2F8FdDEae391720D58D656a8Af0578006eD2",
-    sendMessage: "hi",
+    sendMessage: "@jesse.base.eth",
     networks: ["production"],
     live: true,
   },
