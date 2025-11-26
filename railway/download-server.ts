@@ -150,6 +150,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// Middleware to handle raw binary uploads for /upload endpoint
+app.use(
+  "/upload",
+  express.raw({ type: "*/*", limit: "10gb" }),
+  (req: Request, res: Response, next: NextFunction) => {
+    next();
+  },
+);
+
 app.get("/", async (req: Request, res: Response) => {
   logger.info("Serving landing page with directory contents");
   const snapshot = await getDataDirSnapshot();
@@ -563,6 +572,116 @@ app.delete("/delete", async (req: Request, res: Response) => {
     });
     res.status(500).json({
       error: "Failed to delete file",
+      detail: message,
+    });
+  }
+});
+
+app.post("/upload", async (req: Request, res: Response) => {
+  const fileParam = req.query.filename;
+  let requestedFileRaw: string | undefined;
+  if (typeof fileParam === "string") {
+    requestedFileRaw = fileParam;
+  } else if (Array.isArray(fileParam)) {
+    const [first] = fileParam;
+    requestedFileRaw = typeof first === "string" ? first : undefined;
+  } else {
+    requestedFileRaw = undefined;
+  }
+
+  const descriptionParam = req.query.description;
+  let description: string | undefined;
+  if (typeof descriptionParam === "string") {
+    description = descriptionParam;
+  } else if (Array.isArray(descriptionParam)) {
+    const [first] = descriptionParam;
+    description = typeof first === "string" ? first : undefined;
+  }
+
+  const sanitizedFile = sanitizeRequestedFile(requestedFileRaw);
+  const resolvedPath = path.resolve(dataDir, sanitizedFile);
+
+  logger.info("Upload request received", {
+    requestedFile: requestedFileRaw,
+    sanitizedFile,
+    resolvedPath,
+    description,
+    contentLength: req.headers["content-length"],
+  });
+
+  if (
+    resolvedPath !== dataDir &&
+    !resolvedPath.startsWith(`${dataDir}${path.sep}`)
+  ) {
+    logger.warn("Rejected upload outside of data directory", {
+      resolvedPath,
+      dataDir,
+    });
+    res.status(400).json({
+      error: "Invalid file path",
+      detail: "Requested file must reside inside the data directory",
+    });
+    return;
+  }
+
+  try {
+    // Ensure data directory exists
+    await fs.mkdir(dataDir, { recursive: true });
+
+    // Get the binary data from the request body
+    const fileData = req.body;
+    if (!Buffer.isBuffer(fileData) && !(fileData instanceof Uint8Array)) {
+      logger.warn("Invalid upload data format", {
+        type: typeof fileData,
+        isBuffer: Buffer.isBuffer(fileData),
+      });
+      res.status(400).json({
+        error: "Invalid file data",
+        detail: "Request body must contain binary file data",
+      });
+      return;
+    }
+
+    const buffer = Buffer.isBuffer(fileData) ? fileData : Buffer.from(fileData);
+    const sizeBytes = buffer.length;
+
+    if (sizeBytes === 0) {
+      logger.warn("Empty file upload rejected");
+      res.status(400).json({
+        error: "Empty file",
+        detail: "Cannot upload empty files",
+      });
+      return;
+    }
+
+    // Write the file
+    await fs.writeFile(resolvedPath, buffer);
+
+    const stat = await fs.stat(resolvedPath);
+
+    logger.info("File uploaded successfully", {
+      file: resolvedPath,
+      sizeBytes: stat.size,
+      description,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "File uploaded successfully",
+      filename: sanitizedFile,
+      sizeBytes: stat.size,
+      readableSize: formatBytes(stat.size),
+      description,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : JSON.stringify(error);
+    logger.error("Error uploading file", {
+      error: message,
+      attemptedPath: resolvedPath,
+    });
+    res.status(500).json({
+      error: "Failed to upload file",
       detail: message,
     });
   }
