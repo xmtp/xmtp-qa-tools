@@ -173,13 +173,15 @@ app.get("/", async (req: Request, res: Response) => {
               <td><code>${file.name}</code></td>
               <td>${formatBytes(file.sizeBytes)}</td>
               <td>${new Date(file.updatedAt).toLocaleString()}</td>
-              <td style="display: flex; gap: 0.5rem; align-items: center;">
-                <a class="button-secondary" href="/download?file=${encodeURIComponent(
-                  file.name,
-                )}" download>Download</a>
-                <button class="button-delete" onclick="deleteFile('${encodeURIComponent(
-                  file.name,
-                )}')" title="Delete file">🗑️</button>
+              <td style="white-space: nowrap;">
+                <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                  <a class="button-secondary" href="/download?file=${encodeURIComponent(
+                    file.name,
+                  )}" download>Download</a>
+                  <button class="button-delete" onclick="deleteFile('${encodeURIComponent(
+                    file.name,
+                  )}')" title="Delete file">🗑️</button>
+                </div>
               </td>
             </tr>
           `,
@@ -200,132 +202,176 @@ app.get("/", async (req: Request, res: Response) => {
         <meta charset="utf-8" />
         <title>XMTP QA Tools Backups</title>
         <style>
+          * {
+            box-sizing: border-box;
+          }
           body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
-            background: #0f172a;
-            color: #e2e8f0;
+            padding: 4rem 1.5rem;
+            background: #ffffff;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
           }
           main {
-            background: rgba(15, 23, 42, 0.85);
-            padding: 2.5rem 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-            max-width: 480px;
-            text-align: center;
-            width: min(90vw, 720px);
+            background: #ffffff;
+            padding: 0;
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
           }
           h1 {
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #1d1d1f;
           }
           p {
-            margin-bottom: 2rem;
+            margin: 0 0 3rem 0;
+            font-size: 1.25rem;
             line-height: 1.5;
-          }
-          a.button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.85rem 1.75rem;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            color: #0f172a;
-            font-weight: 600;
-            text-decoration: none;
-            transition: transform 150ms ease, box-shadow 150ms ease;
-            box-shadow: 0 8px 20px rgba(34, 211, 238, 0.35);
-          }
-          a.button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(96, 165, 250, 0.4);
+            color: #86868b;
+            font-weight: 400;
           }
           footer {
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-            color: rgba(226, 232, 240, 0.75);
+            margin-top: 3rem;
+            font-size: 0.875rem;
+            color: #86868b;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
+          }
+          thead {
+            border-bottom: 1px solid #d2d2d7;
           }
           th, td {
-            padding: 0.75rem 1rem;
+            padding: 1rem 1.25rem;
             text-align: left;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.3);
           }
           th {
-            font-weight: 600;
-            letter-spacing: 0.02em;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #86868b;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            color: rgba(226, 232, 240, 0.8);
+            letter-spacing: 0.04em;
+            padding-bottom: 0.75rem;
+          }
+          tbody tr {
+            border-bottom: 1px solid #f5f5f7;
+            transition: background-color 0.2s ease;
+          }
+          tbody tr:hover {
+            background-color: #fafafa;
+          }
+          tbody tr:last-child {
+            border-bottom: none;
+          }
+          td {
+            font-size: 1rem;
+            color: #1d1d1f;
+            vertical-align: middle;
           }
           td code {
-            background: rgba(148, 163, 184, 0.15);
-            padding: 0.1rem 0.4rem;
-            border-radius: 0.4rem;
+            background: #f5f5f7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.875rem;
+            color: #1d1d1f;
           }
           .button-secondary {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.5rem 1.25rem;
-            border-radius: 999px;
-            background: rgba(226, 232, 240, 0.95);
-            color: #0f172a;
-            font-weight: 600;
+            border-radius: 6px;
+            background: #0071e3;
+            color: #ffffff;
+            font-weight: 400;
+            font-size: 0.875rem;
             text-decoration: none;
-            transition: transform 150ms ease, box-shadow 150ms ease;
-            box-shadow: 0 8px 20px rgba(226, 232, 240, 0.25);
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
           }
           .button-secondary:hover {
+            background: #0077ed;
             transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(226, 232, 240, 0.35);
           }
-          .empty {
-            text-align: center;
-            color: rgba(226, 232, 240, 0.65);
-            font-style: italic;
-          }
-          .directory-meta {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: rgba(226, 232, 240, 0.8);
+          .button-secondary:active {
+            transform: translateY(0);
+            background: #0066cc;
           }
           .button-delete {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            border-radius: 0.5rem;
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            background: transparent;
+            color: #ff3b30;
+            border: 1px solid transparent;
             cursor: pointer;
             font-size: 1rem;
-            transition: all 150ms ease;
+            transition: all 0.2s ease;
+            width: 2rem;
+            height: 2rem;
           }
           .button-delete:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: scale(1.05);
+            background: #fff5f5;
+            border-color: #ff3b30;
           }
           .button-delete:active {
+            background: #ffe5e5;
             transform: scale(0.95);
+          }
+          .empty {
+            text-align: center;
+            color: #86868b;
+            font-style: italic;
+            padding: 3rem 1rem;
+          }
+          .directory-meta {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #86868b;
+            line-height: 1.8;
+          }
+          .directory-meta code {
+            background: #f5f5f7;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.8125rem;
+            color: #1d1d1f;
+          }
+          .directory-meta strong {
+            color: #1d1d1f;
+            font-weight: 500;
+          }
+          footer code {
+            background: #f5f5f7;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.8125rem;
+            color: #1d1d1f;
           }
         </style>
       </head>
       <body>
         <main>
-          <h1>Download Backup</h1>
-          <p>Click a download button below to retrieve files from the running service.</p>
+          <h1>XMTP DB Backups</h1>
+          <p>Download files from the running service.</p>
           <div class="directory-meta">
             Monitoring directory: <code>${dataDir}</code><br />
             Default file: <code>${relativeFilePath}</code><br />
