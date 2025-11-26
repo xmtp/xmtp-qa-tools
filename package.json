@@ -14,7 +14,6 @@
     "build": "tsc",
     "c": "yarn format && yarn build && yarn lint ",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
-    "db-manager": "./cli/db-manager --help",
     "db-manager-linux": "./cli/db-manager/db-manager-linux",
     "db-manager-macos": "./cli/db-manager/db-manager-macos",
     "debug": "npx @xmtp/cli debug --help",
