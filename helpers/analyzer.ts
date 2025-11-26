@@ -37,6 +37,8 @@ export const PATTERNS = {
     "xmtp_mls::groups::welcome_sync",
   ],
 
+  FAIL: /FAIL\s+\w+\//,
+
   // Patterns to match error log lines
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/, /WARN/],
 } as const;
@@ -380,9 +382,7 @@ export function extractErrorLogs(testName: string): Set<string> {
  * Extract lines that contain test failures
  */
 export function extractfail_lines(errorLogs: Set<string>): string[] {
-  return Array.from(errorLogs).filter((log) =>
-    log.includes("FAIL  monitoring/"),
-  );
+  return Array.from(errorLogs).filter((log) => PATTERNS.FAIL.test(log));
 }
 
 /**

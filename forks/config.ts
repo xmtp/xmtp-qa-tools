@@ -21,9 +21,9 @@ export const epochRotationOperations = {
   removeMember: true, // removes a random member from the group
 };
 export const otherOperations = {
-  createInstallation: true, // creates a new installation for a random worker
+  createInstallation: false, // creates a new installation for a random worker
   sendMessage: true, // sends a message to the group
-  sync: true, // syncs the group
+  sync: false, // syncs the group
 };
 export const randomInboxIdsCount = 50; // How many inboxIds to use randomly in the add/remove operations
 export const installationCount = 2; // How many installations to use randomly in the createInstallation operations
