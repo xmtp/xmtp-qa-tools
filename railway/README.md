@@ -6,6 +6,27 @@ server to Railway, and accessing the backups listing on port `8080`.
 > [!NOTE]  
 > THis guides assumes you are deploying to Railway in the /app/data folder using this [tutorial](https://docs.xmtp.org/agents/deploy/deploy-agent)
 
+## Upload backups to our own server
+
+To upload a backup (compressing the `/data` folder and optionally `.env` file if it exists):
+
+```bash
+FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \
+tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \
+curl -X POST --data-binary @"$FILENAME" \
+  "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
+```
+
+This command will:
+
+- Use `RAILWAY_SERVICE_NAME` environment variable for the filename (defaults to `data-backup` if not set)
+- Include `.env` in the archive only if it exists
+- Upload the compressed file to the Railway server
+
+## Development
+
+1. Start the download server locally
+
 ## 1. Clone the project
 
 ```bash
@@ -29,41 +50,5 @@ cd xmtp-qa-tools
    ```
 
 3. In the Railway dashboard, open your service settings and set the **Start
-   Command** to `yarn web`. This ensures Railway runs the web server entrypoint
+   Command** to `yarn download-server`. This ensures Railway runs the web server entrypoint
    after each deploy.
-
-4. Deploy the download server:
-
-   ```bash
-   railway up
-   ```
-
-## 3. Access the download page
-
-Once the deployment finishes, open the Railway service URL in your browser:
-
-```
-https://<your-service>.up.railway.app/
-```
-
-You should see the "Download Backup" page with a list of files and their sizes.
-Click any **Download** button to retrieve the selected file.
-
-![Screenshot](./screenshot.png)
-
-## 4. Upload backups
-
-To upload a backup (compressing the `/data` folder and optionally `.env` file if it exists):
-
-```bash
-FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \
-tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \
-curl -X POST --data-binary @"$FILENAME" \
-  "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
-```
-
-This command will:
-
-- Use `RAILWAY_SERVICE_NAME` environment variable for the filename (defaults to `data-backup` if not set)
-- Include `.env` in the archive only if it exists
-- Upload the compressed file to the Railway server
