@@ -16,6 +16,7 @@
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "db-manager-linux": "./cli/db-manager/db-manager-linux",
     "db-manager-macos": "./cli/db-manager/db-manager-macos",
+    "db-manager-query-bench": "chmod +x ./cli/db-manager/db-manager-linux && yarn db-manager-linux /data/production-777f5f2a.db3 --task query-bench",
     "debug": "npx @xmtp/cli debug --help",
     "debug-dm": "tsx agents/debug-dm.ts",
     "download-server": "tsx db-backups/download-server.ts",

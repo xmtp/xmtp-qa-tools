@@ -343,7 +343,19 @@ agent.on("text", async (ctx) => {
     content.trim().startsWith("@kc") ||
     content.trim().startsWith("/kc") ||
     content.trim().startsWith("@key-check.eth");
-  if (isTagged) {
+
+  if (ctx.isDm() && !isTagged) {
+    const welcomeMessage = `### 👋 Welcome to Key-Check Bot isDm: ${ctx.isDm()} isTagged: ${isTagged}
+  
+  Please send \`/kc\` to see the main menu
+  
+  Or directly send:
+  - 📧 An **Ethereum address** to check key packages
+  - 🔑 An **Inbox ID** to check key packages`;
+
+    await ctx.sendText(messageBody1);
+    await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
+  } else if (isTagged) {
     await ctx.sendText(messageBody1);
     await showMenu(ctx, appConfig, "main-menu");
     return;
@@ -403,18 +415,6 @@ agent.on("text", async (ctx) => {
       );
     }
     return;
-  }
-
-  if (ctx.isDm() && !isTagged) {
-    const welcomeMessage = `### 👋 Welcome to Key-Check Bot isDm: ${ctx.isDm()} isTagged: ${isTagged}
-
-Please send \`/kc\` to see the main menu
-
-Or directly send:
-- 📧 An **Ethereum address** to check key packages
-- 🔑 An **Inbox ID** to check key packages`;
-
-    await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
   }
 });
 

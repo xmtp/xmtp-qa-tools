@@ -110,17 +110,8 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Schedule: Scheduled workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - Railway: Multi-region services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - Bots: Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
-  - [`key-check.eth`](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/key-check): key packages
-  - [`hi.xmtp.eth`](https://github.com/xmtp/gm-bot): A bot that replies "gm" to all messages
-- Generate wallet keys and encryption keys for XMTP testing - [see section](./cli/keys.ts)
-  - Creates `.env` file with `XMTP_WALLET_KEY`, `XMTP_DB_ENCRYPTION_KEY`, and `XMTP_ENV`
-  - Usage: `yarn gen:keys [--env <environment>]`
-- Revoke XMTP installations for a given inbox ID - [see section](./cli/revoke.ts)
-  - Can keep specific installations or revoke all except one
-  - Usage: `yarn revoke <inbox-id> [--keep <ids>] [--env <environment>]`
-- XMTP agent assistant for XMTP tasks via Slack or XMTP - [see section](./copilot/CLAUDE.md)
-  - Create groups, send messages, debug addresses, manage permissions, and more
-  - Address: `0x057266a6158a0FC5C9D21b9C1036FBb4af6BD45f`
+- Claude Code ai assistant for XMTP - [see section](./copilot/CLAUDE.md)
+- Railway download db server - [see section](./db-backups/README.md)
 
 ## Development
 
