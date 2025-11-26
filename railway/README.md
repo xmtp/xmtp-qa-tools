@@ -59,7 +59,7 @@ To upload a backup (compressing the `/data` folder and optionally `.env` file if
 FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \
 tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \
 curl -X POST --data-binary @"$FILENAME" \
-  "https://backup-server-production-3285.up.railway.app/upload?description=My-db&filename=$FILENAME"
+  "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
 ```
 
 This command will:
@@ -67,5 +67,3 @@ This command will:
 - Use `RAILWAY_SERVICE_NAME` environment variable for the filename (defaults to `data-backup` if not set)
 - Include `.env` in the archive only if it exists
 - Upload the compressed file to the Railway server
-
-Replace `backup-server-production-3285.up.railway.app` with your Railway service URL.
