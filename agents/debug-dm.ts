@@ -110,6 +110,7 @@ async function sendMessage(
   wait?: boolean,
   timeout?: number,
 ) {
+  //test
   if (wait) {
     const result = await waitForResponse({
       client: {
