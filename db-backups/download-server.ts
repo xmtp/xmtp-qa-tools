@@ -165,6 +165,10 @@ app.get("/", async (req: Request, res: Response) => {
   const files = snapshot.files;
   const totalBytes = snapshot.totalBytes;
   const hasFiles = files.length > 0;
+
+  // Build the upload URL for the copy command
+  const uploadUrl = `${req.protocol}://${req.get("host")}/upload`;
+  const uploadCommand = `FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && curl -X POST --data-binary @"$FILENAME" "${uploadUrl}?description=My-db&filename=$FILENAME"`;
   const downloadCards = hasFiles
     ? files
         .map(
@@ -355,12 +359,108 @@ app.get("/", async (req: Request, res: Response) => {
             font-size: 0.8125rem;
             color: #1d1d1f;
           }
+          .instructions-section {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e5e7;
+          }
+          .instructions-section h2 {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+          }
+          .instruction-block {
+            margin-bottom: 2rem;
+          }
+          .instruction-block:last-child {
+            margin-bottom: 0;
+          }
+          .instruction-block h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: #1d1d1f;
+          }
+          .instruction-description {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.9375rem;
+            color: #86868b;
+            line-height: 1.5;
+          }
+          .instruction-note {
+            margin: 0.75rem 0 0 0;
+            font-size: 0.875rem;
+            color: #86868b;
+            line-height: 1.5;
+          }
+          .code-block-container {
+            position: relative;
+            background: #1d1d1f;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+          }
+          .code-block {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: #f5f5f7;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre;
+          }
+          .code-block code {
+            background: transparent;
+            padding: 0;
+            color: #f5f5f7;
+            font-size: inherit;
+          }
+          .copy-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f5f5f7;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            width: 2rem;
+            height: 2rem;
+            transition: all 0.2s ease;
+          }
+          .copy-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+          }
+          .copy-button:active {
+            background: rgba(255, 255, 255, 0.15);
+          }
+          .copy-button.copied {
+            background: #30d158;
+            border-color: #30d158;
+            color: #ffffff;
+          }
+          .copy-button svg {
+            width: 16px;
+            height: 16px;
+          }
         </style>
       </head>
       <body>
         <main>
           <h1>XMTP DB Backups</h1>
           <p>Download files from the running service.</p>
+          
+       
           <div class="directory-meta">
             Monitoring directory: <code>${dataDir}</code><br />
             Default file: <code>${relativeFilePath}</code><br />
@@ -379,7 +479,26 @@ app.get("/", async (req: Request, res: Response) => {
               ${downloadCards}
             </tbody>
           </table>
-          <footer>Logged service path: <code>${relativeFilePath}</code></footer>
+             <div class="instructions-section">
+            <h2>How to Use</h2>
+            <div class="instruction-block">
+              <h3>Upload a Backup</h3>
+              <p class="instruction-description">Compress your <code>/data</code> folder and upload it:</p>
+              <div class="code-block-container">
+                <button class="copy-button" onclick="copyToClipboard(this, ${JSON.stringify(uploadCommand)})" title="Copy command">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 3h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+                <pre class="code-block"><code>FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \\
+tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \\
+curl -X POST --data-binary @"$FILENAME" \\
+  "${uploadUrl}?description=My-db&filename=$FILENAME"</code></pre>
+              </div>
+              <p class="instruction-note">This command will create a compressed archive and upload it to this server.</p>
+            </div>
+          </div>
         </main>
         <script>
           async function deleteFile(filename) {
@@ -398,6 +517,21 @@ app.get("/", async (req: Request, res: Response) => {
               }
             } catch (error) {
               alert('Error deleting file: ' + error.message);
+            }
+          }
+          
+          async function copyToClipboard(button, text) {
+            try {
+              await navigator.clipboard.writeText(text);
+              const originalHTML = button.innerHTML;
+              button.classList.add('copied');
+              button.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M13 4L6 11L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+              setTimeout(() => {
+                button.classList.remove('copied');
+                button.innerHTML = originalHTML;
+              }, 2000);
+            } catch (error) {
+              alert('Failed to copy: ' + error.message);
             }
           }
         </script>
