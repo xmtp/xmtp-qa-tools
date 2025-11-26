@@ -46,7 +46,24 @@ Once the deployment finishes, open the Railway service URL in your browser:
 https://<your-service>.up.railway.app/
 ```
 
-You should see the “Download Backup” page with a list of files and their sizes.
+You should see the "Download Backup" page with a list of files and their sizes.
 Click any **Download** button to retrieve the selected file.
 
 ![Screenshot](./screenshot.png)
+
+## 4. Upload backups
+
+To upload a backup (compressing the `/data` folder and optionally `.env` file if it exists):
+
+```bash
+FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \
+tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \
+curl -X POST --data-binary @"$FILENAME" \
+  "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
+```
+
+This command will:
+
+- Use `RAILWAY_SERVICE_NAME` environment variable for the filename (defaults to `data-backup` if not set)
+- Include `.env` in the archive only if it exists
+- Upload the compressed file to the Railway server

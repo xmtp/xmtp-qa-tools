@@ -110,13 +110,15 @@ async function sendMessage(
   wait?: boolean,
   timeout?: number,
 ) {
+  //test
   if (wait) {
     const result = await waitForResponse({
       client: {
         conversations: {
           streamAllMessages: () =>
-            //@ts-expect-error - TODO: fix this
-            agent.client.conversations.streamAllMessages(),
+            agent.client.conversations.streamAllMessages() as Promise<
+              AsyncIterable<DecodedMessage>
+            >,
         },
         inboxId: agent.client.inboxId,
       },

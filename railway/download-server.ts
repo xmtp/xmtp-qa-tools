@@ -164,9 +164,14 @@ app.get("/", async (req: Request, res: Response) => {
               <td><code>${file.name}</code></td>
               <td>${formatBytes(file.sizeBytes)}</td>
               <td>${new Date(file.updatedAt).toLocaleString()}</td>
-              <td><a class="button-secondary" href="/download?file=${encodeURIComponent(
-                file.name,
-              )}" download>Download</a></td>
+              <td style="display: flex; gap: 0.5rem; align-items: center;">
+                <a class="button-secondary" href="/download?file=${encodeURIComponent(
+                  file.name,
+                )}" download>Download</a>
+                <button class="button-delete" onclick="deleteFile('${encodeURIComponent(
+                  file.name,
+                )}')" title="Delete file">🗑️</button>
+              </td>
             </tr>
           `,
         )
@@ -286,6 +291,26 @@ app.get("/", async (req: Request, res: Response) => {
             font-size: 0.9rem;
             color: rgba(226, 232, 240, 0.8);
           }
+          .button-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 150ms ease;
+          }
+          .button-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.05);
+          }
+          .button-delete:active {
+            transform: scale(0.95);
+          }
         </style>
       </head>
       <body>
@@ -312,6 +337,26 @@ app.get("/", async (req: Request, res: Response) => {
           </table>
           <footer>Logged service path: <code>${relativeFilePath}</code></footer>
         </main>
+        <script>
+          async function deleteFile(filename) {
+            if (!confirm('Are you sure you want to delete "' + decodeURIComponent(filename) + '"? This action cannot be undone.')) {
+              return;
+            }
+            try {
+              const response = await fetch('/delete?file=' + encodeURIComponent(filename), {
+                method: 'DELETE'
+              });
+              if (response.ok) {
+                location.reload();
+              } else {
+                const error = await response.json();
+                alert('Error deleting file: ' + (error.detail || error.error || 'Unknown error'));
+              }
+            } catch (error) {
+              alert('Error deleting file: ' + error.message);
+            }
+          }
+        </script>
       </body>
     </html>
   `);
@@ -442,6 +487,82 @@ app.get("/download", async (req: Request, res: Response) => {
     res.status(404).json({
       error: "Backup file not found",
       path: resolvedPath,
+      detail: message,
+    });
+  }
+});
+
+app.delete("/delete", async (req: Request, res: Response) => {
+  const fileParam = req.query.file;
+  let requestedFileRaw: string | undefined;
+  if (typeof fileParam === "string") {
+    requestedFileRaw = fileParam;
+  } else if (Array.isArray(fileParam)) {
+    const [first] = fileParam;
+    requestedFileRaw = typeof first === "string" ? first : undefined;
+  } else {
+    requestedFileRaw = undefined;
+  }
+  const sanitizedFile = sanitizeRequestedFile(requestedFileRaw);
+  const resolvedPath = path.resolve(dataDir, sanitizedFile);
+
+  logger.info("Delete request received", {
+    requestedFile: requestedFileRaw,
+    sanitizedFile,
+    resolvedPath,
+  });
+
+  if (
+    resolvedPath !== dataDir &&
+    !resolvedPath.startsWith(`${dataDir}${path.sep}`)
+  ) {
+    logger.warn("Rejected delete outside of data directory", {
+      resolvedPath,
+      dataDir,
+    });
+    res.status(400).json({
+      error: "Invalid file path",
+      detail: "Requested file must reside inside the data directory",
+    });
+    return;
+  }
+
+  try {
+    const stat = await fs.stat(resolvedPath);
+
+    if (!stat.isFile()) {
+      logger.warn("Requested path is not a file", {
+        resolvedPath,
+        isDirectory: stat.isDirectory(),
+      });
+      res.status(404).json({
+        error: "Requested path is not a file",
+        path: resolvedPath,
+      });
+      return;
+    }
+
+    await fs.unlink(resolvedPath);
+
+    logger.info("File deleted successfully", {
+      file: resolvedPath,
+      sizeBytes: stat.size,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "File deleted successfully",
+      filename: sanitizedFile,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : JSON.stringify(error);
+    logger.error("Error deleting file", {
+      error: message,
+      attemptedPath: resolvedPath,
+    });
+    res.status(500).json({
+      error: "Failed to delete file",
       detail: message,
     });
   }
