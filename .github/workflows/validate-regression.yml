@@ -44,7 +44,8 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
 
       - name: Install dependencies
         run: yarn install
