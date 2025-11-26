@@ -46,7 +46,18 @@ Once the deployment finishes, open the Railway service URL in your browser:
 https://<your-service>.up.railway.app/
 ```
 
-You should see the “Download Backup” page with a list of files and their sizes.
+You should see the "Download Backup" page with a list of files and their sizes.
 Click any **Download** button to retrieve the selected file.
 
 ![Screenshot](./screenshot.png)
+
+## 4. Upload backups
+
+To upload a backup (compressing the `/data` folder and optionally `.env` file if it exists):
+
+```bash
+tar -czf data-backup.tar.gz ./data $([ -f .env ] && echo .env) && curl -X POST --data-binary @data-backup.tar.gz \
+  "https://backup-server-production-3285.up.railway.app/upload?description=My-db&filename=data-backup.tar.gz"
+```
+
+This command will include `.env` in the archive only if it exists. Replace `backup-server-production-3285.up.railway.app` with your Railway service URL.
