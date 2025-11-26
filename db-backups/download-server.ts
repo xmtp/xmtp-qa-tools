@@ -175,12 +175,20 @@ app.get("/", async (req: Request, res: Response) => {
               <td>${new Date(file.updatedAt).toLocaleString()}</td>
               <td style="white-space: nowrap;">
                 <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
-                  <a class="button-secondary" href="/download?file=${encodeURIComponent(
+                  <a class="button-icon" href="/download?file=${encodeURIComponent(
                     file.name,
-                  )}" download>Download</a>
-                  <button class="button-delete" onclick="deleteFile('${encodeURIComponent(
+                  )}" download title="Download file">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 2v8M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                  <button class="button-icon" onclick="deleteFile('${encodeURIComponent(
                     file.name,
-                  )}')" title="Delete file">🗑️</button>
+                  )}')" title="Delete file">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 4h12M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 7v5M10 7v5M3 4l1 9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -288,51 +296,32 @@ app.get("/", async (req: Request, res: Response) => {
             font-size: 0.875rem;
             color: #1d1d1f;
           }
-          .button-secondary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1.25rem;
-            border-radius: 6px;
-            background: #0071e3;
-            color: #ffffff;
-            font-weight: 400;
-            font-size: 0.875rem;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-          }
-          .button-secondary:hover {
-            background: #0077ed;
-            transform: translateY(-1px);
-          }
-          .button-secondary:active {
-            transform: translateY(0);
-            background: #0066cc;
-          }
-          .button-delete {
+          .button-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
             border-radius: 6px;
-            background: transparent;
-            color: #ff3b30;
-            border: 1px solid transparent;
+            background: rgb(162, 36, 15);
+            color: #ffffff;
+            border: none;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
             width: 2rem;
             height: 2rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
           }
-          .button-delete:hover {
-            background: #fff5f5;
-            border-color: #ff3b30;
+          .button-icon:hover {
+            background: rgb(180, 40, 17);
+            transform: translateY(-1px);
           }
-          .button-delete:active {
-            background: #ffe5e5;
-            transform: scale(0.95);
+          .button-icon:active {
+            background: rgb(140, 31, 13);
+            transform: translateY(0);
+          }
+          .button-icon svg {
+            width: 16px;
+            height: 16px;
           }
           .empty {
             text-align: center;
