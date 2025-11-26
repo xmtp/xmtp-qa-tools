@@ -208,7 +208,7 @@ app.get("/", async (req: Request, res: Response) => {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
-        <title>XMTP QA Tools Backups</title>
+        <title>XMTP DB Backups</title>
         <style>
           * {
             box-sizing: border-box;
