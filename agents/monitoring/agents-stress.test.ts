@@ -1,4 +1,5 @@
 import productionAgents from "@agents/agents";
+import { PING_MESSAGE } from "@agents/helper";
 import { Agent, type XmtpEnv } from "@agents/versions";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
@@ -51,7 +52,7 @@ describe(testName, () => {
           const group = groups[i];
           for (let j = 0; j < messagesPerGroup; j++) {
             await group.send(
-              `Stress test message ${j + 1}/${messagesPerGroup} to group ${i + 1}`,
+              `${PING_MESSAGE} - ${j + 1}/${messagesPerGroup} to group ${i + 1}`,
             );
           }
           console.log(

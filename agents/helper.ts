@@ -8,10 +8,6 @@ export interface AgentConfig {
   name: string;
   /** Ethereum address */
   address: string;
-  /** Message to send for testing */
-  sendMessage: string;
-  /** Expected response messages (optional) */
-  expectedMessage?: string[];
   /** Networks the agent supports */
   networks: string[];
   /**  the agent is production */
@@ -64,6 +60,7 @@ export interface WaitForResponseOptions {
   attempt?: number;
   messageFilter?: (message: DecodedMessage) => boolean;
 }
+export const PING_MESSAGE = "ping from QA";
 export const AGENT_RESPONSE_TIMEOUT = 8000; // 10 seconds
 
 /**
