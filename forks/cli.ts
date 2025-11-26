@@ -80,8 +80,8 @@ function runForkTest(
     });
 
     return true;
-  } catch (e) {
-    console.error("Error running fork test", e);
+  } catch (e: any) {
+    console.error(`Error running fork test: ${e?.message}`);
     return false;
     // Test may fail if forks are detected, that's expected
     // We'll analyze the logs afterward

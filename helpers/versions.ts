@@ -33,18 +33,6 @@ import {
   Dm as Dm426,
   Group as Group426,
 } from "@xmtp/node-sdk-4.2.6";
-// import {
-//   Client as Client430Dev,
-//   Conversation as Conversation430Dev,
-//   Dm as Dm430Dev,
-//   Group as Group430Dev,
-// } from "@xmtp/node-sdk-4.3.0-dev";
-// import {
-//   Client as Client440,
-//   Conversation as Conversation440,
-//   Dm as Dm440,
-//   Group as Group440,
-// } from "@xmtp/node-sdk-4.4.0";
 import {
   Client as Client450,
   Conversation as Conversation450,
@@ -74,22 +62,13 @@ export {
 
 // Node SDK version list
 export const VersionList = [
-  // {
-  //   Client: Client40Dev,
-  //   Conversation: Conversation430Dev,
-  //   Dm: Dm430Dev,
-  //   Group: Group430Dev,
-  //   nodeSDK: "4.3.0",
-  //   nodeBindings: "1.7.0",
-  //   auto: true,
-  // },
   {
     Client: Client450,
     Conversation: Conversation450,
     Dm: Dm450,
     Group: Group450,
     nodeSDK: "4.5.0",
-    nodeBindings: "1.6.1",
+    nodeBindings: "1.6.2",
     auto: true,
   },
   {
