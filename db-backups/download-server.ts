@@ -150,6 +150,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// Middleware to handle raw binary uploads for /upload endpoint
+app.use(
+  "/upload",
+  express.raw({ type: "*/*", limit: "10gb" }),
+  (req: Request, res: Response, next: NextFunction) => {
+    next();
+  },
+);
+
 app.get("/", async (req: Request, res: Response) => {
   logger.info("Serving landing page with directory contents");
   const snapshot = await getDataDirSnapshot();
@@ -164,13 +173,23 @@ app.get("/", async (req: Request, res: Response) => {
               <td><code>${file.name}</code></td>
               <td>${formatBytes(file.sizeBytes)}</td>
               <td>${new Date(file.updatedAt).toLocaleString()}</td>
-              <td style="display: flex; gap: 0.5rem; align-items: center;">
-                <a class="button-secondary" href="/download?file=${encodeURIComponent(
-                  file.name,
-                )}" download>Download</a>
-                <button class="button-delete" onclick="deleteFile('${encodeURIComponent(
-                  file.name,
-                )}')" title="Delete file">🗑️</button>
+              <td style="white-space: nowrap;">
+                <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                  <a class="button-icon" href="/download?file=${encodeURIComponent(
+                    file.name,
+                  )}" download title="Download file">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 2v8M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                  <button class="button-icon" onclick="deleteFile('${encodeURIComponent(
+                    file.name,
+                  )}')" title="Delete file">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 4h12M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 7v5M10 7v5M3 4l1 9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
               </td>
             </tr>
           `,
@@ -189,134 +208,159 @@ app.get("/", async (req: Request, res: Response) => {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
-        <title>XMTP QA Tools Backups</title>
+        <title>XMTP DB Backups</title>
         <style>
+          * {
+            box-sizing: border-box;
+          }
           body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
-            background: #0f172a;
-            color: #e2e8f0;
+            padding: 4rem 1.5rem;
+            background: #ffffff;
+            color: #1d1d1f;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
           }
           main {
-            background: rgba(15, 23, 42, 0.85);
-            padding: 2.5rem 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
-            max-width: 480px;
-            text-align: center;
-            width: min(90vw, 720px);
+            background: #ffffff;
+            padding: 0;
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
           }
           h1 {
-            margin-top: 0;
-            margin-bottom: 1rem;
-            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #1d1d1f;
           }
           p {
-            margin-bottom: 2rem;
+            margin: 0 0 3rem 0;
+            font-size: 1.25rem;
             line-height: 1.5;
-          }
-          a.button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.85rem 1.75rem;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #60a5fa, #22d3ee);
-            color: #0f172a;
-            font-weight: 600;
-            text-decoration: none;
-            transition: transform 150ms ease, box-shadow 150ms ease;
-            box-shadow: 0 8px 20px rgba(34, 211, 238, 0.35);
-          }
-          a.button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(96, 165, 250, 0.4);
+            color: #86868b;
+            font-weight: 400;
           }
           footer {
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-            color: rgba(226, 232, 240, 0.75);
+            margin-top: 3rem;
+            font-size: 0.875rem;
+            color: #86868b;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
+          }
+          thead {
+            border-bottom: 1px solid #d2d2d7;
           }
           th, td {
-            padding: 0.75rem 1rem;
+            padding: 1rem 1.25rem;
             text-align: left;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.3);
           }
           th {
-            font-weight: 600;
-            letter-spacing: 0.02em;
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #86868b;
             text-transform: uppercase;
-            font-size: 0.75rem;
-            color: rgba(226, 232, 240, 0.8);
+            letter-spacing: 0.04em;
+            padding-bottom: 0.75rem;
+          }
+          tbody tr {
+            border-bottom: 1px solid #f5f5f7;
+            transition: background-color 0.2s ease;
+          }
+          tbody tr:hover {
+            background-color: #fafafa;
+          }
+          tbody tr:last-child {
+            border-bottom: none;
+          }
+          td {
+            font-size: 1rem;
+            color: #1d1d1f;
+            vertical-align: middle;
           }
           td code {
-            background: rgba(148, 163, 184, 0.15);
-            padding: 0.1rem 0.4rem;
-            border-radius: 0.4rem;
+            background: #f5f5f7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.875rem;
+            color: #1d1d1f;
           }
-          .button-secondary {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1.25rem;
-            border-radius: 999px;
-            background: rgba(226, 232, 240, 0.95);
-            color: #0f172a;
-            font-weight: 600;
-            text-decoration: none;
-            transition: transform 150ms ease, box-shadow 150ms ease;
-            box-shadow: 0 8px 20px rgba(226, 232, 240, 0.25);
-          }
-          .button-secondary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(226, 232, 240, 0.35);
-          }
-          .empty {
-            text-align: center;
-            color: rgba(226, 232, 240, 0.65);
-            font-style: italic;
-          }
-          .directory-meta {
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            color: rgba(226, 232, 240, 0.8);
-          }
-          .button-delete {
+          .button-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            border-radius: 0.5rem;
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 6px;
+            background: rgb(162, 36, 15);
+            color: #ffffff;
+            border: none;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 150ms ease;
+            width: 2rem;
+            height: 2rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
           }
-          .button-delete:hover {
-            background: rgba(239, 68, 68, 0.3);
-            transform: scale(1.05);
+          .button-icon:hover {
+            background: rgb(180, 40, 17);
+            transform: translateY(-1px);
           }
-          .button-delete:active {
-            transform: scale(0.95);
+          .button-icon:active {
+            background: rgb(140, 31, 13);
+            transform: translateY(0);
+          }
+          .button-icon svg {
+            width: 16px;
+            height: 16px;
+          }
+          .empty {
+            text-align: center;
+            color: #86868b;
+            font-style: italic;
+            padding: 3rem 1rem;
+          }
+          .directory-meta {
+            margin-top: 2rem;
+            font-size: 0.875rem;
+            color: #86868b;
+            line-height: 1.8;
+          }
+          .directory-meta code {
+            background: #f5f5f7;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.8125rem;
+            color: #1d1d1f;
+          }
+          .directory-meta strong {
+            color: #1d1d1f;
+            font-weight: 500;
+          }
+          footer code {
+            background: #f5f5f7;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
+            font-size: 0.8125rem;
+            color: #1d1d1f;
           }
         </style>
       </head>
       <body>
         <main>
-          <h1>Download Backup</h1>
-          <p>Click a download button below to retrieve files from the running service.</p>
+          <h1>XMTP DB Backups</h1>
+          <p>Download files from the running service.</p>
           <div class="directory-meta">
             Monitoring directory: <code>${dataDir}</code><br />
             Default file: <code>${relativeFilePath}</code><br />
@@ -563,6 +607,116 @@ app.delete("/delete", async (req: Request, res: Response) => {
     });
     res.status(500).json({
       error: "Failed to delete file",
+      detail: message,
+    });
+  }
+});
+
+app.post("/upload", async (req: Request, res: Response) => {
+  const fileParam = req.query.filename;
+  let requestedFileRaw: string | undefined;
+  if (typeof fileParam === "string") {
+    requestedFileRaw = fileParam;
+  } else if (Array.isArray(fileParam)) {
+    const [first] = fileParam;
+    requestedFileRaw = typeof first === "string" ? first : undefined;
+  } else {
+    requestedFileRaw = undefined;
+  }
+
+  const descriptionParam = req.query.description;
+  let description: string | undefined;
+  if (typeof descriptionParam === "string") {
+    description = descriptionParam;
+  } else if (Array.isArray(descriptionParam)) {
+    const [first] = descriptionParam;
+    description = typeof first === "string" ? first : undefined;
+  }
+
+  const sanitizedFile = sanitizeRequestedFile(requestedFileRaw);
+  const resolvedPath = path.resolve(dataDir, sanitizedFile);
+
+  logger.info("Upload request received", {
+    requestedFile: requestedFileRaw,
+    sanitizedFile,
+    resolvedPath,
+    description,
+    contentLength: req.headers["content-length"],
+  });
+
+  if (
+    resolvedPath !== dataDir &&
+    !resolvedPath.startsWith(`${dataDir}${path.sep}`)
+  ) {
+    logger.warn("Rejected upload outside of data directory", {
+      resolvedPath,
+      dataDir,
+    });
+    res.status(400).json({
+      error: "Invalid file path",
+      detail: "Requested file must reside inside the data directory",
+    });
+    return;
+  }
+
+  try {
+    // Ensure data directory exists
+    await fs.mkdir(dataDir, { recursive: true });
+
+    // Get the binary data from the request body
+    const fileData = req.body;
+    if (!Buffer.isBuffer(fileData) && !(fileData instanceof Uint8Array)) {
+      logger.warn("Invalid upload data format", {
+        type: typeof fileData,
+        isBuffer: Buffer.isBuffer(fileData),
+      });
+      res.status(400).json({
+        error: "Invalid file data",
+        detail: "Request body must contain binary file data",
+      });
+      return;
+    }
+
+    const buffer = Buffer.isBuffer(fileData) ? fileData : Buffer.from(fileData);
+    const sizeBytes = buffer.length;
+
+    if (sizeBytes === 0) {
+      logger.warn("Empty file upload rejected");
+      res.status(400).json({
+        error: "Empty file",
+        detail: "Cannot upload empty files",
+      });
+      return;
+    }
+
+    // Write the file
+    await fs.writeFile(resolvedPath, buffer);
+
+    const stat = await fs.stat(resolvedPath);
+
+    logger.info("File uploaded successfully", {
+      file: resolvedPath,
+      sizeBytes: stat.size,
+      description,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "File uploaded successfully",
+      filename: sanitizedFile,
+      sizeBytes: stat.size,
+      readableSize: formatBytes(stat.size),
+      description,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : JSON.stringify(error);
+    logger.error("Error uploading file", {
+      error: message,
+      attemptedPath: resolvedPath,
+    });
+    res.status(500).json({
+      error: "Failed to upload file",
       detail: message,
     });
   }
