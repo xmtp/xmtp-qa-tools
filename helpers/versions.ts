@@ -172,11 +172,6 @@ export const regressionClient = async (
   const loggingLevel = (process.env.LOGGING_LEVEL ||
     "warn") as unknown as LogLevel;
   const apiUrl = apiURL;
-  if (apiUrl) {
-    console.debug(
-      `Creating API client with: SDK version: ${nodeBindings} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
-    );
-  }
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
@@ -193,18 +188,41 @@ export const regressionClient = async (
 
   const signer = createSigner(walletKey);
 
+  // D14N support: For bindings >= 1.6, use d14nHost parameter instead of apiUrl
+  // Parse version carefully to handle rc/dev versions
+  const versionNumber = parseFloat(nodeBindings.split('-')[0]);
+  const supportsD14N = versionNumber >= 1.6;
+
+  const clientOptions: any = {
+    dbEncryptionKey,
+    dbPath,
+    env: env as unknown as XmtpEnv,
+    loggingLevel,
+    appVersion: APP_VERSION,
+    disableDeviceSync: true,
+    codecs: [new ReactionCodec(), new ReplyCodec()],
+  };
+
+  // Add D14N or legacy API URL parameter based on SDK version
+  if (supportsD14N && apiUrl) {
+    clientOptions.d14nHost = apiUrl; // For 1.6+: Use d14nHost for D14N gateway
+    console.log(
+      `[SDK ${nodeBindings}] Using D14N mode with gateway: ${apiUrl}`,
+    );
+  } else if (apiUrl) {
+    clientOptions.apiUrl = apiUrl; // For older versions: Use apiUrl
+    console.log(
+      `[SDK ${nodeBindings}] Using legacy apiUrl override: ${apiUrl}`,
+    );
+  } else {
+    console.log(
+      `[SDK ${nodeBindings}] Using default network endpoint for env: ${env}`,
+    );
+  }
+
   try {
     // @ts-expect-error - TODO: fix this
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env: env as unknown as XmtpEnv,
-      loggingLevel,
-      apiUrl,
-      appVersion: APP_VERSION,
-      disableDeviceSync: true,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
+    client = await ClientClass.create(signer, clientOptions);
   } catch (error) {
     // If database file is corrupted, try using a different path
     if (
@@ -222,17 +240,31 @@ export const regressionClient = async (
       console.debug(`Using alternative database path: ${alternativeDbPath}`);
 
       // Try to create the client with the alternative path
-      // @ts-expect-error - TODO: fix this
-      client = await ClientClass.create(signer, {
+      const retryOptions: any = {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
         env,
         loggingLevel,
-        apiUrl,
         appVersion: APP_VERSION,
         disableDeviceSync: true,
         codecs: [new ReactionCodec(), new ReplyCodec()],
-      });
+      };
+
+      // Add D14N or legacy API URL parameter for retry
+      if (supportsD14N && apiUrl) {
+        retryOptions.d14nHost = apiUrl;
+        console.log(
+          `[SDK ${nodeBindings}] Retry: Using D14N mode with gateway: ${apiUrl}`,
+        );
+      } else if (apiUrl) {
+        retryOptions.apiUrl = apiUrl;
+        console.log(
+          `[SDK ${nodeBindings}] Retry: Using legacy apiUrl override: ${apiUrl}`,
+        );
+      }
+
+      // @ts-expect-error - TODO: fix this
+      client = await ClientClass.create(signer, retryOptions);
     } else {
       throw error;
     }
