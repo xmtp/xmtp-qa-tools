@@ -1696,7 +1696,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-1.6.2@npm:@xmtp/node-bindings@1.6.2":
+"@xmtp/node-bindings-1.6.2@npm:@xmtp/node-bindings@1.6.2, @xmtp/node-bindings@npm:1.6.2":
   version: 1.6.2
   resolution: "@xmtp/node-bindings@npm:1.6.2"
   checksum: 10/6b9a6132217e8758945cdbf50a6a55d07097ebaa8a9109762d8ec4fb720c0c31bed639164c83be56667bccf2fe7d8f9b46113bdbb1313b146638da4a84ad2a5e
@@ -1728,13 +1728,6 @@ __metadata:
   version: 1.3.5
   resolution: "@xmtp/node-bindings@npm:1.3.5"
   checksum: 10/7cfdb95de5ec511961a2754c3aca3a96c68e6fababc754aa359f8b222cac20a86689010ccc28e4f5c175cbd87f7d3a01083289993fbe8e1ff8ffb4751b645508
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings@npm:1.6.2-rc1":
-  version: 1.6.2-rc1
-  resolution: "@xmtp/node-bindings@npm:1.6.2-rc1"
-  checksum: 10/42e4995b532883d7ee35e05f8caa262f2556bd9be3cd2288eff6cf7217c087091f0828374c1d7814b986f62a7e693a986264eaf82296867ff3a91c56ad0ddd09
   languageName: node
   linkType: hard
 
@@ -1846,15 +1839,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.5.0@npm:@xmtp/node-sdk@4.5.0-rc2":
-  version: 4.5.0-rc2
-  resolution: "@xmtp/node-sdk@npm:4.5.0-rc2"
+"@xmtp/node-sdk-4.5.0@npm:@xmtp/node-sdk@4.5.0-rc3":
+  version: 4.5.0-rc3
+  resolution: "@xmtp/node-sdk@npm:4.5.0-rc3"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.2"
     "@xmtp/content-type-primitives": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.6.2-rc1"
-  checksum: 10/654ef67fd8a5cbff6d5077bb8cff89f1388e1dda28247610fc26b4f357f7352feac62de9154becd4ab822c2d28bc24482a9a71a036c39fae5517f6391ba05315
+    "@xmtp/node-bindings": "npm:1.6.2"
+  checksum: 10/6119459fafb8753d7410035419c403bd6fe66c9514182cefdc831ac2d29b56362ce0177da6f9960920f63a577dadaf13d0f2d82bdd0a92f5cd5b1d4952a5dd63
   languageName: node
   linkType: hard
 
@@ -5394,7 +5387,7 @@ __metadata:
     "@xmtp/node-sdk-4.2.6": "npm:@xmtp/node-sdk@4.2.6"
     "@xmtp/node-sdk-4.3.0-dev": "npm:@xmtp/node-sdk@4.3.0-dev.395f798c"
     "@xmtp/node-sdk-4.4.0": "npm:@xmtp/node-sdk@4.4.0"
-    "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0-rc2"
+    "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0-rc3"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.5.0"
