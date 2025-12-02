@@ -115,5 +115,11 @@ const agents: AgentConfig[] = [
     networks: ["dev", "production"],
     live: false,
   },
+  {
+    name: "xmtp-docs",
+    address: "0x212906fdbdb70771461e6cb3376a740132e56b14",
+    networks: ["production"],
+    live: false,
+  },
 ];
 export default agents;
