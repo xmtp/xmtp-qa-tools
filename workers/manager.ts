@@ -153,8 +153,9 @@ export class WorkerManager implements IWorkerManager {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
       await Promise.all(
-        groups.flat().map(async (g: Group) => {
-          const debugInfo = await g.debugInfo();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        groups.flat().map(async (g: any) => {
+          const debugInfo = await (g as Group).debugInfo();
           if (debugInfo.maybeForked || debugInfo.isCommitLogForked) {
             throw new Error(
               `${forkDetectedString} Stopping test, group id ${g.id} may have forked`,
