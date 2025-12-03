@@ -161,6 +161,15 @@ export const checkNoNameContains = (versionList: typeof VersionList) => {
   }
 };
 
+/**
+ * Check if D14N mode is enabled via environment variable
+ * Set XMTP_D14N=true to enable D14N mode
+ */
+export const isD14NEnabled = (): boolean => {
+  const d14nEnv = process.env.XMTP_D14N;
+  return d14nEnv === "true" || d14nEnv === "1";
+};
+
 export const regressionClient = async (
   nodeBindings: string,
   walletKey: `0x${string}`,
@@ -171,7 +180,6 @@ export const regressionClient = async (
 ): Promise<any> => {
   const loggingLevel = (process.env.LOGGING_LEVEL ||
     "warn") as unknown as LogLevel;
-  const apiUrl = apiURL;
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
@@ -188,10 +196,9 @@ export const regressionClient = async (
 
   const signer = createSigner(walletKey);
 
-  // D14N support: For bindings >= 1.6, use d14nHost parameter instead of apiUrl
-  // Parse version carefully to handle rc/dev versions
-  const versionNumber = parseFloat(nodeBindings.split('-')[0]);
-  const supportsD14N = versionNumber >= 1.6;
+  // Check if D14N mode is explicitly enabled
+  const d14nEnabled = isD14NEnabled();
+  const apiUrl = apiURL || process.env.XMTP_API_URL;
 
   const clientOptions: any = {
     dbEncryptionKey,
@@ -203,21 +210,21 @@ export const regressionClient = async (
     codecs: [new ReactionCodec(), new ReplyCodec()],
   };
 
-  // Add D14N or legacy API URL parameter based on SDK version
-  if (supportsD14N && apiUrl) {
-    clientOptions.d14nHost = apiUrl; // For 1.6+: Use d14nHost for D14N gateway
-    console.log(
-      `[SDK ${nodeBindings}] Using D14N mode with gateway: ${apiUrl}`,
-    );
+  // D14N mode: Use d14nHost parameter
+  // V3 mode: Use apiUrl parameter (or default endpoints)
+  if (d14nEnabled) {
+    if (!apiUrl) {
+      throw new Error(
+        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N gateway URL",
+      );
+    }
+    clientOptions.d14nHost = apiUrl;
+    console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
   } else if (apiUrl) {
-    clientOptions.apiUrl = apiUrl; // For older versions: Use apiUrl
-    console.log(
-      `[SDK ${nodeBindings}] Using legacy apiUrl override: ${apiUrl}`,
-    );
+    clientOptions.apiUrl = apiUrl;
+    console.log(`[V3] Using custom API URL: ${apiUrl}`);
   } else {
-    console.log(
-      `[SDK ${nodeBindings}] Using default network endpoint for env: ${env}`,
-    );
+    console.log(`[V3] Using default network endpoint for env: ${env}`);
   }
 
   try {
@@ -250,17 +257,10 @@ export const regressionClient = async (
         codecs: [new ReactionCodec(), new ReplyCodec()],
       };
 
-      // Add D14N or legacy API URL parameter for retry
-      if (supportsD14N && apiUrl) {
+      if (d14nEnabled && apiUrl) {
         retryOptions.d14nHost = apiUrl;
-        console.log(
-          `[SDK ${nodeBindings}] Retry: Using D14N mode with gateway: ${apiUrl}`,
-        );
       } else if (apiUrl) {
         retryOptions.apiUrl = apiUrl;
-        console.log(
-          `[SDK ${nodeBindings}] Retry: Using legacy apiUrl override: ${apiUrl}`,
-        );
       }
 
       // @ts-expect-error - TODO: fix this
