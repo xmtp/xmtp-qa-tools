@@ -30,7 +30,7 @@ export async function getMessageBody(ctx: MessageContext, timezone?: string) {
       dateString = ctx.message.sentAt.toISOString();
     }
 
-    const messageBody1 = `replying content: ${messageContent} sent by ${senderAddress} on ${dateString} on converstion ${ctx.conversation.id}`;
+    const messageBody1 = `replying to a message sent by ${senderAddress} on ${dateString} on converstion ${ctx.conversation.id}. Content: "${messageContent}"`;
 
     console.log(messageBody1);
     return messageBody1;
