@@ -5,7 +5,8 @@
  * It manages XMTP clients, distributes load across groups, and tracks metrics.
  */
 
-import { Client, createSigner } from "@xmtp/agent-sdk";
+import { Client } from "@xmtp/node-sdk";
+import { privateKeyToAccount } from "viem/accounts";
 import { readFileSync } from "fs";
 import { join } from "path";
 
@@ -65,22 +66,13 @@ async function getClient(identity: TestIdentity): Promise<Client> {
   if (cached) return cached;
   
   try {
-    const signer = createSigner({
-      key: identity.privateKey as `0x${string}`,
-      account: {
-        address: identity.accountAddress as `0x${string}`,
-      },
-    });
+    const account = privateKeyToAccount(identity.privateKey as `0x${string}`);
     
-    const client = await Client.create(
-      signer,
-      Buffer.from(identity.encryptionKey, "hex"),
-      { 
-        env: config!.config.env as any,
-        // Use a consistent DB path for each identity
-        dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
-      }
-    );
+    const client = await Client.create(account, {
+      env: config!.config.env as any,
+      dbEncryptionKey: Buffer.from(identity.encryptionKey, "hex"),
+      dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
+    });
     
     clients.set(identity.inboxId, client);
     console.log(`[Worker ${process.pid}] Created client for ${identity.accountAddress}`);
@@ -224,4 +216,5 @@ export default {
   beforeScenario,
   afterScenario,
 };
+
 

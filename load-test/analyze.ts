@@ -143,3 +143,4 @@ function analyzeReport(reportPath: string) {
 const reportPath = process.argv[2] || "./report.json";
 analyzeReport(reportPath);
 
+

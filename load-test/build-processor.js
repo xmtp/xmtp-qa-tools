@@ -12,7 +12,7 @@ try {
   // Check if esbuild is available
   const esbuildCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   
-  execSync(`${esbuildCmd} esbuild artillery-processor.ts --bundle --platform=node --format=cjs --outfile=artillery-processor.js --external:@xmtp/agent-sdk --external:@xmtp/content-type-* --external:viem --external:@noble/* --target=node18`, {
+  execSync(`${esbuildCmd} esbuild artillery-processor.ts --bundle --platform=node --format=cjs --outfile=artillery-processor.js --external:@xmtp/node-sdk --external:@xmtp/content-type-* --external:viem --external:@noble/* --target=node18`, {
     stdio: 'inherit',
     shell: true
   });
@@ -27,4 +27,5 @@ try {
   console.error('❌ Build failed:', error.message);
   process.exit(1);
 }
+
 

@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2022",
@@ -10,14 +10,19 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
+    "types": ["node"]
   },
   "include": [
     "*.ts"
   ],
   "exclude": [
     "node_modules",
-    "data"
+    "data",
+    "dist"
   ]
 }
 

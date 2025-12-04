@@ -6,7 +6,8 @@
  * Run with: tsx run-simple.ts
  */
 
-import { Client, createSigner } from "@xmtp/agent-sdk";
+import { Client } from "@xmtp/node-sdk";
+import { privateKeyToAccount } from "viem/accounts";
 import { readFileSync, existsSync } from "fs";
 import { Worker } from "worker_threads";
 import { cpus } from "os";
@@ -64,21 +65,13 @@ async function runLoadTest() {
   
   for (const identity of config.identities) {
     try {
-      const signer = createSigner({
-        key: identity.privateKey as `0x${string}`,
-        account: {
-          address: identity.accountAddress as `0x${string}`,
-        },
-      });
+      const account = privateKeyToAccount(identity.privateKey as `0x${string}`);
       
-      const client = await Client.create(
-        signer,
-        Buffer.from(identity.encryptionKey, "hex"),
-        { 
-          env: config.config.env as any,
-          dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
-        }
-      );
+      const client = await Client.create(account, {
+        env: config.config.env as any,
+        dbEncryptionKey: Buffer.from(identity.encryptionKey, "hex"),
+        dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
+      });
       
       clients.set(identity.inboxId, client);
     } catch (error) {
@@ -175,4 +168,5 @@ runLoadTest().catch(error => {
   console.error("\n❌ Load test failed:", error);
   process.exit(1);
 });
+
 

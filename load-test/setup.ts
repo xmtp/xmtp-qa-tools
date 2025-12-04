@@ -10,7 +10,8 @@
  */
 
 import { Command } from "commander";
-import { Client, createSigner, createUser } from "@xmtp/agent-sdk";
+import { Client } from "@xmtp/node-sdk";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
 
@@ -55,21 +56,22 @@ program
 const options = program.opts();
 
 async function createTestIdentity(env: string): Promise<TestIdentity> {
-  const user = createUser();
-  const signer = createSigner(user);
+  const privateKey = generatePrivateKey();
+  const account = privateKeyToAccount(privateKey);
   
   // Generate encryption key (32 bytes = 64 hex chars)
   const encryptionKey = Array.from({ length: 64 }, () =>
     Math.floor(Math.random() * 16).toString(16)
   ).join("");
   
-  const client = await Client.create(signer, Buffer.from(encryptionKey, "hex"), {
+  const client = await Client.create(account, {
     env: env as any,
+    dbEncryptionKey: Buffer.from(encryptionKey, "hex"),
   });
   
   const identity: TestIdentity = {
-    accountAddress: user.account.address,
-    privateKey: user.key,
+    accountAddress: account.address,
+    privateKey: privateKey,
     encryptionKey,
     inboxId: client.inboxId,
     installationId: client.installationId,
@@ -160,18 +162,12 @@ async function setupLoadTest() {
     const firstMember = identities.find(id => id.inboxId === memberInboxIds[0]);
     if (!firstMember) continue;
     
-    const signer = createSigner({
-      key: firstMember.privateKey as `0x${string}`,
-      account: {
-        address: firstMember.accountAddress as `0x${string}`,
-      },
-    });
+    const account = privateKeyToAccount(firstMember.privateKey as `0x${string}`);
     
-    const client = await Client.create(
-      signer,
-      Buffer.from(firstMember.encryptionKey, "hex"),
-      { env: options.env as any }
-    );
+    const client = await Client.create(account, {
+      env: options.env as any,
+      dbEncryptionKey: Buffer.from(firstMember.encryptionKey, "hex"),
+    });
     
     // Create the group
     const group = await client.conversations.newGroup(
@@ -247,4 +243,5 @@ setupLoadTest().catch((error) => {
   console.error("\n❌ Setup failed:", error);
   process.exit(1);
 });
+
 

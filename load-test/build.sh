@@ -9,7 +9,7 @@ npx esbuild artillery-processor.ts \
   --platform=node \
   --format=cjs \
   --outfile=artillery-processor.js \
-  --external:@xmtp/agent-sdk \
+  --external:@xmtp/node-sdk \
   --external:@xmtp/content-type-* \
   --external:viem \
   --external:@noble/* \
