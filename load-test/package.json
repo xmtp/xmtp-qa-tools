@@ -1,0 +1,34 @@
+{
+  "name": "@xmtp/load-test",
+  "version": "1.0.0",
+  "description": "High-performance load testing framework for XMTP",
+  "type": "module",
+  "scripts": {
+    "setup": "tsx setup.ts",
+    "build": "node build-processor.js",
+    "test": "npm run build && artillery run artillery-config.yml",
+    "test:debug": "npm run build && artillery run --output report.json artillery-config.yml",
+    "test:simple": "tsx run-simple.ts",
+    "report": "artillery report report.json",
+    "analyze": "tsx analyze.ts",
+    "clean": "node -e \"require('fs').rmSync('data',{recursive:true,force:true}); require('fs').rmSync('report.json',{force:true}); require('fs').rmSync('artillery-processor.js',{force:true}); console.log('✅ Cleaned up test data')\"",
+    "quick-start": "node quick-start.js"
+  },
+  "keywords": [
+    "xmtp",
+    "load-test",
+    "performance"
+  ],
+  "dependencies": {
+    "@xmtp/agent-sdk": "^0.0.33",
+    "artillery": "^2.0.20",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "@types/node": "^20.11.19",
+    "esbuild": "^0.20.0",
+    "typescript": "^5.3.3"
+  }
+}
+

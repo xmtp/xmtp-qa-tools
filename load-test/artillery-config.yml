@@ -1,0 +1,61 @@
+config:
+  target: "xmtp://load-test"
+  
+  # Load test phases - adjust these for your desired load profile
+  phases:
+    # Warm-up phase: gradually ramp up to target rate
+    - duration: 300  # 5 minutes
+      arrivalRate: 10  # Start with 10 virtual users per second
+      rampTo: 50       # Ramp up to 50 VU/s
+      name: "Warm-up"
+    
+    # Sustained load phase: maintain high throughput
+    - duration: 82800  # 23 hours (82800 seconds)
+      arrivalRate: 60   # 60 messages per second = ~5.2M messages/day
+      name: "Sustained Load"
+    
+    # Cool-down phase: gradually reduce load
+    - duration: 300  # 5 minutes
+      arrivalRate: 60
+      rampTo: 10
+      name: "Cool-down"
+  
+  # Artillery processor - custom logic for XMTP message sending
+  processor: "./artillery-processor.js"
+  
+  # Performance tuning
+  ensure:
+    maxErrorRate: 5  # Fail if error rate exceeds 5%
+  
+  # Worker configuration for parallel execution
+  pool: 10  # Number of worker processes (tune based on CPU cores)
+  
+  # Custom payload - not used but required by Artillery
+  payload:
+    path: "./data/load-test-config.json"
+    fields:
+      - "identities"
+      - "groups"
+  
+  # Environment variables
+  variables:
+    configPath: "./data/load-test-config.json"
+
+# Scenario definition
+scenarios:
+  - name: "Send XMTP Messages"
+    engine: "custom"
+    
+    # Flow: Each virtual user sends one message
+    flow:
+      - function: "sendMessage"
+      
+      # Add a small random delay to avoid thundering herd
+      - think: 0.1
+
+# Plugins for enhanced reporting
+plugins:
+  expect: {}
+  metrics-by-endpoint:
+    stripQueryString: true
+

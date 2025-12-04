@@ -1,0 +1,19 @@
+# Data files
+data/
+*.db3
+*.json.tmp
+
+# Artillery reports
+report.json
+report.html
+
+# Node modules
+node_modules/
+
+# Build output
+artillery-processor.js
+
+# Logs
+*.log
+npm-debug.log*
+
