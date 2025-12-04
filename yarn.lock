@@ -1696,10 +1696,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-1.6.2@npm:@xmtp/node-bindings@1.6.2, @xmtp/node-bindings@npm:1.6.2":
-  version: 1.6.2
-  resolution: "@xmtp/node-bindings@npm:1.6.2"
-  checksum: 10/6b9a6132217e8758945cdbf50a6a55d07097ebaa8a9109762d8ec4fb720c0c31bed639164c83be56667bccf2fe7d8f9b46113bdbb1313b146638da4a84ad2a5e
+"@xmtp/node-bindings-1.6.4@npm:@xmtp/node-bindings@1.6.4-rc2":
+  version: 1.6.4-rc2
+  resolution: "@xmtp/node-bindings@npm:1.6.4-rc2"
+  checksum: 10/3d220c17ce800cc424358b1a21f33e23283cee59085c008ba7ff79a22ffb623b12e50eec71dc5cd342696b21d68d92fd9d747fa3451ddf11353a4b87daaba36d
   languageName: node
   linkType: hard
 
@@ -1728,6 +1728,13 @@ __metadata:
   version: 1.3.5
   resolution: "@xmtp/node-bindings@npm:1.3.5"
   checksum: 10/7cfdb95de5ec511961a2754c3aca3a96c68e6fababc754aa359f8b222cac20a86689010ccc28e4f5c175cbd87f7d3a01083289993fbe8e1ff8ffb4751b645508
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-bindings@npm:1.6.2":
+  version: 1.6.2
+  resolution: "@xmtp/node-bindings@npm:1.6.2"
+  checksum: 10/6b9a6132217e8758945cdbf50a6a55d07097ebaa8a9109762d8ec4fb720c0c31bed639164c83be56667bccf2fe7d8f9b46113bdbb1313b146638da4a84ad2a5e
   languageName: node
   linkType: hard
 
@@ -5376,7 +5383,7 @@ __metadata:
     "@xmtp/node-bindings-1.3.6": "npm:@xmtp/node-bindings@1.3.6"
     "@xmtp/node-bindings-1.4.0": "npm:@xmtp/node-bindings@1.4.0"
     "@xmtp/node-bindings-1.5.4": "npm:@xmtp/node-bindings@1.5.4"
-    "@xmtp/node-bindings-1.6.2": "npm:@xmtp/node-bindings@1.6.2"
+    "@xmtp/node-bindings-1.6.4": "npm:@xmtp/node-bindings@1.6.4-rc2"
     "@xmtp/node-bindings-1.7.0": "npm:@xmtp/node-bindings@1.7.0-dev.9bc470b"
     "@xmtp/node-sdk-3.2.2": "npm:@xmtp/node-sdk@3.2.2"
     "@xmtp/node-sdk-4.0.1": "npm:@xmtp/node-sdk@4.0.1"
