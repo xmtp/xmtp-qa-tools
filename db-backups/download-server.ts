@@ -479,26 +479,6 @@ app.get("/", async (req: Request, res: Response) => {
               ${downloadCards}
             </tbody>
           </table>
-             <div class="instructions-section">
-            <h2>How to Use</h2>
-            <div class="instruction-block">
-              <h3>Upload a Backup</h3>
-              <p class="instruction-description">Compress your <code>/data</code> folder and upload it:</p>
-              <div class="code-block-container">
-                <button class="copy-button" onclick="copyToClipboard(this, ${JSON.stringify(uploadCommand)})" title="Copy command">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 3h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M3 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </button>
-                <pre class="code-block"><code>FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \\
-tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \\
-curl -X POST --data-binary @"$FILENAME" \\
-  "${uploadUrl}?description=My-db&filename=$FILENAME"</code></pre>
-              </div>
-              <p class="instruction-note">This command will create a compressed archive and upload it to this server.</p>
-            </div>
-          </div>
         </main>
         <script>
           async function deleteFile(filename) {
