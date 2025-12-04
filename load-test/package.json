@@ -6,13 +6,9 @@
   "scripts": {
     "setup": "tsx setup.ts",
     "build": "node build-processor.js",
-    "test": "npm run build && artillery run artillery-config.yml",
-    "test:debug": "npm run build && artillery run --output report.json artillery-config.yml",
+    "test": "yarn build && artillery run artillery-config.yml",
     "test:simple": "tsx run-simple.ts",
-    "report": "artillery report report.json",
-    "analyze": "tsx analyze.ts",
-    "clean": "node -e \"require('fs').rmSync('data',{recursive:true,force:true}); require('fs').rmSync('report.json',{force:true}); require('fs').rmSync('artillery-processor.js',{force:true}); console.log('✅ Cleaned up test data')\"",
-    "quick-start": "node quick-start.js"
+    "clean": "rm -rf data/ *.db3 report.json artillery-processor.js"
   },
   "keywords": [
     "xmtp",

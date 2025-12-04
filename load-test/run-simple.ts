@@ -7,10 +7,10 @@
  */
 
 import { Client } from "@xmtp/node-sdk";
-import { privateKeyToAccount } from "viem/accounts";
 import { readFileSync, existsSync } from "fs";
 import { Worker } from "worker_threads";
 import { cpus } from "os";
+import { createSigner } from "./xmtp-helpers";
 
 interface TestIdentity {
   accountAddress: string;
@@ -65,9 +65,9 @@ async function runLoadTest() {
   
   for (const identity of config.identities) {
     try {
-      const account = privateKeyToAccount(identity.privateKey as `0x${string}`);
+      const signer = createSigner(identity.privateKey);
       
-      const client = await Client.create(account, {
+      const client = await Client.create(signer, {
         env: config.config.env as any,
         dbEncryptionKey: Buffer.from(identity.encryptionKey, "hex"),
         dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,

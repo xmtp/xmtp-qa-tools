@@ -11,9 +11,9 @@
 
 import { Command } from "commander";
 import { Client } from "@xmtp/node-sdk";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
+import { createUser, createSigner, generateEncryptionKey } from "./xmtp-helpers";
 
 interface TestIdentity {
   accountAddress: string;
@@ -56,22 +56,18 @@ program
 const options = program.opts();
 
 async function createTestIdentity(env: string): Promise<TestIdentity> {
-  const privateKey = generatePrivateKey();
-  const account = privateKeyToAccount(privateKey);
+  const user = createUser();
+  const signer = createSigner(user);
+  const encryptionKey = generateEncryptionKey();
   
-  // Generate encryption key (32 bytes = 64 hex chars)
-  const encryptionKey = Array.from({ length: 64 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join("");
-  
-  const client = await Client.create(account, {
+  const client = await Client.create(signer, {
     env: env as any,
     dbEncryptionKey: Buffer.from(encryptionKey, "hex"),
   });
   
   const identity: TestIdentity = {
-    accountAddress: account.address,
-    privateKey: privateKey,
+    accountAddress: user.account.address,
+    privateKey: user.key,
     encryptionKey,
     inboxId: client.inboxId,
     installationId: client.installationId,
@@ -162,9 +158,9 @@ async function setupLoadTest() {
     const firstMember = identities.find(id => id.inboxId === memberInboxIds[0]);
     if (!firstMember) continue;
     
-    const account = privateKeyToAccount(firstMember.privateKey as `0x${string}`);
+    const signer = createSigner(firstMember.privateKey);
     
-    const client = await Client.create(account, {
+    const client = await Client.create(signer, {
       env: options.env as any,
       dbEncryptionKey: Buffer.from(firstMember.encryptionKey, "hex"),
     });

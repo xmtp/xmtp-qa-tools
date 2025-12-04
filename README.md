@@ -99,7 +99,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Agents: Agent QA & monitoring - see [section](./agents/README.md)
 - Network: Network chaos testing - see [section](./networkchaos/README.md)
 - Forks: Probabilistic fork testing - see [section](./forks/README.md)
-- **Load Test: High-performance load testing framework (5M+ msgs/day) - see [section](./load-test/README.md)**
+- Load Test: High-performance load testing framework (5M+ msgs/day) - see [section](./load-test/)
 - Version management: How to manage SDK and bindings versions - see [section](./workers/README.md)
 - CLI: Command line interface for testing - see [section](./cli/readme.md)
 
