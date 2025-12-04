@@ -20,26 +20,4 @@ curl -X POST --data-binary @"$FILENAME" \
 
 3. Download a backup
 
-```bash
-curl -X GET "https://xmtp-agent-db-backup-server.up.railway.app/download?file=db-backup.tar.gz" -o db-backup.tar.gz
-```
-
-4. Delete a backup
-
-```bash
-curl -X DELETE "https://xmtp-agent-db-backup-server.up.railway.app/delete?file=db-backup.tar.gz"
-```
-
-### Environment Variables
-
-- `PORT` - Port number for the server (default: `8080`)
-- The server expects backups to be stored in `/app/data` directory (or the directory specified by the code)
-
-## Features
-
-- 📁 Web interface to browse and download backups
-- 📤 Upload backups via API
-- 🗑️ Delete backups with confirmation
-- 📊 File size and metadata display
-- 🔒 Path sanitization for security
-- 📝 Detailed logging with Winston
+Go to https://xmtp-agent-db-backup-server.up.railway.app and download the backup you want. You can also use the API endpoint to download a backup.
