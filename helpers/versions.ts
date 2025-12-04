@@ -307,52 +307,11 @@ export function detectNodeSDKVersion(client: any): {
         `node-bindings-${version.nodeBindings}`,
       );
       if (fs.existsSync(bindingsDir)) {
-        const versionJsonPath = path.join(bindingsDir, "dist", "version.json");
-        if (fs.existsSync(versionJsonPath)) {
-          try {
-            const versionInfo = JSON.parse(
-              fs.readFileSync(versionJsonPath, "utf8"),
-            );
-            // Check if this bindings version matches what the client might be using
-            // by checking the client's internal structure or by checking which node-sdk
-            // is linked to this bindings
-            const nodeSDKDir = path.join(
-              xmtpDir,
-              `node-sdk-${version.nodeSDK}`,
-            );
-            const sdkNodeModulesXmtpDir = path.join(
-              nodeSDKDir,
-              "node_modules",
-              "@xmtp",
-            );
-            const symlinkTarget = path.join(
-              sdkNodeModulesXmtpDir,
-              "node-bindings",
-            );
-
-            if (fs.existsSync(symlinkTarget)) {
-              try {
-                const stats = fs.lstatSync(symlinkTarget);
-                if (stats.isSymbolicLink()) {
-                  const target = fs.readlinkSync(symlinkTarget);
-                  if (
-                    path.resolve(sdkNodeModulesXmtpDir, target) === bindingsDir
-                  ) {
-                    return {
-                      nodeSDK: version.nodeSDK,
-                      nodeBindings: version.nodeBindings,
-                      bindingsVersion: versionInfo,
-                    };
-                  }
-                }
-              } catch {
-                // Ignore symlink read errors
-              }
-            }
-          } catch {
-            // Ignore version.json read errors
-          }
-        }
+        return {
+          nodeSDK: version.nodeSDK,
+          nodeBindings: version.nodeBindings,
+          bindingsVersion: getBindingsVersion(version.nodeBindings),
+        };
       }
     }
   } catch {
