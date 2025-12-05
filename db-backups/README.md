@@ -10,11 +10,11 @@ railway ssh
 
 # 2. Upload a backup
 
-To upload a backup (compressing the `/data` folder and `.env` file if it exists):
+To upload a backup (compressing the `/data` folder):
 
 ```bash
 FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz"
-tar -czf "$FILENAME" ./data $(test -f .env && echo .env)
+tar -czf "$FILENAME" ./data
 curl -X POST --data-binary @"$FILENAME" \
   "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
 ```

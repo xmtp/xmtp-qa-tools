@@ -165,10 +165,6 @@ app.get("/", async (req: Request, res: Response) => {
   const files = snapshot.files;
   const totalBytes = snapshot.totalBytes;
   const hasFiles = files.length > 0;
-
-  // Build the upload URL for the copy command
-  const uploadUrl = `${req.protocol}://${req.get("host")}/upload`;
-  const uploadCommand = `FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && tar -czf "$FILENAME" ./data $(test -f .env && echo .env) && curl -X POST --data-binary @"$FILENAME" "${uploadUrl}?description=My-db&filename=$FILENAME"`;
   const downloadCards = hasFiles
     ? files
         .map(
