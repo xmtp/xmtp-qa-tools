@@ -13,7 +13,7 @@ railway ssh
 To upload a backup (compressing the `/data` folder):
 
 ```bash
-FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz"
+FILENAME="${RAILWAY_SERVICE_NAME:-db-backup}-$(date +%H%M).tar.gz"
 tar -czf "$FILENAME" ./data
 curl -X POST --data-binary @"$FILENAME" \
   "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
