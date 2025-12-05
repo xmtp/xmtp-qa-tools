@@ -18,7 +18,8 @@ export function loadEnvFile(scriptUrl?: string | URL) {
         `[loadEnvFile] Loading .env from script directory: ${scriptEnvPath}`,
       );
       // Use dotenv.config() directly to ensure we load from the exact path
-      dotenv.config({ path: scriptEnvPath, override: true });
+      // Don't override existing env vars (e.g., from CLI args)
+      dotenv.config({ path: scriptEnvPath, override: false });
       return; // Stop here - don't check other locations
     } else {
       console.log(
@@ -33,14 +34,14 @@ export function loadEnvFile(scriptUrl?: string | URL) {
     console.log(
       `[loadEnvFile] Loading .env from current working directory: ${cwdEnvPath}`,
     );
-    dotenv.config({ path: cwdEnvPath, override: true });
+    dotenv.config({ path: cwdEnvPath, override: false });
     return;
   }
 
   const rootEnvPath = join(process.cwd(), "../../.env");
   if (existsSync(rootEnvPath)) {
     console.log(`[loadEnvFile] Loading .env from project root: ${rootEnvPath}`);
-    dotenv.config({ path: rootEnvPath, override: true });
+    dotenv.config({ path: rootEnvPath, override: false });
   }
 }
 

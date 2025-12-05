@@ -67,15 +67,23 @@ function parseArgs(): Config {
     if (arg === "--help" || arg === "-h") {
       showHelp();
       process.exit(0);
+    } else if (arg.startsWith("--env=")) {
+      process.env.XMTP_ENV = arg.split("=")[1];
     } else if (arg === "--env" && nextArg) {
       process.env.XMTP_ENV = nextArg;
       i++;
+    } else if (arg.startsWith("--nodeBindings=")) {
+      process.env.NODE_VERSION = arg.split("=")[1];
     } else if (arg === "--nodeBindings" && nextArg) {
       process.env.NODE_VERSION = nextArg;
       i++;
+    } else if (arg.startsWith("--agentSDK=")) {
+      process.env.AGENT_SDK_VERSION = arg.split("=")[1];
     } else if (arg === "--agentSDK" && nextArg) {
       process.env.AGENT_SDK_VERSION = nextArg;
       i++;
+    } else if (arg.startsWith("--log=")) {
+      process.env.LOGGING_LEVEL = arg.split("=")[1];
     } else if (arg === "--log" && nextArg) {
       process.env.LOGGING_LEVEL = nextArg;
       i++;
