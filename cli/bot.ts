@@ -67,17 +67,25 @@ function parseArgs(): Config {
     if (arg === "--help" || arg === "-h") {
       showHelp();
       process.exit(0);
+    } else if (arg.startsWith("--env=")) {
+      process.env.XMTP_ENV = arg.split("=", 2)[1]?.trim();
     } else if (arg === "--env" && nextArg) {
-      process.env.XMTP_ENV = nextArg;
+      process.env.XMTP_ENV = nextArg.trim();
       i++;
+    } else if (arg.startsWith("--nodeBindings=")) {
+      process.env.NODE_VERSION = arg.split("=", 2)[1]?.trim();
     } else if (arg === "--nodeBindings" && nextArg) {
-      process.env.NODE_VERSION = nextArg;
+      process.env.NODE_VERSION = nextArg.trim();
       i++;
+    } else if (arg.startsWith("--agentSDK=")) {
+      process.env.AGENT_SDK_VERSION = arg.split("=", 2)[1]?.trim();
     } else if (arg === "--agentSDK" && nextArg) {
-      process.env.AGENT_SDK_VERSION = nextArg;
+      process.env.AGENT_SDK_VERSION = nextArg.trim();
       i++;
+    } else if (arg.startsWith("--log=")) {
+      process.env.LOGGING_LEVEL = arg.split("=", 2)[1]?.trim();
     } else if (arg === "--log" && nextArg) {
-      process.env.LOGGING_LEVEL = nextArg;
+      process.env.LOGGING_LEVEL = nextArg.trim();
       i++;
     } else if (arg === "--file") {
       fileLogging = true;
@@ -150,16 +158,31 @@ async function main() {
     }
 
     // Run the bot using tsx with environment variable
+    const childEnv: Record<string, string> = {
+      ...(process.env as Record<string, string>),
+    };
+
+    if (config.env) {
+      childEnv.XMTP_ENV = config.env;
+    }
+    if (config.nodeBindings) {
+      childEnv.XMTP_NODE_SDK = config.nodeBindings;
+    }
+    if (config.agentSDK) {
+      childEnv.AGENT_SDK_VERSION = config.agentSDK;
+    }
+    if (config.logLevel) {
+      childEnv.LOGGING_LEVEL = config.logLevel;
+    }
+
+    if (config.env) {
+      console.log(`Setting XMTP_ENV=${config.env}`);
+    }
+
     const child = spawn("npx", ["tsx", "--watch", botPath], {
       stdio: config.fileLogging ? ["pipe", "pipe", "pipe"] : "inherit",
       cwd: process.cwd(),
-      env: {
-        ...process.env,
-        XMTP_ENV: config.env,
-        XMTP_NODE_SDK: config.nodeBindings,
-        AGENT_SDK_VERSION: config.agentSDK,
-        LOGGING_LEVEL: config.logLevel,
-      },
+      env: childEnv,
     });
 
     // Capture output for file logging
