@@ -51,7 +51,7 @@ program
   .requiredOption("-g, --groups <number>", "Number of groups to create", parseInt)
   .requiredOption("-m, --members <number>", "Members per group", parseInt)
   .option("-e, --env <environment>", "XMTP environment (dev|production|local)", "dev")
-  .option("-a, --api-url <url>", "Custom API URL (e.g., for D14n)")
+  .option("-a, --api-url <url>", "Custom API URL", "https://grpc.testnet-staging.xmtp.network:443")
   .option("-o, --output <path>", "Output directory for config", "./data")
   .parse();
 

@@ -8,11 +8,11 @@ High-performance load testing for XMTP (5M+ msgs/day).
 cd load-test
 yarn install
 
-# Setup: Create identities and groups
+# Setup: Create identities and groups (defaults to D14n staging)
 yarn setup -- -i 100 -g 10 -m 20 -e dev
 
-# Setup for D14n staging
-yarn setup -- -i 100 -g 10 -m 20 -e dev -a https://grpc.testnet-staging.xmtp.network:443
+# Override API URL if needed
+yarn setup -- -i 100 -g 10 -m 20 -e dev -a https://grpc.dev.xmtp.network:443
 
 # Run: Artillery load test
 yarn test

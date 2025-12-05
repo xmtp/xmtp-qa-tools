@@ -8,7 +8,12 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { toBytes } from "viem/utils";
 import type { Signer } from "@xmtp/node-sdk";
-import { IdentifierKind } from "@xmtp/node-sdk";
+
+// IdentifierKind enum from XMTP SDK
+const IdentifierKind = {
+  Ethereum: 0,
+  Passkey: 1,
+} as const;
 
 interface User {
   key: `0x${string}`;
