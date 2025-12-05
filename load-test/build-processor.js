@@ -3,8 +3,8 @@
  * Cross-platform build script for Artillery processor
  */
 
-const { execSync } = require('child_process');
-const { existsSync } = require('fs');
+import { execSync } from 'child_process';
+import { existsSync } from 'fs';
 
 console.log('🔨 Building Artillery processor...');
 

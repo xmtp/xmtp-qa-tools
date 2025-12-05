@@ -11,6 +11,9 @@ yarn install
 # Setup: Create identities and groups
 yarn setup -- -i 100 -g 10 -m 20 -e dev
 
+# Setup for D14n staging
+yarn setup -- -i 100 -g 10 -m 20 -e dev -a https://grpc.testnet-staging.xmtp.network:443
+
 # Run: Artillery load test
 yarn test
 

@@ -38,6 +38,7 @@ interface LoadTestConfig {
     numGroups: number;
     membersPerGroup: number;
     env: string;
+    apiUrl?: string;
   };
 }
 
@@ -49,21 +50,28 @@ program
   .requiredOption("-i, --identities <number>", "Number of identities to create", parseInt)
   .requiredOption("-g, --groups <number>", "Number of groups to create", parseInt)
   .requiredOption("-m, --members <number>", "Members per group", parseInt)
-  .option("-e, --env <environment>", "XMTP environment (dev|production)", "dev")
+  .option("-e, --env <environment>", "XMTP environment (dev|production|local)", "dev")
+  .option("-a, --api-url <url>", "Custom API URL (e.g., for D14n)")
   .option("-o, --output <path>", "Output directory for config", "./data")
   .parse();
 
 const options = program.opts();
 
-async function createTestIdentity(env: string): Promise<TestIdentity> {
+async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIdentity> {
   const user = createUser();
   const signer = createSigner(user);
   const encryptionKey = generateEncryptionKey();
   
-  const client = await Client.create(signer, {
+  const clientOptions: any = {
     env: env as any,
     dbEncryptionKey: Buffer.from(encryptionKey, "hex"),
-  });
+  };
+  
+  if (apiUrl) {
+    clientOptions.apiUrl = apiUrl;
+  }
+  
+  const client = await Client.create(signer, clientOptions);
   
   const identity: TestIdentity = {
     accountAddress: user.account.address,
@@ -85,6 +93,9 @@ async function setupLoadTest() {
   console.log(`Groups: ${options.groups}`);
   console.log(`Members per group: ${options.members}`);
   console.log(`Environment: ${options.env}`);
+  if (options.apiUrl) {
+    console.log(`API URL: ${options.apiUrl}`);
+  }
   console.log(`Output: ${options.output}`);
   console.log("=".repeat(60));
   console.log();
@@ -122,7 +133,7 @@ async function setupLoadTest() {
   const identities: TestIdentity[] = [];
   
   for (let i = 0; i < options.identities; i++) {
-    const identity = await createTestIdentity(options.env);
+    const identity = await createTestIdentity(options.env, options.apiUrl);
     identities.push(identity);
     
     if ((i + 1) % 10 === 0) {
@@ -160,10 +171,16 @@ async function setupLoadTest() {
     
     const signer = createSigner(firstMember.privateKey);
     
-    const client = await Client.create(signer, {
+    const clientOptions: any = {
       env: options.env as any,
       dbEncryptionKey: Buffer.from(firstMember.encryptionKey, "hex"),
-    });
+    };
+    
+    if (options.apiUrl) {
+      clientOptions.apiUrl = options.apiUrl;
+    }
+    
+    const client = await Client.create(signer, clientOptions);
     
     // Create the group
     const group = await client.conversations.newGroup(
@@ -201,6 +218,7 @@ async function setupLoadTest() {
       numGroups: options.groups,
       membersPerGroup: options.members,
       env: options.env,
+      apiUrl: options.apiUrl,
     },
   };
   

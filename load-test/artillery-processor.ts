@@ -68,11 +68,17 @@ async function getClient(identity: TestIdentity): Promise<Client> {
   try {
     const signer = createSigner(identity.privateKey);
     
-    const client = await Client.create(signer, {
+    const clientOptions: any = {
       env: config!.config.env as any,
       dbEncryptionKey: Buffer.from(identity.encryptionKey, "hex"),
       dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
-    });
+    };
+    
+    if (config!.config.apiUrl) {
+      clientOptions.apiUrl = config!.config.apiUrl;
+    }
+    
+    const client = await Client.create(signer, clientOptions);
     
     clients.set(identity.inboxId, client);
     console.log(`[Worker ${process.pid}] Created client for ${identity.accountAddress}`);
