@@ -4,20 +4,21 @@ A simple web server for uploading, downloading, and managing database backups. T
 
 # 1. SSH into the server
 
-````bash
+```bash
 railway ssh
+```
 
 # 2. Upload a backup
 
-To upload a backup (compressing the `/data` folder and optionally `.env` file if it exists):
+To upload a backup (compressing the `/data` folder and `.env` file if it exists):
 
 ```bash
-FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && \
-tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && \
+FILENAME="${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz"
+tar -czf "$FILENAME" ./data $(test -f .env && echo .env)
 curl -X POST --data-binary @"$FILENAME" \
   "https://xmtp-agent-db-backup-server.up.railway.app/upload?description=My-db&filename=$FILENAME"
-````
+```
 
-3. Download a backup
+# 3. Download a backup
 
 Go to https://xmtp-agent-db-backup-server.up.railway.app and download the backup you want. You can also use the API endpoint to download a backup.

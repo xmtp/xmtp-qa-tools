@@ -168,7 +168,7 @@ app.get("/", async (req: Request, res: Response) => {
 
   // Build the upload URL for the copy command
   const uploadUrl = `${req.protocol}://${req.get("host")}/upload`;
-  const uploadCommand = `FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && tar -czf "$FILENAME" ./data $([ -f .env ] && echo .env) && curl -X POST --data-binary @"$FILENAME" "${uploadUrl}?description=My-db&filename=$FILENAME"`;
+  const uploadCommand = `FILENAME="\${RAILWAY_SERVICE_NAME:-data-backup}.tar.gz" && tar -czf "$FILENAME" ./data $(test -f .env && echo .env) && curl -X POST --data-binary @"$FILENAME" "${uploadUrl}?description=My-db&filename=$FILENAME"`;
   const downloadCards = hasFiles
     ? files
         .map(
@@ -178,22 +178,13 @@ app.get("/", async (req: Request, res: Response) => {
               <td>${formatBytes(file.sizeBytes)}</td>
               <td>${new Date(file.updatedAt).toLocaleString()}</td>
               <td style="white-space: nowrap;">
-                <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
-                  <a class="button-icon" href="/download?file=${encodeURIComponent(
-                    file.name,
-                  )}" download title="Download file">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M8 2v8M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </a>
-                  <button class="button-icon" onclick="deleteFile('${encodeURIComponent(
-                    file.name,
-                  )}')" title="Delete file">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 4h12M5 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 7v5M10 7v5M3 4l1 9a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </button>
-                </div>
+                <a class="button-icon" href="/download?file=${encodeURIComponent(
+                  file.name,
+                )}" download title="Download file">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 2v8M5 7l3 3 3-3M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
               </td>
             </tr>
           `,

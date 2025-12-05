@@ -454,27 +454,30 @@ function main() {
   const options = parseArgs(args);
   const shouldClean = options.clean;
 
-  if (shouldClean) {
-    cleanPackageJson();
-    if (!process.env.GITHUB_ACTIONS) {
-      const nodeModulesDir = path.join(process.cwd(), "node_modules");
-      if (fs.existsSync(nodeModulesDir)) {
-        try {
-          fs.rmSync(nodeModulesDir, { recursive: true, force: true });
-        } catch (error) {
-          console.warn(
-            `Warning: Could not remove node_modules directory: ${String(error)}`,
-          );
-          console.log("Continuing with existing node_modules...");
-        }
-      }
+  // Always remove node_modules before running
+  if (!process.env.GITHUB_ACTIONS) {
+    const nodeModulesDir = path.join(process.cwd(), "node_modules");
+    if (fs.existsSync(nodeModulesDir)) {
       try {
-        execSync("yarn install", { stdio: "inherit" });
+        fs.rmSync(nodeModulesDir, { recursive: true, force: true });
+        console.log("🧹 Removed node_modules");
       } catch (error) {
-        console.warn(`Warning: Could not run yarn install: ${String(error)}`);
-        console.log("Continuing with existing installation...");
+        console.warn(
+          `Warning: Could not remove node_modules directory: ${String(error)}`,
+        );
+        console.log("Continuing with existing node_modules...");
       }
     }
+    try {
+      execSync("yarn install", { stdio: "inherit" });
+    } catch (error) {
+      console.warn(`Warning: Could not run yarn install: ${String(error)}`);
+      console.log("Continuing with existing installation...");
+    }
+  }
+
+  if (shouldClean) {
+    cleanPackageJson();
   }
 
   // Always run both operations
