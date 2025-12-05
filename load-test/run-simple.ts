@@ -69,7 +69,7 @@ async function runLoadTest() {
       
       const clientOptions: any = {
         env: config.config.env as any,
-        dbEncryptionKey: Buffer.from(identity.encryptionKey, "hex"),
+        dbEncryptionKey: new Uint8Array(Buffer.from(identity.encryptionKey, "hex")),
         dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
       };
       

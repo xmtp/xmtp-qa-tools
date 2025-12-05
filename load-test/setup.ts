@@ -64,7 +64,7 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
   
   const clientOptions: any = {
     env: env as any,
-    dbEncryptionKey: Buffer.from(encryptionKey, "hex"),
+    dbEncryptionKey: new Uint8Array(Buffer.from(encryptionKey, "hex")),
   };
   
   if (apiUrl) {
@@ -173,7 +173,7 @@ async function setupLoadTest() {
     
     const clientOptions: any = {
       env: options.env as any,
-      dbEncryptionKey: Buffer.from(firstMember.encryptionKey, "hex"),
+      dbEncryptionKey: new Uint8Array(Buffer.from(firstMember.encryptionKey, "hex")),
     };
     
     if (options.apiUrl) {
