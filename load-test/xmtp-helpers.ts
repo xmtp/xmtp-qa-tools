@@ -58,6 +58,7 @@ export const createSigner = (key: string | User): Signer => {
   
   return {
     type: "EOA",
+    getAddress: () => user.account.address.toLowerCase(),
     getIdentifier: () => ({
       identifierKind: IdentifierKind.Ethereum,
       identifier: user.account.address.toLowerCase(),
