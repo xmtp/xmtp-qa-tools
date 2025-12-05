@@ -8,7 +8,7 @@
 import { Client } from "@xmtp/node-sdk";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { createSigner } from "./xmtp-helpers";
+import { createSigner, encryptionKeyFromHex } from "./xmtp-helpers";
 
 interface TestIdentity {
   accountAddress: string;
@@ -70,7 +70,7 @@ async function getClient(identity: TestIdentity): Promise<Client> {
     
     const clientOptions: any = {
       env: config!.config.env as any,
-      dbEncryptionKey: new Uint8Array(Buffer.from(identity.encryptionKey, "hex")),
+      dbEncryptionKey: encryptionKeyFromHex(identity.encryptionKey),
       dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
     };
     

@@ -7,6 +7,7 @@ import { createWalletClient, http, type PrivateKeyAccount } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { toBytes } from "viem/utils";
+import { fromString, toString } from "uint8arrays";
 import type { Signer } from "@xmtp/node-sdk";
 
 // IdentifierKind enum from XMTP SDK
@@ -78,8 +79,16 @@ export const createSigner = (key: string | User): Signer => {
  * @returns Hex string of 64 characters
  */
 export const generateEncryptionKey = (): string => {
-  return Array.from({ length: 64 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join("");
+  const uint8Array = crypto.getRandomValues(new Uint8Array(32));
+  return toString(uint8Array, "hex");
+};
+
+/**
+ * Convert hex string to Uint8Array encryption key
+ * @param hex - The hex string
+ * @returns Uint8Array encryption key
+ */
+export const encryptionKeyFromHex = (hex: string): Uint8Array => {
+  return fromString(hex, "hex");
 };
 

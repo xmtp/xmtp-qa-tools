@@ -10,7 +10,7 @@ import { Client } from "@xmtp/node-sdk";
 import { readFileSync, existsSync } from "fs";
 import { Worker } from "worker_threads";
 import { cpus } from "os";
-import { createSigner } from "./xmtp-helpers";
+import { createSigner, encryptionKeyFromHex } from "./xmtp-helpers";
 
 interface TestIdentity {
   accountAddress: string;
@@ -69,7 +69,7 @@ async function runLoadTest() {
       
       const clientOptions: any = {
         env: config.config.env as any,
-        dbEncryptionKey: new Uint8Array(Buffer.from(identity.encryptionKey, "hex")),
+        dbEncryptionKey: encryptionKeyFromHex(identity.encryptionKey),
         dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
       };
       

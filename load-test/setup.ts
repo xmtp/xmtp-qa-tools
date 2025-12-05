@@ -13,7 +13,7 @@ import { Command } from "commander";
 import { Client } from "@xmtp/node-sdk";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join } from "path";
-import { createUser, createSigner, generateEncryptionKey } from "./xmtp-helpers";
+import { createUser, createSigner, generateEncryptionKey, encryptionKeyFromHex } from "./xmtp-helpers";
 
 interface TestIdentity {
   accountAddress: string;
@@ -64,7 +64,7 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
   
   const clientOptions: any = {
     env: env as any,
-    dbEncryptionKey: new Uint8Array(Buffer.from(encryptionKey, "hex")),
+    dbEncryptionKey: encryptionKeyFromHex(encryptionKey),
   };
   
   if (apiUrl) {
@@ -173,7 +173,7 @@ async function setupLoadTest() {
     
     const clientOptions: any = {
       env: options.env as any,
-      dbEncryptionKey: new Uint8Array(Buffer.from(firstMember.encryptionKey, "hex")),
+      dbEncryptionKey: encryptionKeyFromHex(firstMember.encryptionKey),
     };
     
     if (options.apiUrl) {
