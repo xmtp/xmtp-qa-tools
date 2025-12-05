@@ -8,6 +8,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { toBytes } from "viem/utils";
 import { fromString, toString } from "uint8arrays";
+import { getRandomValues } from "node:crypto";
 import type { Signer } from "@xmtp/node-sdk";
 
 // IdentifierKind enum from XMTP SDK
@@ -79,7 +80,7 @@ export const createSigner = (key: string | User): Signer => {
  * @returns Hex string of 64 characters
  */
 export const generateEncryptionKey = (): string => {
-  const uint8Array = crypto.getRandomValues(new Uint8Array(32));
+  const uint8Array = getRandomValues(new Uint8Array(32));
   return toString(uint8Array, "hex");
 };
 

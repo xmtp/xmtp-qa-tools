@@ -62,6 +62,12 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
   const signer = createSigner(user);
   const encryptionKey = generateEncryptionKey();
   
+  // Create data directory if it doesn't exist
+  const dataDir = "./data/dbs";
+  if (!existsSync(dataDir)) {
+    mkdirSync(dataDir, { recursive: true });
+  }
+  
   const clientOptions: any = {
     env: env as any,
     dbEncryptionKey: encryptionKeyFromHex(encryptionKey),
