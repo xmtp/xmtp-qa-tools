@@ -91,32 +91,6 @@ jobs:
           cd gm-bot
           bun install
 
-      - name: Fix TypeScript configuration
-        run: |
-          cd gm-bot
-          # Install @types/node if missing (pnpm needs explicit install since it doesn't hoist by default)
-          # Other package managers may hoist it from transitive deps, but pnpm requires explicit declaration
-          if [ "${{ matrix.package-manager }}" = "pnpm" ] && ! grep -q "@types/node" package.json 2>/dev/null; then
-            pnpm add -D @types/node@^20.0.0
-          fi
-          # Fix tsconfig.json to include node types
-          if [ -f tsconfig.json ]; then
-            node -e "
-              const fs = require('fs');
-              const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
-              if (!tsconfig.compilerOptions) tsconfig.compilerOptions = {};
-              if (!tsconfig.compilerOptions.types) tsconfig.compilerOptions.types = [];
-              if (!tsconfig.compilerOptions.types.includes('node')) {
-                tsconfig.compilerOptions.types.push('node');
-              }
-              if (!tsconfig.compilerOptions.lib) tsconfig.compilerOptions.lib = [];
-              if (!tsconfig.compilerOptions.lib.includes('ESNext')) {
-                tsconfig.compilerOptions.lib.push('ESNext');
-              }
-              fs.writeFileSync('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
-            "
-          fi
-
       - name: Build project
         run: |
           cd gm-bot
