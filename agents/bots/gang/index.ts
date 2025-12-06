@@ -27,7 +27,6 @@ const agent = await Agent.createFromEnv({
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-gang-${inboxId.slice(0, 8)}.db3`,
   appVersion: APP_VERSION,
-  disableDeviceSync: true,
 });
 
 // Handle uncaught errors
