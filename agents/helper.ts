@@ -93,6 +93,7 @@ export async function waitForResponse(
   // Set up stream and start consuming BEFORE sending message to avoid race condition
   const stream = await client.conversations.streamAllMessages();
 
+  let messageSentAt: number | null = null;
   const responseStartTime = performance.now();
   let responseTime = 0;
   let responseMessage: DecodedMessage | null = null;
@@ -108,6 +109,21 @@ export async function waitForResponse(
         console.debug("skipping message", message.content);
         continue;
       }
+
+      // Only accept messages sent AFTER our test message was sent
+      if (messageSentAt === null) {
+        // Haven't sent our message yet, skip all messages
+        console.debug("skipping message before test message sent");
+        continue;
+      }
+
+      const messageTimestamp = message.sentAt.getTime();
+      const cutoffTime = messageSentAt;
+      if (cutoffTime !== null && messageTimestamp <= cutoffTime) {
+        console.debug("skipping old message (sent before test message)");
+        continue;
+      }
+
       // Apply custom message filter if provided
       if (messageFilter && !messageFilter(message)) continue;
 
@@ -126,6 +142,7 @@ export async function waitForResponse(
   const textToSend = messageText || `test-${Date.now()}`;
   await conversation.send(textToSend);
   const sendTime = performance.now() - sendStart;
+  messageSentAt = Date.now();
 
   console.debug(
     `✅  Message sent in ${sendTime.toFixed(2)}ms from ${senderInboxId} to ${conversationId}`,
