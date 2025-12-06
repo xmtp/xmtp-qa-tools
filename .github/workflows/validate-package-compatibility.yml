@@ -43,12 +43,6 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Install pnpm
-        if: matrix.package-manager == 'pnpm'
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.7.0
-
       - name: Install Yarn 1
         if: matrix.package-manager == 'yarn'
         run: |
@@ -94,6 +88,37 @@ jobs:
         run: |
           cd gm-bot
           bun install
+
+      - name: Fix TypeScript configuration and install @types/node
+        run: |
+          cd gm-bot
+          # Ensure @types/node is installed (pnpm is stricter about type resolution)
+          if [ "${{ matrix.package-manager }}" = "pnpm" ]; then
+            pnpm add -D @types/node@^20.0.0 || true
+          elif [ "${{ matrix.package-manager }}" = "npm" ]; then
+            npm install --save-dev @types/node@^20.0.0 || true
+          elif [ "${{ matrix.package-manager }}" = "yarn" ]; then
+            yarn add -D @types/node@^20.0.0 || true
+          elif [ "${{ matrix.package-manager }}" = "bun" ]; then
+            bun add -d @types/node@^20.0.0 || true
+          fi
+          # Fix tsconfig.json to include node types
+          if [ -f tsconfig.json ]; then
+            node -e "
+              const fs = require('fs');
+              const tsconfig = JSON.parse(fs.readFileSync('tsconfig.json', 'utf8'));
+              if (!tsconfig.compilerOptions) tsconfig.compilerOptions = {};
+              if (!tsconfig.compilerOptions.types) tsconfig.compilerOptions.types = [];
+              if (!tsconfig.compilerOptions.types.includes('node')) {
+                tsconfig.compilerOptions.types.push('node');
+              }
+              if (!tsconfig.compilerOptions.lib) tsconfig.compilerOptions.lib = [];
+              if (!tsconfig.compilerOptions.lib.includes('ESNext')) {
+                tsconfig.compilerOptions.lib.push('ESNext');
+              }
+              fs.writeFileSync('tsconfig.json', JSON.stringify(tsconfig, null, 2) + '\n');
+            "
+          fi
 
       - name: Build project
         run: |
