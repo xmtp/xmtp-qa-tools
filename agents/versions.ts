@@ -2,27 +2,27 @@ import fs from "fs";
 import path from "path";
 import { VersionList } from "@helpers/versions";
 import {
-  Agent as Agent1112,
-  MessageContext as MessageContext112,
-} from "@xmtp/agent-sdk-1.1.12";
+  Agent as Agent1116,
+  MessageContext as MessageContext1116,
+} from "@xmtp/agent-sdk-1.1.16";
 import {
-  Agent as Agent1115,
-  MessageContext as MessageContext1115,
-} from "@xmtp/agent-sdk-1.1.15";
+  Agent as Agent1117,
+  MessageContext as MessageContext1117,
+} from "@xmtp/agent-sdk-1.1.17";
 
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent1115,
-    MessageContext: MessageContext1115,
-    agentSDK: "1.1.15",
+    Agent: Agent1117,
+    MessageContext: MessageContext1117,
+    agentSDK: "1.1.17",
     nodeSDK: "4.5.0",
     auto: true,
   },
   {
-    Agent: Agent1112,
-    MessageContext: MessageContext112,
-    agentSDK: "1.1.12",
+    Agent: Agent1116,
+    MessageContext: MessageContext1116,
+    agentSDK: "1.1.16",
     nodeSDK: "4.2.6",
     auto: true,
   },
@@ -36,9 +36,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.15";
+} from "@xmtp/agent-sdk-1.1.17";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.15/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.17/debug";
 
 // Agent SDK functions
 export const getActiveAgentVersion = (index = 0) => {

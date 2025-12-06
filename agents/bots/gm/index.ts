@@ -12,7 +12,6 @@ const agent = await Agent.createFromEnv({
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   appVersion: APP_VERSION,
-  disableDeviceSync: true,
 });
 
 agent.on("text", async (ctx) => {
@@ -27,12 +26,12 @@ agent.on("text", async (ctx) => {
   }
 });
 
-agent.on("start", () => {
+agent.on("start", async () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
-  getSDKVersionInfo(agent, agent.client);
+  await getSDKVersionInfo(agent, agent.client);
 });
 
 await agent.start({});

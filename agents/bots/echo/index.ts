@@ -6,7 +6,6 @@ if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
   appVersion: APP_VERSION,
-  disableDeviceSync: true,
 });
 
 let count = 0;
