@@ -81,6 +81,8 @@ jobs:
         if: matrix.package-manager == 'pnpm'
         run: |
           cd gm-bot
+          # Configure pnpm to hoist @types/* packages (pnpm doesn't hoist by default)
+          echo "public-hoist-pattern[]=@types/*" >> .npmrc
           pnpm install
 
       - name: Install dependencies with bun
@@ -89,18 +91,13 @@ jobs:
           cd gm-bot
           bun install
 
-      - name: Fix TypeScript configuration and install @types/node
+      - name: Fix TypeScript configuration
         run: |
           cd gm-bot
-          # Ensure @types/node is installed (pnpm is stricter about type resolution)
-          if [ "${{ matrix.package-manager }}" = "pnpm" ]; then
-            pnpm add -D @types/node@^20.0.0 || true
-          elif [ "${{ matrix.package-manager }}" = "npm" ]; then
-            npm install --save-dev @types/node@^20.0.0 || true
-          elif [ "${{ matrix.package-manager }}" = "yarn" ]; then
-            yarn add -D @types/node@^20.0.0 || true
-          elif [ "${{ matrix.package-manager }}" = "bun" ]; then
-            bun add -d @types/node@^20.0.0 || true
+          # Install @types/node if missing (pnpm needs explicit install since it doesn't hoist by default)
+          # Other package managers may hoist it from transitive deps, but pnpm requires explicit declaration
+          if [ "${{ matrix.package-manager }}" = "pnpm" ] && ! grep -q "@types/node" package.json 2>/dev/null; then
+            pnpm add -D @types/node@^20.0.0
           fi
           # Fix tsconfig.json to include node types
           if [ -f tsconfig.json ]; then
