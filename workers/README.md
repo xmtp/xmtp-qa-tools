@@ -58,10 +58,10 @@ node_modules/@xmtp/
 
 ### Finding libxmtp version
 
-The libxmtp commit hash is in:
+Get the libxmtp version directly from the client:
 
-```bash
-node_modules/@xmtp/node-bindings-X.X.X/dist/version.json
+```typescript
+const libxmtpVersion = await client?.libxmtpVersion;
 ```
 
 ### Using versions command to see current mappings

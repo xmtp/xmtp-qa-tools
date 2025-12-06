@@ -1489,24 +1489,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.15@npm:@xmtp/agent-sdk@1.1.15":
-  version: 1.1.15
-  resolution: "@xmtp/agent-sdk@npm:1.1.15"
-  dependencies:
-    "@xmtp/content-type-markdown": "npm:^1.0.0"
-    "@xmtp/content-type-reaction": "npm:^2.0.2"
-    "@xmtp/content-type-read-receipt": "npm:^2.0.2"
-    "@xmtp/content-type-remote-attachment": "npm:^2.0.2"
-    "@xmtp/content-type-reply": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/content-type-transaction-reference": "npm:^2.0.2"
-    "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
-    "@xmtp/node-sdk": "npm:4.3.1"
-    viem: "npm:^2.37.6"
-  checksum: 10/c9886a572a3790a9a6d889434074f696d99515f62195fd79a7270ce13277db5a310ddbec5335bc5246af68461bd76840485d13d568e83c75f0fefefc071978dd
-  languageName: node
-  linkType: hard
-
 "@xmtp/agent-sdk-1.1.16@npm:@xmtp/agent-sdk@1.1.16, @xmtp/agent-sdk@npm:1.1.16":
   version: 1.1.16
   resolution: "@xmtp/agent-sdk@npm:1.1.16"
@@ -5347,7 +5329,6 @@ __metadata:
     "@types/express": "npm:^5"
     "@types/node": "npm:^20.0.0"
     "@types/yargs": "npm:^17.0.35"
-    "@xmtp/agent-sdk-1.1.15": "npm:@xmtp/agent-sdk@1.1.15"
     "@xmtp/agent-sdk-1.1.16": "npm:@xmtp/agent-sdk@1.1.16"
     "@xmtp/agent-sdk-1.1.17": "npm:@xmtp/agent-sdk@1.1.17-rc1"
     "@xmtp/cli": "npm:^0.0.4"

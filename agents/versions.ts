@@ -36,9 +36,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.15";
+} from "@xmtp/agent-sdk-1.1.17";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.15/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.17/debug";
 
 // Agent SDK functions
 export const getActiveAgentVersion = (index = 0) => {

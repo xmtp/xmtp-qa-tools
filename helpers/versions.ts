@@ -274,11 +274,11 @@ export function getSdkVersionsForTesting(): string[] {
 /**
  * Detect which node-sdk version is being used by checking the client instance or linked bindings
  */
-export function detectNodeSDKVersion(client: any): {
+export async function detectNodeSDKVersion(client: any): Promise<{
   nodeSDK: string | null;
   nodeBindings: string | null;
-  bindingsVersion: { branch: string; version: string; date: string } | null;
-} {
+  libxmtpVersion: string | null;
+}> {
   try {
     // First, try to find the client in VersionList
     for (const version of VersionList) {
@@ -286,12 +286,12 @@ export function detectNodeSDKVersion(client: any): {
         client instanceof version.Client ||
         client?.constructor === version.Client
       ) {
-        // Try to get the bindings version from the linked node-bindings
-        const bindingsVersion = getBindingsVersion(version.nodeBindings);
+        // Get libxmtp version directly from client
+        const libxmtpVersion = await (client as any)?.libxmtpVersion;
         return {
           nodeSDK: version.nodeSDK,
           nodeBindings: version.nodeBindings,
-          bindingsVersion,
+          libxmtpVersion: libxmtpVersion || null,
         };
       }
     }
@@ -307,10 +307,12 @@ export function detectNodeSDKVersion(client: any): {
         `node-bindings-${version.nodeBindings}`,
       );
       if (fs.existsSync(bindingsDir)) {
+        // Get libxmtp version directly from client
+        const libxmtpVersion = await (client as any)?.libxmtpVersion;
         return {
           nodeSDK: version.nodeSDK,
           nodeBindings: version.nodeBindings,
-          bindingsVersion: getBindingsVersion(version.nodeBindings),
+          libxmtpVersion: libxmtpVersion || null,
         };
       }
     }
@@ -321,46 +323,21 @@ export function detectNodeSDKVersion(client: any): {
   return {
     nodeSDK: null,
     nodeBindings: null,
-    bindingsVersion: null,
+    libxmtpVersion: null,
   };
 }
-
-/**
- * Get the bindings version information from version.json
- */
-export function getBindingsVersion(bindingsVersion: string): {
-  branch: string;
-  version: string;
-  date: string;
-} | null {
-  try {
-    const xmtpDir = path.join(process.cwd(), "node_modules", "@xmtp");
-    const bindingsDir = path.join(xmtpDir, `node-bindings-${bindingsVersion}`);
-    const versionJsonPath = path.join(bindingsDir, "dist", "version.json");
-
-    if (fs.existsSync(versionJsonPath)) {
-      const versionInfo = JSON.parse(fs.readFileSync(versionJsonPath, "utf8"));
-      return versionInfo;
-    }
-  } catch {
-    // Ignore errors
-  }
-
-  return null;
-}
-
 /**
  * Get SDK version information for logging
  */
-export function getSDKVersionInfo(
+export async function getSDKVersionInfo(
   agent: any,
   client: any,
-): {
+): Promise<{
   agentSDK: string | null;
   nodeSDK: string | null;
   nodeBindings: string | null;
-  bindingsVersion: { branch: string; version: string; date: string } | null;
-} {
+  libxmtpVersion: string | null;
+}> {
   // Detect agent-sdk version
   // Use Agent from the first auto-enabled version (respects auto flag)
   const activeVersion = getActiveAgentVersion(0);
@@ -386,7 +363,7 @@ export function getSDKVersionInfo(
 
   // Try to detect from client if not found
   if (!nodeSDK || !nodeBindings) {
-    const nodeInfo = detectNodeSDKVersion(client);
+    const nodeInfo = await detectNodeSDKVersion(client);
     if (nodeInfo.nodeSDK) {
       nodeSDK = nodeInfo.nodeSDK;
     }
@@ -395,21 +372,19 @@ export function getSDKVersionInfo(
     }
   }
 
-  // Get bindings version info
-  const bindingsVersion = nodeBindings
-    ? getBindingsVersion(nodeBindings)
-    : null;
+  // Get libxmtp version directly from client
+  const libxmtpVersion = await (client as any)?.libxmtpVersion;
 
   const versionInfo: {
     agentSDK: string | null;
     nodeSDK: string | null;
     nodeBindings: string | null;
-    bindingsVersion: { branch: string; version: string; date: string } | null;
+    libxmtpVersion: string | null;
   } = {
     agentSDK,
     nodeSDK,
     nodeBindings,
-    bindingsVersion,
+    libxmtpVersion: libxmtpVersion || null,
   };
   console.log(`\n📦 SDK Versions:`);
   if (versionInfo.agentSDK) {
@@ -420,13 +395,9 @@ export function getSDKVersionInfo(
   }
   if (versionInfo.nodeBindings) {
     console.log(`  • Node Bindings: ${versionInfo.nodeBindings}`);
-    if (versionInfo.bindingsVersion) {
-      console.log(
-        `    └─ libxmtp: ${versionInfo.bindingsVersion.branch}@${versionInfo.bindingsVersion.version} (${versionInfo.bindingsVersion.date})`,
-      );
+    if (versionInfo.libxmtpVersion) {
+      console.log(`    └─ libxmtp: ${versionInfo.libxmtpVersion}`);
     }
   }
-  console.log();
-
   return versionInfo;
 }

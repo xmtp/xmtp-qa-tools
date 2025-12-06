@@ -418,12 +418,12 @@ agent.on("text", async (ctx) => {
 });
 
 // 4. Log when we're ready
-agent.on("start", () => {
+agent.on("start", async () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent.client).catch(console.error);
-  getSDKVersionInfo(agent, agent.client);
+  await getSDKVersionInfo(agent, agent.client);
 });
 
 await agent.start({});
