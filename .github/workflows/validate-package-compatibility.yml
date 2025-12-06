@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version: [22, 23, 24]
-        package-manager: [npm, yarn, yarn1, bun]
+        package-manager: [npm, yarn, bun, pnpm]
 
     steps:
       - name: Checkout repository
@@ -44,7 +44,7 @@ jobs:
           bun-version: latest
 
       - name: Install Yarn 1
-        if: matrix.package-manager == 'yarn1'
+        if: matrix.package-manager == 'yarn'
         run: |
           npm install -g yarn@1.22.19
           yarn --version
@@ -70,15 +70,8 @@ jobs:
           cd gm-bot
           npm install
 
-      - name: Install dependencies with yarn
-        if: matrix.package-manager == 'yarn'
-        run: |
-          cd gm-bot
-          touch yarn.lock
-          yarn install --no-immutable
-
       - name: Install dependencies with yarn 1
-        if: matrix.package-manager == 'yarn1'
+        if: matrix.package-manager == 'yarn'
         run: |
           cd gm-bot
           touch yarn.lock
@@ -99,7 +92,7 @@ jobs:
       - name: Build project
         run: |
           cd gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
+            if [ "${{ matrix.package-manager }}" = "yarn" ]; then
             yarn run build
           else
             ${{ matrix.package-manager }} run build
