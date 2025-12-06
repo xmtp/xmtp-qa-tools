@@ -43,6 +43,12 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Install pnpm
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.0
+
       - name: Install Yarn 1
         if: matrix.package-manager == 'yarn'
         run: |
