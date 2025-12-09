@@ -73,7 +73,9 @@ async function runLoadTest() {
         dbPath: `./data/dbs/${identity.inboxId.slice(0, 8)}.db3`,
       };
       
-      if (config.config.apiUrl) {
+      if (config.config.d14nHost) {
+        clientOptions.d14nHost = config.config.d14nHost;
+      } else if (config.config.apiUrl) {
         clientOptions.apiUrl = config.config.apiUrl;
       }
       

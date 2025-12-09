@@ -39,6 +39,7 @@ interface LoadTestConfig {
     membersPerGroup: number;
     env: string;
     apiUrl?: string;
+    d14nHost?: string;
   };
 }
 
@@ -51,13 +52,14 @@ program
   .requiredOption("-g, --groups <number>", "Number of groups to create", parseInt)
   .requiredOption("-m, --members <number>", "Members per group", parseInt)
   .option("-e, --env <environment>", "XMTP environment (dev|production|local)", "dev")
-  .option("-a, --api-url <url>", "Custom API URL", "https://grpc.testnet-staging.xmtp.network:443")
+  .option("-a, --api-url <url>", "Custom API URL (for V3 mode)")
+  .option("-d, --d14n-host <url>", "D14n host URL", "https://grpc.testnet-staging.xmtp.network:443")
   .option("-o, --output <path>", "Output directory for config", "./data")
   .parse();
 
 const options = program.opts();
 
-async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIdentity> {
+async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: string): Promise<TestIdentity> {
   const user = createUser();
   const signer = createSigner(user);
   const encryptionKey = generateEncryptionKey();
@@ -81,11 +83,11 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
     dbPath: tempDbPath,
   };
   
-  if (apiUrl) {
+  if (d14nHost) {
+    clientOptions.d14nHost = d14nHost;
+  } else if (apiUrl) {
     clientOptions.apiUrl = apiUrl;
   }
-  
-  console.log(`DEBUG: Creating client with options:`, { env, dbPath: tempDbPath, dbEncryptionKeyLength: dbEncryptionKey.length });
   
   const client = await Client.create(signer, clientOptions);
   
@@ -109,7 +111,9 @@ async function setupLoadTest() {
   console.log(`Groups: ${options.groups}`);
   console.log(`Members per group: ${options.members}`);
   console.log(`Environment: ${options.env}`);
-  if (options.apiUrl) {
+  if (options.d14nHost) {
+    console.log(`D14n Host: ${options.d14nHost}`);
+  } else if (options.apiUrl) {
     console.log(`API URL: ${options.apiUrl}`);
   }
   console.log(`Output: ${options.output}`);
@@ -149,7 +153,7 @@ async function setupLoadTest() {
   const identities: TestIdentity[] = [];
   
   for (let i = 0; i < options.identities; i++) {
-    const identity = await createTestIdentity(options.env, options.apiUrl);
+    const identity = await createTestIdentity(options.env, options.apiUrl, options.d14nHost);
     identities.push(identity);
     
     if ((i + 1) % 10 === 0) {
@@ -196,7 +200,9 @@ async function setupLoadTest() {
       dbPath: tempDbPath,
     };
     
-    if (options.apiUrl) {
+    if (options.d14nHost) {
+      clientOptions.d14nHost = options.d14nHost;
+    } else if (options.apiUrl) {
       clientOptions.apiUrl = options.apiUrl;
     }
     
@@ -239,6 +245,7 @@ async function setupLoadTest() {
       membersPerGroup: options.members,
       env: options.env,
       apiUrl: options.apiUrl,
+      d14nHost: options.d14nHost,
     },
   };
   
