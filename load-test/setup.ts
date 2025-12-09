@@ -68,9 +68,13 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
     mkdirSync(dataDir, { recursive: true });
   }
   
+  // Create a temporary dbPath for setup
+  const tempDbPath = `${dataDir}/setup-${user.account.address.slice(0, 8)}.db3`;
+  
   const clientOptions: any = {
     env: env as any,
     dbEncryptionKey: encryptionKeyFromHex(encryptionKey),
+    dbPath: tempDbPath,
   };
   
   if (apiUrl) {
@@ -177,9 +181,13 @@ async function setupLoadTest() {
     
     const signer = createSigner(firstMember.privateKey);
     
+    // Use existing temp db if it exists
+    const tempDbPath = `./data/dbs/setup-${firstMember.accountAddress.slice(0, 8)}.db3`;
+    
     const clientOptions: any = {
       env: options.env as any,
       dbEncryptionKey: encryptionKeyFromHex(firstMember.encryptionKey),
+      dbPath: tempDbPath,
     };
     
     if (options.apiUrl) {
