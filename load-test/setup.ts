@@ -70,17 +70,11 @@ async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: strin
     mkdirSync(dataDir, { recursive: true });
   }
   
-  // Create a temporary dbPath for setup
-  const tempDbPath = `${dataDir}/setup-${user.account.address.slice(0, 8)}.db3`;
-  
   const dbEncryptionKey = encryptionKeyFromHex(encryptionKey);
-  console.log(`DEBUG: encryptionKey hex length: ${encryptionKey.length}`);
-  console.log(`DEBUG: dbEncryptionKey type: ${dbEncryptionKey.constructor.name}, length: ${dbEncryptionKey.length}`);
   
   const clientOptions: any = {
     env: env as any,
     dbEncryptionKey,
-    dbPath: tempDbPath,
   };
   
   if (d14nHost) {
@@ -91,12 +85,19 @@ async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: strin
   
   const client = await Client.create(signer, clientOptions);
   
+  // Now create the proper db path based on inboxId and recreate client
+  const dbPath = `${dataDir}/${client.inboxId.slice(0, 8)}.db3`;
+  clientOptions.dbPath = dbPath;
+  
+  // Close and recreate with proper path
+  const finalClient = await Client.create(signer, clientOptions);
+  
   const identity: TestIdentity = {
     accountAddress: user.account.address,
     privateKey: user.key,
     encryptionKey,
-    inboxId: client.inboxId,
-    installationId: client.installationId,
+    inboxId: finalClient.inboxId,
+    installationId: finalClient.installationId,
   };
   
   console.log(`✓ Created identity: ${identity.accountAddress} (inbox: ${identity.inboxId.slice(0, 8)}...)`);
@@ -191,13 +192,13 @@ async function setupLoadTest() {
     
     const signer = createSigner(firstMember.privateKey);
     
-    // Use existing temp db if it exists
-    const tempDbPath = `./data/dbs/setup-${firstMember.accountAddress.slice(0, 8)}.db3`;
+    // Use the same db path as was created for this identity
+    const dbPath = `./data/dbs/${firstMember.inboxId.slice(0, 8)}.db3`;
     
     const clientOptions: any = {
       env: options.env as any,
       dbEncryptionKey: encryptionKeyFromHex(firstMember.encryptionKey),
-      dbPath: tempDbPath,
+      dbPath: dbPath,
     };
     
     if (options.d14nHost) {
