@@ -71,15 +71,21 @@ async function createTestIdentity(env: string, apiUrl?: string): Promise<TestIde
   // Create a temporary dbPath for setup
   const tempDbPath = `${dataDir}/setup-${user.account.address.slice(0, 8)}.db3`;
   
+  const dbEncryptionKey = encryptionKeyFromHex(encryptionKey);
+  console.log(`DEBUG: encryptionKey hex length: ${encryptionKey.length}`);
+  console.log(`DEBUG: dbEncryptionKey type: ${dbEncryptionKey.constructor.name}, length: ${dbEncryptionKey.length}`);
+  
   const clientOptions: any = {
     env: env as any,
-    dbEncryptionKey: encryptionKeyFromHex(encryptionKey),
+    dbEncryptionKey,
     dbPath: tempDbPath,
   };
   
   if (apiUrl) {
     clientOptions.apiUrl = apiUrl;
   }
+  
+  console.log(`DEBUG: Creating client with options:`, { env, dbPath: tempDbPath, dbEncryptionKeyLength: dbEncryptionKey.length });
   
   const client = await Client.create(signer, clientOptions);
   
