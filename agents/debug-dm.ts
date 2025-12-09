@@ -1,198 +1,34 @@
-import { fileURLToPath } from "node:url";
-import agents from "@agents/agents";
-import { PING_MESSAGE } from "@agents/helper";
-import { Agent } from "@agents/versions";
-import { type DecodedMessage } from "@xmtp/node-sdk";
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
+import { Agent } from "@xmtp/agent-sdk";
 
-export interface SendOptions {
-  target?: string;
-  groupId?: string;
-  agent?: string;
-  message?: string;
-  wait?: boolean;
-  timeout?: number;
-}
+process.loadEnvFile(".env");
 
-export interface WaitForResponseResult {
-  success: boolean;
-  sendTime: number;
-  responseTime: number;
-  responseMessage: DecodedMessage | null;
-}
+const MESSAGE = "PING";
+const TIMEOUT_SECONDS = 10;
+const STREAM_SETUP_DELAY_MS = 500;
 
-export function registerSendCommand(yargs: any) {
-  return yargs.command(
-    "send",
-    "Send a message to a conversation",
-    (y: any) =>
-      y
-        .option("target", { type: "string", alias: "t" })
-        .option("group-id", { type: "string" })
-        .option("agent", { type: "string", alias: "a" })
-        .option("message", {
-          type: "string",
-          alias: "m",
-          default: "hello world",
-        })
-        .option("wait", { type: "boolean", default: false })
-        .option("timeout", { type: "number", default: 10000 }),
-    async (argv: any) => {
-      await runSendCommand({
-        target: argv.target,
-        groupId: argv["group-id"],
-        agent: argv.agent,
-        message: argv.message,
-        wait: argv.wait,
-        timeout: argv.timeout,
-      });
-    },
-  );
-}
-
-export async function runSendCommand(options: SendOptions): Promise<void> {
-  let { target, message } = options;
-
-  if (options.agent) {
-    const agent = agents.find(
-      (a) => a.name.toLowerCase() === options.agent?.toLowerCase(),
-    );
-    if (!agent) {
-      throw new Error(
-        `Agent "${options.agent}" not found. Available: ${agents.map((a) => a.name).join(", ")}`,
-      );
-    }
-    target = agent.address;
-    message = message || PING_MESSAGE;
-    console.log(`🤖 Using agent: ${agent.name} (${agent.address})`);
-  }
-
-  if (!target && !options.groupId) {
-    throw new Error("Either --target, --agent, or --group-id is required");
-  }
-
-  const agent = await Agent.createFromEnv({});
-  try {
-    if (options.groupId) {
-      await agent.client.conversations.sync();
-      const group = (await agent.client.conversations.list()).find(
-        (c) => c.id === options.groupId,
-      );
-      if (!group) {
-        throw new Error(`Group ${options.groupId} not found`);
-      }
-      await sendMessage(
-        agent,
-        group,
-        message || "hello world",
-        options.wait,
-        options.timeout,
-      );
-    } else if (target) {
-      const dm = await agent.createDmWithAddress(target as `0x${string}`);
-      await sendMessage(
-        agent,
-        dm,
-        message || "hello world",
-        options.wait,
-        options.timeout,
-      );
-    }
-  } finally {
-    await agent.stop();
-  }
-}
-
-async function sendMessage(
+async function waitForResponse(
   agent: Agent,
   conversation: any,
+  conversationId: string,
   message: string,
-  wait?: boolean,
-  timeout?: number,
 ) {
-  //test
-  if (wait) {
-    const result = await waitForResponse({
-      client: {
-        conversations: {
-          streamAllMessages: () =>
-            agent.client.conversations.streamAllMessages() as Promise<
-              AsyncIterable<DecodedMessage>
-            >,
-        },
-        inboxId: agent.client.inboxId,
-      },
-      conversation: {
-        send: (content: string) => conversation.send(content),
-      },
-      conversationId: conversation.id,
-      senderInboxId: agent.client.inboxId,
-      timeout: timeout || 10000,
-      messageText: message,
-    });
-    console.log(`✅ Message sent: "${message}"`);
-    if (result.responseMessage) {
-      const content =
-        typeof result.responseMessage.content === "string"
-          ? result.responseMessage.content
-          : JSON.stringify(result.responseMessage.content);
-      console.log(`📬 Response (${result.responseTime}ms): "${content}"`);
-    } else {
-      console.log(`❌ No response within timeout`);
-    }
-  } else {
-    await conversation.send(message);
-    console.log(`✅ Message sent: "${message}"`);
-  }
-}
-
-export async function waitForResponse(options: {
-  client: {
-    conversations: {
-      streamAllMessages: () => Promise<AsyncIterable<DecodedMessage>>;
-    };
-    inboxId: string;
-  };
-  conversation: {
-    send: (content: string) => Promise<string>;
-  };
-  conversationId: string;
-  senderInboxId: string;
-  timeout: number;
-  messageText?: string;
-  workerId?: number;
-  attempt?: number;
-}): Promise<WaitForResponseResult> {
-  const {
-    client,
-    conversation,
-    conversationId,
-    senderInboxId,
-    timeout,
-    messageText,
-    workerId,
-    attempt,
-  } = options;
-
-  // Set up stream and start consuming BEFORE sending message to avoid race condition
-  const stream = await client.conversations.streamAllMessages();
-
-  const responseStart = performance.now();
+  const stream = await agent.client.conversations.streamAllMessages();
+  const startTime = performance.now();
   let timeoutId: NodeJS.Timeout | null = null;
+  let done = false;
 
-  // Start consuming the stream BEFORE sending the message
   const responsePromise = (async () => {
     try {
-      for await (const message of stream) {
-        // Filter by conversation ID and exclude messages from sender
+      for await (const msg of stream) {
+        if (done) break;
         if (
-          message.conversationId !== conversationId ||
-          message.senderInboxId.toLowerCase() === senderInboxId.toLowerCase()
+          msg.conversationId !== conversationId ||
+          msg.senderInboxId.toLowerCase() === agent.client.inboxId.toLowerCase()
         ) {
           continue;
         }
-        return message;
+        done = true;
+        return msg;
       }
       return null;
     } catch {
@@ -200,91 +36,73 @@ export async function waitForResponse(options: {
     }
   })();
 
-  // Small delay to ensure stream is actively listening before sending
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, STREAM_SETUP_DELAY_MS));
 
-  // Now send the message - the stream is already being consumed
-  const sendStart = performance.now();
-  await conversation.send(messageText || `test-${Date.now()}`);
-  const sendTime = performance.now() - sendStart;
-
-  if (workerId !== undefined && attempt !== undefined) {
-    console.log(
-      `📩 ${workerId}: Attempt ${attempt}, Sent in ${sendTime.toFixed(2)}ms`,
-    );
-  }
+  await conversation.send(message);
+  const sendTime = performance.now() - startTime;
 
   try {
     const timeoutPromise = new Promise<null>((_, reject) => {
       timeoutId = setTimeout(() => {
         reject(new Error("Timeout"));
-      }, timeout);
+      }, TIMEOUT_SECONDS * 1000);
     });
 
-    const received = await Promise.race([responsePromise, timeoutPromise]);
-    const responseTime = performance.now() - responseStart;
+    const response = await Promise.race([responsePromise, timeoutPromise]);
+    const responseTime = performance.now() - startTime;
 
-    if (workerId !== undefined && attempt !== undefined) {
-      console.log(
-        `✅ ${workerId}: Attempt ${attempt}, Send=${sendTime.toFixed(2)}ms, Response=${responseTime.toFixed(2)}ms`,
-      );
-    }
-    return { success: true, sendTime, responseTime, responseMessage: received };
-  } catch {
-    if (workerId !== undefined && attempt !== undefined) {
-      console.log(
-        `⏱️  ${workerId}: Attempt ${attempt}, Timeout after ${timeout}ms`,
-      );
-    }
     return {
-      success: false,
       sendTime,
-      responseTime: performance.now() - responseStart,
+      responseTime,
+      responseMessage: response,
+    };
+  } catch {
+    done = true;
+    return {
+      sendTime,
+      responseTime: performance.now() - startTime,
       responseMessage: null,
     };
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
+    done = true;
   }
 }
 
 async function main() {
-  const argv = await yargs(hideBin(process.argv))
-    .scriptName("yarn send")
-    .option("target", { type: "string", alias: "t" })
-    .option("group-id", { type: "string" })
-    .option("agent", { type: "string", alias: "a" })
-    .option("message", { type: "string", alias: "m", default: "hello world" })
-    .option("wait", { type: "boolean", default: false })
-    .option("timeout", { type: "number", default: 10000 })
-    .help()
-    .parse();
+  const target = process.argv[2];
+  if (!target) {
+    console.error("Error: Target address required");
+    process.exit(1);
+  }
 
+  const agent = await Agent.createFromEnv({});
   try {
-    await runSendCommand({
-      target: argv.target,
-      groupId: argv["group-id"],
-      agent: argv.agent,
-      message: argv.message,
-      wait: argv.wait,
-      timeout: argv.timeout,
-    });
+    const dm = await agent.createDmWithAddress(target as `0x${string}`);
+    const result = await waitForResponse(agent, dm, dm.id, MESSAGE);
+
+    console.log(`✅ Message sent (${result.sendTime.toFixed(2)}ms)`);
+    if (result.responseMessage) {
+      const content =
+        typeof result.responseMessage.content === "string"
+          ? result.responseMessage.content
+          : JSON.stringify(result.responseMessage.content);
+      console.log(
+        `📬 Response (${result.responseTime.toFixed(2)}ms): "${content}"`,
+      );
+    } else {
+      console.log(`❌ No response within ${TIMEOUT_SECONDS}s`);
+    }
   } finally {
-    // Ensure process exits after completion
+    await agent.stop();
     process.exit(0);
   }
 }
 
-const isMainModule =
-  fileURLToPath(import.meta.url) === process.argv[1] ||
-  process.argv[1]?.includes("send.ts") ||
-  process.argv[1]?.endsWith("send");
-
-if (isMainModule) {
-  main().catch((error: unknown) => {
-    console.error(
-      "Error:",
-      error instanceof Error ? error.message : String(error),
-    );
-    process.exit(1);
-  });
-}
+main().catch((error: unknown) => {
+  console.error(
+    "Error:",
+    error instanceof Error ? error.message : String(error),
+  );
+  process.exit(1);
+});
