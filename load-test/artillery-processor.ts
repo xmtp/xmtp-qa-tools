@@ -137,7 +137,7 @@ function logMetrics() {
 /**
  * Main message sending function called by Artillery
  */
-export async function sendMessage(context: any, events: any, done: Function) {
+export async function sendMessage(userContext: any, events: any, done?: Function) {
   try {
     // Load config on first run
     if (!config) {
@@ -178,32 +178,34 @@ export async function sendMessage(context: any, events: any, done: Function) {
     // Log periodic metrics
     logMetrics();
     
-    done();
+    if (done) done();
   } catch (error) {
     console.error(`[Worker ${process.pid}] Error sending message:`, error);
     events.emit('counter', 'messages.failed', 1);
-    done(error);
+    if (done) done(error);
+    else throw error;
   }
 }
 
 /**
  * Initialize worker - called once per worker process
  */
-export async function beforeScenario(context: any, events: any, done: Function) {
+export async function beforeScenario(userContext: any, events: any, done?: Function) {
   console.log(`[Worker ${process.pid}] Initializing...`);
   try {
     loadConfig();
-    done();
+    if (done) done();
   } catch (error) {
     console.error(`[Worker ${process.pid}] Failed to initialize:`, error);
-    done(error);
+    if (done) done(error);
+    else throw error;
   }
 }
 
 /**
  * Cleanup worker - called when worker is shutting down
  */
-export async function afterScenario(context: any, events: any, done: Function) {
+export async function afterScenario(userContext: any, events: any, done?: Function) {
   console.log(`[Worker ${process.pid}] Shutting down... Sent ${messageCounter} messages`);
   
   // Close all clients
@@ -218,7 +220,7 @@ export async function afterScenario(context: any, events: any, done: Function) {
   }
   
   clients.clear();
-  done();
+  if (done) done();
 }
 
 // Export for Artillery
