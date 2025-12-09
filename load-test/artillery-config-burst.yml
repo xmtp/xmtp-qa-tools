@@ -1,0 +1,31 @@
+config:
+  target: "xmtp://load-test"
+  
+  # Max throughput burst test - 1 minute
+  phases:
+    - duration: 60       # 1 minute max burst
+      arrivalRate: 100   # 100 messages per second
+      name: "Max Burst"
+  
+  # Artillery processor
+  processor: "./artillery-processor.cjs"
+  
+  # Max workers for maximum throughput
+  pool: 20
+  
+  # Performance tuning
+  ensure:
+    maxErrorRate: 10  # Allow higher error rate during burst
+
+# Scenario
+scenarios:
+  - name: "Send XMTP Messages"
+    flow:
+      - function: "sendMessage"
+
+# Plugins
+plugins:
+  expect: {}
+  metrics-by-endpoint:
+    stripQueryString: true
+

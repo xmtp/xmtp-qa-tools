@@ -7,6 +7,7 @@
     "setup": "tsx setup.ts",
     "build": "node build-processor.js",
     "test": "yarn build && artillery run artillery-config.yml",
+    "test:burst": "yarn build && artillery run artillery-config-burst.yml",
     "test:simple": "tsx run-simple.ts",
     "clean": "rm -rf data/ *.db3 report.json artillery-processor.js artillery-processor.cjs dist/"
   },
