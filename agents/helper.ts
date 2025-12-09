@@ -1,4 +1,5 @@
 import { type DecodedMessage, type MessageContext } from "@agents/versions";
+import agents from "./agents";
 
 /**
  * Agent configuration interface
@@ -30,9 +31,19 @@ export async function getMessageBody(ctx: MessageContext, timezone?: string) {
       dateString = ctx.message.sentAt.toISOString();
     }
     const serverId = process.env.SERVER_ID || "railway";
-    const messageBody1 = `replying from ${serverId} to a message sent by ${senderAddress} on ${dateString} on converstion ${ctx.conversation.id}. Content: "${messageContent}"`;
+    const messageBody1 = `replying from ${serverId} to a message \n sent by ${senderAddress} \n on ${dateString} \n on converstion ${ctx.conversation.id}. \n \n Content: "${messageContent}"`;
 
     console.log(messageBody1);
+    console.log({
+      receiver: {
+        libxmtpVersion: ctx.client.libxmtpVersion,
+        installationId: ctx.client.installationId,
+        inboxId: ctx.client.inboxId,
+      },
+      sender: {
+        address: senderAddress,
+      },
+    });
     return messageBody1;
   } catch (error) {
     console.error("Error getting message body", error);
