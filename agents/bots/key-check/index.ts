@@ -35,8 +35,7 @@ const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers();
 const groupHandlers = new GroupHandlers();
-const keyPackagesHandlers = new KeyPackagesHandlers(debugHandlers);
-
+const keyPackagesHandlers = new KeyPackagesHandlers();
 // Configuration for auto-showing menu after actions
 // Set to false to disable automatic menu display after actions
 const AUTO_SHOW_MENU_AFTER_ACTION = true;
@@ -72,7 +71,7 @@ const appConfig: AppConfig = {
 
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
-            await debugHandlers.handleKeyPackageCheck(
+            await keyPackagesHandlers.handleKeyPackageCheck(
               ctx,
               ctx.message.senderInboxId as string,
             );
