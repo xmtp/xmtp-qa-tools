@@ -81,6 +81,9 @@ async function runLoadTest() {
       
       const client = await Client.create(signer, clientOptions);
       
+      // Sync conversations
+      await client.conversations.sync();
+      
       clients.set(identity.inboxId, client);
     } catch (error) {
       console.error(`❌ Failed to create client for ${identity.accountAddress}:`, error);

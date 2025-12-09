@@ -82,6 +82,9 @@ async function getClient(identity: TestIdentity): Promise<Client> {
     
     const client = await Client.create(signer, clientOptions);
     
+    // Sync conversations to ensure they're available
+    await client.conversations.sync();
+    
     clients.set(identity.inboxId, client);
     console.log(`[Worker ${process.pid}] Created client for ${identity.accountAddress}`);
     
