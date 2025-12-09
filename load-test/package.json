@@ -8,7 +8,10 @@
     "build": "node build-processor.js",
     "test": "yarn build && artillery run artillery-config.yml",
     "test:burst": "yarn build && artillery run artillery-config-burst.yml",
+    "test:auto": "yarn build && artillery run artillery-config-auto.yml",
+    "test:adaptive": "tsx adaptive-test.ts",
     "test:simple": "tsx run-simple.ts",
+    "auto-tune": "tsx auto-tune.ts",
     "clean": "rm -rf data/ *.db3 report.json artillery-processor.js artillery-processor.cjs dist/"
   },
   "keywords": [
