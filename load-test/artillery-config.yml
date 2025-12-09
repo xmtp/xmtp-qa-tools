@@ -21,7 +21,7 @@ config:
       name: "Cool-down"
   
   # Artillery processor - custom logic for XMTP message sending
-  processor: "./artillery-processor.js"
+  processor: "./artillery-processor.cjs"
   
   # Performance tuning
   ensure:

@@ -12,6 +12,7 @@ node_modules/
 
 # Build output
 artillery-processor.js
+artillery-processor.cjs
 
 # Logs
 *.log

@@ -8,7 +8,7 @@
     "build": "node build-processor.js",
     "test": "yarn build && artillery run artillery-config.yml",
     "test:simple": "tsx run-simple.ts",
-    "clean": "rm -rf data/ *.db3 report.json artillery-processor.js dist/"
+    "clean": "rm -rf data/ *.db3 report.json artillery-processor.js artillery-processor.cjs dist/"
   },
   "keywords": [
     "xmtp",

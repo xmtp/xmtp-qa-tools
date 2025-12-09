@@ -12,13 +12,13 @@ try {
   // Check if esbuild is available
   const esbuildCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   
-  execSync(`${esbuildCmd} esbuild artillery-processor.ts --bundle --platform=node --format=cjs --outfile=artillery-processor.js --external:@xmtp/node-sdk --external:@xmtp/content-type-* --external:viem --external:@noble/* --target=node18`, {
+  execSync(`${esbuildCmd} esbuild artillery-processor.ts --bundle --platform=node --format=cjs --outfile=artillery-processor.cjs --external:@xmtp/node-sdk --external:@xmtp/content-type-* --external:viem --external:@noble/* --target=node18`, {
     stdio: 'inherit',
     shell: true
   });
   
-  if (existsSync('./artillery-processor.js')) {
-    console.log('✅ Build complete: artillery-processor.js');
+  if (existsSync('./artillery-processor.cjs')) {
+    console.log('✅ Build complete: artillery-processor.cjs');
   } else {
     console.error('❌ Build failed: output file not created');
     process.exit(1);
