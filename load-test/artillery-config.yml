@@ -29,29 +29,12 @@ config:
   
   # Worker configuration for parallel execution
   pool: 10  # Number of worker processes (tune based on CPU cores)
-  
-  # Custom payload - not used but required by Artillery
-  payload:
-    path: "./data/load-test-config.json"
-    fields:
-      - "identities"
-      - "groups"
-  
-  # Environment variables
-  variables:
-    configPath: "./data/load-test-config.json"
 
 # Scenario definition
 scenarios:
   - name: "Send XMTP Messages"
-    engine: "custom"
-    
-    # Flow: Each virtual user sends one message
     flow:
       - function: "sendMessage"
-      
-      # Add a small random delay to avoid thundering herd
-      - think: 0.1
 
 # Plugins for enhanced reporting
 plugins:
