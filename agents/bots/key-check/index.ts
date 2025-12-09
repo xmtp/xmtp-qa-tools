@@ -23,6 +23,7 @@ import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";
+import { KeyPackagesHandlers } from "./handlers/keypackages";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
@@ -34,6 +35,7 @@ const uxHandlers = new UxHandlers();
 const forksHandlers = new ForksHandlers();
 const debugHandlers = new DebugHandlers();
 const groupHandlers = new GroupHandlers();
+const keyPackagesHandlers = new KeyPackagesHandlers(debugHandlers);
 
 // Configuration for auto-showing menu after actions
 // Set to false to disable automatic menu display after actions
@@ -80,14 +82,14 @@ const appConfig: AppConfig = {
           id: "keycheck-inbox",
           label: "🔍 By Inbox ID",
           handler: async (ctx: MessageContext) => {
-            await showInboxInputMenu(ctx);
+            await keyPackagesHandlers.showInboxInputMenu(ctx);
           },
         },
         {
           id: "keycheck-address",
           label: "📧 By Address",
           handler: async (ctx: MessageContext) => {
-            await showAddressInputMenu(ctx);
+            await keyPackagesHandlers.showAddressInputMenu(ctx);
           },
         },
         { id: "main-menu", label: "⬅️ Back" },
@@ -236,34 +238,6 @@ const appConfig: AppConfig = {
 // Note: Common actions like "help", "back-to-main", and "main-menu"
 // are automatically registered by initializeAppFromConfig()
 
-async function showInboxInputMenu(ctx: MessageContext) {
-  const inputMenu = ActionBuilder.create(
-    "inbox-input-menu",
-    "🔍 Check by Inbox ID",
-  )
-    .add("back-to-main", "⬅️ Go back")
-    .build();
-
-  await sendActions(ctx, inputMenu);
-  await ctx.sendText(
-    "Please send the Inbox ID (64 hex characters) you want to check as a regular text message.",
-  );
-}
-
-async function showAddressInputMenu(ctx: MessageContext) {
-  const inputMenu = ActionBuilder.create(
-    "address-input-menu",
-    "📧 Check by Address",
-  )
-    .add("back-to-main", "⬅️ Go back")
-    .build();
-
-  await sendActions(ctx, inputMenu);
-  await ctx.sendText(
-    "Please send the Ethereum address (0x + 40 hex characters) you want to check as a regular text message.",
-  );
-}
-
 async function showCustomLoadTestMenu(ctx: MessageContext) {
   const customMenu = ActionBuilder.create(
     "custom-load-test-menu",
@@ -360,25 +334,13 @@ agent.on("text", async (ctx) => {
     return;
   }
 
-  // Check if this might be an inbox ID (64 hex chars without 0x prefix)
-  const inboxIdPattern = /^[a-fA-F0-9]{64}$/;
-  if (inboxIdPattern.test(content.trim() as string)) {
-    console.log(`Detected inbox ID: ${content.trim()}`);
-    await debugHandlers.handleKeyPackageCheck(ctx, content.trim() as string);
-    await showNavigationOptions(ctx, appConfig, "Key package check completed!");
-    return;
-  }
-
-  // Check if this might be an Ethereum address (0x + 40 hex chars)
-  const addressPattern = /^0x[a-fA-F0-9]{40}$/;
-  if (addressPattern.test(content.trim() as string)) {
-    console.log(`Detected Ethereum address: ${content.trim()}`);
-    await debugHandlers.handleKeyPackageCheck(
-      ctx,
-      "",
-      content.trim() as string,
-    );
-    await showNavigationOptions(ctx, appConfig, "Key package check completed!");
+  // Check for inbox ID or address patterns
+  const handled = await keyPackagesHandlers.handleTextMessage(
+    ctx,
+    content.trim(),
+    appConfig,
+  );
+  if (handled) {
     return;
   }
 
