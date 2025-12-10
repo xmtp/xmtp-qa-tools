@@ -6,16 +6,16 @@ import {
   MessageContext as MessageContext1116,
 } from "@xmtp/agent-sdk-1.1.16";
 import {
-  Agent as Agent1117,
-  MessageContext as MessageContext1117,
-} from "@xmtp/agent-sdk-1.1.17";
+  Agent as Agent120,
+  MessageContext as MessageContext120,
+} from "@xmtp/agent-sdk-1.2.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent1117,
-    MessageContext: MessageContext1117,
-    agentSDK: "1.1.17",
+    Agent: Agent120,
+    MessageContext: MessageContext120,
+    agentSDK: "1.2.0",
     nodeSDK: "4.5.0",
     auto: true,
   },
@@ -36,9 +36,9 @@ export {
   type AgentMiddleware,
   type Group as AgentGroupType,
   type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.1.17";
+} from "@xmtp/agent-sdk-1.2.0";
 
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.1.17/debug";
+export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.2.0/debug";
 
 // Agent SDK functions
 export const getActiveAgentVersion = (index = 0) => {
