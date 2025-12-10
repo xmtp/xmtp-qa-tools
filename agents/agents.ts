@@ -26,6 +26,12 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
+    name: "alphie.base.eth",
+    address: "0x5154C8707f7Fa18961E03F5b51edB2fb56a206dc",
+    networks: ["production"],
+    live: true,
+  },
+  {
     name: "arma",
     address: "0x1456350CD79c51814567b0c1E767d3032dBD1647",
     networks: ["production"],
