@@ -1498,9 +1498,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/agent-sdk-1.1.17@npm:@xmtp/agent-sdk@1.1.17-rc1":
-  version: 1.1.17-rc1
-  resolution: "@xmtp/agent-sdk@npm:1.1.17-rc1"
+"@xmtp/agent-sdk-1.2.0@npm:@xmtp/agent-sdk@1.2.0":
+  version: 1.2.0
+  resolution: "@xmtp/agent-sdk@npm:1.2.0"
   dependencies:
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
@@ -1510,9 +1510,9 @@ __metadata:
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/content-type-transaction-reference": "npm:^2.0.2"
     "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
-    "@xmtp/node-sdk": "npm:4.5.0"
+    "@xmtp/node-sdk": "npm:4.5.1"
     viem: "npm:^2.37.6"
-  checksum: 10/b95be3562259f482a5c8639a5e6ecfa74845eee51cd6331a1915df388f9d9079a280818b136f53352b1c67fa7b6c7cb56a9065c72a213b611e48d302825d6503
+  checksum: 10/c9e72b8388c46062dae956d1b975bb81f7a27fa58637e36c83f83694d78e549e3d5ca218ae8f5e3b9c9907bd0543265b2ec210e99cf7ce7d40df0ddbc543fc1a
   languageName: node
   linkType: hard
 
@@ -1794,7 +1794,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-4.5.0@npm:@xmtp/node-sdk@4.5.0, @xmtp/node-sdk@npm:4.5.0":
+"@xmtp/node-sdk-4.5.0@npm:@xmtp/node-sdk@4.5.0":
   version: 4.5.0
   resolution: "@xmtp/node-sdk@npm:4.5.0"
   dependencies:
@@ -1815,6 +1815,18 @@ __metadata:
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.5.4"
   checksum: 10/27aa71a1cce7f034d883a25a6946338bc967742689b4a71a224ae83ffa930896e33d2cafcd8bfeda85bd6f3ab34419117773d4f3cca770bfd583bde9ef4c84ad
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk@npm:4.5.1":
+  version: 4.5.1
+  resolution: "@xmtp/node-sdk@npm:4.5.1"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.6.6"
+  checksum: 10/3efa4ddb2de91d966c359d31dd90ca615f6bba39a44b36a73bfcea3783edd922d0eb8b3db0a8d6531a6ae273868809f97bf6981c018f1c9f3d5ff49d887dd4c3
   languageName: node
   linkType: hard
 
@@ -5314,7 +5326,7 @@ __metadata:
     "@types/node": "npm:^24.10.1"
     "@types/yargs": "npm:^17.0.35"
     "@xmtp/agent-sdk-1.1.16": "npm:@xmtp/agent-sdk@1.1.16"
-    "@xmtp/agent-sdk-1.1.17": "npm:@xmtp/agent-sdk@1.1.17-rc1"
+    "@xmtp/agent-sdk-1.2.0": "npm:@xmtp/agent-sdk@1.2.0"
     "@xmtp/cli": "npm:^0.0.4"
     "@xmtp/content-type-markdown": "npm:^1.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
