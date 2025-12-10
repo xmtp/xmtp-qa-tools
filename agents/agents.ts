@@ -26,12 +26,6 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
-    name: "squabble",
-    address: "0xD60d560c9Ae4ad9b7C252FacE7B664A8d7A426da",
-    networks: ["production"],
-    live: true,
-  },
-  {
     name: "arma",
     address: "0x1456350CD79c51814567b0c1E767d3032dBD1647",
     networks: ["production"],
