@@ -38,6 +38,7 @@ describe(testName, () => {
   let allMembers: InboxData[] = [];
   let allMembersWithExtra: InboxData[] = [];
   let cumulativeGroups: Group[] = [];
+  let groupWorkers: Worker[] = [];
 
   setupDurationTracking({
     testName,
@@ -129,12 +130,16 @@ describe(testName, () => {
       allMembersWithExtra = getInboxes(i - workers.getAll().length + 2, 2, i);
       allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
       extraMember = allMembersWithExtra.at(-1)!;
+      const workersToAdd = workers
+        .getAllButCreator()
+        .slice(0, i - 1 - allMembers.length);
+      groupWorkers = workersToAdd;
       const membersToAdd = [
         ...allMembers.map((a) => ({
           identifier: a.accountAddress,
           identifierKind: IdentifierKind.Ethereum,
         })),
-        ...workers.getAllButCreator().map((w) => ({
+        ...workersToAdd.map((w) => ({
           identifier: w.address,
           identifierKind: IdentifierKind.Ethereum,
         })),
@@ -170,7 +175,7 @@ describe(testName, () => {
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
       const verifyResult = await verifyMembershipStream(
         newGroup,
-        workers.getAllButCreator(),
+        groupWorkers,
         [extraMember.inboxId],
       );
 
@@ -194,7 +199,7 @@ describe(testName, () => {
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
-        workers.getAllButCreator(),
+        groupWorkers,
       );
 
       sendMetric(
@@ -223,7 +228,7 @@ describe(testName, () => {
     it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
       const verifyResult = await verifyMetadataStream(
         newGroup,
-        workers.getAllButCreator(),
+        groupWorkers,
       );
 
       setCustomDuration(verifyResult.averageEventTiming);
