@@ -383,7 +383,7 @@ agent.on("start", async () => {
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
-  logDetails(agent.client).catch(console.error);
+  logDetails(agent).catch(console.error);
   await getSDKVersionInfo(agent, agent.client);
 });
 
