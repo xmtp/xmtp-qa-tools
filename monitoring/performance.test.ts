@@ -197,10 +197,7 @@ describe(testName, () => {
       }
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
-      const verifyResult = await verifyMessageStream(
-        newGroup,
-        groupWorkers,
-      );
+      const verifyResult = await verifyMessageStream(newGroup, groupWorkers);
 
       sendMetric(
         "response",
@@ -226,10 +223,7 @@ describe(testName, () => {
     });
 
     it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
-      const verifyResult = await verifyMetadataStream(
-        newGroup,
-        groupWorkers,
-      );
+      const verifyResult = await verifyMetadataStream(newGroup, groupWorkers);
 
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
