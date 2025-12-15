@@ -9,26 +9,64 @@ import { APP_VERSION, createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import type { LogLevel, XmtpEnv } from "@xmtp/node-sdk";
-import {
-  Client as Client43,
-  Conversation as Conversation43,
-  Dm as Dm43,
-  Group as Group43,
-} from "@xmtp/node-sdk-4.3.0";
-import {
-  Client as Client44,
-  Conversation as Conversation44,
-  Dm as Dm44,
-  Group as Group44,
-} from "@xmtp/node-sdk-4.4.0";
-import {
-  Client as Client45,
-  Conversation as Conversation45,
-  Dm as Dm45,
-  Group as Group45,
-} from "@xmtp/node-sdk-4.5.0";
 
-// Node SDK exports
+// Lazy load SDK versions to handle older bindings that don't export version.json
+let Client43: any, Conversation43: any, Dm43: any, Group43: any;
+let Client44: any, Conversation44: any, Dm44: any, Group44: any;
+let Client45: any, Conversation45: any, Dm45: any, Group45: any;
+
+// Initialize versions asynchronously, handling import errors gracefully
+const initVersions = (async () => {
+  try {
+    const sdk43 = await import("@xmtp/node-sdk-4.3.0");
+    Client43 = sdk43.Client;
+    Conversation43 = sdk43.Conversation;
+    Dm43 = sdk43.Dm;
+    Group43 = sdk43.Group;
+  } catch (error: any) {
+    // Silently handle - older bindings versions don't export version.json
+    if (
+      error?.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED" &&
+      !error?.message?.includes("version.json")
+    ) {
+      console.warn("Failed to load @xmtp/node-sdk-4.3.0:", error?.message);
+    }
+  }
+
+  try {
+    const sdk44 = await import("@xmtp/node-sdk-4.4.0");
+    Client44 = sdk44.Client;
+    Conversation44 = sdk44.Conversation;
+    Dm44 = sdk44.Dm;
+    Group44 = sdk44.Group;
+  } catch (error: any) {
+    // Silently handle - older bindings versions don't export version.json
+    if (
+      error?.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED" &&
+      !error?.message?.includes("version.json")
+    ) {
+      console.warn("Failed to load @xmtp/node-sdk-4.4.0:", error?.message);
+    }
+  }
+
+  try {
+    const sdk45 = await import("@xmtp/node-sdk-4.5.0");
+    Client45 = sdk45.Client;
+    Conversation45 = sdk45.Conversation;
+    Dm45 = sdk45.Dm;
+    Group45 = sdk45.Group;
+  } catch (error: any) {
+    // Silently handle - older bindings versions don't export version.json
+    if (
+      error?.code !== "ERR_PACKAGE_PATH_NOT_EXPORTED" &&
+      !error?.message?.includes("version.json")
+    ) {
+      console.warn("Failed to load @xmtp/node-sdk-4.5.0:", error?.message);
+    }
+  }
+})();
+
+// Node SDK exports (from latest version)
 export {
   Client,
   ConsentState,
@@ -48,45 +86,80 @@ export {
   ConsentEntityType,
 } from "@xmtp/node-sdk-4.5.0";
 
-// Node SDK version list
-export const VersionList = [
-  // {
-  //   Client: Client40Dev,
-  //   Conversation: Conversation430Dev,
-  //   Dm: Dm430Dev,
-  //   Group: Group430Dev,
-  //   nodeSDK: "4.3.0",
-  //   nodeBindings: "1.7.0",
-  //   auto: true,
-  // },
-  {
-    Client: Client45,
-    Conversation: Conversation45,
-    Dm: Dm45,
-    Group: Group45,
-    nodeSDK: "4.5.0",
-    nodeBindings: "1.6.0",
-    auto: true,
+// Node SDK version list - lazy loaded to handle import errors
+let _versionList: Array<{
+  Client: any;
+  Conversation: any;
+  Dm: any;
+  Group: any;
+  nodeSDK: string;
+  nodeBindings: string;
+  auto: boolean;
+}> | null = null;
+
+function getVersionList() {
+  if (_versionList === null) {
+    // Wait for initialization if not complete (for synchronous access)
+    // In practice, versions should be accessed after imports are ready
+    _versionList = [
+      ...(Client45
+        ? [
+            {
+              Client: Client45,
+              Conversation: Conversation45,
+              Dm: Dm45,
+              Group: Group45,
+              nodeSDK: "4.5.0",
+              nodeBindings: "1.6.0",
+              auto: true,
+            },
+          ]
+        : []),
+      ...(Client44
+        ? [
+            {
+              Client: Client44,
+              Conversation: Conversation44,
+              Dm: Dm44,
+              Group: Group44,
+              nodeSDK: "4.4.0",
+              nodeBindings: "1.6.0",
+              auto: true,
+            },
+          ]
+        : []),
+      ...(Client43
+        ? [
+            {
+              Client: Client43,
+              Conversation: Conversation43,
+              Dm: Dm43,
+              Group: Group43,
+              nodeSDK: "4.3.0",
+              nodeBindings: "1.5.0",
+              auto: true,
+            },
+          ]
+        : []),
+    ];
+  }
+  return _versionList;
+}
+
+export const VersionList = new Proxy([] as any[], {
+  get(target, prop) {
+    return getVersionList()[prop as any];
   },
-  {
-    Client: Client44,
-    Conversation: Conversation44,
-    Dm: Dm44,
-    Group: Group44,
-    nodeSDK: "4.4.0",
-    nodeBindings: "1.6.0",
-    auto: true,
+  ownKeys() {
+    return Reflect.ownKeys(getVersionList());
   },
-  {
-    Client: Client43,
-    Conversation: Conversation43,
-    Dm: Dm43,
-    Group: Group43,
-    nodeSDK: "4.3.0",
-    nodeBindings: "1.5.0",
-    auto: true,
+  getOwnPropertyDescriptor(target, prop) {
+    return Reflect.getOwnPropertyDescriptor(getVersionList(), prop);
   },
-];
+  has(target, prop) {
+    return prop in getVersionList();
+  },
+});
 
 // Node SDK functions
 export const getActiveVersion = (index = 0) => {
