@@ -1,5 +1,4 @@
 import { type DecodedMessage, type MessageContext } from "@agents/versions";
-import agents from "./agents";
 
 /**
  * Agent configuration interface

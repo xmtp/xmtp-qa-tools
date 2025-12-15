@@ -10,46 +10,22 @@ import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import type { LogLevel, XmtpEnv } from "@xmtp/node-sdk";
 import {
-  Client as Client403,
-  Conversation as Conversation403,
-  Dm as Dm403,
-  Group as Group403,
-} from "@xmtp/node-sdk-4.0.3";
+  Client as Client43,
+  Conversation as Conversation43,
+  Dm as Dm43,
+  Group as Group43,
+} from "@xmtp/node-sdk-4.3.0";
 import {
-  Client as Client410,
-  Conversation as Conversation410,
-  Dm as Dm410,
-  Group as Group410,
-} from "@xmtp/node-sdk-4.1.0";
+  Client as Client44,
+  Conversation as Conversation44,
+  Dm as Dm44,
+  Group as Group44,
+} from "@xmtp/node-sdk-4.4.0";
 import {
-  Client as Client420,
-  Conversation as Conversation420,
-  Dm as Dm420,
-  Group as Group420,
-} from "@xmtp/node-sdk-4.2.3";
-import {
-  Client as Client426,
-  Conversation as Conversation426,
-  Dm as Dm426,
-  Group as Group426,
-} from "@xmtp/node-sdk-4.2.6";
-// import {
-//   Client as Client430Dev,
-//   Conversation as Conversation430Dev,
-//   Dm as Dm430Dev,
-//   Group as Group430Dev,
-// } from "@xmtp/node-sdk-4.3.0-dev";
-// import {
-//   Client as Client440,
-//   Conversation as Conversation440,
-//   Dm as Dm440,
-//   Group as Group440,
-// } from "@xmtp/node-sdk-4.4.0";
-import {
-  Client as Client450,
-  Conversation as Conversation450,
-  Dm as Dm450,
-  Group as Group450,
+  Client as Client45,
+  Conversation as Conversation45,
+  Dm as Dm45,
+  Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
 
 // Node SDK exports
@@ -84,48 +60,30 @@ export const VersionList = [
   //   auto: true,
   // },
   {
-    Client: Client450,
-    Conversation: Conversation450,
-    Dm: Dm450,
-    Group: Group450,
+    Client: Client45,
+    Conversation: Conversation45,
+    Dm: Dm45,
+    Group: Group45,
     nodeSDK: "4.5.0",
-    nodeBindings: "1.6.6",
+    nodeBindings: "1.6.0",
     auto: true,
   },
   {
-    Client: Client426,
-    Conversation: Conversation426,
-    Dm: Dm426,
-    Group: Group426,
-    nodeSDK: "4.2.6",
-    nodeBindings: "1.5.4",
+    Client: Client44,
+    Conversation: Conversation44,
+    Dm: Dm44,
+    Group: Group44,
+    nodeSDK: "4.4.0",
+    nodeBindings: "1.6.0",
     auto: true,
   },
   {
-    Client: Client420,
-    Conversation: Conversation420,
-    Dm: Dm420,
-    Group: Group420,
-    nodeSDK: "4.2.3",
-    nodeBindings: "1.5.4",
-    auto: true,
-  },
-  {
-    Client: Client410,
-    Conversation: Conversation410,
-    Dm: Dm410,
-    Group: Group410,
-    nodeSDK: "4.1.0",
-    nodeBindings: "1.4.0",
-    auto: true,
-  },
-  {
-    Client: Client403,
-    Conversation: Conversation403,
-    Dm: Dm403,
-    Group: Group403,
-    nodeSDK: "4.0.3",
-    nodeBindings: "1.3.6",
+    Client: Client43,
+    Conversation: Conversation43,
+    Dm: Dm43,
+    Group: Group43,
+    nodeSDK: "4.3.0",
+    nodeBindings: "1.5.0",
     auto: true,
   },
 ];
