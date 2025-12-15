@@ -16,17 +16,27 @@ import {
   Group as Group43,
 } from "@xmtp/node-sdk-4.3.0";
 import {
-  Client as Client44,
-  Conversation as Conversation44,
-  Dm as Dm44,
-  Group as Group44,
-} from "@xmtp/node-sdk-4.4.0";
-import {
   Client as Client45,
   Conversation as Conversation45,
   Dm as Dm45,
   Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
+
+// 4.4.0 loaded dynamically to catch version.json import error
+let Client44: any;
+let Conversation44: any;
+let Dm44: any;
+let Group44: any;
+
+try {
+  const sdk44 = await import("@xmtp/node-sdk-4.4.0");
+  Client44 = sdk44.Client;
+  Conversation44 = sdk44.Conversation;
+  Dm44 = sdk44.Dm;
+  Group44 = sdk44.Group;
+} catch {
+  // version.json not exported, 4.4.0 unavailable
+}
 
 // Node SDK exports
 export {
@@ -50,15 +60,6 @@ export {
 
 // Node SDK version list
 export const VersionList = [
-  // {
-  //   Client: Client40Dev,
-  //   Conversation: Conversation430Dev,
-  //   Dm: Dm430Dev,
-  //   Group: Group430Dev,
-  //   nodeSDK: "4.3.0",
-  //   nodeBindings: "1.7.0",
-  //   auto: true,
-  // },
   {
     Client: Client45,
     Conversation: Conversation45,
@@ -68,22 +69,26 @@ export const VersionList = [
     nodeBindings: "1.6.0",
     auto: true,
   },
-  {
-    Client: Client44,
-    Conversation: Conversation44,
-    Dm: Dm44,
-    Group: Group44,
-    nodeSDK: "4.4.0",
-    nodeBindings: "1.6.0",
-    auto: true,
-  },
+  ...(Client44
+    ? [
+        {
+          Client: Client44,
+          Conversation: Conversation44,
+          Dm: Dm44,
+          Group: Group44,
+          nodeSDK: "4.4.0",
+          nodeBindings: "1.5.0",
+          auto: true,
+        },
+      ]
+    : []),
   {
     Client: Client43,
     Conversation: Conversation43,
     Dm: Dm43,
     Group: Group43,
     nodeSDK: "4.3.0",
-    nodeBindings: "1.5.0",
+    nodeBindings: "1.4.0",
     auto: true,
   },
 ];
