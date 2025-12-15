@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
-    "@xmtp/agent-sdk-1.1.16": "npm:@xmtp/agent-sdk@1.1.16",
+    "@xmtp/agent-sdk-1.1.0": "npm:@xmtp/agent-sdk@1.1.17",
     "@xmtp/agent-sdk-1.2.0": "npm:@xmtp/agent-sdk@1.2.1",
     "@xmtp/cli": "^0.0.4",
     "@xmtp/content-type-markdown": "^1.0.0",

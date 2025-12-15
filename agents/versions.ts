@@ -2,27 +2,27 @@ import fs from "fs";
 import path from "path";
 import { VersionList } from "@helpers/versions";
 import {
-  Agent as Agent1116,
-  MessageContext as MessageContext1116,
-} from "@xmtp/agent-sdk-1.1.16";
+  Agent as Agent11,
+  MessageContext as MessageContext11,
+} from "@xmtp/agent-sdk-1.1.0";
 import {
-  Agent as Agent120,
-  MessageContext as MessageContext120,
+  Agent as Agent12,
+  MessageContext as MessageContext12,
 } from "@xmtp/agent-sdk-1.2.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
   {
-    Agent: Agent120,
-    MessageContext: MessageContext120,
+    Agent: Agent12,
+    MessageContext: MessageContext12,
     agentSDK: "1.2.0",
     nodeSDK: "4.5.0",
     auto: true,
   },
   {
-    Agent: Agent1116,
-    MessageContext: MessageContext1116,
-    agentSDK: "1.1.16",
+    Agent: Agent11,
+    MessageContext: MessageContext11,
+    agentSDK: "1.1.0",
     nodeSDK: "4.4.0",
     auto: true,
   },
