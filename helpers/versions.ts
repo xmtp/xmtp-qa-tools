@@ -74,7 +74,7 @@ export const VersionList = [
     Dm: Dm44,
     Group: Group44,
     nodeSDK: "4.4.0",
-    nodeBindings: "1.6.0",
+    nodeBindings: "1.5.0",
     auto: true,
   },
   {
@@ -83,7 +83,7 @@ export const VersionList = [
     Dm: Dm43,
     Group: Group43,
     nodeSDK: "4.3.0",
-    nodeBindings: "1.5.0",
+    nodeBindings: "1.4.0",
     auto: true,
   },
 ];
