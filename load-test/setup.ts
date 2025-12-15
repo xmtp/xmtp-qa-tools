@@ -11,7 +11,7 @@
 
 import { Command } from "commander";
 import { Client } from "@xmtp/node-sdk";
-import { writeFileSync, mkdirSync, existsSync } from "fs";
+import { writeFileSync, mkdirSync, existsSync, readdirSync, unlinkSync } from "fs";
 import { join } from "path";
 import { createUser, createSigner, generateEncryptionKey, encryptionKeyFromHex } from "./xmtp-helpers";
 
@@ -72,9 +72,13 @@ async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: strin
   
   const dbEncryptionKey = encryptionKeyFromHex(encryptionKey);
   
+  // Use a temporary db path to avoid creating files in root
+  const tempDbPath = `${dataDir}/temp-${Date.now()}.db3`;
+  
   const clientOptions: any = {
     env: env as any,
     dbEncryptionKey,
+    dbPath: tempDbPath,
   };
   
   if (d14nHost) {
@@ -85,11 +89,11 @@ async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: strin
   
   const client = await Client.create(signer, clientOptions);
   
-  // Now create the proper db path based on inboxId and recreate client
+  // Now update to the proper db path based on inboxId
   const dbPath = `${dataDir}/${client.inboxId.slice(0, 8)}.db3`;
   clientOptions.dbPath = dbPath;
   
-  // Close and recreate with proper path
+  // Close temp db and recreate with proper path
   const finalClient = await Client.create(signer, clientOptions);
   
   const identity: TestIdentity = {
@@ -163,6 +167,20 @@ async function setupLoadTest() {
   }
   
   console.log(`✅ Created ${identities.length} identities in ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+  
+  // Clean up any temporary database files
+  const dataDir = "./data/dbs";
+  if (existsSync(dataDir)) {
+    const files = readdirSync(dataDir);
+    const tempFiles = files.filter(f => f.startsWith('temp-'));
+    tempFiles.forEach(f => {
+      try {
+        unlinkSync(join(dataDir, f));
+      } catch (e) {
+        // Ignore errors
+      }
+    });
+  }
 
   // Step 2: Create groups
   console.log(`\n🔗 Step 2: Creating ${options.groups} groups...`);
