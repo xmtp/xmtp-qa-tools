@@ -157,7 +157,6 @@ export const regressionClient = async (
   const signer = createSigner(walletKey);
 
   try {
-    // @ts-expect-error - TODO: fix this
     client = await ClientClass.create(signer, {
       dbEncryptionKey,
       dbPath,
@@ -185,7 +184,6 @@ export const regressionClient = async (
       console.debug(`Using alternative database path: ${alternativeDbPath}`);
 
       // Try to create the client with the alternative path
-      // @ts-expect-error - TODO: fix this
       client = await ClientClass.create(signer, {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
