@@ -349,7 +349,11 @@ async function smartUpdate({
                 }
                 totalCreated++;
                 installProgress.update();
-              } catch {
+              } catch (error) {
+                console.error(
+                  `Failed to create installation ${j} for ${inbox.accountAddress} in ${env}:`,
+                  error instanceof Error ? error.message : String(error),
+                );
                 totalFailed++;
                 installProgress.update();
               }
@@ -371,7 +375,11 @@ async function smartUpdate({
                   );
                 }
                 totalCreated++;
-              } catch {
+              } catch (error) {
+                console.error(
+                  `Failed to create installation ${j} for ${inbox.accountAddress} in ${env}:`,
+                  error instanceof Error ? error.message : String(error),
+                );
                 totalFailed++;
               }
             }
@@ -379,7 +387,11 @@ async function smartUpdate({
         }
         updateProgress.update();
         writeJson(targetFilePath, existingInboxes);
-      } catch {
+      } catch (error) {
+        console.error(
+          `Failed to process account ${inbox?.accountAddress || "unknown"}:`,
+          error instanceof Error ? error.message : String(error),
+        );
         totalFailed++;
         updateProgress.update();
       }
@@ -414,7 +426,11 @@ async function smartUpdate({
               });
               if (j === 0 && env === envs[0]) inboxId = client.inboxId;
               totalCreated++;
-            } catch {
+            } catch (error) {
+              console.error(
+                `Failed to create installation ${j} for new account ${accountAddress} in ${env}:`,
+                error instanceof Error ? error.message : String(error),
+              );
               totalFailed++;
               installationsFailed++;
             }
@@ -436,7 +452,11 @@ async function smartUpdate({
           consecutiveFailures++;
         }
         generateProgress.update();
-      } catch {
+      } catch (error) {
+        console.error(
+          `Failed to generate new account:`,
+          error instanceof Error ? error.message : String(error),
+        );
         totalFailed++;
         consecutiveFailures++;
         generateProgress.update();
