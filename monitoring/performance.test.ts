@@ -129,12 +129,15 @@ describe(testName, () => {
       allMembersWithExtra = getInboxes(i - workers.getAll().length + 2, 2, i);
       allMembers = allMembersWithExtra.slice(0, allMembersWithExtra.length - 2);
       extraMember = allMembersWithExtra.at(-1)!;
+      const workersToAdd = workers
+        .getAllButCreator()
+        .slice(0, i - 1 - allMembers.length);
       const membersToAdd = [
         ...allMembers.map((a) => ({
           identifier: a.accountAddress,
           identifierKind: IdentifierKind.Ethereum,
         })),
-        ...workers.getAllButCreator().map((w) => ({
+        ...workersToAdd.map((w) => ({
           identifier: w.address,
           identifierKind: IdentifierKind.Ethereum,
         })),
