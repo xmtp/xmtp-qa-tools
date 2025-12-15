@@ -110,24 +110,6 @@ export const VersionList = [
     nodeBindings: "1.5.4",
     auto: true,
   },
-  {
-    Client: Client410,
-    Conversation: Conversation410,
-    Dm: Dm410,
-    Group: Group410,
-    nodeSDK: "4.1.0",
-    nodeBindings: "1.4.0",
-    auto: true,
-  },
-  {
-    Client: Client403,
-    Conversation: Conversation403,
-    Dm: Dm403,
-    Group: Group403,
-    nodeSDK: "4.0.3",
-    nodeBindings: "1.3.6",
-    auto: true,
-  },
 ];
 
 // Node SDK functions
