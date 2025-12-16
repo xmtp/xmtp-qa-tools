@@ -13,7 +13,7 @@
     "test:simple": "tsx run-simple.ts",
     "auto-tune": "tsx auto-tune.ts",
     "analyze": "tsx analyze-results.ts",
-    "clean": "rm -rf data/ *.db3 report.json artillery-processor.js artillery-processor.cjs dist/"
+    "clean": "node clean.js"
   },
   "keywords": [
     "xmtp",
@@ -30,7 +30,6 @@
   "devDependencies": {
     "tsx": "^4.7.1",
     "@types/node": "^20.11.19",
-    "esbuild": "^0.20.0",
     "typescript": "^5.3.3"
   }
 }

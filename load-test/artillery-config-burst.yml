@@ -8,7 +8,7 @@ config:
       name: "Max Burst"
   
   # Artillery processor
-  processor: "./artillery-processor.cjs"
+  processor: "./dist/artillery-processor.js"
   
   # Max workers for maximum throughput
   pool: 20

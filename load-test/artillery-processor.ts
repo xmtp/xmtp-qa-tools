@@ -581,11 +581,21 @@ export async function afterScenario(userContext: any, events: any, done?: Functi
   if (done) done();
 }
 
-// Export for Artillery
-export default {
+// Export for Artillery (CommonJS compatible)
+const artilleryExports = {
   sendMessage,
   beforeScenario,
   afterScenario,
 };
+
+export default artilleryExports;
+
+// Also export for CommonJS (Artillery compatibility)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = artilleryExports;
+  module.exports.sendMessage = sendMessage;
+  module.exports.beforeScenario = beforeScenario;
+  module.exports.afterScenario = afterScenario;
+}
 
 

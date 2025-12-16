@@ -15,8 +15,14 @@ Load testing framework for XMTP messaging protocol using Artillery.
 ## Installation
 
 ```bash
+# Install dependencies
 yarn install
+
+# Build the project (compiles TypeScript to dist/)
+yarn build
 ```
+
+The load-test directory is a standalone project that can be split into its own repository.
 
 ## Quick Start
 
