@@ -1,6 +1,9 @@
 # Data files
 data/
 *.db3
+*.db3-shm
+*.db3-wal
+*.db3.sqlcipher_salt
 *.json.tmp
 
 # Artillery reports
@@ -16,8 +19,6 @@ adaptive-report.json
 node_modules/
 
 # Build output
-artillery-processor.js
-artillery-processor.cjs
 dist/
 
 # Auto-generated configs
@@ -53,5 +54,3 @@ Thumbs.db
 !.yarn/sdks
 !.yarn/versions
 .pnp.*
-
-

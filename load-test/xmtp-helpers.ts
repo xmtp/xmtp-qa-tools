@@ -1,37 +1,36 @@
-/**
- * XMTP Helper Functions
- * Copied from helpers/client.ts to keep load-test isolated
- */
-
-import { createWalletClient, http, type PrivateKeyAccount } from "viem";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { createWalletClient, http, toBytes } from "viem";
+import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { toBytes } from "viem/utils";
-import { fromString, toString } from "uint8arrays";
 import { getRandomValues } from "node:crypto";
-import type { Signer } from "@xmtp/node-sdk";
+import { fromString, toString } from "uint8arrays";
 
-// IdentifierKind enum from XMTP SDK
-const IdentifierKind = {
-  Ethereum: 0,
-  Passkey: 1,
-} as const;
+// Define IdentifierKind inline as it's not directly exported from node-sdk in all versions
+export enum IdentifierKind {
+  Ethereum = 0,
+  Passkey = 1,
+}
+
+interface Signer {
+  type: "EOA" | "SCW";
+  getIdentifier: () => { identifierKind: IdentifierKind; identifier: string };
+  signMessage: (message: string) => Promise<Uint8Array>;
+  getAddress: () => Promise<string>;
+}
 
 interface User {
   key: `0x${string}`;
-  account: PrivateKeyAccount;
+  account: ReturnType<typeof privateKeyToAccount>;
   wallet: ReturnType<typeof createWalletClient>;
 }
 
 /**
  * Creates a user object with a wallet and account
- * @param key - Optional private key, generates one if not provided
+ * @param key - The private key
  * @returns The user object
  */
 export const createUser = (key?: `0x${string}`): User => {
   const privateKey = key || generatePrivateKey();
   const account = privateKeyToAccount(privateKey);
-  
   return {
     key: privateKey,
     account,
@@ -50,17 +49,16 @@ export const createUser = (key?: `0x${string}`): User => {
  */
 export const createSigner = (key: string | User): Signer => {
   let user: User;
-  
+
   if (typeof key === "string") {
     const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
     user = createUser(sanitizedKey as `0x${string}`);
   } else {
     user = key;
   }
-  
+
   return {
     type: "EOA",
-    getAddress: () => user.account.address.toLowerCase(),
     getIdentifier: () => ({
       identifierKind: IdentifierKind.Ethereum,
       identifier: user.account.address.toLowerCase(),
@@ -72,6 +70,7 @@ export const createSigner = (key: string | User): Signer => {
       });
       return toBytes(signature);
     },
+    getAddress: async () => user.account.address,
   };
 };
 
@@ -79,17 +78,16 @@ export const createSigner = (key: string | User): Signer => {
  * Generate a random encryption key
  * @returns Hex string of 64 characters
  */
-export const generateEncryptionKey = (): string => {
+export const generateEncryptionKey = () => {
   const uint8Array = getRandomValues(new Uint8Array(32));
   return toString(uint8Array, "hex");
 };
 
 /**
- * Convert hex string to Uint8Array encryption key
+ * Get the encryption key from a hex string
  * @param hex - The hex string
- * @returns Uint8Array encryption key
+ * @returns The encryption key as Uint8Array
  */
-export const encryptionKeyFromHex = (hex: string): Uint8Array => {
+export const encryptionKeyFromHex = (hex: string) => {
   return fromString(hex, "hex");
 };
-
