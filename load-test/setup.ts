@@ -32,14 +32,17 @@ interface GroupInfo {
 interface LoadTestConfig {
   identities: TestIdentity[];
   groups: GroupInfo[];
+  poolIdentities: TestIdentity[]; // Extra identities for add/remove operations
   createdAt: string;
   config: {
     numIdentities: number;
     numGroups: number;
     membersPerGroup: number;
+    poolSize: number;
     env: string;
     apiUrl?: string;
     d14nHost?: string;
+    workloadPreset?: string;
   };
 }
 
@@ -51,6 +54,8 @@ program
   .requiredOption("-i, --identities <number>", "Number of identities to create", parseInt)
   .requiredOption("-g, --groups <number>", "Number of groups to create", parseInt)
   .requiredOption("-m, --members <number>", "Members per group", parseInt)
+  .option("-p, --pool <number>", "Additional identities for add/remove operations", parseInt, 50)
+  .option("-w, --workload <preset>", "Workload preset (messagesOnly|balanced|metadata|memberChurn|adminOps|realistic)", "messagesOnly")
   .option("-e, --env <environment>", "XMTP environment (dev|production|local)", "dev")
   .option("-a, --api-url <url>", "Custom API URL (for V3 mode)")
   .option("-d, --d14n-host <url>", "D14n host URL", "https://grpc.testnet-staging.xmtp.network:443")
@@ -110,11 +115,13 @@ async function createTestIdentity(env: string, apiUrl?: string, d14nHost?: strin
 }
 
 async function setupLoadTest() {
-  console.log("🚀 XMTP Load Test Setup");
+  console.log("XMTP Load Test Setup");
   console.log("=".repeat(60));
   console.log(`Identities: ${options.identities}`);
   console.log(`Groups: ${options.groups}`);
   console.log(`Members per group: ${options.members}`);
+  console.log(`Pool size: ${options.pool}`);
+  console.log(`Workload: ${options.workload}`);
   console.log(`Environment: ${options.env}`);
   if (options.d14nHost) {
     console.log(`D14n Host: ${options.d14nHost}`);
@@ -167,6 +174,22 @@ async function setupLoadTest() {
   }
   
   console.log(`✅ Created ${identities.length} identities in ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+  
+  // Step 1.5: Create pool identities for add/remove operations
+  console.log(`\n📦 Creating ${options.pool} pool identities for add/remove operations...`);
+  const poolIdentities: TestIdentity[] = [];
+  const poolStartTime = Date.now();
+  
+  for (let i = 0; i < options.pool; i++) {
+    const identity = await createTestIdentity(options.env, options.apiUrl, options.d14nHost);
+    poolIdentities.push(identity);
+    
+    if ((i + 1) % 10 === 0) {
+      console.log(`   Progress: ${i + 1}/${options.pool}`);
+    }
+  }
+  
+  console.log(`✅ Created ${poolIdentities.length} pool identities in ${((Date.now() - poolStartTime) / 1000).toFixed(1)}s`);
   
   // Clean up any temporary database files
   const dataDir = "./data/dbs";
@@ -257,14 +280,17 @@ async function setupLoadTest() {
   const config: LoadTestConfig = {
     identities,
     groups,
+    poolIdentities,
     createdAt: new Date().toISOString(),
     config: {
       numIdentities: options.identities,
       numGroups: options.groups,
       membersPerGroup: options.members,
+      poolSize: options.pool,
       env: options.env,
       apiUrl: options.apiUrl,
       d14nHost: options.d14nHost,
+      workloadPreset: options.workload,
     },
   };
   
@@ -275,8 +301,10 @@ async function setupLoadTest() {
   // Also save a summary
   const summary = {
     totalIdentities: identities.length,
+    totalPoolIdentities: poolIdentities.length,
     totalGroups: groups.length,
     avgMembersPerGroup: (groups.reduce((sum, g) => sum + g.memberInboxIds.length, 0) / groups.length).toFixed(1),
+    workloadPreset: options.workload,
     environment: options.env,
     createdAt: config.createdAt,
     setupDuration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
@@ -288,13 +316,15 @@ async function setupLoadTest() {
 
   // Print summary
   console.log("\n" + "=".repeat(60));
-  console.log("✅ Setup Complete!");
+  console.log("Setup Complete!");
   console.log("=".repeat(60));
   console.log(`Total identities: ${summary.totalIdentities}`);
+  console.log(`Pool identities: ${summary.totalPoolIdentities}`);
   console.log(`Total groups: ${summary.totalGroups}`);
   console.log(`Avg members/group: ${summary.avgMembersPerGroup}`);
+  console.log(`Workload preset: ${summary.workloadPreset}`);
   console.log(`Setup time: ${summary.setupDuration}`);
-  console.log("\n🚀 Ready for load testing! Run: npm run test");
+  console.log("\nReady for load testing! Run: npm run test");
   console.log("=".repeat(60));
 }
 
