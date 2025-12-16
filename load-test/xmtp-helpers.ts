@@ -10,13 +10,14 @@ export enum IdentifierKind {
   Passkey = 1,
 }
 
-interface Signer {
-  type: "EOA" | "SCW";
+// EOA Signer type that matches @xmtp/node-sdk requirements
+type Signer = {
+  type: "EOA";
   getIdentifier: () => { identifierKind: IdentifierKind; identifier: string };
   signMessage: (message: string) => Promise<Uint8Array>;
   getAddress: () => Promise<string>;
   getChainId: () => Promise<bigint>;
-}
+};
 
 interface User {
   key: `0x${string}`;
