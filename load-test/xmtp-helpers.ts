@@ -15,6 +15,7 @@ interface Signer {
   getIdentifier: () => { identifierKind: IdentifierKind; identifier: string };
   signMessage: (message: string) => Promise<Uint8Array>;
   getAddress: () => Promise<string>;
+  getChainId: () => Promise<bigint>;
 }
 
 interface User {
@@ -71,6 +72,7 @@ export const createSigner = (key: string | User): Signer => {
       return toBytes(signature);
     },
     getAddress: async () => user.account.address,
+    getChainId: async () => BigInt(sepolia.id),
   };
 };
 
