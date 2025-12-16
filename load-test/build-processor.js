@@ -5,19 +5,20 @@
  */
 
 import { execSync } from 'child_process';
-import { existsSync, readdirSync } from 'fs';
+import { existsSync } from 'fs';
 
 console.log('🔨 Building load test files...');
 
 try {
   // Use TypeScript compiler to build all .ts files
   // This compiles but doesn't bundle, keeping imports intact
-  const tscCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+  const tscCmd = process.platform === 'win32' ? 'npx.cmd tsc' : 'npx tsc';
   
   console.log('Compiling TypeScript files...');
-  execSync(`${tscCmd} tsc`, {
+  execSync(tscCmd, {
     stdio: 'inherit',
-    shell: true
+    shell: true,
+    cwd: process.cwd()
   });
   
   // Verify the critical files were built
