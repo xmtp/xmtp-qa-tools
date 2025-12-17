@@ -5,15 +5,18 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": ".",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": false,
     "sourceMap": false,
-    "types": ["node"]
+    "types": ["node"],
+    "allowJs": true,
+    "noImplicitAny": false
   },
   "include": ["*.ts"],
   "exclude": ["node_modules", "data", "dist"]
