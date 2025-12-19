@@ -124,6 +124,15 @@ export const checkNoNameContains = (versionList: typeof VersionList) => {
   }
 };
 
+/**
+ * Check if D14N mode is enabled via environment variable
+ * Set XMTP_D14N=true to enable D14N mode
+ */
+export const isD14NEnabled = (): boolean => {
+  const d14nEnv = process.env.XMTP_D14N;
+  return d14nEnv === "true" || d14nEnv === "1";
+};
+
 export const regressionClient = async (
   nodeBindings: string,
   walletKey: `0x${string}`,
@@ -134,12 +143,6 @@ export const regressionClient = async (
 ): Promise<any> => {
   const loggingLevel = (process.env.LOGGING_LEVEL ||
     "warn") as unknown as LogLevel;
-  const apiUrl = apiURL;
-  if (apiUrl) {
-    console.debug(
-      `Creating API client with: SDK version: ${nodeBindings} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
-    );
-  }
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
@@ -156,17 +159,40 @@ export const regressionClient = async (
 
   const signer = createSigner(walletKey);
 
+  // Check if D14N mode is explicitly enabled
+  const d14nEnabled = isD14NEnabled();
+  const apiUrl = apiURL || process.env.XMTP_API_URL;
+
+  const clientOptions: any = {
+    dbEncryptionKey,
+    dbPath,
+    env: env as unknown as XmtpEnv,
+    loggingLevel,
+    appVersion: APP_VERSION,
+    disableDeviceSync: true,
+    codecs: [new ReactionCodec(), new ReplyCodec()],
+  };
+
+  // D14N mode: Use d14nHost parameter
+  // V3 mode: Use apiUrl parameter (or default endpoints)
+  if (d14nEnabled) {
+    if (!apiUrl) {
+      throw new Error(
+        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N gateway URL",
+      );
+    }
+    clientOptions.d14nHost = apiUrl;
+    console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
+  } else if (apiUrl) {
+    clientOptions.apiUrl = apiUrl;
+    console.log(`[V3] Using custom API URL: ${apiUrl}`);
+  } else {
+    console.log(`[V3] Using default network endpoint for env: ${env}`);
+  }
+
   try {
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env: env as unknown as XmtpEnv,
-      loggingLevel,
-      apiUrl,
-      appVersion: APP_VERSION,
-      disableDeviceSync: true,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    client = await ClientClass.create(signer as any, clientOptions);
   } catch (error) {
     // If database file is corrupted, try using a different path
     if (
@@ -184,16 +210,24 @@ export const regressionClient = async (
       console.debug(`Using alternative database path: ${alternativeDbPath}`);
 
       // Try to create the client with the alternative path
-      client = await ClientClass.create(signer, {
+      const retryOptions: any = {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
         env,
         loggingLevel,
-        apiUrl,
         appVersion: APP_VERSION,
         disableDeviceSync: true,
         codecs: [new ReactionCodec(), new ReplyCodec()],
-      });
+      };
+
+      if (d14nEnabled && apiUrl) {
+        retryOptions.d14nHost = apiUrl;
+      } else if (apiUrl) {
+        retryOptions.apiUrl = apiUrl;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      client = await ClientClass.create(signer as any, retryOptions);
     } else {
       throw error;
     }
