@@ -71,7 +71,7 @@ const agents: AgentConfig[] = [
     name: "bracky",
     address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     networks: [],
-    live: false,
+    live: true,
   },
   {
     name: "bankr",
