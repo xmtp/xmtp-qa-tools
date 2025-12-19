@@ -508,9 +508,11 @@ export async function getWorkers(
   );
   let sdkVersions = [options.nodeBindings || getDefaultSdkVersion()];
   if (process.env.TEST_VERSIONS) {
-    sdkVersions = VersionList.slice(0, parseInt(process.env.TEST_VERSIONS)).map(
-      (v) => v.nodeBindings,
-    );
+    // Only include auto-enabled versions to avoid RC versions with `-` in names
+    const autoVersions = VersionList.filter((v) => v.auto);
+    sdkVersions = autoVersions
+      .slice(0, parseInt(process.env.TEST_VERSIONS))
+      .map((v) => v.nodeBindings);
   }
   let workerPromises: Promise<Worker>[] = [];
   let descriptors: string[] = [];

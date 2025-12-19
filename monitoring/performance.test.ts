@@ -106,7 +106,7 @@ describe(testName, () => {
     expect(conversation!.id).toBe(dm!.id);
   });
   it(`send:measure sending a gm`, async () => {
-    const dmId = await dm!.send("gm");
+    const dmId = await dm!.sendText("gm");
     expect(dmId).toBeDefined();
   });
   it(`streamMessage:measure receiving a gm`, async () => {
@@ -169,7 +169,7 @@ describe(testName, () => {
     it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      await newGroup.send(groupMessage);
+      await newGroup.sendText(groupMessage);
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {

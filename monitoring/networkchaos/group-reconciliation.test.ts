@@ -27,7 +27,7 @@ describe(testName, async () => {
       .get("user1")!
       .client.conversations.getConversationById(group.id);
     console.log("Sending welcome message from user1...");
-    await user1Group?.send("Initial welcome message from user1");
+    await user1Group?.sendText("Initial welcome message from user1");
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log(
@@ -90,7 +90,7 @@ describe(testName, async () => {
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log("[test] user4 added to group");
-    await user1Group?.send("User1: user4 just joined!!");
+    await user1Group?.sendText("User1: user4 just joined!!");
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log("[test] Dumping messages received by group members:");

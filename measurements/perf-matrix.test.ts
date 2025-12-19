@@ -126,7 +126,7 @@ describe(testName, () => {
       expect(conversation!.id).toBe(dm!.id);
     });
     it(`send(${populateSize}):measure sending a gm`, async () => {
-      const dmId = await dm!.send("gm");
+      const dmId = await dm!.sendText("gm");
       expect(dmId).toBeDefined();
     });
 
