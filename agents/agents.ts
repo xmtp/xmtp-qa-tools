@@ -11,7 +11,7 @@ const agents: AgentConfig[] = [
     name: "ponder",
     address: "0x2674f0B09B648551d2623177e2761242D708FBb2",
     networks: [],
-    live: true,
+    live: false,
   },
   {
     name: "flaunchy",
@@ -44,18 +44,6 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
-    name: "onit",
-    address: "0xE9C89b50f3b947125FdBCdF8FBff35b9f38fB0C4",
-    networks: [],
-    live: true,
-  },
-  {
-    name: "byte",
-    address: "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
-    networks: [],
-    live: true,
-  },
-  {
     name: "freysa",
     address: "0xEb7DB3ED8609165Ec5d99966CfDdeaE587070cD8",
     networks: ["production"],
@@ -71,7 +59,7 @@ const agents: AgentConfig[] = [
     name: "bracky",
     address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
     networks: [],
-    live: false,
+    live: true,
   },
   {
     name: "bankr",
@@ -80,22 +68,10 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
-    name: "bitte",
-    address: "0xb177e33734e982828eBb5993627ebcD7C8A9106a",
-    networks: [],
-    live: false,
-  },
-  {
-    name: "tokenbot",
-    address: "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-    networks: [],
-    live: false,
-  },
-  {
     name: "basemate",
     address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
     networks: ["production"],
-    live: true,
+    live: false,
   },
   {
     name: "echo",
