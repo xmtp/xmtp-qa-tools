@@ -58,7 +58,7 @@ describe(testName, async () => {
 
           const content = `gm-${sender.name}-${Date.now()}`;
           try {
-            await convo.send(content);
+            await sendTextCompat(convo, content);
           } catch (err) {
             console.warn(`[sendLoop] send failed for ${sender.name}:`, err);
           }
@@ -158,3 +158,5 @@ describe(testName, async () => {
     expect(verifyFinal.receptionPercentage).toBeGreaterThanOrEqual(99);
   });
 });
+
+

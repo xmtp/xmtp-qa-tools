@@ -5,6 +5,7 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@helpers/versions";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
@@ -250,7 +251,7 @@ async function sendGroupMessage(config: Config): Promise<void> {
 
     // Send the message
     const sendStart = Date.now();
-    await group.send(config.message);
+    await sendTextCompat(group, config.message);
     const sendTime = Date.now() - sendStart;
 
     console.log(`✅ Message sent successfully in ${sendTime}ms`);

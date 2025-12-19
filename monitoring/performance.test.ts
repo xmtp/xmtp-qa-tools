@@ -169,7 +169,7 @@ describe(testName, () => {
     it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      await newGroup.send(groupMessage);
+      await sendTextCompat(newGroup, groupMessage);
       expect(groupMessage).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
@@ -276,3 +276,5 @@ describe(testName, () => {
     });
   }
 });
+
+

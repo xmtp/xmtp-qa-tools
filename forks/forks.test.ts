@@ -4,6 +4,7 @@ import type { ChaosProvider } from "@chaos/provider";
 import { StreamsChaos } from "@chaos/streams";
 import { getTime } from "@helpers/logger";
 import { type Group } from "@helpers/versions";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { DockerContainer } from "@network-stability/container";
@@ -252,3 +253,5 @@ describe(testName, () => {
     }
   });
 });
+
+

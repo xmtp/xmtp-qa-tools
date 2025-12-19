@@ -50,7 +50,7 @@ describe(testName, () => {
     );
     await sleep();
     await newGroup.addMembers([xmtpChat.inboxId]);
-    await newGroup.send(`hi ${receiver.name}`);
+    await sendTextCompat(newGroup, `hi ${receiver.name}`);
     console.log("waiting for new conversation");
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
     console.log("new conversation found", result);
@@ -129,3 +129,5 @@ describe(testName, () => {
     }
   }, 30000);
 });
+
+

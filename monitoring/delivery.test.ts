@@ -64,7 +64,7 @@ describe(testName, async () => {
     // Send messages first
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     for (let i = 1; i <= MESSAGE_COUNT; i++) {
-      await group.send(`poll-${i}-${randomSuffix}`);
+      await sendTextCompat(group, `poll-${i}-${randomSuffix}`);
     }
 
     // Wait a bit for messages to propagate
@@ -130,7 +130,7 @@ describe(testName, async () => {
     // Send messages while worker is offline
     console.log(`Sending ${MESSAGE_COUNT} messages while stream is stopped`);
     for (let i = 1; i <= MESSAGE_COUNT; i++) {
-      await group.send(`recovery-${i}-${randomSuffix}`);
+      await sendTextCompat(group, `recovery-${i}-${randomSuffix}`);
     }
 
     // Resume streams and sync
@@ -226,3 +226,5 @@ function calculateDeliveryAndOrder(
 
   return { deliveryPercentage, orderPercentage };
 }
+
+

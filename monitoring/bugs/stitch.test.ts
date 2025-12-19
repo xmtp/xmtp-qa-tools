@@ -1,4 +1,5 @@
 import { type Group } from "@helpers/versions";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -15,7 +16,7 @@ describe(testName, () => {
       allInboxIds,
     )) as Group;
 
-    await group.send(receiver.inboxId);
+    await sendTextCompat(group, receiver.inboxId);
     await receiver.client.conversations.syncAll();
     const stream = receiver.client.conversations.stream();
     await group.addMembers([receiver.client.inboxId]);
@@ -26,3 +27,5 @@ describe(testName, () => {
     }
   });
 });
+
+

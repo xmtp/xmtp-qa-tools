@@ -1,4 +1,5 @@
 import { type Dm } from "@helpers/versions";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -102,3 +103,5 @@ describe(testName, async () => {
     }
   });
 });
+
+

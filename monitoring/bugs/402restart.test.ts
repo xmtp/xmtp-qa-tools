@@ -1,5 +1,6 @@
 import { sleep } from "@helpers/client";
 import { type DecodedMessage } from "@helpers/versions";
+import { sendTextCompat, isDecodedMessage } from "@helpers/sdk-compat";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -16,8 +17,9 @@ describe(testName, () => {
     let convo = await creator.client.conversations.newDm(agent.inboxId);
 
     let stream = await agent.client.conversations.streamAllMessages({
-      onValue: (message: DecodedMessage) => {
+      onValue: (message: any) => {
         if (
+          isDecodedMessage(message) &&
           message.senderInboxId.toLowerCase() !== agent.inboxId.toLowerCase()
         ) {
           console.log("message", message.content);
@@ -28,13 +30,14 @@ describe(testName, () => {
     });
     await sleep(1000);
 
-    await convo.send("convo1");
+    await sendTextCompat(convo, "convo1");
     await sleep(1000);
     void stream.end();
 
     stream = await agent.client.conversations.streamAllMessages({
-      onValue: (message: DecodedMessage) => {
+      onValue: (message: any) => {
         if (
+          isDecodedMessage(message) &&
           message.senderInboxId.toLowerCase() !== agent.inboxId.toLowerCase()
         ) {
           console.log("message", message.content);
@@ -44,9 +47,11 @@ describe(testName, () => {
       },
     });
     // First test
-    await convo.send("convo2");
+    await sendTextCompat(convo, "convo2");
     await sleep(1000);
 
     expect(messageCount).toBe(2);
   });
 });
+
+

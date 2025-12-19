@@ -175,7 +175,7 @@ describe(testName, () => {
           const groupMessage =
             "gm-" + Math.random().toString(36).substring(2, 15);
 
-          await newGroup.send(groupMessage);
+          await sendTextCompat(newGroup, groupMessage);
           expect(groupMessage).toBeDefined();
         });
         it(`addAdmin-${i}(${populateSize})[${installationPerMember}]:add an admin to a group`, async () => {
@@ -249,3 +249,5 @@ describe(testName, () => {
     }
   }
 });
+
+

@@ -13,6 +13,7 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@helpers/versions";
+import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
 import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";
@@ -606,6 +607,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
               continue;
             }
             if (
+              isDecodedMessage(message) &&
               message?.contentType?.typeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
@@ -630,14 +632,16 @@ export class WorkerClient extends Worker implements IWorkerClient {
                     (change) => change.fieldName === "group_name",
                   )?.newValue || "Unknown";
 
-                this.emit("worker_message", {
-                  type: StreamCollectorType.GroupUpdated,
-                  group: {
-                    conversationId: message.conversationId,
-                    name: groupName,
-                    addedInboxes: content.addedInboxes,
-                  },
-                });
+                if (isDecodedMessage(message)) {
+                  this.emit("worker_message", {
+                    type: StreamCollectorType.GroupUpdated,
+                    group: {
+                      conversationId: message.conversationId,
+                      name: groupName,
+                      addedInboxes: content.addedInboxes,
+                    },
+                  });
+                }
               }
               continue;
             } else if (
@@ -654,7 +658,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
               await this.handleResponse(message, type);
 
               // Emit standard message
-              if (this.listenerCount("worker_message") > 0) {
+              if (this.listenerCount("worker_message") > 0 && isDecodedMessage(message)) {
                 // console.debug(
                 //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
                 // );
@@ -753,7 +757,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const debugInfo = await conversation.debugInfo();
         response += ` and epoch ${debugInfo?.epoch}`;
       }
-      await conversation.send(response);
+      await sendTextCompat(conversation, response);
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }

@@ -21,6 +21,12 @@ import {
   Dm as Dm45,
   Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
+import {
+  Client as Client50,
+  Conversation as Conversation50,
+  Dm as Dm50,
+  Group as Group50,
+} from "@xmtp/node-sdk-5.0.0";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -38,7 +44,7 @@ try {
   // version.json not exported, 4.4.0 unavailable
 }
 
-// Node SDK exports
+// Node SDK exports (using latest version 5.0.0)
 export {
   Client,
   ConsentState,
@@ -56,10 +62,19 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.5.0";
+} from "@xmtp/node-sdk-5.0.0";
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client50,
+    Conversation: Conversation50,
+    Dm: Dm50,
+    Group: Group50,
+    nodeSDK: "5.0.0",
+    nodeBindings: "1.7.0",
+    auto: true,
+  },
   {
     Client: Client45,
     Conversation: Conversation45,
