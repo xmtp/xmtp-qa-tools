@@ -3,6 +3,7 @@
 # dependencies
 node_modules
 .yarn/
+.cursor/*
 .vscode/
 .env
 .data copy/

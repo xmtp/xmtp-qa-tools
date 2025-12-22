@@ -21,6 +21,12 @@ import {
   Dm as Dm45,
   Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
+import {
+  Client as Client50rc1,
+  Conversation as Conversation50rc1,
+  Dm as Dm50rc1,
+  Group as Group50rc1,
+} from "@xmtp/node-sdk-5.0.0-rc1";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -60,6 +66,15 @@ export {
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client50rc1,
+    Conversation: Conversation50rc1,
+    Dm: Dm50rc1,
+    Group: Group50rc1,
+    nodeSDK: "5.0.0-rc1",
+    nodeBindings: "1.7.0-rc2",
+    auto: false,
+  },
   {
     Client: Client45,
     Conversation: Conversation45,
@@ -115,7 +130,9 @@ export const getVersions = (filterAuto: boolean = true) => {
 
 export const checkNoNameContains = (versionList: typeof VersionList) => {
   // Node SDK versions should not include - because it messes up with the worker name-installation conversion
+  // Skip non-auto versions (like RC releases) since they won't be used in worker name-installation conversion
   for (const version of versionList) {
+    if (!version.auto) continue;
     if (version.nodeSDK.includes("-")) {
       throw new Error(`Node SDK version ${version.nodeSDK} contains -`);
     } else if (version.nodeBindings.includes("-")) {
@@ -219,14 +236,17 @@ export function getDefaultSdkVersion(): string {
 
 /**
  * Get SDK versions for testing (respects TEST_VERSIONS env var)
+ * Only includes auto-enabled versions to avoid RC versions with `-` in names
+ * which break worker name-installation parsing
  */
 export function getSdkVersionsForTesting(): string[] {
+  const autoVersions = VersionList.filter((v) => v.auto);
   let sdkVersions = [getDefaultSdkVersion()];
 
   if (process.env.TEST_VERSIONS) {
-    sdkVersions = VersionList.slice(0, parseInt(process.env.TEST_VERSIONS)).map(
-      (v) => v.nodeBindings,
-    );
+    sdkVersions = autoVersions
+      .slice(0, parseInt(process.env.TEST_VERSIONS))
+      .map((v) => v.nodeBindings);
   }
 
   return sdkVersions;

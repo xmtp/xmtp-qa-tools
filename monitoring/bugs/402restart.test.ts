@@ -28,7 +28,7 @@ describe(testName, () => {
     });
     await sleep(1000);
 
-    await convo.send("convo1");
+    await convo.sendText("convo1");
     await sleep(1000);
     void stream.end();
 
@@ -44,7 +44,7 @@ describe(testName, () => {
       },
     });
     // First test
-    await convo.send("convo2");
+    await convo.sendText("convo2");
     await sleep(1000);
 
     expect(messageCount).toBe(2);
