@@ -8,12 +8,6 @@ const agents: AgentConfig[] = [
     live: true,
   },
   {
-    name: "ponder",
-    address: "0x2674f0B09B648551d2623177e2761242D708FBb2",
-    networks: [],
-    live: false,
-  },
-  {
     name: "flaunchy",
     address: "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     networks: ["production"],
@@ -58,7 +52,7 @@ const agents: AgentConfig[] = [
   {
     name: "bracky",
     address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
-    networks: [],
+    networks: ["production"],
     live: true,
   },
   {
