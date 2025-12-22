@@ -50,6 +50,10 @@ describe(testName, () => {
           `📤 Sending "${testMessage}" to ${agentConfig.name} (${agentConfig.address}) in group`,
         );
 
+        // Record timestamp before sending to ignore welcome messages
+        const testMessageSendTime = Date.now();
+        let firstMessageSkipped = false;
+
         const result = await waitForResponse({
           client: agent.client as any,
           conversation: {
@@ -59,6 +63,23 @@ describe(testName, () => {
           senderInboxId: agent.client.inboxId,
           timeout: AGENT_RESPONSE_TIMEOUT,
           messageText: testMessage,
+          messageFilter: (message) => {
+            const messageTime = message.sentAt.getTime();
+            // Buffer to account for waitForResponse's 100ms delay + margin
+            const sendTimeWithBuffer = testMessageSendTime - 300;
+
+            // Skip first message if it was sent before our test message (welcome message)
+            if (!firstMessageSkipped && messageTime < sendTimeWithBuffer) {
+              console.log(
+                `⏭️  Skipping welcome message from ${agentConfig.name}`,
+              );
+              firstMessageSkipped = true;
+              return false;
+            }
+
+            // Only accept messages sent after our test message
+            return messageTime >= sendTimeWithBuffer;
+          },
         });
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
