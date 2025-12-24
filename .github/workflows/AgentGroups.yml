@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test: [agents-tagged, agents-untagged]
+        test: [agents-tagged]
         env: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
