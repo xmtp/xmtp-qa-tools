@@ -148,6 +148,27 @@ export const isD14NEnabled = (): boolean => {
   return d14nEnv === "true" || d14nEnv === "1";
 };
 
+/**
+ * Compare two semantic version strings.
+ * Returns true if version >= minVersion.
+ * E.g., compareVersions("1.7.0", "1.6.0") returns true
+ */
+export const compareVersions = (
+  version: string,
+  minVersion: string,
+): boolean => {
+  const vParts = version.split(".").map(Number);
+  const minParts = minVersion.split(".").map(Number);
+
+  for (let i = 0; i < Math.max(vParts.length, minParts.length); i++) {
+    const v = vParts[i] || 0;
+    const min = minParts[i] || 0;
+    if (v > min) return true;
+    if (v < min) return false;
+  }
+  return true; // Equal versions
+};
+
 export const regressionClient = async (
   nodeBindings: string,
   walletKey: `0x${string}`,
@@ -178,6 +199,10 @@ export const regressionClient = async (
   const d14nEnabled = isD14NEnabled();
   const apiUrl = apiURL || process.env.XMTP_API_URL;
 
+  // Check if SDK version supports D14N (nodeBindings >= 1.6.0 corresponds to SDK 4.6+)
+  const D14N_MIN_VERSION = "1.6.0";
+  const supportsD14N = compareVersions(nodeBindings, D14N_MIN_VERSION);
+
   const clientOptions: any = {
     dbEncryptionKey,
     dbPath,
@@ -188,7 +213,7 @@ export const regressionClient = async (
     codecs: [new ReactionCodec(), new ReplyCodec()],
   };
 
-  // D14N mode: Use d14nHost parameter
+  // D14N mode: Use d14nHost parameter (requires SDK 4.6+ / nodeBindings >= 1.6.0)
   // V3 mode: Use apiUrl parameter (or default endpoints)
   if (d14nEnabled) {
     if (!apiUrl) {
@@ -196,8 +221,15 @@ export const regressionClient = async (
         "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N gateway URL",
       );
     }
-    clientOptions.d14nHost = apiUrl;
-    console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
+    if (supportsD14N) {
+      clientOptions.d14nHost = apiUrl;
+      console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
+    } else {
+      console.warn(
+        `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
+      );
+      clientOptions.apiUrl = apiUrl;
+    }
   } else if (apiUrl) {
     clientOptions.apiUrl = apiUrl;
     console.log(`[V3] Using custom API URL: ${apiUrl}`);
@@ -235,7 +267,14 @@ export const regressionClient = async (
       };
 
       if (d14nEnabled && apiUrl) {
-        retryOptions.d14nHost = apiUrl;
+        if (supportsD14N) {
+          retryOptions.d14nHost = apiUrl;
+        } else {
+          console.warn(
+            `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
+          );
+          retryOptions.apiUrl = apiUrl;
+        }
       } else if (apiUrl) {
         retryOptions.apiUrl = apiUrl;
       }
