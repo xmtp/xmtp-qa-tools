@@ -16,7 +16,7 @@
 export const sendTextCompat = async (
   conversation: any,
   text: string,
-): Promise<string> => {
+  ): Promise<unknown> => {
   // Use sendText() for SDK 5.0.0+, fall back to send() for older versions
   if (typeof conversation.sendText === "function") {
     return await conversation.sendText(text);
