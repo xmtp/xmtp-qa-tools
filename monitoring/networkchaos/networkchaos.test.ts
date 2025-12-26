@@ -125,5 +125,3 @@ describe(testName, async () => {
     expect(verifyFinal.receptionPercentage).toBeGreaterThanOrEqual(99);
   });
 });
-
-

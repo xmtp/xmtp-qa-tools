@@ -1,6 +1,5 @@
 import { sleep } from "@helpers/client";
-import { type DecodedMessage } from "@helpers/versions";
-import { sendTextCompat, isDecodedMessage } from "@helpers/sdk-compat";
+import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -53,5 +52,3 @@ describe(testName, () => {
     expect(messageCount).toBe(2);
   });
 });
-
-

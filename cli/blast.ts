@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   IdentifierKind,
   type DecodedMessage,
@@ -5,7 +6,6 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@helpers/versions";
-import { sendTextCompat } from "@helpers/sdk-compat";
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";

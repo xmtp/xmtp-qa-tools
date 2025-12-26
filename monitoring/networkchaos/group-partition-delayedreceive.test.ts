@@ -1,6 +1,6 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import type { Group } from "@helpers/versions";
-import { sendTextCompat } from "@helpers/sdk-compat";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -133,5 +133,3 @@ describe(testName, async () => {
     await workers.checkForks();
   });
 });
-
-

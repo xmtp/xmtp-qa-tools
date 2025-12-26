@@ -420,6 +420,7 @@ export const logAndSend = async (
     if (typeof (conversation as any).sendText === "function") {
       await (conversation as any).sendText(message);
     } else if (typeof conversation.send === "function") {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await conversation.send(message as any);
     }
   }

@@ -512,5 +512,3 @@ export function calculateMessageStats(
   const orderPercentage = (workersInOrder / workerCount) * 100;
   return { receptionPercentage, orderPercentage };
 }
-
-

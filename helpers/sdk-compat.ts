@@ -1,8 +1,8 @@
 /**
  * SDK Compatibility Layer
- * 
+ *
  * This module provides backward compatibility between SDK 4.x and 5.0.0+
- * 
+ *
  * Key changes in SDK 5.0.0:
  * - send() now requires EncodedContent instead of accepting string
  * - New helper methods: sendText(), sendMarkdown(), sendReaction(), etc.
@@ -16,7 +16,7 @@
 export const sendTextCompat = async (
   conversation: any,
   text: string,
-  ): Promise<unknown> => {
+): Promise<unknown> => {
   // Use sendText() for SDK 5.0.0+, fall back to send() for older versions
   if (typeof conversation.sendText === "function") {
     return await conversation.sendText(text);
@@ -32,9 +32,9 @@ export const sendTextCompat = async (
  */
 export const isDecodedMessage = (
   message: any,
-): message is { 
-  contentType: any; 
-  conversationId: string; 
+): message is {
+  contentType: any;
+  conversationId: string;
   sentAt: Date;
   senderInboxId: string;
   content: any;
@@ -54,10 +54,8 @@ export const isDecodedMessage = (
  * Ensure a message is decoded
  * In SDK 5.0.0+, some callbacks receive Message | DecodedMessage
  */
-export const ensureDecodedMessage = async (
-  message: any,
-  client?: any,
-): Promise<any> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const ensureDecodedMessage = (message: any, _client?: any): any => {
   if (isDecodedMessage(message)) {
     return message;
   }
@@ -65,4 +63,3 @@ export const ensureDecodedMessage = async (
   // This might not be needed in practice, but provides safety
   throw new Error("Message is not decoded");
 };
-

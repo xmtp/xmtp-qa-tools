@@ -206,7 +206,6 @@ export const regressionClient = async (
   }
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     client = await ClientClass.create(signer as any, clientOptions);
   } catch (error) {
     // If database file is corrupted, try using a different path
@@ -241,7 +240,6 @@ export const regressionClient = async (
         retryOptions.apiUrl = apiUrl;
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       client = await ClientClass.create(signer as any, retryOptions);
     } else {
       throw error;

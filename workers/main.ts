@@ -6,6 +6,7 @@ import {
   getEncryptionKeyFromHex,
   streamTimeout,
 } from "@helpers/client";
+import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
 import {
   ConsentState,
   regressionClient,
@@ -13,7 +14,6 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@helpers/versions";
-import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
 import { privateKeyToAccount } from "viem/accounts";
 import "dotenv/config";
 import path from "node:path";
@@ -658,7 +658,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
               await this.handleResponse(message, type);
 
               // Emit standard message
-              if (this.listenerCount("worker_message") > 0 && isDecodedMessage(message)) {
+              if (
+                this.listenerCount("worker_message") > 0 &&
+                isDecodedMessage(message)
+              ) {
                 // console.debug(
                 //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
                 // );
@@ -703,10 +706,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleResponse(
-    message: any,
-    streamType: typeofStream,
-  ) {
+  private async handleResponse(message: any, streamType: typeofStream) {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
@@ -721,7 +721,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       }
 
       const conversation = await this.client.conversations.getConversationById(
-        message.conversationId,
+        message.conversationId as string,
       );
       if (!conversation) {
         console.warn(
@@ -731,7 +731,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       }
       const baseName = this.name.split("-")[0].toLowerCase();
       const isDm = (await conversation.metadata())?.conversationType === "dm";
-      const content = (message.content as string).toLowerCase();
+      const content = String(message.content).toLowerCase();
       let shouldRespond = false;
       if (
         ((message?.contentType?.typeId === "text" ||
@@ -1059,7 +1059,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         // Also check if this group update contains added members
         const hasAddedMembers = Boolean(
           streamMsg.group.addedInboxes &&
-            streamMsg.group.addedInboxes.length > 0,
+          streamMsg.group.addedInboxes.length > 0,
         );
         return matches && hasAddedMembers;
       },

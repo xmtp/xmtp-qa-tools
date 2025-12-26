@@ -119,7 +119,7 @@ interface ParsedTestName {
 }
 // Test name parsing - simplified
 export function parseTestName(testName: string): ParsedTestName {
-  const [metricNameParts, metricDescription = ""] = testName.split(":");
+  const [metricNameParts, metricDescription] = testName.split(":");
   const metricName = metricNameParts.replaceAll(" > ", ".");
   const operationParts = metricName.split(".");
 

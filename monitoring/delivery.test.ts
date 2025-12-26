@@ -227,5 +227,3 @@ function calculateDeliveryAndOrder(
 
   return { deliveryPercentage, orderPercentage };
 }
-
-
