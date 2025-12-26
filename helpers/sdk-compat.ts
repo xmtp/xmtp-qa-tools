@@ -55,6 +55,6 @@ export const ensureDecodedMessage = async (
   }
   // If it's a raw Message, we need to decode it
   // This might not be needed in practice, but provides safety
-  return message;
+  throw new Error("Message is not decoded");
 };
 
