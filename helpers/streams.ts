@@ -1,4 +1,5 @@
 import { sleep, streamColdStartTimeout } from "@helpers/client";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   ConsentEntityType,
   ConsentState,

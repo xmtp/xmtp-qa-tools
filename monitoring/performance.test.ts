@@ -4,6 +4,7 @@ import {
   type DeliveryMetricTags,
   type ResponseMetricTags,
 } from "@helpers/datadog";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -106,7 +107,7 @@ describe(testName, () => {
     expect(conversation!.id).toBe(dm!.id);
   });
   it(`send:measure sending a gm`, async () => {
-    const dmId = await dm!.send("gm");
+    const dmId = await sendTextCompat(dm!, "gm");
     expect(dmId).toBeDefined();
   });
   it(`streamMessage:measure receiving a gm`, async () => {

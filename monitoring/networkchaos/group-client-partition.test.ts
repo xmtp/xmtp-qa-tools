@@ -50,7 +50,7 @@ describe(testName, async () => {
         .client.conversations.getConversationById(group.id);
       for (let i = 1; i <= 3; i++) {
         const msg = `partition-msg-${sender}-${i}`;
-        await convo!.send(msg);
+        await sendTextCompat(convo!, msg);
         midPartitionMessages.push(msg);
       }
     }

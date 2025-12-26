@@ -32,13 +32,21 @@ export const sendTextCompat = async (
  */
 export const isDecodedMessage = (
   message: any,
-): message is { contentType: any; conversationId: string; sentAt: Date } => {
+): message is { 
+  contentType: any; 
+  conversationId: string; 
+  sentAt: Date;
+  senderInboxId: string;
+  content: any;
+} => {
   return (
     message &&
     typeof message === "object" &&
     "contentType" in message &&
     "conversationId" in message &&
-    "sentAt" in message
+    "sentAt" in message &&
+    "senderInboxId" in message &&
+    "content" in message
   );
 };
 

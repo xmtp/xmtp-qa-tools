@@ -47,7 +47,7 @@ describe(testName, async () => {
       .get("user2")!
       .client.conversations.getConversationById(group.id);
     for (const msg of expectedMessages) {
-      await user2Group!.send(msg);
+      await sendTextCompat(user2Group!, msg);
     }
 
     await new Promise((res) => setTimeout(res, 3000));

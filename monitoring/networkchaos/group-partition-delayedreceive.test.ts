@@ -53,7 +53,7 @@ describe(testName, async () => {
     const user2Group = await workers
       .get("user2")!
       .client.conversations.getConversationById(group.id);
-    await user2Group!.send(midPartitionMsg);
+    await sendTextCompat(user2Group!, midPartitionMsg);
     await workers.checkForks();
 
     console.log("=== Message Dump After Partition ===");

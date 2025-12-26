@@ -704,7 +704,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
    * Handle generating and sending GPT responses
    */
   private async handleResponse(
-    message: DecodedMessage,
+    message: any,
     streamType: typeofStream,
   ) {
     try {

@@ -51,7 +51,7 @@ describe(testName, async () => {
       }
 
       const start = Date.now();
-      const sendPromise = conversation.send(messageContent);
+      const sendPromise = sendTextCompat(conversation, messageContent);
       console.log("[test] Message send initiated, waiting under partition...");
 
       await new Promise((r) => setTimeout(r, 3000)); // Let send timeout internally

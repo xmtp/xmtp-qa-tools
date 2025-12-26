@@ -75,7 +75,7 @@ const createOperations = (worker: Worker, groupID: string) => {
       }),
     sendMessage: () =>
       getGroup().then((g) =>
-        g.send(`Message from ${worker.name}`).then(() => {}),
+        sendTextCompat(g, `Message from ${worker.name}`).then(() => {}),
       ),
     sync: () => getGroup().then((g) => g.sync()),
   };

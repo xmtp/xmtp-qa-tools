@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";

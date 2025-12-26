@@ -1,4 +1,5 @@
 import { streamTimeout } from "@helpers/client";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   verifyMembershipStream,
   verifyMessageStream,
@@ -126,7 +127,7 @@ describe(testName, () => {
       expect(conversation!.id).toBe(dm!.id);
     });
     it(`send(${populateSize}):measure sending a gm`, async () => {
-      const dmId = await dm!.send("gm");
+      const dmId = await sendTextCompat(dm!, "gm");
       expect(dmId).toBeDefined();
     });
 
