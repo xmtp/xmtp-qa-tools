@@ -38,11 +38,7 @@ export class playwright {
   };
 
   constructor(
-    {
-      headless = true,
-      env = null,
-      defaultUser = undefined,
-    }: playwrightOptions = {
+    { headless = true, env = null, defaultUser }: playwrightOptions = {
       headless: true,
       env: null,
       defaultUser: undefined,

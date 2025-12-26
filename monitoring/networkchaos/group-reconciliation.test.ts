@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import type { Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
@@ -27,7 +28,7 @@ describe(testName, async () => {
       .get("user1")!
       .client.conversations.getConversationById(group.id);
     console.log("Sending welcome message from user1...");
-    await user1Group?.send("Initial welcome message from user1");
+    await sendTextCompat(user1Group!, "Initial welcome message from user1");
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log(
@@ -81,7 +82,8 @@ describe(testName, async () => {
 
     // User1 adds user4 to group
     console.log("Sending welcome message from user1...");
-    await user1Group?.send(
+    await sendTextCompat(
+      user1Group!,
       "Additional welcome message from user1 before user4 joins...",
     );
     await (user1Group as Group).addMembers([
@@ -90,7 +92,7 @@ describe(testName, async () => {
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log("[test] user4 added to group");
-    await user1Group?.send("User1: user4 just joined!!");
+    await sendTextCompat(user1Group!, "User1: user4 just joined!!");
     await new Promise((res) => setTimeout(res, 3000));
 
     console.log("[test] Dumping messages received by group members:");
@@ -147,7 +149,7 @@ describe(testName, async () => {
 
     const user4Id = workers.get("user4")!.client.inboxId;
     const recoveryMsg = "User4 says hello - user3 should see me too!";
-    await user4Group?.send(recoveryMsg);
+    await sendTextCompat(user4Group!, recoveryMsg);
     console.log("[test] user4 sent post-recovery message");
 
     // Poll user3 until it sees updated members

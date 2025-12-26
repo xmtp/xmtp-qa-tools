@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -58,7 +59,7 @@ describe(testName, async () => {
 
           const content = `gm-${sender.name}-${Date.now()}`;
           try {
-            await convo.send(content);
+            await sendTextCompat(convo, content);
           } catch (err) {
             console.warn(`[sendLoop] send failed for ${sender.name}:`, err);
           }

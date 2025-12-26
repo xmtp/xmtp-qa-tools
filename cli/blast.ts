@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   IdentifierKind,
   type DecodedMessage,
@@ -250,7 +251,7 @@ async function sendGroupMessage(config: Config): Promise<void> {
 
     // Send the message
     const sendStart = Date.now();
-    await group.send(config.message);
+    await sendTextCompat(group, config.message);
     const sendTime = Date.now() - sendStart;
 
     console.log(`✅ Message sent successfully in ${sendTime}ms`);

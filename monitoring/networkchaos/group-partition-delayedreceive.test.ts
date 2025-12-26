@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import type { Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
@@ -52,7 +53,7 @@ describe(testName, async () => {
     const user2Group = await workers
       .get("user2")!
       .client.conversations.getConversationById(group.id);
-    await user2Group!.send(midPartitionMsg);
+    await sendTextCompat(user2Group!, midPartitionMsg);
     await workers.checkForks();
 
     console.log("=== Message Dump After Partition ===");
