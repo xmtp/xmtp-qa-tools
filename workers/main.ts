@@ -601,7 +601,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
             //this.logMessage(message);
             if (
               !message ||
-              message?.senderInboxId.toLowerCase() ===
+              message?.senderInboxId?.toLowerCase() ===
                 this.client.inboxId.toLowerCase()
             ) {
               continue;
