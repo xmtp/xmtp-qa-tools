@@ -213,7 +213,7 @@ export const regressionClient = async (
     codecs: [new ReactionCodec(), new ReplyCodec()],
   };
 
-  // D14N mode: Use d14nHost parameter (requires SDK 4.6+ / nodeBindings >= 1.6.0)
+  // D14N mode: Use gatewayHost parameter (requires SDK 4.6+ / nodeBindings >= 1.6.0)
   // V3 mode: Use apiUrl parameter (or default endpoints)
   if (d14nEnabled) {
     if (!apiUrl) {
@@ -222,8 +222,8 @@ export const regressionClient = async (
       );
     }
     if (supportsD14N) {
-      clientOptions.d14nHost = apiUrl;
-      console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
+      clientOptions.gatewayHost = apiUrl;
+      console.log(`[D14N] Using D14N gateway (gatewayHost): ${apiUrl}`);
     } else {
       console.warn(
         `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
@@ -268,7 +268,7 @@ export const regressionClient = async (
 
       if (d14nEnabled && apiUrl) {
         if (supportsD14N) {
-          retryOptions.d14nHost = apiUrl;
+          retryOptions.gatewayHost = apiUrl;
         } else {
           console.warn(
             `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
