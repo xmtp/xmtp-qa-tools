@@ -157,8 +157,14 @@ export const compareVersions = (
   version: string,
   minVersion: string,
 ): boolean => {
-  const vParts = version.split("-")[0].split(".").map((p) => parseInt(p, 10) || 0);
-  const minParts = minVersion.split("-")[0].split(".").map((p) => parseInt(p, 10) || 0);
+  const vParts = version
+    .split("-")[0]
+    .split(".")
+    .map((p) => parseInt(p, 10) || 0);
+  const minParts = minVersion
+    .split("-")[0]
+    .split(".")
+    .map((p) => parseInt(p, 10) || 0);
 
   for (let i = 0; i < Math.max(vParts.length, minParts.length); i++) {
     const v = vParts[i] || 0;
