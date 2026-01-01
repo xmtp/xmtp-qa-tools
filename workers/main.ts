@@ -6,6 +6,7 @@ import {
   getEncryptionKeyFromHex,
   streamTimeout,
 } from "@helpers/client";
+import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
 import {
   ConsentState,
   regressionClient,
@@ -600,12 +601,13 @@ export class WorkerClient extends Worker implements IWorkerClient {
             //this.logMessage(message);
             if (
               !message ||
-              message?.senderInboxId.toLowerCase() ===
+              message?.senderInboxId?.toLowerCase() ===
                 this.client.inboxId.toLowerCase()
             ) {
               continue;
             }
             if (
+              isDecodedMessage(message) &&
               message?.contentType?.typeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
@@ -630,14 +632,16 @@ export class WorkerClient extends Worker implements IWorkerClient {
                     (change) => change.fieldName === "group_name",
                   )?.newValue || "Unknown";
 
-                this.emit("worker_message", {
-                  type: StreamCollectorType.GroupUpdated,
-                  group: {
-                    conversationId: message.conversationId,
-                    name: groupName,
-                    addedInboxes: content.addedInboxes,
-                  },
-                });
+                if (isDecodedMessage(message)) {
+                  this.emit("worker_message", {
+                    type: StreamCollectorType.GroupUpdated,
+                    group: {
+                      conversationId: message.conversationId,
+                      name: groupName,
+                      addedInboxes: content.addedInboxes,
+                    },
+                  });
+                }
               }
               continue;
             } else if (
@@ -654,7 +658,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
               await this.handleResponse(message, type);
 
               // Emit standard message
-              if (this.listenerCount("worker_message") > 0) {
+              if (
+                this.listenerCount("worker_message") > 0 &&
+                isDecodedMessage(message)
+              ) {
                 // console.debug(
                 //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
                 // );
@@ -699,10 +706,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleResponse(
-    message: DecodedMessage,
-    streamType: typeofStream,
-  ) {
+  private async handleResponse(message: any, streamType: typeofStream) {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
@@ -717,7 +721,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       }
 
       const conversation = await this.client.conversations.getConversationById(
-        message.conversationId,
+        message.conversationId as string,
       );
       if (!conversation) {
         console.warn(
@@ -727,7 +731,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
       }
       const baseName = this.name.split("-")[0].toLowerCase();
       const isDm = (await conversation.metadata())?.conversationType === "dm";
-      const content = (message.content as string).toLowerCase();
+      const content = String(message.content).toLowerCase();
       let shouldRespond = false;
       if (
         ((message?.contentType?.typeId === "text" ||
@@ -753,7 +757,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         const debugInfo = await conversation.debugInfo();
         response += ` and epoch ${debugInfo?.epoch}`;
       }
-      await conversation.send(response);
+      await sendTextCompat(conversation, response);
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }
@@ -1055,7 +1059,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         // Also check if this group update contains added members
         const hasAddedMembers = Boolean(
           streamMsg.group.addedInboxes &&
-            streamMsg.group.addedInboxes.length > 0,
+          streamMsg.group.addedInboxes.length > 0,
         );
         return matches && hasAddedMembers;
       },

@@ -1,5 +1,6 @@
 import { sleep } from "@helpers/client";
 import { getTime } from "@helpers/logger";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
@@ -50,7 +51,7 @@ describe(testName, () => {
     );
     await sleep();
     await newGroup.addMembers([xmtpChat.inboxId]);
-    await newGroup.send(`hi ${receiver.name}`);
+    await sendTextCompat(newGroup, `hi ${receiver.name}`);
     console.log("waiting for new conversation");
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
     console.log("new conversation found", result);

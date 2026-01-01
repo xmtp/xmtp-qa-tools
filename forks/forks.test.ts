@@ -3,6 +3,7 @@ import { NetworkChaos } from "@chaos/network";
 import type { ChaosProvider } from "@chaos/provider";
 import { StreamsChaos } from "@chaos/streams";
 import { getTime } from "@helpers/logger";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { type Group } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
@@ -74,7 +75,7 @@ const createOperations = (worker: Worker, groupID: string) => {
       }),
     sendMessage: () =>
       getGroup().then((g) =>
-        g.send(`Message from ${worker.name}`).then(() => {}),
+        sendTextCompat(g, `Message from ${worker.name}`).then(() => {}),
       ),
     sync: () => getGroup().then((g) => g.sync()),
   };

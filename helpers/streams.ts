@@ -1,4 +1,5 @@
 import { sleep, streamColdStartTimeout } from "@helpers/client";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   ConsentEntityType,
   ConsentState,
@@ -237,7 +238,7 @@ export async function verifyMessageStream(
           .replace("{i}", `${i + 1}`)
           .replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
-        await group.send(content);
+        await sendTextCompat(group, content);
         sent.push({ content, sentAt });
 
         // Add small delay between messages to prevent overwhelming

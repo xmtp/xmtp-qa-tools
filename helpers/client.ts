@@ -415,8 +415,18 @@ export const logAndSend = async (
   }
 
   // Send to conversation if provided
-  if (conversation && typeof conversation.send === "function") {
-    await conversation.send(message);
+  if (conversation) {
+    // Use sendText() for SDK 5.0.0+, fall back to send() for older versions
+    if (typeof (conversation as any).sendText === "function") {
+      await (conversation as any).sendText(message);
+    } else if (typeof conversation.send === "function") {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      await conversation.send(message as any);
+    } else {
+      console.warn(
+        "logAndSend: conversation has neither sendText() nor send(); message not sent.",
+      );
+    }
   }
 };
 export const getMessageByMb = (mb: number) => {
@@ -424,6 +434,23 @@ export const getMessageByMb = (mb: number) => {
   //const message = "A";
   console.log(`Message size: ${formatBytes(message.length)}`);
   return message;
+};
+
+/**
+ * Send a text message to a conversation, compatible with both SDK 4.x and 5.0+
+ * SDK 5.0+ uses sendText(), while SDK 4.x uses send()
+ */
+export const sendTextMessage = async (
+  conversation: any,
+  text: string,
+): Promise<string> => {
+  // Use sendText() for SDK 5.0.0+, fall back to send() for older versions
+  if (conversation && typeof conversation.sendText === "function") {
+    return await conversation.sendText(text);
+  } else if (conversation && typeof conversation.send === "function") {
+    return await conversation.send(text);
+  }
+  throw new Error("Conversation does not have send or sendText method");
 };
 export async function checkKeyPackageStatusesByInboxId(
   client: Client,

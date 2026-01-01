@@ -1,3 +1,4 @@
+import { sendTextCompat } from "@helpers/sdk-compat";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -50,7 +51,7 @@ describe(testName, async () => {
             group.id,
           );
           const content = `gm-${sender.name}-${Date.now()}`;
-          await convo!.send(content);
+          await sendTextCompat(convo!, content);
         }
         await new Promise((r) => setTimeout(r, 1000));
       }

@@ -21,6 +21,12 @@ import {
   Dm as Dm45,
   Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
+import {
+  Client as Client50,
+  Conversation as Conversation50,
+  Dm as Dm50,
+  Group as Group50,
+} from "@xmtp/node-sdk-5.0.0";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -38,7 +44,7 @@ try {
   // version.json not exported, 4.4.0 unavailable
 }
 
-// Node SDK exports
+// Node SDK exports (using latest version 5.0.0)
 export {
   Client,
   ConsentState,
@@ -56,10 +62,19 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-4.5.0";
+} from "@xmtp/node-sdk-5.0.0";
 
 // Node SDK version list
 export const VersionList = [
+  {
+    Client: Client50,
+    Conversation: Conversation50,
+    Dm: Dm50,
+    Group: Group50,
+    nodeSDK: "5.0.0",
+    nodeBindings: "1.7.0",
+    auto: true,
+  },
   {
     Client: Client45,
     Conversation: Conversation45,
@@ -124,6 +139,42 @@ export const checkNoNameContains = (versionList: typeof VersionList) => {
   }
 };
 
+/**
+ * Check if D14N mode is enabled via environment variable
+ * Set XMTP_D14N=true to enable D14N mode
+ */
+export const isD14NEnabled = (): boolean => {
+  const d14nEnv = process.env.XMTP_D14N;
+  return d14nEnv === "true" || d14nEnv === "1";
+};
+
+/**
+ * Compare two semantic version strings.
+ * Returns true if version >= minVersion.
+ * E.g., compareVersions("1.7.0", "1.6.0") returns true
+ */
+export const compareVersions = (
+  version: string,
+  minVersion: string,
+): boolean => {
+  const vParts = version
+    .split("-")[0]
+    .split(".")
+    .map((p) => parseInt(p, 10) || 0);
+  const minParts = minVersion
+    .split("-")[0]
+    .split(".")
+    .map((p) => parseInt(p, 10) || 0);
+
+  for (let i = 0; i < Math.max(vParts.length, minParts.length); i++) {
+    const v = vParts[i] || 0;
+    const min = minParts[i] || 0;
+    if (v > min) return true;
+    if (v < min) return false;
+  }
+  return true; // Equal versions
+};
+
 export const regressionClient = async (
   nodeBindings: string,
   walletKey: `0x${string}`,
@@ -134,12 +185,6 @@ export const regressionClient = async (
 ): Promise<any> => {
   const loggingLevel = (process.env.LOGGING_LEVEL ||
     "warn") as unknown as LogLevel;
-  const apiUrl = apiURL;
-  if (apiUrl) {
-    console.debug(
-      `Creating API client with: SDK version: ${nodeBindings} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
-    );
-  }
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
@@ -156,17 +201,57 @@ export const regressionClient = async (
 
   const signer = createSigner(walletKey);
 
+  // Check if D14N mode is explicitly enabled
+  const d14nEnabled = isD14NEnabled();
+  const apiUrl = apiURL || process.env.XMTP_API_URL;
+
+  // Check if SDK version supports D14N (nodeBindings >= 1.6.0 corresponds to SDK 4.6+)
+  const D14N_MIN_VERSION = "1.6.0";
+  const supportsD14N = compareVersions(nodeBindings, D14N_MIN_VERSION);
+
+  const clientOptions: any = {
+    dbEncryptionKey,
+    dbPath,
+    env: env as unknown as XmtpEnv,
+    loggingLevel,
+    appVersion: APP_VERSION,
+    disableDeviceSync: true,
+    codecs: [new ReactionCodec(), new ReplyCodec()],
+  };
+
+  // D14N mode: Use gatewayHost (payer) + apiUrl (grpc) parameters
+  // gatewayHost = payer URL for writes (identity registration, sending)
+  // apiUrl = grpc URL for reads (queries, sync)
+  // V3 mode: Use apiUrl parameter only (or default endpoints)
+  if (d14nEnabled) {
+    if (!apiUrl) {
+      throw new Error(
+        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N grpc URL (e.g., https://grpc.testnet-dev.xmtp.network:443)",
+      );
+    }
+    if (supportsD14N) {
+      // Derive payer URL from grpc URL (grpc.* -> payer.*)
+      const payerUrl =
+        process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
+      clientOptions.gatewayHost = payerUrl; // Payer URL for writes
+      clientOptions.apiUrl = apiUrl; // gRPC URL for reads
+      console.log(`[D14N] Using D14N gateway (gatewayHost): ${payerUrl}`);
+      console.log(`[D14N] Using D14N node (apiUrl): ${apiUrl}`);
+    } else {
+      console.warn(
+        `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
+      );
+      clientOptions.apiUrl = apiUrl;
+    }
+  } else if (apiUrl) {
+    clientOptions.apiUrl = apiUrl;
+    console.log(`[V3] Using custom API URL: ${apiUrl}`);
+  } else {
+    console.log(`[V3] Using default network endpoint for env: ${env}`);
+  }
+
   try {
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey,
-      dbPath,
-      env: env as unknown as XmtpEnv,
-      loggingLevel,
-      apiUrl,
-      appVersion: APP_VERSION,
-      disableDeviceSync: true,
-      codecs: [new ReactionCodec(), new ReplyCodec()],
-    });
+    client = await ClientClass.create(signer as any, clientOptions);
   } catch (error) {
     // If database file is corrupted, try using a different path
     if (
@@ -184,16 +269,33 @@ export const regressionClient = async (
       console.debug(`Using alternative database path: ${alternativeDbPath}`);
 
       // Try to create the client with the alternative path
-      client = await ClientClass.create(signer, {
+      const retryOptions: any = {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
         env,
         loggingLevel,
-        apiUrl,
         appVersion: APP_VERSION,
         disableDeviceSync: true,
         codecs: [new ReactionCodec(), new ReplyCodec()],
-      });
+      };
+
+      if (d14nEnabled && apiUrl) {
+        if (supportsD14N) {
+          const payerUrl =
+            process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
+          retryOptions.gatewayHost = payerUrl;
+          retryOptions.apiUrl = apiUrl;
+        } else {
+          console.warn(
+            `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
+          );
+          retryOptions.apiUrl = apiUrl;
+        }
+      } else if (apiUrl) {
+        retryOptions.apiUrl = apiUrl;
+      }
+
+      client = await ClientClass.create(signer as any, retryOptions);
     } else {
       throw error;
     }
