@@ -181,28 +181,39 @@ export const regressionClient = async (
   const clientOptions: any = {
     dbEncryptionKey,
     dbPath,
-    env: env as unknown as XmtpEnv,
     loggingLevel,
     appVersion: APP_VERSION,
     disableDeviceSync: true,
     codecs: [new ReactionCodec(), new ReplyCodec()],
   };
 
-  // D14N mode: Use d14nHost parameter
+  // D14N mode: Requires BOTH gatewayHost (payer) and apiUrl (node)
+  // - gatewayHost: The payer/gateway URL (e.g., payer.testnet-dev.xmtp.network)
+  // - apiUrl: The node/v3 URL (e.g., grpc.testnet-dev.xmtp.network)
+  // Note: Don't set env when using D14N - rely on apiUrl and gatewayHost only
   // V3 mode: Use apiUrl parameter (or default endpoints)
   if (d14nEnabled) {
     if (!apiUrl) {
       throw new Error(
-        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N gateway URL",
+        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N node URL",
       );
     }
-    clientOptions.d14nHost = apiUrl;
-    console.log(`[D14N] Using D14N gateway: ${apiUrl}`);
-  } else if (apiUrl) {
-    clientOptions.apiUrl = apiUrl;
-    console.log(`[V3] Using custom API URL: ${apiUrl}`);
+    // Derive gateway URL from node URL (grpc.* -> payer.*)
+    const gatewayUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
+    clientOptions.gatewayHost = gatewayUrl;  // D14N gateway (payer)
+    clientOptions.apiUrl = apiUrl;           // Node URL for reads
+    // Don't set env for D14N - the apiUrl/gatewayHost override it
+    console.log(`[D14N] Using D14N gateway: ${gatewayUrl}`);
+    console.log(`[D14N] Using D14N node: ${apiUrl}`);
   } else {
-    console.log(`[V3] Using default network endpoint for env: ${env}`);
+    // V3 mode - set env for default endpoints
+    clientOptions.env = env as unknown as XmtpEnv;
+    if (apiUrl) {
+      clientOptions.apiUrl = apiUrl;
+      console.log(`[V3] Using custom API URL: ${apiUrl}`);
+    } else {
+      console.log(`[V3] Using default network endpoint for env: ${env}`);
+    }
   }
 
   try {
@@ -227,7 +238,6 @@ export const regressionClient = async (
       const retryOptions: any = {
         dbEncryptionKey,
         dbPath: alternativeDbPath,
-        env,
         loggingLevel,
         appVersion: APP_VERSION,
         disableDeviceSync: true,
@@ -235,9 +245,15 @@ export const regressionClient = async (
       };
 
       if (d14nEnabled && apiUrl) {
-        retryOptions.d14nHost = apiUrl;
-      } else if (apiUrl) {
+        const gatewayUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
+        retryOptions.gatewayHost = gatewayUrl;
         retryOptions.apiUrl = apiUrl;
+        // Don't set env for D14N
+      } else {
+        retryOptions.env = env;
+        if (apiUrl) {
+          retryOptions.apiUrl = apiUrl;
+        }
       }
 
       client = await ClientClass.create(signer as any, retryOptions);
