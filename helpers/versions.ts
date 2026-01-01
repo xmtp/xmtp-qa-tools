@@ -225,9 +225,10 @@ export const regressionClient = async (
     }
     if (supportsD14N) {
       // Derive payer URL from grpc URL (grpc.* -> payer.*)
-      const payerUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
-      clientOptions.gatewayHost = payerUrl;  // Payer URL for writes
-      clientOptions.apiUrl = apiUrl;          // gRPC URL for reads
+      const payerUrl =
+        process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
+      clientOptions.gatewayHost = payerUrl; // Payer URL for writes
+      clientOptions.apiUrl = apiUrl; // gRPC URL for reads
       console.log(`[D14N] Using D14N gateway (gatewayHost): ${payerUrl}`);
       console.log(`[D14N] Using D14N node (apiUrl): ${apiUrl}`);
     } else {
@@ -274,7 +275,8 @@ export const regressionClient = async (
 
       if (d14nEnabled && apiUrl) {
         if (supportsD14N) {
-          const payerUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
+          const payerUrl =
+            process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
           retryOptions.gatewayHost = payerUrl;
           retryOptions.apiUrl = apiUrl;
         } else {
