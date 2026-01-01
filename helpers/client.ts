@@ -422,6 +422,8 @@ export const logAndSend = async (
     } else if (typeof conversation.send === "function") {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       await conversation.send(message as any);
+    } else {
+      console.warn("logAndSend: conversation has neither sendText() nor send(); message not sent.");
     }
   }
 };
