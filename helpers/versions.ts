@@ -213,17 +213,23 @@ export const regressionClient = async (
     codecs: [new ReactionCodec(), new ReplyCodec()],
   };
 
-  // D14N mode: Use gatewayHost parameter (requires SDK 4.6+ / nodeBindings >= 1.6.0)
-  // V3 mode: Use apiUrl parameter (or default endpoints)
+  // D14N mode: Use gatewayHost (payer) + apiUrl (grpc) parameters
+  // gatewayHost = payer URL for writes (identity registration, sending)
+  // apiUrl = grpc URL for reads (queries, sync)
+  // V3 mode: Use apiUrl parameter only (or default endpoints)
   if (d14nEnabled) {
     if (!apiUrl) {
       throw new Error(
-        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N gateway URL",
+        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N grpc URL (e.g., https://grpc.testnet-dev.xmtp.network:443)",
       );
     }
     if (supportsD14N) {
-      clientOptions.gatewayHost = apiUrl;
-      console.log(`[D14N] Using D14N gateway (gatewayHost): ${apiUrl}`);
+      // Derive payer URL from grpc URL (grpc.* -> payer.*)
+      const payerUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
+      clientOptions.gatewayHost = payerUrl;  // Payer URL for writes
+      clientOptions.apiUrl = apiUrl;          // gRPC URL for reads
+      console.log(`[D14N] Using D14N gateway (gatewayHost): ${payerUrl}`);
+      console.log(`[D14N] Using D14N node (apiUrl): ${apiUrl}`);
     } else {
       console.warn(
         `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
@@ -268,7 +274,9 @@ export const regressionClient = async (
 
       if (d14nEnabled && apiUrl) {
         if (supportsD14N) {
-          retryOptions.gatewayHost = apiUrl;
+          const payerUrl = process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, 'payer.');
+          retryOptions.gatewayHost = payerUrl;
+          retryOptions.apiUrl = apiUrl;
         } else {
           console.warn(
             `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
