@@ -445,9 +445,9 @@ export const sendTextMessage = async (
   text: string,
 ): Promise<string> => {
   // Use sendText() for SDK 5.0.0+, fall back to send() for older versions
-  if (typeof conversation.sendText === "function") {
+  if (conversation && typeof conversation.sendText === "function") {
     return await conversation.sendText(text);
-  } else if (typeof conversation.send === "function") {
+  } else if (conversation && typeof conversation.send === "function") {
     return await conversation.send(text);
   }
   throw new Error("Conversation does not have send or sendText method");
