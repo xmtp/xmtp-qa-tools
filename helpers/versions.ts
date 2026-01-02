@@ -64,7 +64,11 @@ export {
   ConsentEntityType,
 } from "@xmtp/node-sdk-5.0.0";
 
-// Node SDK version list
+/**
+ * Version references use simplified versions without patches/pre-release suffixes.
+ * The actual package version (e.g., "1.7.0-rc2") is stored in package.json, but we refer to it as "1.7.0" here.
+ * This prevents parsing issues with worker name-installation conversion.
+ */
 export const VersionList = [
   {
     Client: Client50,
