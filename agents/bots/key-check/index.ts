@@ -1,3 +1,4 @@
+import { getMessageBody } from "@agents/helper";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -25,11 +26,6 @@ import { GroupHandlers } from "./handlers/groups";
 import { KeyPackagesHandlers } from "./handlers/keypackages";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
-
-// Immediate synchronous log - FIRST THING that runs
-console.log(
-  `[RESTART] Key-check bot starting - PID: ${process.pid} at ${new Date().toISOString()}`,
-);
 
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
@@ -268,32 +264,7 @@ const agent = await Agent.createFromEnv({
   codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
-// Handle agent-level unhandled errors
-agent.on("unhandledError", (error) => {
-  console.error("Key-check bot fatal error:", error);
-  if (error instanceof Error) {
-    console.error("Error stack:", error.stack);
-  }
-  console.error("Exiting process - PM2 will restart");
-  process.exit(1);
-});
-
-// // Handle process-level uncaught exceptions
-// process.on("uncaughtException", (error) => {
-//   console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
-//   process.exit(1);
-// });
-
-// // Handle unhandled promise rejections
-// process.on("unhandledRejection", (reason) => {
-//   console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
-//   process.exit(1);
-// });
-
 // Add inline actions middleware
-// Type assertion needed because AgentMiddleware is a conditional type based on active version
-// The middleware is compatible but TypeScript can't verify due to version-specific types
-// @ts-expect-error - AgentMiddleware types from different SDK versions are incompatible at compile time but compatible at runtime
 agent.use(inlineActionsMiddleware);
 
 // Initialize load test handlers now that agent is available
@@ -334,11 +305,10 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
-  // const messageBody1 = await getMessageBody(
-  //   ctx,
-  //   "America/Argentina/Buenos_Aires",
-  // );
-  // //await ctx.sendText(messageBody1);
+  const messageBody1 = await getMessageBody(
+    ctx,
+    "America/Argentina/Buenos_Aires",
+  );
   const message = ctx.message;
   const content = message.content;
   const isTagged =
@@ -355,8 +325,10 @@ agent.on("text", async (ctx) => {
   - 📧 An **Ethereum address** to check key packages
   - 🔑 An **Inbox ID** to check key packages`;
 
+    await ctx.sendText(messageBody1);
     await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
   } else if (isTagged) {
+    await ctx.sendText(messageBody1);
     await showMenu(ctx, appConfig, "main-menu");
     return;
   }

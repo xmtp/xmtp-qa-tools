@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 import { spawn } from "child_process";
-import { mkdirSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { createTestLogger } from "@helpers/logger";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, "..");
-const projectRoot = join(__dirname, "..");
 
 interface Config {
   botName: string;
@@ -16,7 +14,6 @@ interface Config {
   agentSDK: string;
   logLevel: string;
   fileLogging: boolean;
-  pm2: boolean;
 }
 
 function showHelp() {
@@ -35,7 +32,6 @@ OPTIONS:
   --agentSDK <version>  XMTP Agent SDK version to use [default: latest]
   --log <level>         Logging level (info, warn, error) [default: info]
   --file                Enable file logging (saves raw logs to logs/ directory)
-  --pm2                 Run bot using PM2 instead of direct execution
   -h, --help           Show this help message
 
 ENVIRONMENTS:
@@ -63,7 +59,6 @@ function parseArgs(): Config {
   const args = process.argv.slice(2);
   let botName = "";
   let fileLogging = false;
-  let pm2 = false;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -94,8 +89,6 @@ function parseArgs(): Config {
       i++;
     } else if (arg === "--file") {
       fileLogging = true;
-    } else if (arg === "--pm2") {
-      pm2 = true;
     } else if (!botName) {
       // First non-flag argument is the bot name
       botName = arg;
@@ -109,7 +102,6 @@ function parseArgs(): Config {
     agentSDK: process.env.AGENT_SDK_VERSION as string,
     logLevel: process.env.LOGGING_LEVEL as string,
     fileLogging,
-    pm2,
   };
 }
 
@@ -163,65 +155,6 @@ async function main() {
 
     if (config.fileLogging && logger) {
       console.info(`File logging enabled: ${logger.logFileName}`);
-    }
-
-    if (config.pm2) {
-      const ecosystemPath = join(
-        __dirname,
-        "..",
-        "agents",
-        "bots",
-        config.botName,
-        "ecosystem.config.cjs",
-      );
-
-      const logsDir = join(projectRoot, "logs");
-      try {
-        mkdirSync(logsDir, { recursive: true });
-      } catch {
-        // Directory might already exist, ignore
-      }
-
-      const appName = `${config.botName}-bot`;
-
-      const startProcess = spawn("pm2", ["start", ecosystemPath], {
-        stdio: "inherit",
-        cwd: projectRoot,
-      });
-
-      startProcess.on("error", (error) => {
-        console.error(`Failed to start bot: ${error.message}`);
-        process.exit(1);
-      });
-
-      startProcess.on("exit", (code) => {
-        if (code !== 0) {
-          process.exit(code || 1);
-        }
-
-        console.log(`\n[PM2] Starting log stream for ${appName}...\n`);
-
-        const logsProcess = spawn(
-          "pm2",
-          ["logs", appName, "--raw", "--lines", "1000"],
-          {
-            stdio: "inherit",
-            cwd: projectRoot,
-          },
-        );
-
-        logsProcess.on("error", (error) => {
-          console.error(`Failed to stream logs: ${error.message}`);
-          process.exit(1);
-        });
-
-        process.on("SIGINT", () => {
-          logsProcess.kill();
-          process.exit(0);
-        });
-      });
-
-      return;
     }
 
     // Run the bot using tsx with environment variable

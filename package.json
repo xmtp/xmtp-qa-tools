@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.5.12",
+  "version": "0.5.10",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -11,8 +11,6 @@
   "scripts": {
     "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
-    "bot:pm2": "tsx cli/bot.ts --pm2",
-    "bot:pm2:logs": "pm2 logs gm-bot --raw --lines 1000",
     "build": "tsc",
     "c": "yarn format && yarn build && yarn lint ",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
@@ -36,7 +34,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
     "@xmtp/agent-sdk-1.1.0": "npm:@xmtp/agent-sdk@1.1.16",
-    "@xmtp/agent-sdk-1.2.0": "npm:@xmtp/agent-sdk@1.2.4-dev.f53662f",
+    "@xmtp/agent-sdk-1.2.0": "npm:@xmtp/agent-sdk@1.2.1",
     "@xmtp/cli": "^0.0.4",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
@@ -49,14 +47,12 @@
     "@xmtp/node-sdk-4.3.0": "npm:@xmtp/node-sdk@4.3.0",
     "@xmtp/node-sdk-4.4.0": "npm:@xmtp/node-sdk@4.4.0",
     "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0",
-    "@xmtp/node-sdk-4.6.0": "npm:@xmtp/node-sdk@4.6.0-dev.02e173d",
     "@xmtp/node-sdk-5.0.0": "npm:@xmtp/node-sdk@5.0.0-rc1",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "node-fetch": "^3.3.0",
-    "pm2": "^5.3.1",
     "rimraf": "^6.0.1",
     "uint8arrays": "^5.1.0",
     "viem": "^2",

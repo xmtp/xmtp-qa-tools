@@ -13,12 +13,12 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  // {
-  //   name: "mamo",
-  //   address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
-  //   networks: ["production"],
-  //   live: true,
-  // },
+  {
+    name: "mamo",
+    address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
+    networks: ["production"],
+    live: true,
+  },
   {
     name: "alphie.base.eth",
     address: "0x5154C8707f7Fa18961E03F5b51edB2fb56a206dc",
@@ -49,33 +49,27 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  // {
-  //   name: "bracky",
-  //   address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
-  //   networks: ["production"],
-  //   live: true,
-  // },
+  {
+    name: "bracky",
+    address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
+    networks: ["production"],
+    live: true,
+  },
   {
     name: "bankr",
     address: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     networks: ["production"],
     live: true,
   },
-  // {
-  //   name: "basemate",
-  //   address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
-  //   networks: ["production"],
-  //   live: false,
-  // },
-  // {
-  //   name: "fail-agent",
-  //   address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
-  //   networks: ["dev"],
-  //   live: false,
-  // },
+  {
+    name: "basemate",
+    address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
+    networks: ["production"],
+    live: false,
+  },
   {
     name: "echo",
-    address: "0xc832b862fde939e8ba29b80b62e28a2e3c022d5a",
+    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     networks: ["dev"],
     live: false,
   },
@@ -95,6 +89,7 @@ const agents: AgentConfig[] = [
     name: "xmtp-docs",
     address: "0x212906fdbdb70771461e6cb3376a740132e56b14",
     networks: ["production"],
+    text: "/ask hi",
     live: false,
   },
 ];

@@ -22,12 +22,6 @@ import {
   Group as Group45,
 } from "@xmtp/node-sdk-4.5.0";
 import {
-  Client as Client46,
-  Conversation as Conversation46,
-  Dm as Dm46,
-  Group as Group46,
-} from "@xmtp/node-sdk-4.6.0";
-import {
   Client as Client50,
   Conversation as Conversation50,
   Dm as Dm50,
@@ -83,15 +77,6 @@ export const VersionList = [
     Group: Group50,
     nodeSDK: "5.0.0",
     nodeBindings: "1.7.0",
-    auto: true,
-  },
-  {
-    Client: Client46,
-    Conversation: Conversation46,
-    Dm: Dm46,
-    Group: Group46,
-    nodeSDK: "4.6.0",
-    nodeBindings: "1.6.0",
     auto: true,
   },
   {

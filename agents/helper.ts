@@ -12,6 +12,8 @@ export interface AgentConfig {
   networks: string[];
   /**  the agent is production */
   live: boolean;
+  /** Custom text message to send to this agent (optional) */
+  text?: string;
 }
 
 export async function getMessageBody(ctx: MessageContext, timezone?: string) {
@@ -35,7 +37,7 @@ export async function getMessageBody(ctx: MessageContext, timezone?: string) {
     console.log(messageBody1);
     console.log({
       receiver: {
-        libxmtpVersion: (ctx.client as any).libxmtpVersion,
+        libxmtpVersion: ctx.client.libxmtpVersion,
         installationId: ctx.client.installationId,
         inboxId: ctx.client.inboxId,
       },

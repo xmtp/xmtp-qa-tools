@@ -38,13 +38,14 @@ export class playwright {
   };
 
   constructor(
-    { headless = false, env = null, defaultUser }: playwrightOptions = {
-      headless: false,
+    { headless = true, env = null, defaultUser }: playwrightOptions = {
+      headless: true,
       env: null,
       defaultUser: undefined,
     },
   ) {
-    this.isHeadless = headless;
+    this.isHeadless =
+      process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
     this.defaultUser = defaultUser ?? {
       walletKey: "",
@@ -52,9 +53,7 @@ export class playwright {
       dbEncryptionKey: "",
       inboxId: "",
     };
-    console.debug(
-      `Starting playwright with env: ${this.env}, headless: ${this.isHeadless}`,
-    );
+    console.debug("Starting playwright with env:", this.env);
   }
 
   /**
@@ -71,67 +70,6 @@ export class playwright {
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
-    console.debug(`Screenshot saved: ${screenshotPath}`);
-  }
-
-  /**
-   * Debug method to inspect DOM structure
-   */
-  async debugMessageList(): Promise<void> {
-    if (!this.page) return;
-
-    console.debug("=== Debugging Message List Structure ===");
-    console.debug(`Current URL: ${this.page.url()}`);
-
-    // Check for main element
-    const mainCount = await this.page.getByRole("main").count();
-    console.debug(`Main elements found: ${mainCount}`);
-
-    // Check for virtuoso-item-list
-    const virtuosoCount = await this.page
-      .getByTestId("virtuoso-item-list")
-      .count();
-    console.debug(`virtuoso-item-list elements found: ${virtuosoCount}`);
-
-    // Try to get all test IDs in main
-    try {
-      const testIds = await this.page
-        .getByRole("main")
-        .locator("[data-testid]")
-        .all();
-      console.debug(
-        `Found ${testIds.length} elements with data-testid in main`,
-      );
-      for (let i = 0; i < Math.min(5, testIds.length); i++) {
-        const testId = await testIds[i].getAttribute("data-testid");
-        console.debug(`  - data-testid: ${testId}`);
-      }
-    } catch (error) {
-      console.debug("Could not get test IDs:", error);
-    }
-
-    // Try to get message-like elements
-    try {
-      const messageElements = await this.page
-        .getByRole("main")
-        .locator("div")
-        .all();
-      console.debug(`Found ${messageElements.length} div elements in main`);
-
-      // Get text from last few elements
-      for (
-        let i = Math.max(0, messageElements.length - 3);
-        i < messageElements.length;
-        i++
-      ) {
-        const text = await messageElements[i].textContent();
-        console.debug(`  Element ${i}: "${text?.slice(0, 100)}"`);
-      }
-    } catch (error) {
-      console.debug("Could not get message elements:", error);
-    }
-
-    console.debug("=== End Debug ===");
   }
 
   public async addMemberToGroup(
@@ -142,7 +80,7 @@ export class playwright {
       if (!this.page) throw new Error("Page is not initialized");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = `https://xmtp.chat/${this.env}/conversations/${groupId}/manage/members`;
+      const targetUrl = `https://xmtp.chat/conversations/${groupId}/manage/members`;
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -172,7 +110,7 @@ export class playwright {
       if (!this.page) throw new Error("Page is not initialized");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = `https://xmtp.chat/${this.env}/conversations/new-group`;
+      const targetUrl = "https://xmtp.chat/conversations/new-group";
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -215,7 +153,7 @@ export class playwright {
       console.debug("Navigating to new DM");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = `https://xmtp.chat/${this.env}/conversations/new-dm`;
+      const targetUrl = "https://xmtp.chat/conversations/new-dm";
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -317,11 +255,9 @@ export class playwright {
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     try {
       if (!this.page) throw new Error("Page is not initialized");
-
       for (let i = 0; i < browserTimeout / 1000; i++) {
         await this.page.waitForTimeout(1000);
         const responseText = await this.getLatestMessageText();
-
         if (
           expectedMessage.some((phrase) =>
             responseText.toLowerCase().includes(phrase.toLowerCase()),
@@ -329,10 +265,10 @@ export class playwright {
         ) {
           return true;
         }
+        console.debug(`No response found after ${i + 1} checks`);
       }
       return false;
     } catch (error) {
-      console.debug(`Error in waitForResponse:`, error);
       await this.takeSnapshot(
         `waitForResponse-error-${expectedMessage.join("-")}`,
       );
@@ -346,160 +282,18 @@ export class playwright {
   private async getLatestMessageText(): Promise<string> {
     if (!this.page) throw new Error("Page is not initialized");
 
-    // Try multiple selector strategies
-    let messageItems: any[] = [];
+    const messageItems = await this.page
+      .getByRole("main")
+      .getByTestId("virtuoso-item-list")
+      .locator("div")
+      .locator("div.mantine-Stack-root")
+      .all();
 
-    try {
-      // Strategy 1: Original selector
-      messageItems = await this.page
-        .getByRole("main")
-        .getByTestId("virtuoso-item-list")
-        .locator("div")
-        .locator("div.mantine-Stack-root")
-        .all();
-    } catch {
-      // Strategy 1 failed, try Strategy 2
-    }
+    if (messageItems.length === 0) return "";
 
-    if (messageItems.length === 0) {
-      try {
-        // Strategy 2: Try without mantine-Stack-root
-        messageItems = await this.page
-          .getByRole("main")
-          .getByTestId("virtuoso-item-list")
-          .locator("div")
-          .all();
-      } catch {
-        // Strategy 2 failed, try Strategy 3
-      }
-    }
-
-    if (messageItems.length === 0) {
-      try {
-        // Strategy 3: Try finding any message-like elements
-        messageItems = await this.page
-          .getByRole("main")
-          .locator(
-            '[data-testid*="message"], [class*="message"], [class*="Message"]',
-          )
-          .all();
-      } catch {
-        // All strategies failed
-      }
-    }
-
-    if (messageItems.length === 0) {
-      await this.debugMessageList();
-      return "";
-    }
-
-    // Iterate backwards through messages to find one with actual content
-    let responseText = "";
-
-    for (let i = messageItems.length - 1; i >= 0; i--) {
-      const messageElement = messageItems[i];
-      const fullText = (await messageElement.textContent()) || "";
-
-      // Try to extract message content, excluding addresses
-      const cleanedText = fullText
-        .replace(/0x[a-fA-F0-9]{4,}\.\.\.[a-fA-F0-9]{4}/g, "") // Remove truncated addresses
-        .replace(/0x[a-fA-F0-9]{40,}/g, "") // Remove full addresses
-        .replace(/\s+/g, " ") // Normalize whitespace
-        .trim();
-
-      // If we have meaningful content (more than just whitespace/addresses)
-      if (cleanedText.length > 3) {
-        // Try to find the actual message text within the element
-        try {
-          // Look for text that's NOT a date/time and NOT an address
-          // Try multiple strategies to find message content
-          let messageContent: string | null = null;
-
-          // Strategy 1: Get all direct text nodes and child text
-          // First, try to get text that's not in nested elements (direct text content)
-          const directText = await messageElement
-            .evaluate((el: any): string => {
-              // Get direct text nodes (not from children)
-              // Node.TEXT_NODE = 3
-              let text = "";
-              for (const node of el.childNodes) {
-                if (node.nodeType === 3) {
-                  const nodeText = node.textContent;
-                  if (nodeText) {
-                    text += String(nodeText).trim() + " ";
-                  }
-                }
-              }
-              return text.trim();
-            })
-            .catch(() => null);
-
-          if (
-            directText &&
-            typeof directText === "string" &&
-            directText.length > 2 &&
-            !/^\d{1,2}\/\d{1,2}\/\d{4}/.test(directText) &&
-            !/^0x/.test(directText)
-          ) {
-            messageContent = directText;
-          } else {
-            // Strategy 2: Look for text in specific message content containers
-            const allTextElements = await messageElement.locator("*").all();
-
-            for (const elem of allTextElements) {
-              const text = await elem.textContent().catch(() => null);
-              if (!text || typeof text !== "string") continue;
-
-              const trimmed = text.trim();
-              // Skip if it's just a date/time pattern
-              if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(trimmed)) continue;
-              // Skip if it's just an address
-              if (/^0x[a-fA-F0-9]{4,}/.test(trimmed)) continue;
-              // Skip if it's just whitespace or very short
-              if (trimmed.length < 2) continue;
-              // Skip if it contains date/time patterns
-              if (/\d{1,2}\/\d{1,2}\/\d{4}.*\d{1,2}:\d{2}:\d{2}/.test(trimmed))
-                continue;
-              // Skip if it's mostly addresses
-              if ((trimmed.match(/0x[a-fA-F0-9]{4,}/g) || []).length > 1)
-                continue;
-
-              // This looks like actual message content
-              messageContent = trimmed;
-              break;
-            }
-          }
-
-          if (messageContent && messageContent.length > 0) {
-            responseText = messageContent;
-            break;
-          }
-        } catch {
-          // Continue to next element
-        }
-
-        // If no specific content found, try to extract from cleaned text
-        // Remove date/time patterns and addresses
-        const finalCleaned = cleanedText
-          .replace(
-            /\d{1,2}\/\d{1,2}\/\d{4}.*\d{1,2}:\d{2}:\d{2}\s*(AM|PM)/gi,
-            "",
-          )
-          .replace(/0x[a-fA-F0-9]{4,}\.\.\.[a-fA-F0-9]{4}/g, "")
-          .trim();
-
-        if (!responseText && finalCleaned.length > 2) {
-          responseText = finalCleaned;
-          break;
-        }
-      }
-    }
-
-    // If still no text found, use the last element's full text
-    if (!responseText && messageItems.length > 0) {
-      const latestMessageElement = messageItems[messageItems.length - 1];
-      responseText = (await latestMessageElement.textContent()) || "";
-    }
+    const latestMessageElement = messageItems[messageItems.length - 1];
+    const responseText = (await latestMessageElement.textContent()) || "";
+    console.debug(`Latest message: "${responseText}"`);
 
     return responseText;
   }
@@ -520,16 +314,11 @@ export class playwright {
         console.debug("Reusing existing browser instance");
         return { browser: this.browser, page: this.page };
       }
-      console.debug(
-        `Creating new browser instance (headless: ${this.isHeadless})`,
-      );
+      console.debug("Creating new browser instance");
       const browser = await chromium.launch({
         headless: this.isHeadless,
         slowMo: this.isHeadless ? 0 : 100,
       });
-      console.debug(
-        `Browser launched successfully in ${this.isHeadless ? "headless" : "visible"} mode`,
-      );
 
       const context: BrowserContext = await browser.newContext(
         this.isHeadless ? {} : { viewport: { width: 1280, height: 720 } },
@@ -543,15 +332,22 @@ export class playwright {
         this.defaultUser.dbEncryptionKey,
       );
 
-      const url = `https://xmtp.chat/${this.env}`;
+      const url = "https://xmtp.chat/";
 
       console.debug("Navigating to:", url);
       await page.goto(url);
       await page.getByRole("button", { name: "Connect" }).last().click();
       console.debug("Clicked connect button");
-      await page.getByRole("button", { name: "I understand" }).click();
 
-      console.debug("Logged in successfully");
+      let maxRetries = 10;
+      while (
+        page.url() !== "https://xmtp.chat/conversations" &&
+        maxRetries > 0
+      ) {
+        await page.waitForTimeout(1000);
+        maxRetries--;
+      }
+      console.debug("Logged in");
       this.page = page;
       this.browser = browser;
       return { browser, page };
