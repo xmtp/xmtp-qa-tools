@@ -1,0 +1,80 @@
+D14N TESTNET-DEV ISSUE SUMMARY
+==============================
+Date: 2026-01-05
+Environment: testnet-dev
+  - API URL: https://grpc.testnet-dev.xmtp.network:443
+  - Gateway URL: https://payer.testnet-dev.xmtp.network:443
+
+CONFIGURATION REQUIREMENTS
+==========================
+- Gateway (payer) URL is REQUIRED - direct node access returns 404
+- Must set both apiUrl and gatewayHost in client options
+- No 'env' setting when using D14N (apiUrl/gatewayHost override it)
+
+WHAT WORKS ✅
+=============
+1. Client.create() - Successfully creates clients with inbox IDs
+2. conversations.sync() - Basic sync works
+3. conversations.syncAll() - Full sync works  
+4. conversations.list() - Listing works
+5. preferences.inboxStateFromInboxIds() - Looking up OTHER users' inbox state works
+
+WHAT FAILS ❌
+=============
+1. preferences.inboxState() (self)
+   Error: "Association error: Missing identity update"
+   - Can't query own inbox state
+   - WORKAROUND: Skip this call on D14N
+
+2. getKeyPackageStatusesForInstallationIds()
+   Error: "mismatched number of results, key packages 0 != installation_keys N"
+   - Key package lookup returns 0 results for other users
+   - Sometimes works for self, sometimes doesn't (flaky)
+
+3. conversations.newDm(inboxId)
+   Error: "mismatched number of results, key packages 0 != installation_keys 1"
+   - Can't create DMs because key package lookup fails
+   - The DM object may be created locally but recipient never receives it
+
+4. conversations.newGroup(inboxIds)
+   Error: "mismatched number of results, key packages N != installation_keys M"
+   - Same issue as DM - key package lookup fails
+
+5. Sending messages after creation
+   Error: "Content type is required when sending encoded content"
+   - Conversation is in invalid state because creation partially failed
+
+ROOT CAUSE
+==========
+The D14N gateway/payer is not properly storing or retrieving key packages.
+
+When a client is created:
+1. Client registers identity ✅
+2. Client uploads key package ❓ (may not be stored correctly)
+
+When creating conversation:
+1. SDK queries for recipient's key packages
+2. Gateway returns 0 results (should return 1+)
+3. SDK throws mismatch error
+
+EVIDENCE
+========
+- Client creation succeeds (inbox IDs are assigned)
+- inboxStateFromInboxIds() works (can find other users' installations)
+- But getKeyPackageStatusesForInstallationIds() fails (can't get their key packages)
+- This indicates identity service works, but key package service doesn't
+
+NEXT STEPS FOR SERVER TEAM
+==========================
+1. Verify key packages are being stored when clients register
+2. Check key package query endpoint returns correct data
+3. Compare behavior with V3 dev network (grpc.dev.xmtp.network)
+
+TEST COMMANDS
+=============
+# This will fail with key package errors:
+XMTP_D14N=true XMTP_API_URL=https://grpc.testnet-dev.xmtp.network:443 yarn test delivery
+
+# To debug manually:
+XMTP_D14N=true XMTP_API_URL=https://grpc.testnet-dev.xmtp.network:443 npx tsx debug-d14n.ts
+
