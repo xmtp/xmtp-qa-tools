@@ -46,23 +46,29 @@ WHAT FAILS ❌
 
 ROOT CAUSE
 ==========
-The D14N gateway/payer is not properly storing or retrieving key packages.
+The D14N gateway/payer has INTERMITTENT key package retrieval issues.
+
+INTERMITTENT TEST RESULTS (5 iterations):
+- Self Key Package:    60% success (3/5)
+- Other Key Package:   40% success (2/5)  
+- Self Inbox State:    0% success (0/5) - ALWAYS FAILS
+- Other Inbox State:   0% success (0/5) - ALWAYS FAILS
 
 When a client is created:
 1. Client registers identity ✅
-2. Client uploads key package ❓ (may not be stored correctly)
+2. Client uploads key package ✅ (sometimes retrievable)
 
 When creating conversation:
 1. SDK queries for recipient's key packages
-2. Gateway returns 0 results (should return 1+)
-3. SDK throws mismatch error
+2. Gateway SOMETIMES returns 0 results (race condition?)
+3. SDK throws mismatch error when key packages not found
 
 EVIDENCE
 ========
-- Client creation succeeds (inbox IDs are assigned)
-- inboxStateFromInboxIds() works (can find other users' installations)
-- But getKeyPackageStatusesForInstallationIds() fails (can't get their key packages)
-- This indicates identity service works, but key package service doesn't
+- Key packages ARE being stored (60% self-retrieval success)
+- Key packages ARE sometimes retrievable for other users (40% success)
+- This suggests replication lag, caching issue, or race condition
+- inboxState() is completely broken (separate bug - "Missing identity update")
 
 NEXT STEPS FOR SERVER TEAM
 ==========================
