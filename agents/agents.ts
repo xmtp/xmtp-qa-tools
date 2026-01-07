@@ -61,12 +61,12 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  {
-    name: "basemate",
-    address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
-    networks: ["production"],
-    live: false,
-  },
+  // {
+  //   name: "basemate",
+  //   address: "0xB257b5C180b7b2cb80E35d6079AbE68D9CF0467F",
+  //   networks: ["production"],
+  //   live: false,
+  // },
   {
     name: "echo",
     address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
