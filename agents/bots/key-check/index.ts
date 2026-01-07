@@ -327,7 +327,6 @@ agent.on("text", async (ctx) => {
 
     await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
   } else if (isTagged) {
-    await ctx.sendText(messageBody1);
     await showMenu(ctx, appConfig, "main-menu");
     return;
   }
