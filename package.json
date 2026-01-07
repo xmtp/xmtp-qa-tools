@@ -70,7 +70,8 @@
     "viem": "^2",
     "vitest": "^3.2.4",
     "winston": "^3.17.0",
-    "yargs": "^18.0.0"
+    "yargs": "^18.0.0",
+    "pm2": "^5.3.1"
   },
   "devDependencies": {
     "@anthropic-ai/claude-code": "latest",
@@ -86,7 +87,6 @@
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
     "playwright-chromium": "latest",
-    "pm2": "^5.3.1",
     "prettier": "^3.4.2",
     "prettier-plugin-packagejson": "^2.5.8",
     "tsx": "^4.19.2",
