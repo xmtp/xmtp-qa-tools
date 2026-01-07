@@ -1,4 +1,3 @@
-import { getMessageBody } from "@agents/helper";
 import { Agent, getTestUrl, logDetails } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
 import { getSDKVersionInfo } from "@helpers/versions";
@@ -15,14 +14,15 @@ const agent = await Agent.createFromEnv({
 });
 
 agent.on("text", async (ctx) => {
-  const messageBody1 = await getMessageBody(
-    ctx,
-    "America/Argentina/Buenos_Aires",
-  );
+  //   const messageBody1 = await getMessageBody(
+  //     ctx,
+  //     "America/Argentina/Buenos_Aires",
+  //   );
+  //   //await ctx.sendText(messageBody1);
   if (ctx.isDm()) {
-    await ctx.sendText(messageBody1);
+    await ctx.sendText("gm from dm");
   } else if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
-    await ctx.sendText(messageBody1);
+    await ctx.sendText("gm from group");
   }
 });
 
