@@ -1,4 +1,3 @@
-import { getMessageBody } from "@agents/helper";
 import {
   ActionBuilder,
   initializeAppFromConfig,
@@ -305,10 +304,11 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 initializeAppFromConfig(appConfig);
 
 agent.on("text", async (ctx) => {
-  const messageBody1 = await getMessageBody(
-    ctx,
-    "America/Argentina/Buenos_Aires",
-  );
+  // const messageBody1 = await getMessageBody(
+  //   ctx,
+  //   "America/Argentina/Buenos_Aires",
+  // );
+  // //await ctx.sendText(messageBody1);
   const message = ctx.message;
   const content = message.content;
   const isTagged =
@@ -325,10 +325,8 @@ agent.on("text", async (ctx) => {
   - 📧 An **Ethereum address** to check key packages
   - 🔑 An **Inbox ID** to check key packages`;
 
-    await ctx.sendText(messageBody1);
     await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
   } else if (isTagged) {
-    await ctx.sendText(messageBody1);
     await showMenu(ctx, appConfig, "main-menu");
     return;
   }
