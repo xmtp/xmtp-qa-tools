@@ -6,6 +6,7 @@ import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
 import { ProgressBar } from "@helpers/logger";
 import {
   getDefaultSdkVersion,
+  isD14NEnabled,
   isValidSdkVersion,
   VersionList,
   type Client,
@@ -596,8 +597,14 @@ export async function getWorkers(
   }
 
   manager.checkCLI();
-  await manager.printWorkers();
-  await manager.revokeExcessInstallations();
+  
+  // Skip inboxState-dependent calls when using D14N (not yet fully supported)
+  if (!isD14NEnabled()) {
+    await manager.printWorkers();
+    await manager.revokeExcessInstallations();
+  } else {
+    console.log("[D14N] Skipping printWorkers and revokeExcessInstallations (inboxState not supported)");
+  }
 
   return manager;
 }
