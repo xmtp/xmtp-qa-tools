@@ -72,7 +72,7 @@ export const VersionList = [
     Dm: Dm50,
     Group: Group50,
     nodeSDK: "5.0.0",
-    nodeBindings: "1.7.0",
+    nodeBindings: "1.8.0",
     auto: true,
   },
   {
