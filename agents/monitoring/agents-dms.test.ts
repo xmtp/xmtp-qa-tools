@@ -49,16 +49,26 @@ describe(testName, () => {
           `📤 Sending "${PING_MESSAGE}" to ${agentConfig.name} (${agentConfig.address})`,
         );
 
-        const result = await waitForResponse({
-          client: agent.client as any,
-          conversation: {
-            send: (content: string) => conversation.send(content),
-          },
-          conversationId: conversation.id,
-          senderInboxId: agent.client.inboxId,
-          timeout: AGENT_RESPONSE_TIMEOUT,
-          messageText: PING_MESSAGE,
-        });
+        let result;
+        try {
+          result = await waitForResponse({
+            client: agent.client as any,
+            conversation: {
+              send: (content: string) => conversation.send(content),
+            },
+            conversationId: conversation.id,
+            senderInboxId: agent.client.inboxId,
+            timeout: AGENT_RESPONSE_TIMEOUT,
+            messageText: PING_MESSAGE,
+          });
+        } catch {
+          result = {
+            success: false,
+            sendTime: 0,
+            responseTime: AGENT_RESPONSE_TIMEOUT,
+            responseMessage: null,
+          };
+        }
 
         sendMetric(
           "response",
