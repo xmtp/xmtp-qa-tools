@@ -11,7 +11,7 @@
   "scripts": {
     "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
-    "bot:pm2": "sh -c 'pm2 start agents/bots/gm/ecosystem.config.cjs'",
+    "bot:pm2": "sh -c 'pm2 start agents/bots/$1/ecosystem.config.cjs' --",
     "bot:pm2:logs": "pm2 logs gm-bot --lines 1000",
     "build": "tsc",
     "c": "yarn format && yarn build && yarn lint ",
