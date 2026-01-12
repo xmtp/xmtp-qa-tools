@@ -42,6 +42,20 @@ describe(testName, () => {
     await xmtpTester.startPage();
   });
 
+  it("newGroup and message stream", async () => {
+    await sleep();
+    groupId = await xmtpTester.newGroupFromUI([
+      ...getInboxes(4).map((a) => a.inboxId),
+      receiver.inboxId,
+    ]);
+    await sleep(); // Give time for group creation to sync
+    await xmtpTester.sendMessage(`hi ${receiver.name}`);
+    console.log("waiting for response");
+    const result = await xmtpTester.waitForResponse(["gm"]);
+    console.log("response received", result);
+    expect(result).toBe(true);
+  });
+
   it("conversation stream with message", async () => {
     const newGroup = await creator.client.conversations.newGroup(
       getInboxes(4).map((a) => a.inboxId),
@@ -69,30 +83,6 @@ describe(testName, () => {
     await newGroup.addMembers([xmtpChat.inboxId]);
     console.log("waiting for new conversation");
     const result = await xmtpTester.waitForNewConversation(newGroup.name);
-    expect(result).toBe(true);
-  });
-
-  // it("newDm and message stream", async () => {
-  //   await sleep();
-  //   await xmtpTester.newDmFromUI(receiver.address);
-  //   await xmtpTester.sendMessage(`hi ${receiver.name}`);
-  //   console.log("waiting for response");
-  //   const result = await xmtpTester.waitForResponse(["gm"]);
-  //   console.log("response received", result);
-  //   expect(result).toBe(true);
-  // });
-
-  it("newGroup and message stream", async () => {
-    await sleep();
-    groupId = await xmtpTester.newGroupFromUI([
-      ...getInboxes(4).map((a) => a.inboxId),
-      receiver.inboxId,
-    ]);
-    await sleep(); // Give time for group creation to sync
-    await xmtpTester.sendMessage(`hi ${receiver.name}`);
-    console.log("waiting for response");
-    const result = await xmtpTester.waitForResponse(["gm"]);
-    console.log("response received", result);
     expect(result).toBe(true);
   });
 
