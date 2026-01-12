@@ -12,7 +12,7 @@ const testName = "browser";
 describe(testName, () => {
   setupDurationTracking({ testName });
   let groupId: string;
-  const headless = false;
+  const headless = process.env.GITHUB_ACTIONS === "true";
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
