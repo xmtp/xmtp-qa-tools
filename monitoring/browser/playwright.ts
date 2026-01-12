@@ -341,13 +341,11 @@ export class playwright {
       await page.getByRole("button", { name: "I understand" }).click();
 
       let maxRetries = 10;
-      while (
-      const consentButton = page.getByRole("button", { name: "I understand" });
-      if (await consentButton.isVisible()) {
-        await consentButton.click();
-      }
-        maxRetries > 0
-      ) {
+      while (maxRetries > 0) {
+        const consentButton = page.getByRole("button", { name: "I understand" });
+        if (await consentButton.isVisible()) {
+          await consentButton.click();
+        }
         await page.waitForTimeout(1000);
         maxRetries--;
       }
