@@ -69,7 +69,7 @@ const agents: AgentConfig[] = [
   // },
   {
     name: "fail-agent",
-    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
     networks: ["dev"],
     live: false,
   },
