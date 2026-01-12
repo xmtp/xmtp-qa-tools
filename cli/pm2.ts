@@ -22,7 +22,7 @@ const ecosystemPath = join(
 const logsDir = join(projectRoot, "logs");
 try {
   mkdirSync(logsDir, { recursive: true });
-} catch (error) {
+} catch {
   // Directory might already exist, ignore
 }
 

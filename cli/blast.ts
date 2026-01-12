@@ -257,7 +257,7 @@ async function sendGroupMessage(config: Config): Promise<void> {
     console.log(`✅ Message sent successfully in ${sendTime}ms`);
     console.log(`💬 Message: "${config.message}"`);
     console.log(
-      `🔗 Group URL: https://xmtp.chat/conversations/${config.groupId}`,
+      `🔗 Group URL: https://xmtp.chat/${config.env}/conversations/${config.groupId}`,
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

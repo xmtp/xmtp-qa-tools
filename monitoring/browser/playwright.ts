@@ -80,7 +80,7 @@ export class playwright {
       if (!this.page) throw new Error("Page is not initialized");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = `https://xmtp.chat/conversations/${groupId}/manage/members`;
+      const targetUrl = `https://xmtp.chat/${this.env}/conversations/${groupId}/manage/members`;
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -110,7 +110,7 @@ export class playwright {
       if (!this.page) throw new Error("Page is not initialized");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = "https://xmtp.chat/conversations/new-group";
+      const targetUrl = `https://xmtp.chat/${this.env}/conversations/new-group`;
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -153,7 +153,7 @@ export class playwright {
       console.debug("Navigating to new DM");
 
       // Navigate using client-side routing instead of page reload
-      const targetUrl = "https://xmtp.chat/conversations/new-dm";
+      const targetUrl = `https://xmtp.chat/${this.env}/conversations/new-dm`;
       if (this.page.url() !== targetUrl) {
         await this.page.evaluate((url) => {
           // @ts-expect-error Window access in browser context
@@ -332,18 +332,22 @@ export class playwright {
         this.defaultUser.dbEncryptionKey,
       );
 
-      const url = "https://xmtp.chat/";
+      const url = `https://xmtp.chat/${this.env}`;
 
       console.debug("Navigating to:", url);
       await page.goto(url);
       await page.getByRole("button", { name: "Connect" }).last().click();
       console.debug("Clicked connect button");
+      await page.getByRole("button", { name: "I understand" }).click();
 
       let maxRetries = 10;
-      while (
-        page.url() !== "https://xmtp.chat/conversations" &&
-        maxRetries > 0
-      ) {
+      while (maxRetries > 0) {
+        const consentButton = page.getByRole("button", {
+          name: "I understand",
+        });
+        if (await consentButton.isVisible()) {
+          await consentButton.click();
+        }
         await page.waitForTimeout(1000);
         maxRetries--;
       }
