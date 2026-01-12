@@ -10,7 +10,7 @@ import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
-import { beforeAll, describe, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "agents-dms";
 
@@ -76,12 +76,12 @@ describe(testName, () => {
           createMetricTags(agentConfig),
         );
 
-        if (result.success && result.responseMessage)
-          console.log(
-            `✅ ${agentConfig.name} responded in ${result.responseTime.toFixed(2)}ms`,
-          );
-        else
-          console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
+        expect(result.success).toBe(true);
+        expect(result.responseMessage).toBeTruthy();
+
+        console.log(
+          `✅ ${agentConfig.name} responded in ${result.responseTime.toFixed(2)}ms`,
+        );
       } finally {
         await agent.stop();
       }
