@@ -69,7 +69,7 @@ const agents: AgentConfig[] = [
   // },
   {
     name: "echo",
-    address: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    address: "0xc832b862fde939e8ba29b80b62e28a2e3c022d5a",
     networks: ["dev"],
     live: false,
   },
