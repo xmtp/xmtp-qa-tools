@@ -342,7 +342,10 @@ export class playwright {
 
       let maxRetries = 10;
       while (
-        page.url() !== `https://xmtp.chat/${this.env}/conversations` &&
+      const consentButton = page.getByRole("button", { name: "I understand" });
+      if (await consentButton.isVisible()) {
+        await consentButton.click();
+      }
         maxRetries > 0
       ) {
         await page.waitForTimeout(1000);
