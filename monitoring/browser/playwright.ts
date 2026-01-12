@@ -44,8 +44,7 @@ export class playwright {
       defaultUser: undefined,
     },
   ) {
-    this.isHeadless =
-      process.env.GITHUB_ACTIONS !== undefined ? true : headless;
+    this.isHeadless = headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
     this.defaultUser = defaultUser ?? {
       walletKey: "",
