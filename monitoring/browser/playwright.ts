@@ -358,7 +358,7 @@ export class playwright {
         .locator("div")
         .locator("div.mantine-Stack-root")
         .all();
-    } catch (error) {
+    } catch {
       // Strategy 1 failed, try Strategy 2
     }
 
@@ -370,7 +370,7 @@ export class playwright {
           .getByTestId("virtuoso-item-list")
           .locator("div")
           .all();
-      } catch (error) {
+      } catch {
         // Strategy 2 failed, try Strategy 3
       }
     }
@@ -384,7 +384,7 @@ export class playwright {
             '[data-testid*="message"], [class*="message"], [class*="Message"]',
           )
           .all();
-      } catch (error) {
+      } catch {
         // All strategies failed
       }
     }
@@ -419,12 +419,16 @@ export class playwright {
           // Strategy 1: Get all direct text nodes and child text
           // First, try to get text that's not in nested elements (direct text content)
           const directText = await messageElement
-            .evaluate((el) => {
+            .evaluate((el: any): string => {
               // Get direct text nodes (not from children)
+              // Node.TEXT_NODE = 3
               let text = "";
               for (const node of el.childNodes) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                  text += node.textContent?.trim() + " ";
+                if (node.nodeType === 3) {
+                  const nodeText = node.textContent;
+                  if (nodeText) {
+                    text += String(nodeText).trim() + " ";
+                  }
                 }
               }
               return text.trim();
@@ -433,6 +437,7 @@ export class playwright {
 
           if (
             directText &&
+            typeof directText === "string" &&
             directText.length > 2 &&
             !/^\d{1,2}\/\d{1,2}\/\d{4}/.test(directText) &&
             !/^0x/.test(directText)
@@ -444,7 +449,7 @@ export class playwright {
 
             for (const elem of allTextElements) {
               const text = await elem.textContent().catch(() => null);
-              if (!text) continue;
+              if (!text || typeof text !== "string") continue;
 
               const trimmed = text.trim();
               // Skip if it's just a date/time pattern
@@ -470,7 +475,7 @@ export class playwright {
             responseText = messageContent;
             break;
           }
-        } catch (error) {
+        } catch {
           // Continue to next element
         }
 
