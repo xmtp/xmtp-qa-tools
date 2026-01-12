@@ -10,7 +10,7 @@ import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
-import { describe, it } from "vitest";
+import { beforeAll, describe, it } from "vitest";
 
 const testName = "agents-dms";
 
@@ -31,12 +31,15 @@ describe(testName, () => {
     sdk: "",
   });
 
+  let agent: Agent;
+  beforeAll(async () => {
+    agent = await Agent.createFromEnv({
+      codecs: [new ActionsCodec(), new IntentCodec()],
+    });
+  });
+
   for (const agentConfig of filteredAgents) {
     it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
-      const agent = await Agent.createFromEnv({
-        codecs: [new ActionsCodec(), new IntentCodec()],
-      });
-
       try {
         const conversation = await agent.createDmWithAddress(
           agentConfig.address as `0x${string}`,
@@ -57,12 +60,15 @@ describe(testName, () => {
           messageText: PING_MESSAGE,
         });
 
-        const responseTime = Math.max(result.responseTime || 0, 0.0001);
-        sendMetric("response", responseTime, createMetricTags(agentConfig));
+        sendMetric(
+          "response",
+          result.responseTime ?? AGENT_RESPONSE_TIMEOUT,
+          createMetricTags(agentConfig),
+        );
 
         if (result.success && result.responseMessage)
           console.log(
-            `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
+            `✅ ${agentConfig.name} responded in ${result.responseTime.toFixed(2)}ms`,
           );
         else
           console.error(`❌ ${agentConfig.name} - NO RESPONSE within timeout`);
