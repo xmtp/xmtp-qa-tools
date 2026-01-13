@@ -269,6 +269,7 @@ agent.on("unhandledError", (error) => {
   if (error instanceof Error) {
     console.error("Error stack:", error.stack);
   }
+  console.error("Exiting process - PM2 will restart");
   process.exit(1);
 });
 
