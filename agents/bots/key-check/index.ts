@@ -263,6 +263,31 @@ const agent = await Agent.createFromEnv({
   codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
+// Handle agent-level unhandled errors
+agent.on("unhandledError", (error) => {
+  console.error("Key-check bot fatal error:", error);
+  if (error instanceof Error) {
+    console.error("Error stack:", error.stack);
+  }
+  process.exit(1);
+});
+
+// Handle process-level uncaught exceptions
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception in Key-check bot:", error);
+  console.error("Error stack:", error.stack);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection in Key-check bot:", reason);
+  if (reason instanceof Error) {
+    console.error("Error stack:", reason.stack);
+  }
+  process.exit(1);
+});
+
 // Add inline actions middleware
 agent.use(inlineActionsMiddleware);
 
