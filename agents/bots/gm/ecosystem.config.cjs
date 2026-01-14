@@ -18,7 +18,7 @@ module.exports = {
       max_memory_restart: "1G",
       error_file: "./logs/pm2-gm-error.log",
       out_file: "./logs/pm2-gm-out.log",
-      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
+      log_date_format: "",
       merge_logs: true,
       restart_delay: 4000,
       exp_backoff_restart_delay: 0,

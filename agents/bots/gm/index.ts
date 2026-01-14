@@ -58,6 +58,12 @@ agent.on("start", async () => {
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent).catch(console.error);
   await getSDKVersionInfo(agent, agent.client);
+  
+  // TEST: Crash after 30 seconds to test PM2 restart
+  setTimeout(() => {
+    console.error("💥 TEST CRASH - Exiting after 30 seconds to test PM2 restart");
+    process.exit(1);
+  }, 30000);
 });
 
 await agent.start({});

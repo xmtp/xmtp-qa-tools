@@ -6,9 +6,17 @@ import {
   MessageContext as MessageContext11,
 } from "@xmtp/agent-sdk-1.1.0";
 import {
+  getTestUrl as getTestUrl11,
+  logDetails as logDetails11,
+} from "@xmtp/agent-sdk-1.1.0/debug";
+import {
   Agent as Agent12,
   MessageContext as MessageContext12,
 } from "@xmtp/agent-sdk-1.2.0";
+import {
+  getTestUrl as getTestUrl12,
+  logDetails as logDetails12,
+} from "@xmtp/agent-sdk-1.2.0/debug";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -18,6 +26,8 @@ export const AgentVersionList = [
     agentSDK: "1.2.0",
     nodeSDK: "4.5.0",
     auto: true,
+    getTestUrl: getTestUrl12,
+    logDetails: logDetails12,
   },
   {
     Agent: Agent11,
@@ -25,22 +35,16 @@ export const AgentVersionList = [
     agentSDK: "1.1.0",
     nodeSDK: "4.4.0",
     auto: true,
+    getTestUrl: getTestUrl11,
+    logDetails: logDetails11,
   },
 ];
 
-export {
-  Agent,
-  type XmtpEnv,
-  MessageContext,
-  type DecodedMessage,
-  type AgentMiddleware,
-  type Group as AgentGroupType,
-  type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.2.0";
-
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.2.0/debug";
-
 // Agent SDK functions
+export const getAgentVersions = (filterAuto: boolean = true) => {
+  return filterAuto ? AgentVersionList.filter((v) => v.auto) : AgentVersionList;
+};
+
 export const getActiveAgentVersion = (index = 0) => {
   const versions = getAgentVersions();
   let latestVersion = versions[index];
@@ -58,9 +62,23 @@ export const getActiveAgentVersion = (index = 0) => {
   return latestVersion;
 };
 
-export const getAgentVersions = (filterAuto: boolean = true) => {
-  return filterAuto ? AgentVersionList.filter((v) => v.auto) : AgentVersionList;
-};
+// Get active version and export dynamically
+const activeVersion = getActiveAgentVersion(0);
+
+// Export Agent and MessageContext from the active version
+export const Agent = activeVersion.Agent;
+export const MessageContext = activeVersion.MessageContext;
+
+// Export debug functions from the active version
+export const getTestUrl = activeVersion.getTestUrl;
+export const logDetails = activeVersion.logDetails;
+
+// Export types - using 1.2.0 as base (types should be compatible)
+export type { XmtpEnv } from "@xmtp/agent-sdk-1.2.0";
+export type { DecodedMessage } from "@xmtp/agent-sdk-1.2.0";
+export type { AgentMiddleware } from "@xmtp/agent-sdk-1.2.0";
+export type { Group as AgentGroupType } from "@xmtp/agent-sdk-1.2.0";
+export type { PermissionLevel as AgentPermissionLevel } from "@xmtp/agent-sdk-1.2.0";
 
 export const checkAgentVersionFormat = (
   versionList: typeof AgentVersionList,
