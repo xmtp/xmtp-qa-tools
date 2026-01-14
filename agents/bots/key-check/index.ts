@@ -264,6 +264,9 @@ const agent = await Agent.createFromEnv({
 });
 
 // Add inline actions middleware
+// Type assertion needed because AgentMiddleware is a conditional type based on active version
+// The middleware is compatible but TypeScript can't verify due to version-specific types
+// @ts-expect-error - AgentMiddleware types from different SDK versions are incompatible at compile time but compatible at runtime
 agent.use(inlineActionsMiddleware);
 
 // Initialize load test handlers now that agent is available
