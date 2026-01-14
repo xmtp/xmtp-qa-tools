@@ -4,23 +4,29 @@ import { VersionList } from "@helpers/versions";
 import {
   Agent as Agent11,
   MessageContext as MessageContext11,
-  type XmtpEnv as XmtpEnv11,
-  type DecodedMessage as DecodedMessage11,
-  type AgentMiddleware as AgentMiddleware11,
   type Group as AgentGroupType11,
+  type AgentMiddleware as AgentMiddleware11,
   type PermissionLevel as AgentPermissionLevel11,
+  type DecodedMessage as DecodedMessage11,
+  type XmtpEnv as XmtpEnv11,
 } from "@xmtp/agent-sdk-1.1.0";
+import {
+  getTestUrl as getTestUrl11,
+  logDetails as logDetails11,
+} from "@xmtp/agent-sdk-1.1.0/debug";
 import {
   Agent as Agent12,
   MessageContext as MessageContext12,
-  type XmtpEnv as XmtpEnv12,
-  type DecodedMessage as DecodedMessage12,
-  type AgentMiddleware as AgentMiddleware12,
   type Group as AgentGroupType12,
+  type AgentMiddleware as AgentMiddleware12,
   type PermissionLevel as AgentPermissionLevel12,
+  type DecodedMessage as DecodedMessage12,
+  type XmtpEnv as XmtpEnv12,
 } from "@xmtp/agent-sdk-1.2.0";
-import { getTestUrl as getTestUrl11, logDetails as logDetails11 } from "@xmtp/agent-sdk-1.1.0/debug";
-import { getTestUrl as getTestUrl12, logDetails as logDetails12 } from "@xmtp/agent-sdk-1.2.0/debug";
+import {
+  getTestUrl as getTestUrl12,
+  logDetails as logDetails12,
+} from "@xmtp/agent-sdk-1.2.0/debug";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -50,7 +56,9 @@ export const getActiveAgentVersion = (index = 0) => {
   let latestVersion = versions[index];
 
   if (process.env.AGENT_SDK_VERSION) {
-    console.log(`[versions] AGENT_SDK_VERSION env var set to: ${process.env.AGENT_SDK_VERSION}`);
+    console.log(
+      `[versions] AGENT_SDK_VERSION env var set to: ${process.env.AGENT_SDK_VERSION}`,
+    );
     latestVersion = versions.find(
       (v) => v.agentSDK === process.env.AGENT_SDK_VERSION,
     ) as (typeof AgentVersionList)[number];
@@ -59,9 +67,13 @@ export const getActiveAgentVersion = (index = 0) => {
         `Agent SDK version ${process.env.AGENT_SDK_VERSION} not found`,
       );
     }
-    console.log(`[versions] Selected Agent SDK version: ${latestVersion.agentSDK}`);
+    console.log(
+      `[versions] Selected Agent SDK version: ${latestVersion.agentSDK}`,
+    );
   } else {
-    console.log(`[versions] No AGENT_SDK_VERSION env var, using default: ${latestVersion.agentSDK}`);
+    console.log(
+      `[versions] No AGENT_SDK_VERSION env var, using default: ${latestVersion.agentSDK}`,
+    );
   }
   return latestVersion;
 };
@@ -84,7 +96,9 @@ export type AgentMiddleware = typeof activeVersion.agentSDK extends "1.1.0"
   ? AgentMiddleware11
   : AgentMiddleware12;
 export type AgentGroupType = AgentGroupType11 | AgentGroupType12;
-export type AgentPermissionLevel = AgentPermissionLevel11 | AgentPermissionLevel12;
+export type AgentPermissionLevel =
+  | AgentPermissionLevel11
+  | AgentPermissionLevel12;
 
 // Export debug utilities from the active version
 // Use any to avoid union type issues when mixing SDK versions
