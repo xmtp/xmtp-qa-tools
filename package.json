@@ -11,8 +11,8 @@
   "scripts": {
     "agent-versions": "tsx cli/versions.ts",
     "bot": "tsx cli/bot.ts",
-    "bot:pm2": "tsx cli/pm2.ts",
-    "bot:pm2:logs": "pm2 logs gm-bot --lines 1000",
+    "bot:pm2": "tsx cli/bot.ts --pm2",
+    "bot:pm2:logs": "pm2 logs gm-bot --raw --lines 1000",
     "build": "tsc",
     "c": "yarn format && yarn build && yarn lint ",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
