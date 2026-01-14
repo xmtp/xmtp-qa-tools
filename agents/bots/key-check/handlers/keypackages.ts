@@ -80,7 +80,7 @@ export class KeyPackagesHandlers {
     // If we have an address, resolve it to inbox ID
     if (targetAddress) {
       try {
-        const inboxId = await ctx.client.getInboxIdByIdentifier({
+        const inboxId = await (ctx.client as any).getInboxIdByIdentifier({
           identifier: targetAddress,
           identifierKind: 0,
         });

@@ -264,7 +264,7 @@ const agent = await Agent.createFromEnv({
 });
 
 // Add inline actions middleware
-agent.use(inlineActionsMiddleware);
+agent.use(inlineActionsMiddleware as any);
 
 // Initialize load test handlers now that agent is available
 const loadTestHandlers = new LoadTestHandlers(agent);

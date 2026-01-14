@@ -35,7 +35,7 @@ export async function getMessageBody(ctx: MessageContext, timezone?: string) {
     console.log(messageBody1);
     console.log({
       receiver: {
-        libxmtpVersion: ctx.client.libxmtpVersion,
+        libxmtpVersion: (ctx.client as any).libxmtpVersion,
         installationId: ctx.client.installationId,
         inboxId: ctx.client.inboxId,
       },

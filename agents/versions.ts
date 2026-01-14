@@ -4,11 +4,23 @@ import { VersionList } from "@helpers/versions";
 import {
   Agent as Agent11,
   MessageContext as MessageContext11,
+  type XmtpEnv as XmtpEnv11,
+  type DecodedMessage as DecodedMessage11,
+  type AgentMiddleware as AgentMiddleware11,
+  type Group as AgentGroupType11,
+  type PermissionLevel as AgentPermissionLevel11,
 } from "@xmtp/agent-sdk-1.1.0";
 import {
   Agent as Agent12,
   MessageContext as MessageContext12,
+  type XmtpEnv as XmtpEnv12,
+  type DecodedMessage as DecodedMessage12,
+  type AgentMiddleware as AgentMiddleware12,
+  type Group as AgentGroupType12,
+  type PermissionLevel as AgentPermissionLevel12,
 } from "@xmtp/agent-sdk-1.2.0";
+import { getTestUrl as getTestUrl11, logDetails as logDetails11 } from "@xmtp/agent-sdk-1.1.0/debug";
+import { getTestUrl as getTestUrl12, logDetails as logDetails12 } from "@xmtp/agent-sdk-1.2.0/debug";
 
 // Agent SDK version list
 export const AgentVersionList = [
@@ -28,17 +40,9 @@ export const AgentVersionList = [
   },
 ];
 
-export {
-  Agent,
-  type XmtpEnv,
-  MessageContext,
-  type DecodedMessage,
-  type AgentMiddleware,
-  type Group as AgentGroupType,
-  type PermissionLevel as AgentPermissionLevel,
-} from "@xmtp/agent-sdk-1.2.0";
-
-export { getTestUrl, logDetails } from "@xmtp/agent-sdk-1.2.0/debug";
+export const getAgentVersions = (filterAuto: boolean = true) => {
+  return filterAuto ? AgentVersionList.filter((v) => v.auto) : AgentVersionList;
+};
 
 // Agent SDK functions
 export const getActiveAgentVersion = (index = 0) => {
@@ -46,6 +50,7 @@ export const getActiveAgentVersion = (index = 0) => {
   let latestVersion = versions[index];
 
   if (process.env.AGENT_SDK_VERSION) {
+    console.log(`[versions] AGENT_SDK_VERSION env var set to: ${process.env.AGENT_SDK_VERSION}`);
     latestVersion = versions.find(
       (v) => v.agentSDK === process.env.AGENT_SDK_VERSION,
     ) as (typeof AgentVersionList)[number];
@@ -54,12 +59,55 @@ export const getActiveAgentVersion = (index = 0) => {
         `Agent SDK version ${process.env.AGENT_SDK_VERSION} not found`,
       );
     }
+    console.log(`[versions] Selected Agent SDK version: ${latestVersion.agentSDK}`);
+  } else {
+    console.log(`[versions] No AGENT_SDK_VERSION env var, using default: ${latestVersion.agentSDK}`);
   }
   return latestVersion;
 };
 
-export const getAgentVersions = (filterAuto: boolean = true) => {
-  return filterAuto ? AgentVersionList.filter((v) => v.auto) : AgentVersionList;
+// Get the active version based on environment variable
+const activeVersion = getActiveAgentVersion(0);
+
+// Dynamically export Agent and related types from the active version
+export const Agent = activeVersion.Agent;
+export const MessageContext = activeVersion.MessageContext;
+
+// Export types - use union types since we can't conditionally export at compile time
+// Use InstanceType to get the instance type from the class
+export type Agent = InstanceType<typeof activeVersion.Agent>;
+export type MessageContext = InstanceType<typeof activeVersion.MessageContext>;
+export type XmtpEnv = XmtpEnv11 | XmtpEnv12;
+export type DecodedMessage = DecodedMessage11 | DecodedMessage12;
+// For AgentMiddleware, use the active version's type directly to avoid union type issues
+export type AgentMiddleware = typeof activeVersion.agentSDK extends "1.1.0"
+  ? AgentMiddleware11
+  : AgentMiddleware12;
+export type AgentGroupType = AgentGroupType11 | AgentGroupType12;
+export type AgentPermissionLevel = AgentPermissionLevel11 | AgentPermissionLevel12;
+
+// Export debug utilities from the active version
+// Use any to avoid union type issues when mixing SDK versions
+export const getTestUrl = (client: any) => {
+  if (activeVersion.agentSDK === "1.1.0") {
+    return getTestUrl11(client);
+  } else {
+    return getTestUrl12(client);
+  }
+};
+
+// Wrapper for logDetails to handle API differences between versions
+// In 1.1.0, logDetails expects agent.client, in 1.2.0 it expects agent
+export const logDetails = (agentOrClient: any) => {
+  if (activeVersion.agentSDK === "1.1.0") {
+    // Version 1.1.0 expects agent.client
+    // If agentOrClient has a .client property, use it; otherwise assume it's already a client
+    const client = agentOrClient?.client ?? agentOrClient;
+    return logDetails11(client);
+  } else {
+    // Version 1.2.0 expects agent
+    return logDetails12(agentOrClient);
+  }
 };
 
 export const checkAgentVersionFormat = (
