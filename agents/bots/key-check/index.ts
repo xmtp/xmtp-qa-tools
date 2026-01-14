@@ -26,6 +26,11 @@ import { KeyPackagesHandlers } from "./handlers/keypackages";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
 
+// Immediate synchronous log - FIRST THING that runs
+console.log(
+  `[RESTART] Key-check bot starting - PID: ${process.pid} at ${new Date().toISOString()}`,
+);
+
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
@@ -275,17 +280,13 @@ agent.on("unhandledError", (error) => {
 
 // Handle process-level uncaught exceptions
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception in Key-check bot:", error);
-  console.error("Error stack:", error.stack);
+  console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
   process.exit(1);
 });
 
 // Handle unhandled promise rejections
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection in Key-check bot:", reason);
-  if (reason instanceof Error) {
-    console.error("Error stack:", reason.stack);
-  }
+process.on("unhandledRejection", (reason) => {
+  console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
   process.exit(1);
 });
 
