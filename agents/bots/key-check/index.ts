@@ -264,7 +264,8 @@ const agent = await Agent.createFromEnv({
 });
 
 // Add inline actions middleware
-agent.use(inlineActionsMiddleware as any);
+// Type assertion needed because AgentMiddleware is a conditional type based on active version
+agent.use(inlineActionsMiddleware as Parameters<typeof agent.use>[0]);
 
 // Initialize load test handlers now that agent is available
 const loadTestHandlers = new LoadTestHandlers(agent);

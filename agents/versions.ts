@@ -8,7 +8,6 @@ import {
   type AgentMiddleware as AgentMiddleware11,
   type PermissionLevel as AgentPermissionLevel11,
   type DecodedMessage as DecodedMessage11,
-  type XmtpEnv as XmtpEnv11,
 } from "@xmtp/agent-sdk-1.1.0";
 import {
   getTestUrl as getTestUrl11,
@@ -89,7 +88,8 @@ export const MessageContext = activeVersion.MessageContext;
 // Use InstanceType to get the instance type from the class
 export type Agent = InstanceType<typeof activeVersion.Agent>;
 export type MessageContext = InstanceType<typeof activeVersion.MessageContext>;
-export type XmtpEnv = XmtpEnv11 | XmtpEnv12;
+// XmtpEnv11 and XmtpEnv12 are the same type, so use one to avoid duplicate union
+export type XmtpEnv = XmtpEnv12;
 export type DecodedMessage = DecodedMessage11 | DecodedMessage12;
 // For AgentMiddleware, use the active version's type directly to avoid union type issues
 export type AgentMiddleware = typeof activeVersion.agentSDK extends "1.1.0"
@@ -101,26 +101,27 @@ export type AgentPermissionLevel =
   | AgentPermissionLevel12;
 
 // Export debug utilities from the active version
-// Use any to avoid union type issues when mixing SDK versions
-export const getTestUrl = (client: any) => {
+// Use unknown and type assertions to handle different SDK versions
+export const getTestUrl = (client: unknown) => {
   if (activeVersion.agentSDK === "1.1.0") {
-    return getTestUrl11(client);
+    return getTestUrl11(client as Parameters<typeof getTestUrl11>[0]);
   } else {
-    return getTestUrl12(client);
+    return getTestUrl12(client as Parameters<typeof getTestUrl12>[0]);
   }
 };
 
 // Wrapper for logDetails to handle API differences between versions
 // In 1.1.0, logDetails expects agent.client, in 1.2.0 it expects agent
-export const logDetails = (agentOrClient: any) => {
+export const logDetails = (agentOrClient: unknown) => {
   if (activeVersion.agentSDK === "1.1.0") {
     // Version 1.1.0 expects agent.client
     // If agentOrClient has a .client property, use it; otherwise assume it's already a client
-    const client = agentOrClient?.client ?? agentOrClient;
-    return logDetails11(client);
+    const client =
+      (agentOrClient as { client?: unknown })?.client ?? agentOrClient;
+    return logDetails11(client as Parameters<typeof logDetails11>[0]);
   } else {
     // Version 1.2.0 expects agent
-    return logDetails12(agentOrClient);
+    return logDetails12(agentOrClient as Parameters<typeof logDetails12>[0]);
   }
 };
 
