@@ -6,6 +6,12 @@ import { loadEnvFile } from "../../utils/general";
 // Load .env file only in local development
 if (process.env.NODE_ENV !== "production") loadEnvFile(import.meta.url);
 
+// Immediate log with flush to show restart
+console.log(`[RESTART] ========================================`);
+console.log(`[RESTART] GM bot process starting at ${new Date().toISOString()}`);
+console.log(`[RESTART] ========================================`);
+process.stdout.write(""); // Force flush
+
 const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
@@ -40,6 +46,9 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 agent.on("text", async (ctx) => {
+  console.log(
+    `[MESSAGE] Received text message: ${ctx.message.content.substring(0, 50)}...`,
+  );
   //   const messageBody1 = await getMessageBody(
   //     ctx,
   //     "America/Argentina/Buenos_Aires",
@@ -53,19 +62,39 @@ agent.on("text", async (ctx) => {
 });
 
 agent.on("start", async () => {
+  const startTime = Date.now();
+  console.log(`[START EVENT] ========================================`);
+  console.log(
+    `[START EVENT] Agent 'start' event fired at ${new Date().toISOString()}`,
+  );
+  console.log(`[START EVENT] ========================================`);
+  process.stdout.write(""); // Force flush
   console.log(`Waiting for messages...`);
   console.log(`Address: ${agent.address}`);
   console.log(`🔗${getTestUrl(agent.client)}`);
   logDetails(agent).catch(console.error);
   await getSDKVersionInfo(agent, agent.client);
+  console.log(`[READY] Agent fully initialized and ready`);
+  process.stdout.write(""); // Force flush
+
+  // Periodic heartbeat to show agent is running after restart
+  const heartbeatInterval = setInterval(() => {
+    const uptime = Math.floor((Date.now() - startTime) / 1000);
+    console.log(`[HEARTBEAT] Agent running - uptime: ${uptime}s`);
+  }, 5000);
 
   // TEST: Crash after 30 seconds to test PM2 restart
   setTimeout(() => {
+    clearInterval(heartbeatInterval);
     console.error(
       "💥 TEST CRASH - Exiting after 30 seconds to test PM2 restart",
     );
+    process.stdout.write(""); // Force flush before exit
     process.exit(1);
   }, 30000);
 });
 
+console.log(`[INIT] Starting agent...`);
 await agent.start({});
+console.log(`[INIT] Agent started, waiting for 'start' event...`);
+process.stdout.write(""); // Force flush
