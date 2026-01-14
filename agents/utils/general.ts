@@ -40,4 +40,3 @@ export function getDbPathBase(): string {
   }
   return process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".";
 }
-
