@@ -34,6 +34,9 @@ describe(testName, () => {
   const INSTALLATION_PER_MEMBER = process.env.INSTALLATION_PER_MEMBER
     ? process.env.INSTALLATION_PER_MEMBER.split("-").map((v) => Number(v))
     : [2];
+  const MESSAGE_SYNC_COUNT = process.env.MESSAGE_SYNC_COUNT
+    ? Number(process.env.MESSAGE_SYNC_COUNT)
+    : 10;
   const randomNames = getRandomNames(5);
   let dm: Dm | undefined;
 
@@ -160,10 +163,33 @@ describe(testName, () => {
           // Add current group to cumulative tracking
           cumulativeGroups.push(newGroup);
         });
-        it(`groupsync-${i}(${populateSize})[${installationPerMember}]:sync a large group of ${i} members ${i}`, async () => {
-          await newGroup.sync();
-          const members = await newGroup.members();
-          expect(members.length).toBe(members.length);
+        it(`groupsync-${i}(${populateSize})[${installationPerMember}]:sync ${MESSAGE_SYNC_COUNT} messages as group member`, async () => {
+          // 1. Send MESSAGE_SYNC_COUNT messages to the group from creator
+          for (let msgIdx = 0; msgIdx < MESSAGE_SYNC_COUNT; msgIdx++) {
+            await sendTextCompat(
+              newGroup,
+              `history-msg-${msgIdx}-${Math.random().toString(36).substring(2, 8)}`,
+            );
+          }
+
+          // 2. Get receiver's view of the group (receiver is already a member but hasn't synced yet)
+          await receiver!.client.conversations.sync();
+          const receiverGroup =
+            await receiver!.client.conversations.getConversationById(
+              newGroup.id,
+            );
+          expect(receiverGroup).toBeDefined();
+
+          // 3. Measure sync time for message history
+          const syncStart = performance.now();
+          await receiverGroup!.sync();
+          const messages = await receiverGroup!.messages();
+          const syncDuration = performance.now() - syncStart;
+
+          setCustomDuration(syncDuration);
+
+          // Verify we got the messages (at least MESSAGE_SYNC_COUNT)
+          expect(messages.length).toBeGreaterThanOrEqual(MESSAGE_SYNC_COUNT);
         });
 
         it(`updateName-${i}(${populateSize})[${installationPerMember}]:update the group name`, async () => {
