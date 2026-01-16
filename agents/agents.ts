@@ -49,12 +49,12 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  {
-    name: "bracky",
-    address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
-    networks: ["production"],
-    live: true,
-  },
+  // {
+  //   name: "bracky",
+  //   address: "0x62db4c5A8fdF004754b9EFe92dF39927aB68920d",
+  //   networks: ["production"],
+  //   live: true,
+  // },
   {
     name: "bankr",
     address: "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",

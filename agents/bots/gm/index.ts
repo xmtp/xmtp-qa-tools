@@ -27,17 +27,17 @@ agent.on("unhandledError", (error) => {
   process.exit(1);
 });
 
-// Handle process-level uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
-  process.exit(1);
-});
+// // Handle process-level uncaught exceptions
+// process.on("uncaughtException", (error) => {
+//   console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
+//   process.exit(1);
+// });
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason) => {
-  console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
-  process.exit(1);
-});
+// // Handle unhandled promise rejections
+// process.on("unhandledRejection", (reason) => {
+//   console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
+//   process.exit(1);
+// });
 
 agent.on("text", async (ctx) => {
   console.log(

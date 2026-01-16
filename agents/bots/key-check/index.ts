@@ -278,17 +278,17 @@ agent.on("unhandledError", (error) => {
   process.exit(1);
 });
 
-// Handle process-level uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
-  process.exit(1);
-});
+// // Handle process-level uncaught exceptions
+// process.on("uncaughtException", (error) => {
+//   console.error(`[UNCAUGHT_EXCEPTION] PID: ${process.pid}`, error);
+//   process.exit(1);
+// });
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (reason) => {
-  console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
-  process.exit(1);
-});
+// // Handle unhandled promise rejections
+// process.on("unhandledRejection", (reason) => {
+//   console.error(`[UNHANDLED_REJECTION] PID: ${process.pid}`, reason);
+//   process.exit(1);
+// });
 
 // Add inline actions middleware
 // Type assertion needed because AgentMiddleware is a conditional type based on active version
