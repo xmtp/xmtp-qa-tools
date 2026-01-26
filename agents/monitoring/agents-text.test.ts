@@ -42,8 +42,9 @@ describe(testName, () => {
           agentConfig.address as `0x${string}`,
         );
 
+        const messageText = agentConfig.text || PING_MESSAGE;
         console.log(
-          `📤 Sending "${PING_MESSAGE}" to ${agentConfig.name} (${agentConfig.address})`,
+          `📤 Sending "${messageText}" to ${agentConfig.name} (${agentConfig.address})`,
         );
 
         const result = await waitForResponse({
@@ -54,7 +55,7 @@ describe(testName, () => {
           conversationId: conversation.id,
           senderInboxId: agent.client.inboxId,
           timeout: AGENT_RESPONSE_TIMEOUT,
-          messageText: PING_MESSAGE,
+          messageText: messageText,
           messageFilter: (message) => {
             return message.contentType?.typeId === "text";
           },
