@@ -29,7 +29,14 @@
     "regression": "yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs",
     "revoke": "npx @xmtp/cli revoke",
     "test": "tsx cli/test.ts",
-    "versions": "tsx cli/versions.ts"
+    "versions": "tsx cli/versions.ts",
+    "gm:start": "pm2 start ecosystem.config.js --env dev",
+    "gm:start:prod": "pm2 start ecosystem.config.js --env production",
+    "gm:stop": "pm2 stop gm-bot",
+    "gm:restart": "pm2 restart gm-bot",
+    "gm:delete": "pm2 delete gm-bot",
+    "gm:logs": "pm2 logs gm-bot",
+    "gm:status": "pm2 status gm-bot"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
