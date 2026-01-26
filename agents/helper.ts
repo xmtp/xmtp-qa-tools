@@ -12,6 +12,8 @@ export interface AgentConfig {
   networks: string[];
   /**  the agent is production */
   live: boolean;
+  /** Custom text message to send to this agent (optional) */
+  customText?: string;
 }
 
 export async function getMessageBody(ctx: MessageContext, timezone?: string) {
