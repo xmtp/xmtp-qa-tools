@@ -13,12 +13,12 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  {
-    name: "mamo",
-    address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
-    networks: ["production"],
-    live: true,
-  },
+  // {
+  //   name: "mamo",
+  //   address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
+  //   networks: ["production"],
+  //   live: true,
+  // },
   {
     name: "alphie.base.eth",
     address: "0x5154C8707f7Fa18961E03F5b51edB2fb56a206dc",
@@ -67,12 +67,12 @@ const agents: AgentConfig[] = [
   //   networks: ["production"],
   //   live: false,
   // },
-  {
-    name: "fail-agent",
-    address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
-    networks: ["dev"],
-    live: false,
-  },
+  // {
+  //   name: "fail-agent",
+  //   address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
+  //   networks: ["dev"],
+  //   live: false,
+  // },
   {
     name: "echo",
     address: "0xc832b862fde939e8ba29b80b62e28a2e3c022d5a",
