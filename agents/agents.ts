@@ -67,12 +67,12 @@ const agents: AgentConfig[] = [
   //   networks: ["production"],
   //   live: false,
   // },
-  {
-    name: "fail-agent",
-    address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
-    networks: ["dev"],
-    live: false,
-  },
+  // {
+  //   name: "fail-agent",
+  //   address: "0xa5f2197585bfbc1bebcbf41d0a1a487eb14ffb39",
+  //   networks: ["dev"],
+  //   live: false,
+  // },
   {
     name: "echo",
     address: "0xc832b862fde939e8ba29b80b62e28a2e3c022d5a",
