@@ -13,12 +13,12 @@ const agents: AgentConfig[] = [
     networks: ["production"],
     live: true,
   },
-  {
-    name: "mamo",
-    address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
-    networks: ["production"],
-    live: true,
-  },
+  // {
+  //   name: "mamo",
+  //   address: "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
+  //   networks: ["production"],
+  //   live: true,
+  // },
   {
     name: "alphie.base.eth",
     address: "0x5154C8707f7Fa18961E03F5b51edB2fb56a206dc",
