@@ -21,7 +21,7 @@ import {
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, () => {
@@ -56,10 +56,23 @@ describe(testName, () => {
   let creator: Worker | undefined;
   let receiver: Worker | undefined;
   let dm: Dm | undefined;
-  it(`create: measure creating a client`, async () => {
+
+  beforeAll(async () => {
     workers = await getWorkers(10);
     creator = workers.getCreator();
     receiver = workers.getReceiver();
+    if (!creator || !receiver) {
+      throw new Error("Worker not found");
+    }
+
+    setCustomDuration(creator.initializationTime);
+  });
+
+  it(`create: measure creating a client`, () => {
+    if (!creator) {
+      throw new Error("Creator worker not found");
+    }
+
     setCustomDuration(creator.initializationTime);
   });
   it(`sync:measure sync`, async () => {
@@ -86,14 +99,14 @@ describe(testName, () => {
   });
 
   it(`newDm:measure creating a DM`, async () => {
-    dm = (await creator!.client.conversations.newDm(
+    dm = (await creator!.client.conversations.createDm(
       receiver!.client.inboxId,
     )) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
   });
   it(`newDmByAddress:measure creating a DM`, async () => {
-    const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
+    const dm2 = await receiver!.client.conversations.createDmWithIdentifier({
       identifier: getInboxes(1)[0].accountAddress,
       identifierKind: IdentifierKind.Ethereum,
     });
@@ -145,9 +158,10 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ];
-      newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
-        membersToAdd,
-      )) as Group;
+      newGroup =
+        (await creator!.client.conversations.createGroupWithIdentifiers(
+          membersToAdd,
+        )) as Group;
       const members = await newGroup.members();
       expect(members.length).toBe(i);
       expect(newGroup.id).toBeDefined();

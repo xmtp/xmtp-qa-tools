@@ -72,6 +72,11 @@ describe(testName, () => {
       workers = await getWorkers(workerNames);
       creator = workers.get(workerNames[0])!;
       receiver = workers.get(workerNames[1])!;
+
+      if (!creator || !receiver) {
+        throw new Error("Worker not found");
+      }
+
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
@@ -112,7 +117,7 @@ describe(testName, () => {
     });
 
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
-      dm = (await creator!.client.conversations.newDm(
+      dm = (await creator!.client.conversations.createDm(
         receiver!.client.inboxId,
       )) as Dm;
       expect(dm).toBeDefined();
@@ -144,7 +149,7 @@ describe(testName, () => {
           );
           extraMember = allMembersWithExtra.at(-1)!;
           newGroup =
-            (await creator!.client.conversations.newGroupWithIdentifiers([
+            (await creator!.client.conversations.createGroupWithIdentifiers([
               ...allMembers.map((a) => ({
                 identifier: a.accountAddress,
                 identifierKind: IdentifierKind.Ethereum,

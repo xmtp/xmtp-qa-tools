@@ -8,7 +8,6 @@ import {
 import { APP_VERSION, createSigner } from "@helpers/client";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
-import type { LogLevel, XmtpEnv } from "@xmtp/node-sdk";
 import {
   Client as Client43,
   Conversation as Conversation43,
@@ -33,6 +32,14 @@ import {
   Dm as Dm50,
   Group as Group50,
 } from "@xmtp/node-sdk-5.0.0";
+import {
+  Client as Client511,
+  Conversation as Conversation511,
+  Dm as Dm511,
+  Group as Group511,
+  type LogLevel as LogLevelType,
+  type XmtpEnv as XmtpEnvType,
+} from "@xmtp/node-sdk-5.1.1";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -50,10 +57,11 @@ try {
   // version.json not exported, 4.4.0 unavailable
 }
 
-// Node SDK exports (using latest version 5.0.0)
+// Node SDK exports (using latest version 5.1.1)
 export {
   Client,
   ConsentState,
+  ConversationType,
   type Signer,
   type ClientOptions,
   type Conversation,
@@ -61,14 +69,16 @@ export {
   type DecodedMessage,
   type Dm,
   type Group,
+  type Installation,
   LogLevel,
+  type Message,
   type XmtpEnv,
   type GroupMember,
   type KeyPackageStatus,
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-5.0.0";
+} from "@xmtp/node-sdk-5.1.1";
 
 /**
  * Version references use simplified versions without patches/pre-release suffixes.
@@ -76,6 +86,15 @@ export {
  * This prevents parsing issues with worker name-installation conversion.
  */
 export const VersionList = [
+  {
+    Client: Client511,
+    Conversation: Conversation511,
+    Dm: Dm511,
+    Group: Group511,
+    nodeSDK: "5.1.1",
+    nodeBindings: "1.8.1",
+    auto: true,
+  },
   {
     Client: Client50,
     Conversation: Conversation50,
@@ -185,17 +204,44 @@ export const compareVersions = (
   return true; // Equal versions
 };
 
+/**
+ * Normalize log level format based on bindings version.
+ * Bindings < 1.8.0 expect lowercase (e.g., "warn")
+ * Bindings >= 1.8.0 expect capitalized (e.g., "Warn")
+ */
+export const normalizeLogLevel = (
+  nodeBindings: string,
+  logLevel: string,
+): string => {
+  const LOG_LEVEL_FORMAT_VERSION = "1.8.0";
+  const usesCapitalizedFormat = compareVersions(
+    nodeBindings,
+    LOG_LEVEL_FORMAT_VERSION,
+  );
+
+  if (usesCapitalizedFormat) {
+    // Capitalize first letter: "warn" -> "Warn"
+    return logLevel.charAt(0).toUpperCase() + logLevel.slice(1).toLowerCase();
+  } else {
+    // Lowercase: "Warn" -> "warn"
+    return logLevel.toLowerCase();
+  }
+};
+
 export const regressionClient = async (
   nodeBindings: string,
   walletKey: `0x${string}`,
   dbEncryptionKey: Uint8Array,
   dbPath: string,
-  env: XmtpEnv,
+  env: XmtpEnvType,
   apiURL?: string,
   gatewayHost?: string,
 ): Promise<any> => {
-  const loggingLevel = (process.env.LOGGING_LEVEL ||
-    "warn") as unknown as LogLevel;
+  const rawLogLevel = process.env.LOGGING_LEVEL || "Warn";
+  const loggingLevel = normalizeLogLevel(
+    nodeBindings,
+    rawLogLevel,
+  ) as unknown as LogLevelType;
 
   // Ensure the database directory exists
   const dbDir = path.dirname(dbPath);
@@ -216,6 +262,12 @@ export const regressionClient = async (
   const d14nEnabled = !!gatewayHost;
   const apiUrl = apiURL || process.env.XMTP_API_URL;
 
+  if (apiUrl) {
+    console.debug(
+      `Creating API client with: SDK version: ${nodeBindings} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+    );
+  }
+
   // Check if SDK version supports D14N (nodeBindings >= 1.6.0 corresponds to SDK 4.6+)
   const D14N_MIN_VERSION = "1.6.0";
   const supportsD14N = compareVersions(nodeBindings, D14N_MIN_VERSION);
@@ -223,7 +275,7 @@ export const regressionClient = async (
   const clientOptions: any = {
     dbEncryptionKey,
     dbPath,
-    env: env as unknown as XmtpEnv,
+    env: env as unknown as XmtpEnvType,
     loggingLevel,
     appVersion: APP_VERSION,
     disableDeviceSync: true,

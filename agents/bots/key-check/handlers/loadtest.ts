@@ -21,7 +21,7 @@ export class LoadTestHandlers {
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
+          const group = await this.agent.client.conversations.createGroup(
             [ctx.message.senderInboxId],
             {
               groupName,
@@ -36,7 +36,7 @@ export class LoadTestHandlers {
           // Send messages to this group
           for (let messageIndex = 0; messageIndex < 10; messageIndex++) {
             const message = `Load test message ${messageIndex + 1}/10 in ${groupName}`;
-            await group.send(message);
+            await group.sendText(message);
             totalMessagesSent++;
 
             // Small delay to avoid overwhelming
@@ -103,7 +103,7 @@ ${createdGroups
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
+          const group = await this.agent.client.conversations.createGroup(
             [ctx.message.senderInboxId],
             {
               groupName,
@@ -118,7 +118,7 @@ ${createdGroups
           // Send messages to this group
           for (let messageIndex = 0; messageIndex < 10; messageIndex++) {
             const message = `Load test message ${messageIndex + 1}/10 in ${groupName}`;
-            await group.send(message);
+            await group.sendText(message);
             totalMessagesSent++;
 
             // Small delay to avoid overwhelming
@@ -190,7 +190,7 @@ ${createdGroups
 
       try {
         // Create group with sender as the only member initially
-        const group = await this.agent.client.conversations.newGroup(
+        const group = await this.agent.client.conversations.createGroup(
           [ctx.message.senderInboxId],
           {
             groupName,
@@ -205,7 +205,7 @@ ${createdGroups
         // Send 100 messages to this group
         for (let messageIndex = 0; messageIndex < 100; messageIndex++) {
           const message = `Load test message ${messageIndex + 1}/100 in ${groupName}`;
-          await group.send(message);
+          await group.sendText(message);
           totalMessagesSent++;
 
           // Progress updates every 25 messages
@@ -280,7 +280,7 @@ ${createdGroups
 
         try {
           // Create group with sender as the only member initially
-          const group = await this.agent.client.conversations.newGroup(
+          const group = await this.agent.client.conversations.createGroup(
             [], // Start with empty member list, sender is automatically included
             {
               groupName,
@@ -301,7 +301,7 @@ ${createdGroups
             messageIndex++
           ) {
             const message = `Load test message ${messageIndex + 1}/${messagesPerGroup} in ${groupName}`;
-            await group.send(message);
+            await group.sendText(message);
             totalMessagesSent++;
 
             // Small delay to avoid overwhelming

@@ -6,12 +6,14 @@ import {
   getEncryptionKeyFromHex,
   streamTimeout,
 } from "@helpers/client";
-import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
+import { sendTextCompat } from "@helpers/sdk-compat";
 import {
   ConsentState,
+  ConversationType,
   regressionClient,
   type Client,
   type DecodedMessage,
+  type Message,
   type XmtpEnv,
 } from "@helpers/versions";
 import { privateKeyToAccount } from "viem/accounts";
@@ -211,6 +213,37 @@ type StreamMessage =
   | StreamGroupUpdateMessage
   | StreamConversationMessage
   | StreamConsentMessage;
+
+/**
+ * Type guard to check if a stream message is a DecodedMessage
+ * DecodedMessage has 'conversationId' and 'contentType' properties
+ * while raw Message has 'convoId' and content.type
+ */
+function isDecodedMessage(
+  msg: Message | DecodedMessage,
+): msg is DecodedMessage {
+  return "conversationId" in msg && "contentType" in msg;
+}
+
+/**
+ * Get the conversation ID from either Message or DecodedMessage
+ */
+function getConversationId(msg: Message | DecodedMessage): string {
+  if (isDecodedMessage(msg)) {
+    return msg.conversationId;
+  }
+  return msg.convoId;
+}
+
+/**
+ * Get the content type ID from either Message or DecodedMessage
+ */
+function getContentTypeId(msg: Message | DecodedMessage): string | undefined {
+  if (isDecodedMessage(msg)) {
+    return msg.contentType?.typeId;
+  }
+  return msg.content?.type?.typeId;
+}
 
 export class WorkerClient extends Worker implements IWorkerClient {
   public name: string;
@@ -611,9 +644,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
             ) {
               continue;
             }
+            const contentTypeId = getContentTypeId(message);
+            const conversationId = getConversationId(message);
             if (
-              isDecodedMessage(message) &&
-              message?.contentType?.typeId === "group_updated" &&
+              contentTypeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
@@ -637,16 +671,14 @@ export class WorkerClient extends Worker implements IWorkerClient {
                     (change) => change.fieldName === "group_name",
                   )?.newValue || "Unknown";
 
-                if (isDecodedMessage(message)) {
-                  this.emit("worker_message", {
-                    type: StreamCollectorType.GroupUpdated,
-                    group: {
-                      conversationId: message.conversationId,
-                      name: groupName,
-                      addedInboxes: content.addedInboxes,
-                    },
-                  });
-                }
+                this.emit("worker_message", {
+                  type: StreamCollectorType.GroupUpdated,
+                  group: {
+                    conversationId,
+                    name: groupName,
+                    addedInboxes: content.addedInboxes,
+                  },
+                });
               }
               continue;
             } else if (
@@ -656,7 +688,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
             ) {
               // Log message details for debugging
               // console.debug(
-              //   `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
+              //   `[${this.nameId}] Message details: conversationId=${conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
               // );
 
               // Handle auto-responses if enabled
@@ -673,10 +705,12 @@ export class WorkerClient extends Worker implements IWorkerClient {
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
                   message: {
-                    conversationId: message.conversationId,
+                    conversationId,
                     senderInboxId: message.senderInboxId,
                     content: message.content as string,
-                    contentType: message.contentType,
+                    contentType: isDecodedMessage(message)
+                      ? message.contentType
+                      : undefined,
                   },
                 });
               } else {
@@ -687,7 +721,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
             } else {
               // // Log non-text messages for debugging
               // console.debug(
-              //   `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
+              //   `[${this.nameId}] Received NON-TEXT message: contentType=${contentTypeId}, streamType=${type}`,
               // );
             }
           }
@@ -711,7 +745,10 @@ export class WorkerClient extends Worker implements IWorkerClient {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleResponse(message: any, streamType: typeofStream) {
+  private async handleResponse(
+    message: Message | DecodedMessage,
+    streamType: typeofStream,
+  ) {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
@@ -725,9 +762,9 @@ export class WorkerClient extends Worker implements IWorkerClient {
         return;
       }
 
-      const conversation = await this.client.conversations.getConversationById(
-        message.conversationId as string,
-      );
+      const conversationId = getConversationId(message);
+      const conversation =
+        await this.client.conversations.getConversationById(conversationId);
       if (!conversation) {
         console.warn(
           `[${this.nameId}] Skipping message, conversation not found`,
@@ -735,13 +772,16 @@ export class WorkerClient extends Worker implements IWorkerClient {
         return;
       }
       const baseName = this.name.split("-")[0].toLowerCase();
-      const isDm = (await conversation.metadata())?.conversationType === "dm";
-      const content = String(message.content).toLowerCase();
+      const isDm =
+        (await conversation.metadata())?.conversationType ===
+        ConversationType.Dm;
+      const content = (message.content as string).toLowerCase();
+      const contentTypeId = getContentTypeId(message);
       let shouldRespond = false;
       if (
-        ((message?.contentType?.typeId === "text" ||
-          message?.contentType?.typeId === "reaction" ||
-          message?.contentType?.typeId === "reply") &&
+        ((contentTypeId === "text" ||
+          contentTypeId === "reaction" ||
+          contentTypeId === "reply") &&
           content.includes(baseName) &&
           !content.includes("/") &&
           !content.includes("workers") &&
