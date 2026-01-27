@@ -45,8 +45,9 @@ describe(testName, () => {
           agentConfig.address as `0x${string}`,
         );
 
+        const messageToSend = agentConfig.customText || PING_MESSAGE;
         console.log(
-          `📤 Sending "${PING_MESSAGE}" to ${agentConfig.name} (${agentConfig.address})`,
+          `📤 Sending "${messageToSend}" to ${agentConfig.name} (${agentConfig.address})`,
         );
 
         let result;
@@ -59,7 +60,7 @@ describe(testName, () => {
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,
             timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: PING_MESSAGE,
+            messageText: messageToSend,
           });
         } catch {
           result = {
