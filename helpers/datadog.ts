@@ -130,6 +130,9 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
 }
 
 export function initializeDatadog(): boolean {
+  if (process.env.DISABLE_DATADOG === "true") {
+    return false;
+  }
   if (!process.env.DATADOG_API_KEY) {
     console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
     return false;
@@ -159,6 +162,9 @@ export function sendMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
+  if (process.env.DISABLE_DATADOG === "true") {
+    return;
+  }
   try {
     if (metricValue <= 0) {
       console.error(`${metricName} Metric value is ${metricValue}`);
@@ -220,6 +226,9 @@ export function sendHistogramMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
+  if (process.env.DISABLE_DATADOG === "true") {
+    return;
+  }
   try {
     if (metricValue <= 0) {
       console.error(`${metricName} Histogram metric value is ${metricValue}`);
