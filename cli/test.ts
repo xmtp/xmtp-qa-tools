@@ -2,6 +2,7 @@ import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import { sendDatadogLog } from "@helpers/datadog";
+import { isValidExtendedEnv, VALID_ENVIRONMENTS } from "@helpers/environment";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
 import {
@@ -50,12 +51,13 @@ OPTIONS:
   -h, --help            Show this help message
 
 ENVIRONMENTS:
-  local       Local XMTP network for development
-  dev         Development XMTP network (default)
-  production  Production XMTP network
+  local            Local XMTP network for development
+  dev              Development XMTP network (default)
+  production       Production XMTP network
+  testnet-staging  Staging testnet (uses dev with custom gateway)
 
 TEST SUITES:
-  performance    Core performance metrics and large groups  
+  performance    Core performance metrics and large groups
   delivery       Message delivery reliability
   browser        Playwright browser automation
   agents         Live bot monitoring
@@ -288,6 +290,11 @@ function parseTestArgs(args: string[]): {
         break;
       case "--env":
         if (nextArg) {
+          if (!isValidExtendedEnv(nextArg)) {
+            console.warn(
+              `Invalid environment: ${nextArg}. Valid: ${VALID_ENVIRONMENTS.join(", ")}`,
+            );
+          }
           process.env.XMTP_ENV = nextArg;
           i++;
         } else {

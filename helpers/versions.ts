@@ -159,15 +159,6 @@ export const checkNoNameContains = (versionList: typeof VersionList) => {
 };
 
 /**
- * Check if D14N mode is enabled via environment variable
- * Set XMTP_D14N=true to enable D14N mode
- */
-export const isD14NEnabled = (): boolean => {
-  const d14nEnv = process.env.XMTP_D14N;
-  return d14nEnv === "true" || d14nEnv === "1";
-};
-
-/**
  * Compare two semantic version strings.
  * Returns true if version >= minVersion.
  * E.g., compareVersions("1.7.0", "1.6.0") returns true
@@ -201,6 +192,7 @@ export const regressionClient = async (
   dbPath: string,
   env: XmtpEnv,
   apiURL?: string,
+  gatewayHost?: string,
 ): Promise<any> => {
   const loggingLevel = (process.env.LOGGING_LEVEL ||
     "warn") as unknown as LogLevel;
@@ -221,7 +213,7 @@ export const regressionClient = async (
   const signer = createSigner(walletKey);
 
   // Check if D14N mode is explicitly enabled
-  const d14nEnabled = isD14NEnabled();
+  const d14nEnabled = !!gatewayHost;
   const apiUrl = apiURL || process.env.XMTP_API_URL;
 
   // Check if SDK version supports D14N (nodeBindings >= 1.6.0 corresponds to SDK 4.6+)
@@ -243,19 +235,10 @@ export const regressionClient = async (
   // apiUrl = grpc URL for reads (queries, sync)
   // V3 mode: Use apiUrl parameter only (or default endpoints)
   if (d14nEnabled) {
-    if (!apiUrl) {
-      throw new Error(
-        "XMTP_D14N=true requires XMTP_API_URL to be set with the D14N grpc URL (e.g., https://grpc.testnet-dev.xmtp.network:443)",
-      );
-    }
     if (supportsD14N) {
-      // Derive payer URL from grpc URL (grpc.* -> payer.*)
-      const payerUrl =
-        process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
-      clientOptions.gatewayHost = payerUrl; // Payer URL for writes
+      clientOptions.gatewayHost = gatewayHost; // Payer URL for writes
       clientOptions.apiUrl = apiUrl; // gRPC URL for reads
-      console.log(`[D14N] Using D14N gateway (gatewayHost): ${payerUrl}`);
-      console.log(`[D14N] Using D14N node (apiUrl): ${apiUrl}`);
+      console.log(`[D14N] Using D14N gateway (gatewayHost): ${gatewayHost}`);
     } else {
       console.warn(
         `[D14N] D14N is enabled but SDK version ${nodeBindings} (< ${D14N_MIN_VERSION}) does not support D14N. Falling back to apiUrl.`,
@@ -298,11 +281,9 @@ export const regressionClient = async (
         codecs: [new ReactionCodec(), new ReplyCodec()],
       };
 
-      if (d14nEnabled && apiUrl) {
+      if (d14nEnabled) {
         if (supportsD14N) {
-          const payerUrl =
-            process.env.XMTP_GATEWAY_URL || apiUrl.replace(/grpc\./, "payer.");
-          retryOptions.gatewayHost = payerUrl;
+          retryOptions.gatewayHost = gatewayHost;
           retryOptions.apiUrl = apiUrl;
         } else {
           console.warn(

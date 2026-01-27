@@ -3,6 +3,7 @@ import { appendFile } from "fs/promises";
 import "dotenv/config";
 import path from "path";
 import { formatBytes, generateEncryptionKeyHex, sleep } from "@helpers/client";
+import { resolveEnvironment, type ExtendedXmtpEnv } from "@helpers/environment";
 import { ProgressBar } from "@helpers/logger";
 import {
   getDefaultSdkVersion,
@@ -98,7 +99,8 @@ export interface Worker extends WorkerBase {
 export class WorkerManager implements IWorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private activeWorkers: WorkerClient[] = [];
-  private env: XmtpEnv;
+  private extendedEnv: ExtendedXmtpEnv;
+  private resolvedEnv: { sdkEnv: XmtpEnv; gatewayHost?: string };
   private keysCache: Record<
     string,
     { walletKey: string; encryptionKey: string }
@@ -107,8 +109,9 @@ export class WorkerManager implements IWorkerManager {
   /**
    * Constructor creates an empty manager or populates it with existing workers
    */
-  constructor(env: XmtpEnv) {
-    this.env = env;
+  constructor(env: ExtendedXmtpEnv) {
+    this.extendedEnv = env;
+    this.resolvedEnv = resolveEnvironment(env);
     this.workers = {};
   }
   /**
@@ -233,7 +236,7 @@ export class WorkerManager implements IWorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk} ${installationCount.installations.length} - ${formatBytes(
+            `${this.extendedEnv}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk} ${installationCount.installations.length} - ${formatBytes(
               (await currentWorker.worker.getSQLiteFileSizes())?.total,
             )}`,
           );
@@ -456,10 +459,11 @@ export class WorkerManager implements IWorkerManager {
     // Create and initialize the worker
     const workerClient = new WorkerClient(
       workerData,
-      this.env,
+      this.resolvedEnv.sdkEnv,
       {},
       effectiveApiUrl,
       undefined,
+      this.resolvedEnv.gatewayHost,
     );
 
     const startTime = performance.now();
@@ -475,7 +479,7 @@ export class WorkerManager implements IWorkerManager {
       dbPath: initializedWorker.dbPath,
       address: initializedWorker.address,
       installationId: initializedWorker.client.installationId,
-      env: this.env,
+      env: this.resolvedEnv.sdkEnv,
       folder,
       worker: workerClient,
       initializationTime,
@@ -497,7 +501,7 @@ export class WorkerManager implements IWorkerManager {
 export async function getWorkers(
   workers: string[] | Record<string, string> | number,
   options: {
-    env?: XmtpEnv;
+    env?: ExtendedXmtpEnv;
     nodeBindings?: string;
     randomNames?: boolean;
   } = {
@@ -507,7 +511,8 @@ export async function getWorkers(
   },
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
-    (options.env as XmtpEnv) || (process.env.XMTP_ENV as XmtpEnv),
+    (options.env as ExtendedXmtpEnv) ||
+      (process.env.XMTP_ENV as ExtendedXmtpEnv),
   );
   let sdkVersions = [options.nodeBindings || getDefaultSdkVersion()];
   if (process.env.TEST_VERSIONS) {

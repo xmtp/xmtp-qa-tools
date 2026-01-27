@@ -20,6 +20,7 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
@@ -52,11 +53,12 @@ jobs:
       fail-fast: false
       matrix:
         test: [agents-stress]
-        env: [dev, production]
+        env: [dev, production, testnet-staging]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env

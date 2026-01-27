@@ -1,8 +1,9 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import { APP_VERSION } from "@helpers/client";
+import { resolveEnvironment, type ExtendedXmtpEnv } from "@helpers/environment";
 import { ProgressBar } from "@helpers/logger";
-import { Client, type XmtpEnv } from "@helpers/versions";
+import { Client } from "@helpers/versions";
 import {
   createSigner,
   generateEncryptionKeyHex,
@@ -17,7 +18,7 @@ let debugMode = false;
 
 // === Tweakable Defaults ===
 const DEFAULT_COUNT = 200;
-const DEFAULT_ENVS: XmtpEnv[] = ["local"];
+const DEFAULT_ENVS: ExtendedXmtpEnv[] = ["local"];
 const DEFAULT_INSTALLATIONS = 2;
 const MAX_RETRIES = 3;
 // =========================
@@ -54,9 +55,10 @@ OPTIONS:
   -h, --help            Show this help message
 
 ENVIRONMENTS:
-  local       Local XMTP network for development
-  dev         Development XMTP network
-  production  Production XMTP network
+  local            Local XMTP network for development
+  dev              Development XMTP network
+  production       Production XMTP network
+  testnet-staging  Staging testnet (use gateway from XMTP_GATEWAY_HOST environment variable)
 
 EXAMPLES:
   yarn gen --count 500 --env local
@@ -276,7 +278,7 @@ async function smartUpdate({
   restart,
 }: {
   count?: number;
-  envs?: XmtpEnv[];
+  envs?: ExtendedXmtpEnv[];
   installations?: number;
   restart?: boolean;
 }) {
@@ -317,12 +319,14 @@ async function smartUpdate({
         const signer = createSigner(inbox.walletKey as `0x${string}`);
         const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
         for (const env of envs) {
+          const resolved = resolveEnvironment(env);
           const client = await Client.create(signer, {
             dbEncryptionKey,
             dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
             appVersion: APP_VERSION,
             disableDeviceSync: true,
-            env,
+            env: resolved.sdkEnv,
+            gatewayHost: resolved.gatewayHost,
           });
           const { currentInstallations } = await checkInstallations(
             client,
@@ -338,7 +342,8 @@ async function smartUpdate({
                 await Client.create(signer, {
                   dbEncryptionKey,
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
-                  env,
+                  env: resolved.sdkEnv,
+                  gatewayHost: resolved.gatewayHost,
                   appVersion: APP_VERSION,
                   disableDeviceSync: true,
                 });
@@ -365,7 +370,8 @@ async function smartUpdate({
                 await Client.create(signer, {
                   dbEncryptionKey,
                   dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
-                  env,
+                  env: resolved.sdkEnv,
+                  gatewayHost: resolved.gatewayHost,
                   appVersion: APP_VERSION,
                   disableDeviceSync: true,
                 });
@@ -415,12 +421,14 @@ async function smartUpdate({
         let inboxId = "";
         let installationsFailed = 0;
         for (const env of envs) {
+          const resolved = resolveEnvironment(env);
           for (let j = 0; j < installationCount; j++) {
             try {
               const client = await Client.create(signer, {
                 dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
                 dbPath: `${LOGPATH}/${env}-${accountAddress}-install-${j}`,
-                env,
+                env: resolved.sdkEnv,
+                gatewayHost: resolved.gatewayHost,
                 appVersion: APP_VERSION,
                 disableDeviceSync: true,
               });
@@ -481,7 +489,7 @@ async function main() {
 
   // Parse arguments
   let count: number | undefined = undefined,
-    envs: XmtpEnv[] | undefined = undefined,
+    envs: ExtendedXmtpEnv[] | undefined = undefined,
     installations: string | undefined = undefined,
     restart = false;
 
@@ -490,7 +498,7 @@ async function main() {
     if (arg === "--env")
       envs = args[i + 1]
         .split(",")
-        .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
+        .map((e) => e.trim().toLowerCase()) as ExtendedXmtpEnv[];
     if (arg === "--installations") installations = args[i + 1];
     if (arg === "--restart") restart = true;
     if (arg === "--log warn --file") debugMode = true;

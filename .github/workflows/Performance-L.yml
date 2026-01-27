@@ -15,12 +15,13 @@ jobs:
       matrix:
         test: [performance]
         size: [200-250]
-        env: [dev]
+        env: [dev, testnet-staging]
         cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env
