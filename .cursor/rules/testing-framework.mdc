@@ -117,16 +117,16 @@ const workers = await getWorkers(["alice"], { env: "local" });
 
 ```typescript
 // Create DM by inbox ID
-const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+const dm = await alice.client.conversations.createDm(bob.client.inboxId);
 
 // Create DM by Ethereum address
-const dm2 = await alice.client.conversations.newDmWithIdentifier({
+const dm2 = await alice.client.conversations.createDmWithIdentifier({
   identifier: bob.address,
   identifierKind: IdentifierKind.Ethereum,
 });
 
 // Create group with inbox IDs
-const group = await alice.client.conversations.newGroup([
+const group = await alice.client.conversations.createGroup([
   bob.client.inboxId,
   workers.get("charlie").client.inboxId,
 ]);
@@ -157,7 +157,7 @@ await group.addSuperAdmin(memberInboxId);
 // Get group info
 const members = await group.members();
 const name = group.name;
-const admins = group.admins;
+const admins = group.listAdmins();
 ```
 
 ## Streams and Stream Verification
@@ -373,7 +373,7 @@ it("deliver messages in real-time", async () => {
   // Start message streams
   workers.getReceiver().worker.startStream(typeofStream.Message);
 
-  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+  const dm = await alice.client.conversations.createDm(bob.client.inboxId);
 
   const verifyResult = await verifyMessageStream(
     dm,
@@ -443,7 +443,7 @@ import { getWorkerNames, getWorkers } from "@workers/manager";
 const workers = await getWorkers(["alice", "bob"]);
 const alice = workers.get("alice");
 const bob = workers.get("bob");
-const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+const dm = await alice.client.conversations.createDm(bob.client.inboxId);
 ```
 
 ### Group Test Setup
@@ -470,7 +470,7 @@ const workers = await getWorkers(1);
 const memberInboxIds = getInboxIds(100);
 const group = await workers
   .getCreator()
-  .client.conversations.newGroup(memberInboxIds);
+  .client.conversations.createGroup(memberInboxIds);
 ```
 
 ### Version-Specific Testing

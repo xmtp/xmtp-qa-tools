@@ -22,13 +22,13 @@ export async function updateGroupConsent(
   client: Client,
   group: Group,
 ): Promise<void> {
-  const getState = await group.consentState;
+  const currentState = group.consentState();
   await client.preferences.setConsentStates([
     {
       entity: group.id,
       entityType: ConsentEntityType.GroupId,
       state:
-        getState === ConsentState.Allowed
+        currentState === ConsentState.Allowed
           ? ConsentState.Denied
           : ConsentState.Allowed,
     },
@@ -415,7 +415,7 @@ export async function verifyConversationStream(
       r.worker.collectConversations(initiator.client.inboxId, 1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      const conversation = await initiator.client.conversations.newGroup(
+      const conversation = await initiator.client.conversations.createGroup(
         receivers.map((r) => r.client.inboxId),
       );
       console.debug("conversation created", conversation.id);

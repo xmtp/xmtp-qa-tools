@@ -51,6 +51,7 @@
     "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0",
     "@xmtp/node-sdk-4.6.0": "npm:@xmtp/node-sdk@4.6.0-dev.02e173d",
     "@xmtp/node-sdk-5.0.0": "npm:@xmtp/node-sdk@5.0.0-rc1",
+    "@xmtp/node-sdk-5.1.1": "npm:@xmtp/node-sdk@5.1.1",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.5.0",

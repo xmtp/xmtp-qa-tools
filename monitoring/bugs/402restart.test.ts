@@ -1,5 +1,6 @@
 import { sleep } from "@helpers/client";
 import { isDecodedMessage, sendTextCompat } from "@helpers/sdk-compat";
+import { type DecodedMessage, type Message } from "@helpers/versions";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -13,10 +14,10 @@ describe(testName, () => {
     // First test
     let talkerWorkers = await getWorkers(1);
     let creator = talkerWorkers.getCreator();
-    let convo = await creator.client.conversations.newDm(agent.inboxId);
+    let convo = await creator.client.conversations.createDm(agent.inboxId);
 
     let stream = await agent.client.conversations.streamAllMessages({
-      onValue: (message: any) => {
+      onValue: (message: Message | DecodedMessage) => {
         if (
           isDecodedMessage(message) &&
           message.senderInboxId.toLowerCase() !== agent.inboxId.toLowerCase()
@@ -34,7 +35,7 @@ describe(testName, () => {
     void stream.end();
 
     stream = await agent.client.conversations.streamAllMessages({
-      onValue: (message: any) => {
+      onValue: (message: Message | DecodedMessage) => {
         if (
           isDecodedMessage(message) &&
           message.senderInboxId.toLowerCase() !== agent.inboxId.toLowerCase()

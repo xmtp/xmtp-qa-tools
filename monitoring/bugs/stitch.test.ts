@@ -12,7 +12,7 @@ describe(testName, () => {
     const receiver = workers.get("john")!;
     const allInboxIds = getInboxes(2).map((a) => a.inboxId);
     console.log("All inbox ids", allInboxIds);
-    const group = (await creator.client.conversations.newGroup(
+    const group = (await creator.client.conversations.createGroup(
       allInboxIds,
     )) as Group;
 

@@ -106,7 +106,7 @@ async function populate(count: number, worker: Worker) {
 
     await Promise.all(
       senderWorkers.map(async (sender) => {
-        await sender.client.conversations.newDmWithIdentifier({
+        await sender.client.conversations.createDmWithIdentifier({
           identifier: worker.address,
           identifierKind: IdentifierKind.Ethereum,
         });

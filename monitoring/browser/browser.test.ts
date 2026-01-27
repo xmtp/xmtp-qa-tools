@@ -57,7 +57,7 @@ describe(testName, () => {
   });
 
   it("conversation stream with message", async () => {
-    const newGroup = await creator.client.conversations.newGroup(
+    const newGroup = await creator.client.conversations.createGroup(
       getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 1 " + getTime(),
@@ -73,7 +73,7 @@ describe(testName, () => {
   });
 
   it("conversation stream without message", async () => {
-    const newGroup = await creator.client.conversations.newGroup(
+    const newGroup = await creator.client.conversations.createGroup(
       getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 2 " + getTime(),
