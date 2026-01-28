@@ -266,7 +266,7 @@ export class WorkerManager implements IWorkerManager {
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
     extraMembers: string[] = [],
   ): Promise<Group> {
-    const creator = this.getCreator();
+    const creator = this.mustGetCreator();
     const memberList = this.getAllButCreator().map(
       (worker) => worker.client.inboxId,
     );
@@ -283,6 +283,9 @@ export class WorkerManager implements IWorkerManager {
   getAllButCreator(): Worker[] {
     const workers = this.getAll();
     const creator = this.getCreator();
+    if (!creator) {
+      return workers;
+    }
     return workers.filter((worker) => worker.name !== creator.name);
   }
 
