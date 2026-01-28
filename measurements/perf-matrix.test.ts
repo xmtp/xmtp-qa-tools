@@ -38,7 +38,7 @@ describe(testName, () => {
     ? Number(process.env.MESSAGE_SYNC_COUNT)
     : 10;
   const randomNames = getRandomNames(5);
-  let dm: Dm | undefined;
+  let dm: Dm;
 
   let newGroup: Group;
   let customDuration: number | undefined = undefined;
@@ -60,8 +60,8 @@ describe(testName, () => {
 
   for (const populateSize of POPULATE_SIZE) {
     let workers: WorkerManager;
-    let creator: Worker | undefined;
-    let receiver: Worker | undefined;
+    let creator: Worker;
+    let receiver: Worker;
     it(`create(${populateSize}): measure creating a client`, async () => {
       const workerNames = [...randomNames];
       let bysizeWorkerName = "";
@@ -70,32 +70,28 @@ describe(testName, () => {
         workerNames.unshift(bysizeWorkerName);
       }
       workers = await getWorkers(workerNames);
-      creator = workers.get(workerNames[0])!;
-      receiver = workers.get(workerNames[1])!;
-
-      if (!creator || !receiver) {
-        throw new Error("Worker not found");
-      }
+      creator = workers.mustGet(workerNames[0]);
+      receiver = workers.mustGet(workerNames[1]);
 
       setCustomDuration(creator.initializationTime);
     });
     it(`sync(${populateSize}):measure sync`, async () => {
-      await creator!.client.conversations.sync();
+      await creator.client.conversations.sync();
     });
 
     it(`syncAll(${populateSize}):measure syncAll`, async () => {
-      await creator!.client.conversations.syncAll();
+      await creator.client.conversations.syncAll();
     });
 
     it(`storage(${populateSize}):measure storage`, async () => {
-      const storage = await creator!.worker.getSQLiteFileSizes();
+      const storage = await creator.worker.getSQLiteFileSizes();
       setCustomDuration(storage.dbFile);
     });
     it(`inboxState(${populateSize}):measure inboxState`, async () => {
-      await creator!.client.preferences.inboxState();
+      await creator.client.preferences.inboxState();
     });
     it(`setConsentStates:group consent`, async () => {
-      await creator!.client.preferences.setConsentStates([
+      await creator.client.preferences.setConsentStates([
         {
           entity: getInboxes(1)[0].inboxId,
           entityType: ConsentEntityType.InboxId,
@@ -107,35 +103,35 @@ describe(testName, () => {
       const canMessage = await Client.canMessage(
         [
           {
-            identifier: receiver!.address,
+            identifier: receiver.address,
             identifierKind: IdentifierKind.Ethereum,
           },
         ],
-        receiver!.env,
+        receiver.env,
       );
-      expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
+      expect(canMessage.get(receiver.address.toLowerCase())).toBe(true);
     });
 
     it(`newDm(${populateSize}):measure creating a DM`, async () => {
-      dm = (await creator!.client.conversations.createDm(
-        receiver!.client.inboxId,
+      dm = (await creator.client.conversations.createDm(
+        receiver.client.inboxId,
       )) as Dm;
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     });
     it(`streamMessage(${populateSize}):measure receiving a gm`, async () => {
-      const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+      const verifyResult = await verifyMessageStream(dm, [receiver]);
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
     });
 
     it(`getConversationById(${populateSize}):measure getting a conversation by id`, async () => {
       const conversation =
-        await creator!.client.conversations.getConversationById(dm!.id);
-      expect(conversation!.id).toBe(dm!.id);
+        await creator.client.conversations.getConversationById(dm.id);
+      expect(conversation!.id).toBe(dm.id);
     });
     it(`send(${populateSize}):measure sending a gm`, async () => {
-      const dmId = await sendTextCompat(dm!, "gm");
+      const dmId = await sendTextCompat(dm, "gm");
       expect(dmId).toBeDefined();
     });
 
@@ -149,7 +145,7 @@ describe(testName, () => {
           );
           extraMember = allMembersWithExtra.at(-1)!;
           newGroup =
-            (await creator!.client.conversations.createGroupWithIdentifiers([
+            (await creator.client.conversations.createGroupWithIdentifiers([
               ...allMembers.map((a) => ({
                 identifier: a.accountAddress,
                 identifierKind: IdentifierKind.Ethereum,
@@ -178,9 +174,9 @@ describe(testName, () => {
           }
 
           // 2. Get receiver's view of the group (receiver is already a member but hasn't synced yet)
-          await receiver!.client.conversations.sync();
+          await receiver.client.conversations.sync();
           const receiverGroup =
-            await receiver!.client.conversations.getConversationById(
+            await receiver.client.conversations.getConversationById(
               newGroup.id,
             );
           expect(receiverGroup).toBeDefined();
@@ -211,19 +207,19 @@ describe(testName, () => {
           expect(groupMessage).toBeDefined();
         });
         it(`addAdmin-${i}(${populateSize})[${installationPerMember}]:add an admin to a group`, async () => {
-          await newGroup.addAdmin(receiver!.client.inboxId);
+          await newGroup.addAdmin(receiver.client.inboxId);
         });
         it(
           `streamMembership-${i}(${populateSize})[${installationPerMember}]: new member added to group`,
           async () => {
-            await receiver?.client.conversations.sync();
+            await receiver.client.conversations.sync();
             const groupByReceiver =
-              await receiver?.client.conversations.getConversationById(
+              await receiver.client.conversations.getConversationById(
                 newGroup.id,
               );
             const verifyResult = await verifyMembershipStream(
               groupByReceiver as Group,
-              [creator!],
+              [creator],
               [extraMember.inboxId],
             );
 
@@ -241,15 +237,15 @@ describe(testName, () => {
         it(
           `streamMessage-${i}(${populateSize})[${installationPerMember}]: stream members of message changes in ${i} member group`,
           async () => {
-            await receiver?.client.conversations.sync();
+            await receiver.client.conversations.sync();
             const groupByReceiver =
-              await receiver?.client.conversations.getConversationById(
+              await receiver.client.conversations.getConversationById(
                 newGroup.id,
               );
             console.log("groupByReceiver", groupByReceiver?.id);
             const verifyResult = await verifyMessageStream(
               groupByReceiver as Group,
-              [creator!],
+              [creator],
             );
 
             setCustomDuration(verifyResult.averageEventTiming);
@@ -261,15 +257,15 @@ describe(testName, () => {
         it(
           `streamMetadata-${i}(${populateSize})[${installationPerMember}]: stream members of metadata changes in ${i} member group`,
           async () => {
-            await receiver?.client.conversations.sync();
+            await receiver.client.conversations.sync();
             const groupByReceiver =
-              await receiver?.client.conversations.getConversationById(
+              await receiver.client.conversations.getConversationById(
                 newGroup.id,
               );
             console.log("groupByReceiver", groupByReceiver?.id);
             const verifyResult = await verifyMetadataStream(
               groupByReceiver as Group,
-              [creator!],
+              [creator],
             );
 
             setCustomDuration(verifyResult.averageEventTiming);

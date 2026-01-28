@@ -8,8 +8,8 @@ const testName = "sync";
 describe(testName, () => {
   it("create a group", async () => {
     const workers = await getWorkers(["henry", "john"]);
-    const creator = workers.get("henry")!;
-    const receiver = workers.get("john")!;
+    const creator = workers.mustGet("henry");
+    const receiver = workers.mustGet("john");
     const allInboxIds = getInboxes(2).map((a) => a.inboxId);
     console.log("All inbox ids", allInboxIds);
     const group = (await creator.client.conversations.createGroup(

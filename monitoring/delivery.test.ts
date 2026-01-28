@@ -38,11 +38,11 @@ describe(testName, async () => {
       test: testName,
       metric_type: "stream",
       metric_subtype: "message",
-      sdk: workers.getCreator().sdk,
+      sdk: workers.mustGetCreator().sdk,
     } as ResponseMetricTags);
 
     sendMetric("delivery", stats.receptionPercentage, {
-      sdk: workers.getCreator().sdk,
+      sdk: workers.mustGetCreator().sdk,
       test: testName,
       metric_type: "delivery",
       metric_subtype: "stream",
@@ -50,7 +50,7 @@ describe(testName, async () => {
     } as DeliveryMetricTags);
 
     sendMetric("order", stats.orderPercentage, {
-      sdk: workers.getCreator().sdk,
+      sdk: workers.mustGetCreator().sdk,
       test: testName,
       metric_type: "order",
       metric_subtype: "stream",
@@ -101,7 +101,7 @@ describe(testName, async () => {
     );
 
     sendMetric("delivery", stats.deliveryPercentage, {
-      sdk: workers.getCreator().sdk,
+      sdk: workers.mustGetCreator().sdk,
       test: testName,
       metric_type: "delivery",
       metric_subtype: "poll",
@@ -109,7 +109,7 @@ describe(testName, async () => {
     } as DeliveryMetricTags);
 
     sendMetric("order", stats.orderPercentage, {
-      sdk: workers.getCreator().sdk,
+      sdk: workers.mustGetCreator().sdk,
       test: testName,
       metric_type: "order",
       metric_subtype: "poll",
@@ -121,7 +121,7 @@ describe(testName, async () => {
   });
 
   it("recovery:message recovery after stream interruption", async () => {
-    const offlineWorker = workers.getReceiver();
+    const offlineWorker = workers.mustGetReceiver();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     console.log(`Stopping streams for ${offlineWorker.name}`);
 
