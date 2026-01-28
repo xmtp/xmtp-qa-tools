@@ -14,13 +14,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: [production]
+        env: [production, testnet-staging]
         test: [browser] # performance test with more large groups
         # test: [performance] # performance test with more large groups
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       REGION: ${{ vars.REGION }}
+      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup test env

@@ -223,6 +223,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
   public client!: Client;
   private env: XmtpEnv;
   private apiUrl?: string;
+  private gatewayHost?: string;
   private activeStreamTypes: Set<typeofStream> = new Set();
   private streamControllers: Map<typeofStream, AbortController> = new Map();
   private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
@@ -234,6 +235,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     options: WorkerOptions = {},
     apiUrl?: string,
     customDbPath?: string,
+    gatewayHost?: string,
   ) {
     options.workerData = {
       worker,
@@ -245,6 +247,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
+    this.gatewayHost = gatewayHost;
     this.nameId = worker.name + "-" + worker.sdk;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
@@ -538,6 +541,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         this.dbPath,
         this.env,
         this.apiUrl,
+        this.gatewayHost,
       );
       dbPath = this.dbPath;
     } else {
@@ -550,6 +554,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
         this.folder,
         this.env,
         this.apiUrl,
+        this.gatewayHost,
       );
       client = result.client;
       dbPath = result.dbPath;
@@ -1289,6 +1294,8 @@ export class WorkerClient extends Worker implements IWorkerClient {
       this.env,
       {}, // Use default worker options
       this.apiUrl,
+      undefined,
+      this.gatewayHost,
     );
 
     // Initialize the cloned worker to create its client instance

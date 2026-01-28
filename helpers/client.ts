@@ -135,6 +135,7 @@ export async function createClient(
   folder: string,
   env: XmtpEnv,
   apiUrl?: string,
+  gatewayHost?: string,
 ): Promise<{
   client: unknown;
   dbPath: string;
@@ -154,6 +155,7 @@ export async function createClient(
     dbPath,
     env,
     apiUrl,
+    gatewayHost,
   );
 
   return {
