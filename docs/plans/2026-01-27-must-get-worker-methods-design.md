@@ -5,6 +5,7 @@
 The codebase has 50+ non-null assertions (`!`) when accessing workers, clients, groups, and DMs. These hide bugs that only surface at runtime with cryptic errors like "Cannot read property 'client' of undefined".
 
 Examples:
+
 ```typescript
 const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
 await creator!.client.conversations.sync();
@@ -55,11 +56,13 @@ mustGetReceiver(): Worker {
 ### 3. Migrate Test Files
 
 Update all test files to:
+
 1. Type local variables as non-optional (`let creator: Worker` not `let creator: Worker | undefined`)
 2. Use `mustGet` in `beforeAll` blocks for validation
 3. Remove all `!` assertions
 
 **Before:**
+
 ```typescript
 let creator: Worker | undefined;
 
@@ -74,6 +77,7 @@ it("test", async () => {
 ```
 
 **After:**
+
 ```typescript
 let creator: Worker;
 
@@ -90,9 +94,11 @@ it("test", async () => {
 ## Files to Modify
 
 ### Core (1 file)
+
 - `workers/manager.ts`
 
 ### Test Files (10 files)
+
 1. `monitoring/bugs/stitch.test.ts`
 2. `monitoring/bugs/verifyallinstalls.test.ts`
 3. `monitoring/browser/browser.test.ts`

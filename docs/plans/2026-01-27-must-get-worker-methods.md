@@ -13,6 +13,7 @@
 ## Task 1: Update IWorkerManager Interface
 
 **Files:**
+
 - Modify: `workers/manager.ts:29-63`
 
 **Step 1: Update the interface with corrected types and new methods**
@@ -77,6 +78,7 @@ git commit -m "chore: update IWorkerManager interface with mustGet methods and c
 ## Task 2: Fix getCreator and getReceiver Return Types
 
 **Files:**
+
 - Modify: `workers/manager.ts:251-261`
 
 **Step 1: Update getCreator return type**
@@ -131,6 +133,7 @@ git commit -m "fix: correct return types for getCreator, getReceiver, getRandomW
 ## Task 3: Add mustGet, mustGetCreator, mustGetReceiver Methods
 
 **Files:**
+
 - Modify: `workers/manager.ts` (add after line 327, after the `get` method)
 
 **Step 1: Add the three new methods**
@@ -193,6 +196,7 @@ git commit -m "feat: add mustGet, mustGetCreator, mustGetReceiver methods"
 ## Task 4: Fix Internal Usage in WorkerManager
 
 **Files:**
+
 - Modify: `workers/manager.ts:266-278` (createGroupBetweenAll method)
 
 **Step 1: Update createGroupBetweenAll to use mustGetCreator**
@@ -253,6 +257,7 @@ git commit -m "fix: update internal WorkerManager methods to handle undefined"
 ## Task 5: Migrate monitoring/bugs/stitch.test.ts
 
 **Files:**
+
 - Modify: `monitoring/bugs/stitch.test.ts`
 
 **Step 1: Replace .get()! with .mustGet()**
@@ -283,6 +288,7 @@ git commit -m "refactor: use mustGet in stitch.test.ts"
 ## Task 6: Migrate monitoring/bugs/verifyallinstalls.test.ts
 
 **Files:**
+
 - Modify: `monitoring/bugs/verifyallinstalls.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -308,6 +314,7 @@ git commit -m "refactor: use mustGet in verifyallinstalls.test.ts"
 ## Task 7: Migrate monitoring/browser/browser.test.ts
 
 **Files:**
+
 - Modify: `monitoring/browser/browser.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -331,6 +338,7 @@ git commit -m "refactor: use mustGet in browser.test.ts"
 ## Task 8: Migrate monitoring/networkchaos/node-blackhole.test.ts
 
 **Files:**
+
 - Modify: `monitoring/networkchaos/node-blackhole.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -354,6 +362,7 @@ git commit -m "refactor: use mustGet in node-blackhole.test.ts"
 ## Task 9: Migrate monitoring/networkchaos/dm-duplicate-prevention.test.ts
 
 **Files:**
+
 - Modify: `monitoring/networkchaos/dm-duplicate-prevention.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -377,6 +386,7 @@ git commit -m "refactor: use mustGet in dm-duplicate-prevention.test.ts"
 ## Task 10: Migrate monitoring/networkchaos/group-client-partition.test.ts
 
 **Files:**
+
 - Modify: `monitoring/networkchaos/group-client-partition.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -400,6 +410,7 @@ git commit -m "refactor: use mustGet in group-client-partition.test.ts"
 ## Task 11: Migrate monitoring/networkchaos/group-partition-delayedreceive.test.ts
 
 **Files:**
+
 - Modify: `monitoring/networkchaos/group-partition-delayedreceive.test.ts`
 
 **Step 1: Read the file and identify patterns**
@@ -423,11 +434,13 @@ git commit -m "refactor: use mustGet in group-partition-delayedreceive.test.ts"
 ## Task 12: Migrate monitoring/networkchaos/group-reconciliation.test.ts
 
 **Files:**
+
 - Modify: `monitoring/networkchaos/group-reconciliation.test.ts`
 
 **Step 1: Replace all .get()! with .mustGet()**
 
 Lines to change:
+
 - Line 27-29: `workers.get("user1")!` -> `workers.mustGet("user1")`
 - Line 89-91: `workers.get("user4")!` -> `workers.mustGet("user4")`
 - Line 124-126: `workers.get("user4")!` -> `workers.mustGet("user4")`
@@ -451,6 +464,7 @@ git commit -m "refactor: use mustGet in group-reconciliation.test.ts"
 ## Task 13: Migrate monitoring/performance.test.ts
 
 **Files:**
+
 - Modify: `monitoring/performance.test.ts`
 
 This file has the most changes. Key patterns:
@@ -466,10 +480,10 @@ This file has the most changes. Key patterns:
 Replace lines 56-58:
 
 ```typescript
-  let workers: WorkerManager;
-  let creator: Worker;
-  let receiver: Worker;
-  let dm: Dm;
+let workers: WorkerManager;
+let creator: Worker;
+let receiver: Worker;
+let dm: Dm;
 ```
 
 **Step 2: Update beforeAll block**
@@ -477,13 +491,13 @@ Replace lines 56-58:
 Replace lines 60-68:
 
 ```typescript
-  beforeAll(async () => {
-    workers = await getWorkers(10);
-    creator = workers.mustGetCreator();
-    receiver = workers.mustGetReceiver();
+beforeAll(async () => {
+  workers = await getWorkers(10);
+  creator = workers.mustGetCreator();
+  receiver = workers.mustGetReceiver();
 
-    setCustomDuration(creator.initializationTime);
-  });
+  setCustomDuration(creator.initializationTime);
+});
 ```
 
 **Step 3: Remove the null check in first test**
@@ -491,14 +505,15 @@ Replace lines 60-68:
 Replace lines 71-77:
 
 ```typescript
-  it(`create: measure creating a client`, () => {
-    setCustomDuration(creator.initializationTime);
-  });
+it(`create: measure creating a client`, () => {
+  setCustomDuration(creator.initializationTime);
+});
 ```
 
 **Step 4: Remove all `!` assertions from creator, receiver, dm**
 
 Replace throughout:
+
 - `creator!` -> `creator`
 - `receiver!` -> `receiver`
 - `dm!` -> `dm`
@@ -528,6 +543,7 @@ git commit -m "refactor: use mustGet in performance.test.ts"
 ## Task 14: Migrate measurements/perf-matrix.test.ts
 
 **Files:**
+
 - Modify: `measurements/perf-matrix.test.ts`
 
 Similar patterns to performance.test.ts:
@@ -541,8 +557,8 @@ Similar patterns to performance.test.ts:
 Replace lines 63-64:
 
 ```typescript
-    let creator: Worker;
-    let receiver: Worker;
+let creator: Worker;
+let receiver: Worker;
 ```
 
 **Step 2: Update worker initialization**
@@ -550,13 +566,14 @@ Replace lines 63-64:
 Replace lines 73-74:
 
 ```typescript
-      creator = workers.mustGet(workerNames[0]);
-      receiver = workers.mustGet(workerNames[1]);
+creator = workers.mustGet(workerNames[0]);
+receiver = workers.mustGet(workerNames[1]);
 ```
 
 **Step 3: Remove all `!` assertions**
 
 Replace throughout:
+
 - `creator!` -> `creator`
 - `receiver!` -> `receiver`
 - `dm!` -> `dm`
@@ -596,6 +613,7 @@ If any issues found, fix and commit.
 ## Task 16: Update Design Document
 
 **Files:**
+
 - Modify: `docs/plans/2026-01-27-must-get-worker-methods-design.md`
 
 **Step 1: Add "Completed" status**
