@@ -19,10 +19,10 @@ describe(testName, () => {
   let cumulativeGroups: Group[] = [];
 
   let workers: WorkerManager;
-  let creator: Worker | undefined;
+  let creator: Worker;
   it(`create: measure creating a client`, async () => {
     workers = await getWorkers(5);
-    creator = workers.getCreator();
+    creator = workers.mustGetCreator();
   });
   for (const i of BATCH_SIZE) {
     it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
@@ -41,7 +41,7 @@ describe(testName, () => {
         })),
       ];
       newGroup =
-        (await creator!.client.conversations.createGroupWithIdentifiers(
+        (await creator.client.conversations.createGroupWithIdentifiers(
           membersToAdd,
         )) as Group;
       const members = await newGroup.members();
@@ -52,7 +52,7 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`addMember-${i}:add members to a group`, async () => {
-      await checkKeyPackageStatusesByInboxId(creator!.client, extraMember);
+      await checkKeyPackageStatusesByInboxId(creator.client, extraMember);
       await newGroup.addMembers([extraMember]);
     });
   }
