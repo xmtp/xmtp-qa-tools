@@ -27,9 +27,9 @@ describe(testName, () => {
     // Start message and response streams for gm bot
     gmBotWorker.startStream(typeofStream.MessageandResponse);
 
-    creator = convoStreamBot.get(0)!;
-    xmtpChat = convoStreamBot.get(1)!;
-    receiver = gmBotWorker.getCreator();
+    creator = convoStreamBot.mustGet(0);
+    xmtpChat = convoStreamBot.mustGet(1);
+    receiver = gmBotWorker.mustGetCreator();
     xmtpTester = new playwright({
       headless,
       defaultUser: {
