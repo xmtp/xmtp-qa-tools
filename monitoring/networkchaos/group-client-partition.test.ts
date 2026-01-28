@@ -46,7 +46,7 @@ describe(testName, async () => {
 
     for (const sender of senders) {
       const convo = await workers
-        .get(sender)!
+        .mustGet(sender)
         .client.conversations.getConversationById(group.id);
       for (let i = 1; i <= 3; i++) {
         const msg = `partition-msg-${sender}-${i}`;
@@ -62,7 +62,7 @@ describe(testName, async () => {
     );
     for (const recipient of ["user3", "user4"]) {
       const convo = await workers
-        .get(recipient)!
+        .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
@@ -82,10 +82,10 @@ describe(testName, async () => {
     await new Promise((r) => setTimeout(r, 3000));
 
     await workers
-      .get("user3")!
+      .mustGet("user3")
       .client.conversations.getConversationById(group.id);
     await workers
-      .get("user4")!
+      .mustGet("user4")
       .client.conversations.getConversationById(group.id);
 
     await workers.checkForks();
@@ -95,7 +95,7 @@ describe(testName, async () => {
     );
     for (const recipient of ["user3", "user4"]) {
       const convo = await workers
-        .get(recipient)!
+        .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
@@ -110,7 +110,7 @@ describe(testName, async () => {
     console.log("[verify] Ensuring senders retained all sent messages");
     for (const recipient of ["user1", "user2"]) {
       const convo = await workers
-        .get(recipient)!
+        .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
