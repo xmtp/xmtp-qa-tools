@@ -312,7 +312,7 @@ export const regressionClient = async (
       error instanceof Error &&
       error.message.includes("Unable to open the database file")
     ) {
-      console.debug(
+      console.warn(
         `Database file corrupted, trying alternative path: ${dbPath}`,
       );
 
