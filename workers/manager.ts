@@ -35,6 +35,7 @@ interface IWorkerManager {
   mustGet(baseName: string | number, installationId?: string): Worker;
   getRandomWorkers(count: number): Worker[];
   getRandomWorker(): Worker | undefined;
+  mustGetRandomWorker(): Worker;
   getCreator(): Worker | undefined;
   mustGetCreator(): Worker;
   getReceiver(): Worker | undefined;
@@ -153,6 +154,14 @@ export class WorkerManager implements IWorkerManager {
   public getRandomWorker(): Worker | undefined {
     const allWorkers = this.getAll();
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
+  }
+
+  public mustGetRandomWorker(): Worker {
+    const worker = this.getRandomWorker();
+    if (!worker) {
+      throw new Error("No workers available");
+    }
+    return worker;
   }
 
   public async checkForks(): Promise<void> {

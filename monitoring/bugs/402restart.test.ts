@@ -8,12 +8,12 @@ const testName = "clients";
 describe(testName, () => {
   it("check stream restart (prev 4.0.2 bug)", async () => {
     const agentWorkers = await getWorkers(1);
-    const agent = agentWorkers.getCreator();
+    const agent = agentWorkers.mustGetCreator();
     let messageCount = 0;
 
     // First test
     let talkerWorkers = await getWorkers(1);
-    let creator = talkerWorkers.getCreator();
+    let creator = talkerWorkers.mustGetCreator();
     let convo = await creator.client.conversations.createDm(agent.inboxId);
 
     let stream = await agent.client.conversations.streamAllMessages({
