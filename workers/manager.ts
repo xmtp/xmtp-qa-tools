@@ -150,7 +150,7 @@ export class WorkerManager implements IWorkerManager {
     return allWorkers.sort(() => 0.5 - Math.random()).slice(0, count);
   }
 
-  public getRandomWorker(): Worker {
+  public getRandomWorker(): Worker | undefined {
     const allWorkers = this.getAll();
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
   }
@@ -251,12 +251,12 @@ export class WorkerManager implements IWorkerManager {
       console.error(error);
     }
   }
-  getCreator(): Worker {
+  getCreator(): Worker | undefined {
     const workers = this.getAll();
     return workers[0];
   }
 
-  getReceiver(): Worker {
+  getReceiver(): Worker | undefined {
     const workers = this.getAll();
     const creator = this.getCreator();
     const otherWorkers = workers.filter((worker) => worker !== creator);
