@@ -330,6 +330,39 @@ export class WorkerManager implements IWorkerManager {
   }
 
   /**
+   * Gets a specific worker by name, throwing if not found
+   */
+  public mustGet(baseName: string | number, installationId?: string): Worker {
+    const worker = this.get(baseName, installationId);
+    if (!worker) {
+      throw new Error(`Worker "${baseName}" not found`);
+    }
+    return worker;
+  }
+
+  /**
+   * Gets the creator (first worker), throwing if no workers exist
+   */
+  public mustGetCreator(): Worker {
+    const worker = this.getCreator();
+    if (!worker) {
+      throw new Error("No workers available");
+    }
+    return worker;
+  }
+
+  /**
+   * Gets a receiver (random non-creator), throwing if insufficient workers
+   */
+  public mustGetReceiver(): Worker {
+    const worker = this.getReceiver();
+    if (!worker) {
+      throw new Error("No receiver available");
+    }
+    return worker;
+  }
+
+  /**
    * Adds a worker to the manager
    */
   public addWorker(
