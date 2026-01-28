@@ -72,3 +72,6 @@ dist
 # Claude Code (keep config, ignore session data)
 .claude/session-*
 .claude/.tmp/
+
+# git worktrees
+.worktrees/
