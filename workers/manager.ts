@@ -32,10 +32,13 @@ interface IWorkerManager {
 
   getAll(): Worker[];
   get(baseName: string | number, installationId?: string): Worker | undefined;
+  mustGet(baseName: string | number, installationId?: string): Worker;
   getRandomWorkers(count: number): Worker[];
-  getRandomWorker(): Worker;
-  getCreator(): Worker;
-  getReceiver(): Worker;
+  getRandomWorker(): Worker | undefined;
+  getCreator(): Worker | undefined;
+  mustGetCreator(): Worker;
+  getReceiver(): Worker | undefined;
+  mustGetReceiver(): Worker;
   getAllButCreator(): Worker[];
 
   // Worker Creation & Management
