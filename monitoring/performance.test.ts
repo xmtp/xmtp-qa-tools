@@ -58,11 +58,9 @@ describe(testName, () => {
   let dm: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(10);
+    workers = await getWorkers(10, { randomNames: false });
     creator = workers.mustGetCreator();
     receiver = workers.mustGetReceiver();
-
-    setCustomDuration(creator.initializationTime);
   });
 
   it(`create: measure creating a client`, () => {
