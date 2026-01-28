@@ -90,7 +90,7 @@ describe(testName, async () => {
         );
         void (async () => {
           try {
-            const newMember = workers.getRandomWorker().client.inboxId;
+            const newMember = workers.mustGetRandomWorker().client.inboxId;
             await group.removeMembers([newMember]);
             await group.addMembers([newMember]);
             const info = await group.debugInfo();
