@@ -108,8 +108,9 @@ describe(testName, () => {
     expect(dm2.id).toBeDefined();
   });
   it(`getConversationById:measure getting a conversation by id`, async () => {
-    const conversation =
-      await creator.client.conversations.getConversationById(dm.id);
+    const conversation = await creator.client.conversations.getConversationById(
+      dm.id,
+    );
     expect(conversation!.id).toBe(dm.id);
   });
   it(`send:measure sending a gm`, async () => {
@@ -151,10 +152,9 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ];
-      newGroup =
-        (await creator.client.conversations.createGroupWithIdentifiers(
-          membersToAdd,
-        )) as Group;
+      newGroup = (await creator.client.conversations.createGroupWithIdentifiers(
+        membersToAdd,
+      )) as Group;
       const members = await newGroup.members();
       expect(members.length).toBe(i);
       expect(newGroup.id).toBeDefined();
