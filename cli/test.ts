@@ -281,6 +281,7 @@ function parseTestArgs(args: string[]): {
         break;
       case "--no-datadog":
         options.sendToDatadog = false;
+        process.env.DISABLE_DATADOG = "true";
         break;
       case "--no-fail":
         options.noFail = true;
