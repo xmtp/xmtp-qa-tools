@@ -1,5 +1,7 @@
 # Add `mustGet` Methods to WorkerManager
 
+**Status:** Completed
+
 ## Problem
 
 The codebase has 50+ non-null assertions (`!`) when accessing workers, clients, groups, and DMs. These hide bugs that only surface at runtime with cryptic errors like "Cannot read property 'client' of undefined".
