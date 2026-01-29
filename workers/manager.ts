@@ -279,7 +279,7 @@ export class WorkerManager implements IWorkerManager {
     const memberList = this.getAllButCreator().map(
       (worker) => worker.client.inboxId,
     );
-    const group = await creator.client.conversations.createGroup(memberList, {
+    const group = await creator.worker.createGroup(memberList, {
       groupName,
     });
     if (extraMembers.length > 0) {
