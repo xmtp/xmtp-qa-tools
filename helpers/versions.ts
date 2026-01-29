@@ -80,7 +80,6 @@ export {
   ConsentEntityType,
 } from "@xmtp/node-sdk-5.1.1";
 
-
 // Union types for any supported SDK version (used by compat layer)
 export type AnyClient =
   | InstanceType<typeof Client43>

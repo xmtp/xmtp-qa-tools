@@ -13,6 +13,7 @@
 ### Task 1: Add Union Types to helpers/versions.ts
 
 **Files:**
+
 - Modify: `helpers/versions.ts:11-42` (after existing imports)
 
 **Step 1: Add the union type exports after the SDK imports**
@@ -24,17 +25,22 @@ Add after line 81 (after the `export { ... } from "@xmtp/node-sdk-5.1.1";` block
 export type AnyClient = typeof Client43 extends new (...args: any[]) => infer R
   ? R
   : never | typeof Client45 extends new (...args: any[]) => infer R
-  ? R
-  : never | typeof Client46 extends new (...args: any[]) => infer R
-  ? R
-  : never | typeof Client50 extends new (...args: any[]) => infer R
-  ? R
-  : never | typeof Client511 extends new (...args: any[]) => infer R
-  ? R
-  : never;
+    ? R
+    : never | typeof Client46 extends new (...args: any[]) => infer R
+      ? R
+      : never | typeof Client50 extends new (...args: any[]) => infer R
+        ? R
+        : never | typeof Client511 extends new (...args: any[]) => infer R
+          ? R
+          : never;
 
 export type AnyGroup = Group43 | Group45 | Group46 | Group50 | Group511;
-export type AnyConversation = Conversation43 | Conversation45 | Conversation46 | Conversation50 | Conversation511;
+export type AnyConversation =
+  | Conversation43
+  | Conversation45
+  | Conversation46
+  | Conversation50
+  | Conversation511;
 export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50 | Dm511;
 ```
 
@@ -55,6 +61,7 @@ git commit -m "feat: add union types for SDK compatibility layer"
 ### Task 2: Add createGroupCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add imports and createGroupCompat function**
@@ -62,9 +69,9 @@ git commit -m "feat: add union types for SDK compatibility layer"
 Add at the top of the file (after line 10):
 
 ```typescript
+import type { AnyClient, AnyGroup } from "@helpers/versions";
 import type { Client as Client43 } from "@xmtp/node-sdk-4.3.0";
 import type { Client as Client511 } from "@xmtp/node-sdk-5.1.1";
-import type { AnyClient, AnyGroup } from "@helpers/versions";
 ```
 
 Add after the existing `ensureDecodedMessage` function:
@@ -102,6 +109,7 @@ git commit -m "feat: add createGroupCompat helper"
 ### Task 3: Add createDmCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add createDmCompat function**
@@ -128,7 +136,7 @@ export async function createDmCompat(
 Add `AnyConversation` to the import from `@helpers/versions`:
 
 ```typescript
-import type { AnyClient, AnyGroup, AnyConversation } from "@helpers/versions";
+import type { AnyClient, AnyConversation, AnyGroup } from "@helpers/versions";
 ```
 
 **Step 3: Verify build passes**
@@ -148,6 +156,7 @@ git commit -m "feat: add createDmCompat helper"
 ### Task 4: Add fetchInboxStateCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add fetchInboxStateCompat function**
@@ -183,6 +192,7 @@ git commit -m "feat: add fetchInboxStateCompat helper"
 ### Task 5: Add fetchInboxStatesCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add fetchInboxStatesCompat function**
@@ -193,11 +203,17 @@ Add after `fetchInboxStateCompat`:
 /**
  * Fetch inbox states for multiple inboxIds - uses fetchInboxStates() or falls back to inboxStateFromInboxIds()
  */
-export async function fetchInboxStatesCompat(client: AnyClient, inboxIds: string[]) {
+export async function fetchInboxStatesCompat(
+  client: AnyClient,
+  inboxIds: string[],
+) {
   if ("fetchInboxStates" in client.preferences) {
     return (client as Client511).preferences.fetchInboxStates(inboxIds);
   }
-  return (client as Client43).preferences.inboxStateFromInboxIds(inboxIds, true);
+  return (client as Client43).preferences.inboxStateFromInboxIds(
+    inboxIds,
+    true,
+  );
 }
 ```
 
@@ -218,6 +234,7 @@ git commit -m "feat: add fetchInboxStatesCompat helper"
 ### Task 6: Add fetchKeyPackageStatusesCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add fetchKeyPackageStatusesCompat function**
@@ -235,7 +252,9 @@ export async function fetchKeyPackageStatusesCompat(
   if ("fetchKeyPackageStatuses" in client) {
     return (client as Client511).fetchKeyPackageStatuses(installationIds);
   }
-  return (client as Client43).getKeyPackageStatusesForInstallationIds(installationIds);
+  return (client as Client43).getKeyPackageStatusesForInstallationIds(
+    installationIds,
+  );
 }
 ```
 
@@ -256,6 +275,7 @@ git commit -m "feat: add fetchKeyPackageStatusesCompat helper"
 ### Task 7: Add getConsentStateCompat to sdk-compat.ts
 
 **Files:**
+
 - Modify: `helpers/sdk-compat.ts`
 
 **Step 1: Add imports for ConsentState and Conversation types**
@@ -263,9 +283,20 @@ git commit -m "feat: add fetchKeyPackageStatusesCompat helper"
 Update imports:
 
 ```typescript
-import type { Client as Client43, Conversation as Conversation43 } from "@xmtp/node-sdk-4.3.0";
-import type { Client as Client511, Conversation as Conversation511 } from "@xmtp/node-sdk-5.1.1";
-import type { AnyClient, AnyGroup, AnyConversation, ConsentState } from "@helpers/versions";
+import type {
+  AnyClient,
+  AnyConversation,
+  AnyGroup,
+  ConsentState,
+} from "@helpers/versions";
+import type {
+  Client as Client43,
+  Conversation as Conversation43,
+} from "@xmtp/node-sdk-4.3.0";
+import type {
+  Client as Client511,
+  Conversation as Conversation511,
+} from "@xmtp/node-sdk-5.1.1";
 ```
 
 **Step 2: Add getConsentStateCompat function**
@@ -276,7 +307,9 @@ Add after `fetchKeyPackageStatusesCompat`:
 /**
  * Get consent state - handles method vs property difference between SDK versions
  */
-export function getConsentStateCompat(conversation: AnyConversation | AnyGroup): ConsentState {
+export function getConsentStateCompat(
+  conversation: AnyConversation | AnyGroup,
+): ConsentState {
   if (typeof (conversation as Conversation511).consentState === "function") {
     return (conversation as Conversation511).consentState();
   }
@@ -301,6 +334,7 @@ git commit -m "feat: add getConsentStateCompat helper"
 ### Task 8: Update IWorkerClient interface in workers/main.ts
 
 **Files:**
+
 - Modify: `workers/main.ts:51-122`
 
 **Step 1: Add imports at top of file**
@@ -313,8 +347,8 @@ import {
   ConversationType,
   regressionClient,
   type AnyClient,
-  type AnyGroup,
   type AnyConversation,
+  type AnyGroup,
   type Client,
   type DecodedMessage,
   type Message,
@@ -326,12 +360,12 @@ Add import for compat helpers:
 
 ```typescript
 import {
-  sendTextCompat,
-  createGroupCompat,
   createDmCompat,
+  createGroupCompat,
   fetchInboxStateCompat,
   fetchInboxStatesCompat,
   fetchKeyPackageStatusesCompat,
+  sendTextCompat,
 } from "@helpers/sdk-compat";
 ```
 
@@ -365,6 +399,7 @@ git commit -m "feat: update IWorkerClient interface with compat methods"
 ### Task 9: Add wrapper methods to WorkerClient class
 
 **Files:**
+
 - Modify: `workers/main.ts` (add methods to WorkerClient class, before the `terminate()` method around line 291)
 
 **Step 1: Add the wrapper methods to WorkerClient**
@@ -428,6 +463,7 @@ git commit -m "feat: add version-compatible wrapper methods to WorkerClient"
 ### Task 10: Update WorkerManager.createGroupBetweenAll
 
 **Files:**
+
 - Modify: `workers/manager.ts:274-290`
 
 **Step 1: Update createGroupBetweenAll to use compat method**

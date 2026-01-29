@@ -37,20 +37,20 @@ yarn agent-versions            # Show agent versions
 Tests use a `WorkerManager` pattern where each worker has an isolated XMTP client with separate database:
 
 ```typescript
-import { getWorkers } from "@workers/manager";
-import { setupDurationTracking } from "@helpers/vitest";
 import { verifyMessageStream } from "@helpers/streams";
+import { setupDurationTracking } from "@helpers/vitest";
+import { getWorkers } from "@workers/manager";
 
-const workers = await getWorkers(["alice", "bob"]);  // Named workers
-const workers = await getWorkers(5);                  // Random workers
+const workers = await getWorkers(["alice", "bob"]); // Named workers
+const workers = await getWorkers(5); // Random workers
 const workers = await getWorkers(5, { randomNames: false }); // Fixed names
 
 // Access patterns
-workers.get("alice");           // Specific worker
-workers.getCreator();           // First worker
-workers.getReceiver();          // Random non-creator
-workers.getAllButCreator();     // All except first
-workers.createGroupBetweenAll("Group Name");  // Create group with all workers
+workers.get("alice"); // Specific worker
+workers.getCreator(); // First worker
+workers.getReceiver(); // Random non-creator
+workers.getAllButCreator(); // All except first
+workers.createGroupBetweenAll("Group Name"); // Create group with all workers
 ```
 
 ### Multi-version SDK Support
@@ -80,7 +80,7 @@ const result = await verifyMessageStream(
   conversation,
   [receivers],
   messageCount,
-  "template-{i}-{randomSuffix}"
+  "template-{i}-{randomSuffix}",
 );
 
 expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
@@ -136,6 +136,7 @@ describe(testName, async () => {
 - `LOG_LEVEL`: JS log level
 
 Endpoints:
+
 - local: `http://localhost:5556`
 - dev: `https://grpc.dev.xmtp.network:443`
 - production: `https://grpc.production.xmtp.network:443`

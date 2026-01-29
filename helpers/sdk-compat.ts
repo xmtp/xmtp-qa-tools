@@ -10,6 +10,12 @@
  */
 
 import type {
+  AnyClient,
+  AnyConversation,
+  AnyGroup,
+  ConsentState,
+} from "@helpers/versions";
+import type {
   Client as Client43,
   Conversation as Conversation43,
 } from "@xmtp/node-sdk-4.3.0";
@@ -17,12 +23,6 @@ import type {
   Client as Client511,
   Conversation as Conversation511,
 } from "@xmtp/node-sdk-5.1.1";
-import type {
-  AnyClient,
-  AnyGroup,
-  AnyConversation,
-  ConsentState,
-} from "@helpers/versions";
 
 /**
  * Send a text message to a conversation, compatible with both SDK 4.x and 5.0+
@@ -155,10 +155,9 @@ export async function fetchKeyPackageStatusesCompat(
 export function getConsentStateCompat(
   conversation: AnyConversation | AnyGroup,
 ): ConsentState {
-  if (
-    typeof (conversation as Conversation511).consentState === "function"
-  ) {
+  if (typeof (conversation as Conversation511).consentState === "function") {
     return (conversation as Conversation511).consentState();
   }
-  return (conversation as Conversation43).consentState as unknown as ConsentState;
+  return (conversation as Conversation43)
+    .consentState as unknown as ConsentState;
 }
