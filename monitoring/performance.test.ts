@@ -21,7 +21,7 @@ import {
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes, type InboxData } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "performance";
 describe(testName, () => {
@@ -53,47 +53,51 @@ describe(testName, () => {
   });
 
   let workers: WorkerManager;
-  let creator: Worker | undefined;
-  let receiver: Worker | undefined;
-  let dm: Dm | undefined;
-  it(`create: measure creating a client`, async () => {
-    workers = await getWorkers(10);
-    creator = workers.getCreator();
-    receiver = workers.getReceiver();
+  let creator: Worker;
+  let receiver: Worker;
+  let dm: Dm;
+
+  beforeAll(async () => {
+    workers = await getWorkers(10, { randomNames: false });
+    creator = workers.mustGetCreator();
+    receiver = workers.mustGetReceiver();
+  });
+
+  it(`create: measure creating a client`, () => {
     setCustomDuration(creator.initializationTime);
   });
   it(`sync:measure sync`, async () => {
-    await creator!.client.conversations.sync();
+    await creator.client.conversations.sync();
   });
   it(`syncAll:measure syncAll`, async () => {
-    await creator!.client.conversations.syncAll();
+    await creator.client.conversations.syncAll();
   });
 
   it(`inboxState:measure inboxState`, async () => {
-    await creator!.client.preferences.inboxState();
+    await creator.client.preferences.inboxState();
   });
   it(`canMessage:measure canMessage`, async () => {
     const canMessage = await Client.canMessage(
       [
         {
-          identifier: receiver!.address,
+          identifier: receiver.address,
           identifierKind: IdentifierKind.Ethereum,
         },
       ],
-      receiver!.env,
+      receiver.env,
     );
-    expect(canMessage.get(receiver!.address.toLowerCase())).toBe(true);
+    expect(canMessage.get(receiver.address.toLowerCase())).toBe(true);
   });
 
   it(`newDm:measure creating a DM`, async () => {
-    dm = (await creator!.client.conversations.newDm(
-      receiver!.client.inboxId,
+    dm = (await creator.client.conversations.createDm(
+      receiver.client.inboxId,
     )) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
   });
   it(`newDmByAddress:measure creating a DM`, async () => {
-    const dm2 = await receiver!.client.conversations.newDmWithIdentifier({
+    const dm2 = await receiver.client.conversations.createDmWithIdentifier({
       identifier: getInboxes(1)[0].accountAddress,
       identifierKind: IdentifierKind.Ethereum,
     });
@@ -102,22 +106,23 @@ describe(testName, () => {
     expect(dm2.id).toBeDefined();
   });
   it(`getConversationById:measure getting a conversation by id`, async () => {
-    const conversation =
-      await creator!.client.conversations.getConversationById(dm!.id);
-    expect(conversation!.id).toBe(dm!.id);
+    const conversation = await creator.client.conversations.getConversationById(
+      dm.id,
+    );
+    expect(conversation!.id).toBe(dm.id);
   });
   it(`send:measure sending a gm`, async () => {
-    const dmId = await sendTextCompat(dm!, "gm");
+    const dmId = await sendTextCompat(dm, "gm");
     expect(dmId).toBeDefined();
   });
   it(`streamMessage:measure receiving a gm`, async () => {
-    const verifyResult = await verifyMessageStream(dm!, [receiver!]);
+    const verifyResult = await verifyMessageStream(dm, [receiver]);
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
   });
 
   it(`setConsentStates:group consent`, async () => {
-    await creator!.client.preferences.setConsentStates([
+    await creator.client.preferences.setConsentStates([
       {
         entity: getInboxes(1)[0].accountAddress,
         entityType: ConsentEntityType.InboxId,
@@ -145,7 +150,7 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ];
-      newGroup = (await creator!.client.conversations.newGroupWithIdentifiers(
+      newGroup = (await creator.client.conversations.createGroupWithIdentifiers(
         membersToAdd,
       )) as Group;
       const members = await newGroup.members();
@@ -207,12 +212,12 @@ describe(testName, () => {
           test: testName,
           metric_type: "stream",
           metric_subtype: "message",
-          sdk: workers.getCreator().sdk,
+          sdk: workers.mustGetCreator().sdk,
         } as ResponseMetricTags,
       );
 
       sendMetric("delivery", verifyResult.receptionPercentage, {
-        sdk: workers.getCreator().sdk,
+        sdk: workers.mustGetCreator().sdk,
         test: testName,
         metric_type: "delivery",
         metric_subtype: "stream",
@@ -233,7 +238,7 @@ describe(testName, () => {
     it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
+      const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
       const start = performance.now();
       await clientSingleSync.conversations.sync();
@@ -243,7 +248,7 @@ describe(testName, () => {
     it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
+      const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
       await newGroup.addMembers([clientSingleSync.inboxId]);
       const start = performance.now();
       await clientSingleSync.conversations.syncAll();
@@ -254,7 +259,7 @@ describe(testName, () => {
     it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
+      const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
       for (const group of cumulativeGroups) {
         await group.addMembers([clientSingleSync.inboxId]);
       }
@@ -266,7 +271,7 @@ describe(testName, () => {
     it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
-      const clientSingleSync = singleSyncWorkers.get(randomName)!.client;
+      const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
       for (const group of cumulativeGroups) {
         await group.addMembers([clientSingleSync.inboxId]);
       }

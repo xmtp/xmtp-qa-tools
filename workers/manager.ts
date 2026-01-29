@@ -32,10 +32,14 @@ interface IWorkerManager {
 
   getAll(): Worker[];
   get(baseName: string | number, installationId?: string): Worker | undefined;
+  mustGet(baseName: string | number, installationId?: string): Worker;
   getRandomWorkers(count: number): Worker[];
-  getRandomWorker(): Worker;
-  getCreator(): Worker;
-  getReceiver(): Worker;
+  getRandomWorker(): Worker | undefined;
+  mustGetRandomWorker(): Worker;
+  getCreator(): Worker | undefined;
+  mustGetCreator(): Worker;
+  getReceiver(): Worker | undefined;
+  mustGetReceiver(): Worker;
   getAllButCreator(): Worker[];
 
   // Worker Creation & Management
@@ -147,9 +151,17 @@ export class WorkerManager implements IWorkerManager {
     return allWorkers.sort(() => 0.5 - Math.random()).slice(0, count);
   }
 
-  public getRandomWorker(): Worker {
+  public getRandomWorker(): Worker | undefined {
     const allWorkers = this.getAll();
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
+  }
+
+  public mustGetRandomWorker(): Worker {
+    const worker = this.getRandomWorker();
+    if (!worker) {
+      throw new Error("No workers available");
+    }
+    return worker;
   }
 
   public async checkForks(): Promise<void> {
@@ -248,12 +260,12 @@ export class WorkerManager implements IWorkerManager {
       console.error(error);
     }
   }
-  getCreator(): Worker {
+  getCreator(): Worker | undefined {
     const workers = this.getAll();
     return workers[0];
   }
 
-  getReceiver(): Worker {
+  getReceiver(): Worker | undefined {
     const workers = this.getAll();
     const creator = this.getCreator();
     const otherWorkers = workers.filter((worker) => worker !== creator);
@@ -263,11 +275,11 @@ export class WorkerManager implements IWorkerManager {
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
     extraMembers: string[] = [],
   ): Promise<Group> {
-    const creator = this.getCreator();
+    const creator = this.mustGetCreator();
     const memberList = this.getAllButCreator().map(
       (worker) => worker.client.inboxId,
     );
-    const group = await creator.client.conversations.newGroup(memberList, {
+    const group = await creator.worker.createGroup(memberList, {
       groupName,
     });
     if (extraMembers.length > 0) {
@@ -280,6 +292,9 @@ export class WorkerManager implements IWorkerManager {
   getAllButCreator(): Worker[] {
     const workers = this.getAll();
     const creator = this.getCreator();
+    if (!creator) {
+      return workers;
+    }
     return workers.filter((worker) => worker.name !== creator.name);
   }
 
@@ -324,6 +339,39 @@ export class WorkerManager implements IWorkerManager {
       }
       return this.workers[baseName]?.[installationId];
     }
+  }
+
+  /**
+   * Gets a specific worker by name, throwing if not found
+   */
+  public mustGet(baseName: string | number, installationId?: string): Worker {
+    const worker = this.get(baseName, installationId);
+    if (!worker) {
+      throw new Error(`Worker "${baseName}" not found`);
+    }
+    return worker;
+  }
+
+  /**
+   * Gets the creator (first worker), throwing if no workers exist
+   */
+  public mustGetCreator(): Worker {
+    const worker = this.getCreator();
+    if (!worker) {
+      throw new Error("No workers available");
+    }
+    return worker;
+  }
+
+  /**
+   * Gets a receiver (random non-creator), throwing if insufficient workers
+   */
+  public mustGetReceiver(): Worker {
+    const worker = this.getReceiver();
+    if (!worker) {
+      throw new Error("No receiver available");
+    }
+    return worker;
   }
 
   /**

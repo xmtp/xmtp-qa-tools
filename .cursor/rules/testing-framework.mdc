@@ -115,21 +115,23 @@ const workers = await getWorkers(["alice"], { env: "local" });
 
 ## Conversation Operations
 
+Use version-compatible worker methods for DM/group creation:
+
 ```typescript
-// Create DM by inbox ID
-const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+// Create DM (version-compatible)
+const dm = await alice.worker.createDm(bob.client.inboxId);
 
-// Create DM by Ethereum address
-const dm2 = await alice.client.conversations.newDmWithIdentifier({
-  identifier: bob.address,
-  identifierKind: IdentifierKind.Ethereum,
-});
-
-// Create group with inbox IDs
-const group = await alice.client.conversations.newGroup([
+// Create group with inbox IDs (version-compatible)
+const group = await alice.worker.createGroup([
   bob.client.inboxId,
   workers.get("charlie").client.inboxId,
 ]);
+
+// Create group with name
+const namedGroup = await alice.worker.createGroup(
+  [bob.client.inboxId],
+  { groupName: "My Group" },
+);
 
 // Create group between all workers
 const testGroup = await workers.createGroupBetweenAll("My Group");
@@ -157,7 +159,7 @@ await group.addSuperAdmin(memberInboxId);
 // Get group info
 const members = await group.members();
 const name = group.name;
-const admins = group.admins;
+const admins = group.listAdmins();
 ```
 
 ## Streams and Stream Verification
@@ -373,7 +375,7 @@ it("deliver messages in real-time", async () => {
   // Start message streams
   workers.getReceiver().worker.startStream(typeofStream.Message);
 
-  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+  const dm = await alice.worker.createDm(bob.client.inboxId);
 
   const verifyResult = await verifyMessageStream(
     dm,
@@ -443,7 +445,7 @@ import { getWorkerNames, getWorkers } from "@workers/manager";
 const workers = await getWorkers(["alice", "bob"]);
 const alice = workers.get("alice");
 const bob = workers.get("bob");
-const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+const dm = await alice.worker.createDm(bob.client.inboxId);
 ```
 
 ### Group Test Setup
@@ -468,9 +470,7 @@ expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
 // Large group with external members
 const workers = await getWorkers(1);
 const memberInboxIds = getInboxIds(100);
-const group = await workers
-  .getCreator()
-  .client.conversations.newGroup(memberInboxIds);
+const group = await workers.getCreator().worker.createGroup(memberInboxIds);
 ```
 
 ### Version-Specific Testing

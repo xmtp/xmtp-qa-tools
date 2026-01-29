@@ -24,9 +24,9 @@ describe(testName, async () => {
 
     try {
       conversation = (await workers
-        .get("henry")!
-        .client.conversations.newDm(
-          workers.get("randomguy")!.client.inboxId,
+        .mustGet("henry")
+        .client.conversations.createDm(
+          workers.mustGet("randomguy").client.inboxId,
         )) as Dm;
 
       const messageContent = "dedupe-chaos-" + String(Date.now());
@@ -83,11 +83,13 @@ describe(testName, async () => {
       );
 
       const convoFromReceiver = await workers
-        .get("randomguy")!
-        .client.conversations.newDm(workers.get("henry")!.client.inboxId);
+        .mustGet("randomguy")
+        .client.conversations.createDm(workers.mustGet("henry").client.inboxId);
 
       const received = await convoFromReceiver.messages();
-      const matching = received.filter((m) => m.content === messageContent);
+      const matching = received.filter(
+        (m: { content: unknown }) => m.content === messageContent,
+      );
 
       for (const m of matching) {
         const ts = new Date(Number(m.sentAtNs) / 1e6).toISOString();

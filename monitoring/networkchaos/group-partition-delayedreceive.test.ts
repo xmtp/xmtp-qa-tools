@@ -51,7 +51,7 @@ describe(testName, async () => {
     console.log("[test] Sending message during partition: " + midPartitionMsg);
 
     const user2Group = await workers
-      .get("user2")!
+      .mustGet("user2")
       .client.conversations.getConversationById(group.id);
     await sendTextCompat(user2Group!, midPartitionMsg);
     await workers.checkForks();
@@ -59,7 +59,7 @@ describe(testName, async () => {
     console.log("=== Message Dump After Partition ===");
     for (const name of ["user1", "user2", "user3", "user4"]) {
       const g = await workers
-        .get(name)!
+        .mustGet(name)
         .client.conversations.getConversationById(group.id);
       const msgs = await g!.messages();
       console.log("Messages seen by " + name + ":");
@@ -75,10 +75,10 @@ describe(testName, async () => {
     console.log("=== Done ===");
 
     const user3Group = await workers
-      .get("user3")!
+      .mustGet("user3")
       .client.conversations.getConversationById(group.id);
     const user4Group = await workers
-      .get("user4")!
+      .mustGet("user4")
       .client.conversations.getConversationById(group.id);
 
     const user2Msgs = await user2Group!.messages();
@@ -115,7 +115,7 @@ describe(testName, async () => {
     const postRecoveryMsgs = await Promise.all(
       ["user3", "user4"].map(async (name) => {
         const g = await workers
-          .get(name)!
+          .mustGet(name)
           .client.conversations.getConversationById(group.id);
         const msgs = await g!.messages();
         return msgs.some((m) => m.content === midPartitionMsg);
