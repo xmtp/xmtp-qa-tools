@@ -80,6 +80,24 @@ export {
   ConsentEntityType,
 } from "@xmtp/node-sdk-5.1.1";
 
+
+// Union types for any supported SDK version (used by compat layer)
+export type AnyClient =
+  | InstanceType<typeof Client43>
+  | InstanceType<typeof Client45>
+  | InstanceType<typeof Client46>
+  | InstanceType<typeof Client50>
+  | InstanceType<typeof Client511>;
+
+export type AnyGroup = Group43 | Group45 | Group46 | Group50 | Group511;
+export type AnyConversation =
+  | Conversation43
+  | Conversation45
+  | Conversation46
+  | Conversation50
+  | Conversation511;
+export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50 | Dm511;
+
 /**
  * Version references use simplified versions without patches/pre-release suffixes.
  * The actual package version (e.g., "1.7.0-rc2") is stored in package.json, but we refer to it as "1.7.0" here.
