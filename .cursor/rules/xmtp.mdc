@@ -426,17 +426,17 @@ XMTP provides two main conversation types:
 ### Direct Messages (DMs)
 
 ```typescript
-// Create a new DM via Inboxid
-const dm = await client.conversations.newDm("inboxId123");
+// Create a new DM via inbox ID
+const dm = await client.conversations.createDm("inboxId123");
 
 // Or create using an Ethereum address
-const dmByAddress = await agent.createDmWithIdentifier({
+const dmByAddress = await client.conversations.createDmWithIdentifier({
   identifier: "0x7c40611372d354799d138542e77243c284e460b2",
   identifierKind: IdentifierKind.Ethereum,
 });
 
 // Send a message
-await dm.send("Hello!");
+await dm.sendText("Hello!");
 
 // Access peer's inbox ID
 const peerInboxId = dm.peerInboxId;
@@ -445,11 +445,20 @@ const peerInboxId = dm.peerInboxId;
 ### Groups
 
 ```typescript
-// Create a new group
-const group = await agent.createGroupWithAddresses(addresses, {
+// Create a new group with inbox IDs
+const group = await client.conversations.createGroup(["inboxId1", "inboxId2"], {
   groupName: "My Group",
   groupDescription: "Group description",
 });
+
+// Or create with Ethereum addresses
+const group2 = await client.conversations.createGroupWithIdentifiers(
+  [
+    { identifier: "0x123...", identifierKind: IdentifierKind.Ethereum },
+    { identifier: "0x456...", identifierKind: IdentifierKind.Ethereum },
+  ],
+  { groupName: "My Group" }
+);
 
 // Update group metadata
 await group.updateName("New Group Name");
@@ -462,13 +471,17 @@ await group.removeMembers(["memberToRemoveInboxId"]);
 // Manage permissions
 await group.addAdmin("memberInboxId");
 await group.addSuperAdmin("memberInboxId");
+
+// Get admin lists
+const admins = group.listAdmins();
+const superAdmins = group.listSuperAdmins();
 ```
 
 Example usage:
 
 ```typescript
 // Create a group with some initial settings
-const group = await agent.createGroupWithAddresses(addresses, {
+const group = await client.conversations.createGroup(inboxIds, {
   groupName: "Project Discussion",
   groupDescription: "A group for our project collaboration",
   groupImageUrlSquare: "https://example.com/image.jpg",
@@ -490,17 +503,13 @@ await client.conversations.sync();
 const messages = await conversation.messages();
 ```
 
-## Key Type References
+## Key Type References (SDK 5.1.1)
 
 ```tsx
 // Client Class
 declare class Client {
-  constructor(client: Client$1, signer: Signer, codecs: ContentCodec[]);
-  static create(
-    signer: Signer,
-    encryptionKey: Uint8Array,
-    options?: ClientOptions,
-  ): Promise<Client>;
+  static create(signer: Signer, options?: ClientOptions): Promise<Client>;
+  static build(identifier: Identifier, options?: ClientOptions): Promise<Client>;
   get inboxId(): string;
   get installationId(): string;
   get conversations(): Conversations;
@@ -509,92 +518,84 @@ declare class Client {
 
 // Conversations Class
 declare class Conversations {
-  constructor(client: Client, conversations: Conversations$1);
   getConversationById(id: string): Promise<Dm | Group | undefined>;
-  newGroupWithIdentifiers(
+  getDmByInboxId(inboxId: string): Dm | undefined;
+  fetchDmByIdentifier(identifier: Identifier): Promise<Dm | undefined>;
+  createGroupWithIdentifiers(
     identifiers: Identifier[],
     options?: CreateGroupOptions,
   ): Promise<Group>;
-  newGroup(inboxIds: string[], options?: CreateGroupOptions): Promise<Group>;
-  newDmWithIdentifier(
+  createGroup(inboxIds: string[], options?: CreateGroupOptions): Promise<Group>;
+  createDmWithIdentifier(
     identifier: Identifier,
     options?: CreateDmOptions,
   ): Promise<Dm>;
-  newDm(inboxId: string, options?: CreateDmOptions): Promise<Dm>;
+  createDm(inboxId: string, options?: CreateDmOptions): Promise<Dm>;
+  list(options?: ListConversationsOptions): Promise<(Group | Dm)[]>;
+  listGroups(options?: ListConversationsOptions): Group[];
+  listDms(options?: ListConversationsOptions): Dm[];
   sync(): Promise<void>;
-  streamAllMessages(
-    callback?: StreamCallback<DecodedMessage>,
-  ): Promise<AsyncStream<DecodedMessage<any>>>;
+  syncAll(consentStates?: ConsentState[]): Promise<GroupSyncSummary>;
+  stream(options?: StreamOptions): Promise<AsyncStreamProxy<Group | Dm>>;
+  streamAllMessages(options?: StreamOptions): Promise<AsyncStreamProxy<DecodedMessage>>;
 }
 
 // Conversation Base Class
 declare class Conversation {
-  client: Client;
-  constructor(
-    client: Client,
-    conversation: Conversation$1,
-    lastMessage?: Message | null,
-  );
   get id(): string;
-  send<T>(content: T, options?: SendOptions): Promise<string>;
-  messages<T>(options?: PaginationOptions): Promise<Array<DecodedMessage<T>>>;
+  get isActive(): boolean;
+  get createdAt(): Date;
+  send(encodedContent: EncodedContent, sendOptions?: SendMessageOpts): Promise<string>;
+  sendText(text: string, isOptimistic?: boolean): Promise<string>;
+  sendReaction(reaction: Reaction, isOptimistic?: boolean): Promise<string>;
+  sendReply(reply: Reply, isOptimistic?: boolean): Promise<string>;
+  messages(options?: ListMessagesOptions): Promise<DecodedMessage[]>;
   members(): Promise<GroupMember[]>;
+  sync(): Promise<void>;
+  stream(options?: StreamOptions): Promise<AsyncStreamProxy<DecodedMessage>>;
+  consentState(): ConsentState;
+  updateConsentState(consentState: ConsentState): void;
 }
 
 // Dm Class
 declare class Dm extends Conversation {
-  constructor(
-    client: Client,
-    conversation: Conversation$1,
-    lastMessage?: Message | null,
-  );
   get peerInboxId(): string;
 }
 
 // Group Class
 declare class Group extends Conversation {
-  constructor(
-    client: Client,
-    conversation: Conversation$1,
-    lastMessage?: Message | null,
-  );
   get name(): string;
   updateName(name: string): Promise<void>;
   get imageUrl(): string;
   updateImageUrl(imageUrl: string): Promise<void>;
   get description(): string;
   updateDescription(description: string): Promise<void>;
-  get admins(): string[];
-  get superAdmins(): string[];
+  listAdmins(): string[];
+  listSuperAdmins(): string[];
   isAdmin(inboxId: string): boolean;
   isSuperAdmin(inboxId: string): boolean;
   addMembersByIdentifiers(identifiers: Identifier[]): Promise<void>;
   addMembers(inboxIds: string[]): Promise<void>;
+  removeMembersByIdentifiers(identifiers: Identifier[]): Promise<void>;
   removeMembers(inboxIds: string[]): Promise<void>;
   addAdmin(inboxId: string): Promise<void>;
   removeAdmin(inboxId: string): Promise<void>;
   addSuperAdmin(inboxId: string): Promise<void>;
   removeSuperAdmin(inboxId: string): Promise<void>;
-}
-
-// GroupMember Class
-declare class GroupMember {
-  inboxId: string;
-  accountIdentifiers: Array<Identifier>;
-  installationIds: Array<string>;
-  permissionLevel: PermissionLevel;
-  consentState: ConsentState;
+  requestRemoval(): Promise<void>;
 }
 
 // DecodedMessage Class
 declare class DecodedMessage<T = any> {
   content: T;
-  contentType: ContentTypeId | undefined;
+  contentType: ContentTypeId;
   conversationId: string;
+  deliveryStatus: DeliveryStatus;
   id: string;
+  kind: GroupMessageKind;
   senderInboxId: string;
   sentAt: Date;
-  constructor(client: Client, message: Message);
+  sentAtNs: bigint;
 }
 
 // Identifier Interface
@@ -673,8 +674,8 @@ const isAdmin = group.isAdmin(inboxId);
 const isSuperAdmin = group.isSuperAdmin(inboxId);
 
 // Get role lists
-const admins = group.admins;
-const superAdmins = group.superAdmins;
+const admins = group.listAdmins();
+const superAdmins = group.listSuperAdmins();
 
 // Manage admin status
 await group.addAdmin(inboxId);

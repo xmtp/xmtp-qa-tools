@@ -27,9 +27,9 @@ describe(testName, () => {
     // Start message and response streams for gm bot
     gmBotWorker.startStream(typeofStream.MessageandResponse);
 
-    creator = convoStreamBot.get(0)!;
-    xmtpChat = convoStreamBot.get(1)!;
-    receiver = gmBotWorker.getCreator();
+    creator = convoStreamBot.mustGet(0);
+    xmtpChat = convoStreamBot.mustGet(1);
+    receiver = gmBotWorker.mustGetCreator();
     xmtpTester = new playwright({
       headless,
       defaultUser: {
@@ -57,7 +57,7 @@ describe(testName, () => {
   });
 
   it("conversation stream with message", async () => {
-    const newGroup = await creator.client.conversations.newGroup(
+    const newGroup = await creator.client.conversations.createGroup(
       getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 1 " + getTime(),
@@ -73,7 +73,7 @@ describe(testName, () => {
   });
 
   it("conversation stream without message", async () => {
-    const newGroup = await creator.client.conversations.newGroup(
+    const newGroup = await creator.client.conversations.createGroup(
       getInboxes(4).map((a) => a.inboxId),
       {
         groupName: "Test Group 2 " + getTime(),

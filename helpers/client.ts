@@ -254,7 +254,7 @@ export const createRandomInstallations = async (
   worker: Worker,
 ): Promise<Worker | undefined> => {
   console.debug(`[${worker.name}] Creating ${count} installations`);
-  const initialState = await worker.client.preferences.inboxState(true);
+  const initialState = await worker.client.preferences.fetchInboxState();
   console.debug(
     `[${worker.name}] Initial inbox state: ${JSON.stringify(initialState)}`,
   );
@@ -266,7 +266,7 @@ export const createRandomInstallations = async (
     await sleep(1000);
   }
 
-  const finalState = await worker.client.preferences.inboxState(true);
+  const finalState = await worker.client.preferences.fetchInboxState();
   console.debug(
     `[${worker.name}] Created ${count} installations. Final state: ${JSON.stringify(finalState)}`,
   );
@@ -458,15 +458,14 @@ export async function checkKeyPackageStatusesByInboxId(
   client: Client,
   inboxId: string,
 ) {
-  const installationIdsState = await client.preferences.inboxStateFromInboxIds(
-    [inboxId],
-    true,
-  );
+  const installationIdsState = await client.preferences.fetchInboxStates([
+    inboxId,
+  ]);
   const installationIds = installationIdsState[0].installations.map(
-    (installation) => installation.id,
+    (installation: { id: string }) => installation.id,
   );
   // Retrieve a map of installation id to KeyPackageStatus
-  const status = (await client.getKeyPackageStatusesForInstallationIds(
+  const status = (await client.fetchKeyPackageStatuses(
     installationIds,
   )) as Record<string, any>;
 

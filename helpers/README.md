@@ -11,6 +11,7 @@ Utility modules that power the XMTP testing framework. These helpers provide the
 | **logger.ts**   | Logging utilities                | File logging, ANSI stripping, pretty console output  |
 | **vitest.ts**   | Test lifecycle management        | Test setup, performance metrics, cleanup             |
 | **datadog.ts**  | Metrics and monitoring           | Performance tracking, network stats, reporting       |
+| **sdk-compat.ts** | SDK version compatibility      | Compat wrappers for createGroup, createDm, etc.      |
 | **streams.ts**  | Message streaming utilities      | Stream verification, message delivery testing        |
 
 ## Usage

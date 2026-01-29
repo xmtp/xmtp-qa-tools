@@ -216,7 +216,7 @@ describe(testName, () => {
             try {
               await workers.checkForksForGroup(groupID);
               const group = await workers
-                .getCreator()
+                .mustGetCreator()
                 .client.conversations.getConversationById(groupID);
               if (!group) {
                 throw new Error("Could not find group");

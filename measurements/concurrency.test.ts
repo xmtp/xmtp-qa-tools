@@ -66,7 +66,7 @@ describe(testName, () => {
     // Create many DMs (like the Rust test)
     for (const peerId of testConfig.randomInboxIds) {
       try {
-        const dm = await primaryClient.conversations.newDm(peerId);
+        const dm = await primaryClient.conversations.createDm(peerId);
         createdDms.push(dm.id);
         console.log(`Created DM with peer: ${peerId}`);
       } catch (error) {
@@ -82,7 +82,7 @@ describe(testName, () => {
 
     for (let i = 0; i < testConfig.groupCount; i++) {
       try {
-        const group = await primaryClient.conversations.newGroup(
+        const group = await primaryClient.conversations.createGroup(
           [secondaryInboxId],
           {
             groupName: `Test Group ${i + 1}`,

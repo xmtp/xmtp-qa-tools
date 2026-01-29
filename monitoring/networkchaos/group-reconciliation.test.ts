@@ -25,7 +25,7 @@ describe(testName, async () => {
     console.log("[test] Initial group created");
 
     const user1Group = await workers
-      .get("user1")!
+      .mustGet("user1")
       .client.conversations.getConversationById(group.id);
     console.log("Sending welcome message from user1...");
     await sendTextCompat(user1Group!, "Initial welcome message from user1");
@@ -87,7 +87,7 @@ describe(testName, async () => {
       "Additional welcome message from user1 before user4 joins...",
     );
     await (user1Group as Group).addMembers([
-      workers.get("user4")!.client.inboxId,
+      workers.mustGet("user4").client.inboxId,
     ]);
     await new Promise((res) => setTimeout(res, 3000));
 
@@ -122,7 +122,7 @@ describe(testName, async () => {
 
     // Sync user4 with the group
     const user4Group = await workers
-      .get("user4")!
+      .mustGet("user4")
       .client.conversations.getConversationById(group.id);
     await user4Group?.sync();
     console.log("[test] user4 joined and synced");
@@ -138,7 +138,7 @@ describe(testName, async () => {
     console.log("[test] Restored node3's connectivity");
 
     const user3Group = await workers
-      .get("user3")!
+      .mustGet("user3")
       .client.conversations.getConversationById(group.id);
     await user3Group?.sync();
     const membersAfterRecovery = await user3Group?.members();
@@ -147,7 +147,7 @@ describe(testName, async () => {
       console.log("  " + m.inboxId);
     });
 
-    const user4Id = workers.get("user4")!.client.inboxId;
+    const user4Id = workers.mustGet("user4").client.inboxId;
     const recoveryMsg = "User4 says hello - user3 should see me too!";
     await sendTextCompat(user4Group!, recoveryMsg);
     console.log("[test] user4 sent post-recovery message");

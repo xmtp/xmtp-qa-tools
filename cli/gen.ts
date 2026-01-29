@@ -234,10 +234,7 @@ async function checkInstallations(
   forceRestart: boolean = false,
 ) {
   debugLog(`\n🔍 Checking installations for inbox: ${client.inboxId}`);
-  const state = await client.preferences.inboxStateFromInboxIds(
-    [client.inboxId],
-    true,
-  );
+  const state = await client.preferences.fetchInboxStates([client.inboxId]);
   let current = state?.[0]?.installations.length || 0;
   debugLog(`📊 Current installations: ${current}/${installationCount}`);
 
@@ -245,7 +242,8 @@ async function checkInstallations(
     debugLog(`🔄 Force restart: Revoking ALL ${current} installations`);
     const all = state?.[0]?.installations || [];
     const toRevoke = all.map(
-      (inst) => new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
+      (inst: { id: string }) =>
+        new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
     );
     if (toRevoke.length) await client.revokeInstallations(toRevoke);
     debugLog(
@@ -260,7 +258,7 @@ async function checkInstallations(
       const toRevoke = all
         .slice(installationCount)
         .map(
-          (inst) =>
+          (inst: { id: string }) =>
             new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
         );
       if (toRevoke.length) await client.revokeInstallations(toRevoke);

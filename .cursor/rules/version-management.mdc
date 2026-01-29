@@ -16,12 +16,12 @@ Versions are mapped in `versions/node-sdk.ts`:
 ```typescript
 export const VersionList = [
   {
-    Client: Client322,
-    Conversation: Conversation322,
-    Dm: Dm322,
-    Group: Group322,
-    nodeSDK: "3.2.2", // SDK version
-    nodeBindings: "1.3.3", // Bindings version
+    Client: Client511,
+    Conversation: Conversation511,
+    Dm: Dm511,
+    Group: Group511,
+    nodeSDK: "5.1.1", // SDK version
+    nodeBindings: "1.8.1", // Bindings version
     auto: true, // Include in automated testing
   },
 ];
@@ -34,8 +34,8 @@ Multiple versions installed via npm aliases:
 ```json
 {
   "dependencies": {
-    "@xmtp/node-sdk-3.2.2": "npm:@xmtp/node-sdk@3.2.2",
-    "@xmtp/node-bindings-1.3.3": "npm:@xmtp/node-bindings@1.3.3"
+    "@xmtp/node-sdk-5.1.1": "npm:@xmtp/node-sdk@5.1.1",
+    "@xmtp/node-bindings-1.8.1": "npm:@xmtp/node-bindings@1.8.1"
   }
 }
 ```
@@ -71,6 +71,6 @@ yarn versions
 
 ```bash
 yarn test performance --versions 3  # Test latest 3 auto-enabled versions
-yarn test performance --nodeSDK 3.2.2 # custom version
+yarn test performance --nodeSDK 5.1.1 # custom version
 yarn regression  # Vibe check on latest version
 ```
