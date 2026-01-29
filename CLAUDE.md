@@ -57,6 +57,8 @@ workers.createGroupBetweenAll("Group Name"); // Create group with all workers
 
 Supports testing across multiple Node SDK versions (4.3.0-5.1.1) for backward compatibility. Versions are mapped in `versions/node-sdk.ts` with npm aliases allowing multiple versions installed simultaneously.
 
+**Compat layer:** SDK API names changed across versions (e.g., `newGroup` → `createGroup`, `newDm` → `createDm`). Tests should use `worker.worker.createGroup()` / `worker.worker.createDm()` / `worker.worker.fetchInboxState()` instead of direct `client.conversations.*` calls, so tests work across all supported SDK versions. The compat wrappers live in `helpers/sdk-compat.ts`.
+
 **Upgrade procedure:** Update `package.json` with aliased package, add import to `versions/node-sdk.ts`, run `yarn versions` to link, run `yarn regression` to verify.
 
 ### Key Path Aliases
@@ -87,21 +89,22 @@ expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
 expect(result.averageEventTiming).toBeLessThan(500);
 ```
 
-### XMTP Client Operations (SDK 5.1.1)
+### XMTP Client Operations
+
+Use the version-compatible worker methods for DM/group creation and inbox state:
 
 ```typescript
-// DM creation
-const dm = await alice.client.conversations.createDm(bob.client.inboxId);
-const dm2 = await alice.client.conversations.createDmWithIdentifier({
-  identifier: bob.address,
-  identifierKind: IdentifierKind.Ethereum,
+// DM creation (version-compatible)
+const dm = await alice.worker.createDm(bob.client.inboxId);
+
+// Group creation (version-compatible)
+const group = await alice.worker.createGroup([...inboxIds]);
+const group2 = await alice.worker.createGroup([...inboxIds], {
+  groupName: "My Group",
 });
 
-// Group creation
-const group = await alice.client.conversations.createGroup([...inboxIds]);
-const group2 = await alice.client.conversations.createGroupWithIdentifiers([
-  { identifier: "0x123...", identifierKind: IdentifierKind.Ethereum },
-]);
+// Inbox state (version-compatible)
+const state = await alice.worker.fetchInboxState();
 
 // Messaging
 await dm.sendText("Hello");
