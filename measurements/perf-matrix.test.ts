@@ -144,17 +144,16 @@ describe(testName, () => {
             allMembersWithExtra.length - 2,
           );
           extraMember = allMembersWithExtra.at(-1)!;
-          newGroup =
-            (await creator.client.conversations.createGroupWithIdentifiers([
-              ...allMembers.map((a) => ({
-                identifier: a.accountAddress,
-                identifierKind: IdentifierKind.Ethereum,
-              })),
-              ...workers.getAllButCreator().map((w) => ({
-                identifier: w.address,
-                identifierKind: IdentifierKind.Ethereum,
-              })),
-            ])) as Group;
+          newGroup = (await creator.worker.createGroupWithIdentifiers([
+            ...allMembers.map((a) => ({
+              identifier: a.accountAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+            ...workers.getAllButCreator().map((w) => ({
+              identifier: w.address,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+          ])) as Group;
           const members = await newGroup.members();
           expect(members.length).toBe(i);
           expect(newGroup.id).toBeDefined();
