@@ -6,11 +6,21 @@ import {
   getEncryptionKeyFromHex,
   streamTimeout,
 } from "@helpers/client";
-import { sendTextCompat } from "@helpers/sdk-compat";
+import {
+  createDmCompat,
+  createGroupCompat,
+  fetchInboxStateCompat,
+  fetchInboxStatesCompat,
+  fetchKeyPackageStatusesCompat,
+  sendTextCompat,
+} from "@helpers/sdk-compat";
 import {
   ConsentState,
   ConversationType,
   regressionClient,
+  type AnyClient,
+  type AnyConversation,
+  type AnyGroup,
   type Client,
   type DecodedMessage,
   type Message,
@@ -113,6 +123,18 @@ interface IWorkerClient {
     installationId: string;
     address: `0x${string}`;
   }>;
+
+  // Version-compatible SDK methods
+  createGroup(
+    inboxIds: string[],
+    options?: { groupName?: string },
+  ): Promise<AnyGroup>;
+  createDm(inboxId: string): Promise<AnyConversation>;
+  fetchInboxState(): Promise<any>;
+  fetchInboxStates(inboxIds: string[]): Promise<any[]>;
+  fetchKeyPackageStatuses(
+    installationIds: string[],
+  ): Promise<Record<string, unknown>>;
 
   // Properties
   readonly currentFolder: string;
@@ -286,6 +308,47 @@ export class WorkerClient extends Worker implements IWorkerClient {
     this.encryptionKeyHex = worker.encryptionKey;
     this.dbPath = customDbPath || "";
     this.setupEventHandlers();
+  }
+
+  /**
+   * Create a group (version-compatible)
+   */
+  async createGroup(
+    inboxIds: string[],
+    options?: { groupName?: string },
+  ): Promise<AnyGroup> {
+    return createGroupCompat(this.client as AnyClient, inboxIds, options);
+  }
+
+  /**
+   * Create a DM (version-compatible)
+   */
+  async createDm(inboxId: string): Promise<AnyConversation> {
+    return createDmCompat(this.client as AnyClient, inboxId);
+  }
+
+  /**
+   * Fetch inbox state with refresh (version-compatible)
+   */
+  async fetchInboxState() {
+    return fetchInboxStateCompat(this.client as AnyClient);
+  }
+
+  /**
+   * Fetch inbox states for multiple inboxIds (version-compatible)
+   */
+  async fetchInboxStates(inboxIds: string[]) {
+    return fetchInboxStatesCompat(this.client as AnyClient, inboxIds);
+  }
+
+  /**
+   * Fetch key package statuses (version-compatible)
+   */
+  async fetchKeyPackageStatuses(installationIds: string[]) {
+    return fetchKeyPackageStatusesCompat(
+      this.client as AnyClient,
+      installationIds,
+    );
   }
 
   terminate() {
