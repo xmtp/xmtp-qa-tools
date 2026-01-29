@@ -8,7 +8,9 @@ import {
 } from "@helpers/client";
 import {
   createDmCompat,
+  createDmWithIdentifierCompat,
   createGroupCompat,
+  createGroupWithIdentifiersCompat,
   fetchInboxStateCompat,
   fetchInboxStatesCompat,
   fetchKeyPackageStatusesCompat,
@@ -23,6 +25,7 @@ import {
   type AnyGroup,
   type Client,
   type DecodedMessage,
+  type Identifier,
   type Message,
   type XmtpEnv,
 } from "@helpers/versions";
@@ -129,7 +132,12 @@ interface IWorkerClient {
     inboxIds: string[],
     options?: { groupName?: string },
   ): Promise<AnyGroup>;
+  createGroupWithIdentifiers(
+    identifiers: Identifier[],
+    options?: { groupName?: string },
+  ): Promise<AnyGroup>;
   createDm(inboxId: string): Promise<AnyConversation>;
+  createDmWithIdentifier(identifier: Identifier): Promise<AnyConversation>;
   fetchInboxState(): Promise<any>;
   fetchInboxStates(inboxIds: string[]): Promise<any[]>;
   fetchKeyPackageStatuses(
@@ -325,6 +333,29 @@ export class WorkerClient extends Worker implements IWorkerClient {
    */
   async createDm(inboxId: string): Promise<AnyConversation> {
     return createDmCompat(this.client as AnyClient, inboxId);
+  }
+
+  /**
+   * Create a DM with identifier (version-compatible)
+   */
+  async createDmWithIdentifier(
+    identifier: Identifier,
+  ): Promise<AnyConversation> {
+    return createDmWithIdentifierCompat(this.client as AnyClient, identifier);
+  }
+
+  /**
+   * Create a group with identifiers (version-compatible)
+   */
+  async createGroupWithIdentifiers(
+    identifiers: Identifier[],
+    options?: { groupName?: string },
+  ): Promise<AnyGroup> {
+    return createGroupWithIdentifiersCompat(
+      this.client as AnyClient,
+      identifiers,
+      options,
+    );
   }
 
   /**

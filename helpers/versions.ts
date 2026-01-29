@@ -65,6 +65,7 @@ export {
   type Signer,
   type ClientOptions,
   type Conversation,
+  type Identifier,
   IdentifierKind,
   type DecodedMessage,
   type Dm,

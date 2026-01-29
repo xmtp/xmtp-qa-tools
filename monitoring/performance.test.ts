@@ -97,7 +97,7 @@ describe(testName, () => {
     expect(dm.id).toBeDefined();
   });
   it(`newDmByAddress:measure creating a DM`, async () => {
-    const dm2 = await receiver.client.conversations.createDmWithIdentifier({
+    const dm2 = await receiver.worker.createDmWithIdentifier({
       identifier: getInboxes(1)[0].accountAddress,
       identifierKind: IdentifierKind.Ethereum,
     });
@@ -150,7 +150,7 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ];
-      newGroup = (await creator.client.conversations.createGroupWithIdentifiers(
+      newGroup = (await creator.worker.createGroupWithIdentifiers(
         membersToAdd,
       )) as Group;
       const members = await newGroup.members();

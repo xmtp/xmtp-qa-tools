@@ -40,7 +40,7 @@ describe(testName, () => {
           identifierKind: IdentifierKind.Ethereum,
         })),
       ];
-      newGroup = (await creator.client.conversations.createGroupWithIdentifiers(
+      newGroup = (await creator.worker.createGroupWithIdentifiers(
         membersToAdd,
       )) as Group;
       const members = await newGroup.members();

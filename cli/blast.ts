@@ -284,11 +284,10 @@ async function runWorker(
 ): Promise<TestResult> {
   try {
     // Create conversation
-    const conversation =
-      await worker.client.conversations.createDmWithIdentifier({
-        identifier: config.target,
-        identifierKind: IdentifierKind.Ethereum,
-      });
+    const conversation = await worker.worker.createDmWithIdentifier({
+      identifier: config.target,
+      identifierKind: IdentifierKind.Ethereum,
+    });
 
     let responseTime = 0;
     let responsePromise: Promise<void> | null = null;

@@ -14,6 +14,7 @@ import type {
   AnyConversation,
   AnyGroup,
   ConsentState,
+  Identifier,
 } from "@helpers/versions";
 import type {
   Client as Client43,
@@ -144,6 +145,49 @@ export async function fetchKeyPackageStatusesCompat(
   }
   return (client as Client43).getKeyPackageStatusesForInstallationIds(
     installationIds,
+  );
+}
+
+/**
+ * Create a DM with identifier - uses createDmWithIdentifier() or falls back to newDmWithIdentifier()
+ */
+export async function createDmWithIdentifierCompat(
+  client: AnyClient,
+  identifier: Identifier,
+): Promise<AnyConversation> {
+  if ("createDmWithIdentifier" in client.conversations) {
+    return (client as Client511).conversations.createDmWithIdentifier(
+      identifier,
+    );
+  }
+  // Older SDKs used newDmWithIdentifier (Identifier types are structurally identical across versions)
+  return (client as Client43).conversations.newDmWithIdentifier(
+    identifier as unknown as Parameters<
+      Client43["conversations"]["newDmWithIdentifier"]
+    >[0],
+  );
+}
+
+/**
+ * Create a group with identifiers - uses createGroupWithIdentifiers() or falls back to newGroupWithIdentifiers()
+ */
+export async function createGroupWithIdentifiersCompat(
+  client: AnyClient,
+  identifiers: Identifier[],
+  options?: { groupName?: string },
+): Promise<AnyGroup> {
+  if ("createGroupWithIdentifiers" in client.conversations) {
+    return (client as Client511).conversations.createGroupWithIdentifiers(
+      identifiers,
+      options,
+    );
+  }
+  // Older SDKs used newGroupWithIdentifiers (Identifier types are structurally identical across versions)
+  return (client as Client43).conversations.newGroupWithIdentifiers(
+    identifiers as unknown as Parameters<
+      Client43["conversations"]["newGroupWithIdentifiers"]
+    >[0],
+    options,
   );
 }
 
