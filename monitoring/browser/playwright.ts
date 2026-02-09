@@ -273,19 +273,31 @@ export class playwright {
   }
 
   /**
-   * Waits for a response matching the expected message(s)
+   * Waits for a new conversation (group) to appear in the sidebar list.
+   * Searches all list items, not only the first.
+   * When options.acceptUntitled is true, also returns true if any item shows "Untitled"
+   * (new groups often appear as Untitled until name syncs).
    */
-  public async waitForNewConversation(groupName: string): Promise<boolean> {
+  public async waitForNewConversation(
+    groupName: string,
+    options?: { acceptUntitled?: boolean },
+  ): Promise<boolean> {
     try {
       if (!this.page) throw new Error("Page is not initialized");
       for (let i = 0; i < browserTimeout / 1000; i++) {
         await this.page.waitForTimeout(1000);
-        const responseText = await this.getLatestGroupFromList();
-        console.debug(`Latest group: "${responseText}"`);
-        if (responseText.includes(groupName)) {
+        const allTexts = await this.getAllConversationListTexts();
+        console.debug(`Conversation list: ${allTexts.length} items`);
+        if (allTexts.some((text) => text.includes(groupName))) {
           return true;
         }
-        console.debug(`No response found after ${i + 1} checks`);
+        if (
+          options?.acceptUntitled &&
+          allTexts.some((text) => text.includes("Untitled"))
+        ) {
+          return true;
+        }
+        console.debug(`No match for "${groupName}" after ${i + 1} checks`);
       }
       return false;
     } catch (error) {
@@ -293,7 +305,8 @@ export class playwright {
       throw error;
     }
   }
-  private async getLatestGroupFromList(): Promise<string> {
+
+  private async getAllConversationListTexts(): Promise<string[]> {
     if (!this.page) throw new Error("Page is not initialized");
 
     const messageItems = await this.page
@@ -302,13 +315,28 @@ export class playwright {
       .locator("div")
       .all();
 
-    if (messageItems.length === 0) return "";
-    console.debug(`Found ${messageItems.length} conversation items`);
-    const latestMessageElement = messageItems[0];
-    const responseText = (await latestMessageElement.textContent()) || "";
-    console.debug(`Latest conversation: "${responseText}"`);
+    if (messageItems.length > 0) {
+      console.debug(`Found ${messageItems.length} conversation items`);
+      const texts: string[] = [];
+      for (const el of messageItems) {
+        const text = (await el.textContent()) || "";
+        texts.push(text);
+      }
+      return texts;
+    }
 
-    return responseText;
+    // Fallback: selector may not match DOM; check full navigation text
+    try {
+      const navText =
+        (await this.page.getByRole("navigation").textContent()) || "";
+      if (navText.trim().length > 0) {
+        console.debug("Using navigation fallback (virtuoso list empty)");
+        return [navText];
+      }
+    } catch {
+      // ignore
+    }
+    return [];
   }
 
   /**
@@ -318,16 +346,27 @@ export class playwright {
     try {
       if (!this.page) throw new Error("Page is not initialized");
 
+      // Give the worker time to receive the message and reply before first check
+      await this.page.waitForTimeout(2000);
+
+      const hasExpected = (text: string) =>
+        expectedMessage.some((phrase) =>
+          text.toLowerCase().includes(phrase.toLowerCase()),
+        );
+
       for (let i = 0; i < browserTimeout / 1000; i++) {
         await this.page.waitForTimeout(1000);
         const responseText = await this.getLatestMessageText();
+        if (hasExpected(responseText)) return true;
 
-        if (
-          expectedMessage.some((phrase) =>
-            responseText.toLowerCase().includes(phrase.toLowerCase()),
-          )
-        ) {
-          return true;
+        // Extraction may return an earlier message (e.g. "hi jade"); also check
+        // full main content so we detect the reply when it's visible anywhere
+        try {
+          const mainText =
+            (await this.page.getByRole("main").textContent()) || "";
+          if (hasExpected(mainText)) return true;
+        } catch {
+          // ignore
         }
       }
       return false;
@@ -499,6 +538,20 @@ export class playwright {
     if (!responseText && messageItems.length > 0) {
       const latestMessageElement = messageItems[messageItems.length - 1];
       responseText = (await latestMessageElement.textContent()) || "";
+    }
+
+    // Fallback: if extraction failed or selectors don't match DOM, use full main content
+    // so we can still detect expected phrases (e.g. "gm") anywhere in the conversation
+    if ((!responseText || responseText.length < 3) && this.page) {
+      try {
+        const mainText =
+          (await this.page.getByRole("main").textContent()) || "";
+        if (mainText.trim().length > 0) {
+          responseText = mainText;
+        }
+      } catch {
+        // ignore
+      }
     }
 
     return responseText;

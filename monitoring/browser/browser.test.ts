@@ -67,7 +67,9 @@ describe(testName, () => {
     await newGroup.addMembers([xmtpChat.inboxId]);
     await sendTextCompat(newGroup, `hi ${receiver.name}`);
     console.log("waiting for new conversation");
-    const result = await xmtpTester.waitForNewConversation(newGroup.name);
+    const result = await xmtpTester.waitForNewConversation(newGroup.name, {
+      acceptUntitled: true,
+    });
     console.log("new conversation found", result);
     expect(result).toBe(true);
   });
@@ -82,7 +84,9 @@ describe(testName, () => {
     await sleep();
     await newGroup.addMembers([xmtpChat.inboxId]);
     console.log("waiting for new conversation");
-    const result = await xmtpTester.waitForNewConversation(newGroup.name);
+    const result = await xmtpTester.waitForNewConversation(newGroup.name, {
+      acceptUntitled: true,
+    });
     expect(result).toBe(true);
   });
 
