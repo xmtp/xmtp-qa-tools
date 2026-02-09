@@ -542,10 +542,10 @@ export class playwright {
 
     // Fallback: if extraction failed or selectors don't match DOM, use full main content
     // so we can still detect expected phrases (e.g. "gm") anywhere in the conversation
-    if (!responseText || responseText.length < 3) {
+    if ((!responseText || responseText.length < 3) && this.page) {
       try {
         const mainText =
-          (await this.page!.getByRole("main").textContent()) || "";
+          (await this.page.getByRole("main").textContent()) || "";
         if (mainText.trim().length > 0) {
           responseText = mainText;
         }
