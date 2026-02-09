@@ -291,7 +291,10 @@ export class playwright {
         if (allTexts.some((text) => text.includes(groupName))) {
           return true;
         }
-        if (options?.acceptUntitled && allTexts.some((text) => text.includes("Untitled"))) {
+        if (
+          options?.acceptUntitled &&
+          allTexts.some((text) => text.includes("Untitled"))
+        ) {
           return true;
         }
         console.debug(`No match for "${groupName}" after ${i + 1} checks`);
@@ -324,7 +327,8 @@ export class playwright {
 
     // Fallback: selector may not match DOM; check full navigation text
     try {
-      const navText = (await this.page.getByRole("navigation").textContent()) || "";
+      const navText =
+        (await this.page.getByRole("navigation").textContent()) || "";
       if (navText.trim().length > 0) {
         console.debug("Using navigation fallback (virtuoso list empty)");
         return [navText];
@@ -540,7 +544,8 @@ export class playwright {
     // so we can still detect expected phrases (e.g. "gm") anywhere in the conversation
     if (!responseText || responseText.length < 3) {
       try {
-        const mainText = (await this.page!.getByRole("main").textContent()) || "";
+        const mainText =
+          (await this.page!.getByRole("main").textContent()) || "";
         if (mainText.trim().length > 0) {
           responseText = mainText;
         }
