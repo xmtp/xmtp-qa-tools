@@ -70,11 +70,13 @@ describe(testName, () => {
     await creator.client.conversations.sync();
   });
   it(`syncAll:measure syncAll`, async () => {
-    await creator.client.conversations.syncAll();
+    const result = await creator.client.conversations.syncAll();
+    expect(result).toBeDefined();
   });
 
   it(`inboxState:measure inboxState`, async () => {
-    await creator.client.preferences.inboxState();
+    const state = await creator.client.preferences.inboxState();
+    expect(state).toBeDefined();
   });
   it(`canMessage:measure canMessage`, async () => {
     const canMessage = await Client.canMessage(
@@ -106,16 +108,25 @@ describe(testName, () => {
     expect(dm2.id).toBeDefined();
   });
   it(`getConversationById:measure getting a conversation by id`, async () => {
+    if (!dm) {
+      throw new Error("dm is undefined - the 'newDm' test must run first");
+    }
     const conversation = await creator.client.conversations.getConversationById(
       dm.id,
     );
     expect(conversation!.id).toBe(dm.id);
   });
   it(`send:measure sending a gm`, async () => {
+    if (!dm) {
+      throw new Error("dm is undefined - the 'newDm' test must run first");
+    }
     const dmId = await sendTextCompat(dm, "gm");
     expect(dmId).toBeDefined();
   });
   it(`streamMessage:measure receiving a gm`, async () => {
+    if (!dm) {
+      throw new Error("dm is undefined - the 'newDm' test must run first");
+    }
     const verifyResult = await verifyMessageStream(dm, [receiver]);
     setCustomDuration(verifyResult.averageEventTiming);
     expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(99);
@@ -161,24 +172,48 @@ describe(testName, () => {
       cumulativeGroups.push(newGroup);
     });
     it(`groupsync-${i}:sync a large group of ${i} members ${i}`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       await newGroup.sync();
       const members = await newGroup.members();
-      expect(members.length).toBe(members.length);
+      expect(members.length).toBe(i);
     });
 
     it(`updateName-${i}:update the group name`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       const newName = "Large Group";
       await newGroup.updateName(newName);
-      const name = newGroup.name;
-      expect(name).toBe(newName);
+      // Sync from a different client (group worker) to verify the name propagated
+      const verifier = groupWorkers[0];
+      await verifier.client.conversations.sync();
+      const verifierConvo = await verifier.client.conversations.getConversationById(newGroup.id);
+      await verifierConvo!.sync();
+      expect((verifierConvo as Group).name).toBe(newName);
     });
     it(`send-${i}:measure sending a gm in a group of ${i} members`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      await sendTextCompat(newGroup, groupMessage);
-      expect(groupMessage).toBeDefined();
+      const sendResult = await sendTextCompat(newGroup, groupMessage);
+      expect(sendResult).toBeDefined();
     });
     it(`streamMembership-${i}: stream members of additions in ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       const verifyResult = await verifyMembershipStream(
         newGroup,
         groupWorkers,
@@ -189,20 +224,31 @@ describe(testName, () => {
       expect(verifyResult.receptionPercentage).toBeGreaterThanOrEqual(90);
     });
     it(`removeMembers-${i}:remove a participant from a group`, async () => {
-      await newGroup.removeMembers([extraMember.inboxId]);
-    });
-    it(`addMember-${i}:add members to a group`, async () => {
-      try {
-        await newGroup.addMembers([extraMember.inboxId]);
-      } catch (error) {
-        console.error(
-          "extraMember",
-          error,
-          JSON.stringify(extraMember, null, 2),
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
         );
       }
+      await newGroup.removeMembers([extraMember.inboxId]);
+      const members = await newGroup.members();
+      expect(members.find((m: any) => m.inboxId === extraMember.inboxId)).toBeUndefined();
+    });
+    it(`addMember-${i}:add members to a group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
+      await newGroup.addMembers([extraMember.inboxId]);
+      const members = await newGroup.members();
+      expect(members.length).toBeGreaterThan(0);
     });
     it(`streamMessage-${i}: stream members of message changes in ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       const verifyResult = await verifyMessageStream(newGroup, groupWorkers);
 
       sendMetric(
@@ -229,6 +275,11 @@ describe(testName, () => {
     });
 
     it(`streamMetadata-${i}: stream members of metadata changes in ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       const verifyResult = await verifyMetadataStream(newGroup, groupWorkers);
 
       setCustomDuration(verifyResult.averageEventTiming);
@@ -236,6 +287,11 @@ describe(testName, () => {
     });
 
     it(`sync-${i}:perform cold start sync operations on ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
@@ -246,6 +302,11 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAll-${i}:perform cold start sync operations on ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
@@ -257,6 +318,11 @@ describe(testName, () => {
     });
 
     it(`syncCumulative-${i}:perform cumulative sync operations on ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;
@@ -269,6 +335,11 @@ describe(testName, () => {
       setCustomDuration(end - start);
     });
     it(`syncAllCumulative-${i}:perform cumulative syncAll operations on ${i} member group`, async () => {
+      if (!newGroup) {
+        throw new Error(
+          "newGroup is undefined - the 'newGroup' test must run first",
+        );
+      }
       let randomName = "random" + Math.random().toString(36).substring(2, 5);
       const singleSyncWorkers = await getWorkers([randomName]);
       const clientSingleSync = singleSyncWorkers.mustGet(randomName).client;

@@ -1,6 +1,5 @@
 import { sendTextCompat } from "@helpers/sdk-compat";
 import { type Group } from "@helpers/versions";
-import { getInboxes } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -10,20 +9,32 @@ describe(testName, () => {
     const workers = await getWorkers(["henry", "john"]);
     const creator = workers.mustGet("henry");
     const receiver = workers.mustGet("john");
-    const allInboxIds = getInboxes(2).map((a) => a.inboxId);
-    console.log("All inbox ids", allInboxIds);
-    const group = (await creator.client.conversations.createGroup(
-      allInboxIds,
-    )) as Group;
 
-    await sendTextCompat(group, receiver.inboxId);
-    await receiver.client.conversations.syncAll();
+    // Start the conversation stream BEFORE creating the group
     const stream = receiver.client.conversations.stream();
-    await group.addMembers([receiver.client.inboxId]);
-    for await (const conversation of await stream) {
-      console.log("Conversation", conversation?.id);
-      expect(conversation?.id).toBe(group.id);
-      break;
-    }
+
+    // Create the group with the receiver as a member
+    const group = (await creator.client.conversations.createGroup([
+      receiver.client.inboxId,
+    ])) as Group;
+    console.log("Group created", group.id);
+
+    await sendTextCompat(group, "test message");
+
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error("Timed out waiting for conversation stream"));
+      }, 30000);
+    });
+
+    const streamPromise = (async () => {
+      for await (const conversation of await stream) {
+        console.log("Conversation", conversation?.id);
+        expect(conversation?.id).toBe(group.id);
+        break;
+      }
+    })();
+
+    await Promise.race([streamPromise, timeoutPromise]);
   });
 });

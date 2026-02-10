@@ -61,6 +61,7 @@ describe(testName, async () => {
       const g = await workers
         .mustGet(name)
         .client.conversations.getConversationById(group.id);
+      await g!.sync();
       const msgs = await g!.messages();
       console.log("Messages seen by " + name + ":");
       for (const msg of msgs) {
@@ -81,8 +82,11 @@ describe(testName, async () => {
       .mustGet("user4")
       .client.conversations.getConversationById(group.id);
 
+    await user2Group!.sync();
     const user2Msgs = await user2Group!.messages();
+    await user3Group!.sync();
     const user3Msgs = await user3Group!.messages();
+    await user4Group!.sync();
     const user4Msgs = await user4Group!.messages();
 
     const user2SawMid = user2Msgs.some((m) => m.content === midPartitionMsg);
@@ -113,10 +117,11 @@ describe(testName, async () => {
     await workers.checkForks();
 
     const postRecoveryMsgs = await Promise.all(
-      ["user3", "user4"].map(async (name) => {
+      ["user1", "user3", "user4"].map(async (name) => {
         const g = await workers
           .mustGet(name)
           .client.conversations.getConversationById(group.id);
+        await g!.sync();
         const msgs = await g!.messages();
         return msgs.some((m) => m.content === midPartitionMsg);
       }),

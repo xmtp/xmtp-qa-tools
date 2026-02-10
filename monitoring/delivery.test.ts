@@ -78,7 +78,9 @@ describe(testName, async () => {
       await worker.client.conversations.sync();
       const conversation =
         await worker.client.conversations.getConversationById(group.id);
-      const messages = await conversation?.messages();
+      expect(conversation).not.toBeNull();
+      await conversation!.sync();
+      const messages = await conversation!.messages();
 
       const filteredMessages =
         messages
@@ -120,6 +122,10 @@ describe(testName, async () => {
     expect(stats.deliveryPercentage).toBeGreaterThanOrEqual(ERROR_TRESHOLD);
   });
 
+  // NOTE: This is a poll-based recovery test, not stream-based. After restarting
+  // the stream, messages are recovered via sync + poll rather than collected from
+  // the stream. A true stream recovery test would collect messages from the
+  // restarted stream instead.
   it("recovery:message recovery after stream interruption", async () => {
     const offlineWorker = workers.mustGetReceiver();
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -142,10 +148,11 @@ describe(testName, async () => {
     await offlineWorker.client.conversations.sync();
     const conversation =
       await offlineWorker.client.conversations.getConversationById(group.id);
-    await conversation?.sync();
+    expect(conversation).not.toBeNull();
+    await conversation!.sync();
 
     // Check recovered messages
-    const messages = await conversation?.messages();
+    const messages = await conversation!.messages();
     const recoveredMessages =
       messages
         ?.filter(

@@ -31,8 +31,12 @@ describe(testName, () => {
     sdk: "",
   });
 
+  it("should have agents configured for this environment", () => {
+    expect(filteredAgents.length).toBeGreaterThan(0);
+  });
+
   for (const agentConfig of filteredAgents) {
-    it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
+    it(`${testName}: ${agentConfig.name} text : ${agentConfig.address}`, async () => {
       const agent = await Agent.createFromEnv({
         codecs: [new ActionsCodec(), new IntentCodec()],
       });
@@ -42,33 +46,24 @@ describe(testName, () => {
           agentConfig.address as `0x${string}`,
         );
 
+        const messageToSend = agentConfig.customText || PING_MESSAGE;
         console.log(
-          `📤 Sending "${PING_MESSAGE}" to ${agentConfig.name} (${agentConfig.address})`,
+          `Sending "${messageToSend}" to ${agentConfig.name} (${agentConfig.address})`,
         );
 
-        let result;
-        try {
-          result = await waitForResponse({
-            client: agent.client as any,
-            conversation: {
-              send: (content: string) => conversation.send(content),
-            },
-            conversationId: conversation.id,
-            senderInboxId: agent.client.inboxId,
-            timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: PING_MESSAGE,
-            messageFilter: (message) => {
-              return message.contentType?.typeId === "text";
-            },
-          });
-        } catch {
-          result = {
-            success: false,
-            sendTime: 0,
-            responseTime: AGENT_RESPONSE_TIMEOUT,
-            responseMessage: null,
-          };
-        }
+        const result = await waitForResponse({
+          client: agent.client as any,
+          conversation: {
+            send: (content: string) => conversation.send(content),
+          },
+          conversationId: conversation.id,
+          senderInboxId: agent.client.inboxId,
+          timeout: AGENT_RESPONSE_TIMEOUT,
+          messageText: messageToSend,
+          messageFilter: (message) => {
+            return message.contentType?.typeId === "text";
+          },
+        });
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
         sendMetric("response", responseTime, createMetricTags(agentConfig));
@@ -77,7 +72,7 @@ describe(testName, () => {
         expect(result.responseMessage).toBeTruthy();
 
         console.log(
-          `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
+          `${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
         );
       } finally {
         await agent.stop();

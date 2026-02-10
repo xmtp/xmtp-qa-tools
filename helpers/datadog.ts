@@ -166,7 +166,7 @@ export function sendMetric(
     return;
   }
   try {
-    if (metricValue <= 0) {
+    if (metricValue < 0 || Number.isNaN(metricValue)) {
       console.error(`${metricName} Metric value is ${metricValue}`);
       return;
     }
