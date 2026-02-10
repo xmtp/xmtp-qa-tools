@@ -41,8 +41,6 @@ describe(testName, async () => {
         client && (await client.conversations.getConversationById(group.id));
       if (!convo) {
         if (name === "user4") {
-          // check if env dirty
-          expect(convo).toBeFalsy();
           console.log("  [user4] No conversation found - expected.");
         } else {
           throw new Error(`[${name}] convo unexpectedly undefined`);
@@ -104,6 +102,7 @@ describe(testName, async () => {
         console.log("  [" + name + "] No conversation found.");
         continue;
       }
+      await convo.sync();
       const messages = await convo.messages();
       console.log(
         "  [" + name + "] Received " + String(messages.length) + " messages:",
@@ -124,7 +123,8 @@ describe(testName, async () => {
     const user4Group = await workers
       .mustGet("user4")
       .client.conversations.getConversationById(group.id);
-    await user4Group?.sync();
+    expect(user4Group).toBeDefined();
+    await user4Group!.sync();
     console.log("[test] user4 joined and synced");
 
     // Restore network
@@ -137,13 +137,25 @@ describe(testName, async () => {
     await new Promise((r) => setTimeout(r, 3000));
     console.log("[test] Restored node3's connectivity");
 
+    const user2Group = await workers
+      .mustGet("user2")
+      .client.conversations.getConversationById(group.id);
+    expect(user2Group).toBeDefined();
+    await user2Group!.sync();
+    const user2MembersAfterRecovery = await user2Group!.members();
+    console.log("[test] user2 sees group members after partition recovery:");
+    user2MembersAfterRecovery.forEach((m) => {
+      console.log("  " + m.inboxId);
+    });
+
     const user3Group = await workers
       .mustGet("user3")
       .client.conversations.getConversationById(group.id);
-    await user3Group?.sync();
-    const membersAfterRecovery = await user3Group?.members();
+    expect(user3Group).toBeDefined();
+    await user3Group!.sync();
+    const membersAfterRecovery = await user3Group!.members();
     console.log("[test] user3 sees group members after partition recovery:");
-    membersAfterRecovery?.forEach((m) => {
+    membersAfterRecovery.forEach((m) => {
       console.log("  " + m.inboxId);
     });
 
@@ -155,19 +167,19 @@ describe(testName, async () => {
     // Poll user3 until it sees updated members
     let found = false;
     for (let attempts = 0; attempts < 5 && !found; attempts++) {
-      await user3Group?.sync();
+      await user3Group!.sync();
 
-      const members = await user3Group?.members();
-      const hasUser4 = members?.some((m) => m.inboxId === user4Id);
+      const members = await user3Group!.members();
+      const hasUser4 = members.some((m) => m.inboxId === user4Id);
       if (hasUser4) {
         console.log("[test] user3 sees user4 after receiving new message");
         found = true;
         break;
       }
 
-      const msgs = await user3Group?.messages();
+      const msgs = await user3Group!.messages();
       if (
-        msgs?.some(
+        msgs.some(
           (m) =>
             typeof m.content === "string" && m.content.includes(recoveryMsg),
         )

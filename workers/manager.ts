@@ -322,7 +322,7 @@ export class WorkerManager implements IWorkerManager {
    */
   public get(
     baseName: string | number,
-    installationId: string = "a",
+    installationId?: string,
   ): Worker | undefined {
     if (typeof baseName === "number") {
       let index = baseName;
@@ -337,7 +337,14 @@ export class WorkerManager implements IWorkerManager {
         const id = parts[1];
         return this.workers[name]?.[id];
       }
-      return this.workers[baseName]?.[installationId];
+      if (installationId) {
+        return this.workers[baseName]?.[installationId];
+      }
+      // No installationId specified - return the first available installation
+      const installations = this.workers[baseName];
+      if (!installations) return undefined;
+      const firstKey = Object.keys(installations)[0];
+      return firstKey ? installations[firstKey] : undefined;
     }
   }
 
@@ -392,10 +399,10 @@ export class WorkerManager implements IWorkerManager {
    * Ensures a worker has wallet and encryption keys
    * Either retrieves from env vars or generates new ones
    */
-  private ensureKeys(name: string): {
+  private async ensureKeys(name: string): Promise<{
     walletKey: string;
     encryptionKey: string;
-  } {
+  }> {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
@@ -442,7 +449,7 @@ export class WorkerManager implements IWorkerManager {
       // Append to .env file for persistence across runs
       const filePath =
         process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
-      void appendFile(
+      await appendFile(
         filePath,
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
       );
@@ -487,7 +494,7 @@ export class WorkerManager implements IWorkerManager {
     }
 
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
+    const { walletKey, encryptionKey } = await this.ensureKeys(baseName);
 
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
@@ -668,16 +675,21 @@ export function getWorkerNames(workers: WorkerManager): string[] {
  */
 function getNextFolderName(): string {
   const dataPath = path.resolve(process.cwd(), ".data");
-  let folder = "a";
-  if (fs.existsSync(dataPath)) {
-    const existingFolders = fs
-      .readdirSync(dataPath)
-      .filter((f) => /^[a-z]$/.test(f));
-    folder = String.fromCharCode(
-      "a".charCodeAt(0) + (existingFolders.length % 26),
-    );
+  if (!fs.existsSync(dataPath)) {
+    return "a";
   }
-  return folder;
+  const existingFolders = fs
+    .readdirSync(dataPath)
+    .filter((f) => /^[a-z]+$/.test(f))
+    .sort();
+  const count = existingFolders.length;
+  // Generate folder names: a-z, then aa-az, ba-bz, etc.
+  if (count < 26) {
+    return String.fromCharCode("a".charCodeAt(0) + count);
+  }
+  const first = String.fromCharCode("a".charCodeAt(0) + Math.floor(count / 26) - 1);
+  const second = String.fromCharCode("a".charCodeAt(0) + (count % 26));
+  return first + second;
 }
 
 /**

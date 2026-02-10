@@ -41,6 +41,7 @@ describe(testName, async () => {
 
     const allUsers = workers.getAll();
     const otherUsers = workers.getAllButCreator();
+    const verifyResults: { receptionPercentage: number }[] = [];
 
     console.log("[start] Initiating concurrent message traffic");
 
@@ -75,7 +76,7 @@ describe(testName, async () => {
             console.log("[verify] Checking fork and delivery");
             await workers.checkForks();
             const res = await verifyMessageStream(group, otherUsers);
-            expect(res.receptionPercentage).toBeGreaterThanOrEqual(99);
+            verifyResults.push({ receptionPercentage: res.receptionPercentage });
           } catch (e) {
             console.warn("[verify] Skipping check due to error:", e);
           }
@@ -90,9 +91,13 @@ describe(testName, async () => {
         );
         void (async () => {
           try {
-            const newMember = workers.mustGetRandomWorker().client.inboxId;
-            await group.removeMembers([newMember]);
-            await group.addMembers([newMember]);
+            let newMember = workers.mustGetRandomWorker();
+            const creator = workers.getCreator();
+            while (newMember === creator) {
+              newMember = workers.mustGetRandomWorker();
+            }
+            await group.removeMembers([newMember.client.inboxId]);
+            await group.addMembers([newMember.client.inboxId]);
             const info = await group.debugInfo();
             console.log("[key-rotation] After rotation, epoch =", info.epoch);
           } catch (err) {
@@ -151,6 +156,11 @@ describe(testName, async () => {
       console.error("[test] Error during chaos test:", err);
       clearChaos();
       throw err;
+    }
+
+    console.log("[final] Asserting collected verification results");
+    for (const result of verifyResults) {
+      expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
     }
 
     console.log("[final] Validating final group state and message sync");

@@ -23,11 +23,15 @@ describe(testName, () => {
   const createMetricTags = (agentConfig: AgentConfig): ResponseMetricTags => ({
     test: testName,
     metric_type: "agent",
-    metric_subtype: "dm",
+    metric_subtype: "group",
     live: agentConfig.live ? "true" : "false",
     agent: agentConfig.name,
     address: agentConfig.address,
     sdk: "",
+  });
+
+  it("should have agents configured for this environment", () => {
+    expect(filteredAgents.length).toBeGreaterThan(0);
   });
 
   for (const agentConfig of filteredAgents) {
@@ -35,6 +39,7 @@ describe(testName, () => {
       const agent = await Agent.createFromEnv({});
 
       try {
+        // Tag format: @name convention (e.g., "@agentName ping from QA")
         const testMessage = `@${agentConfig.name} ${PING_MESSAGE}`;
         const testUserAddress = getInboxes(1)[0].accountAddress;
         const conversation = await agent.createGroupWithAddresses([
@@ -46,8 +51,8 @@ describe(testName, () => {
           `📤 Sending "${testMessage}" to ${agentConfig.name} (${agentConfig.address}) in group`,
         );
 
-        // Record timestamp before sending to ignore welcome messages
-        const testMessageSendTime = Date.now();
+        // Skip the first welcome message by checking sender identity
+        // instead of using fragile time-based filtering (clock skew can cause issues).
         let firstMessageSkipped = false;
 
         let result;
@@ -62,30 +67,31 @@ describe(testName, () => {
             timeout: AGENT_RESPONSE_TIMEOUT,
             messageText: testMessage,
             messageFilter: (message) => {
-              const messageTime = message.sentAt.getTime();
-              // Buffer to account for waitForResponse's 100ms delay + margin
-              const sendTimeWithBuffer = testMessageSendTime - 300;
+              // Skip messages from the test agent itself (should not happen
+              // since waitForResponse already filters these, but guard anyway)
+              if (
+                message.senderInboxId.toLowerCase() ===
+                agent.client.inboxId.toLowerCase()
+              ) {
+                return false;
+              }
 
-              // Skip first message if it was sent before our test message (welcome message)
-              if (!firstMessageSkipped && messageTime < sendTimeWithBuffer) {
+              // Skip the first message from the bot, which is the welcome message
+              // sent automatically when the agent is added to the group
+              if (!firstMessageSkipped) {
                 console.log(
-                  `⏭️  Skipping welcome message from ${agentConfig.name}`,
+                  `Skipping welcome message from ${agentConfig.name}`,
                 );
                 firstMessageSkipped = true;
                 return false;
               }
 
-              // Only accept messages sent after our test message
-              return messageTime >= sendTimeWithBuffer;
+              return true;
             },
           });
-        } catch {
-          result = {
-            success: false,
-            sendTime: 0,
-            responseTime: AGENT_RESPONSE_TIMEOUT,
-            responseMessage: null,
-          };
+        } catch (error) {
+          console.error(`waitForResponse failed for ${agentConfig.name}:`, error);
+          throw error;
         }
 
         const responseTime = Math.max(result.responseTime || 0, 0.0001);
@@ -95,7 +101,7 @@ describe(testName, () => {
         expect(result.responseMessage).toBeTruthy();
 
         console.log(
-          `✅ ${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
+          `${agentConfig.name} responded in ${responseTime.toFixed(2)}ms`,
         );
       } finally {
         await agent.stop();

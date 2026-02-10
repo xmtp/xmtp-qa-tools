@@ -39,8 +39,8 @@ export function validateEnvironment(vars: string[]): Record<string, string> {
         });
       }
     } catch (e) {
-      console.error(e);
-      /* ignore errors */
+      console.error("Error parsing .env file:", e);
+      throw e;
     }
 
     const stillMissing = vars.filter((v) => !process.env[v]);
@@ -323,10 +323,8 @@ export const appendToEnv = (key: string, value: string): void => {
     console.debug(`[appendToEnv] Env path resolved to: ${envPath}`);
     console.debug(`[appendToEnv] File exists: ${fs.existsSync(envPath)}`);
 
-    // Update process.env
-    if (key in process.env) {
-      process.env[key] = value;
-    }
+    // Update process.env (always, not just for pre-existing keys)
+    process.env[key] = value;
 
     // Read/create .env file
     let envContent = "";
@@ -375,6 +373,7 @@ export const appendToEnv = (key: string, value: string): void => {
     console.debug(`Updated .env with ${key}: ${value}`);
   } catch (error) {
     console.error(`Failed to update .env with ${key}:`, error);
+    throw error;
   }
 };
 

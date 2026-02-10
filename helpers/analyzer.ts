@@ -371,6 +371,7 @@ export function extractErrorLogs(testName: string): Set<string> {
     }
   } catch (error) {
     console.error("Error reading log files:", error);
+    return new Set([`ERROR: Failed to extract logs: ${String(error)}`]);
   }
 
   return new Set();

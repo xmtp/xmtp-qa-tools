@@ -41,6 +41,7 @@ describe(testName, async () => {
 
     const allUsers = workers.getAll();
     const otherUsers = workers.getAllButCreator();
+    const verifyResults: { receptionPercentage: number }[] = [];
 
     // Kick off traffic stream
     console.log("[start] Initiating concurrent traffic flood");
@@ -50,8 +51,14 @@ describe(testName, async () => {
           const convo = await sender.client.conversations.getConversationById(
             group.id,
           );
+          if (!convo) {
+            console.warn(
+              `[sendLoop] ${sender.name} not in group right now, skipping send`,
+            );
+            continue;
+          }
           const content = `gm-${sender.name}-${Date.now()}`;
-          await sendTextCompat(convo!, content);
+          await sendTextCompat(convo, content);
         }
         await new Promise((r) => setTimeout(r, 1000));
       }
@@ -64,7 +71,7 @@ describe(testName, async () => {
             console.log("[verify] Checking fork and delivery under chaos");
             await workers.checkForks();
             const res = await verifyMessageStream(group, otherUsers);
-            expect(res.receptionPercentage).toBeGreaterThanOrEqual(99);
+            verifyResults.push({ receptionPercentage: res.receptionPercentage });
           } catch (e) {
             console.warn("[verify] Skipping check due to exception:", e);
           }
@@ -106,6 +113,7 @@ describe(testName, async () => {
     try {
       verifyLoop();
       startChaos();
+      await new Promise((r) => setTimeout(r, 1000));
       await sendLoop();
       console.log(
         `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
@@ -116,6 +124,12 @@ describe(testName, async () => {
       console.error("[test] Encountered error during chaos:", err);
       clearChaos();
       throw err;
+    }
+
+    // Assert collected verification results
+    console.log("[final] Asserting collected verification results");
+    for (const result of verifyResults) {
+      expect(result.receptionPercentage).toBeGreaterThanOrEqual(99);
     }
 
     // Final delivery validation
