@@ -88,7 +88,7 @@ Link to test code [agents-tagged.test.ts](./agents-tagged.test.ts)
 ```json
 {
   "name": "gm",
-  "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+  "address": "0x4796C95DDACb0A29c3b2c8295a8b2fB94d5046e9",
   "sendMessage": "hola",
   "live": false,
   "networks": ["dev", "production"],
