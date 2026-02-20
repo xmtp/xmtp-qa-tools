@@ -18,7 +18,6 @@ import {
   MessageContext as MessageContext12,
   type Group as AgentGroupType12,
   type AgentMiddleware as AgentMiddleware12,
-  type PermissionLevel as AgentPermissionLevel12,
   type DecodedMessage as DecodedMessage12,
   type XmtpEnv as XmtpEnv12,
 } from "@xmtp/agent-sdk-1.2.0";
@@ -26,9 +25,20 @@ import {
   getTestUrl as getTestUrl12,
   logDetails as logDetails12,
 } from "@xmtp/agent-sdk-1.2.0/debug";
+import {
+  Agent as Agent22,
+  MessageContext as MessageContext22,
+} from "@xmtp/agent-sdk-2.2.0";
 
 // Agent SDK version list
 export const AgentVersionList = [
+  {
+    Agent: Agent22,
+    MessageContext: MessageContext22,
+    agentSDK: "2.2.0",
+    nodeSDK: "5.0.0",
+    auto: true,
+  },
   {
     Agent: Agent12,
     MessageContext: MessageContext12,
@@ -96,9 +106,7 @@ export type AgentMiddleware = typeof activeVersion.agentSDK extends "1.1.0"
   ? AgentMiddleware11
   : AgentMiddleware12;
 export type AgentGroupType = AgentGroupType11 | AgentGroupType12;
-export type AgentPermissionLevel =
-  | AgentPermissionLevel11
-  | AgentPermissionLevel12;
+export type AgentPermissionLevel = AgentPermissionLevel11;
 
 // Export debug utilities from the active version
 // Use unknown and type assertions to handle different SDK versions
