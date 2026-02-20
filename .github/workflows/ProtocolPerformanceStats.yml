@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 25
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -32,7 +32,7 @@ jobs:
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
-        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 2
+        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 25
 
       - name: Cleanup and upload artifacts
         if: always()
