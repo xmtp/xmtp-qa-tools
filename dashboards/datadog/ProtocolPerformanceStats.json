@@ -37,7 +37,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "p95:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
+                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
                 "aggregator": "avg"
               }
             ],
@@ -193,7 +193,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk}.as_count()",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -235,7 +235,7 @@
                     {
                       "data_source": "metrics",
                       "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation_name}",
+                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
                       "aggregator": "avg"
                     }
                   ],
@@ -244,7 +244,7 @@
                     "order_by": [
                       {
                         "type": "group",
-                        "name": "operation_name",
+                        "name": "operation",
                         "order": "asc"
                       }
                     ],
@@ -280,7 +280,7 @@
                     {
                       "data_source": "metrics",
                       "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:production,$region,$sdk,$members_bucket} by {operation_name}",
+                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:production,$region,$sdk,$members_bucket} by {operation}",
                       "aggregator": "avg"
                     }
                   ],
@@ -289,7 +289,7 @@
                     "order_by": [
                       {
                         "type": "group",
-                        "name": "operation_name",
+                        "name": "operation",
                         "order": "asc"
                       }
                     ],
@@ -325,7 +325,7 @@
                     {
                       "data_source": "metrics",
                       "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation_name}",
+                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
                       "aggregator": "avg"
                     }
                   ],
@@ -334,7 +334,7 @@
                     "order_by": [
                       {
                         "type": "group",
-                        "name": "operation_name",
+                        "name": "operation",
                         "order": "asc"
                       }
                     ],
@@ -369,7 +369,7 @@
     {
       "id": 501020,
       "definition": {
-        "title": "Latency by Stats Operation",
+        "title": "Latency stats by operation",
         "title_size": "16",
         "title_align": "left",
         "type": "query_table",
@@ -379,31 +379,31 @@
               {
                 "data_source": "metrics",
                 "name": "avg_d",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation_name,members_bucket}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p50_d",
-                "query": "p50:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation_name,members_bucket}",
+                "query": "avg:xmtp.sdk.duration.50percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_d",
-                "query": "p95:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation_name,members_bucket}",
+                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "ops_c",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation_name,members_bucket}.as_count()",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_c",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,$env,$region,$sdk,$members_bucket} by {operation_name,members_bucket}.as_count()",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "sum"
               }
             ],
@@ -413,7 +413,7 @@
               "order_by": [
                 {
                   "type": "group",
-                  "name": "operation_name",
+                  "name": "operation",
                   "order": "asc"
                 }
               ]
@@ -447,7 +447,7 @@
               {
                 "cell_display_mode": "number",
                 "alias": "p95_samples_needed_to_100",
-                "formula": "100 - ops_c"
+                "formula": "clamp_min(100 - ops_c, 0)"
               }
             ]
           }
@@ -480,7 +480,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "p95:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation_name}"
+                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation}"
               }
             ],
             "formulas": [
@@ -530,7 +530,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation_name}.as_count()"
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation}"
               }
             ],
             "formulas": [
