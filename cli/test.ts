@@ -338,6 +338,25 @@ function parseTestArgs(args: string[]): {
   return { testName, options };
 }
 
+function quoteForShell(value: string): string {
+  if (value.length === 0) {
+    return "''";
+  }
+  if (/^[a-zA-Z0-9_./:=,@-]+$/.test(value)) {
+    return value;
+  }
+  return `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+function buildVitestCommand(testName: string, options: TestOptions): string {
+  const defaultThreadingOptions = options.parallel
+    ? "--pool=forks"
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+  const escapedTestName = quoteForShell(testName);
+  const escapedVitestArgs = options.vitestArgs.map(quoteForShell).join(" ");
+  return `npx vitest run ${escapedTestName} ${defaultThreadingOptions} ${escapedVitestArgs}`.trim();
+}
+
 async function runCommand(
   command: string,
   logger?: ReturnType<typeof createTestLogger>,
@@ -426,11 +445,7 @@ async function runTest(testName: string, options: TestOptions): Promise<void> {
     });
 
     try {
-      const defaultThreadingOptions = options.parallel
-        ? "--pool=forks"
-        : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
-      const command =
-        `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
+      const command = buildVitestCommand(testName, options);
 
       const { exitCode } = await runCommand(command, logger);
 
@@ -554,11 +569,7 @@ async function main(): Promise<void> {
           console.info(`Environment: ${process.env.XMTP_ENV || "local"}`);
           console.info(`Configuration: Simple run (direct execution)`);
 
-          const defaultThreadingOptions = options.parallel
-            ? "--pool=forks"
-            : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
-          const command =
-            `npx vitest run ${testName} ${defaultThreadingOptions} ${options.vitestArgs.join(" ")}`.trim();
+          const command = buildVitestCommand(testName, options);
 
           execSync(command, { stdio: "inherit" });
         } else {
