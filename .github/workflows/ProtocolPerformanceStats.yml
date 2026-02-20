@@ -1,0 +1,50 @@
+name: Protocol Performance Stats
+description: "Protocol performance stats for cross-repo parity"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 25
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [group-stats]
+        size: [10-50, 100]
+        env: [dev, production, testnet-staging]
+        cache-data: [false]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      REGION: ${{ vars.REGION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      GROUP_STATS_MESSAGE_COUNT: 5
+      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup test env
+        uses: ./.github/actions/xmtp-test-setup
+        with:
+          cache-data: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
+          env: ${{ matrix.env }}
+
+      - name: Run tests ${{ matrix.size }}
+        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 2
+
+      - name: Cleanup and upload artifacts
+        if: always()
+        uses: ./.github/actions/xmtp-test-cleanup
+        with:
+          save-to-cache: ${{ matrix.cache-data }}
+          test-name: ${{ matrix.test }}-${{ matrix.size }}
+          env: ${{ matrix.env }}
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        uses: ./.github/actions/slack-notification
+        with:
+          workflow-name: "Protocol Performance Stats (${{ matrix.env }}, ${{ matrix.size }})"
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}

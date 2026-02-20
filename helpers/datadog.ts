@@ -142,10 +142,10 @@ export function initializeDatadog(): boolean {
   try {
     metrics.init({
       apiKey: process.env.DATADOG_API_KEY,
-      // Configure histogram defaults to include p95
+      // Configure histogram defaults to include p50/p95 for latency summaries.
       histogram: {
         aggregates: ["sum", "avg", "count", "min", "max"],
-        percentiles: [0.95], // This will create p95 metrics
+        percentiles: [0.5, 0.95], // Emits p50 and p95 metrics
       },
     });
     state.isInitialized = true;
