@@ -99,6 +99,7 @@ const state = {
 };
 
 const execAsync = promisify(exec);
+const HISTOGRAM_METRIC_SUFFIX = ".hist";
 
 // Utility functions
 export const calculateAverage = (values: number[]): number =>
@@ -127,6 +128,10 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
   return tags.operation
     ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
     : metricName;
+}
+
+function withHistogramSuffix(metricName: string): string {
+  return `${metricName}${HISTOGRAM_METRIC_SUFFIX}`;
 }
 
 export function initializeDatadog(): boolean {
@@ -210,7 +215,11 @@ export function sendMetric(
       enrichedTags.metric_type === "operation" ||
       enrichedTags.metric_type === "delivery"
     ) {
-      metrics.histogram(fullMetricName, Math.round(metricValue), formattedTags);
+      metrics.histogram(
+        withHistogramSuffix(fullMetricName),
+        Math.round(metricValue),
+        formattedTags,
+      );
     }
   } catch (error) {
     console.error(
@@ -236,6 +245,7 @@ export function sendHistogramMetric(
     }
     const enrichedTags = enrichTags(tags);
     const fullMetricName = `xmtp.sdk.${metricName}`;
+    const histogramMetricName = withHistogramSuffix(fullMetricName);
 
     // Format tags for DataDog
     const formattedTags = Object.entries(enrichedTags)
@@ -246,7 +256,7 @@ export function sendHistogramMetric(
     console.debug(
       JSON.stringify(
         {
-          histogramMetricName: fullMetricName,
+          histogramMetricName,
           metricValue: Math.round(metricValue),
           tags: formattedTags,
         },
@@ -255,7 +265,11 @@ export function sendHistogramMetric(
       ),
     );
 
-    metrics.histogram(fullMetricName, Math.round(metricValue), formattedTags);
+    metrics.histogram(
+      histogramMetricName,
+      Math.round(metricValue),
+      formattedTags,
+    );
   } catch (error) {
     console.error(
       `❌ Error sending histogram metric '${metricName}':`,

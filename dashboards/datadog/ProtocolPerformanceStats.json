@@ -37,7 +37,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
+                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
                 "aggregator": "avg"
               }
             ],
@@ -385,13 +385,13 @@
               {
                 "data_source": "metrics",
                 "name": "p50_d",
-                "query": "avg:xmtp.sdk.duration.50percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "query": "avg:xmtp.sdk.duration.hist.50percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_d",
-                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
                 "aggregator": "avg"
               },
               {
@@ -480,7 +480,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation}"
+                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation}"
               }
             ],
             "formulas": [
