@@ -2,8 +2,6 @@ name: Protocol Performance Stats
 description: "Protocol performance stats for cross-repo parity"
 
 on:
-  schedule:
-    - cron: "20 */6 * * *" # Runs every 6 hours
   workflow_dispatch:
 
 jobs:
