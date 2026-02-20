@@ -28,12 +28,8 @@ import {
 } from "@xmtp/node-sdk-4.6.0";
 import {
   Client as Client50,
-  Client as Client50,
-  Conversation as Conversation50,
   Conversation as Conversation50,
   Dm as Dm50,
-  Dm as Dm50,
-  Group as Group50,
   Group as Group50,
   type LogLevel as LogLevelType,
   type XmtpEnv as XmtpEnvType,
@@ -106,7 +102,7 @@ export const VersionList = [
     Dm: Dm50,
     Group: Group50,
     nodeSDK: "5.0.0",
-    nodeBindings: "1.9.1",
+    nodeBindings: "1.7.0",
     auto: true,
   },
   {
@@ -115,7 +111,7 @@ export const VersionList = [
     Dm: Dm50,
     Group: Group50,
     nodeSDK: "5.0.0",
-    nodeBindings: "1.9.1",
+    nodeBindings: "1.7.0",
     auto: true,
   },
   {

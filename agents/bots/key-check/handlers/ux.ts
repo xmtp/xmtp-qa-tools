@@ -1,26 +1,25 @@
 import { type MessageContext } from "@agents/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import type { EncodedContent } from "@xmtp/content-type-primitives";
+import { createERC20TransferCalls } from "@xmtp/agent-sdk-2.2.0";
 import {
   ContentTypeRemoteAttachment,
   type RemoteAttachment,
 } from "@xmtp/content-type-remote-attachment";
-import { ContentTypeWalletSendCalls } from "@xmtp/content-type-wallet-send-calls";
-import { USDCHandler } from "../../../utils/usdc";
+import { parseUnits } from "viem";
+import { baseSepolia } from "viem/chains";
+
+const USDC_BASE_SEPOLIA =
+  "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as `0x${string}`;
+const USDC_DECIMALS = 6;
 
 export class UxHandlers {
-  private usdcHandler: USDCHandler;
-
-  constructor() {
-    this.usdcHandler = new USDCHandler("base-sepolia");
-  }
+  constructor() {}
   async handleUxMiniApp(ctx: MessageContext): Promise<void> {
     try {
       const miniAppContent = `https://squabble.lol/`;
-      await ctx.sendText(miniAppContent);
+      await ctx.conversation.sendText(miniAppContent);
     } catch (error) {
       console.error("Error sending mini app:", error);
-      await ctx.sendText("❌ Failed to send mini app");
+      await ctx.conversation.sendText("❌ Failed to send mini app");
     }
   }
   async handleUxAttachment(ctx: MessageContext): Promise<void> {
@@ -28,17 +27,18 @@ export class UxHandlers {
       const senderAddress = await ctx.getSenderAddress();
 
       console.log(`Preparing attachment for ${senderAddress}...`);
-      await ctx.sendText(`I'll send you an attachment now...`);
+      await ctx.conversation.sendText(`I'll send you an attachment now...`);
 
-      await ctx.conversation.send(
-        parseSavedAttachment(),
-        ContentTypeRemoteAttachment,
-      );
+      await (
+        ctx.conversation as {
+          send: (c: unknown, t?: unknown) => Promise<string>;
+        }
+      ).send(parseSavedAttachment(), ContentTypeRemoteAttachment);
 
       console.log("Remote attachment sent successfully");
     } catch (error) {
       console.error("❌ Error sending real attachment:", error);
-      await ctx.sendText("❌ Failed to send real attachment");
+      await ctx.conversation.sendText("❌ Failed to send real attachment");
     }
   }
 
@@ -93,22 +93,22 @@ function greet(name) {
 
 **This demonstrates the full power of markdown formatting in XMTP messages!**`;
 
-      await ctx.conversation.send(markdownContent, ContentTypeMarkdown);
+      await ctx.conversation.sendMarkdown(markdownContent);
 
-      await ctx.sendText(
+      await ctx.conversation.sendText(
         "✅ Markdown message sent successfully! Check how it renders in your client.",
       );
       console.log("Sent comprehensive markdown demo");
     } catch (error) {
       console.error("Error sending markdown demo:", error);
-      await ctx.sendText("❌ Failed to send markdown demo");
+      await ctx.conversation.sendText("❌ Failed to send markdown demo");
     }
   }
 
   async handleBasics(ctx: MessageContext): Promise<void> {
     try {
       // First, send a text message
-      const textMessage = await ctx.conversation.send(
+      const textMessage = await ctx.conversation.sendText(
         "📝 This is a text message that will be replied to and reacted to!",
       );
       console.log("Sent text message for basics demo", textMessage);
@@ -121,24 +121,29 @@ function greet(name) {
       console.log("Sent reply to text message");
     } catch (error) {
       console.error("Error in basics demo:", error);
-      await ctx.sendText("❌ Failed to complete basics demo");
+      await ctx.conversation.sendText("❌ Failed to complete basics demo");
     }
   }
 
   async handleTransaction(ctx: MessageContext): Promise<void> {
     const agentAddress = await ctx.getClientAddress();
     const senderAddress = await ctx.getSenderAddress();
+    if (!agentAddress || !senderAddress) {
+      await ctx.conversation.sendText("❌ Could not resolve addresses");
+      return;
+    }
 
-    // Convert amount to USDC decimals (6 decimal places)
-    const amountInDecimals = Math.floor(0.1 * Math.pow(10, 6));
-
-    const walletSendCalls = this.usdcHandler.createUSDCTransferCalls(
-      senderAddress as string,
-      agentAddress as string,
-      amountInDecimals,
-    ) as EncodedContent;
+    const amount = parseUnits("0.1", USDC_DECIMALS);
+    const walletSendCalls = createERC20TransferCalls({
+      chain: baseSepolia,
+      tokenAddress: USDC_BASE_SEPOLIA,
+      from: senderAddress as `0x${string}`,
+      to: agentAddress as `0x${string}`,
+      amount,
+      description: "Transfer 0.1 USDC to key-check agent (UX demo)",
+    });
     console.log("Replied with wallet sendcall");
-    await ctx.conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
+    await ctx.conversation.sendWalletSendCalls(walletSendCalls);
   }
 
   async handleDeeplink(ctx: MessageContext): Promise<void> {
@@ -149,14 +154,14 @@ function greet(name) {
       console.log(`Creating deeplink for agent address: ${agentAddress}`);
 
       // Send deeplink message as specified in the user's function
-      await ctx.conversation.send(
+      await ctx.conversation.sendText(
         `💬 Want to chat privately? Tap here to start a direct conversation:\n\n${deeplink}`,
       );
 
       console.log("Deeplink message sent successfully");
     } catch (error) {
       console.error("Error creating deeplink:", error);
-      await ctx.sendText("❌ Failed to create deeplink message");
+      await ctx.conversation.sendText("❌ Failed to create deeplink message");
     }
   }
 }

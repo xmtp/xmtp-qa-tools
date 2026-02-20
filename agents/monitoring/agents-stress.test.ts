@@ -1,8 +1,6 @@
 import productionAgents from "@agents/agents";
 import { PING_MESSAGE } from "@agents/helper";
 import { Agent, type XmtpEnv } from "@agents/versions";
-import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, it } from "vitest";
 
 const testName = "agents-stress";
@@ -15,9 +13,7 @@ describe(testName, () => {
 
   for (const agentConfig of filteredAgents) {
     it(`${testName}: ${agentConfig.name} Stress : ${agentConfig.address}`, async () => {
-      const agent = await Agent.createFromEnv({
-        codecs: [new ActionsCodec(), new IntentCodec()],
-      });
+      const agent = await Agent.createFromEnv({});
 
       try {
         const targetAgentAddress = agentConfig.address as `0x${string}`;
@@ -51,7 +47,7 @@ describe(testName, () => {
         for (let i = 0; i < groups.length; i++) {
           const group = groups[i];
           for (let j = 0; j < messagesPerGroup; j++) {
-            await group.send(
+            await group.sendText(
               `${PING_MESSAGE} - ${j + 1}/${messagesPerGroup} to group ${i + 1}`,
             );
           }

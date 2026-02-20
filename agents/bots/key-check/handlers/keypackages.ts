@@ -1,11 +1,10 @@
+import { type MessageContext } from "@agents/versions";
 import {
   ActionBuilder,
   sendActions,
   showNavigationOptions,
   type AppConfig,
-} from "@agents/utils/inline-actions/inline-actions";
-import { type MessageContext } from "@agents/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
+} from "../inline-actions";
 
 export class KeyPackagesHandlers {
   async showInboxInputMenu(ctx: MessageContext): Promise<void> {
@@ -17,7 +16,7 @@ export class KeyPackagesHandlers {
       .build();
 
     await sendActions(ctx, inputMenu);
-    await ctx.sendText(
+    await ctx.conversation.sendText(
       "Please send the Inbox ID (64 hex characters) you want to check as a regular text message.",
     );
   }
@@ -31,7 +30,7 @@ export class KeyPackagesHandlers {
       .build();
 
     await sendActions(ctx, inputMenu);
-    await ctx.sendText(
+    await ctx.conversation.sendText(
       "Please send the Ethereum address (0x + 40 hex characters) you want to check as a regular text message.",
     );
   }
@@ -85,26 +84,31 @@ export class KeyPackagesHandlers {
           identifierKind: 0,
         });
         if (!inboxId) {
-          await ctx.sendText(`No inbox found for address ${targetAddress}`);
+          await ctx.conversation.sendText(
+            `No inbox found for address ${targetAddress}`,
+          );
           return;
         }
         resolvedInboxId = inboxId;
       } catch (error) {
         console.error(`Error resolving address ${targetAddress}:`, error);
-        await ctx.sendText(`Error resolving address ${targetAddress}`);
+        await ctx.conversation.sendText(
+          `Error resolving address ${targetAddress}`,
+        );
         return;
       }
     }
 
     // Get inbox state for the target inbox ID
     try {
-      const inboxState = await ctx.client.preferences.inboxStateFromInboxIds(
-        [resolvedInboxId],
-        true,
-      );
+      const inboxState = await ctx.client.preferences.getInboxStates([
+        resolvedInboxId,
+      ]);
 
       if (!inboxState || inboxState.length === 0) {
-        await ctx.sendText(`No inbox state found for ${resolvedInboxId}`);
+        await ctx.conversation.sendText(
+          `No inbox state found for ${resolvedInboxId}`,
+        );
         return;
       }
 
@@ -116,7 +120,7 @@ export class KeyPackagesHandlers {
       );
 
       // Retrieve a map of installation id to KeyPackageStatus
-      const status = (await ctx.client.getKeyPackageStatusesForInstallationIds(
+      const status = (await ctx.client.fetchKeyPackageStatuses(
         installationIds,
       )) as Record<string, any>;
       console.log(status);
@@ -166,14 +170,14 @@ export class KeyPackagesHandlers {
         }
       }
 
-      await ctx.conversation.send(summaryText, ContentTypeMarkdown);
+      await ctx.conversation.sendMarkdown(summaryText);
       console.log(`Sent key status for ${resolvedInboxId}`);
     } catch (error) {
       console.error(
         `Error processing key-check for ${resolvedInboxId}:`,
         error,
       );
-      await ctx.sendText(
+      await ctx.conversation.sendText(
         `Error processing key-check: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }

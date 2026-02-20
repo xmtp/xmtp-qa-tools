@@ -1,14 +1,4 @@
 import {
-  ActionBuilder,
-  initializeAppFromConfig,
-  inlineActionsMiddleware,
-  sendActions,
-  showMenu,
-  showNavigationOptions,
-  type AppConfig,
-  type MenuAction,
-} from "@agents/utils/inline-actions/inline-actions";
-import {
   Agent,
   getTestUrl,
   logDetails,
@@ -16,15 +6,23 @@ import {
 } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
 import { getSDKVersionInfo } from "@helpers/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
-import { ActionsCodec } from "../../utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "../../utils/inline-actions/types/IntentContent";
 import { DebugHandlers } from "./handlers/debug";
 import { ForksHandlers } from "./handlers/forks";
 import { GroupHandlers } from "./handlers/groups";
 import { KeyPackagesHandlers } from "./handlers/keypackages";
 import { LoadTestHandlers } from "./handlers/loadtest";
 import { UxHandlers } from "./handlers/ux";
+import {
+  ActionBuilder,
+  ActionStyle,
+  initializeAppFromConfig,
+  inlineActionsMiddleware,
+  sendActions,
+  showMenu,
+  showNavigationOptions,
+  type AppConfig,
+  type MenuAction,
+} from "./inline-actions";
 
 // Immediate synchronous log - FIRST THING that runs
 console.log(
@@ -58,7 +56,11 @@ const appConfig: AppConfig = {
         "Hey, this is the Key-Check Bot** 🔑\n*if appears greyed out, please go back to the conversation list and open the conversation again",
 
       actions: [
-        { id: "key-packages-menu", label: "🔑 Key Packages", style: "primary" },
+        {
+          id: "key-packages-menu",
+          label: "🔑 Key Packages",
+          style: ActionStyle.Primary,
+        },
         { id: "group-tools-menu", label: "👥 Group Tools" },
         { id: "debug-tools-menu", label: "🛠️ Debug Tools" },
         { id: "load-test-menu", label: "🧪 Load Testing" },
@@ -153,7 +155,7 @@ const appConfig: AppConfig = {
         {
           id: "debug-info",
           label: "🔧 Debug Info",
-          style: "primary",
+          style: ActionStyle.Primary,
           showNavigationOptions: true,
           handler: async (ctx: MessageContext) => {
             await debugHandlers.handleDebugInfo(ctx);
@@ -250,7 +252,7 @@ async function showCustomLoadTestMenu(ctx: MessageContext) {
     .build();
 
   await sendActions(ctx, customMenu);
-  await ctx.sendText(
+  await ctx.conversation.sendText(
     "Please send your custom parameters as a text message in the format:\n" +
       "**groups messages**\n\n" +
       "Examples:\n" +
@@ -265,7 +267,6 @@ const agent = await Agent.createFromEnv({
   dbPath: (inboxId: string) =>
     (process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".") +
     `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
-  codecs: [new ActionsCodec(), new IntentCodec()],
 });
 
 // Handle agent-level unhandled errors
@@ -290,10 +291,6 @@ agent.on("unhandledError", (error) => {
 //   process.exit(1);
 // });
 
-// Add inline actions middleware
-// Type assertion needed because AgentMiddleware is a conditional type based on active version
-// The middleware is compatible but TypeScript can't verify due to version-specific types
-// @ts-expect-error - AgentMiddleware types from different SDK versions are incompatible at compile time but compatible at runtime
 agent.use(inlineActionsMiddleware);
 
 // Initialize load test handlers now that agent is available
@@ -355,7 +352,7 @@ agent.on("text", async (ctx: MessageContext) => {
   - 📧 An **Ethereum address** to check key packages
   - 🔑 An **Inbox ID** to check key packages`;
 
-    await ctx.conversation.send(welcomeMessage, ContentTypeMarkdown);
+    await ctx.conversation.sendMarkdown(welcomeMessage);
   } else if (isTagged) {
     await showMenu(ctx, appConfig, "main-menu");
     return;
@@ -391,7 +388,7 @@ agent.on("text", async (ctx: MessageContext) => {
         "Custom load test completed!",
       );
     } else {
-      await ctx.sendText(
+      await ctx.conversation.sendText(
         "❌ Invalid parameters! Please use reasonable values:\n" +
           "• Groups: 1-1000\n" +
           "• Messages: 1-1000\n\n" +
