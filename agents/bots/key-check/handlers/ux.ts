@@ -12,7 +12,6 @@ const USDC_BASE_SEPOLIA =
 const USDC_DECIMALS = 6;
 
 export class UxHandlers {
-  constructor() {}
   async handleUxMiniApp(ctx: MessageContext): Promise<void> {
     try {
       const miniAppContent = `https://squabble.lol/`;
