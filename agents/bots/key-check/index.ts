@@ -333,14 +333,14 @@ appConfig.menus["load-test-menu"].actions.forEach((action: MenuAction) => {
 // Initialize the app from config - this registers all handlers
 initializeAppFromConfig(appConfig);
 
-agent.on("text", async (ctx) => {
+agent.on("text", async (ctx: MessageContext) => {
   // const messageBody1 = await getMessageBody(
   //   ctx,
   //   "America/Argentina/Buenos_Aires",
   // );
   // //await ctx.sendText(messageBody1);
   const message = ctx.message;
-  const content = message.content;
+  const content = typeof message.content === "string" ? message.content : "";
   const isTagged =
     content.trim().startsWith("@kc") ||
     content.trim().startsWith("/kc") ||
@@ -362,9 +362,10 @@ agent.on("text", async (ctx) => {
   }
 
   // Check for inbox ID or address patterns
+  const trimmedContent: string = content.trim();
   const handled = await keyPackagesHandlers.handleTextMessage(
     ctx,
-    content.trim(),
+    trimmedContent,
     appConfig,
   );
   if (handled) {

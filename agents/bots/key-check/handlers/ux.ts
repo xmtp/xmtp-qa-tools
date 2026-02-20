@@ -1,5 +1,6 @@
 import { type MessageContext } from "@agents/versions";
 import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
+import type { EncodedContent } from "@xmtp/content-type-primitives";
 import {
   ContentTypeRemoteAttachment,
   type RemoteAttachment,
@@ -135,7 +136,7 @@ function greet(name) {
       senderAddress as string,
       agentAddress as string,
       amountInDecimals,
-    );
+    ) as EncodedContent;
     console.log("Replied with wallet sendcall");
     await ctx.conversation.send(walletSendCalls, ContentTypeWalletSendCalls);
   }

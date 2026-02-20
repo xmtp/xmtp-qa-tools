@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== "production") loadEnvFile(import.meta.url);
 
 const agent = await Agent.createFromEnv({
   dbPath: (inboxId) =>
-    getDbPathBase() + `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+    `${String(getDbPathBase())}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   appVersion: APP_VERSION,
 });
 
