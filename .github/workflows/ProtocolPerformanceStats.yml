@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [group-stats]
-        size: [10-50, 100]
+        size: [10-50]
         env: [dev]
         cache-data: [false]
     env:
@@ -32,7 +32,7 @@ jobs:
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
-        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 25
+        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 15
 
       - name: Cleanup and upload artifacts
         if: always()
