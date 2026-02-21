@@ -13,7 +13,7 @@ A comprehensive CLI for testing XMTP protocol implementations across environment
 | `yarn fork`                                  | Run forks testing     | `yarn fork --help`          |
 | `yarn versions`                              | Manage SDK versions   | `yarn versions --help`      |
 | `yarn gen`                                   | Generate test data    | `yarn gen --help`           |
-| `yarn gen:keys [--env <env>]`                | Generate wallet keys  | `yarn gen:keys --help`      |
+| `yarn gen:keys [--env <env>] [--force]`      | Generate wallet keys  | `yarn gen:keys --help`      |
 | `yarn revoke <inbox-id> [--keep <ids>]`      | Revoke installations  | `yarn revoke --help`        |
 | `yarn debug --address <addr>`                | Get DM by address     | `yarn debug --help`         |
 | `yarn debug --inbox-id <id>`                 | Get DM by inbox ID    | `yarn debug --help`         |
@@ -126,10 +126,10 @@ appended to it.
 
 ```bash
 # Generate keys with default dev environment
-yarn gen:keys
+yarn gen:keys --force
 
 # Generate keys for production
-yarn gen:keys --env production
+yarn gen:keys --env production --force
 
 # Show help
 yarn gen:keys --help

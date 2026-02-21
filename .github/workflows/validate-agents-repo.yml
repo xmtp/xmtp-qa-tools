@@ -24,7 +24,7 @@ jobs:
           git clone https://github.com/ephemeraHQ/xmtp-agent-examples.git
           cd xmtp-agent-examples
           yarn install --no-frozen-lockfile
-          yarn gen:keys
+          yarn gen:keys --force
 
       - name: Run agent
         run: |

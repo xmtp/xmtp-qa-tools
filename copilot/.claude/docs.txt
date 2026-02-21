@@ -72,7 +72,7 @@ console.log(`Encryption key: ${encryptionKeyHex}`);
 Use this [script to generate](https://github.com/ephemeraHQ/xmtp-agent-examples) random XMTP keys:
 
 ```bash
-yarn gen:keys
+yarn gen:keys --force
 ```
 
 > Running the command will append keys to your existing .env file.
