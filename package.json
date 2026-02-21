@@ -38,7 +38,7 @@
     "@xmtp/agent-sdk-1.1.0": "npm:@xmtp/agent-sdk@1.1.16",
     "@xmtp/agent-sdk-1.2.0": "npm:@xmtp/agent-sdk@1.2.4",
     "@xmtp/agent-sdk-2.2.0": "npm:@xmtp/agent-sdk@2.2.0",
-    "@xmtp/cli": "^0.0.4",
+    "@xmtp/cli": "^0.2.0",
     "@xmtp/content-type-markdown": "^1.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
