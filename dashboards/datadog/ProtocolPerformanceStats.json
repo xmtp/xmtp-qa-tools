@@ -467,11 +467,7 @@
         "title": "p95 Latency Trend by Stats Operation",
         "show_legend": true,
         "legend_layout": "horizontal",
-        "legend_columns": [
-          "avg",
-          "max",
-          "value"
-        ],
+        "legend_columns": ["avg", "max", "value"],
         "type": "timeseries",
         "requests": [
           {
@@ -518,10 +514,7 @@
         "title": "Throughput Trend by Stats Operation",
         "show_legend": true,
         "legend_layout": "horizontal",
-        "legend_columns": [
-          "sum",
-          "value"
-        ],
+        "legend_columns": ["sum", "value"],
         "type": "timeseries",
         "requests": [
           {
@@ -561,10 +554,7 @@
         "title": "Reliability Trend (Delivery vs Order)",
         "show_legend": true,
         "legend_layout": "horizontal",
-        "legend_columns": [
-          "avg",
-          "value"
-        ],
+        "legend_columns": ["avg", "value"],
         "type": "timeseries",
         "requests": [
           {
@@ -626,11 +616,7 @@
     {
       "name": "env",
       "prefix": "env",
-      "available_values": [
-        "dev",
-        "production",
-        "testnet-staging"
-      ],
+      "available_values": ["dev", "production", "testnet-staging"],
       "default": "production"
     },
     {
@@ -648,11 +634,7 @@
     {
       "name": "members_bucket",
       "prefix": "members_bucket",
-      "available_values": [
-        "small",
-        "medium",
-        "large"
-      ],
+      "available_values": ["small", "medium", "large"],
       "default": "*"
     }
   ],

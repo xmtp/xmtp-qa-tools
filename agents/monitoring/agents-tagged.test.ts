@@ -9,8 +9,6 @@ import { Agent, type XmtpEnv } from "@agents/versions";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
 
 const testName = "agents-tagged";
@@ -34,9 +32,7 @@ describe(testName, () => {
 
   for (const agentConfig of filteredAgents) {
     it(`${testName}: ${agentConfig.name} should respond to tagged/command message : ${agentConfig.address}`, async () => {
-      const agent = await Agent.createFromEnv({
-        codecs: [new ActionsCodec(), new IntentCodec()],
-      });
+      const agent = await Agent.createFromEnv({});
 
       try {
         const testMessage = `@${agentConfig.name} ${PING_MESSAGE}`;
@@ -59,7 +55,7 @@ describe(testName, () => {
           result = await waitForResponse({
             client: agent.client as any,
             conversation: {
-              send: (content: string) => conversation.send(content),
+              send: (content: string) => conversation.sendText(content),
             },
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,

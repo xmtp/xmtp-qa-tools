@@ -31,15 +31,9 @@ import {
   Conversation as Conversation50,
   Dm as Dm50,
   Group as Group50,
-} from "@xmtp/node-sdk-5.0.0";
-import {
-  Client as Client511,
-  Conversation as Conversation511,
-  Dm as Dm511,
-  Group as Group511,
   type LogLevel as LogLevelType,
   type XmtpEnv as XmtpEnvType,
-} from "@xmtp/node-sdk-5.1.1";
+} from "@xmtp/node-sdk-5.0.0";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -79,24 +73,22 @@ export {
   type PermissionLevel,
   type PermissionUpdateType,
   ConsentEntityType,
-} from "@xmtp/node-sdk-5.1.1";
+} from "@xmtp/node-sdk-5.0.0";
 
 // Union types for any supported SDK version (used by compat layer)
 export type AnyClient =
   | InstanceType<typeof Client43>
   | InstanceType<typeof Client45>
   | InstanceType<typeof Client46>
-  | InstanceType<typeof Client50>
-  | InstanceType<typeof Client511>;
+  | InstanceType<typeof Client50>;
 
-export type AnyGroup = Group43 | Group45 | Group46 | Group50 | Group511;
+export type AnyGroup = Group43 | Group45 | Group46 | Group50;
 export type AnyConversation =
   | Conversation43
   | Conversation45
   | Conversation46
-  | Conversation50
-  | Conversation511;
-export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50 | Dm511;
+  | Conversation50;
+export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50;
 
 /**
  * Version references use simplified versions without patches/pre-release suffixes.
@@ -105,12 +97,12 @@ export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50 | Dm511;
  */
 export const VersionList = [
   {
-    Client: Client511,
-    Conversation: Conversation511,
-    Dm: Dm511,
-    Group: Group511,
-    nodeSDK: "5.1.1",
-    nodeBindings: "1.8.1",
+    Client: Client50,
+    Conversation: Conversation50,
+    Dm: Dm50,
+    Group: Group50,
+    nodeSDK: "5.0.0",
+    nodeBindings: "1.7.0",
     auto: true,
   },
   {

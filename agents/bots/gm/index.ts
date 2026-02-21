@@ -1,7 +1,6 @@
 import { Agent, getTestUrl, logDetails } from "@agents/versions";
 import { APP_VERSION } from "@helpers/client";
 import { getSDKVersionInfo } from "@helpers/versions";
-import { getDbPathBase, loadEnvFile } from "../../utils/general";
 
 // Immediate synchronous log - FIRST THING that runs
 console.log(
@@ -9,11 +8,11 @@ console.log(
 );
 
 // Load .env file only in local development
-if (process.env.NODE_ENV !== "production") loadEnvFile(import.meta.url);
+if (process.env.NODE_ENV !== "production") process.loadEnvFile(".env");
 
 const agent = await Agent.createFromEnv({
-  dbPath: (inboxId) =>
-    getDbPathBase() + `/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
+  dbPath: (inboxId: string) =>
+    `${process.env.RAILWAY_VOLUME_MOUNT_PATH ?? "."}/${process.env.XMTP_ENV}-${inboxId.slice(0, 8)}.db3`,
   appVersion: APP_VERSION,
 });
 
@@ -49,9 +48,9 @@ agent.on("text", async (ctx) => {
   //   );
   //   //await ctx.sendText(messageBody1);
   if (ctx.isDm()) {
-    await ctx.sendText("gm from dm");
+    await ctx.conversation.sendText("gm from dm");
   } else if (ctx.isGroup() && ctx.message.content.includes("@gm")) {
-    await ctx.sendText("gm from group");
+    await ctx.conversation.sendText("gm from group");
   }
 });
 

@@ -24,6 +24,13 @@ agents/
 
 ## Quick Start
 
+### Link dependencies
+
+```bash
+yarn versions
+yarn agent-versions
+```
+
 ### Running Agents
 
 ```bash

@@ -1,6 +1,5 @@
 import { createRequire } from "node:module";
 import { type MessageContext } from "@agents/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -16,12 +15,14 @@ export class DebugHandlers {
   }
 
   async handleHelp(ctx: MessageContext, helpText: string): Promise<void> {
-    await ctx.sendText(helpText);
+    await ctx.conversation.sendText(helpText);
     console.log("Sent help information");
   }
 
   async handleVersion(ctx: MessageContext): Promise<void> {
-    await ctx.sendText(`XMTP agent-sdk Version: ${xmtpSdkVersion}`);
+    await ctx.conversation.sendText(
+      `XMTP agent-sdk Version: ${xmtpSdkVersion}`,
+    );
     console.log(`Sent XMTP agent-sdk version: ${xmtpSdkVersion}`);
   }
 
@@ -41,7 +42,7 @@ export class DebugHandlers {
       `Bot started at: ${this.startTime.toLocaleString()}\n` +
       `Uptime: ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    await ctx.sendText(uptimeText);
+    await ctx.conversation.sendText(uptimeText);
     console.log(`Sent uptime information: ${uptimeText}`);
   }
 
@@ -52,7 +53,7 @@ export class DebugHandlers {
       "Conversations:",
       conversations.map((conversation: any) => conversation.id),
     );
-    await ctx.sendText(
+    await ctx.conversation.sendText(
       `key-check conversations: \n${conversations.map((conversation: any) => conversation.id).join("\n")}`,
     );
   }
@@ -82,10 +83,9 @@ export class DebugHandlers {
 
     // Get inbox state and key package info
     const inboxState = await ctx.client.preferences.inboxState();
-    const keyPackageStatuses =
-      await ctx.client.getKeyPackageStatusesForInstallationIds([
-        installationId,
-      ]);
+    const keyPackageStatuses = await ctx.client.fetchKeyPackageStatuses([
+      installationId,
+    ]);
     const keyPackageStatus = keyPackageStatuses[installationId];
 
     let createdDate = new Date();
@@ -125,7 +125,7 @@ export class DebugHandlers {
 - **Bot Status:** ✅ Running
 - **Last Updated:** ${currentTime.toLocaleString()}`;
 
-    await ctx.conversation.send(debugInfo, ContentTypeMarkdown);
+    await ctx.conversation.sendMarkdown(debugInfo);
     console.log("Sent comprehensive debug information");
   }
 }
