@@ -1,4 +1,4 @@
-import { Agent } from "@xmtp/agent-sdk";
+import { Agent } from "@agents/versions";
 
 process.loadEnvFile(".env");
 
