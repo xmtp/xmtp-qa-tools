@@ -126,10 +126,7 @@ appended to it.
 
 ```bash
 # Generate keys with default dev environment
-yarn gen:keys --force
-
-# Generate keys for production
-yarn gen:keys --env production --force
+yarn gen:keys
 
 # Show help
 yarn gen:keys --help
