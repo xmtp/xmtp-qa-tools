@@ -10,11 +10,22 @@ import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 
+// Load .env for keys but preserve XMTP_ENV from runner (--env); gen:keys can overwrite .env with empty/wrong XMTP_ENV
+const runnerEnv = process.env.XMTP_ENV;
+process.loadEnvFile(".env");
+if (runnerEnv) process.env.XMTP_ENV = runnerEnv;
+
 const testName = "agents-dms";
+const VALID_ENVS: XmtpEnv[] = ["dev", "production", "local"];
 
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
+  if (!env || !VALID_ENVS.includes(env)) {
+    throw new Error(
+      `XMTP_ENV must be one of ${VALID_ENVS.join(", ")}. Got: ${String(env)}`,
+    );
+  }
   const filteredAgents = productionAgents.filter((agent: AgentConfig) =>
     agent.networks.includes(env),
   );
