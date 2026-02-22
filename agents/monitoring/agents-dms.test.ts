@@ -44,6 +44,11 @@ describe(testName, () => {
   beforeAll(async () => {
     // Ensure SDK sees correct env (e.g. after .env load in worker)
     process.env.XMTP_ENV = env;
+    // Clear empty XMTP_GATEWAY_HOST — the agent SDK treats "" as a valid host,
+    // which produces an invalid gRPC URI and fails channel creation
+    if (!process.env.XMTP_GATEWAY_HOST) {
+      delete process.env.XMTP_GATEWAY_HOST;
+    }
     agent = await Agent.createFromEnv();
   });
 
