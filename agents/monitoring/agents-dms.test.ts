@@ -42,6 +42,8 @@ describe(testName, () => {
 
   let agent: Agent;
   beforeAll(async () => {
+    // Ensure SDK sees correct env (e.g. after .env load in worker)
+    process.env.XMTP_ENV = env;
     agent = await Agent.createFromEnv();
   });
 
