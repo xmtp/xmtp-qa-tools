@@ -78,7 +78,7 @@
     {
       "id": 501011,
       "definition": {
-        "title": "Delivery Rate (%)",
+        "title": "Operation Success Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -87,15 +87,21 @@
             "response_format": "scalar",
             "queries": [
               {
-                "name": "query1",
+                "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_family:group_stats_v1,metric_name:group.delivery_rate.pct,$env,$region,$sdk}",
-                "aggregator": "avg"
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk}",
+                "aggregator": "sum"
+              },
+              {
+                "name": "err_ops",
+                "data_source": "metrics",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,$env,$region,$sdk}",
+                "aggregator": "sum"
               }
             ],
             "formulas": [
               {
-                "formula": "query1"
+                "formula": "(100 * ok_ops) / (ok_ops + default_zero(err_ops) + 0.000001)"
               }
             ],
             "conditional_formats": [
