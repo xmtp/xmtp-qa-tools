@@ -71,7 +71,7 @@
       "layout": {
         "x": 0,
         "y": 1,
-        "width": 3,
+        "width": 6,
         "height": 2
       }
     },
@@ -121,96 +121,9 @@
         "precision": 1
       },
       "layout": {
-        "x": 3,
-        "y": 1,
-        "width": 3,
-        "height": 2
-      }
-    },
-    {
-      "id": 501012,
-      "definition": {
-        "title": "Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_family:group_stats_v1,metric_name:group.order_rate.pct,$env,$region,$sdk}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99,
-                "palette": "white_on_green"
-              },
-              {
-                "comparator": ">=",
-                "value": 95,
-                "palette": "white_on_yellow"
-              },
-              {
-                "comparator": "<",
-                "value": 95,
-                "palette": "white_on_red"
-              }
-            ]
-          }
-        ],
-        "autoscale": true,
-        "precision": 1
-      },
-      "layout": {
         "x": 6,
         "y": 1,
-        "width": 3,
-        "height": 2
-      }
-    },
-    {
-      "id": 501013,
-      "definition": {
-        "title": "Group Throughput (ops/s)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk}",
-                "aggregator": "sum"
-              }
-            ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ]
-          }
-        ],
-        "autoscale": true,
-        "precision": 2
-      },
-      "layout": {
-        "x": 9,
-        "y": 1,
-        "width": 3,
+        "width": 6,
         "height": 2
       }
     },
