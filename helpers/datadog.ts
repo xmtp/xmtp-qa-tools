@@ -100,6 +100,7 @@ const state = {
 
 const execAsync = promisify(exec);
 const HISTOGRAM_METRIC_SUFFIX = ".hist";
+const DISTRIBUTION_METRIC_SUFFIX = ".dist";
 
 // Utility functions
 export const calculateAverage = (values: number[]): number =>
@@ -132,6 +133,10 @@ function getOperationKey(tags: MetricTags, metricName: string): string {
 
 function withHistogramSuffix(metricName: string): string {
   return `${metricName}${HISTOGRAM_METRIC_SUFFIX}`;
+}
+
+function withDistributionSuffix(metricName: string): string {
+  return `${metricName}${DISTRIBUTION_METRIC_SUFFIX}`;
 }
 
 export function initializeDatadog(): boolean {
@@ -217,6 +222,16 @@ export function sendMetric(
     ) {
       metrics.histogram(
         withHistogramSuffix(fullMetricName),
+        Math.round(metricValue),
+        formattedTags,
+      );
+    }
+
+    // Send operation latency as distribution so Datadog can compute
+    // p50/p95 across raw points within query time windows.
+    if (metricName === "duration" && enrichedTags.metric_type === "operation") {
+      metrics.distribution(
+        withDistributionSuffix(fullMetricName),
         Math.round(metricValue),
         formattedTags,
       );

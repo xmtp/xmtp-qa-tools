@@ -37,7 +37,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
+                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
                 "aggregator": "avg"
               }
             ],
@@ -217,159 +217,7 @@
     {
       "id": 501015,
       "definition": {
-        "title": "Group Latency by Environment",
-        "show_title": true,
-        "type": "group",
-        "layout_type": "ordered",
-        "widgets": [
-          {
-            "id": 501016,
-            "definition": {
-              "title": "dev",
-              "title_size": "16",
-              "title_align": "left",
-              "type": "query_table",
-              "requests": [
-                {
-                  "queries": [
-                    {
-                      "data_source": "metrics",
-                      "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
-                      "aggregator": "avg"
-                    }
-                  ],
-                  "response_format": "scalar",
-                  "sort": {
-                    "order_by": [
-                      {
-                        "type": "group",
-                        "name": "operation",
-                        "order": "asc"
-                      }
-                    ],
-                    "count": 500
-                  },
-                  "formulas": [
-                    {
-                      "cell_display_mode": "trend",
-                      "formula": "query1"
-                    }
-                  ]
-                }
-              ],
-              "has_search_bar": "auto"
-            },
-            "layout": {
-              "x": 0,
-              "y": 0,
-              "width": 4,
-              "height": 4
-            }
-          },
-          {
-            "id": 501017,
-            "definition": {
-              "title": "production",
-              "title_size": "16",
-              "title_align": "left",
-              "type": "query_table",
-              "requests": [
-                {
-                  "queries": [
-                    {
-                      "data_source": "metrics",
-                      "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:production,$region,$sdk,$members_bucket} by {operation}",
-                      "aggregator": "avg"
-                    }
-                  ],
-                  "response_format": "scalar",
-                  "sort": {
-                    "order_by": [
-                      {
-                        "type": "group",
-                        "name": "operation",
-                        "order": "asc"
-                      }
-                    ],
-                    "count": 500
-                  },
-                  "formulas": [
-                    {
-                      "cell_display_mode": "trend",
-                      "formula": "query1"
-                    }
-                  ]
-                }
-              ],
-              "has_search_bar": "auto"
-            },
-            "layout": {
-              "x": 4,
-              "y": 0,
-              "width": 4,
-              "height": 4
-            }
-          },
-          {
-            "id": 501018,
-            "definition": {
-              "title": "testnet-staging",
-              "title_size": "16",
-              "title_align": "left",
-              "type": "query_table",
-              "requests": [
-                {
-                  "queries": [
-                    {
-                      "data_source": "metrics",
-                      "name": "query1",
-                      "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
-                      "aggregator": "avg"
-                    }
-                  ],
-                  "response_format": "scalar",
-                  "sort": {
-                    "order_by": [
-                      {
-                        "type": "group",
-                        "name": "operation",
-                        "order": "asc"
-                      }
-                    ],
-                    "count": 500
-                  },
-                  "formulas": [
-                    {
-                      "cell_display_mode": "trend",
-                      "formula": "query1"
-                    }
-                  ]
-                }
-              ],
-              "has_search_bar": "auto"
-            },
-            "layout": {
-              "x": 8,
-              "y": 0,
-              "width": 4,
-              "height": 4
-            }
-          }
-        ]
-      },
-      "layout": {
-        "x": 0,
-        "y": 3,
-        "width": 12,
-        "height": 5
-      }
-    },
-    {
-      "id": 501020,
-      "definition": {
-        "title": "Latency stats by operation",
+        "title": "Dev vs testnet-staging stats by operation",
         "title_size": "16",
         "title_align": "left",
         "type": "query_table",
@@ -378,32 +226,50 @@
             "queries": [
               {
                 "data_source": "metrics",
-                "name": "avg_d",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "name": "avg_dev",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
-                "name": "p50_d",
-                "query": "avg:xmtp.sdk.duration.hist.50percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "name": "avg_tns",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
-                "name": "p95_d",
-                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "name": "p95_dev",
+                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
-                "name": "ops_c",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "name": "p95_tns",
+                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "ok_dev",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
-                "name": "err_c",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,$env,$region,$sdk,$members_bucket} by {operation,members_bucket}",
+                "name": "err_dev",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "aggregator": "sum"
+              },
+              {
+                "data_source": "metrics",
+                "name": "ok_tns",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "aggregator": "sum"
+              },
+              {
+                "data_source": "metrics",
+                "name": "err_tns",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "sum"
               }
             ],
@@ -421,33 +287,48 @@
             "formulas": [
               {
                 "cell_display_mode": "number",
-                "alias": "avg_ms",
-                "formula": "avg_d"
+                "alias": "avg_dev_ms",
+                "formula": "avg_dev"
               },
               {
                 "cell_display_mode": "number",
-                "alias": "p50_ms",
-                "formula": "p50_d"
+                "alias": "avg_testnet_ms",
+                "formula": "avg_tns"
               },
               {
                 "cell_display_mode": "number",
-                "alias": "p95_ms",
-                "formula": "p95_d"
+                "alias": "avg_diff_ms",
+                "formula": "avg_tns - avg_dev"
               },
               {
                 "cell_display_mode": "number",
-                "alias": "sample_count",
-                "formula": "ops_c"
+                "alias": "p95_dev_ms",
+                "formula": "p95_dev"
               },
               {
                 "cell_display_mode": "number",
-                "alias": "failure_rate_pct",
-                "formula": "(100 * default_zero(err_c)) / (ops_c + default_zero(err_c) + 0.000001)"
+                "alias": "p95_testnet_ms",
+                "formula": "p95_tns"
               },
               {
                 "cell_display_mode": "number",
-                "alias": "p95_samples_needed_to_100",
-                "formula": "clamp_min(100 - ops_c, 0)"
+                "alias": "p95_diff_ms",
+                "formula": "p95_tns - p95_dev"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "failure_dev_pct",
+                "formula": "(100 * default_zero(err_dev)) / (ok_dev + default_zero(err_dev) + 0.000001)"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "failure_testnet_pct",
+                "formula": "(100 * default_zero(err_tns)) / (ok_tns + default_zero(err_tns) + 0.000001)"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "failure_diff_pct",
+                "formula": "((100 * default_zero(err_tns)) / (ok_tns + default_zero(err_tns) + 0.000001)) - ((100 * default_zero(err_dev)) / (ok_dev + default_zero(err_dev) + 0.000001))"
               }
             ]
           }
@@ -456,169 +337,9 @@
       },
       "layout": {
         "x": 0,
-        "y": 8,
+        "y": 3,
         "width": 12,
-        "height": 5
-      }
-    },
-    {
-      "id": 501030,
-      "definition": {
-        "title": "p95 Latency Trend by Stats Operation",
-        "show_legend": true,
-        "legend_layout": "horizontal",
-        "legend_columns": [
-          "avg",
-          "max",
-          "value"
-        ],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration.hist.95percentile{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk,$members_bucket} by {operation}"
-              }
-            ],
-            "formulas": [
-              {
-                "alias": "p95_ms",
-                "formula": "query1"
-              }
-            ],
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "markers": [
-          {
-            "label": "Target",
-            "value": "y = 1000",
-            "display_type": "warning dashed"
-          }
-        ]
-      },
-      "layout": {
-        "x": 0,
-        "y": 13,
-        "width": 6,
-        "height": 3
-      }
-    },
-    {
-      "id": 501031,
-      "definition": {
-        "title": "Throughput Trend by Stats Operation",
-        "show_legend": true,
-        "legend_layout": "horizontal",
-        "legend_columns": [
-          "sum",
-          "value"
-        ],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk,$members_bucket} by {operation}"
-              }
-            ],
-            "formulas": [
-              {
-                "alias": "ops_per_s",
-                "formula": "query1"
-              }
-            ],
-            "style": {
-              "palette": "cool",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ]
-      },
-      "layout": {
-        "x": 6,
-        "y": 13,
-        "width": 6,
-        "height": 3
-      }
-    },
-    {
-      "id": 501040,
-      "definition": {
-        "title": "Reliability Trend (Delivery vs Order)",
-        "show_legend": true,
-        "legend_layout": "horizontal",
-        "legend_columns": [
-          "avg",
-          "value"
-        ],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_family:group_stats_v1,metric_name:group.delivery_rate.pct,$env,$region,$sdk,$members_bucket}"
-              },
-              {
-                "name": "query2",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_family:group_stats_v1,metric_name:group.order_rate.pct,$env,$region,$sdk,$members_bucket}"
-              }
-            ],
-            "formulas": [
-              {
-                "alias": "Delivery",
-                "formula": "query1"
-              },
-              {
-                "alias": "Order",
-                "formula": "query2"
-              }
-            ],
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "markers": [
-          {
-            "label": "SLO",
-            "value": "y = 99",
-            "display_type": "warning dashed"
-          }
-        ],
-        "yaxis": {
-          "label": "Percentage (%)",
-          "include_zero": false,
-          "scale": "linear",
-          "min": "90",
-          "max": "100"
-        }
-      },
-      "layout": {
-        "x": 0,
-        "y": 16,
-        "width": 12,
-        "height": 3
+        "height": 8
       }
     }
   ],
