@@ -10,6 +10,11 @@ interface MetricData {
   members?: string;
 }
 
+interface DurationStatData {
+  values: number[];
+  tags: MetricTags;
+}
+
 // Simplified metric tags interface - consolidates all previous metric tag types
 interface MetricTags {
   metric_type: string;
@@ -24,6 +29,7 @@ interface MetricTags {
   country_iso_code?: string;
   members?: string;
   conversation_count?: string;
+  [key: string]: string | undefined;
 }
 export interface DeliveryMetricTags extends MetricTags {
   metric_type: "delivery" | "order";
@@ -96,11 +102,13 @@ export const GEO_TO_COUNTRY_CODE = {
 const state = {
   isInitialized: false,
   collectedMetrics: {} as Record<string, MetricData>,
+  durationStats: {} as Record<string, DurationStatData>,
 };
 
 const execAsync = promisify(exec);
 const HISTOGRAM_METRIC_SUFFIX = ".hist";
-const DISTRIBUTION_METRIC_SUFFIX = ".dist";
+const DURATION_CALC_P50_METRIC = "xmtp.sdk.duration.calc.p50";
+const DURATION_CALC_P95_METRIC = "xmtp.sdk.duration.calc.p95";
 
 // Utility functions
 export const calculateAverage = (values: number[]): number =>
@@ -135,8 +143,78 @@ function withHistogramSuffix(metricName: string): string {
   return `${metricName}${HISTOGRAM_METRIC_SUFFIX}`;
 }
 
-function withDistributionSuffix(metricName: string): string {
-  return `${metricName}${DISTRIBUTION_METRIC_SUFFIX}`;
+function formatTagsForDatadog(tags: MetricTags): string[] {
+  return Object.entries(tags)
+    .map(([key, value]) => `${key}:${String(value || "").trim()}`)
+    .filter((tag) => !tag.endsWith(":"));
+}
+
+function normalizeCalculatedTags(tags: MetricTags): MetricTags {
+  const normalized = { ...tags };
+  delete normalized.timestamp;
+  return normalized;
+}
+
+function durationStatsKey(tags: MetricTags): string {
+  const keyFields = [
+    "metric_family",
+    "metrics_tier",
+    "tool",
+    "metric_type",
+    "metric_subtype",
+    "operation",
+    "operation_name",
+    "members_bucket",
+    "members",
+    "run_mode",
+    "test",
+    "sdk",
+    "env",
+    "region",
+  ];
+
+  return keyFields.map((field) => tags[field] || "").join("|");
+}
+
+function calculatePercentile(values: number[], percentile: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = percentile * (sorted.length - 1);
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+
+  if (lower === upper) {
+    return sorted[lower];
+  }
+
+  const weight = index - lower;
+  return sorted[lower] + (sorted[upper] - sorted[lower]) * weight;
+}
+
+function trackDurationStats(tags: MetricTags, metricValue: number): void {
+  const calculatedTags = normalizeCalculatedTags(tags);
+  const key = durationStatsKey(calculatedTags);
+  if (!state.durationStats[key]) {
+    state.durationStats[key] = { values: [], tags: calculatedTags };
+  }
+  state.durationStats[key].values.push(metricValue);
+}
+
+function emitCalculatedDurationPercentiles(): void {
+  for (const stat of Object.values(state.durationStats)) {
+    if (stat.values.length === 0) {
+      continue;
+    }
+
+    const formattedTags = formatTagsForDatadog(stat.tags);
+    const p50 = calculatePercentile(stat.values, 0.5);
+    const p95 = calculatePercentile(stat.values, 0.95);
+
+    metrics.gauge(DURATION_CALC_P50_METRIC, Math.round(p50), formattedTags);
+    metrics.gauge(DURATION_CALC_P95_METRIC, Math.round(p95), formattedTags);
+  }
+
+  state.durationStats = {};
 }
 
 export function initializeDatadog(): boolean {
@@ -194,9 +272,7 @@ export function sendMetric(
     state.collectedMetrics[operationKey].values.push(metricValue);
 
     // Format tags for DataDog
-    const formattedTags = Object.entries(enrichedTags)
-      .map(([key, value]) => `${key}:${String(value || "").trim()}`)
-      .filter((tag) => !tag.endsWith(":"));
+    const formattedTags = formatTagsForDatadog(enrichedTags);
 
     // Debug logging (exclude network metrics to reduce noise)
     if (enrichedTags.metric_type !== "network") {
@@ -227,14 +303,8 @@ export function sendMetric(
       );
     }
 
-    // Send operation latency as distribution so Datadog can compute
-    // p50/p95 across raw points within query time windows.
     if (metricName === "duration" && enrichedTags.metric_type === "operation") {
-      metrics.distribution(
-        withDistributionSuffix(fullMetricName),
-        Math.round(metricValue),
-        formattedTags,
-      );
+      trackDurationStats(enrichedTags, metricValue);
     }
   } catch (error) {
     console.error(
@@ -263,9 +333,7 @@ export function sendHistogramMetric(
     const histogramMetricName = withHistogramSuffix(fullMetricName);
 
     // Format tags for DataDog
-    const formattedTags = Object.entries(enrichedTags)
-      .map(([key, value]) => `${key}:${String(value || "").trim()}`)
-      .filter((tag) => !tag.endsWith(":"));
+    const formattedTags = formatTagsForDatadog(enrichedTags);
 
     // Debug logging
     console.debug(
@@ -338,7 +406,16 @@ export async function getNetworkStats(
 
 // Utility functions
 export function flushMetrics(): Promise<void> {
-  return state.isInitialized ? metrics.flush() : Promise.resolve();
+  if (!state.isInitialized) {
+    return Promise.resolve();
+  }
+
+  emitCalculatedDurationPercentiles();
+
+  return metrics.flush().finally(() => {
+    state.collectedMetrics = {};
+    state.durationStats = {};
+  });
 }
 
 // Datadog log sending - optimized

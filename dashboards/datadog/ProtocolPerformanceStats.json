@@ -37,7 +37,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
                 "aggregator": "avg"
               }
             ],
@@ -239,13 +239,13 @@
               {
                 "data_source": "metrics",
                 "name": "p95_dev",
-                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_tns",
-                "query": "p95:xmtp.sdk.duration.dist{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
                 "aggregator": "avg"
               },
               {
