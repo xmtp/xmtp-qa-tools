@@ -10,7 +10,7 @@ import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
 import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "agents-dms";
 
@@ -36,6 +36,10 @@ describe(testName, () => {
     agent = await Agent.createFromEnv({
       codecs: [new ActionsCodec(), new IntentCodec()],
     });
+  });
+
+  afterAll(async () => {
+    await agent?.stop();
   });
 
   it("should have agents configured for this environment", () => {

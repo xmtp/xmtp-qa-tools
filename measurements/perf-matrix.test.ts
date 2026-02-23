@@ -137,7 +137,6 @@ describe(testName, () => {
 
     for (const i of BATCH_SIZE) {
       for (const installationPerMember of INSTALLATION_PER_MEMBER) {
-        let initialMemberCount = 0;
         it(`newGroup-${i}:create a large group of ${i} members ${i}`, async () => {
           allMembersWithExtra = getInboxes(i - workers.getAll().length + 2);
           allMembers = allMembersWithExtra.slice(
@@ -156,7 +155,6 @@ describe(testName, () => {
             })),
           ])) as Group;
           const members = await newGroup.members();
-          initialMemberCount = members.length;
           // Some identifier-based members may not resolve; require at least 80% success
           expect(members.length).toBeGreaterThanOrEqual(Math.ceil(i * 0.8));
           expect(newGroup.id).toBeDefined();

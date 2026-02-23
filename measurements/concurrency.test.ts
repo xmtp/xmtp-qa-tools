@@ -60,7 +60,7 @@ describe(testName, () => {
     console.log(`Secondary client inbox ID: ${secondaryClient.inboxId}`);
   });
 
-  it("massive sync and concurrent creation race test", async () => {
+  it("massive sync after bulk creation test", async () => {
     console.log("Creating 100+ DMs...");
 
     // Create many DMs (like the Rust test)
@@ -127,7 +127,7 @@ describe(testName, () => {
     // Assert performance (like the Rust test)
     expect(duration).toBeLessThanOrEqual(testConfig.timeoutSeconds);
 
-    console.log("✓ Concurrency race test passed!");
+    console.log("Sync after bulk creation test passed");
   });
 
   it("verify conversation counts after race", async () => {
@@ -152,6 +152,6 @@ describe(testName, () => {
     // Basic verification that we have conversations
     expect(allConversations.length).toBeGreaterThan(0);
 
-    console.log("✓ Conversation verification passed!");
+    console.log("Conversation verification passed");
   });
 });

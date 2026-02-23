@@ -227,6 +227,17 @@ export const compareVersions = (
  * Bindings < 1.8.0 expect lowercase (e.g., "warn")
  * Bindings >= 1.8.0 expect capitalized (e.g., "Warn")
  */
+const LOG_LEVEL_ALIASES: Record<string, string> = {
+  warning: "warn",
+  warnings: "warn",
+  err: "error",
+  errors: "error",
+  dbg: "debug",
+  inf: "info",
+  information: "info",
+  verbose: "trace",
+};
+
 export const normalizeLogLevel = (
   nodeBindings: string,
   logLevel: string,
@@ -237,12 +248,16 @@ export const normalizeLogLevel = (
     LOG_LEVEL_FORMAT_VERSION,
   );
 
+  // Resolve common synonyms to canonical names
+  const canonical =
+    LOG_LEVEL_ALIASES[logLevel.toLowerCase()] || logLevel.toLowerCase();
+
   if (usesCapitalizedFormat) {
     // Capitalize first letter: "warn" -> "Warn"
-    return logLevel.charAt(0).toUpperCase() + logLevel.slice(1).toLowerCase();
+    return canonical.charAt(0).toUpperCase() + canonical.slice(1);
   } else {
     // Lowercase: "Warn" -> "warn"
-    return logLevel.toLowerCase();
+    return canonical;
   }
 };
 
