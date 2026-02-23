@@ -26,7 +26,7 @@
     {
       "id": 501010,
       "definition": {
-        "title": "p95 Group Latency (ms)",
+        "title": "p95 Group Latency (dev, ms)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -37,7 +37,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,$env,$region,$sdk}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk}",
                 "aggregator": "avg"
               }
             ],
@@ -71,14 +71,66 @@
       "layout": {
         "x": 0,
         "y": 1,
-        "width": 6,
+        "width": 3,
         "height": 2
       }
     },
     {
       "id": 501011,
       "definition": {
-        "title": "Operation Success Rate (%)",
+        "title": "p95 Group Latency (testnet, ms)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "query1"
+              }
+            ],
+            "conditional_formats": [
+              {
+                "comparator": "<=",
+                "value": 1000,
+                "palette": "white_on_green"
+              },
+              {
+                "comparator": "<=",
+                "value": 3000,
+                "palette": "white_on_yellow"
+              },
+              {
+                "comparator": ">",
+                "value": 3000,
+                "palette": "white_on_red"
+              }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 0
+      },
+      "layout": {
+        "x": 3,
+        "y": 1,
+        "width": 3,
+        "height": 2
+      }
+    },
+    {
+      "id": 501012,
+      "definition": {
+        "title": "Operation Success (dev, %)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -89,13 +141,13 @@
               {
                 "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,$env,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               },
               {
                 "name": "err_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,$env,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -129,7 +181,65 @@
       "layout": {
         "x": 6,
         "y": 1,
-        "width": 6,
+        "width": 3,
+        "height": 2
+      }
+    },
+    {
+      "id": 501013,
+      "definition": {
+        "title": "Operation Success (testnet, %)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "ok_ops",
+                "data_source": "metrics",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk}",
+                "aggregator": "sum"
+              },
+              {
+                "name": "err_ops",
+                "data_source": "metrics",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk}",
+                "aggregator": "sum"
+              }
+            ],
+            "formulas": [
+              {
+                "formula": "(100 * ok_ops) / (ok_ops + default_zero(err_ops) + 0.000001)"
+              }
+            ],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99,
+                "palette": "white_on_green"
+              },
+              {
+                "comparator": ">=",
+                "value": 95,
+                "palette": "white_on_yellow"
+              },
+              {
+                "comparator": "<",
+                "value": 95,
+                "palette": "white_on_red"
+              }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 1
+      },
+      "layout": {
+        "x": 9,
+        "y": 1,
+        "width": 3,
         "height": 2
       }
     },
