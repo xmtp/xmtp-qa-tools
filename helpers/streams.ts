@@ -396,7 +396,7 @@ export async function verifyConsentStream(
     statsLabel: "consent:",
     count: 1,
     messageTemplate: "",
-    membersForStats: [receiver],
+    membersForStats: [initiator],
   });
 }
 

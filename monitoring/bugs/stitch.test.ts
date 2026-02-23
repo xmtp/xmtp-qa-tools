@@ -21,8 +21,9 @@ describe(testName, () => {
 
     await sendTextCompat(group, "test message");
 
+    let timer: ReturnType<typeof setTimeout>;
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
+      timer = setTimeout(() => {
         reject(new Error("Timed out waiting for conversation stream"));
       }, 30000);
     });
@@ -36,5 +37,6 @@ describe(testName, () => {
     })();
 
     await Promise.race([streamPromise, timeoutPromise]);
+    clearTimeout(timer!);
   });
 });

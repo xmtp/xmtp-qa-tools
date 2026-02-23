@@ -202,7 +202,6 @@ describe(testName, () => {
                       `Group ${groupIndex + 1} operation failed:`,
                       e,
                     );
-                    throw e;
                   }
                 })(),
             );

@@ -8,7 +8,7 @@ import {
 import { Agent, type XmtpEnv } from "@agents/versions";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // Load .env for keys but preserve XMTP_ENV from runner (--env); gen:keys can overwrite .env with empty/wrong XMTP_ENV
 const runnerEnv = process.env.XMTP_ENV;
@@ -50,6 +50,10 @@ describe(testName, () => {
       delete process.env.XMTP_GATEWAY_HOST;
     }
     agent = await Agent.createFromEnv();
+  });
+
+  afterAll(async () => {
+    await agent?.stop();
   });
 
   it("should have agents configured for this environment", () => {

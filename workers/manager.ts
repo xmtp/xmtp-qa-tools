@@ -680,7 +680,7 @@ function getNextFolderName(): string {
   }
   const existingFolders = fs
     .readdirSync(dataPath)
-    .filter((f) => /^[a-z]+$/.test(f))
+    .filter((f) => /^[a-z]{1,2}$/.test(f))
     .sort();
   const count = existingFolders.length;
   // Generate folder names: a-z, then aa-az, ba-bz, etc.
