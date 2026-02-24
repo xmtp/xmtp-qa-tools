@@ -672,24 +672,52 @@ export function getWorkerNames(workers: WorkerManager): string[] {
 
 /**
  * Helper function to get the next available folder name
+ * Uses atomic directory creation to avoid race conditions
  */
 function getNextFolderName(): string {
   const dataPath = path.resolve(process.cwd(), ".data");
+
+  // Ensure .data directory exists
   if (!fs.existsSync(dataPath)) {
-    return "a";
+    fs.mkdirSync(dataPath, { recursive: true });
   }
-  const existingFolders = fs
-    .readdirSync(dataPath)
-    .filter((f) => /^[a-z]{1,2}$/.test(f))
-    .sort();
-  const count = existingFolders.length;
-  // Generate folder names: a-z, then aa-az, ba-bz, etc.
-  if (count < 26) {
-    return String.fromCharCode("a".charCodeAt(0) + count);
+
+  const maxAttempts = 1000;
+
+  for (let count = 0; count < maxAttempts; count++) {
+    // Generate folder names: a-z, then aa-az, ba-bz, etc.
+    let folderName: string;
+    if (count < 26) {
+      folderName = String.fromCharCode("a".charCodeAt(0) + count);
+    } else {
+      const firstIndex = Math.floor(count / 26) - 1;
+      if (firstIndex >= 26) {
+        throw new Error(
+          "Folder limit exceeded: cannot create more than 702 folders"
+        );
+      }
+      const first = String.fromCharCode("a".charCodeAt(0) + firstIndex);
+      const second = String.fromCharCode("a".charCodeAt(0) + (count % 26));
+      folderName = first + second;
+    }
+
+    const folderPath = path.join(dataPath, folderName);
+
+    try {
+      // Attempt atomic directory creation
+      fs.mkdirSync(folderPath, { recursive: false });
+      return folderName;
+    } catch (error) {
+      // If folder already exists, try next name
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+        continue;
+      }
+      // Re-throw unexpected errors
+      throw error;
+    }
   }
-  const first = String.fromCharCode("a".charCodeAt(0) + Math.floor(count / 26) - 1);
-  const second = String.fromCharCode("a".charCodeAt(0) + (count % 26));
-  return first + second;
+
+  throw new Error(`Failed to create folder after ${maxAttempts} attempts`);
 }
 
 /**
