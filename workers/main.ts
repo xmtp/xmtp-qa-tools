@@ -1059,7 +1059,6 @@ export class WorkerClient extends Worker implements IWorkerClient {
           console.error(
             `[${this.nameId}] consent stream error: ${String(error)}`,
           );
-          throw error;
         }
       }
     })();
