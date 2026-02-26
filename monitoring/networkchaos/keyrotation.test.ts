@@ -76,7 +76,9 @@ describe(testName, async () => {
             console.log("[verify] Checking fork and delivery");
             await workers.checkForks();
             const res = await verifyMessageStream(group, otherUsers);
-            verifyResults.push({ receptionPercentage: res.receptionPercentage });
+            verifyResults.push({
+              receptionPercentage: res.receptionPercentage,
+            });
           } catch (e) {
             console.warn("[verify] Skipping check due to error:", e);
           }

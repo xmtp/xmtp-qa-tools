@@ -16,7 +16,6 @@ const testName = "agents-untagged";
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const isProduction = env === "production";
   const filteredAgents = productionAgents.filter((agent) =>
     agent.networks.includes(env),
   );

@@ -11,7 +11,9 @@ describe("Basic Network Fault Tests", () => {
     node1.clearLatency();
 
     console.log("[netem] Pinging node2 from node1 before latency:");
-    expect(() => node1.ping(node2)).not.toThrow();
+    expect(() => {
+      node1.ping(node2);
+    }).not.toThrow();
 
     console.log(
       `[netem] Applying 200ms delay to node1 veth interface: ${node1.veth}`,
@@ -20,7 +22,9 @@ describe("Basic Network Fault Tests", () => {
 
     console.log("[netem] Pinging node2 from node1 with latency:");
     const start = Date.now();
-    expect(() => node1.ping(node2)).not.toThrow();
+    expect(() => {
+      node1.ping(node2);
+    }).not.toThrow();
     const elapsed = Date.now() - start;
     console.log(`[netem] Ping with latency took ${elapsed}ms`);
     expect(elapsed).toBeGreaterThan(200);
@@ -29,27 +33,39 @@ describe("Basic Network Fault Tests", () => {
     node1.clearLatency();
 
     console.log("[netem] Pinging node2 from node1 after latency removed:");
-    expect(() => node1.ping(node2)).not.toThrow();
+    expect(() => {
+      node1.ping(node2);
+    }).not.toThrow();
   });
 
   it("block and restore traffic between node1 and node4", () => {
     console.log("[iptables] Pinging node4 from node1 before partition:");
-    expect(() => node1.ping(node4)).not.toThrow();
+    expect(() => {
+      node1.ping(node4);
+    }).not.toThrow();
 
     console.log("[iptables] Blocking outbound traffic from node1 to node4...");
-    expect(() => node1.blockOutboundTrafficTo(node4)).not.toThrow();
+    expect(() => {
+      node1.blockOutboundTrafficTo(node4);
+    }).not.toThrow();
 
     console.log(
       "[iptables] Pinging node4 from node1 during partition (expect failure):",
     );
-    expect(() => node1.ping(node4)).toThrow();
+    expect(() => {
+      node1.ping(node4);
+    }).toThrow();
 
     console.log(
       "[iptables] Unblocking outbound traffic from node1 to node4...",
     );
-    expect(() => node1.unblockOutboundTrafficTo(node4)).not.toThrow();
+    expect(() => {
+      node1.unblockOutboundTrafficTo(node4);
+    }).not.toThrow();
 
     console.log("[iptables] Pinging node4 from node1 after restoring:");
-    expect(() => node1.ping(node4)).not.toThrow();
+    expect(() => {
+      node1.ping(node4);
+    }).not.toThrow();
   });
 });

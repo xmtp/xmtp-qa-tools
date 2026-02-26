@@ -693,7 +693,7 @@ function getNextFolderName(): string {
       const firstIndex = Math.floor(count / 26) - 1;
       if (firstIndex >= 26) {
         throw new Error(
-          "Folder limit exceeded: cannot create more than 702 folders"
+          "Folder limit exceeded: cannot create more than 702 folders",
         );
       }
       const first = String.fromCharCode("a".charCodeAt(0) + firstIndex);

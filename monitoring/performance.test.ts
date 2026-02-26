@@ -193,7 +193,8 @@ describe(testName, () => {
       // Sync from a different client (group worker) to verify the name propagated
       const verifier = groupWorkers[0];
       await verifier.client.conversations.sync();
-      const verifierConvo = await verifier.client.conversations.getConversationById(newGroup.id);
+      const verifierConvo =
+        await verifier.client.conversations.getConversationById(newGroup.id);
       await verifierConvo!.sync();
       expect((verifierConvo as Group).name).toBe(newName);
     });
@@ -231,7 +232,9 @@ describe(testName, () => {
       }
       await newGroup.removeMembers([extraMember.inboxId]);
       const members = await newGroup.members();
-      expect(members.find((m: any) => m.inboxId === extraMember.inboxId)).toBeUndefined();
+      expect(
+        members.find((m: any) => m.inboxId === extraMember.inboxId),
+      ).toBeUndefined();
     });
     it(`addMember-${i}:add members to a group`, async () => {
       if (!newGroup) {

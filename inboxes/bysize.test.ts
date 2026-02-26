@@ -121,10 +121,7 @@ async function populate(count: number, worker: Worker) {
     for (const result of results) {
       if (result.status === "rejected") {
         batchFailed++;
-        console.warn(
-          `[${worker.name}] DM creation failed:`,
-          result.reason,
-        );
+        console.warn(`[${worker.name}] DM creation failed:`, result.reason);
       }
     }
 

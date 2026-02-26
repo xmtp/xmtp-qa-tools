@@ -90,7 +90,10 @@ describe(testName, () => {
             },
           });
         } catch (error) {
-          console.error(`waitForResponse failed for ${agentConfig.name}:`, error);
+          console.error(
+            `waitForResponse failed for ${agentConfig.name}:`,
+            error,
+          );
           throw error;
         }
 
