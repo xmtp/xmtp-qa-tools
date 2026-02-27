@@ -8,7 +8,7 @@ import {
 import { Agent, type XmtpEnv } from "@agents/versions";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // Load .env for keys but preserve XMTP_ENV from runner (--env); gen:keys can overwrite .env with empty/wrong XMTP_ENV
 const runnerEnv = process.env.XMTP_ENV;
@@ -52,54 +52,50 @@ describe(testName, () => {
     agent = await Agent.createFromEnv();
   });
 
+  afterAll(async () => {
+    await agent?.stop();
+  });
+
+  it("should have agents configured for this environment", () => {
+    expect(filteredAgents.length).toBeGreaterThan(0);
+  });
+
   for (const agentConfig of filteredAgents) {
     it(`${testName}: ${agentConfig.name} DM : ${agentConfig.address}`, async () => {
-      try {
-        const conversation = await agent.createDmWithAddress(
-          agentConfig.address as `0x${string}`,
-        );
+      const conversation = await agent.createDmWithAddress(
+        agentConfig.address as `0x${string}`,
+      );
 
-        const messageToSend = agentConfig.customText || PING_MESSAGE;
-        console.log(
-          `📤 Sending "${messageToSend}" to ${agentConfig.name} (${agentConfig.address})`,
-        );
+      const messageToSend = agentConfig.customText || PING_MESSAGE;
+      console.log(
+        `Sending "${messageToSend}" to ${agentConfig.name} (${agentConfig.address})`,
+      );
 
-        let result;
-        try {
-          result = await waitForResponse({
-            client: agent.client as any,
-            conversation: {
-              send: (content: string) => conversation.sendText(content),
-            },
-            conversationId: conversation.id,
-            senderInboxId: agent.client.inboxId,
-            timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: messageToSend,
-          });
-        } catch {
-          result = {
-            success: false,
-            sendTime: 0,
-            responseTime: AGENT_RESPONSE_TIMEOUT,
-            responseMessage: null,
-          };
-        }
+      const result = await waitForResponse({
+        client: agent.client as any,
+        conversation: {
+          send: (content: string) => conversation.sendText(content),
+        },
+        conversationId: conversation.id,
+        senderInboxId: agent.client.inboxId,
+        timeout: AGENT_RESPONSE_TIMEOUT,
+        messageText: messageToSend,
+      });
 
+      if (result.success) {
         sendMetric(
           "response",
-          result.responseTime ?? AGENT_RESPONSE_TIMEOUT,
+          Math.max(result.responseTime || 0, 0.0001),
           createMetricTags(agentConfig),
         );
-
-        expect(result.success).toBe(true);
-        expect(result.responseMessage).toBeTruthy();
-
-        console.log(
-          `✅ ${agentConfig.name} responded in ${result.responseTime.toFixed(2)}ms`,
-        );
-      } finally {
-        await agent.stop();
       }
+
+      expect(result.success).toBe(true);
+      expect(result.responseMessage).toBeTruthy();
+
+      console.log(
+        `${agentConfig.name} responded in ${result.responseTime.toFixed(2)}ms`,
+      );
     });
   }
 });

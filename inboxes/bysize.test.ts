@@ -1,7 +1,7 @@
 import { ProgressBar } from "@helpers/logger";
 import { IdentifierKind } from "@helpers/versions";
 import { getWorkers, type Worker } from "@workers/manager";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("bysize", () => {
   const POPULATE_SIZE = process.env.POPULATE_SIZE
@@ -12,6 +12,8 @@ describe("bysize", () => {
     Math.max(5, Math.floor(expectedSize * 0.1));
 
   it("populate", async () => {
+    let sizesVerified = 0;
+
     for (const [, populateSize] of POPULATE_SIZE.entries()) {
       if (populateSize === 0) continue;
 
@@ -19,12 +21,13 @@ describe("bysize", () => {
 
       const coworkers = await getWorkers([creatorName]);
       const creator = coworkers.get(creatorName);
-      if (!creator) throw new Error(`Creator ${creatorName} not found`);
+      expect(creator).toBeDefined();
+      if (!creator) throw new Error(`Worker ${creatorName} not found`);
 
       console.log(`Syncing all conversations for ${creatorName}...`);
 
       console.time("syncAll");
-      await creator?.client.conversations.sync();
+      await creator.client.conversations.sync();
       console.timeEnd("syncAll");
 
       console.log(
@@ -41,15 +44,15 @@ describe("bysize", () => {
       const minExpected = populateSize - tolerance;
       const maxExpected = populateSize + tolerance;
 
-      if (
-        conversationsAfter.length < minExpected ||
-        conversationsAfter.length > maxExpected
-      ) {
-        throw new Error(
-          `Expected approximately ${populateSize} conversations for ${creatorName} (tolerance: ±${tolerance}), but got ${conversationsAfter.length}`,
-        );
-      }
+      expect(conversationsAfter.length).toBeGreaterThanOrEqual(minExpected);
+      expect(conversationsAfter.length).toBeLessThanOrEqual(maxExpected);
+      sizesVerified++;
     }
+
+    expect(
+      sizesVerified,
+      "At least one populate size must be verified to avoid a vacuous pass",
+    ).toBeGreaterThan(0);
   });
 });
 
@@ -104,7 +107,7 @@ async function populate(count: number, worker: Worker) {
     let batchCreated = 0;
     let batchFailed = 0;
 
-    await Promise.all(
+    const results = await Promise.allSettled(
       senderWorkers.map(async (sender) => {
         await sender.worker.createDmWithIdentifier({
           identifier: worker.address,
@@ -114,6 +117,13 @@ async function populate(count: number, worker: Worker) {
         batchCreated++;
       }),
     );
+
+    for (const result of results) {
+      if (result.status === "rejected") {
+        batchFailed++;
+        console.warn(`[${worker.name}] DM creation failed:`, result.reason);
+      }
+    }
 
     console.log(
       `[${worker.name}] Batch completed: ${batchCreated} created, ${batchFailed} failed`,

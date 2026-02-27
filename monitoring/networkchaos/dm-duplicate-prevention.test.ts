@@ -1,7 +1,6 @@
 import { sendTextCompat } from "@helpers/sdk-compat";
 import { type Dm } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability/container";
@@ -12,9 +11,6 @@ describe(testName, async () => {
     henry: "http://localhost:5556",
     randomguy: "http://localhost:6556",
   });
-  // Start message streams for duplicate prevention test
-  workers.startStream(typeofStream.Message);
-
   setupDurationTracking({ testName });
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
@@ -86,6 +82,7 @@ describe(testName, async () => {
         .mustGet("randomguy")
         .client.conversations.createDm(workers.mustGet("henry").client.inboxId);
 
+      await convoFromReceiver.sync();
       const received = await convoFromReceiver.messages();
       const matching = received.filter(
         (m: { content: unknown }) => m.content === messageContent,
@@ -99,8 +96,7 @@ describe(testName, async () => {
       }
 
       expect(matching.length).toBe(1); // Validate deduplication held
-    } catch (err) {
-      console.error(err);
+    } finally {
       node2.clearLatency();
     }
   });

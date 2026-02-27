@@ -48,6 +48,7 @@ describe(testName, async () => {
       const convo = await workers
         .mustGet(sender)
         .client.conversations.getConversationById(group.id);
+      expect(convo).toBeDefined();
       for (let i = 1; i <= 3; i++) {
         const msg = `partition-msg-${sender}-${i}`;
         await sendTextCompat(convo!, msg);
@@ -64,6 +65,8 @@ describe(testName, async () => {
       const convo = await workers
         .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
+      expect(convo).toBeDefined();
+      await convo!.sync();
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
         const seen = msgs.some((m) => m.content === content);
@@ -81,12 +84,14 @@ describe(testName, async () => {
 
     await new Promise((r) => setTimeout(r, 3000));
 
-    await workers
+    const user3ReconnectConvo = await workers
       .mustGet("user3")
       .client.conversations.getConversationById(group.id);
-    await workers
+    expect(user3ReconnectConvo).toBeDefined();
+    const user4ReconnectConvo = await workers
       .mustGet("user4")
       .client.conversations.getConversationById(group.id);
+    expect(user4ReconnectConvo).toBeDefined();
 
     await workers.checkForks();
 
@@ -97,6 +102,8 @@ describe(testName, async () => {
       const convo = await workers
         .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
+      expect(convo).toBeDefined();
+      await convo!.sync();
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
         const seen = msgs.some((m) => m.content === content);
@@ -112,6 +119,8 @@ describe(testName, async () => {
       const convo = await workers
         .mustGet(recipient)
         .client.conversations.getConversationById(group.id);
+      expect(convo).toBeDefined();
+      await convo!.sync();
       const msgs = await convo!.messages();
       for (const content of midPartitionMessages) {
         const seen = msgs.some((m) => m.content === content);
