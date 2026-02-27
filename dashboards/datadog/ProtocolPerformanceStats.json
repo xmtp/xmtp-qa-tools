@@ -376,11 +376,7 @@
     {
       "name": "env",
       "prefix": "env",
-      "available_values": [
-        "dev",
-        "production",
-        "testnet-staging"
-      ],
+      "available_values": ["dev", "production", "testnet-staging"],
       "default": "production"
     },
     {
@@ -398,11 +394,7 @@
     {
       "name": "members_bucket",
       "prefix": "members_bucket",
-      "available_values": [
-        "small",
-        "medium",
-        "large"
-      ],
+      "available_values": ["small", "medium", "large"],
       "default": "*"
     }
   ],

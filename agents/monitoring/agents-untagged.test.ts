@@ -9,8 +9,6 @@ import { Agent, type XmtpEnv } from "@agents/versions";
 import { sendMetric, type ResponseMetricTags } from "@helpers/datadog";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { ActionsCodec } from "agents/utils/inline-actions/types/ActionsContent";
-import { IntentCodec } from "agents/utils/inline-actions/types/IntentContent";
 import { describe, expect, it } from "vitest";
 
 const testName = "agents-untagged";
@@ -18,7 +16,6 @@ const testName = "agents-untagged";
 describe(testName, () => {
   setupDurationTracking({ testName, initDataDog: true });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const isProduction = env === "production";
   const filteredAgents = productionAgents.filter((agent) =>
     agent.networks.includes(env),
   );
@@ -26,18 +23,20 @@ describe(testName, () => {
   const createMetricTags = (agentConfig: AgentConfig): ResponseMetricTags => ({
     test: testName,
     metric_type: "agent",
-    metric_subtype: "dm",
+    metric_subtype: "group",
     live: agentConfig.live ? "true" : "false",
     agent: agentConfig.name,
     address: agentConfig.address,
     sdk: "",
   });
 
+  it("should have agents configured for this environment", () => {
+    expect(filteredAgents.length).toBeGreaterThan(0);
+  });
+
   for (const agentConfig of filteredAgents) {
     it(`${testName}: ${agentConfig.name} should not respond to untagged hi : ${agentConfig.address}`, async () => {
-      const agent = await Agent.createFromEnv({
-        codecs: [new ActionsCodec(), new IntentCodec()],
-      });
+      const agent = await Agent.createFromEnv({});
 
       try {
         const testUserAddress = getInboxes(1)[0].accountAddress;
@@ -55,7 +54,7 @@ describe(testName, () => {
           await waitForResponse({
             client: agent.client as any,
             conversation: {
-              send: (content: string) => conversation.send(content),
+              send: (content: string) => conversation.sendText(content),
             },
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,
@@ -67,18 +66,18 @@ describe(testName, () => {
           console.log("No welcome message received (this is okay)");
         }
 
-        // Test actual response to untagged message
+        // Test actual response to untagged message (plain "hi", no @mention)
         let result;
         try {
           result = await waitForResponse({
             client: agent.client as any,
             conversation: {
-              send: (content: string) => conversation.send(content),
+              send: (content: string) => conversation.sendText(content),
             },
             conversationId: conversation.id,
             senderInboxId: agent.client.inboxId,
             timeout: AGENT_RESPONSE_TIMEOUT,
-            messageText: PING_MESSAGE,
+            messageText: "hi",
           });
         } catch {
           // No response is expected for untagged messages
@@ -95,19 +94,16 @@ describe(testName, () => {
 
         if (result.success && result.responseMessage) {
           console.log(
-            `⚠️ ${agentConfig.name} responded to untagged message in ${responseTime.toFixed(2)}ms`,
+            `WARNING: ${agentConfig.name} responded to untagged message in ${responseTime.toFixed(2)}ms`,
           );
         } else {
           console.log(
-            `✅ ${agentConfig.name} correctly did not respond to untagged message`,
+            `${agentConfig.name} correctly did not respond to untagged message`,
           );
         }
 
-        // For untagged messages, we don't require a response
-        // The test passes whether there's a response or not (just monitoring behavior)
-        if (!isProduction) {
-          expect(result).toBeTruthy();
-        }
+        // The agent should NOT have responded to an untagged message
+        expect(result.success).toBe(false);
       } finally {
         await agent.stop();
       }

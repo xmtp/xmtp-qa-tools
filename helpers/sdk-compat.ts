@@ -23,7 +23,7 @@ import type {
 import type {
   Client as Client511,
   Conversation as Conversation511,
-} from "@xmtp/node-sdk-5.1.1";
+} from "@xmtp/node-sdk-5.0.0";
 
 /**
  * Send a text message to a conversation, compatible with both SDK 4.x and 5.0+

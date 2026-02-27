@@ -97,13 +97,13 @@ function extractTimestamp(ev: unknown): number | null {
   // Try top-level fields
   for (const field of timestampFields) {
     const value = getProperty<number>(ev, [field]);
-    if (value) return value;
+    if (value != null) return value;
   }
 
   // Try nested in message object
   for (const field of timestampFields) {
     const value = getProperty<number>(ev, ["message", field]);
-    if (value) return value;
+    if (value != null) return value;
   }
 
   return null;
@@ -203,10 +203,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
 
   const allResults = {
-    averageEventTiming:
-      averageEventTiming === 0 ? undefined : averageEventTiming,
-    receptionPercentage: stats?.receptionPercentage,
-    orderPercentage: stats?.orderPercentage,
+    averageEventTiming: timingCount === 0 ? undefined : averageEventTiming,
+    receptionPercentage: stats?.receptionPercentage ?? 0,
+    orderPercentage: stats?.orderPercentage ?? 0,
   };
   console.debug("allResults", JSON.stringify(allResults, null, 2));
   return allResults;
@@ -310,15 +309,16 @@ export async function verifyMembershipStream(
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, 1),
     triggerEvents: async () => {
       const sent: { inboxId: string; sentAt: number }[] = [];
-      const sentAt = Date.now();
       for (const member of membersToAdd) {
         try {
+          const sentAt = Date.now();
           await group.addMembers([member]);
+          sent.push({ inboxId: member, sentAt });
         } catch (error) {
           console.error("Error adding member to group", error);
           console.error("member", member);
+          // Don't push to sent — the add failed, so we shouldn't expect a stream event
         }
-        sent.push({ inboxId: member, sentAt });
       }
       return sent;
     },
@@ -366,19 +366,19 @@ export async function verifyConsentStream(
   initiator: Worker,
   receiver: Worker,
 ): Promise<VerifyStreamResult> {
-  receiver.worker.startStream(typeofStream.Consent);
+  initiator.worker.startStream(typeofStream.Consent);
 
   return collectAndTimeEventsWithStats({
-    receivers: [receiver],
+    receivers: [initiator],
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      const getState = await receiver.client.preferences.getConsentState(
+      const getState = await initiator.client.preferences.getConsentState(
         ConsentEntityType.InboxId,
         receiver.client.inboxId,
       );
 
-      await receiver.client.preferences.setConsentStates([
+      await initiator.client.preferences.setConsentStates([
         {
           entity: receiver.client.inboxId,
           entityType: ConsentEntityType.InboxId,
@@ -496,19 +496,24 @@ export function calculateMessageStats(
     const inOrder = isOrderedSubsequence(messages, expectedMessages);
     return { inOrder, expectedMessages };
   };
-  let totalExpectedMessages = amount * messagesByWorker.length;
+  const workerCount = messagesByWorker.length;
+  if (workerCount === 0) {
+    return { receptionPercentage: 0, orderPercentage: 0 };
+  }
+  let totalExpectedMessages = amount * workerCount;
   let totalReceivedMessages = messagesByWorker.reduce(
     (sum, msgs) => sum + msgs.length,
     0,
   );
   let workersInOrder = 0;
-  const workerCount = messagesByWorker.length;
   for (const messages of messagesByWorker) {
     const { inOrder } = verifyMessageOrder(messages, prefix, amount);
     if (inOrder) workersInOrder++;
   }
   const receptionPercentage =
-    (totalReceivedMessages / totalExpectedMessages) * 100;
+    totalExpectedMessages > 0
+      ? (totalReceivedMessages / totalExpectedMessages) * 100
+      : 0;
   const orderPercentage = (workersInOrder / workerCount) * 100;
   return { receptionPercentage, orderPercentage };
 }

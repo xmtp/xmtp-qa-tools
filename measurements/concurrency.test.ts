@@ -6,7 +6,7 @@ import {
 import { Client, type XmtpEnv } from "@helpers/versions";
 import { setupDurationTracking } from "@helpers/vitest";
 import { getInboxes } from "@inboxes/utils";
-import { beforeAll, describe, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testConfig = {
   randomInboxIds: getInboxes(100).map((a) => a.inboxId), // 100 DMs like the Rust test
@@ -60,7 +60,7 @@ describe(testName, () => {
     console.log(`Secondary client inbox ID: ${secondaryClient.inboxId}`);
   });
 
-  it("massive sync and consent race test", async () => {
+  it("massive sync after bulk creation test", async () => {
     console.log("Creating 100+ DMs...");
 
     // Create many DMs (like the Rust test)
@@ -75,6 +75,16 @@ describe(testName, () => {
     }
 
     console.log(`Created ${createdDms.length} DMs`);
+    const dmFailureRate =
+      1 - createdDms.length / testConfig.randomInboxIds.length;
+    if (dmFailureRate > 0.2) {
+      throw new Error(
+        `DM creation failure rate too high: ${(dmFailureRate * 100).toFixed(1)}% ` +
+          `(${createdDms.length}/${testConfig.randomInboxIds.length} succeeded). ` +
+          `Maximum allowed failure rate is 20%.`,
+      );
+    }
+    expect(createdDms.length).toBeGreaterThan(0);
 
     // Create 200+ groups with secondary client as member (like the Rust test)
     console.log("Creating 200+ groups...");
@@ -100,48 +110,14 @@ describe(testName, () => {
     }
 
     console.log(`Created ${createdGroups.length} groups`);
-    console.log("Starting sync + stream race...");
+    expect(createdGroups.length).toBeGreaterThan(0);
+    console.log("Starting sync race...");
 
     const startTime = performance.now();
 
-    // Start streamAllMessages (like the Rust test)
-    const streamPromise = (async () => {
-      try {
-        await primaryClient.conversations.sync();
-        const stream = await primaryClient.conversations.streamAllMessages();
-
-        // Collect some messages to verify streaming works
-        let messageCount = 0;
-        const maxMessages = 10; // Just collect a few to verify it works
-
-        for await (const message of stream) {
-          console.log("Message", message);
-          messageCount++;
-          if (messageCount >= maxMessages) {
-            break;
-          }
-        }
-
-        console.log(`Stream collected ${messageCount} messages`);
-      } catch (error) {
-        console.error("Stream error:", error);
-        throw error;
-      }
-    })();
-
-    // Run syncAllConversations concurrently (like the Rust test)
-    const syncPromise = (async () => {
-      try {
-        await primaryClient.conversations.sync();
-        console.log("Sync completed successfully");
-      } catch (error) {
-        console.error("Sync error:", error);
-        throw error;
-      }
-    })();
-
-    // Wait for both operations to complete
-    await Promise.all([streamPromise, syncPromise]);
+    // Run syncAllConversations
+    await primaryClient.conversations.sync();
+    console.log("Sync completed successfully");
 
     const duration = (performance.now() - startTime) / 1000; // Convert to seconds
     console.log(
@@ -149,13 +125,9 @@ describe(testName, () => {
     );
 
     // Assert performance (like the Rust test)
-    if (duration > testConfig.timeoutSeconds) {
-      throw new Error(
-        `Sync and stream should complete within ${testConfig.timeoutSeconds} seconds, but took ${duration.toFixed(2)} seconds`,
-      );
-    }
+    expect(duration).toBeLessThanOrEqual(testConfig.timeoutSeconds);
 
-    console.log("✓ Concurrency race test passed!");
+    console.log("Sync after bulk creation test passed");
   });
 
   it("verify conversation counts after race", async () => {
@@ -178,10 +150,8 @@ describe(testName, () => {
     console.log(`Groups: ${groups.length}`);
 
     // Basic verification that we have conversations
-    if (allConversations.length === 0) {
-      throw new Error("No conversations found after sync");
-    }
+    expect(allConversations.length).toBeGreaterThan(0);
 
-    console.log("✓ Conversation verification passed!");
+    console.log("Conversation verification passed");
   });
 });

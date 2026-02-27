@@ -1,8 +1,29 @@
 import { execSync } from "child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { AgentVersionList } from "@agents/versions";
-import { VersionList } from "@helpers/versions";
+
+/**
+ * Static symlink config so we can create node-sdk → node-bindings symlinks
+ * without importing @helpers/versions (which would load node-sdk-5.0.0 before
+ * symlinks exist). Keep in sync with helpers/versions.ts VersionList.
+ */
+const SYMLINK_NODE_BINDINGS: { nodeSDK: string; nodeBindings: string }[] = [
+  { nodeSDK: "5.0.0", nodeBindings: "1.9.1" },
+  { nodeSDK: "5.0.0", nodeBindings: "1.9.1" },
+  { nodeSDK: "4.6.0", nodeBindings: "1.6.0" },
+  { nodeSDK: "4.5.0", nodeBindings: "1.6.0" },
+  { nodeSDK: "4.4.0", nodeBindings: "1.5.0" },
+  { nodeSDK: "4.3.0", nodeBindings: "1.4.0" },
+];
+
+/**
+ * Static symlink config for agent-sdk → node-sdk. Keep in sync with agents/versions.ts AgentVersionList.
+ */
+const SYMLINK_AGENT_SDK: { agentSDK: string; nodeSDK: string }[] = [
+  { agentSDK: "2.2.0", nodeSDK: "5.0.0" },
+  { agentSDK: "1.2.0", nodeSDK: "4.6.0" },
+  { agentSDK: "1.1.0", nodeSDK: "4.4.0" },
+];
 
 function showHelp() {
   console.log(`
@@ -377,8 +398,7 @@ function createBindingsSymlinks() {
 
   let hasErrors = false;
 
-  for (const config of VersionList) {
-    if (!config.nodeSDK) continue;
+  for (const config of SYMLINK_NODE_BINDINGS) {
     if (!linkNodeSDKToBindings(config.nodeSDK, config.nodeBindings)) {
       hasErrors = true;
     }
@@ -407,8 +427,7 @@ function createAgentSDKSymlinks() {
 
   let hasErrors = false;
 
-  for (const config of AgentVersionList) {
-    if (!config.agentSDK || !config.nodeSDK) continue;
+  for (const config of SYMLINK_AGENT_SDK) {
     if (!linkAgentSDKToNodeSDK(config.agentSDK, config.nodeSDK)) {
       hasErrors = true;
     }
@@ -488,17 +507,17 @@ function main() {
     let resolvedNodeSDK = options.nodeSDK;
 
     if (!resolvedNodeSDK && options.nodeBindings) {
-      const matchingVersion = VersionList.find(
-        (version) => version.nodeBindings === options.nodeBindings,
+      const matching = SYMLINK_NODE_BINDINGS.find(
+        (v) => v.nodeBindings === options.nodeBindings,
       );
-      resolvedNodeSDK = matchingVersion?.nodeSDK;
+      resolvedNodeSDK = matching?.nodeSDK;
     }
 
     if (!resolvedNodeSDK && options.agentSDK) {
-      const matchingAgent = AgentVersionList.find(
-        (version) => version.agentSDK === options.agentSDK,
+      const matching = SYMLINK_AGENT_SDK.find(
+        (v) => v.agentSDK === options.agentSDK,
       );
-      resolvedNodeSDK = matchingAgent?.nodeSDK;
+      resolvedNodeSDK = matching?.nodeSDK;
     }
 
     if (options.nodeBindings && !resolvedNodeSDK) {

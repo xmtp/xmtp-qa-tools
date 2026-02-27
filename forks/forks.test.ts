@@ -112,6 +112,10 @@ describe(testName, () => {
   setupDurationTracking({ testName });
 
   it("perform concurrent operations with multiple users across 5 groups", async () => {
+    expect(
+      targetEpoch,
+      "targetEpoch must be a positive number to avoid a vacuous pass",
+    ).toBeGreaterThan(0);
     let workers = await getWorkers(workerNames, {
       env: network as "local" | "dev" | "production",
       nodeBindings: NODE_VERSION,
@@ -203,15 +207,7 @@ describe(testName, () => {
             );
 
             // We want to wait for all operations to complete, but ignore any errors which may be caused by the chaos
-            const results = await Promise.allSettled(parallelOperationsArray);
-            for (const result of results) {
-              if (result.status === "rejected") {
-                console.error(
-                  `Group ${groupIndex + 1} operation failed:`,
-                  result.reason,
-                );
-              }
-            }
+            await Promise.allSettled(parallelOperationsArray);
 
             try {
               await workers.checkForksForGroup(groupID);
@@ -232,6 +228,7 @@ describe(testName, () => {
             }
           }
 
+          expect(currentEpoch).toBeGreaterThanOrEqual(targetEpoch);
           return { groupIndex, finalEpoch: currentEpoch };
         },
       );

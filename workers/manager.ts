@@ -322,7 +322,7 @@ export class WorkerManager implements IWorkerManager {
    */
   public get(
     baseName: string | number,
-    installationId: string = "a",
+    installationId?: string,
   ): Worker | undefined {
     if (typeof baseName === "number") {
       let index = baseName;
@@ -337,7 +337,14 @@ export class WorkerManager implements IWorkerManager {
         const id = parts[1];
         return this.workers[name]?.[id];
       }
-      return this.workers[baseName]?.[installationId];
+      if (installationId) {
+        return this.workers[baseName]?.[installationId];
+      }
+      // No installationId specified - return the first available installation
+      const installations = this.workers[baseName];
+      if (!installations) return undefined;
+      const firstKey = Object.keys(installations)[0];
+      return firstKey ? installations[firstKey] : undefined;
     }
   }
 
@@ -392,10 +399,10 @@ export class WorkerManager implements IWorkerManager {
    * Ensures a worker has wallet and encryption keys
    * Either retrieves from env vars or generates new ones
    */
-  private ensureKeys(name: string): {
+  private async ensureKeys(name: string): Promise<{
     walletKey: string;
     encryptionKey: string;
-  } {
+  }> {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
@@ -442,7 +449,7 @@ export class WorkerManager implements IWorkerManager {
       // Append to .env file for persistence across runs
       const filePath =
         process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
-      void appendFile(
+      await appendFile(
         filePath,
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
       );
@@ -487,7 +494,7 @@ export class WorkerManager implements IWorkerManager {
     }
 
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
+    const { walletKey, encryptionKey } = await this.ensureKeys(baseName);
 
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
@@ -665,19 +672,52 @@ export function getWorkerNames(workers: WorkerManager): string[] {
 
 /**
  * Helper function to get the next available folder name
+ * Uses atomic directory creation to avoid race conditions
  */
 function getNextFolderName(): string {
   const dataPath = path.resolve(process.cwd(), ".data");
-  let folder = "a";
-  if (fs.existsSync(dataPath)) {
-    const existingFolders = fs
-      .readdirSync(dataPath)
-      .filter((f) => /^[a-z]$/.test(f));
-    folder = String.fromCharCode(
-      "a".charCodeAt(0) + (existingFolders.length % 26),
-    );
+
+  // Ensure .data directory exists
+  if (!fs.existsSync(dataPath)) {
+    fs.mkdirSync(dataPath, { recursive: true });
   }
-  return folder;
+
+  const maxAttempts = 1000;
+
+  for (let count = 0; count < maxAttempts; count++) {
+    // Generate folder names: a-z, then aa-az, ba-bz, etc.
+    let folderName: string;
+    if (count < 26) {
+      folderName = String.fromCharCode("a".charCodeAt(0) + count);
+    } else {
+      const firstIndex = Math.floor(count / 26) - 1;
+      if (firstIndex >= 26) {
+        throw new Error(
+          "Folder limit exceeded: cannot create more than 702 folders",
+        );
+      }
+      const first = String.fromCharCode("a".charCodeAt(0) + firstIndex);
+      const second = String.fromCharCode("a".charCodeAt(0) + (count % 26));
+      folderName = first + second;
+    }
+
+    const folderPath = path.join(dataPath, folderName);
+
+    try {
+      // Attempt atomic directory creation
+      fs.mkdirSync(folderPath, { recursive: false });
+      return folderName;
+    } catch (error) {
+      // If folder already exists, try next name
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+        continue;
+      }
+      // Re-throw unexpected errors
+      throw error;
+    }
+  }
+
+  throw new Error(`Failed to create folder after ${maxAttempts} attempts`);
 }
 
 /**

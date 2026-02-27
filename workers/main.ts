@@ -383,7 +383,8 @@ export class WorkerClient extends Worker implements IWorkerClient {
   }
 
   terminate() {
-    // Stop active streams first
+    // Stop active sync loops and streams first
+    this.stopSync();
     this.stopStreams();
     // Then terminate the worker thread
     return super.terminate();
@@ -436,26 +437,46 @@ export class WorkerClient extends Worker implements IWorkerClient {
    * @param syncType - The type of sync to start
    * @param interval - The interval in milliseconds to sync
    */
+  private syncController: AbortController | null = null;
+
   public startSync(syncType: typeOfSync, interval: number = 10000): void {
     if (syncType === typeOfSync.None) {
       return;
     }
 
+    // Stop any existing sync loop first
+    this.stopSync();
+
+    this.syncController = new AbortController();
+    const signal = this.syncController.signal;
+
     console.debug(`[${this.nameId}] Starting ${syncType} sync`);
     void (async () => {
-      while (true) {
-        if (syncType === typeOfSync.SyncAll) {
-          await this.client.conversations.syncAll();
-        } else if (syncType === typeOfSync.Sync) {
-          await this.client.conversations.sync();
-        } else if (syncType === typeOfSync.Both) {
-          await this.client.conversations.syncAll();
-          await this.client.conversations.sync();
+      while (!signal.aborted) {
+        try {
+          if (syncType === typeOfSync.SyncAll) {
+            await this.client.conversations.syncAll();
+          } else if (syncType === typeOfSync.Sync) {
+            await this.client.conversations.sync();
+          } else if (syncType === typeOfSync.Both) {
+            await this.client.conversations.syncAll();
+            await this.client.conversations.sync();
+          }
+        } catch (error) {
+          if (signal.aborted) break;
+          console.error(`[${this.nameId}] sync error: ${String(error)}`);
         }
 
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     })();
+  }
+
+  public stopSync(): void {
+    if (this.syncController) {
+      this.syncController.abort();
+      this.syncController = null;
+    }
   }
 
   /**
@@ -469,7 +490,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
 
     if (this.activeStreamTypes.has(streamType)) {
       console.debug(`[${this.nameId}] Stream ${streamType} is already active`);
-      //return;
+      return;
     } else {
       console.debug(`[${this.nameId}] Starting ${streamType} stream`);
       this.activeStreamTypes.add(streamType);
@@ -1064,7 +1085,7 @@ export class WorkerClient extends Worker implements IWorkerClient {
     // Create unique collector ID to prevent conflicts
     //const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const events: T[] = [];
       let resolved = false;
 
@@ -1111,7 +1132,11 @@ export class WorkerClient extends Worker implements IWorkerClient {
             `[${this.nameId}-${testName}] Collector timed out. ${customTimeout / 1000}s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
-          resolve(events);
+          reject(
+            new Error(
+              `Collector timed out after ${customTimeout / 1000}s. Expected ${count} events of type ${type}, collected ${events.length}.`,
+            ),
+          );
         }
       }, customTimeout);
     });

@@ -1,5 +1,4 @@
 import { type AgentGroupType, type MessageContext } from "@agents/versions";
-import { ContentTypeMarkdown } from "@xmtp/content-type-markdown";
 
 interface ForkDebugInfo {
   epoch: bigint;
@@ -247,7 +246,7 @@ export class ForksHandlers {
         analysis,
         senderAddress as string,
       );
-      await ctx.conversation.send(report, ContentTypeMarkdown);
+      await ctx.conversation.sendMarkdown(report);
 
       this.logInfo("Fork detection report sent successfully");
       this.logSection("FORK DETECTION COMPLETE");
@@ -259,7 +258,7 @@ export class ForksHandlers {
         `Error: ${error instanceof Error ? error.message : "Unknown error"}\n\n` +
         `Please check the logs for detailed error information.`;
 
-      await ctx.sendText(errorMessage);
+      await ctx.conversation.sendText(errorMessage);
     }
   }
 }
