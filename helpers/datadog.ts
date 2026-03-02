@@ -1,5 +1,8 @@
 import "dotenv/config";
 import { exec } from "child_process";
+import { mkdirSync, writeFileSync } from "fs";
+import { appendFile } from "fs/promises";
+import path from "path";
 import { promisify } from "util";
 import { getActiveVersion } from "@helpers/versions";
 import metrics from "datadog-metrics";
@@ -13,6 +16,14 @@ interface MetricData {
 interface DurationStatData {
   values: number[];
   tags: MetricTags;
+}
+
+interface LocalMetricRecord {
+  timestamp: string;
+  metric: string;
+  value: number;
+  tags: MetricTags;
+  source: string;
 }
 
 // Simplified metric tags interface - consolidates all previous metric tag types
@@ -101,6 +112,9 @@ export const GEO_TO_COUNTRY_CODE = {
 // Global state
 const state = {
   isInitialized: false,
+  datadogEnabled: false,
+  localSinkEnabled: false,
+  localSinkFile: "",
   collectedMetrics: {} as Record<string, MetricData>,
   durationStats: {} as Record<string, DurationStatData>,
 };
@@ -109,6 +123,10 @@ const execAsync = promisify(exec);
 const HISTOGRAM_METRIC_SUFFIX = ".hist";
 const DURATION_CALC_P50_METRIC = "xmtp.sdk.duration.calc.p50";
 const DURATION_CALC_P95_METRIC = "xmtp.sdk.duration.calc.p95";
+const LOCAL_METRICS_DEFAULT_FILE = "logs/local-metrics.ndjson";
+const LOCAL_METRICS_SINK_ENV = "LOCAL_METRICS_SINK";
+const LOCAL_METRICS_FILE_ENV = "LOCAL_METRICS_FILE";
+const LOCAL_METRICS_APPEND_ENV = "LOCAL_METRICS_APPEND";
 
 // Utility functions
 export const calculateAverage = (values: number[]): number =>
@@ -147,6 +165,52 @@ function formatTagsForDatadog(tags: MetricTags): string[] {
   return Object.entries(tags)
     .map(([key, value]) => `${key}:${String(value || "").trim()}`)
     .filter((tag) => !tag.endsWith(":"));
+}
+
+function isTruthyEnv(value?: string): boolean {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return ["1", "true", "yes", "on"].includes(normalized);
+}
+
+function resolveLocalMetricsPath(): string {
+  const configured =
+    process.env[LOCAL_METRICS_FILE_ENV]?.trim() || LOCAL_METRICS_DEFAULT_FILE;
+  if (path.isAbsolute(configured)) {
+    return configured;
+  }
+  return path.join(process.cwd(), configured);
+}
+
+function initializeLocalMetricsSink(filePath: string): void {
+  mkdirSync(path.dirname(filePath), { recursive: true });
+  if (!isTruthyEnv(process.env[LOCAL_METRICS_APPEND_ENV])) {
+    writeFileSync(filePath, "");
+  }
+}
+
+function writeLocalMetricRecord(
+  metricName: string,
+  metricValue: number,
+  tags: MetricTags,
+  source: string,
+): void {
+  if (!state.localSinkEnabled || !state.localSinkFile) {
+    return;
+  }
+
+  const record: LocalMetricRecord = {
+    timestamp: new Date().toISOString(),
+    metric: metricName,
+    value: metricValue,
+    tags,
+    source,
+  };
+
+  const line = `${JSON.stringify(record)}\n`;
+  appendFile(state.localSinkFile, line).catch((error: unknown) => {
+    console.error("❌ Failed writing local metrics sink:", error);
+  });
 }
 
 function normalizeCalculatedTags(tags: MetricTags): MetricTags {
@@ -210,22 +274,50 @@ function emitCalculatedDurationPercentiles(): void {
     const p50 = calculatePercentile(stat.values, 0.5);
     const p95 = calculatePercentile(stat.values, 0.95);
 
-    metrics.gauge(DURATION_CALC_P50_METRIC, Math.round(p50), formattedTags);
-    metrics.gauge(DURATION_CALC_P95_METRIC, Math.round(p95), formattedTags);
+    if (state.datadogEnabled) {
+      metrics.gauge(DURATION_CALC_P50_METRIC, Math.round(p50), formattedTags);
+      metrics.gauge(DURATION_CALC_P95_METRIC, Math.round(p95), formattedTags);
+    }
+
+    writeLocalMetricRecord(
+      DURATION_CALC_P50_METRIC,
+      Math.round(p50),
+      stat.tags,
+      "calculated",
+    );
+    writeLocalMetricRecord(
+      DURATION_CALC_P95_METRIC,
+      Math.round(p95),
+      stat.tags,
+      "calculated",
+    );
   }
 
   state.durationStats = {};
 }
 
 export function initializeDatadog(): boolean {
-  if (process.env.DISABLE_DATADOG === "true") {
-    return false;
+  if (state.isInitialized) return true;
+
+  state.localSinkEnabled = isTruthyEnv(process.env[LOCAL_METRICS_SINK_ENV]);
+  if (state.localSinkEnabled) {
+    state.localSinkFile = resolveLocalMetricsPath();
+    initializeLocalMetricsSink(state.localSinkFile);
+    console.info(`Local metrics sink enabled: ${state.localSinkFile}`);
   }
+
+  if (process.env.DISABLE_DATADOG === "true") {
+    state.datadogEnabled = false;
+    state.isInitialized = state.localSinkEnabled;
+    return state.isInitialized;
+  }
+
   if (!process.env.DATADOG_API_KEY) {
     console.warn("⚠️ DATADOG_API_KEY not found - metrics will not be sent");
-    return false;
+    state.datadogEnabled = false;
+    state.isInitialized = state.localSinkEnabled;
+    return state.isInitialized;
   }
-  if (state.isInitialized) return true;
 
   try {
     metrics.init({
@@ -236,11 +328,14 @@ export function initializeDatadog(): boolean {
         percentiles: [0.5, 0.95], // Emits p50 and p95 metrics
       },
     });
+    state.datadogEnabled = true;
     state.isInitialized = true;
     return true;
   } catch (error) {
     console.error("❌ Failed to initialize DataDog metrics:", error);
-    return false;
+    state.datadogEnabled = false;
+    state.isInitialized = state.localSinkEnabled;
+    return state.isInitialized;
   }
 }
 
@@ -250,7 +345,7 @@ export function sendMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
-  if (process.env.DISABLE_DATADOG === "true") {
+  if (!state.datadogEnabled && !state.localSinkEnabled) {
     return;
   }
   try {
@@ -289,17 +384,34 @@ export function sendMetric(
       );
     }
 
-    metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
+    if (state.datadogEnabled) {
+      metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
+    }
+    writeLocalMetricRecord(
+      fullMetricName,
+      Math.round(metricValue),
+      enrichedTags,
+      "gauge",
+    );
 
     // Also send as histogram for p95 calculation (duration metrics only)
     if (
       enrichedTags.metric_type === "operation" ||
       enrichedTags.metric_type === "delivery"
     ) {
-      metrics.histogram(
-        withHistogramSuffix(fullMetricName),
+      const histogramMetricName = withHistogramSuffix(fullMetricName);
+      if (state.datadogEnabled) {
+        metrics.histogram(
+          histogramMetricName,
+          Math.round(metricValue),
+          formattedTags,
+        );
+      }
+      writeLocalMetricRecord(
+        histogramMetricName,
         Math.round(metricValue),
-        formattedTags,
+        enrichedTags,
+        "histogram",
       );
     }
 
@@ -320,7 +432,7 @@ export function sendHistogramMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
-  if (process.env.DISABLE_DATADOG === "true") {
+  if (!state.datadogEnabled && !state.localSinkEnabled) {
     return;
   }
   try {
@@ -348,10 +460,18 @@ export function sendHistogramMetric(
       ),
     );
 
-    metrics.histogram(
+    if (state.datadogEnabled) {
+      metrics.histogram(
+        histogramMetricName,
+        Math.round(metricValue),
+        formattedTags,
+      );
+    }
+    writeLocalMetricRecord(
       histogramMetricName,
       Math.round(metricValue),
-      formattedTags,
+      enrichedTags,
+      "histogram",
     );
   } catch (error) {
     console.error(
@@ -411,6 +531,12 @@ export function flushMetrics(): Promise<void> {
   }
 
   emitCalculatedDurationPercentiles();
+
+  if (!state.datadogEnabled) {
+    state.collectedMetrics = {};
+    state.durationStats = {};
+    return Promise.resolve();
+  }
 
   return metrics.flush().finally(() => {
     state.collectedMetrics = {};

@@ -246,7 +246,7 @@
     {
       "id": 501015,
       "definition": {
-        "title": "Dev vs testnet-staging stats by operation",
+        "title": "Dev vs testnet-staging stats by operation and size",
         "title_size": "16",
         "title_align": "left",
         "type": "query_table",
@@ -256,49 +256,49 @@
               {
                 "data_source": "metrics",
                 "name": "avg_dev",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "avg_tns",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_dev",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_tns",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk,$members_bucket} by {operation}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk,$members_bucket} by {operation}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               }
             ],
@@ -392,9 +392,9 @@
       "default": "*"
     },
     {
-      "name": "members_bucket",
-      "prefix": "members_bucket",
-      "available_values": ["small", "medium", "large"],
+      "name": "members",
+      "prefix": "members",
+      "available_values": ["10", "50", "100"],
       "default": "*"
     }
   ],
