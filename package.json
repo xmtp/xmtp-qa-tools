@@ -26,6 +26,7 @@
     "inboxes:restart": "yarn gen --installations 2 --env production --count 200 --restart",
     "inboxes:update": "yarn gen --installations 2 --env production",
     "lint": "eslint .",
+    "metrics:status": "tsx cli/local-metrics-summary.ts --metric-family group_stats_v1 --env dev,testnet-staging",
     "metrics:summary": "tsx cli/local-metrics-summary.ts",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",

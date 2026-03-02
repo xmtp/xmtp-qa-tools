@@ -15,14 +15,20 @@ type SummaryOptions = {
   envFilter: Set<string> | null;
 };
 
-type OperationStats = {
+type FunctionStats = {
   durations: number[];
   success: number;
   error: number;
 };
 
-type OperationSummary = {
+type SetupStats = {
+  success: number;
+  error: number;
+};
+
+type FunctionSummary = {
   env: string;
+  members: string;
   operation: string;
   sampleCount: number;
   avgMs: number;
@@ -32,6 +38,24 @@ type OperationSummary = {
   error: number;
   failureRatePct: number;
 };
+
+type SetupSummary = {
+  env: string;
+  members: string;
+  success: number;
+  error: number;
+  failureRatePct: number;
+};
+
+type BuiltSummaries = {
+  functionSummaries: FunctionSummary[];
+  setupSummaries: SetupSummary[];
+};
+
+const DURATION_METRIC = "xmtp.sdk.duration";
+const OPERATION_COUNT_METRIC = "xmtp.sdk.operation_count";
+const SETUP_OPERATION = "setupContext";
+const SETUP_OPERATION_NAME = "group.setup_context";
 
 function parseArgs(args: string[]): SummaryOptions {
   let file = path.join(process.cwd(), "logs", "local-metrics.ndjson");
@@ -87,6 +111,7 @@ Local Metrics Summary CLI
 
 USAGE:
   yarn metrics:summary [options]
+  yarn metrics:status [options]
 
 OPTIONS:
   --file <path>           Path to local metrics NDJSON file
@@ -114,8 +139,42 @@ function average(values: number[]): number {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-function keyFor(env: string, operation: string): string {
-  return `${env}__${operation}`;
+function functionKey(env: string, members: string, operation: string): string {
+  return `${env}|${members}|${operation}`;
+}
+
+function setupKey(env: string, members: string): string {
+  return `${env}|${members}`;
+}
+
+function parseFunctionKey(key: string): {
+  env: string;
+  members: string;
+  operation: string;
+} {
+  const [env = "unknown", members = "unknown", operation = "unknown"] =
+    key.split("|");
+  return { env, members, operation };
+}
+
+function parseSetupKey(key: string): { env: string; members: string } {
+  const [env = "unknown", members = "unknown"] = key.split("|");
+  return { env, members };
+}
+
+function compareMembers(a: string, b: string): number {
+  const aNum = Number(a);
+  const bNum = Number(b);
+  const aIsNum = Number.isFinite(aNum);
+  const bIsNum = Number.isFinite(bNum);
+
+  if (aIsNum && bIsNum) {
+    return aNum - bNum;
+  }
+
+  if (aIsNum) return -1;
+  if (bIsNum) return 1;
+  return a.localeCompare(b);
 }
 
 function parseRecords(file: string): LocalMetricRecord[] {
@@ -142,11 +201,48 @@ function parseRecords(file: string): LocalMetricRecord[] {
   return records;
 }
 
-function toSummaries(
+function ensureFunctionStats(
+  statsMap: Map<string, FunctionStats>,
+  key: string,
+): FunctionStats {
+  const existing = statsMap.get(key);
+  if (existing) {
+    return existing;
+  }
+
+  const created: FunctionStats = { durations: [], success: 0, error: 0 };
+  statsMap.set(key, created);
+  return created;
+}
+
+function ensureSetupStats(
+  statsMap: Map<string, SetupStats>,
+  key: string,
+): SetupStats {
+  const existing = statsMap.get(key);
+  if (existing) {
+    return existing;
+  }
+
+  const created: SetupStats = { success: 0, error: 0 };
+  statsMap.set(key, created);
+  return created;
+}
+
+function isSetupMetric(tags: Record<string, string>): boolean {
+  const operation = tags.operation || "";
+  const operationName = tags.operation_name || "";
+  return (
+    operation === SETUP_OPERATION || operationName === SETUP_OPERATION_NAME
+  );
+}
+
+function buildSummaries(
   records: LocalMetricRecord[],
   options: SummaryOptions,
-): OperationSummary[] {
-  const statsMap = new Map<string, OperationStats>();
+): BuiltSummaries {
+  const functionStatsMap = new Map<string, FunctionStats>();
+  const setupStatsMap = new Map<string, SetupStats>();
 
   for (const record of records) {
     const tags = record.tags || {};
@@ -159,41 +255,56 @@ function toSummaries(
       continue;
     }
 
+    const members = tags.members || "unknown";
     const operation = tags.operation || tags.operation_name || "unknown";
-    const key = keyFor(env, operation);
+    const setupMetric = isSetupMetric(tags);
 
-    if (!statsMap.has(key)) {
-      statsMap.set(key, { durations: [], success: 0, error: 0 });
-    }
+    if (record.metric === OPERATION_COUNT_METRIC) {
+      if (setupMetric) {
+        const setup = ensureSetupStats(setupStatsMap, setupKey(env, members));
+        if (tags.status === "success") {
+          setup.success += record.value;
+        } else if (tags.status === "error") {
+          setup.error += record.value;
+        }
+        continue;
+      }
 
-    const stats = statsMap.get(key);
-    if (!stats) {
-      continue;
-    }
-
-    if (
-      record.metric === "xmtp.sdk.duration" &&
-      tags.metric_type === "operation"
-    ) {
-      stats.durations.push(record.value);
-    } else if (record.metric === "xmtp.sdk.operation_count") {
+      const stats = ensureFunctionStats(
+        functionStatsMap,
+        functionKey(env, members, operation),
+      );
       if (tags.status === "success") {
         stats.success += record.value;
       } else if (tags.status === "error") {
         stats.error += record.value;
       }
+      continue;
+    }
+
+    if (
+      record.metric === DURATION_METRIC &&
+      tags.metric_type === "operation" &&
+      !setupMetric
+    ) {
+      const stats = ensureFunctionStats(
+        functionStatsMap,
+        functionKey(env, members, operation),
+      );
+      stats.durations.push(record.value);
     }
   }
 
-  const summaries: OperationSummary[] = [];
-  for (const [key, stats] of statsMap.entries()) {
-    const [env, operation] = key.split("__");
+  const functionSummaries: FunctionSummary[] = [];
+  for (const [key, stats] of functionStatsMap.entries()) {
+    const { env, members, operation } = parseFunctionKey(key);
     const denominator = stats.success + stats.error;
     const failureRatePct =
       denominator === 0 ? 0 : (100 * stats.error) / (denominator + 0.000001);
 
-    summaries.push({
+    functionSummaries.push({
       env,
+      members,
       operation,
       sampleCount: stats.durations.length,
       avgMs: average(stats.durations),
@@ -205,10 +316,36 @@ function toSummaries(
     });
   }
 
-  return summaries.sort((a, b) => {
+  const setupSummaries: SetupSummary[] = [];
+  for (const [key, stats] of setupStatsMap.entries()) {
+    const { env, members } = parseSetupKey(key);
+    const denominator = stats.success + stats.error;
+    const failureRatePct =
+      denominator === 0 ? 0 : (100 * stats.error) / (denominator + 0.000001);
+
+    setupSummaries.push({
+      env,
+      members,
+      success: stats.success,
+      error: stats.error,
+      failureRatePct,
+    });
+  }
+
+  functionSummaries.sort((a, b) => {
     if (a.env !== b.env) return a.env.localeCompare(b.env);
-    return a.operation.localeCompare(b.operation);
+    if (a.operation !== b.operation) {
+      return a.operation.localeCompare(b.operation);
+    }
+    return compareMembers(a.members, b.members);
   });
+
+  setupSummaries.sort((a, b) => {
+    if (a.env !== b.env) return a.env.localeCompare(b.env);
+    return compareMembers(a.members, b.members);
+  });
+
+  return { functionSummaries, setupSummaries };
 }
 
 function formatNumber(value: number, precision = 1): string {
@@ -217,6 +354,11 @@ function formatNumber(value: number, precision = 1): string {
 }
 
 function printTable(headers: string[], rows: string[][]): void {
+  if (rows.length === 0) {
+    console.log("(no rows)");
+    return;
+  }
+
   const widths = headers.map((header, i) =>
     Math.max(header.length, ...rows.map((row) => (row[i] || "").length)),
   );
@@ -231,48 +373,100 @@ function printTable(headers: string[], rows: string[][]): void {
   }
 }
 
-function printPerEnvSection(summaries: OperationSummary[]): void {
-  console.log("\nPer-env Operation Stats");
-  const rows = summaries.map((s) => [
+function printSetupSection(setupSummaries: SetupSummary[]): void {
+  console.log("\nSetup Context Status (by env + size)");
+  const rows = setupSummaries.map((s) => [
     s.env,
+    s.members,
+    formatNumber(s.success, 0),
+    formatNumber(s.error, 0),
+    formatNumber(s.failureRatePct, 2),
+    formatNumber(s.success + s.error, 0),
+  ]);
+
+  printTable(
+    [
+      "env",
+      "members",
+      "setup_success",
+      "setup_error",
+      "setup_fail_pct",
+      "total",
+    ],
+    rows,
+  );
+}
+
+function printFunctionSection(functionSummaries: FunctionSummary[]): void {
+  console.log("\nFunction Stats (setup-excluded)");
+  const rows = functionSummaries.map((s) => [
+    s.env,
+    s.members,
     s.operation,
     String(s.sampleCount),
     formatNumber(s.avgMs),
     formatNumber(s.p50Ms),
     formatNumber(s.p95Ms),
+    formatNumber(s.success, 0),
+    formatNumber(s.error, 0),
     formatNumber(s.failureRatePct, 2),
   ]);
 
   printTable(
     [
       "env",
+      "members",
       "operation",
       "samples",
       "avg_ms",
       "p50_ms",
       "p95_ms",
+      "success",
+      "error",
       "failure_pct",
     ],
     rows,
   );
 }
 
-function printComparisonSection(summaries: OperationSummary[]): void {
-  const byKey = new Map<string, OperationSummary>();
-  for (const summary of summaries) {
-    byKey.set(keyFor(summary.env, summary.operation), summary);
+function printComparisonSection(
+  functionSummaries: FunctionSummary[],
+  setupSummaries: SetupSummary[],
+): void {
+  const functionByKey = new Map<string, FunctionSummary>();
+  for (const summary of functionSummaries) {
+    functionByKey.set(
+      functionKey(summary.env, summary.members, summary.operation),
+      summary,
+    );
   }
 
-  const operations = Array.from(
-    new Set(summaries.map((s) => s.operation)),
-  ).sort();
+  const setupByKey = new Map<string, SetupSummary>();
+  for (const setup of setupSummaries) {
+    setupByKey.set(setupKey(setup.env, setup.members), setup);
+  }
 
-  console.log("\nDev vs Testnet-Staging Comparison");
+  const operationMemberPairs = Array.from(
+    new Set(functionSummaries.map((s) => `${s.operation}|${s.members}`)),
+  );
+  operationMemberPairs.sort((a, b) => {
+    const [opA = "", membersA = ""] = a.split("|");
+    const [opB = "", membersB = ""] = b.split("|");
+    if (opA !== opB) return opA.localeCompare(opB);
+    return compareMembers(membersA, membersB);
+  });
+
+  console.log("\nDev vs Testnet-Staging Function Comparison");
   const rows: string[][] = [];
 
-  for (const operation of operations) {
-    const dev = byKey.get(keyFor("dev", operation));
-    const testnet = byKey.get(keyFor("testnet-staging", operation));
+  for (const pair of operationMemberPairs) {
+    const [operation = "", members = ""] = pair.split("|");
+    const dev = functionByKey.get(functionKey("dev", members, operation));
+    const testnet = functionByKey.get(
+      functionKey("testnet-staging", members, operation),
+    );
+    const setupDev = setupByKey.get(setupKey("dev", members));
+    const setupTestnet = setupByKey.get(setupKey("testnet-staging", members));
 
     const avgDev = dev?.avgMs ?? 0;
     const avgTestnet = testnet?.avgMs ?? 0;
@@ -283,6 +477,7 @@ function printComparisonSection(summaries: OperationSummary[]): void {
 
     rows.push([
       operation,
+      members,
       formatNumber(avgDev),
       formatNumber(avgTestnet),
       formatNumber(avgTestnet - avgDev),
@@ -294,12 +489,15 @@ function printComparisonSection(summaries: OperationSummary[]): void {
       formatNumber(failTestnet - failDev, 2),
       String(dev?.sampleCount ?? 0),
       String(testnet?.sampleCount ?? 0),
+      formatNumber(setupDev?.failureRatePct ?? 0, 2),
+      formatNumber(setupTestnet?.failureRatePct ?? 0, 2),
     ]);
   }
 
   printTable(
     [
       "operation",
+      "members",
       "avg_dev",
       "avg_tns",
       "avg_diff",
@@ -311,6 +509,8 @@ function printComparisonSection(summaries: OperationSummary[]): void {
       "fail_diff",
       "samples_dev",
       "samples_tns",
+      "setup_fail_dev",
+      "setup_fail_tns",
     ],
     rows,
   );
@@ -319,22 +519,27 @@ function printComparisonSection(summaries: OperationSummary[]): void {
 function main(): void {
   const options = parseArgs(process.argv.slice(2));
   const records = parseRecords(options.file);
-  const summaries = toSummaries(records, options);
+  const { functionSummaries, setupSummaries } = buildSummaries(
+    records,
+    options,
+  );
 
   console.log(`Source: ${options.file}`);
   console.log(`Metric family: ${options.metricFamily}`);
   console.log(`Parsed records: ${records.length}`);
-  console.log(`Summary rows: ${summaries.length}`);
+  console.log(`Function rows: ${functionSummaries.length}`);
+  console.log(`Setup rows: ${setupSummaries.length}`);
 
-  if (summaries.length === 0) {
+  if (functionSummaries.length === 0 && setupSummaries.length === 0) {
     console.log(
       "No summary rows found. Check --metric-family/--env filters and test command flags.",
     );
     return;
   }
 
-  printPerEnvSection(summaries);
-  printComparisonSection(summaries);
+  printSetupSection(setupSummaries);
+  printFunctionSection(functionSummaries);
+  printComparisonSection(functionSummaries, setupSummaries);
 }
 
 main();

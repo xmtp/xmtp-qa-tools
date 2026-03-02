@@ -6,7 +6,7 @@
       "id": 501001,
       "definition": {
         "type": "note",
-        "content": "This dashboard tracks group stats metrics (`metric_family:group_stats_v1`) emitted by `monitoring/group-stats.test.ts`. Percentile policy: track avg, p50, and p95. Treat p95 as valid once `sample_count >= 100`.",
+        "content": "This dashboard tracks group stats metrics (`metric_family:group_stats_v1`) emitted by `monitoring/group-stats.test.ts`. Percentile policy: track avg, p50, and p95. Treat p95 as valid once `sample_count >= 100`. Operation failure rates exclude setup failures (`operation:setupContext`), which are shown separately in the setup table.",
         "background_color": "white",
         "font_size": "14",
         "text_align": "left",
@@ -130,7 +130,7 @@
     {
       "id": 501012,
       "definition": {
-        "title": "Operation Success (dev, %)",
+        "title": "Function Success (dev, %)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -141,13 +141,13 @@
               {
                 "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               },
               {
                 "name": "err_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -188,7 +188,7 @@
     {
       "id": 501013,
       "definition": {
-        "title": "Operation Success (testnet, %)",
+        "title": "Function Success (testnet, %)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -199,13 +199,13 @@
               {
                 "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:testnet-staging,$region,$sdk}",
                 "aggregator": "sum"
               },
               {
                 "name": "err_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:testnet-staging,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -256,49 +256,49 @@
               {
                 "data_source": "metrics",
                 "name": "avg_dev",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "avg_tns",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_dev",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_tns",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               }
             ],
@@ -369,6 +369,90 @@
         "y": 3,
         "width": 12,
         "height": 8
+      }
+    },
+    {
+      "id": 501016,
+      "definition": {
+        "title": "Setup context failure by size (dev vs testnet-staging)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_table",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "setup_ok_dev",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,operation:setupContext,status:success,env:dev,$region,$sdk,$members} by {members}",
+                "aggregator": "sum"
+              },
+              {
+                "data_source": "metrics",
+                "name": "setup_err_dev",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,operation:setupContext,status:error,env:dev,$region,$sdk,$members} by {members}",
+                "aggregator": "sum"
+              },
+              {
+                "data_source": "metrics",
+                "name": "setup_ok_tns",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,operation:setupContext,status:success,env:testnet-staging,$region,$sdk,$members} by {members}",
+                "aggregator": "sum"
+              },
+              {
+                "data_source": "metrics",
+                "name": "setup_err_tns",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,operation:setupContext,status:error,env:testnet-staging,$region,$sdk,$members} by {members}",
+                "aggregator": "sum"
+              }
+            ],
+            "response_format": "scalar",
+            "sort": {
+              "count": 500,
+              "order_by": [
+                {
+                  "type": "group",
+                  "name": "members",
+                  "order": "asc"
+                }
+              ]
+            },
+            "formulas": [
+              {
+                "cell_display_mode": "number",
+                "alias": "setup_dev_failure_pct",
+                "formula": "(100 * default_zero(setup_err_dev)) / (setup_ok_dev + default_zero(setup_err_dev) + 0.000001)"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "setup_testnet_failure_pct",
+                "formula": "(100 * default_zero(setup_err_tns)) / (setup_ok_tns + default_zero(setup_err_tns) + 0.000001)"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "setup_failure_diff_pct",
+                "formula": "((100 * default_zero(setup_err_tns)) / (setup_ok_tns + default_zero(setup_err_tns) + 0.000001)) - ((100 * default_zero(setup_err_dev)) / (setup_ok_dev + default_zero(setup_err_dev) + 0.000001))"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "setup_dev_samples",
+                "formula": "setup_ok_dev + default_zero(setup_err_dev)"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "setup_testnet_samples",
+                "formula": "setup_ok_tns + default_zero(setup_err_tns)"
+              }
+            ]
+          }
+        ],
+        "has_search_bar": "auto"
+      },
+      "layout": {
+        "x": 0,
+        "y": 11,
+        "width": 12,
+        "height": 4
       }
     }
   ],

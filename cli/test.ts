@@ -436,6 +436,13 @@ function logDetails(testName: string, options: TestOptions) {
   if (process.env.LOCAL_METRICS_FILE) {
     console.info(`Local metrics file: ${process.env.LOCAL_METRICS_FILE}`);
   }
+  if (process.env.LOCAL_METRICS_SINK === "true") {
+    const metricsFile =
+      process.env.LOCAL_METRICS_FILE || "logs/local-metrics.ndjson";
+    console.info(
+      `Local status command: yarn metrics:status --file ${metricsFile}`,
+    );
+  }
 
   console.info(`Parallel: ${options.parallel ? "Enabled" : "Disabled"}`);
   console.info(
