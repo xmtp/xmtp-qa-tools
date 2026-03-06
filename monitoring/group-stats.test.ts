@@ -145,12 +145,24 @@ describe(testName, () => {
         group = (await creator.worker.createGroupWithIdentifiers(
           membersToAdd,
         )) as Group;
+        const duration = performance.now() - start;
+
+        const createdMembers = await group.members();
+        if (!group.id) {
+          throw new Error("Setup validation failed: group id is missing");
+        }
+        if (createdMembers.length !== memberCount) {
+          throw new Error(
+            `Setup validation failed: expected ${memberCount} members, got ${createdMembers.length}`,
+          );
+        }
+
         reportSetupOutcome({
           sdk: creator.sdk,
           members: memberCount,
           status: "success",
         });
-        return performance.now() - start;
+        return duration;
       } catch (error) {
         setupError = new GroupSetupError(
           `Failed to create setup context for ${memberCount} members`,
@@ -168,10 +180,6 @@ describe(testName, () => {
     it(`newGroup-${memberCount}:group.create_with_members`, async () => {
       try {
         const duration = await ensureGroupContext();
-
-        const members = await group.members();
-        expect(members.length).toBe(memberCount);
-        expect(group.id).toBeDefined();
 
         if (typeof duration === "number") {
           sendStatsDurationMetric({

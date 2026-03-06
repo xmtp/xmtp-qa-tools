@@ -141,13 +141,13 @@
               {
                 "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:dev,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,!operation:setupContext,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               },
               {
                 "name": "err_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:dev,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,!operation:setupContext,env:dev,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -199,13 +199,13 @@
               {
                 "name": "ok_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:testnet-staging,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,!operation:setupContext,env:testnet-staging,$region,$sdk}",
                 "aggregator": "sum"
               },
               {
                 "name": "err_ops",
                 "data_source": "metrics",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:testnet-staging,$region,$sdk}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,!operation:setupContext,env:testnet-staging,$region,$sdk}",
                 "aggregator": "sum"
               }
             ],
@@ -256,49 +256,49 @@
               {
                 "data_source": "metrics",
                 "name": "avg_dev",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "avg_tns",
-                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_dev",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "p95_tns",
-                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_dev",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "ok_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:success,!operation:setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               },
               {
                 "data_source": "metrics",
                 "name": "err_tns",
-                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,operation:!setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "query": "sum:xmtp.sdk.operation_count{metric_family:group_stats_v1,status:error,!operation:setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "sum"
               }
             ],
