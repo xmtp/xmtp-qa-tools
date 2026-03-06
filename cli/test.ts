@@ -48,6 +48,8 @@ OPTIONS:
   --versions <count>    Use multiple SDK versions for testing
   --size <range>        Batch size range (e.g., 5-10)
   --populate <number>   Population size for testing (e.g., 1000)
+  --local-metrics       Write metrics to local NDJSON sink
+  --local-metrics-file  Path for local metrics sink [default: logs/local-metrics.ndjson]
   -h, --help            Show this help message
 
 ENVIRONMENTS:
@@ -283,6 +285,20 @@ function parseTestArgs(args: string[]): {
         options.sendToDatadog = false;
         process.env.DISABLE_DATADOG = "true";
         break;
+      case "--local-metrics":
+        process.env.LOCAL_METRICS_SINK = "true";
+        break;
+      case "--local-metrics-file":
+        if (nextArg) {
+          process.env.LOCAL_METRICS_SINK = "true";
+          process.env.LOCAL_METRICS_FILE = nextArg;
+          i++;
+        } else {
+          console.warn(
+            "--local-metrics-file flag requires a value (e.g., --local-metrics-file logs/local-metrics.ndjson)",
+          );
+        }
+        break;
       case "--no-fail":
         options.noFail = true;
         break;
@@ -412,6 +428,21 @@ function logDetails(testName: string, options: TestOptions) {
   console.info(
     `Send To Datadog: ${options.sendToDatadog ? "Enabled" : "Disabled"}`,
   );
+  console.info(
+    `Local metrics sink: ${
+      process.env.LOCAL_METRICS_SINK === "true" ? "Enabled" : "Disabled"
+    }`,
+  );
+  if (process.env.LOCAL_METRICS_FILE) {
+    console.info(`Local metrics file: ${process.env.LOCAL_METRICS_FILE}`);
+  }
+  if (process.env.LOCAL_METRICS_SINK === "true") {
+    const metricsFile =
+      process.env.LOCAL_METRICS_FILE || "logs/local-metrics.ndjson";
+    console.info(
+      `Local status command: yarn metrics:status --file ${metricsFile}`,
+    );
+  }
 
   console.info(`Parallel: ${options.parallel ? "Enabled" : "Disabled"}`);
   console.info(

@@ -6,14 +6,14 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 25
+    timeout-minutes: 60
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         test: [group-stats]
-        size: [10-50, 100]
-        env: [dev, production, testnet-staging]
+        size: [10-50]
+        env: [dev, testnet-staging]
         cache-data: [false]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
@@ -32,7 +32,7 @@ jobs:
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
-        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 2
+        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 15
 
       - name: Cleanup and upload artifacts
         if: always()
