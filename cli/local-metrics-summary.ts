@@ -13,6 +13,8 @@ type SummaryOptions = {
   file: string;
   metricFamily: string;
   envFilter: Set<string> | null;
+  compareLeftEnv: string;
+  compareRightEnv: string;
 };
 
 type FunctionStats = {
@@ -61,6 +63,8 @@ function parseArgs(args: string[]): SummaryOptions {
   let file = path.join(process.cwd(), "logs", "local-metrics.ndjson");
   let metricFamily = "group_stats_v1";
   let envFilter: Set<string> | null = null;
+  let compareLeftEnv = "testnet-staging";
+  let compareRightEnv = "testnet-dev";
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -92,6 +96,18 @@ function parseArgs(args: string[]): SummaryOptions {
           i++;
         }
         break;
+      case "--compare-left":
+        if (nextArg) {
+          compareLeftEnv = nextArg.trim();
+          i++;
+        }
+        break;
+      case "--compare-right":
+        if (nextArg) {
+          compareRightEnv = nextArg.trim();
+          i++;
+        }
+        break;
       case "-h":
       case "--help":
         printHelp();
@@ -102,7 +118,13 @@ function parseArgs(args: string[]): SummaryOptions {
     }
   }
 
-  return { file, metricFamily, envFilter };
+  return {
+    file,
+    metricFamily,
+    envFilter,
+    compareLeftEnv,
+    compareRightEnv,
+  };
 }
 
 function printHelp(): void {
@@ -118,7 +140,9 @@ OPTIONS:
                           [default: logs/local-metrics.ndjson]
   --metric-family <name>  Filter metrics by metric_family tag
                           [default: group_stats_v1]
-  --env <list>            Comma-separated env filter (e.g., dev,testnet-staging)
+  --env <list>            Comma-separated env filter (e.g., testnet-staging,testnet-dev)
+  --compare-left <env>    Left side env for comparison [default: testnet-staging]
+  --compare-right <env>   Right side env for comparison [default: testnet-dev]
   -h, --help              Show this help message
 `);
 }
@@ -432,6 +456,7 @@ function printFunctionSection(functionSummaries: FunctionSummary[]): void {
 function printComparisonSection(
   functionSummaries: FunctionSummary[],
   setupSummaries: SetupSummary[],
+  options: SummaryOptions,
 ): void {
   const functionByKey = new Map<string, FunctionSummary>();
   for (const summary of functionSummaries) {
@@ -456,41 +481,47 @@ function printComparisonSection(
     return compareMembers(membersA, membersB);
   });
 
-  console.log("\nDev vs Testnet-Staging Function Comparison");
+  console.log(
+    `\nFunction Comparison (${options.compareLeftEnv} vs ${options.compareRightEnv})`,
+  );
   const rows: string[][] = [];
 
   for (const pair of operationMemberPairs) {
     const [operation = "", members = ""] = pair.split("|");
-    const dev = functionByKey.get(functionKey("dev", members, operation));
-    const testnet = functionByKey.get(
-      functionKey("testnet-staging", members, operation),
+    const left = functionByKey.get(
+      functionKey(options.compareLeftEnv, members, operation),
     );
-    const setupDev = setupByKey.get(setupKey("dev", members));
-    const setupTestnet = setupByKey.get(setupKey("testnet-staging", members));
+    const right = functionByKey.get(
+      functionKey(options.compareRightEnv, members, operation),
+    );
+    const setupLeft = setupByKey.get(setupKey(options.compareLeftEnv, members));
+    const setupRight = setupByKey.get(
+      setupKey(options.compareRightEnv, members),
+    );
 
-    const avgDev = dev?.avgMs ?? 0;
-    const avgTestnet = testnet?.avgMs ?? 0;
-    const p95Dev = dev?.p95Ms ?? 0;
-    const p95Testnet = testnet?.p95Ms ?? 0;
-    const failDev = dev?.failureRatePct ?? 0;
-    const failTestnet = testnet?.failureRatePct ?? 0;
+    const avgLeft = left?.avgMs ?? 0;
+    const avgRight = right?.avgMs ?? 0;
+    const p95Left = left?.p95Ms ?? 0;
+    const p95Right = right?.p95Ms ?? 0;
+    const failLeft = left?.failureRatePct ?? 0;
+    const failRight = right?.failureRatePct ?? 0;
 
     rows.push([
       operation,
       members,
-      formatNumber(avgDev),
-      formatNumber(avgTestnet),
-      formatNumber(avgTestnet - avgDev),
-      formatNumber(p95Dev),
-      formatNumber(p95Testnet),
-      formatNumber(p95Testnet - p95Dev),
-      formatNumber(failDev, 2),
-      formatNumber(failTestnet, 2),
-      formatNumber(failTestnet - failDev, 2),
-      String(dev?.sampleCount ?? 0),
-      String(testnet?.sampleCount ?? 0),
-      formatNumber(setupDev?.failureRatePct ?? 0, 2),
-      formatNumber(setupTestnet?.failureRatePct ?? 0, 2),
+      formatNumber(avgLeft),
+      formatNumber(avgRight),
+      formatNumber(avgRight - avgLeft),
+      formatNumber(p95Left),
+      formatNumber(p95Right),
+      formatNumber(p95Right - p95Left),
+      formatNumber(failLeft, 2),
+      formatNumber(failRight, 2),
+      formatNumber(failRight - failLeft, 2),
+      String(left?.sampleCount ?? 0),
+      String(right?.sampleCount ?? 0),
+      formatNumber(setupLeft?.failureRatePct ?? 0, 2),
+      formatNumber(setupRight?.failureRatePct ?? 0, 2),
     ]);
   }
 
@@ -498,19 +529,19 @@ function printComparisonSection(
     [
       "operation",
       "members",
-      "avg_dev",
-      "avg_tns",
+      "avg_left",
+      "avg_right",
       "avg_diff",
-      "p95_dev",
-      "p95_tns",
+      "p95_left",
+      "p95_right",
       "p95_diff",
-      "fail_dev",
-      "fail_tns",
+      "fail_left",
+      "fail_right",
       "fail_diff",
-      "samples_dev",
-      "samples_tns",
-      "setup_fail_dev",
-      "setup_fail_tns",
+      "samples_left",
+      "samples_right",
+      "setup_fail_left",
+      "setup_fail_right",
     ],
     rows,
   );
@@ -529,6 +560,9 @@ function main(): void {
   console.log(`Parsed records: ${records.length}`);
   console.log(`Function rows: ${functionSummaries.length}`);
   console.log(`Setup rows: ${setupSummaries.length}`);
+  console.log(
+    `Comparison envs: ${options.compareLeftEnv} vs ${options.compareRightEnv}`,
+  );
 
   if (functionSummaries.length === 0 && setupSummaries.length === 0) {
     console.log(
@@ -539,7 +573,7 @@ function main(): void {
 
   printSetupSection(setupSummaries);
   printFunctionSection(functionSummaries);
-  printComparisonSection(functionSummaries, setupSummaries);
+  printComparisonSection(functionSummaries, setupSummaries, options);
 }
 
 main();

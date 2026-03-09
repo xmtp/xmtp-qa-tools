@@ -57,6 +57,7 @@ ENVIRONMENTS:
   dev              Development XMTP network (default)
   production       Production XMTP network
   testnet-staging  Staging testnet (uses dev with custom gateway)
+  testnet-dev      Dev testnet (uses dev with custom gateway)
 
 TEST SUITES:
   performance    Core performance metrics and large groups

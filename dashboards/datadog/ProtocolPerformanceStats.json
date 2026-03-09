@@ -267,6 +267,18 @@
               },
               {
                 "data_source": "metrics",
+                "name": "max_dev",
+                "query": "max:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
+                "aggregator": "max"
+              },
+              {
+                "data_source": "metrics",
+                "name": "max_tns",
+                "query": "max:xmtp.sdk.duration{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:testnet-staging,$region,$sdk,$members} by {operation,members}",
+                "aggregator": "max"
+              },
+              {
+                "data_source": "metrics",
                 "name": "p95_dev",
                 "query": "avg:xmtp.sdk.duration.calc.p95{metric_family:group_stats_v1,metric_type:operation,!operation:setupContext,env:dev,$region,$sdk,$members} by {operation,members}",
                 "aggregator": "avg"
@@ -331,6 +343,16 @@
               },
               {
                 "cell_display_mode": "number",
+                "alias": "max_dev_ms",
+                "formula": "max_dev"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "max_testnet_ms",
+                "formula": "max_tns"
+              },
+              {
+                "cell_display_mode": "number",
                 "alias": "p95_dev_ms",
                 "formula": "p95_dev"
               },
@@ -343,6 +365,16 @@
                 "cell_display_mode": "number",
                 "alias": "p95_diff_ms",
                 "formula": "p95_tns - p95_dev"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "latency_samples_dev",
+                "formula": "ok_dev"
+              },
+              {
+                "cell_display_mode": "number",
+                "alias": "latency_samples_testnet",
+                "formula": "ok_tns"
               },
               {
                 "cell_display_mode": "number",
