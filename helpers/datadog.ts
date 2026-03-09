@@ -220,24 +220,13 @@ function normalizeCalculatedTags(tags: MetricTags): MetricTags {
 }
 
 function durationStatsKey(tags: MetricTags): string {
-  const keyFields = [
-    "metric_family",
-    "metrics_tier",
-    "tool",
-    "metric_type",
-    "metric_subtype",
-    "operation",
-    "operation_name",
-    "members_bucket",
-    "members",
-    "run_mode",
-    "test",
-    "sdk",
-    "env",
-    "region",
-  ];
-
-  return keyFields.map((field) => tags[field] || "").join("|");
+  // Use all normalized tags to avoid merging different contexts into one
+  // percentile bucket (for example: branch, conversation_count, or custom tags).
+  return Object.entries(tags)
+    .filter(([, value]) => value !== undefined)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("|");
 }
 
 function calculatePercentile(values: number[], percentile: number): number {
