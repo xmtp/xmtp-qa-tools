@@ -7,31 +7,49 @@ export interface ResolvedEnvironment {
   gatewayHost?: string;
 }
 
-function resolveTestnetGatewayHost(env: ExtendedXmtpEnv): string | undefined {
+function testnetGatewayCandidates(env: ExtendedXmtpEnv): string[] {
   if (env === "testnet-staging") {
-    return (
-      process.env.XMTP_GATEWAY_HOST_TESTNET_STAGING ||
-      process.env.XMTP_GATEWAY_HOST_STAGING ||
-      process.env.XMTP_GATEWAY_HOST
-    );
+    return [
+      "XMTP_GATEWAY_HOST_TESTNET_STAGING",
+      "XMTP_GATEWAY_HOST_STAGING",
+      "XMTP_GATEWAY_HOST",
+    ];
   }
 
   if (env === "testnet-dev") {
-    return (
-      process.env.XMTP_GATEWAY_HOST_TESTNET_DEV ||
-      process.env.XMTP_GATEWAY_HOST_DEV ||
-      process.env.XMTP_GATEWAY_HOST
-    );
+    return [
+      "XMTP_GATEWAY_HOST_TESTNET_DEV",
+      "XMTP_GATEWAY_HOST_DEV",
+      "XMTP_GATEWAY_HOST",
+    ];
   }
 
-  return process.env.XMTP_GATEWAY_HOST;
+  return [];
+}
+
+function resolveTestnetGatewayHost(env: ExtendedXmtpEnv): string | undefined {
+  const candidates = testnetGatewayCandidates(env);
+  for (const key of candidates) {
+    const value = process.env[key]?.trim();
+    if (value) {
+      return value;
+    }
+  }
+  return undefined;
 }
 
 export function resolveEnvironment(env: ExtendedXmtpEnv): ResolvedEnvironment {
   if (env.startsWith("testnet")) {
+    const gatewayHost = resolveTestnetGatewayHost(env);
+    if (!gatewayHost) {
+      const candidates = testnetGatewayCandidates(env);
+      throw new Error(
+        `Environment '${env}' requires a gateway host. Set one of: ${candidates.join(", ")}`,
+      );
+    }
     return {
       sdkEnv: "dev",
-      gatewayHost: resolveTestnetGatewayHost(env),
+      gatewayHost,
     };
   }
   return { sdkEnv: env as XmtpEnv };

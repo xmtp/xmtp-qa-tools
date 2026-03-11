@@ -61,7 +61,7 @@ These tests emit the protocol performance metric family (`metric_family:group_st
 - For testnet environments, set gateway host env vars:
   - `XMTP_GATEWAY_HOST_TESTNET_STAGING`
   - `XMTP_GATEWAY_HOST_TESTNET_DEV`
-- If these are not set, runtime falls back to `XMTP_GATEWAY_HOST`.
+- Testnet runs fail fast if no gateway host is set (`XMTP_GATEWAY_HOST` is accepted as a shared fallback).
 
 ### Run protocol metrics locally
 
