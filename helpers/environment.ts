@@ -43,8 +43,14 @@ export function resolveEnvironment(env: ExtendedXmtpEnv): ResolvedEnvironment {
     const gatewayHost = resolveTestnetGatewayHost(env);
     if (!gatewayHost) {
       const candidates = testnetGatewayCandidates(env);
+      const visibleValues = candidates
+        .map(
+          (name) =>
+            `${name}=${process.env[name]?.trim() ? "<set>" : "<unset>"}`,
+        )
+        .join(", ");
       throw new Error(
-        `Environment '${env}' requires a gateway host. Set one of: ${candidates.join(", ")}`,
+        `Environment '${env}' requires a gateway host. Set one of: ${candidates.join(", ")}. Visible env vars: ${visibleValues}. If 'echo $VAR' shows a value but this error persists, export it before running tests (e.g. 'export ${candidates[0]}=https://...').`,
       );
     }
     return {
