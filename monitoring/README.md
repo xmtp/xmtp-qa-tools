@@ -83,6 +83,39 @@ Run against regular `dev`:
 yarn test group-stats --env dev --size 10-50 --attempts 15 --max-retry 1 --no-fail --log Warn --file --local-metrics --local-metrics-file logs/protocol-performance.ndjson
 ```
 
+### Enable logs locally
+
+Recommended log levels (least to most verbose):
+
+- `error`
+- `warn`
+- `info`
+- `debug`
+- `trace` (highest volume; use only when needed)
+
+Use flags instead of setting env vars manually:
+
+- `--log <level>` controls XMTP SDK / node-bindings logging (`LOGGING_LEVEL`)
+- `--winston <level>` controls JS logger verbosity (`LOG_LEVEL`)
+
+Save verbose logs to file while running group-stats:
+
+```bash
+yarn test group-stats --env dev --size 10-50 --attempts 1 --max-retry 1 --no-fail --no-datadog --log debug --winston debug --file --local-metrics --local-metrics-file logs/protocol-performance.ndjson
+```
+
+Show logs directly in terminal (do not pass `--file`):
+
+```bash
+yarn test group-stats --env dev --size 10-50 --attempts 1 --max-retry 1 --no-fail --no-datadog --log debug --winston debug
+```
+
+View the latest saved group-stats log:
+
+```bash
+ls -lt logs/raw-group-stats-*.log | head -n 1
+```
+
 ### Clear local stats before a fresh run
 
 Clear both raw logs and local metrics sink data:
