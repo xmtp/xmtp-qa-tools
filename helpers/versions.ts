@@ -34,6 +34,12 @@ import {
   type LogLevel as LogLevelType,
   type XmtpEnv as XmtpEnvType,
 } from "@xmtp/node-sdk-5.0.0";
+import {
+  Client as Client56,
+  Conversation as Conversation56,
+  Dm as Dm56,
+  Group as Group56,
+} from "@xmtp/node-sdk-5.6.0";
 
 // 4.4.0 loaded dynamically to catch version.json import error
 let Client44: any;
@@ -80,15 +86,17 @@ export type AnyClient =
   | InstanceType<typeof Client43>
   | InstanceType<typeof Client45>
   | InstanceType<typeof Client46>
-  | InstanceType<typeof Client50>;
+  | InstanceType<typeof Client50>
+  | InstanceType<typeof Client56>;
 
-export type AnyGroup = Group43 | Group45 | Group46 | Group50;
+export type AnyGroup = Group43 | Group45 | Group46 | Group50 | Group56;
 export type AnyConversation =
   | Conversation43
   | Conversation45
   | Conversation46
-  | Conversation50;
-export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50;
+  | Conversation50
+  | Conversation56;
+export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50 | Dm56;
 
 /**
  * Version references use simplified versions without patches/pre-release suffixes.
@@ -96,6 +104,15 @@ export type AnyDm = Dm43 | Dm45 | Dm46 | Dm50;
  * This prevents parsing issues with worker name-installation conversion.
  */
 export const VersionList = [
+  {
+    Client: Client56,
+    Conversation: Conversation56,
+    Dm: Dm56,
+    Group: Group56,
+    nodeSDK: "5.6.0",
+    nodeBindings: "1.10.0",
+    auto: true,
+  },
   {
     Client: Client50,
     Conversation: Conversation50,

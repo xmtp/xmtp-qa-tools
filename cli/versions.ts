@@ -8,7 +8,7 @@ import * as path from "node:path";
  * symlinks exist). Keep in sync with helpers/versions.ts VersionList.
  */
 const SYMLINK_NODE_BINDINGS: { nodeSDK: string; nodeBindings: string }[] = [
-  { nodeSDK: "5.0.0", nodeBindings: "1.9.1" },
+  { nodeSDK: "5.6.0", nodeBindings: "1.10.0" },
   { nodeSDK: "5.0.0", nodeBindings: "1.9.1" },
   { nodeSDK: "4.6.0", nodeBindings: "1.6.0" },
   { nodeSDK: "4.5.0", nodeBindings: "1.6.0" },
