@@ -7,11 +7,55 @@ export interface ResolvedEnvironment {
   gatewayHost?: string;
 }
 
+function testnetGatewayCandidates(env: ExtendedXmtpEnv): string[] {
+  if (env === "testnet-staging") {
+    return [
+      "XMTP_GATEWAY_HOST_TESTNET_STAGING",
+      "XMTP_GATEWAY_HOST_STAGING",
+      "XMTP_GATEWAY_HOST",
+    ];
+  }
+
+  if (env === "testnet-dev") {
+    return [
+      "XMTP_GATEWAY_HOST_TESTNET_DEV",
+      "XMTP_GATEWAY_HOST_DEV",
+      "XMTP_GATEWAY_HOST",
+    ];
+  }
+
+  return [];
+}
+
+function resolveTestnetGatewayHost(env: ExtendedXmtpEnv): string | undefined {
+  const candidates = testnetGatewayCandidates(env);
+  for (const key of candidates) {
+    const value = process.env[key]?.trim();
+    if (value) {
+      return value;
+    }
+  }
+  return undefined;
+}
+
 export function resolveEnvironment(env: ExtendedXmtpEnv): ResolvedEnvironment {
   if (env.startsWith("testnet")) {
+    const gatewayHost = resolveTestnetGatewayHost(env);
+    if (!gatewayHost) {
+      const candidates = testnetGatewayCandidates(env);
+      const visibleValues = candidates
+        .map(
+          (name) =>
+            `${name}=${process.env[name]?.trim() ? "<set>" : "<unset>"}`,
+        )
+        .join(", ");
+      throw new Error(
+        `Environment '${env}' requires a gateway host. Set one of: ${candidates.join(", ")}. Visible env vars: ${visibleValues}. If 'echo $VAR' shows a value but this error persists, export it before running tests (e.g. 'export ${candidates[0]}=https://...').`,
+      );
+    }
     return {
       sdkEnv: "dev",
-      gatewayHost: process.env.XMTP_GATEWAY_HOST,
+      gatewayHost,
     };
   }
   return { sdkEnv: env as XmtpEnv };
