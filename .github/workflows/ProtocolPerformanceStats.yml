@@ -20,7 +20,7 @@ jobs:
       REGION: ${{ vars.REGION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       GROUP_STATS_MESSAGE_COUNT: 5
-      XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
+      XMTP_GATEWAY_HOST: ${{ secrets.XMTP_PERF_GATEWAY_HOST || secrets.XMTP_GATEWAY_HOST || '' }}
     steps:
       - uses: actions/checkout@v4
 
