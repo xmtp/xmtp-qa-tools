@@ -92,9 +92,7 @@ describe(testName, () => {
   });
 
   it(`newDm:measure creating a DM`, async () => {
-    dm = (await creator.client.conversations.createDm(
-      receiver.client.inboxId,
-    )) as Dm;
+    dm = (await creator.worker.createDm(receiver.client.inboxId)) as Dm;
     expect(dm).toBeDefined();
     expect(dm.id).toBeDefined();
   });

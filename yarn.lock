@@ -1732,6 +1732,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/node-bindings-1.10.0@npm:@xmtp/node-bindings@1.10.0-rc2, @xmtp/node-bindings@npm:1.10.0-rc2":
+  version: 1.10.0-rc2
+  resolution: "@xmtp/node-bindings@npm:1.10.0-rc2"
+  checksum: 10/0b59078e6c0e4d0072a4de087730d6e86f06431b89d74dc68266b2ced3a3a80c09e07650a0c53dc963921556ae2508aa180211322b20b122c7a35418a871b6f0
+  languageName: node
+  linkType: hard
+
 "@xmtp/node-bindings-1.4.0@npm:@xmtp/node-bindings@1.4.0":
   version: 1.4.0
   resolution: "@xmtp/node-bindings@npm:1.4.0"
@@ -1850,6 +1857,16 @@ __metadata:
     "@xmtp/content-type-primitives": "npm:3.0.0"
     "@xmtp/node-bindings": "npm:1.9.1"
   checksum: 10/22321dbfc58bdc9c477825a9c0a5aecc1e62b9ed24a646004ab0550453bb86d2555c7efe0b037854148109956402675893e6c0973d653a84b820a8ca2c706049
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-5.6.0@npm:@xmtp/node-sdk@5.6.0-rc1.8dae562":
+  version: 5.6.0-rc1.8dae562
+  resolution: "@xmtp/node-sdk@npm:5.6.0-rc1.8dae562"
+  dependencies:
+    "@xmtp/content-type-primitives": "npm:3.0.0"
+    "@xmtp/node-bindings": "npm:1.10.0-rc2"
+  checksum: 10/5b2deb7e95b3153220a83981d74695ea597bc0bc5906c5f27d95c8cdb7f2af8279fd7c2921f7aa6ce5db4b86140fc7e382c9fb11e344a51e1f2df83d159298b3
   languageName: node
   linkType: hard
 
@@ -6032,6 +6049,7 @@ __metadata:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/content-type-wallet-send-calls": "npm:^2.0.0"
+    "@xmtp/node-bindings-1.10.0": "npm:@xmtp/node-bindings@1.10.0-rc2"
     "@xmtp/node-bindings-1.4.0": "npm:@xmtp/node-bindings@1.4.0"
     "@xmtp/node-bindings-1.5.0": "npm:@xmtp/node-bindings@1.5.4"
     "@xmtp/node-bindings-1.6.0": "npm:@xmtp/node-bindings@1.6.6"
@@ -6043,6 +6061,7 @@ __metadata:
     "@xmtp/node-sdk-4.5.0": "npm:@xmtp/node-sdk@4.5.0"
     "@xmtp/node-sdk-4.6.0": "npm:@xmtp/node-sdk@4.6.0"
     "@xmtp/node-sdk-5.0.0": "npm:@xmtp/node-sdk@5.3.0"
+    "@xmtp/node-sdk-5.6.0": "npm:@xmtp/node-sdk@5.6.0-rc1.8dae562"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.5.0"
