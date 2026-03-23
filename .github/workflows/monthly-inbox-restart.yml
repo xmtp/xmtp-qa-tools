@@ -26,6 +26,6 @@ jobs:
         run: yarn install --immutable
 
       - name: Restart inboxes for ${{ matrix.env }}
-        run: yarn gen --installations 2 --count 200 --restart --env ${{ matrix.env }}
+        run: yarn gen --installations 2 --count 200 --restart --batch-size 10 --env ${{ matrix.env }}
         env:
           XMTP_GATEWAY_HOST: ${{ secrets.XMTP_GATEWAY_HOST }}
