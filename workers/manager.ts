@@ -682,24 +682,10 @@ function getNextFolderName(): string {
     fs.mkdirSync(dataPath, { recursive: true });
   }
 
-  const maxAttempts = 1000;
-
-  for (let count = 0; count < maxAttempts; count++) {
-    // Generate folder names: a-z, then aa-az, ba-bz, etc.
-    let folderName: string;
-    if (count < 26) {
-      folderName = String.fromCharCode("a".charCodeAt(0) + count);
-    } else {
-      const firstIndex = Math.floor(count / 26) - 1;
-      if (firstIndex >= 26) {
-        throw new Error(
-          "Folder limit exceeded: cannot create more than 702 folders",
-        );
-      }
-      const first = String.fromCharCode("a".charCodeAt(0) + firstIndex);
-      const second = String.fromCharCode("a".charCodeAt(0) + (count % 26));
-      folderName = first + second;
-    }
+er  for (let count = 0; ; count++) {
+    // Generate folder names with unbounded alphabetic indexing:
+    // a..z, aa..az, ba..zz, aaa...
+    const folderName = indexToFolderName(count);
 
     const folderPath = path.join(dataPath, folderName);
 
@@ -716,8 +702,20 @@ function getNextFolderName(): string {
       throw error;
     }
   }
+}
 
-  throw new Error(`Failed to create folder after ${maxAttempts} attempts`);
+function indexToFolderName(index: number): string {
+  const alphabetStart = "a".charCodeAt(0);
+  let value = index + 1;
+  let folderName = "";
+
+  while (value > 0) {
+    value--;
+    folderName = String.fromCharCode(alphabetStart + (value % 26)) + folderName;
+    value = Math.floor(value / 26);
+  }
+
+  return folderName;
 }
 
 /**
