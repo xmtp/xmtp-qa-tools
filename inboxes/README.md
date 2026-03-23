@@ -4,8 +4,7 @@ Pre-generated XMTP inbox data for testing with multiple device installations.
 
 ## Files
 
-- **`{number}.json`** - Inbox data files (e.g., `2.json`, `5.json`, `10.json`)
-- **`gen.ts`** - TypeScript generator script
+- **`byinstallation/{number}.json`** - Inbox data files organized by installation count (e.g., `2.json`, `5.json`, `10.json`)
 
 ## Data format
 
@@ -24,7 +23,7 @@ Each JSON file contains an array of inbox objects:
 ## Usage in tests
 
 ```typescript
-import inboxData from "./inboxes/10.json";
+import inboxData from "./inboxes/byinstallation/10.json";
 
 const testInbox = inboxData[0];
 const signer = createSigner(testInbox.walletKey);
@@ -38,17 +37,7 @@ const client = await Client.create(signer, {
 
 ## Generation commands
 
-### Quick commands (predefined)
-
-```bash
-# Generate for local environment only
-yarn local-update
-
-# Generate for all environments
-yarn prod-update
-```
-
-### Direct generation with yarn gen
+### Basic generation
 
 ```bash
 # Basic usage - generates 200 inboxes with 2 installations each
@@ -58,29 +47,85 @@ yarn gen
 yarn gen --count 500 --installations 10 --env local
 
 # Multiple environments
-yarn gen  --installations 5 --env local,dev,production
+yarn gen --installations 5 --env local,dev,production
 ```
+
+### Check installation status
+
+Use `--check` to verify installations are valid without modifying anything:
+
+```bash
+# Check first 20 inboxes on dev
+yarn gen --check --count 20 --env dev
+
+# Check first 50 inboxes on production
+yarn gen --check --count 50 --env production
+```
+
+Output shows a table with:
+- **Installs** - Total installations registered for the inbox
+- **Valid** - Installations with valid key packages
+- **Invalid** - Installations with expired/stale key packages
+- **Status** - OK, Missing (fewer valid than expected), Stale (has invalid), or None
+
+### Restart/refresh installations
+
+Use `--restart` to revoke existing installations and create fresh ones:
+
+```bash
+# Restart first 50 inboxes on dev
+yarn gen --restart --count 50 --env dev
+
+# Restart with smaller batch size (for CI/memory-constrained environments)
+yarn gen --restart --count 50 --batch-size 5 --env dev
+
+# Restart on multiple environments
+yarn gen --restart --count 200 --env dev,production
+```
+
+The restart process:
+1. Creates a client (registers new installation)
+2. Calls `revokeAllOtherInstallations()` to revoke all others
+3. Creates additional installations to reach the target count
+
+### Batching for memory management
+
+The `--batch-size` parameter controls how many inboxes are processed at once:
+
+```bash
+# Default batch size (10 inboxes at a time)
+yarn gen --restart --count 100 --env production
+
+# Smaller batches for CI environments with memory limits
+yarn gen --restart --count 100 --batch-size 5 --env production
+```
+
+Between batches:
+- Database files are cleaned up to free mlock memory
+- Garbage collection is triggered if available
+- 1 second delay allows resources to settle
+
+This prevents `sqlcipher_mlock` errors in memory-constrained environments like GitHub Actions.
 
 ## Parameters
 
-- **`--count`** - Number of accounts to generate (default: 200)
-- **`--installations`** - Number of installations per account (default: 2)
-- **`--env`** - Target environments: `local`, `dev`, `production` (default: production)
-- **`--log warn --file`** - Enable verbose logging
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `--count` | Number of accounts to process | 200 |
+| `--installations` | Installations per account | 2 |
+| `--env` | Target environments (comma-separated) | local |
+| `--batch-size` | Inboxes per batch (memory management) | 10 |
+| `--restart` | Force revoke and recreate installations | false |
+| `--check` | Check status without modifying | false |
+| `--debug` | Enable verbose logging | false |
+| `--clean` | Clean logs/ and .data/ directories | false |
 
-## Troubleshooting
+## GitHub Actions
 
-```bash
-# Clean reset for local development
-XMTP_ENV=local
+The `monthly-inbox-restart.yml` workflow automatically refreshes installations:
 
-# Remove data and restart
-rm -rf .data/ logs/
-./dev/down && ./dev/up
-
-# Regenerate local inboxes
-yarn local-update
-
-# Run tests to verify
-yarn test performance --env local
+```yaml
+yarn gen --installations 2 --count 50 --restart --batch-size 5 --env ${{ matrix.env }}
 ```
+
+Uses small batch size (5) to avoid memory issues in CI.
