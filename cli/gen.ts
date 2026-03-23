@@ -50,7 +50,8 @@ OPTIONS:
   --env <environments>  Comma-separated environments (local,dev,production) [default: local]
   --installations <num>  Number of installations per inbox [default: 2]
   --restart             Force restart existing installations (revokes and recreates)
-  --log warn --file               Enable debug logging
+  --check               Check installation status without modifying (shows table)
+  --debug               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
   -h, --help            Show this help message
 
@@ -64,7 +65,8 @@ EXAMPLES:
   yarn gen --count 500 --env local
   yarn gen --env local,dev --installations 3
   yarn gen --restart --env production --installations 2
-  yarn gen --clean --log warn --file
+  yarn gen --check --count 20 --env dev          Check status of first 20 inboxes
+  yarn gen --clean --debug
   yarn gen --help
 
 PRESET COMMANDS:
@@ -226,6 +228,136 @@ function showFileStats(
     `   🧹 Total records removed: ${results.reduce((a, r) => a + r.removed, 0)}`,
   );
   console.log(`\n🎉 Analysis & deduplication complete!`);
+}
+
+async function checkInboxStatus({
+  count,
+  envs,
+  installations,
+}: {
+  count: number;
+  envs: ExtendedXmtpEnv[];
+  installations: number;
+}) {
+  const targetFileName = `${installations}.json`;
+  const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
+  const existingInboxes: InboxData[] =
+    (readJson(targetFilePath) as InboxData[]) || [];
+
+  if (existingInboxes.length === 0) {
+    console.error(`❌ No inboxes found in ${targetFilePath}`);
+    return;
+  }
+
+  const inboxesToCheck = existingInboxes.slice(0, count);
+  console.log(
+    `\n🔍 Checking ${inboxesToCheck.length} inboxes from ${targetFileName} on ${envs.join(", ")}\n`,
+  );
+
+  for (const env of envs) {
+    const resolved = resolveEnvironment(env);
+    console.log(`\n📡 Environment: ${env}`);
+    console.log("─".repeat(120));
+    console.log(
+      `${"#".padEnd(4)} ${"Inbox ID".padEnd(20)} ${"Address".padEnd(14)} ${"Installs".padEnd(10)} ${"Valid".padEnd(8)} ${"Invalid".padEnd(10)} ${"Status".padEnd(10)}`,
+    );
+    console.log("─".repeat(120));
+
+    let totalValid = 0;
+    let totalInvalid = 0;
+    let totalMissing = 0;
+
+    for (let i = 0; i < inboxesToCheck.length; i++) {
+      const inbox = inboxesToCheck[i];
+      try {
+        const signer = createSigner(inbox.walletKey as `0x${string}`);
+        const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
+        const tempDbPath = `${BASE_LOGPATH}/check-${env}-${inbox.accountAddress}`;
+
+        const client = await Client.create(signer, {
+          dbEncryptionKey,
+          dbPath: tempDbPath,
+          appVersion: APP_VERSION,
+          disableDeviceSync: true,
+          env: resolved.sdkEnv,
+          gatewayHost: resolved.gatewayHost,
+        });
+
+        const states = await client.preferences.getInboxStates([inbox.inboxId]);
+        const installs = states?.[0]?.installations || [];
+        const installCount = installs.length;
+
+        let validCount = 0;
+        let invalidCount = 0;
+        let status = "✅";
+
+        if (installCount > 0) {
+          try {
+            const installationIds = installs.map(
+              (inst: { id: string }) => inst.id,
+            );
+            const keyStatuses = (await client.fetchKeyPackageStatuses(
+              installationIds,
+            )) as Record<string, any>;
+
+            for (const [, keyStatus] of Object.entries(keyStatuses)) {
+              if (keyStatus?.validationError) {
+                invalidCount++;
+              } else if (keyStatus?.lifetime) {
+                validCount++;
+              }
+            }
+
+            if (invalidCount > 0) {
+              status = "⚠️ Stale";
+              totalInvalid += invalidCount;
+            }
+            if (validCount < installations) {
+              status = "❌ Missing";
+              totalMissing++;
+            }
+            if (validCount >= installations && invalidCount === 0) {
+              status = "✅ OK";
+            }
+            totalValid += validCount;
+          } catch {
+            status = "❓ Error";
+          }
+        } else {
+          status = "❌ None";
+          totalMissing++;
+        }
+
+        const shortInboxId = `${inbox.inboxId.slice(0, 8)}...${inbox.inboxId.slice(-4)}`;
+        const shortAddress = `${inbox.accountAddress.slice(0, 6)}...${inbox.accountAddress.slice(-4)}`;
+
+        console.log(
+          `${(i + 1).toString().padEnd(4)} ${shortInboxId.padEnd(20)} ${shortAddress.padEnd(14)} ${installCount.toString().padEnd(10)} ${validCount.toString().padEnd(8)} ${invalidCount.toString().padEnd(10)} ${status.padEnd(10)}`,
+        );
+
+        // Clean up temp db
+        if (fs.existsSync(tempDbPath)) {
+          fs.rmSync(tempDbPath, { recursive: true, force: true });
+        }
+      } catch (error) {
+        const shortInboxId = `${inbox.inboxId.slice(0, 8)}...${inbox.inboxId.slice(-4)}`;
+        const shortAddress = `${inbox.accountAddress.slice(0, 6)}...${inbox.accountAddress.slice(-4)}`;
+        console.log(
+          `${(i + 1).toString().padEnd(4)} ${shortInboxId.padEnd(20)} ${shortAddress.padEnd(14)} ${"?".padEnd(10)} ${"?".padEnd(8)} ${"?".padEnd(10)} ❌ Error`,
+        );
+      }
+    }
+
+    console.log("─".repeat(120));
+    console.log(
+      `\n📊 Summary for ${env}: ${totalValid} valid, ${totalInvalid} invalid/stale, ${totalMissing} missing installations`,
+    );
+    if (totalInvalid > 0 || totalMissing > 0) {
+      console.log(
+        `💡 Run: yarn gen --installations ${installations} --count ${count} --restart --env ${env}`,
+      );
+    }
+  }
 }
 
 async function checkInstallations(
@@ -489,7 +621,8 @@ async function main() {
   let count: number | undefined = undefined,
     envs: ExtendedXmtpEnv[] | undefined = undefined,
     installations: string | undefined = undefined,
-    restart = false;
+    restart = false,
+    check = false;
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -499,11 +632,25 @@ async function main() {
         .map((e) => e.trim().toLowerCase()) as ExtendedXmtpEnv[];
     if (arg === "--installations") installations = args[i + 1];
     if (arg === "--restart") restart = true;
-    if (arg === "--log warn --file") debugMode = true;
+    if (arg === "--check") check = true;
+    if (arg === "--debug") debugMode = true;
   });
 
   if (count === undefined) count = DEFAULT_COUNT;
   if (envs === undefined) envs = DEFAULT_ENVS;
+
+  // Handle check mode (read-only, shows status table)
+  if (check) {
+    const installationCount = installations
+      ? parseInt(installations, 10)
+      : DEFAULT_INSTALLATIONS;
+    await checkInboxStatus({
+      count,
+      envs,
+      installations: installationCount,
+    });
+    return;
+  }
 
   // Handle cleanup
   if (!args.includes("--no-cleanup")) {
