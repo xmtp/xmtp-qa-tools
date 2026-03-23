@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        env: [dev, production]
+        env: [dev, production, testnet-staging]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,13 +19,13 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup Yarn
-        uses: yarnpkg/setup-yarn@v3
-        with:
-          yarn-version: "4.6.0"
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Restart inboxes for ${{ matrix.env }}
         run: yarn gen --installations 2 --count 200 --restart --env ${{ matrix.env }}
+        env:
+          XMTP_GATEWAY_HOST: ${{ secrets.XMTP_GATEWAY_HOST }}
