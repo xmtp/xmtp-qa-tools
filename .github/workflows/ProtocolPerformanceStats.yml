@@ -58,6 +58,13 @@ jobs:
             echo "No raw group-stats log file found"
           fi
 
+          if [[ -f "/tmp/metric-debug.log" ]]; then
+            echo "Metric debug (/tmp/metric-debug.log):"
+            tail -n 400 /tmp/metric-debug.log
+          else
+            echo "No /tmp/metric-debug.log found"
+          fi
+
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup

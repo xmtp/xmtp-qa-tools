@@ -209,15 +209,24 @@ describe(testName, () => {
 
     it(`addMember-${memberCount}:group.add_members and group.add_member_unit`, async () => {
       try {
+        console.info(
+          `[METRIC_DEBUG] addMembers start (members=${memberCount})`,
+        );
         await ensureGroupContext();
 
         await group.removeMembers([extraMember.inboxId]);
-        // await group.sync();
-        // await sleep(1000);
+        await group.sync();
+        await sleep(1000);
 
         const start = performance.now();
         await group.addMembers([extraMember.inboxId]);
         const duration = performance.now() - start;
+
+        console.info(
+          `[METRIC_DEBUG] addMembers success (members=${memberCount}) duration_ms=${Math.round(
+            duration,
+          )}`,
+        );
 
         try {
           const fs = await import("fs");
@@ -253,6 +262,11 @@ describe(testName, () => {
           legacyOperation: "addMember",
           runMode: "warm",
         });
+        const message =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        console.error(
+          `[METRIC_DEBUG] addMembers failure (members=${memberCount}) error=${message}`,
+        );
         throw error;
       }
     });
