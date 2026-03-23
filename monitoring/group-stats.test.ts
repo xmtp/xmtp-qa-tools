@@ -22,6 +22,8 @@ const batchSizes = process.env.BATCH_SIZE
   ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
   : [10];
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const setupOperationName = "group.setup_context";
 const setupLegacyOperation = "setupContext";
 
@@ -107,50 +109,51 @@ describe(testName, () => {
     let setupError: GroupSetupError | undefined;
 
     async function ensureGroupContext(): Promise<number | undefined> {
-      if (group) {
-        return undefined;
-      }
-      if (setupError) {
-        throw setupError;
-      }
+      // Return early if group already created or setup failed
+      if (group) return undefined;
+      if (setupError) throw setupError;
 
       try {
-        const allMembersWithExtra = getInboxes(
-          memberCount - workers.getAll().length + 2,
-          2,
-          memberCount,
+        // We need memberCount members in the group, plus 1 extra for add/remove tests
+        // Use workers first (they can stream messages), fill remainder with passive inboxes
+        const availableWorkers = workers.getAllButCreator();
+        const workersNeeded = Math.min(
+          availableWorkers.length,
+          memberCount - 1,
         );
-        const allMembers = allMembersWithExtra.slice(
-          0,
-          allMembersWithExtra.length - 2,
-        );
-        extraMember = allMembersWithExtra.at(-1)!;
-        const workersToAdd = workers
-          .getAllButCreator()
-          .slice(0, memberCount - 1 - allMembers.length);
-        groupWorkers = workersToAdd;
+        const inboxesNeeded = memberCount - 1 - workersNeeded;
 
+        // Get inboxes + 1 extra member for add/remove tests
+        const inboxes = getInboxes(inboxesNeeded + 1, 2, memberCount);
+        const inboxMembers = inboxes.slice(0, inboxesNeeded);
+        extraMember = inboxes[inboxesNeeded]; // Reserved for add/remove tests
+
+        // Workers that will be in the group (can receive streamed messages)
+        groupWorkers = availableWorkers.slice(0, workersNeeded);
+
+        // Build member list for group creation (creator is added automatically)
         const membersToAdd = [
-          ...allMembers.map((a) => ({
-            identifier: a.accountAddress,
+          ...inboxMembers.map((inbox) => ({
+            identifier: inbox.accountAddress,
             identifierKind: IdentifierKind.Ethereum,
           })),
-          ...workersToAdd.map((w) => ({
-            identifier: w.address,
+          ...groupWorkers.map((worker) => ({
+            identifier: worker.address,
             identifierKind: IdentifierKind.Ethereum,
           })),
         ];
 
+        // Create group and measure duration
         const start = performance.now();
         group = (await creator.worker.createGroupWithIdentifiers(
           membersToAdd,
         )) as Group;
         const duration = performance.now() - start;
 
+        // Validate setup
         const createdMembers = await group.members();
-        if (!group.id) {
+        if (!group.id)
           throw new Error("Setup validation failed: group id is missing");
-        }
         if (createdMembers.length !== memberCount) {
           throw new Error(
             `Setup validation failed: expected ${memberCount} members, got ${createdMembers.length}`,
@@ -209,26 +212,22 @@ describe(testName, () => {
         await ensureGroupContext();
 
         await group.removeMembers([extraMember.inboxId]);
+        // await group.sync();
+        // await sleep(1000);
 
         const start = performance.now();
         await group.addMembers([extraMember.inboxId]);
         const duration = performance.now() - start;
+
+        console.warn(
+          `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms`,
+        );
 
         sendStatsDurationMetric({
           test: testName,
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.add_members",
-          legacyOperation: "addMember",
-          runMode: "warm",
-          valueMs: duration,
-        });
-
-        sendStatsDurationMetric({
-          test: testName,
-          sdk: creator.sdk,
-          members: memberCount,
-          operationName: "group.add_member_unit",
           legacyOperation: "addMember",
           runMode: "warm",
           valueMs: duration,
