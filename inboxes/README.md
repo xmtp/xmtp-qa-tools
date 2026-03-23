@@ -63,6 +63,7 @@ yarn gen --check --count 50 --env production
 ```
 
 Output shows a table with:
+
 - **Installs** - Total installations registered for the inbox
 - **Valid** - Installations with valid key packages
 - **Invalid** - Installations with expired/stale key packages
@@ -84,6 +85,7 @@ yarn gen --restart --count 200 --env dev,production
 ```
 
 The restart process:
+
 1. Creates a client (registers new installation)
 2. Calls `revokeAllOtherInstallations()` to revoke all others
 3. Creates additional installations to reach the target count
@@ -101,6 +103,7 @@ yarn gen --restart --count 100 --batch-size 5 --env production
 ```
 
 Between batches:
+
 - Database files are cleaned up to free mlock memory
 - Garbage collection is triggered if available
 - 1 second delay allows resources to settle
@@ -109,16 +112,16 @@ This prevents `sqlcipher_mlock` errors in memory-constrained environments like G
 
 ## Parameters
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `--count` | Number of accounts to process | 200 |
-| `--installations` | Installations per account | 2 |
-| `--env` | Target environments (comma-separated) | local |
-| `--batch-size` | Inboxes per batch (memory management) | 10 |
-| `--restart` | Force revoke and recreate installations | false |
-| `--check` | Check status without modifying | false |
-| `--debug` | Enable verbose logging | false |
-| `--clean` | Clean logs/ and .data/ directories | false |
+| Parameter         | Description                             | Default |
+| ----------------- | --------------------------------------- | ------- |
+| `--count`         | Number of accounts to process           | 200     |
+| `--installations` | Installations per account               | 2       |
+| `--env`           | Target environments (comma-separated)   | local   |
+| `--batch-size`    | Inboxes per batch (memory management)   | 10      |
+| `--restart`       | Force revoke and recreate installations | false   |
+| `--check`         | Check status without modifying          | false   |
+| `--debug`         | Enable verbose logging                  | false   |
+| `--clean`         | Clean logs/ and .data/ directories      | false   |
 
 ## GitHub Actions
 

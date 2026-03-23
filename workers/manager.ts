@@ -682,7 +682,7 @@ function getNextFolderName(): string {
     fs.mkdirSync(dataPath, { recursive: true });
   }
 
-er  for (let count = 0; ; count++) {
+  for (let count = 0; ; count++) {
     // Generate folder names with unbounded alphabetic indexing:
     // a..z, aa..az, ba..zz, aaa...
     const folderName = indexToFolderName(count);
