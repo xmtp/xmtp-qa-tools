@@ -21,6 +21,8 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       GROUP_STATS_MESSAGE_COUNT: 5
       XMTP_GATEWAY_HOST: ${{ matrix.env == 'testnet-staging' && secrets.XMTP_GATEWAY_HOST || '' }}
+      LOGGING_LEVEL: debug
+      LOG_LEVEL: debug
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +34,29 @@ jobs:
           env: ${{ matrix.env }}
 
       - name: Run tests ${{ matrix.size }}
-        run: yarn test ${{ matrix.test }} --no-fail --log Warn --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 15
+        run: yarn test ${{ matrix.test }} --no-fail --log debug --winston debug --file --env ${{ matrix.env }} --size ${{ matrix.size }} --max-retry 1 --attempts 15
+
+      - name: Print latest group-stats debug log
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_group_log="$(ls -1t logs/group-stats-${{ matrix.env }}-*.log 2>/dev/null | head -n 1 || true)"
+          latest_raw_log="$(ls -1t logs/raw-group-stats-*.log 2>/dev/null | head -n 1 || true)"
+
+          if [[ -n "${latest_group_log}" ]]; then
+            echo "Latest group-stats log: ${latest_group_log}"
+            tail -n 400 "${latest_group_log}"
+          else
+            echo "No group-stats log file found for env=${{ matrix.env }}"
+          fi
+
+          if [[ -n "${latest_raw_log}" ]]; then
+            echo "Latest raw group-stats log: ${latest_raw_log}"
+            tail -n 200 "${latest_raw_log}"
+          else
+            echo "No raw group-stats log file found"
+          fi
 
       - name: Cleanup and upload artifacts
         if: always()

@@ -219,9 +219,15 @@ describe(testName, () => {
         await group.addMembers([extraMember.inboxId]);
         const duration = performance.now() - start;
 
-        process.stderr.write(
-          `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms\n`,
-        );
+        try {
+          const fs = await import("fs");
+          fs.appendFileSync(
+            "/tmp/metric-debug.log",
+            `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms\n`,
+          );
+        } catch {
+          // ignore write errors
+        }
 
         sendStatsDurationMetric({
           test: testName,
