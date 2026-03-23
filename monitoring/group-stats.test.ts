@@ -219,8 +219,8 @@ describe(testName, () => {
         await group.addMembers([extraMember.inboxId]);
         const duration = performance.now() - start;
 
-        console.warn(
-          `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms`,
+        process.stderr.write(
+          `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms\n`,
         );
 
         sendStatsDurationMetric({
