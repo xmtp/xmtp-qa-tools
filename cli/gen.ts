@@ -280,7 +280,9 @@ async function checkInboxStatus({
       );
       debugLog(`📦 Fetched ${allStates.length} inbox states in batch`);
     } catch (error) {
-      console.error(`❌ Failed to fetch inbox states: ${error}`);
+      console.error(
+        `❌ Failed to fetch inbox states: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return;
     }
 
@@ -289,14 +291,18 @@ async function checkInboxStatus({
     // Try multiple inboxes as fallback if one fails
     let helperClient: any = null;
     const tempDbPath = `${BASE_LOGPATH}/check-helper-${env}`;
-    
+
     // Clean up any existing temp db first
     if (fs.existsSync(tempDbPath)) {
       fs.rmSync(tempDbPath, { recursive: true, force: true });
     }
-    
+
     // Try to create helper client from one of the inboxes
-    for (let attempt = 0; attempt < Math.min(5, inboxesToCheck.length); attempt++) {
+    for (
+      let attempt = 0;
+      attempt < Math.min(5, inboxesToCheck.length);
+      attempt++
+    ) {
       const inbox = inboxesToCheck[attempt];
       try {
         const signer = createSigner(inbox.walletKey as `0x${string}`);
@@ -312,10 +318,18 @@ async function checkInboxStatus({
         debugLog(`✅ Created helper client from inbox ${attempt + 1}`);
         break; // Success, exit loop
       } catch (error) {
-        debugLog(`⚠️ Failed to create helper client from inbox ${attempt + 1}: ${error}`);
+        debugLog(
+          `⚠️ Failed to create helper client from inbox ${attempt + 1}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
         if (attempt === Math.min(4, inboxesToCheck.length - 1)) {
-          console.error(`❌ Failed to create helper client after ${attempt + 1} attempts`);
-          console.error(`   Last error: ${error instanceof Error ? error.message : String(error)}`);
+          console.error(
+            `❌ Failed to create helper client after ${attempt + 1} attempts`,
+          );
+          console.error(
+            `   Last error: ${error instanceof Error ? error.message : String(error)}`,
+          );
           console.error(`   Key package status checks will be skipped.`);
         }
       }
@@ -414,7 +428,9 @@ async function checkInstallations(
 
   if (forceRestart && current > 1) {
     // Use revokeAllOtherInstallations to keep the current client's installation
-    debugLog(`🔄 Force restart: Revoking all other ${current - 1} installations (keeping current)`);
+    debugLog(
+      `🔄 Force restart: Revoking all other ${current - 1} installations (keeping current)`,
+    );
     await client.revokeAllOtherInstallations();
     debugLog(`✅ Successfully revoked other installations, keeping current`);
     current = 1; // We kept the current installation
@@ -459,7 +475,12 @@ function tryGarbageCollect() {
 /**
  * Clean up db files for a batch to free resources
  */
-function cleanupBatchDbFiles(logPath: string, env: string, inboxes: InboxData[], installations: number) {
+function cleanupBatchDbFiles(
+  logPath: string,
+  env: string,
+  inboxes: InboxData[],
+  installations: number,
+) {
   for (const inbox of inboxes) {
     for (let j = 0; j < installations; j++) {
       const dbPath = `${logPath}/${env}-${inbox.accountAddress}-install-${j}`;
@@ -501,35 +522,39 @@ async function smartUpdate({
   const targetCount = count || existingCount;
   const folderName = `db-generated-${installationCount}-${envs.join(",")}-${installationCount}inst`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
-  
+
   // Clean up old db files completely to start fresh
   if (fs.existsSync(LOGPATH)) {
     fs.rmSync(LOGPATH, { recursive: true, force: true });
   }
   fs.mkdirSync(LOGPATH, { recursive: true });
-  
+
   analyzeInboxFiles();
   let totalCreated = 0,
     totalFailed = 0,
     totalRevoked = 0;
-  
+
   // Update existing accounts in batches
   const accountsToProcess = Math.min(targetCount, existingCount);
   if (accountsToProcess > 0) {
     const totalBatches = Math.ceil(accountsToProcess / batchSize);
-    console.log(`\n📦 Processing ${accountsToProcess} inboxes in ${totalBatches} batches of ${batchSize} to avoid memory issues\n`);
-    
+    console.log(
+      `\n📦 Processing ${accountsToProcess} inboxes in ${totalBatches} batches of ${batchSize} to avoid memory issues\n`,
+    );
+
     for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
       const batchStart = batchNum * batchSize;
       const batchEnd = Math.min(batchStart + batchSize, accountsToProcess);
       const batchInboxes = existingInboxes.slice(batchStart, batchEnd);
-      
-      console.log(`\n📦 Batch ${batchNum + 1}/${totalBatches} (inboxes ${batchStart + 1}-${batchEnd})`);
-      
+
+      console.log(
+        `\n📦 Batch ${batchNum + 1}/${totalBatches} (inboxes ${batchStart + 1}-${batchEnd})`,
+      );
+
       let batchCreated = 0;
       let batchFailed = 0;
       let batchRevoked = 0;
-      
+
       for (const inbox of batchInboxes) {
         try {
           if (
@@ -542,11 +567,13 @@ async function smartUpdate({
             continue;
           }
           const signer = createSigner(inbox.walletKey as `0x${string}`);
-          const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
-          
+          const dbEncryptionKey = getEncryptionKeyFromHex(
+            inbox.dbEncryptionKey,
+          );
+
           for (const env of envs) {
             const resolved = resolveEnvironment(env);
-            
+
             // When restarting, clean up ALL db files first to ensure fresh installations
             if (restart) {
               for (let j = 0; j < installationCount; j++) {
@@ -556,7 +583,7 @@ async function smartUpdate({
                 }
               }
             }
-            
+
             // Create first client to check/revoke existing installations
             const client = await Client.create(signer, {
               dbEncryptionKey,
@@ -571,11 +598,11 @@ async function smartUpdate({
               installationCount,
               restart || false,
             );
-            
+
             if (restart) {
               batchRevoked++;
             }
-            
+
             // Create remaining installations from currentInstallations onwards
             // (install-0 already exists from the client we just created)
             for (let j = currentInstallations; j < installationCount; j++) {
@@ -588,7 +615,9 @@ async function smartUpdate({
                   appVersion: APP_VERSION,
                   disableDeviceSync: true,
                 });
-                debugLog(`Created installation ${j} for ${inbox.accountAddress} in ${env}`);
+                debugLog(
+                  `Created installation ${j} for ${inbox.accountAddress} in ${env}`,
+                );
                 batchCreated++;
               } catch (error) {
                 debugLog(
@@ -605,32 +634,34 @@ async function smartUpdate({
           batchFailed++;
         }
       }
-      
+
       // Batch summary
-      console.log(`   ✅ Created: ${batchCreated}, Revoked: ${batchRevoked}, Failed: ${batchFailed}`);
-      
+      console.log(
+        `   ✅ Created: ${batchCreated}, Revoked: ${batchRevoked}, Failed: ${batchFailed}`,
+      );
+
       totalCreated += batchCreated;
       totalFailed += batchFailed;
       totalRevoked += batchRevoked;
-      
+
       // Clean up db files from this batch to free mlock memory
       for (const env of envs) {
         cleanupBatchDbFiles(LOGPATH, env, batchInboxes, installationCount);
       }
-      
+
       // Try garbage collection
       tryGarbageCollect();
-      
+
       // Small delay between batches to let resources settle
       if (batchNum < totalBatches - 1) {
         debugLog(`   ⏳ Waiting 1s before next batch...`);
         await sleep(1000);
       }
     }
-    
+
     // Save after all batches complete
     writeJson(targetFilePath, existingInboxes);
-    
+
     console.log(`\n📊 Summary:`);
     console.log(`   • Created: ${totalCreated} installations`);
     console.log(`   • Revoked: ${totalRevoked} inboxes`);
@@ -774,7 +805,14 @@ async function main() {
       console.log(`\n--- Running for --installations ${inst} ---`);
       try {
         await runWithRetry(
-          () => smartUpdate({ count, envs, installations: inst, restart, batchSize }),
+          () =>
+            smartUpdate({
+              count,
+              envs,
+              installations: inst,
+              restart,
+              batchSize,
+            }),
           `installation ${inst}`,
         );
       } catch (error) {
@@ -791,7 +829,13 @@ async function main() {
       : DEFAULT_INSTALLATIONS;
     await runWithRetry(
       () =>
-        smartUpdate({ count, envs, installations: installationCount, restart, batchSize }),
+        smartUpdate({
+          count,
+          envs,
+          installations: installationCount,
+          restart,
+          batchSize,
+        }),
       "smart update",
     );
   }
