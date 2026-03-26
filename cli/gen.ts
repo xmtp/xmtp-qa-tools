@@ -49,8 +49,10 @@ OPTIONS:
   --count <number>       Number of inboxes to generate [default: 200]
   --env <environments>  Comma-separated environments (local,dev,production) [default: local]
   --installations <num>  Number of installations per inbox [default: 2]
+  --batch-size <num>     Inboxes per batch (memory management) [default: 10]
   --restart             Force restart existing installations (revokes and recreates)
-  --log warn --file               Enable debug logging
+  --check               Check installation status without modifying (shows table)
+  --debug               Enable debug logging
   --clean               Clean up logs/ and .data/ directories before running
   -h, --help            Show this help message
 
@@ -63,8 +65,10 @@ ENVIRONMENTS:
 EXAMPLES:
   yarn gen --count 500 --env local
   yarn gen --env local,dev --installations 3
-  yarn gen --restart --env production --installations 2
-  yarn gen --clean --log warn --file
+  yarn gen --restart --count 50 --env dev                   Restart with batching
+  yarn gen --restart --count 50 --batch-size 5 --env dev    Smaller batches (for CI memory limits)
+  yarn gen --check --count 20 --env dev                     Check status of first 20 inboxes
+  yarn gen --clean --debug
   yarn gen --help
 
 PRESET COMMANDS:
@@ -228,6 +232,190 @@ function showFileStats(
   console.log(`\n🎉 Analysis & deduplication complete!`);
 }
 
+async function checkInboxStatus({
+  count,
+  envs,
+  installations,
+}: {
+  count: number;
+  envs: ExtendedXmtpEnv[];
+  installations: number;
+}) {
+  const targetFileName = `${installations}.json`;
+  const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
+  const existingInboxes: InboxData[] =
+    (readJson(targetFilePath) as InboxData[]) || [];
+
+  if (existingInboxes.length === 0) {
+    console.error(`❌ No inboxes found in ${targetFilePath}`);
+    return;
+  }
+
+  const inboxesToCheck = existingInboxes.slice(0, count);
+  console.log(
+    `\n🔍 Checking ${inboxesToCheck.length} inboxes from ${targetFileName} on ${envs.join(", ")}\n`,
+  );
+
+  for (const env of envs) {
+    const resolved = resolveEnvironment(env);
+    console.log(`\n📡 Environment: ${env}`);
+    console.log("─".repeat(120));
+    console.log(
+      `${"#".padEnd(4)} ${"Inbox ID".padEnd(20)} ${"Address".padEnd(14)} ${"Installs".padEnd(10)} ${"Valid".padEnd(8)} ${"Invalid".padEnd(10)} ${"Status".padEnd(10)}`,
+    );
+    console.log("─".repeat(120));
+
+    let totalValid = 0;
+    let totalInvalid = 0;
+    let totalMissing = 0;
+
+    // Batch fetch all inbox states using static method (much faster)
+    const inboxIds = inboxesToCheck.map((inbox) => inbox.inboxId);
+    let allStates: any[] = [];
+    try {
+      allStates = await Client.fetchInboxStates(
+        inboxIds,
+        resolved.sdkEnv,
+        resolved.gatewayHost,
+      );
+      debugLog(`📦 Fetched ${allStates.length} inbox states in batch`);
+    } catch (error) {
+      console.error(
+        `❌ Failed to fetch inbox states: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return;
+    }
+
+    // Create a single client for key package status checks
+    // We need at least one client because fetchKeyPackageStatuses is an instance method
+    // Try multiple inboxes as fallback if one fails
+    let helperClient: any = null;
+    const tempDbPath = `${BASE_LOGPATH}/check-helper-${env}`;
+
+    // Clean up any existing temp db first
+    if (fs.existsSync(tempDbPath)) {
+      fs.rmSync(tempDbPath, { recursive: true, force: true });
+    }
+
+    // Try to create helper client from one of the inboxes
+    for (
+      let attempt = 0;
+      attempt < Math.min(5, inboxesToCheck.length);
+      attempt++
+    ) {
+      const inbox = inboxesToCheck[attempt];
+      try {
+        const signer = createSigner(inbox.walletKey as `0x${string}`);
+        const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
+        helperClient = await Client.create(signer, {
+          dbEncryptionKey,
+          dbPath: `${tempDbPath}-${attempt}`,
+          appVersion: APP_VERSION,
+          disableDeviceSync: true,
+          env: resolved.sdkEnv,
+          gatewayHost: resolved.gatewayHost,
+        });
+        debugLog(`✅ Created helper client from inbox ${attempt + 1}`);
+        break; // Success, exit loop
+      } catch (error) {
+        debugLog(
+          `⚠️ Failed to create helper client from inbox ${attempt + 1}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+        if (attempt === Math.min(4, inboxesToCheck.length - 1)) {
+          console.error(
+            `❌ Failed to create helper client after ${attempt + 1} attempts`,
+          );
+          console.error(
+            `   Last error: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          console.error(`   Key package status checks will be skipped.`);
+        }
+      }
+    }
+
+    // Process each inbox using the batch-fetched states
+    for (let i = 0; i < inboxesToCheck.length; i++) {
+      const inbox = inboxesToCheck[i];
+      const state = allStates.find((s: any) => s?.inboxId === inbox.inboxId);
+      const installs = state?.installations || [];
+      const installCount = installs.length;
+
+      let validCount = 0;
+      let invalidCount = 0;
+      let status = "✅";
+
+      if (installCount > 0 && helperClient) {
+        try {
+          const installationIds = installs.map(
+            (inst: { id: string }) => inst.id,
+          );
+          const keyStatuses = (await helperClient.fetchKeyPackageStatuses(
+            installationIds,
+          )) as Record<string, any>;
+
+          for (const [, keyStatus] of Object.entries(keyStatuses)) {
+            if (keyStatus?.validationError) {
+              invalidCount++;
+            } else if (keyStatus?.lifetime) {
+              validCount++;
+            }
+          }
+
+          if (invalidCount > 0) {
+            status = "⚠️ Stale";
+            totalInvalid += invalidCount;
+          }
+          if (validCount < installations) {
+            status = "❌ Missing";
+            totalMissing++;
+          }
+          if (validCount >= installations && invalidCount === 0) {
+            status = "✅ OK";
+          }
+          totalValid += validCount;
+        } catch {
+          status = "❓ Error";
+        }
+      } else if (installCount === 0) {
+        status = "❌ None";
+        totalMissing++;
+      } else {
+        status = "❓ No client";
+      }
+
+      const shortInboxId = `${inbox.inboxId.slice(0, 8)}...${inbox.inboxId.slice(-4)}`;
+      const shortAddress = `${inbox.accountAddress.slice(0, 6)}...${inbox.accountAddress.slice(-4)}`;
+
+      console.log(
+        `${(i + 1).toString().padEnd(4)} ${shortInboxId.padEnd(20)} ${shortAddress.padEnd(14)} ${installCount.toString().padEnd(10)} ${validCount.toString().padEnd(8)} ${invalidCount.toString().padEnd(10)} ${status.padEnd(10)}`,
+      );
+    }
+
+    // Clean up helper client dbs
+    for (let i = 0; i < 5; i++) {
+      const dbPath = `${tempDbPath}-${i}`;
+      if (fs.existsSync(dbPath)) {
+        fs.rmSync(dbPath, { recursive: true, force: true });
+      }
+    }
+
+    console.log("─".repeat(120));
+    console.log(
+      `\n📊 Summary for ${env}: ${totalValid} valid, ${totalInvalid} invalid/stale, ${totalMissing} missing installations`,
+    );
+    if (totalInvalid > 0 || totalMissing > 0) {
+      console.log(
+        `💡 Run: yarn gen --installations ${installations} --count ${count} --restart --env ${env}`,
+      );
+    }
+  }
+}
+
+/**
+ * Check and manage installations for an inbox
+ */
 async function checkInstallations(
   client: Client,
   installationCount: number,
@@ -238,19 +426,15 @@ async function checkInstallations(
   let current = state?.[0]?.installations.length || 0;
   debugLog(`📊 Current installations: ${current}/${installationCount}`);
 
-  if (forceRestart && current > 0) {
-    debugLog(`🔄 Force restart: Revoking ALL ${current} installations`);
-    const all = state?.[0]?.installations || [];
-    const toRevoke = all.map(
-      (inst: { id: string }) =>
-        new Uint8Array(Buffer.from(inst.id.replace(/^0x/, ""), "hex")),
-    );
-    if (toRevoke.length) await client.revokeInstallations(toRevoke);
+  if (forceRestart && current > 1) {
+    // Use revokeAllOtherInstallations to keep the current client's installation
     debugLog(
-      `✅ Successfully revoked ${toRevoke.length} installations for restart`,
+      `🔄 Force restart: Revoking all other ${current - 1} installations (keeping current)`,
     );
-    current = 0; // Reset to 0 since we revoked all
-  } else {
+    await client.revokeAllOtherInstallations();
+    debugLog(`✅ Successfully revoked other installations, keeping current`);
+    current = 1; // We kept the current installation
+  } else if (!forceRestart) {
     const surplus = current - installationCount;
     if (surplus > 0) {
       debugLog(`🔄 Revoking ${surplus} surplus installations`);
@@ -269,22 +453,66 @@ async function checkInstallations(
   return { client, currentInstallations: current };
 }
 
+/**
+ * Sleep helper for delays between batches
+ */
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Try to trigger garbage collection if available (requires --expose-gc flag)
+ */
+function tryGarbageCollect() {
+  if (global.gc) {
+    try {
+      global.gc();
+      debugLog("   🧹 Garbage collection triggered");
+    } catch {
+      // GC not available
+    }
+  }
+}
+
+/**
+ * Clean up db files for a batch to free resources
+ */
+function cleanupBatchDbFiles(
+  logPath: string,
+  env: string,
+  inboxes: InboxData[],
+  installations: number,
+) {
+  for (const inbox of inboxes) {
+    for (let j = 0; j < installations; j++) {
+      const dbPath = `${logPath}/${env}-${inbox.accountAddress}-install-${j}`;
+      if (fs.existsSync(dbPath)) {
+        try {
+          fs.rmSync(dbPath, { recursive: true, force: true });
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+    }
+  }
+}
+
 async function smartUpdate({
   count,
   envs,
   installations,
   restart,
+  batchSize = 10,
 }: {
   count?: number;
   envs?: ExtendedXmtpEnv[];
   installations?: number;
   restart?: boolean;
+  batchSize?: number;
 }) {
   envs = envs || ["local"];
   const installationCount = installations || 2;
   if (envs.includes("local")) loadEnv("smart-update");
   debugLog(
-    `\nConfiguration:\n- Environments: ${envs.join(", ")}\n- Installations per account: ${installationCount}\n- Target accounts: ${count || "all existing"}\n- Restart mode: ${restart ? "enabled (force recreate)" : "disabled"}`,
+    `\nConfiguration:\n- Environments: ${envs.join(", ")}\n- Installations per account: ${installationCount}\n- Target accounts: ${count || "all existing"}\n- Restart mode: ${restart ? "enabled (force recreate)" : "disabled"}\n- Batch size: ${batchSize}`,
   );
   const targetFileName = `${installationCount}.json`;
   const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
@@ -294,75 +522,89 @@ async function smartUpdate({
   const targetCount = count || existingCount;
   const folderName = `db-generated-${installationCount}-${envs.join(",")}-${installationCount}inst`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
-  if (!fs.existsSync(LOGPATH)) fs.mkdirSync(LOGPATH, { recursive: true });
+
+  // Clean up old db files completely to start fresh
+  if (fs.existsSync(LOGPATH)) {
+    fs.rmSync(LOGPATH, { recursive: true, force: true });
+  }
+  fs.mkdirSync(LOGPATH, { recursive: true });
+
   analyzeInboxFiles();
   let totalCreated = 0,
-    totalFailed = 0;
-  // Update existing accounts
+    totalFailed = 0,
+    totalRevoked = 0;
+
+  // Update existing accounts in batches
   const accountsToProcess = Math.min(targetCount, existingCount);
   if (accountsToProcess > 0) {
-    const updateProgress = new ProgressBar(accountsToProcess);
-    for (let i = 0; i < targetCount; i++) {
-      const inbox = existingInboxes[i];
-      try {
-        if (
-          !inbox.walletKey ||
-          !inbox.accountAddress ||
-          !inbox.inboxId ||
-          !inbox.dbEncryptionKey
-        ) {
-          totalFailed++;
-          continue;
-        }
-        const signer = createSigner(inbox.walletKey as `0x${string}`);
-        const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
-        for (const env of envs) {
-          const resolved = resolveEnvironment(env);
-          const client = await Client.create(signer, {
-            dbEncryptionKey,
-            dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
-            appVersion: APP_VERSION,
-            disableDeviceSync: true,
-            env: resolved.sdkEnv,
-            gatewayHost: resolved.gatewayHost,
-          });
-          const { currentInstallations } = await checkInstallations(
-            client,
-            installationCount,
-            restart || false,
+    const totalBatches = Math.ceil(accountsToProcess / batchSize);
+    console.log(
+      `\n📦 Processing ${accountsToProcess} inboxes in ${totalBatches} batches of ${batchSize} to avoid memory issues\n`,
+    );
+
+    for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+      const batchStart = batchNum * batchSize;
+      const batchEnd = Math.min(batchStart + batchSize, accountsToProcess);
+      const batchInboxes = existingInboxes.slice(batchStart, batchEnd);
+
+      console.log(
+        `\n📦 Batch ${batchNum + 1}/${totalBatches} (inboxes ${batchStart + 1}-${batchEnd})`,
+      );
+
+      let batchCreated = 0;
+      let batchFailed = 0;
+      let batchRevoked = 0;
+
+      for (const inbox of batchInboxes) {
+        try {
+          if (
+            !inbox.walletKey ||
+            !inbox.accountAddress ||
+            !inbox.inboxId ||
+            !inbox.dbEncryptionKey
+          ) {
+            batchFailed++;
+            continue;
+          }
+          const signer = createSigner(inbox.walletKey as `0x${string}`);
+          const dbEncryptionKey = getEncryptionKeyFromHex(
+            inbox.dbEncryptionKey,
           );
-          if (debugMode) {
-            const installProgress = new ProgressBar(
-              installationCount - currentInstallations,
-            );
-            for (let j = currentInstallations; j < installationCount; j++) {
-              try {
-                await Client.create(signer, {
-                  dbEncryptionKey,
-                  dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
-                  env: resolved.sdkEnv,
-                  gatewayHost: resolved.gatewayHost,
-                  appVersion: APP_VERSION,
-                  disableDeviceSync: true,
-                });
-                if (debugMode) {
-                  process.stdout.write(
-                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
-                  );
+
+          for (const env of envs) {
+            const resolved = resolveEnvironment(env);
+
+            // When restarting, clean up ALL db files first to ensure fresh installations
+            if (restart) {
+              for (let j = 0; j < installationCount; j++) {
+                const dbPath = `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`;
+                if (fs.existsSync(dbPath)) {
+                  fs.rmSync(dbPath, { recursive: true, force: true });
                 }
-                totalCreated++;
-                installProgress.update();
-              } catch (error) {
-                console.error(
-                  `Failed to create installation ${j} for ${inbox.accountAddress} in ${env}:`,
-                  error instanceof Error ? error.message : String(error),
-                );
-                totalFailed++;
-                installProgress.update();
               }
             }
-            installProgress.finish();
-          } else {
+
+            // Create first client to check/revoke existing installations
+            const client = await Client.create(signer, {
+              dbEncryptionKey,
+              dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
+              appVersion: APP_VERSION,
+              disableDeviceSync: true,
+              env: resolved.sdkEnv,
+              gatewayHost: resolved.gatewayHost,
+            });
+            const { currentInstallations } = await checkInstallations(
+              client,
+              installationCount,
+              restart || false,
+            );
+
+            if (restart) {
+              batchRevoked++;
+            }
+
+            // Create remaining installations from currentInstallations onwards
+            // (install-0 already exists from the client we just created)
             for (let j = currentInstallations; j < installationCount; j++) {
               try {
                 await Client.create(signer, {
@@ -373,34 +615,57 @@ async function smartUpdate({
                   appVersion: APP_VERSION,
                   disableDeviceSync: true,
                 });
-                if (debugMode) {
-                  process.stdout.write(
-                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
-                  );
-                }
-                totalCreated++;
-              } catch (error) {
-                console.error(
-                  `Failed to create installation ${j} for ${inbox.accountAddress} in ${env}:`,
-                  error instanceof Error ? error.message : String(error),
+                debugLog(
+                  `Created installation ${j} for ${inbox.accountAddress} in ${env}`,
                 );
-                totalFailed++;
+                batchCreated++;
+              } catch (error) {
+                debugLog(
+                  `Failed to create installation ${j} for ${inbox.accountAddress} in ${env}: ${error instanceof Error ? error.message : String(error)}`,
+                );
+                batchFailed++;
               }
             }
           }
+        } catch (error) {
+          debugLog(
+            `Failed to process account ${inbox?.accountAddress || "unknown"}: ${error instanceof Error ? error.message : String(error)}`,
+          );
+          batchFailed++;
         }
-        updateProgress.update();
-        writeJson(targetFilePath, existingInboxes);
-      } catch (error) {
-        console.error(
-          `Failed to process account ${inbox?.accountAddress || "unknown"}:`,
-          error instanceof Error ? error.message : String(error),
-        );
-        totalFailed++;
-        updateProgress.update();
+      }
+
+      // Batch summary
+      console.log(
+        `   ✅ Created: ${batchCreated}, Revoked: ${batchRevoked}, Failed: ${batchFailed}`,
+      );
+
+      totalCreated += batchCreated;
+      totalFailed += batchFailed;
+      totalRevoked += batchRevoked;
+
+      // Clean up db files from this batch to free mlock memory
+      for (const env of envs) {
+        cleanupBatchDbFiles(LOGPATH, env, batchInboxes, installationCount);
+      }
+
+      // Try garbage collection
+      tryGarbageCollect();
+
+      // Small delay between batches to let resources settle
+      if (batchNum < totalBatches - 1) {
+        debugLog(`   ⏳ Waiting 1s before next batch...`);
+        await sleep(1000);
       }
     }
-    updateProgress.finish();
+
+    // Save after all batches complete
+    writeJson(targetFilePath, existingInboxes);
+
+    console.log(`\n📊 Summary:`);
+    console.log(`   • Created: ${totalCreated} installations`);
+    console.log(`   • Revoked: ${totalRevoked} inboxes`);
+    console.log(`   • Failed: ${totalFailed}`);
   }
   // Generate new accounts
   const newAccountsNeeded = Math.max(0, targetCount - accountsToProcess);
@@ -489,7 +754,9 @@ async function main() {
   let count: number | undefined = undefined,
     envs: ExtendedXmtpEnv[] | undefined = undefined,
     installations: string | undefined = undefined,
-    restart = false;
+    batchSize: number = 10,
+    restart = false,
+    check = false;
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -498,12 +765,27 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as ExtendedXmtpEnv[];
     if (arg === "--installations") installations = args[i + 1];
+    if (arg === "--batch-size") batchSize = parseInt(args[i + 1], 10);
     if (arg === "--restart") restart = true;
-    if (arg === "--log warn --file") debugMode = true;
+    if (arg === "--check") check = true;
+    if (arg === "--debug") debugMode = true;
   });
 
   if (count === undefined) count = DEFAULT_COUNT;
   if (envs === undefined) envs = DEFAULT_ENVS;
+
+  // Handle check mode (read-only, shows status table)
+  if (check) {
+    const installationCount = installations
+      ? parseInt(installations, 10)
+      : DEFAULT_INSTALLATIONS;
+    await checkInboxStatus({
+      count,
+      envs,
+      installations: installationCount,
+    });
+    return;
+  }
 
   // Handle cleanup
   if (!args.includes("--no-cleanup")) {
@@ -523,7 +805,14 @@ async function main() {
       console.log(`\n--- Running for --installations ${inst} ---`);
       try {
         await runWithRetry(
-          () => smartUpdate({ count, envs, installations: inst, restart }),
+          () =>
+            smartUpdate({
+              count,
+              envs,
+              installations: inst,
+              restart,
+              batchSize,
+            }),
           `installation ${inst}`,
         );
       } catch (error) {
@@ -540,7 +829,13 @@ async function main() {
       : DEFAULT_INSTALLATIONS;
     await runWithRetry(
       () =>
-        smartUpdate({ count, envs, installations: installationCount, restart }),
+        smartUpdate({
+          count,
+          envs,
+          installations: installationCount,
+          restart,
+          batchSize,
+        }),
       "smart update",
     );
   }

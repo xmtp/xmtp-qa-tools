@@ -7,6 +7,7 @@ The regression test suite (`yarn regression`) tests XMTP operations across multi
 ## Current Setup (as of writing)
 
 The `yarn regression` command runs:
+
 ```bash
 yarn versions && yarn test performance --env dev --sync all --versions 3 --size 10-100 && yarn test bugs
 ```
@@ -17,11 +18,11 @@ yarn versions && yarn test performance --env dev --sync all --versions 3 --size 
 Current `VersionList` order in `helpers/versions.ts`:
 | Node SDK | Node Bindings | package.json alias target |
 |----------|--------------|--------------------------|
-| 5.0.0    | 1.9.1        | `@xmtp/node-sdk@5.3.0`  |
-| 4.6.0    | 1.6.0        | `@xmtp/node-sdk@4.6.0`  |
-| 4.5.0    | 1.6.0        | `@xmtp/node-sdk@4.5.0`  |
-| 4.4.0    | 1.5.0        | `@xmtp/node-sdk@4.4.0`  |
-| 4.3.0    | 1.4.0        | `@xmtp/node-sdk@4.3.0`  |
+| 5.0.0 | 1.9.1 | `@xmtp/node-sdk@5.3.0` |
+| 4.6.0 | 1.6.0 | `@xmtp/node-sdk@4.6.0` |
+| 4.5.0 | 1.6.0 | `@xmtp/node-sdk@4.5.0` |
+| 4.4.0 | 1.5.0 | `@xmtp/node-sdk@4.4.0` |
+| 4.3.0 | 1.4.0 | `@xmtp/node-sdk@4.3.0` |
 
 **Important naming rule:** Version strings in `VersionList` CANNOT contain hyphens (`-`). Use simplified version numbers (e.g., `1.9.1` not `1.9.1-rc1`). The actual npm version with pre-release suffixes goes in `package.json`.
 
@@ -43,10 +44,12 @@ If these fail, fix them first — you need a clean baseline.
 ### Step 2: Identify the new SDK and bindings versions
 
 Determine:
+
 - The new **Node SDK** version (e.g., `5.4.0`)
 - The matching **Node Bindings** version (e.g., `2.0.0`)
 
 Check npm for the latest releases:
+
 ```bash
 npm view @xmtp/node-sdk versions --json | tail -5
 npm view @xmtp/node-bindings versions --json | tail -5
@@ -62,6 +65,7 @@ Add entries in the `dependencies` section using the npm alias pattern:
 ```
 
 **Example** — adding Node SDK 5.4.0 with bindings 2.0.0:
+
 ```json
 "@xmtp/node-sdk-5.4.0": "npm:@xmtp/node-sdk@5.4.0",
 "@xmtp/node-bindings-2.0.0": "npm:@xmtp/node-bindings@2.0.0"
@@ -70,6 +74,7 @@ Add entries in the `dependencies` section using the npm alias pattern:
 Note: The alias label (e.g., `5.0.0`) doesn't have to match the actual npm version (e.g., `5.3.0`). The label is what the rest of the codebase references.
 
 Then install:
+
 ```bash
 yarn install
 ```
@@ -129,7 +134,7 @@ Add a new entry to `SYMLINK_NODE_BINDINGS`:
 
 ```typescript
 const SYMLINK_NODE_BINDINGS = [
-  { nodeSDK: "X.Y.Z", nodeBindings: "A.B.C" },  // new
+  { nodeSDK: "X.Y.Z", nodeBindings: "A.B.C" }, // new
   { nodeSDK: "5.0.0", nodeBindings: "1.9.1" },
   // ... existing entries
 ];
@@ -138,6 +143,7 @@ const SYMLINK_NODE_BINDINGS = [
 ### Step 8: Update compat layer if needed (`helpers/sdk-compat.ts`)
 
 If the new SDK version changes any API names (e.g., method renames, new parameters), update the compat functions. Common things to check:
+
 - `createGroup` / `createDm` method names
 - `sendText` / `send` method names
 - `fetchInboxState` / `inboxState` method names
@@ -173,6 +179,7 @@ This tests with `--versions 3`, which now includes your new version plus the nex
 ### What `yarn test performance` checks
 
 The performance test suite measures:
+
 - **Message send/receive timing** across SDK versions
 - **Stream reliability** (reception percentage)
 - **Group operations** (create, sync, admin management)
@@ -191,24 +198,24 @@ Runs regression tests for previously-fixed bugs to ensure they don't resurface.
 
 ### Common failure modes
 
-| Symptom | Likely Cause | Fix |
-|---------|-------------|-----|
-| Import error on new SDK | Missing symlink or wrong bindings | Check `cli/versions.ts` config, re-run `yarn versions` |
-| `method not found` errors | API renamed in new version | Add compat wrapper in `helpers/sdk-compat.ts` |
-| Version string contains `-` | Pre-release suffix in VersionList | Use simplified version (e.g., `2.0.0` not `2.0.0-rc1`) |
-| `version.json` import error | SDK doesn't export version.json | Use dynamic import with try/catch (see 4.4.0 pattern) |
-| Cross-version message failures | Protocol change | May need XMTP team investigation |
+| Symptom                        | Likely Cause                      | Fix                                                    |
+| ------------------------------ | --------------------------------- | ------------------------------------------------------ |
+| Import error on new SDK        | Missing symlink or wrong bindings | Check `cli/versions.ts` config, re-run `yarn versions` |
+| `method not found` errors      | API renamed in new version        | Add compat wrapper in `helpers/sdk-compat.ts`          |
+| Version string contains `-`    | Pre-release suffix in VersionList | Use simplified version (e.g., `2.0.0` not `2.0.0-rc1`) |
+| `version.json` import error    | SDK doesn't export version.json   | Use dynamic import with try/catch (see 4.4.0 pattern)  |
+| Cross-version message failures | Protocol change                   | May need XMTP team investigation                       |
 
 ---
 
 ## Quick Reference: Files to Modify
 
-| File | What to change |
-|------|---------------|
-| `package.json` | Add aliased `@xmtp/node-sdk-X.Y.Z` and `@xmtp/node-bindings-A.B.C` dependencies |
-| `helpers/versions.ts` | Add import, add to `VersionList`, update union types |
-| `cli/versions.ts` | Add to `SYMLINK_NODE_BINDINGS` array |
-| `helpers/sdk-compat.ts` | Add compat wrappers if APIs changed |
+| File                    | What to change                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| `package.json`          | Add aliased `@xmtp/node-sdk-X.Y.Z` and `@xmtp/node-bindings-A.B.C` dependencies |
+| `helpers/versions.ts`   | Add import, add to `VersionList`, update union types                            |
+| `cli/versions.ts`       | Add to `SYMLINK_NODE_BINDINGS` array                                            |
+| `helpers/sdk-compat.ts` | Add compat wrappers if APIs changed                                             |
 
 ## Quick Reference: Commands
 

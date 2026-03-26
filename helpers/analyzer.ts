@@ -301,7 +301,14 @@ export function extractErrorLogs(testName: string): Set<string> {
   try {
     const logFiles = fs
       .readdirSync("logs")
-      .filter((file) => file.endsWith(".log") && file.includes(testName));
+      .filter((file) => file.endsWith(".log") && file.includes(testName))
+      .map((file) => ({
+        name: file,
+        mtime: fs.statSync(path.join("logs", file)).mtime.getTime(),
+      }))
+      .sort((a, b) => b.mtime - a.mtime) // Most recent first
+      .slice(0, 1) // Only the most recent log file
+      .map((f) => f.name);
 
     const errorLines: string[] = [];
     const seenPatterns = new Set<string>();

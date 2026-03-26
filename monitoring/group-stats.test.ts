@@ -22,6 +22,21 @@ const batchSizes = process.env.BATCH_SIZE
   ? process.env.BATCH_SIZE.split("-").map((v) => Number(v))
   : [10];
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const setupOperationName = "group.setup_context";
+const setupLegacyOperation = "setupContext";
+
+class GroupSetupError extends Error {
+  constructor(
+    message: string,
+    public readonly cause: unknown,
+  ) {
+    super(message);
+    this.name = "GroupSetupError";
+  }
+}
+
 function reportOperationFailure(input: {
   sdk: string;
   members: number;
@@ -38,6 +53,38 @@ function reportOperationFailure(input: {
     runMode: input.runMode,
     status: "error",
   });
+}
+
+function reportSetupOutcome(input: {
+  sdk: string;
+  members: number;
+  status: "success" | "error";
+}): void {
+  sendStatsOperationCount({
+    test: testName,
+    sdk: input.sdk,
+    members: input.members,
+    operationName: setupOperationName,
+    legacyOperation: setupLegacyOperation,
+    runMode: "warm",
+    status: input.status,
+  });
+}
+
+function reportOperationFailureUnlessSetupError(
+  error: unknown,
+  input: {
+    sdk: string;
+    members: number;
+    operationName: string;
+    legacyOperation?: string;
+    runMode?: "cold" | "warm" | "stream";
+  },
+): void {
+  if (error instanceof GroupSetupError) {
+    return;
+  }
+  reportOperationFailure(input);
 }
 
 describe(testName, () => {
@@ -59,52 +106,83 @@ describe(testName, () => {
     let group: Group;
     let groupWorkers: Worker[] = [];
     let extraMember: InboxData;
+    let setupError: GroupSetupError | undefined;
 
     async function ensureGroupContext(): Promise<number | undefined> {
-      if (group) {
-        return undefined;
+      // Return early if group already created or setup failed
+      if (group) return undefined;
+      if (setupError) throw setupError;
+
+      try {
+        // We need memberCount members in the group, plus 1 extra for add/remove tests
+        // Use workers first (they can stream messages), fill remainder with passive inboxes
+        const availableWorkers = workers.getAllButCreator();
+        const workersNeeded = Math.min(
+          availableWorkers.length,
+          memberCount - 1,
+        );
+        const inboxesNeeded = memberCount - 1 - workersNeeded;
+
+        // Get inboxes + 1 extra member for add/remove tests
+        const inboxes = getInboxes(inboxesNeeded + 1, 2, memberCount);
+        const inboxMembers = inboxes.slice(0, inboxesNeeded);
+        extraMember = inboxes[inboxesNeeded]; // Reserved for add/remove tests
+
+        // Workers that will be in the group (can receive streamed messages)
+        groupWorkers = availableWorkers.slice(0, workersNeeded);
+
+        // Build member list for group creation (creator is added automatically)
+        const membersToAdd = [
+          ...inboxMembers.map((inbox) => ({
+            identifier: inbox.accountAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          })),
+          ...groupWorkers.map((worker) => ({
+            identifier: worker.address,
+            identifierKind: IdentifierKind.Ethereum,
+          })),
+        ];
+
+        // Create group and measure duration
+        const start = performance.now();
+        group = (await creator.worker.createGroupWithIdentifiers(
+          membersToAdd,
+        )) as Group;
+        const duration = performance.now() - start;
+
+        // Validate setup
+        const createdMembers = await group.members();
+        if (!group.id)
+          throw new Error("Setup validation failed: group id is missing");
+        if (createdMembers.length !== memberCount) {
+          throw new Error(
+            `Setup validation failed: expected ${memberCount} members, got ${createdMembers.length}`,
+          );
+        }
+
+        reportSetupOutcome({
+          sdk: creator.sdk,
+          members: memberCount,
+          status: "success",
+        });
+        return duration;
+      } catch (error) {
+        setupError = new GroupSetupError(
+          `Failed to create setup context for ${memberCount} members`,
+          error,
+        );
+        reportSetupOutcome({
+          sdk: creator.sdk,
+          members: memberCount,
+          status: "error",
+        });
+        throw setupError;
       }
-
-      const allMembersWithExtra = getInboxes(
-        memberCount - workers.getAll().length + 2,
-        2,
-        memberCount,
-      );
-      const allMembers = allMembersWithExtra.slice(
-        0,
-        allMembersWithExtra.length - 2,
-      );
-      extraMember = allMembersWithExtra.at(-1)!;
-      const workersToAdd = workers
-        .getAllButCreator()
-        .slice(0, memberCount - 1 - allMembers.length);
-      groupWorkers = workersToAdd;
-
-      const membersToAdd = [
-        ...allMembers.map((a) => ({
-          identifier: a.accountAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        })),
-        ...workersToAdd.map((w) => ({
-          identifier: w.address,
-          identifierKind: IdentifierKind.Ethereum,
-        })),
-      ];
-
-      const start = performance.now();
-      group = (await creator.worker.createGroupWithIdentifiers(
-        membersToAdd,
-      )) as Group;
-      return performance.now() - start;
     }
 
     it(`newGroup-${memberCount}:group.create_with_members`, async () => {
       try {
         const duration = await ensureGroupContext();
-
-        const members = await group.members();
-        expect(members.length).toBe(memberCount);
-        expect(group.id).toBeDefined();
 
         if (typeof duration === "number") {
           sendStatsDurationMetric({
@@ -118,7 +196,7 @@ describe(testName, () => {
           });
         }
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.create_with_members",
@@ -131,48 +209,64 @@ describe(testName, () => {
 
     it(`addMember-${memberCount}:group.add_members and group.add_member_unit`, async () => {
       try {
+        console.info(
+          `[METRIC_DEBUG] addMembers start (members=${memberCount})`,
+        );
         await ensureGroupContext();
 
         await group.removeMembers([extraMember.inboxId]);
+        await group.sync();
+        await sleep(1000);
 
         const start = performance.now();
         await group.addMembers([extraMember.inboxId]);
         const duration = performance.now() - start;
 
-        sendStatsDurationMetric({
-          test: testName,
-          sdk: creator.sdk,
-          members: memberCount,
-          operationName: "group.add_members",
-          legacyOperation: "addMember",
-          runMode: "warm",
-          valueMs: duration,
-        });
+        console.info(
+          `[METRIC_DEBUG] addMembers success (members=${memberCount}) duration_ms=${Math.round(
+            duration,
+          )}`,
+        );
+
+        try {
+          const fs = await import("fs");
+          fs.appendFileSync(
+            "/tmp/metric-debug.log",
+            `[METRIC_DEBUG] addMembers (${memberCount} members): ${Math.round(duration)}ms\n`,
+          );
+        } catch {
+          // ignore write errors
+        }
 
         sendStatsDurationMetric({
           test: testName,
           sdk: creator.sdk,
           members: memberCount,
-          operationName: "group.add_member_unit",
+          operationName: "group.add_members",
           legacyOperation: "addMember",
           runMode: "warm",
           valueMs: duration,
         });
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.add_members",
           legacyOperation: "addMember",
           runMode: "warm",
         });
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.add_member_unit",
           legacyOperation: "addMember",
           runMode: "warm",
         });
+        const message =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        console.error(
+          `[METRIC_DEBUG] addMembers failure (members=${memberCount}) error=${message}`,
+        );
         throw error;
       }
     });
@@ -197,7 +291,7 @@ describe(testName, () => {
 
         await group.addMembers([extraMember.inboxId]);
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.remove_members",
@@ -227,7 +321,7 @@ describe(testName, () => {
           valueMs: duration,
         });
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.send_message",
@@ -261,7 +355,7 @@ describe(testName, () => {
           valueMs: duration,
         });
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.sync_read",
@@ -294,7 +388,7 @@ describe(testName, () => {
           valueMs: duration,
         });
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.member_visibility",
@@ -368,7 +462,7 @@ describe(testName, () => {
           valuePct: verify.orderPercentage,
         });
       } catch (error) {
-        reportOperationFailure({
+        reportOperationFailureUnlessSetupError(error, {
           sdk: creator.sdk,
           members: memberCount,
           operationName: "group.receive_message",

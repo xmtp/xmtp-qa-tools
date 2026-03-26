@@ -1,12 +1,5 @@
 [
   {
-    "accountAddress": "0xcd50b4aed21e3adfa411106737e97de431e2eddf",
-    "inboxId": "a5402cdaea8ca241516574d4b855dbb82cfedd29e5f3ba2b997f6bee321879fe",
-    "walletKey": "0x9fb73f84b3f6ac457f48ee0ea8ff1b757e00f11c60389eaf166bdcb64ce2b11f",
-    "dbEncryptionKey": "0cb3fd80723858194b3767df7cb9aac300aed88cc39e0d081dc60e53af475896",
-    "installations": 2
-  },
-  {
     "accountAddress": "0x714130af378e7b744f479789a9b2838361237436",
     "inboxId": "449c0564b394bf12313bda4f0527a5d500afb1d7802250bc382d346ced3f63eb",
     "walletKey": "0x87d299d6ba4130a2579e3eb99eb8cd5259f7453842b8d7d78e271135b3c58ff8",

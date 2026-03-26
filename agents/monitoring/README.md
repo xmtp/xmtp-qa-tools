@@ -1,20 +1,20 @@
 # Agents monitoring
 
-| Test suite   | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency    | Networks           |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------ |
-| AgentGroups  | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml)  | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 30 min     | `dev` `production` |
-| AgentHealth  | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 10 minutes | `dev` `production` |
+| Test suite  | Status                                                                                                                                                                       | Resources                                                                                                                                                            | Run frequency    | Networks           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------------ |
+| AgentGroups | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentGroups.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 30 min     | `dev` `production` |
+| AgentHealth | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/AgentHealth.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/agents/monitoring) | Every 10 minutes | `dev` `production` |
 
 **Purpose**: Validates health, responsiveness, and behavioral patterns of live XMTP agents across production and development environments.
 
 ## Core tests
 
-| Suite              | File                     | Description |
-| ------------------ | ------------------------ | ----------- |
-| `agents-dms`       | [agents-dms.test.ts](./agents-dms.test.ts)       | DM first reaction: agent responds in DM within timeout. |
-| `agents-tagged`    | [agents-tagged.test.ts](./agents-tagged.test.ts) | Group: agent responds to tagged/command message in group. |
-| `agents-untagged`  | [agents-untagged.test.ts](./agents-untagged.test.ts) | Negative: agent does not respond to untagged "hi" in group. |
-| `agents-stress`    | [agents-stress.test.ts](./agents-stress.test.ts) | Stress: 50 groups, 10 messages each (agents with `live: false` only). |
+| Suite             | File                                                 | Description                                                           |
+| ----------------- | ---------------------------------------------------- | --------------------------------------------------------------------- |
+| `agents-dms`      | [agents-dms.test.ts](./agents-dms.test.ts)           | DM first reaction: agent responds in DM within timeout.               |
+| `agents-tagged`   | [agents-tagged.test.ts](./agents-tagged.test.ts)     | Group: agent responds to tagged/command message in group.             |
+| `agents-untagged` | [agents-untagged.test.ts](./agents-untagged.test.ts) | Negative: agent does not respond to untagged "hi" in group.           |
+| `agents-stress`   | [agents-stress.test.ts](./agents-stress.test.ts)     | Stress: 50 groups, 10 messages each (agents with `live: false` only). |
 
 **Measurements**
 
@@ -51,13 +51,13 @@
 
 Config lives in [agents.ts](../agents.ts). Properties:
 
-| Property    | Description |
-| ----------- | ----------- |
-| `name`      | Agent identifier. |
-| `address`   | Ethereum address. |
-| `networks`  | Supported networks (`["dev", "production"]`). |
-| `live`      | Production flag; stress test runs only when `live: false`. |
-| `customText`| Optional message to send instead of default ping. |
+| Property     | Description                                                |
+| ------------ | ---------------------------------------------------------- |
+| `name`       | Agent identifier.                                          |
+| `address`    | Ethereum address.                                          |
+| `networks`   | Supported networks (`["dev", "production"]`).              |
+| `live`       | Production flag; stress test runs only when `live: false`. |
+| `customText` | Optional message to send instead of default ping.          |
 
 Example:
 
